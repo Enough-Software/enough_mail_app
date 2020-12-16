@@ -7,9 +7,9 @@ import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/scaffold_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
 // import 'package:enough_style/enough_style.dart';
@@ -48,6 +48,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   Future<bool> initMessageSource() {
     print('${DateTime.now()}: loadMessages()');
     return _sectionedMessageSource.init();
+    //print('${DateTime.now()}: loaded ${_sectionedMessageSource.size} messages');
   }
 
   @override
@@ -84,6 +85,37 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       ),
     ];
     final i18nService = locator<I18nService>();
+    Widget zeroPosWidget;
+    if (_sectionedMessageSource.isInitialized &&
+        widget.messageSource.size == 0) {
+      zeroPosWidget = Padding(
+        padding: EdgeInsets.symmetric(vertical: 32, horizontal: 32),
+        child: Text('All done!\n\nThere are no messages in this folder.'),
+      );
+    } else if (widget.messageSource.supportsDeleteAll) {
+      final style = TextButton.styleFrom(primary: Colors.grey[600]);
+      final textStyle =
+          Theme.of(context).textTheme.button; //.copyWith(color: Colors.white);
+      zeroPosWidget = Padding(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: TextButton.icon(
+          style: style,
+          icon: Icon(Icons.delete),
+          label: Text('Delete all', style: textStyle),
+          onPressed: () async {
+            bool confirmed = await locator<AlertService>().askForConfirmation(
+                context,
+                title: 'Confirm',
+                query: 'Really delete all messages?',
+                action: 'Delete all',
+                isDangerousAction: true);
+            if (confirmed == true) {
+              await widget.messageSource.deleteAllMessages();
+            }
+          },
+        ),
+      );
+    }
     return Scaffold(
       drawer: AppDrawer(),
       floatingActionButton: _visualization == _Visualization.stack
@@ -152,6 +184,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           //print('building message item at $index');
+                          if (zeroPosWidget != null) {
+                            if (index == 0) {
+                              return zeroPosWidget;
+                            }
+                            index--;
+                          }
                           var element =
                               _sectionedMessageSource.getElementAt(index);
                           if (element.section != null) {
@@ -239,7 +277,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                             },
                           );
                         },
-                        childCount: _sectionedMessageSource.size,
+                        childCount: _sectionedMessageSource.size +
+                            ((zeroPosWidget != null) ? 1 : 0),
                         semanticIndexCallback: (Widget widget, int localIndex) {
                           if (widget is MessageOverview) {
                             return widget.message.sourceIndex;

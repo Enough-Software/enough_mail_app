@@ -28,9 +28,18 @@ abstract class MessageSource extends ChangeNotifier
 
   String get name => _name;
 
+  bool _supportsDeleteAll = false;
+  bool get supportsDeleteAll => _supportsDeleteAll;
+  set supportsDeleteAll(bool value) {
+    _supportsDeleteAll = value;
+    notifyListeners();
+  }
+
   Future<bool> init();
 
   Future<void> waitForDownload();
+
+  Future<List<DeleteResult>> deleteAllMessages();
 
   Future<Message> waitForMessageAt(int index) async {
     var message = getMessageAt(index);
@@ -133,7 +142,6 @@ class MailboxMessageSource extends MessageSource {
   MimeSource _mimeSource;
 
   MailboxMessageSource(Mailbox mailbox, MailClient mailClient) {
-    //mailbox ??= mailClient.selectedMailbox;
     _mimeSource = MimeSource(mailClient, mailbox, subscriber: this);
     _description = mailClient.account.email;
     _name = mailbox?.name;
@@ -156,7 +164,11 @@ class MailboxMessageSource extends MessageSource {
   @override
   Future<bool> init() async {
     final result = await _mimeSource.init();
-    name ??= _mimeSource.mailbox?.name;
+    final mailbox = _mimeSource.mailbox;
+    name ??= mailbox?.name;
+    if (mailbox != null) {
+      supportsDeleteAll = (mailbox.isTrash || mailbox.isJunk);
+    }
     return result;
   }
 
@@ -168,6 +180,16 @@ class MailboxMessageSource extends MessageSource {
     }
     return Future.value();
   }
+
+  @override
+  Future<List<DeleteResult>> deleteAllMessages() async {
+    final results = await _mimeSource.deleteAllMessages();
+    if (results?.isNotEmpty ?? false) {
+      _cache.clear();
+      notifyListeners();
+    }
+    return results;
+  }
 }
 
 class MultipleMessageSource extends MessageSource {
@@ -177,6 +199,7 @@ class MultipleMessageSource extends MessageSource {
     mimeSources.forEach((s) {
       complete += s.size;
     });
+    print('MultipleMessageSource.size: $complete');
     return complete;
   }
 
@@ -184,12 +207,14 @@ class MultipleMessageSource extends MessageSource {
   final _multipleMimeSources = <_MultipleMimeSource>[];
   int _lastUncachedIndex = 0;
 
-  MultipleMessageSource(this.mimeSources, String name) {
+  MultipleMessageSource(this.mimeSources, String name, MailboxFlag flag) {
     mimeSources.forEach((s) {
       s.addSubscriber(this);
       _multipleMimeSources.add(_MultipleMimeSource(s));
     });
     _name = name;
+    supportsDeleteAll =
+        (flag == MailboxFlag.trash) || (flag == MailboxFlag.junk);
     _description =
         mimeSources.map((s) => s.mailClient.account.email).join(', ');
   }
@@ -217,28 +242,28 @@ class MultipleMessageSource extends MessageSource {
     for (var i = 0; i < _multipleMimeSources.length; i++) {
       final source = _multipleMimeSources[i];
       final mime = source.peek();
-      if (mime.isEmpty) {
-        //TODO
-        //await waitForDownload();
-      }
-      mimes.add(mime);
-      var date = mime.decodeDate();
-      if (date == null) {
-        date = DateTime.now();
-        print(
-            'unable to decode date for $_lastUncachedIndex on ${mimeSources[i].mailClient.account.name} message is empty: ${mime.isEmpty}.');
-      }
+      if (mime != null) {
+        if (mime.isEmpty) {
+          //TODO
+          //await waitForDownload();
+        }
+        mimes.add(mime);
+        var date = mime.decodeDate();
+        if (date == null) {
+          date = DateTime.now();
+          print(
+              'unable to decode date for $_lastUncachedIndex on ${mimeSources[i].mailClient.account.name} message is empty: ${mime.isEmpty}.');
+        }
 
-      //PROBLEM: initially the MIME messages will just be empty
-      // and are only populated after successful loading....
-      // if (mime.decodeDate() == null) {
-      //   print('UNABLE TO DECODE DATE FOR mime ${mime.bodyRaw}');
-      // }
-      if (newestTime == null) {
-        newestTime = date;
-      } else if (date.isAfter(newestTime)) {
-        newestIndex = i;
-        newestTime = date;
+        //PROBLEM: initially the MIME messages will just be empty
+        // and are only populated after successful loading....
+        // if (mime.decodeDate() == null) {
+        //   print('UNABLE TO DECODE DATE FOR mime ${mime.bodyRaw}');
+        // }
+        if (newestTime == null || date.isAfter(newestTime)) {
+          newestIndex = i;
+          newestTime = date;
+        }
       }
     }
     final newestSource = _multipleMimeSources[newestIndex];
@@ -273,6 +298,22 @@ class MultipleMessageSource extends MessageSource {
     }
     return Future.wait(futures);
   }
+
+  @override
+  Future<List<DeleteResult>> deleteAllMessages() async {
+    final results = <DeleteResult>[];
+    for (final mimeSource in mimeSources) {
+      final mimeResults = await mimeSource.deleteAllMessages();
+      if (mimeResults != null) {
+        results.addAll(mimeResults);
+      }
+    }
+    if (results.isNotEmpty) {
+      _cache.clear();
+      notifyListeners();
+    }
+    return results;
+  }
 }
 
 class _MultipleMimeSource {
@@ -296,6 +337,9 @@ class _MultipleMimeSource {
   }
 
   MimeMessage _next() {
+    if (_currentIndex >= mimeSource.size) {
+      return null;
+    }
     final mime = mimeSource.getMessageAt(_currentIndex);
     _currentIndex++;
     return mime;

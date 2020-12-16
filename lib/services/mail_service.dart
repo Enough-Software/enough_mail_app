@@ -100,18 +100,16 @@ class MailService {
       Mailbox mailbox, Account account) async {
     if (account is UnifiedAccount) {
       final mimeSources = <MimeSource>[];
-      for (final account in account.accounts) {
-        final client = await getClientFor(account);
+      MailboxFlag flag = mailbox?.flags?.first;
+      for (final subAccount in account.accounts) {
+        final client = await getClientFor(subAccount);
         await client.stopPollingIfNeeded();
         Mailbox accountMailbox;
-        if (mailbox != null) {
-          if (client.mailboxes != null) {
-            accountMailbox =
-                client.getMailbox(mailbox.flags.first, client.mailboxes);
-          }
+        if (flag != null) {
+          accountMailbox = client.getMailbox(flag);
           if (accountMailbox == null) {
             print(
-                'unable to find mailbox with ${mailbox.flags.first} in account ${account.name}');
+                'unable to find mailbox with $flag in account ${subAccount.name}');
             continue;
           }
         }
@@ -119,7 +117,10 @@ class MailService {
         mimeSources.add(MimeSource(client, accountMailbox));
       }
       return MultipleMessageSource(
-          mimeSources, mailbox == null ? 'Unified Inbox' : mailbox.name);
+        mimeSources,
+        mailbox == null ? 'Unified Inbox' : mailbox.name,
+        flag,
+      );
     } else {
       var mailClient = await getClientFor(account);
       await mailClient.stopPollingIfNeeded();
@@ -220,7 +221,9 @@ class MailService {
     var client = _mailClientsPerAccount[account];
     if (client == null) {
       client = MailClient(account.account,
-          eventBus: AppEventBus.eventBus, isLogEnabled: true);
+          eventBus: AppEventBus.eventBus,
+          isLogEnabled: true,
+          logName: account.account.name);
       _mailClientsPerAccount[account] = client;
       await client.connect();
       await loadMailboxesFor(client);
@@ -261,7 +264,7 @@ class MailService {
   }
 
   Future<void> saveAccount(MailAccount account) {
-    print('saving account ${account.name}');
+    // print('saving account ${account.name}');
     return _saveAccounts();
   }
 

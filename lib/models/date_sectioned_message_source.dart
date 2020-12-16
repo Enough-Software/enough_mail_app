@@ -13,6 +13,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
   int _numberOfSections = 0;
   int get size => messageSource.size + _numberOfSections;
   List<MessageDateSection> _sections;
+  bool isInitialized = false;
 
   DateSectionedMessageSource(this.messageSource) {
     messageSource.addListener(_update);
@@ -23,6 +24,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
     if (success) {
       _sections = await getDateSections();
       _numberOfSections = _sections.length;
+      isInitialized = true;
     }
     return success;
   }
@@ -39,6 +41,10 @@ class DateSectionedMessageSource extends ChangeNotifier {
     final sections = <MessageDateSection>[];
     DateSectionRange lastRange;
     int foundSections = 0;
+    final max = messageSource.size;
+    if (numberOfMessagesToBeConsidered > max) {
+      numberOfMessagesToBeConsidered = max;
+    }
     for (var i = 0; i < numberOfMessagesToBeConsidered; i++) {
       final message = await messageSource.waitForMessageAt(i);
       final dateTime = message.mimeMessage.decodeDate()?.toLocal();

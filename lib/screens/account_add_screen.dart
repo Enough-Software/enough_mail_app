@@ -142,7 +142,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                     labelText: 'Password',
                     hintText: 'Please enter your password',
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     onPressed: navigateToManualSettings,
                     child: Text('Not on ${_clientConfig?.displayName}?'),
                   )
@@ -154,7 +154,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                 children: [
                   Text(
                       'Unable to resolve ${account.email}. Please go back to change it or set up the account manually.'),
-                  RaisedButton(
+                  ElevatedButton(
                     child: Text('Edit manually'),
                     onPressed: navigateToManualSettings,
                   )

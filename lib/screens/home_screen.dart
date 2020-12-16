@@ -13,10 +13,10 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Text('Home sweet home'),
-            RaisedButton(
+            ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, Routes.settings),
                 child: Text('Settings')),
-            RaisedButton(
+            ElevatedButton(
                 onPressed: () =>
                     Navigator.pushNamed(context, Routes.accountAdd),
                 child: Text('Add Account'))
