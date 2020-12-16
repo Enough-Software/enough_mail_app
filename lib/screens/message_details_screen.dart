@@ -1,15 +1,14 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
@@ -210,7 +209,7 @@ class _MessageContentState extends State<_MessageContent> {
                 : MainAxisAlignment.end,
             children: [
               if (_blockExternalImages) ...{
-                RaisedButton(
+                ElevatedButton(
                   child: Text('Show images'),
                   onPressed: () => setState(() {
                     _blockExternalImages = false;
@@ -220,7 +219,7 @@ class _MessageContentState extends State<_MessageContent> {
               if (mime.isNewsletter) ...{
                 if (widget.message.isNewsletterUnsubscribed) ...{
                   widget.message.isNewsLetterSubscribable
-                      ? RaisedButton(
+                      ? ElevatedButton(
                           child: Text('Re-subscribe'),
                           onPressed: resubscribe,
                         )
@@ -229,7 +228,7 @@ class _MessageContentState extends State<_MessageContent> {
                           style: TextStyle(fontStyle: FontStyle.italic),
                         ),
                 } else ...{
-                  RaisedButton(
+                  ElevatedButton(
                     child: Text('Unsubscribe'),
                     onPressed: unsubscribe,
                   ),
@@ -333,7 +332,8 @@ class _MessageContentState extends State<_MessageContent> {
   void resubscribe() async {
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName();
-    final confirmation = await askForSubscribeActionConfirmation(
+    final confirmation = await locator<AlertService>().askForConfirmation(
+        context,
         title: 'Resubscribe',
         action: 'Subscribe',
         query:
@@ -358,7 +358,7 @@ class _MessageContentState extends State<_MessageContent> {
               ? 'You are now subscribed to the mailing list $listName.'
               : 'Sorry, but the subscribe request has failed.'),
           actions: [
-            FlatButton(
+            TextButton(
               child: const Text('OK'),
               onPressed: () => Navigator.of(context).pop(false),
             ),
@@ -373,10 +373,12 @@ class _MessageContentState extends State<_MessageContent> {
   void unsubscribe() async {
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName();
-    final confirmation = await askForSubscribeActionConfirmation(
-        title: 'Unsubscribe',
-        action: 'Unsubscribe',
-        query: 'Do you want to unsubscribe from this mailing list $listName?');
+    final confirmation = await locator<AlertService>().askForConfirmation(
+      context,
+      title: 'Unsubscribe',
+      action: 'Unsubscribe',
+      query: 'Do you want to unsubscribe from this mailing list $listName?',
+    );
     if (confirmation == true) {
       // TODO show busy indicator
       final mailClient = widget.message.mailClient;
@@ -397,7 +399,7 @@ class _MessageContentState extends State<_MessageContent> {
               ? 'You are now unsubscribed from the mailing list $listName.'
               : 'Sorry, but the unsubscribe request has failed.'),
           actions: [
-            FlatButton(
+            TextButton(
               child: const Text('OK'),
               onPressed: () => Navigator.of(context).pop(false),
             ),
@@ -407,28 +409,6 @@ class _MessageContentState extends State<_MessageContent> {
       );
       //locator<NavigationService>().pop();
     }
-  }
-
-  Future<bool> askForSubscribeActionConfirmation(
-      {String title, String action, String query}) {
-    // first get confirmation:
-    return showDialog<bool>(
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(query),
-        actions: [
-          FlatButton(
-            child: const Text('Cancel'),
-            onPressed: () => Navigator.of(context).pop(false),
-          ),
-          FlatButton(
-            child: Text(action ?? title),
-            onPressed: () => Navigator.of(context).pop(true),
-          ),
-        ],
-      ),
-      context: context,
-    );
   }
 
   void next() {

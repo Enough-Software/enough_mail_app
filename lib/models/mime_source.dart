@@ -67,8 +67,9 @@ class MimeSource {
     _subscribers.remove(subscriber);
   }
 
-  MimeMessage _getMessageFromCache(int index) {
-    return _cache.firstWhere((m) => m.sequenceId == index, orElse: () => null);
+  MimeMessage _getMessageFromCache(int sequenceId) {
+    return _cache.firstWhere((m) => m.sequenceId == sequenceId,
+        orElse: () => null);
   }
 
   MimeMessage _getMessageFromCacheWithUid(int uid) {
@@ -76,17 +77,20 @@ class MimeSource {
   }
 
   MimeMessage getMessageAt(int index) {
-    index = (size - index);
     //print('getMessageAt($index)');
-    final existingMessage = _getMessageFromCache(index);
+    if (index >= size) {
+      throw StateError('Invalid index $index for MimeSource with size $size');
+    }
+    final sequenceId = (size - index);
+    final existingMessage = _getMessageFromCache(sequenceId);
     if (existingMessage != null) {
       return existingMessage;
     }
-    final pageIndex = (size - index) ~/ _pageSize;
+    final pageIndex = index ~/ _pageSize;
     if (!_requestedPages.contains(pageIndex)) {
       _queue(pageIndex);
     }
-    return MimeMessage()..sequenceId = index;
+    return MimeMessage()..sequenceId = sequenceId;
   }
 
   void _registerEvents() {
@@ -198,7 +202,7 @@ class MimeSource {
 
   Future<void> _download(int pageIndex) async {
     //print('downloading $pageIndex');
-    mailClient.stopPollingIfNeeded();
+    await mailClient.stopPollingIfNeeded();
     final response = await mailClient.fetchMessages(
         count: _pageSize,
         page: (pageIndex + 1),
@@ -228,5 +232,14 @@ class MimeSource {
     for (final subscriber in _subscribers) {
       subscriber.onMailLoaded(mime, this);
     }
+  }
+
+  Future<List<DeleteResult>> deleteAllMessages() async {
+    final response = await mailClient.deleteAllMessages(mailbox);
+    if (response.isOkStatus) {
+      mailbox.messagesExists = 0;
+      return [response.result];
+    }
+    return null;
   }
 }

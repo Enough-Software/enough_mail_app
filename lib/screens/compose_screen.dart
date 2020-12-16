@@ -245,7 +245,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                   decoration: InputDecoration(
                     labelText: 'To',
                     hintText: 'Recipient email',
-                    suffixIcon: RaisedButton(
+                    suffixIcon: ElevatedButton(
                       child: Text('CC/BCC'),
                       onPressed: () => setState(
                         () => _isCcBccVisible = !_isCcBccVisible,

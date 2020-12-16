@@ -70,7 +70,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
     return AlertDialog(
       content: image,
       actions: [
-        FlatButton(
+        TextButton(
           child: Text('Done'),
           onPressed: () {
             Navigator.of(context).pop();
@@ -94,7 +94,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
               title: Text("Material Dialog"),
               content: Text(text),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text('Close me!'),
                   onPressed: () {
                     Navigator.of(context).pop();

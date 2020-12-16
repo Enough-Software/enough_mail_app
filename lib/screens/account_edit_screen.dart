@@ -3,6 +3,7 @@ import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/validator.dart';
@@ -91,9 +92,10 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                     showDialog(
                       context: context,
                       builder: (context) => AliasEditDialog(
-                          isNewAlias: false,
-                          alias: alias,
-                          account: widget.account),
+                        isNewAlias: false,
+                        alias: alias,
+                        account: widget.account,
+                      ),
                     );
                   },
                 ),
@@ -126,7 +128,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 onChanged: null,
                 title: Text('Supports plus aliases')),
             //if (!widget.account.supportsPlusAliases) ...{
-            RaisedButton(
+            ElevatedButton(
               child: Text('Test support for plus aliases'),
               onPressed: () async {
                 var result = await showDialog<bool>(
@@ -146,37 +148,27 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
             Divider(),
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
-              child: FlatButton(
-                color: Colors.red,
-                child: ListTile(
-                  leading: Icon(
-                    Icons.delete,
-                    color: Colors.white,
-                  ),
-                  title: Text('Delete account',
-                      style: TextStyle(color: Colors.white)),
+              child: TextButton.icon(
+                style: TextButton.styleFrom(backgroundColor: Colors.red),
+                icon: Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  'Delete account',
+                  style: Theme.of(context)
+                      .textTheme
+                      .button
+                      .copyWith(color: Colors.white),
                 ),
                 onPressed: () async {
-                  var result = await showDialog<bool>(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('Confirm'),
-                          content: Text(
-                              'Do you want to delete the account ${accountNameController.text}?'),
-                          actions: [
-                            FlatButton(
-                              child: const Text('Cancel'),
-                              onPressed: () => Navigator.of(context).pop(false),
-                            ),
-                            FlatButton(
-                              color: Colors.red,
-                              child: Text('Delete'),
-                              onPressed: () => Navigator.of(context).pop(true),
-                            ),
-                          ],
-                        );
-                      });
+                  final result = await locator<AlertService>().askForConfirmation(
+                      context,
+                      title: 'Confirm',
+                      query:
+                          'Do you want to delete the account ${accountNameController.text}?',
+                      action: 'Delete',
+                      isDangerousAction: true);
                   if (result == true) {
                     final mailService = locator<MailService>();
                     await mailService.removeAccount(widget.account);
@@ -363,11 +355,11 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
       title: Text(widget.isNewAlias ? 'Add alias' : 'Edit alias'),
       content: isSaving ? CircularProgressIndicator() : buildContent(),
       actions: [
-        FlatButton(
+        TextButton(
           child: const Text('Cancel'),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        FlatButton(
+        TextButton(
           child: Text(widget.isNewAlias ? 'Add' : 'Update'),
           onPressed: isEmailValid
               ? () async {

@@ -35,7 +35,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             style: TextStyle(color: Colors.white),
           )
         ],
-        action: RaisedButton(
+        action: ElevatedButton(
           onPressed: () {
             locator<NavigationService>().push(Routes.accountAdd);
           },
@@ -60,7 +60,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       //         ],
       //       ),
       //     ),
-      //     RaisedButton(
+      //     ElevatedButton(
       //       onPressed: () {
       //         locator<NavigationService>().push(Routes.accountAdd);
       //       },

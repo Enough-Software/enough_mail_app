@@ -1,7 +1,5 @@
-import 'package:enough_mail_app/app_styles.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/settings.dart';
-import 'package:enough_mail_app/screens/account_edit_screen.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
@@ -76,7 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               //       styleName: 'page',
               //       child: _createStylesSection(),
               //     ),
-              //     RaisedButton(
+              //     ElevatedButton(
               //       onPressed: () => Navigator.pop(context),
               //       child: Text('Done'),
               //     )
@@ -106,7 +104,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   //               ),
   //               for (final sheet
   //                   in appStyles.styleSheetManager.styleSheets) ...[
-  //                 RaisedButton(
+  //                 ElevatedButton(
   //                   child: Text(sheet.name),
   //                   onPressed: () {
   //                     appStyles.styleSheetManager.current = sheet;
@@ -142,7 +140,7 @@ class _AccountListState extends State<AccountList> {
             account: account,
           ),
         },
-        FlatButton(
+        TextButton(
           child: ListTile(
             leading: Icon(Icons.add),
             title: Text('Add account'),

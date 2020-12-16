@@ -59,4 +59,8 @@ class MessageCache {
     }
     return isRemoved;
   }
+
+  void clear() {
+    _messages.clear();
+  }
 }
