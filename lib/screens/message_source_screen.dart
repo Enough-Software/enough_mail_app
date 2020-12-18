@@ -86,8 +86,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     ];
     final i18nService = locator<I18nService>();
     Widget zeroPosWidget;
-    if (_sectionedMessageSource.isInitialized &&
-        widget.messageSource.size == 0) {
+    if (widget.messageSource.size == 0) {
       zeroPosWidget = Padding(
         padding: EdgeInsets.symmetric(vertical: 32, horizontal: 32),
         child: Text('All done!\n\nThere are no messages in this folder.'),

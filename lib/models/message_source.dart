@@ -199,7 +199,7 @@ class MultipleMessageSource extends MessageSource {
     mimeSources.forEach((s) {
       complete += s.size;
     });
-    print('MultipleMessageSource.size: $complete');
+    //print('MultipleMessageSource.size: $complete');
     return complete;
   }
 
