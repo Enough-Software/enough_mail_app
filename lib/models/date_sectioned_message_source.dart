@@ -32,6 +32,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
       _sections = await getDateSections();
       _numberOfSections = _sections.length;
       isInitialized = true;
+      notifyListeners();
     }
     return success;
   }
