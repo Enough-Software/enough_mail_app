@@ -11,7 +11,14 @@ import 'message_date_section.dart';
 class DateSectionedMessageSource extends ChangeNotifier {
   final MessageSource messageSource;
   int _numberOfSections = 0;
-  int get size => messageSource.size + _numberOfSections;
+  int get size {
+    final sourceSize = messageSource.size;
+    if (sourceSize == 0) {
+      return 0;
+    }
+    return sourceSize + _numberOfSections;
+  }
+
   List<MessageDateSection> _sections;
   bool isInitialized = false;
 
