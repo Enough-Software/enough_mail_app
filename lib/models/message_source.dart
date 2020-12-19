@@ -74,7 +74,9 @@ abstract class MessageSource extends ChangeNotifier
     return getMessageAt(current.sourceIndex - 1);
   }
 
-  void remove(Message message) {
+  void remove(Message message);
+
+  void removeFromCache(Message message) {
     _cache.remove(message);
     notifyListeners();
   }
@@ -115,8 +117,7 @@ abstract class MessageSource extends ChangeNotifier
   Future<MailResponse> deleteMessage(
       BuildContext context, Message message) async {
     remove(message);
-    //return message.mailClient.flagMessage(message.mimeMessage, isDeleted: true);
-    //TODO use returning mail sequence to allow undo delete
+    removeFromCache(message);
     final response =
         await message.mailClient.deleteMessage(message.mimeMessage);
     if (response.result?.isUndoable == true) {
@@ -125,7 +126,7 @@ abstract class MessageSource extends ChangeNotifier
         final undoResponse =
             await message.mailClient.undoDeleteMessages(response.result);
         if (undoResponse.isOkStatus) {
-          //TODO update mimeMessage's UID and sequence ID
+          //TODO update mimeMessage's UID and sequence ID?
           _cache.insert(message);
           notifyListeners();
         }
@@ -189,6 +190,11 @@ class MailboxMessageSource extends MessageSource {
       notifyListeners();
     }
     return results;
+  }
+
+  @override
+  void remove(Message message) {
+    _mimeSource.remove(message.mimeMessage);
   }
 }
 
@@ -313,6 +319,17 @@ class MultipleMessageSource extends MessageSource {
       notifyListeners();
     }
     return results;
+  }
+
+  MimeSource getMimeSource(Message message) {
+    return mimeSources
+        .firstWhere((source) => source.mailClient == message.mailClient);
+  }
+
+  @override
+  void remove(Message message) {
+    final mimeSource = getMimeSource(message);
+    mimeSource.remove(message.mimeMessage);
   }
 }
 
