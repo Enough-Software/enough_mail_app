@@ -242,4 +242,9 @@ class MimeSource {
     }
     return null;
   }
+
+  void remove(MimeMessage mimeMessage) {
+    _cache.remove(mimeMessage);
+    mailbox.messagesExists--;
+  }
 }
