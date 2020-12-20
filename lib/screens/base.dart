@@ -1,18 +1,7 @@
-import 'package:enough_mail/imap/mailbox.dart';
-import 'package:enough_mail/mail/mail_account.dart';
-import 'package:enough_mail/mail/tree.dart';
-import 'package:enough_mail_app/events/account_change_event.dart';
-import 'package:enough_mail_app/events/app_event_bus.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/scaffold_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 // import 'package:enough_style/enough_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 
 class Base {
   static Widget onBottom(Widget child) => align(child, Alignment.bottomCenter);
