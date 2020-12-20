@@ -1,15 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
-
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter_html/flutter_html.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:url_launcher/url_launcher.dart' as urlLauncher;
 import 'dart:math' as math;
 
 enum DragAction { noted, later, delete, reply }
