@@ -1,7 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/services/scaffold_service.dart';
 import 'package:flutter/material.dart';
 
 class AttachmentChip extends StatefulWidget {

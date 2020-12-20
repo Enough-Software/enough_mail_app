@@ -5,12 +5,7 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-        // MaterialApp(
-        //   title: 'Enough Mail',
-        //   debugShowCheckedModeBanner: false,
-        //   home:
-        Scaffold(
+    return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
@@ -33,7 +28,6 @@ class SplashScreen extends StatelessWidget {
           ),
         ],
       ),
-//      ),
     );
   }
 }
