@@ -1,4 +1,3 @@
-import 'package:enough_mail_app/screens/base.dart';
 import 'package:flutter/material.dart';
 
 class ScaffoldService {
