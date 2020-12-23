@@ -7,12 +7,15 @@ Current development state is very limted to say the least. But it should be enou
 * Multiple account support
 * Unified account - when you have at least 2 accounts, a unified account will show up automatically - with unified inbox, sent, trash, etc
 * Mail management: delete, mark as read/unread
+* Unsubscribe from newslettters easily
 * View attachments - images only at this stage
 * Compose messages: compose text messages
 * Swipe right to left to delete
 * Swipe left to right to mark as read/unread
 * Optionally you can block external images when viewing mails
 * You can specify aliases and check for + alias support by your mail provider
+* Swipe left or right in the message details to view the next/previous message
+* Experimental 'stack' display of messages
 
 ## Miss a feature or found a bug?
 
