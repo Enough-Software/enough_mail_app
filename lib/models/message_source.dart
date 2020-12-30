@@ -135,7 +135,7 @@ abstract class MessageSource extends ChangeNotifier
     return response;
   }
 
-  bool shouldBlockImages();
+  bool get shouldBlockImages;
 }
 
 class MailboxMessageSource extends MessageSource {
@@ -200,9 +200,7 @@ class MailboxMessageSource extends MessageSource {
   }
 
   @override
-  bool shouldBlockImages() {
-    return _mimeSource.shouldBlockImages();
-  }
+  bool get shouldBlockImages => _mimeSource.shouldBlockImages;
 }
 
 class MultipleMessageSource extends MessageSource {
@@ -340,9 +338,8 @@ class MultipleMessageSource extends MessageSource {
   }
 
   @override
-  bool shouldBlockImages() {
-    return mimeSources.any((source) => source.shouldBlockImages());
-  }
+  bool get shouldBlockImages =>
+      mimeSources.any((source) => source.shouldBlockImages);
 }
 
 class _MultipleMimeSource {
