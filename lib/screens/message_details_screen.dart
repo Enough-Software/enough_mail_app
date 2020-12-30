@@ -297,7 +297,8 @@ class _MessageContentState extends State<_MessageContent> {
   void onMimeMessageDownloaded(MimeMessage mimeMessage) {
     widget.message.updateMime(mimeMessage);
     var blockExternalImages =
-        locator<SettingsService>().settings.blockExternalImages;
+        locator<SettingsService>().settings.blockExternalImages ||
+            widget.message.source.shouldBlockImages();
     if (blockExternalImages) {
       final html = mimeMessage.decodeTextHtmlPart();
       final hasImages = (html != null) && (html.contains('<img '));
