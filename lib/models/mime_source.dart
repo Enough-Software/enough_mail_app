@@ -248,7 +248,5 @@ class MimeSource {
     mailbox.messagesExists--;
   }
 
-  bool shouldBlockImages() {
-    return mailbox.isTrash || mailbox.isJunk;
-  }
+  bool get shouldBlockImages => mailbox.isTrash || mailbox.isJunk;
 }
