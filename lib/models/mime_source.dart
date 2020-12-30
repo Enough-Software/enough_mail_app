@@ -247,4 +247,8 @@ class MimeSource {
     _cache.remove(mimeMessage);
     mailbox.messagesExists--;
   }
+
+  bool shouldBlockImages() {
+    return mailbox.isTrash || mailbox.isJunk;
+  }
 }
