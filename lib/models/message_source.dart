@@ -121,21 +121,57 @@ abstract class MessageSource extends ChangeNotifier
     final response =
         await message.mailClient.deleteMessage(message.mimeMessage);
     if (response.result?.isUndoable == true) {
-      locator<ScaffoldService>().showTextSnackBar(context, 'Deleted',
-          undo: () async {
-        final undoResponse =
-            await message.mailClient.undoDeleteMessages(response.result);
-        if (undoResponse.isOkStatus) {
-          //TODO update mimeMessage's UID and sequence ID?
-          _cache.insert(message);
-          notifyListeners();
-        }
-      });
+      locator<ScaffoldService>().showTextSnackBar(
+        context,
+        'Deleted',
+        undo: () async {
+          final undoResponse =
+              await message.mailClient.undoDeleteMessages(response.result);
+          if (undoResponse.isOkStatus) {
+            //TODO update mimeMessage's UID and sequence ID?
+            _cache.insert(message);
+            notifyListeners();
+          }
+        },
+      );
     }
     return response;
   }
 
   bool get shouldBlockImages;
+  bool get isJunk;
+  bool get supportsMessageFolders;
+
+  Future<MailResponse> markAsJunk(BuildContext context, Message message) {
+    return _markJunk(context, message, true);
+  }
+
+  Future<MailResponse> markAsNotJunk(BuildContext context, Message message) {
+    return _markJunk(context, message, false);
+  }
+
+  Future<MailResponse> _markJunk(
+      BuildContext context, Message message, bool markAsJunk) async {
+    remove(message);
+    removeFromCache(message);
+    final response = await message.mailClient.junkMessage(message.mimeMessage);
+    if (response.result?.isUndoable == true) {
+      locator<ScaffoldService>().showTextSnackBar(
+        context,
+        markAsJunk ? 'Moved to junk' : 'Moved to inbox',
+        undo: () async {
+          final undoResponse =
+              await message.mailClient.undoMove(response.result);
+          if (undoResponse.isOkStatus) {
+            //TODO update message's UID and sequence ID?
+            _cache.insert(message);
+            notifyListeners();
+          }
+        },
+      );
+    }
+    return response;
+  }
 }
 
 class MailboxMessageSource extends MessageSource {
@@ -201,6 +237,12 @@ class MailboxMessageSource extends MessageSource {
 
   @override
   bool get shouldBlockImages => _mimeSource.shouldBlockImages;
+
+  @override
+  bool get isJunk => _mimeSource.isJunk;
+
+  @override
+  bool get supportsMessageFolders => _mimeSource.supportsMessageFolders;
 }
 
 class MultipleMessageSource extends MessageSource {
@@ -340,6 +382,13 @@ class MultipleMessageSource extends MessageSource {
   @override
   bool get shouldBlockImages =>
       mimeSources.any((source) => source.shouldBlockImages);
+
+  @override
+  bool get isJunk => mimeSources.every((source) => source.isJunk);
+
+  @override
+  bool get supportsMessageFolders =>
+      mimeSources.every((source) => source.supportsMessageFolders);
 }
 
 class _MultipleMimeSource {

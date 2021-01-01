@@ -117,8 +117,7 @@ class _MessageContentState extends State<_MessageContent> {
                 break;
             }
           },
-          itemBuilder: (BuildContext context) =>
-              <PopupMenuEntry<_OverflowMenuChoice>>[
+          itemBuilder: (BuildContext context) => [
             const PopupMenuItem<_OverflowMenuChoice>(
               value: _OverflowMenuChoice.showSourceCode,
               child: Text('View source'),
@@ -298,7 +297,7 @@ class _MessageContentState extends State<_MessageContent> {
     widget.message.updateMime(mimeMessage);
     var blockExternalImages =
         locator<SettingsService>().settings.blockExternalImages ||
-            widget.message.source.shouldBlockImages();
+            widget.message.source.shouldBlockImages;
     if (blockExternalImages) {
       final html = mimeMessage.decodeTextHtmlPart();
       final hasImages = (html != null) && (html.contains('<img '));
