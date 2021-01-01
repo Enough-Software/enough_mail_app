@@ -38,6 +38,8 @@ class MimeSource {
     _registerEvents();
   }
 
+  get supportsMessageFolders => (mailClient.mailboxes?.length != 0);
+
   Future<bool> init() async {
     MailResponse<Mailbox> selectResponse;
     if (mailbox == null) {
@@ -249,4 +251,6 @@ class MimeSource {
   }
 
   bool get shouldBlockImages => mailbox.isTrash || mailbox.isJunk;
+
+  bool get isJunk => mailbox.isJunk;
 }

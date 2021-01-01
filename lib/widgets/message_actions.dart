@@ -54,6 +54,13 @@ class _MessageActionsState extends State<MessageActions> {
                 widget.message.isFlagged ? Icons.flag : Icons.outlined_flag),
             onPressed: toggleFlagged,
           ),
+          if (widget.message.source.supportsMessageFolders) ...{
+            IconButton(
+              icon: Icon(
+                  widget.message.source.isJunk ? Entypo.check : Entypo.bug),
+              onPressed: moveJunk,
+            ),
+          },
           Spacer(),
           IconButton(icon: Icon(Icons.reply), onPressed: reply),
           IconButton(icon: Icon(Icons.reply_all), onPressed: replyAll),
@@ -103,6 +110,16 @@ class _MessageActionsState extends State<MessageActions> {
 
   void delete() async {
     await widget.message.source.deleteMessage(context, widget.message);
+    locator<NavigationService>().pop();
+  }
+
+  void moveJunk() async {
+    final source = widget.message.source;
+    if (source.isJunk) {
+      await widget.message.source.markAsNotJunk(context, widget.message);
+    } else {
+      await widget.message.source.markAsJunk(context, widget.message);
+    }
     locator<NavigationService>().pop();
   }
 
