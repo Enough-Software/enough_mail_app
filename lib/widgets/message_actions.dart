@@ -17,6 +17,8 @@ class MessageActions extends StatefulWidget {
   _MessageActionsState createState() => _MessageActionsState();
 }
 
+enum _OverflowMenuChoice { reply, replyAll, forward, delete, junk, seen, flag }
+
 class _MessageActionsState extends State<MessageActions> {
   @override
   void initState() {
@@ -54,24 +56,140 @@ class _MessageActionsState extends State<MessageActions> {
                 widget.message.isFlagged ? Icons.flag : Icons.outlined_flag),
             onPressed: toggleFlagged,
           ),
-          if (widget.message.source.supportsMessageFolders) ...{
-            IconButton(
-              icon: Icon(
-                  widget.message.source.isJunk ? Entypo.check : Entypo.bug),
-              onPressed: moveJunk,
-            ),
-          },
+          // if (widget.message.source.supportsMessageFolders) ...{
+          //   IconButton(
+          //     icon: Icon(
+          //         widget.message.source.isJunk ? Entypo.check : Entypo.bug),
+          //     onPressed: moveJunk,
+          //   ),
+          // },
           Spacer(),
           IconButton(icon: Icon(Icons.reply), onPressed: reply),
           IconButton(icon: Icon(Icons.reply_all), onPressed: replyAll),
           IconButton(icon: Icon(Icons.forward), onPressed: forward),
           IconButton(icon: Icon(Icons.delete), onPressed: delete),
+          PopupMenuButton<_OverflowMenuChoice>(
+            onSelected: onOverflowChoiceSelected,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _OverflowMenuChoice.reply,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.reply),
+                    Text(' reply'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _OverflowMenuChoice.replyAll,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.reply_all),
+                    Text(' reply all'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _OverflowMenuChoice.forward,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.forward),
+                    Text(' forward'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _OverflowMenuChoice.delete,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.delete),
+                    Text(' delete'),
+                  ],
+                ),
+              ),
+              PopupMenuDivider(),
+              PopupMenuItem(
+                value: _OverflowMenuChoice.seen,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(widget.message.isSeen
+                        ? Feather.circle
+                        : Entypo.mail_with_circle),
+                    Text(widget.message.isSeen ? ' is read' : ' is not read'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _OverflowMenuChoice.flag,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(widget.message.isFlagged
+                        ? Icons.flag
+                        : Icons.outlined_flag),
+                    Text(widget.message.isFlagged
+                        ? ' is flagged'
+                        : ' is not flagged'),
+                  ],
+                ),
+              ),
+              if (widget.message.source.supportsMessageFolders) ...{
+                PopupMenuDivider(),
+                PopupMenuItem(
+                  value: _OverflowMenuChoice.junk,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(widget.message.source.isJunk
+                          ? Entypo.check
+                          : Entypo.bug),
+                      Text(widget.message.source.isJunk
+                          ? ' mark as not junk'
+                          : ' mark as junk'),
+                    ],
+                  ),
+                ),
+              },
+            ],
+          ),
+
           // IconButton(
           //     icon: Icon(Icons.arrow_right),
           //     onPressed: widget.message.hasNext ? next : null),
         ],
       ),
     );
+  }
+
+  void onOverflowChoiceSelected(_OverflowMenuChoice result) {
+    switch (result) {
+      case _OverflowMenuChoice.reply:
+        reply();
+        break;
+      case _OverflowMenuChoice.replyAll:
+        replyAll();
+        break;
+      case _OverflowMenuChoice.forward:
+        forward();
+        break;
+      case _OverflowMenuChoice.delete:
+        delete();
+        break;
+      case _OverflowMenuChoice.junk:
+        moveJunk();
+        break;
+      case _OverflowMenuChoice.seen:
+        toggleSeen();
+        break;
+      case _OverflowMenuChoice.flag:
+        toggleFlagged();
+        break;
+    }
   }
 
   void next() {
