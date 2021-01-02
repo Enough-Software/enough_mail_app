@@ -253,4 +253,6 @@ class MimeSource {
   bool get shouldBlockImages => mailbox.isTrash || mailbox.isJunk;
 
   bool get isJunk => mailbox.isJunk;
+
+  bool get isArchive => mailbox.isArchive;
 }

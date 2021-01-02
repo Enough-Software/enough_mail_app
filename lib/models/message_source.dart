@@ -140,25 +140,27 @@ abstract class MessageSource extends ChangeNotifier
 
   bool get shouldBlockImages;
   bool get isJunk;
+  bool get isArchive;
   bool get supportsMessageFolders;
 
   Future<MailResponse> markAsJunk(BuildContext context, Message message) {
-    return _markJunk(context, message, true);
+    return moveMessage(context, message, MailboxFlag.junk, 'Marked as spam');
   }
 
   Future<MailResponse> markAsNotJunk(BuildContext context, Message message) {
-    return _markJunk(context, message, false);
+    return moveMessage(context, message, MailboxFlag.inbox, 'Moved to inbox');
   }
 
-  Future<MailResponse> _markJunk(
-      BuildContext context, Message message, bool markAsJunk) async {
+  Future<MailResponse> moveMessage(BuildContext context, Message message,
+      MailboxFlag targetMailboxFlag, String notification) async {
     remove(message);
     removeFromCache(message);
-    final response = await message.mailClient.junkMessage(message.mimeMessage);
+    final response = await message.mailClient
+        .moveMessageToFlag(message.mimeMessage, targetMailboxFlag);
     if (response.result?.isUndoable == true) {
       locator<ScaffoldService>().showTextSnackBar(
         context,
-        markAsJunk ? 'Moved to junk' : 'Moved to inbox',
+        notification,
         undo: () async {
           final undoResponse =
               await message.mailClient.undoMove(response.result);
@@ -171,6 +173,15 @@ abstract class MessageSource extends ChangeNotifier
       );
     }
     return response;
+  }
+
+  Future<MailResponse> moveToInbox(
+      BuildContext context, Message message) async {
+    return moveMessage(context, message, MailboxFlag.inbox, 'Moved to inbox');
+  }
+
+  Future<MailResponse> archive(BuildContext context, Message message) {
+    return moveMessage(context, message, MailboxFlag.archive, 'Archived');
   }
 }
 
@@ -240,6 +251,9 @@ class MailboxMessageSource extends MessageSource {
 
   @override
   bool get isJunk => _mimeSource.isJunk;
+
+  @override
+  bool get isArchive => _mimeSource.isArchive;
 
   @override
   bool get supportsMessageFolders => _mimeSource.supportsMessageFolders;
@@ -389,6 +403,9 @@ class MultipleMessageSource extends MessageSource {
   @override
   bool get supportsMessageFolders =>
       mimeSources.every((source) => source.supportsMessageFolders);
+
+  @override
+  bool get isArchive => mimeSources.every((source) => source.isArchive);
 }
 
 class _MultipleMimeSource {

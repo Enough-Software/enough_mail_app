@@ -17,7 +17,16 @@ class MessageActions extends StatefulWidget {
   _MessageActionsState createState() => _MessageActionsState();
 }
 
-enum _OverflowMenuChoice { reply, replyAll, forward, delete, junk, seen, flag }
+enum _OverflowMenuChoice {
+  reply,
+  replyAll,
+  forward,
+  delete,
+  junk,
+  seen,
+  flag,
+  archive
+}
 
 class _MessageActionsState extends State<MessageActions> {
   @override
@@ -42,9 +51,6 @@ class _MessageActionsState extends State<MessageActions> {
       elevation: 16,
       child: Row(
         children: [
-          // IconButton(
-          //     icon: Icon(Icons.arrow_left),
-          //     onPressed: widget.message.hasPrevious ? previous : null),
           IconButton(
             icon: Icon(widget.message.isSeen
                 ? Feather.circle // Icons.check_circle_outline
@@ -56,13 +62,6 @@ class _MessageActionsState extends State<MessageActions> {
                 widget.message.isFlagged ? Icons.flag : Icons.outlined_flag),
             onPressed: toggleFlagged,
           ),
-          // if (widget.message.source.supportsMessageFolders) ...{
-          //   IconButton(
-          //     icon: Icon(
-          //         widget.message.source.isJunk ? Entypo.check : Entypo.bug),
-          //     onPressed: moveJunk,
-          //   ),
-          // },
           Spacer(),
           IconButton(icon: Icon(Icons.reply), onPressed: reply),
           IconButton(icon: Icon(Icons.reply_all), onPressed: replyAll),
@@ -154,13 +153,23 @@ class _MessageActionsState extends State<MessageActions> {
                     ],
                   ),
                 ),
+                PopupMenuItem(
+                  value: _OverflowMenuChoice.archive,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(widget.message.source.isArchive
+                          ? Entypo.inbox
+                          : Entypo.archive),
+                      Text(widget.message.source.isArchive
+                          ? ' move to inbox'
+                          : ' archive'),
+                    ],
+                  ),
+                ),
               },
             ],
           ),
-
-          // IconButton(
-          //     icon: Icon(Icons.arrow_right),
-          //     onPressed: widget.message.hasNext ? next : null),
         ],
       ),
     );
@@ -180,14 +189,17 @@ class _MessageActionsState extends State<MessageActions> {
       case _OverflowMenuChoice.delete:
         delete();
         break;
-      case _OverflowMenuChoice.junk:
-        moveJunk();
-        break;
       case _OverflowMenuChoice.seen:
         toggleSeen();
         break;
       case _OverflowMenuChoice.flag:
         toggleFlagged();
+        break;
+      case _OverflowMenuChoice.junk:
+        moveJunk();
+        break;
+      case _OverflowMenuChoice.archive:
+        moveArchive();
         break;
     }
   }
@@ -237,6 +249,16 @@ class _MessageActionsState extends State<MessageActions> {
       await widget.message.source.markAsNotJunk(context, widget.message);
     } else {
       await widget.message.source.markAsJunk(context, widget.message);
+    }
+    locator<NavigationService>().pop();
+  }
+
+  void moveArchive() async {
+    final source = widget.message.source;
+    if (source.isArchive) {
+      await widget.message.source.moveToInbox(context, widget.message);
+    } else {
+      await widget.message.source.archive(context, widget.message);
     }
     locator<NavigationService>().pop();
   }
