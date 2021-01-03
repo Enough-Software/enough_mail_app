@@ -14,6 +14,15 @@ class Message extends ChangeNotifier {
   int sourceIndex;
   final MessageSource source;
 
+  bool _isSelected = false;
+  bool get isSelected => _isSelected;
+  set isSelected(bool value) {
+    if (value != _isSelected) {
+      _isSelected = value;
+      notifyListeners();
+    }
+  }
+
   Message(this.mimeMessage, this.mailClient, this.source, this.sourceIndex);
 
   bool get hasNext => (next != null);
@@ -81,6 +90,10 @@ class Message extends ChangeNotifier {
   String decodeAndStripHtml() {
     var html = mimeMessage.decodeTextHtmlPart();
     return HtmlUtil.stripConditionals(html);
+  }
+
+  void toggleSelected() {
+    isSelected = !_isSelected;
   }
 }
 
