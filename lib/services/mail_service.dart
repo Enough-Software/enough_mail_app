@@ -75,6 +75,9 @@ class MailService {
           ..name = 'Unified Trash'
           ..flags = [MailboxFlag.trash],
         Mailbox()
+          ..name = 'Unified Archive'
+          ..flags = [MailboxFlag.archive],
+        Mailbox()
           ..name = 'Unified Spam'
           ..flags = [MailboxFlag.junk],
       ];

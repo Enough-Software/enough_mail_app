@@ -182,7 +182,7 @@ class _AppDrawerState extends State<AppDrawer> {
       } else if (element.value.isArchive) {
         iconData = MaterialCommunityIcons.archive;
       } else if (element.value.isJunk) {
-        iconData = MaterialCommunityIcons.emoticon_angry_outline;
+        iconData = Entypo.bug;
       }
       return ListTile(
         leading: Icon(iconData),
