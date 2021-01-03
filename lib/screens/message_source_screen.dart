@@ -35,6 +35,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   Future<void> _messageLoader;
   _Visualization _visualization = _Visualization.list;
   DateSectionedMessageSource _sectionedMessageSource;
+  bool isInSelectionMode = false;
+  List<Message> selectedMessages = [];
 
   @override
   void initState() {
@@ -137,41 +139,49 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             )
           : null,
       body: FutureBuilder<void>(
-          future: _messageLoader,
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-              case ConnectionState.active:
-                return Center(
-                  child: Row(
-                    children: [
-                      Padding(
+        future: _messageLoader,
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              return Center(
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                    Expanded(
+                      child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(),
+                        child: Text(
+                            'loading messages for ${widget.messageSource.name ?? widget.messageSource.description}...'),
                       ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                              'loading messages for ${widget.messageSource.name ?? widget.messageSource.description}...'),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
+              );
+              break;
+            case ConnectionState.done:
+              if (_visualization == _Visualization.stack) {
+                return WillPopScope(
+                  onWillPop: () {
+                    switchVisualization(_Visualization.list);
+                    return Future.value(false);
+                  },
+                  child: MessageStack(messageSource: widget.messageSource),
                 );
-                break;
-              case ConnectionState.done:
-                if (_visualization == _Visualization.stack) {
-                  return WillPopScope(
-                    onWillPop: () {
-                      switchVisualization(_Visualization.list);
-                      return Future.value(false);
-                    },
-                    child: MessageStack(messageSource: widget.messageSource),
-                  );
-                }
-                return CustomScrollView(
+              }
+              return WillPopScope(
+                onWillPop: () {
+                  if (isInSelectionMode) {
+                    leaveSelectionMode();
+                    return Future.value(false);
+                  }
+                  return Future.value(true);
+                },
+                child: CustomScrollView(
                   physics: BouncingScrollPhysics(),
                   slivers: [
                     SliverAppBar(
@@ -252,7 +262,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 ],
                               ),
                             ),
-                            child: MessageOverview(element.message),
+                            child: MessageOverview(
+                              element.message,
+                              isInSelectionMode,
+                              onMessageTap,
+                              onMessageLongPress,
+                            ),
                             onDismissed: (direction) async {
                               if (direction == DismissDirection.startToEnd) {
                                 // left to right swipe action:
@@ -288,10 +303,107 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       ),
                     ),
                   ],
-                );
-            }
-            return Container();
-          }),
+                ),
+              );
+          }
+          return Container();
+        },
+      ),
+      bottomNavigationBar: isInSelectionMode
+          ? BottomAppBar(
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text('${selectedMessages.length}'),
+                  ),
+                  if (selectedMessages.any((m) => !m.isSeen)) ...{
+                    IconButton(
+                      icon: Icon(Entypo.mail_with_circle),
+                      onPressed: () async {
+                        await widget.messageSource
+                            .markMessagesAsSeen(selectedMessages, true);
+                        setState(() {});
+                      },
+                    ),
+                  } else ...{
+                    IconButton(
+                      icon: Icon(Feather.circle),
+                      onPressed: () async {
+                        await widget.messageSource
+                            .markMessagesAsSeen(selectedMessages, false);
+                        setState(() {});
+                      },
+                    ),
+                  },
+                  if (selectedMessages.any((m) => !m.isFlagged)) ...{
+                    IconButton(
+                      icon: Icon(Icons.flag_outlined),
+                      onPressed: () async {
+                        await widget.messageSource
+                            .markMessagesAsFlagged(selectedMessages, true);
+                        setState(() {});
+                      },
+                    ),
+                  } else ...{
+                    IconButton(
+                      icon: Icon(Icons.flag),
+                      onPressed: () async {
+                        await widget.messageSource
+                            .markMessagesAsFlagged(selectedMessages, false);
+                        setState(() {});
+                      },
+                    ),
+                  },
+                  IconButton(
+                    icon: Icon(widget.messageSource.isJunk
+                        ? Entypo.inbox
+                        : Entypo.bug),
+                    onPressed: () async {
+                      final targetFlag = widget.messageSource.isJunk
+                          ? MailboxFlag.inbox
+                          : MailboxFlag.junk;
+                      final notification = widget.messageSource.isJunk
+                          ? 'Moved ${selectedMessages.length} message(s) to inbox'
+                          : 'Marked ${selectedMessages.length} message(s) as spam';
+                      //TODO replace null with context when Scaffold Change becomes live, compare https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
+                      await widget.messageSource.moveMessages(
+                          null, selectedMessages, targetFlag, notification);
+                      leaveSelectionMode();
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(widget.messageSource.isArchive
+                        ? Entypo.inbox
+                        : Entypo.archive),
+                    onPressed: () async {
+                      final targetFlag = widget.messageSource.isJunk
+                          ? MailboxFlag.inbox
+                          : MailboxFlag.archive;
+                      final notification = widget.messageSource.isArchive
+                          ? 'Moved ${selectedMessages.length} message(s) to inbox'
+                          : 'Archived ${selectedMessages.length} message(s)';
+                      //TODO replace null with context when Scaffold Change becomes live, compare https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
+                      await widget.messageSource.moveMessages(
+                          null, selectedMessages, targetFlag, notification);
+                      leaveSelectionMode();
+                    },
+                  ),
+                  Spacer(),
+                  IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () async {
+                        //TODO replace null with context when Scaffold Change becomes live, compare https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
+                        await widget.messageSource
+                            .deleteMessages(null, selectedMessages);
+                        leaveSelectionMode();
+                      }),
+                  IconButton(
+                      icon: Icon(Icons.close), onPressed: leaveSelectionMode),
+                ],
+              ),
+            )
+          : null,
     );
   }
 
@@ -300,30 +412,65 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       _visualization = result;
     });
   }
+
+  void onMessageTap(Message message) {
+    if (isInSelectionMode) {
+      message.toggleSelected();
+      if (message.isSelected) {
+        selectedMessages.add(message);
+      } else {
+        selectedMessages.remove(message);
+      }
+      setState(() {});
+    } else {
+      locator<NavigationService>().push(Routes.mailDetails, arguments: message);
+    }
+  }
+
+  void onMessageLongPress(Message message) {
+    message.isSelected = true;
+    selectedMessages = [message];
+    setState(() {
+      isInSelectionMode = true;
+    });
+  }
+
+  void leaveSelectionMode() {
+    selectedMessages.forEach((m) => m.isSelected = false);
+    selectedMessages = [];
+    setState(() {
+      isInSelectionMode = false;
+    });
+  }
 }
 
 class MessageOverview extends StatefulWidget {
   final Message message;
+  final bool isInSelectionMode;
+  final void Function(Message message) onTap;
+  final void Function(Message message) onLongPress;
   final AnimationController animationController;
-  MessageOverview(this.message, {this.animationController})
+
+  MessageOverview(
+      this.message, this.isInSelectionMode, this.onTap, this.onLongPress,
+      {this.animationController})
       : super(key: ValueKey(message.mimeMessage.sequenceId.toString()));
 
   @override
-  _MessageOverviewState createState() => _MessageOverviewState(message);
+  _MessageOverviewState createState() => _MessageOverviewState();
 }
 
 class _MessageOverviewState extends State<MessageOverview> {
-  final Message message;
   String subject;
   String sender;
   String date;
   bool hasAttachments;
 
-  _MessageOverviewState(this.message);
+  _MessageOverviewState();
 
   @override
   void dispose() {
-    message.removeListener(_update);
+    widget.message.removeListener(_update);
     super.dispose();
   }
 
@@ -333,13 +480,13 @@ class _MessageOverviewState extends State<MessageOverview> {
 
   @override
   void initState() {
-    message.addListener(_update);
+    widget.message.addListener(_update);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final mime = message.mimeMessage;
+    final mime = widget.message.mimeMessage;
     if (mime.isEmpty) {
       return ListTile(
         visualDensity: VisualDensity.compact,
@@ -363,141 +510,98 @@ class _MessageOverviewState extends State<MessageOverview> {
             : '<no sender>';
     hasAttachments = mime.hasAttachments();
     date = locator<I18nService>().formatDate(mime.decodeDate(), context);
-    var overview = buildMessageOverview();
-    return widget.animationController != null
+    final overview = buildMessageOverview();
+    return (widget.animationController != null)
         ? SizeTransition(
             sizeFactor: CurvedAnimation(
-                parent: widget.animationController, curve: Curves.easeOut),
-            child: overview)
+              parent: widget.animationController,
+              curve: Curves.easeOut,
+            ),
+            child: overview,
+          )
         : overview;
   }
 
   Widget buildMessageOverview() {
-    return ListTile(
-      visualDensity: VisualDensity.compact,
-      title: Container(
-        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-        color: message.isFlagged ? Colors.amber[50] : null,
-        // child: Slidable(
-        //   actionPane: SlidableDrawerActionPane(),
-        //   actionExtentRatio: 0.25,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Text(
-                      sender,
-                      overflow: TextOverflow.fade,
-                      softWrap: false,
-                      style: TextStyle(
-                          fontWeight: message.isSeen
-                              ? FontWeight.normal
-                              : FontWeight.bold),
-                    ),
+    return widget.isInSelectionMode
+        ? CheckboxListTile(
+            value: widget.message.isSelected,
+            selected: widget.message.isSelected,
+            title: buildMessageDetails(),
+            onChanged: (value) => widget.onTap(widget.message),
+          )
+        : ListTile(
+            visualDensity: VisualDensity.compact,
+            title: buildMessageDetails(),
+            onTap: () => widget.onTap(widget.message),
+            onLongPress: () => widget.onLongPress(widget.message),
+          );
+  }
+
+  Widget buildMessageDetails() {
+    final message = widget.message;
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+      color: message.isFlagged ? Colors.amber[50] : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Text(
+                    sender,
+                    overflow: TextOverflow.fade,
+                    softWrap: false,
+                    style: TextStyle(
+                        fontWeight: message.isSeen
+                            ? FontWeight.normal
+                            : FontWeight.bold),
                   ),
                 ),
-                Text(date, style: TextStyle(fontSize: 12)),
-                if (hasAttachments ||
-                    message.isAnswered ||
-                    message.isForwarded ||
-                    message.isFlagged) ...{
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Row(
-                      children: [
-                        if (message.isFlagged) ...{
-                          Icon(Icons.outlined_flag, size: 12),
-                        },
-                        if (hasAttachments) ...{
-                          Icon(Icons.attach_file, size: 12),
-                        },
-                        if (message.isAnswered) ...{
-                          Icon(Icons.reply, size: 12),
-                        },
-                        if (message.isForwarded) ...{
-                          Icon(Icons.forward, size: 12),
-                        },
-                      ],
-                    ),
+              ),
+              Text(date, style: TextStyle(fontSize: 12)),
+              if (hasAttachments ||
+                  message.isAnswered ||
+                  message.isForwarded ||
+                  message.isFlagged) ...{
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Row(
+                    children: [
+                      if (message.isFlagged) ...{
+                        Icon(Icons.outlined_flag, size: 12),
+                      },
+                      if (hasAttachments) ...{
+                        Icon(Icons.attach_file, size: 12),
+                      },
+                      if (message.isAnswered) ...{
+                        Icon(Icons.reply, size: 12),
+                      },
+                      if (message.isForwarded) ...{
+                        Icon(Icons.forward, size: 12),
+                      },
+                    ],
                   ),
-                }
-              ],
-            ),
-            Text(
-              subject ?? '',
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  fontWeight:
-                      message.isSeen ? FontWeight.normal : FontWeight.bold),
-            ),
-          ],
-        ),
-        //   actions: <Widget>[
-        //     // IconSlideAction(
-        //     //   caption: 'Archive',
-        //     //   color: Colors.blue,
-        //     //   icon: Icons.archive,
-        //     //   onTap: () => _showSnackBar('Archive'),
-        //     // ),
-        //     // IconSlideAction(
-        //     //   caption: 'Share',
-        //     //   color: Colors.indigo,
-        //     //   icon: Icons.share,
-        //     //   onTap: () => _showSnackBar('Share'),
-        //     // ),
-        //     if (message.isSeen) ...{
-        //       IconSlideAction(
-        //         caption: 'Unread',
-        //         color: Colors.indigo,
-        //         icon: Icons.check_circle_outline,
-        //         onTap: () async {
-        //           message.isSeen = false;
-        //           await message.mailClient
-        //               .flagMessage(message.mimeMessage, isSeen: false);
-        //         },
-        //       )
-        //     } else ...{
-        //       IconSlideAction(
-        //         caption: 'Read',
-        //         color: Colors.indigo,
-        //         icon: Icons.check_circle,
-        //         onTap: () async {
-        //           message.isSeen = true;
-        //           await message.mailClient
-        //               .flagMessage(message.mimeMessage, isSeen: true);
-        //         },
-        //       )
-        //     }
-        //   ],
-        //   secondaryActions: <Widget>[
-        //     IconSlideAction(
-        //       caption: 'More',
-        //       color: Colors.black45,
-        //       icon: Icons.more_horiz,
-        //       onTap: () => _showSnackBar('More'),
-        //     ),
-        //     IconSlideAction(
-        //       caption: 'Delete',
-        //       color: Colors.red,
-        //       icon: Icons.delete,
-        //       onTap: () {
-        //         //widget.messageSource.deleteMessage(message);
-        //       },
-        //     ),
-        //   ],
-        // ),
+                ),
+              }
+            ],
+          ),
+          Text(
+            subject ?? '',
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontWeight:
+                    message.isSeen ? FontWeight.normal : FontWeight.bold),
+          ),
+        ],
       ),
-      onTap: () {
-        locator<NavigationService>()
-            .push(Routes.mailDetails, arguments: message);
-      },
     );
   }
 }

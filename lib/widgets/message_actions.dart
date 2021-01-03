@@ -273,17 +273,15 @@ class _MessageActionsState extends State<MessageActions> {
   }
 
   void toggleFlagged() async {
-    final flagged = !widget.message.isFlagged;
-    widget.message.isFlagged = flagged;
     final msg = widget.message;
-    await msg.mailClient.flagMessage(msg.mimeMessage, isFlagged: flagged);
+    final flagged = !msg.isFlagged;
+    await msg.source.markAsFlagged(msg, flagged);
   }
 
   void toggleSeen() async {
-    final seen = !widget.message.isSeen;
-    widget.message.isSeen = seen;
     final msg = widget.message;
-    await msg.mailClient.flagMessage(msg.mimeMessage, isSeen: seen);
+    final seen = !msg.isSeen;
+    await msg.source.markAsSeen(msg, seen);
   }
 
   void navigateToCompose(

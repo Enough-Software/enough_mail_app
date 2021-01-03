@@ -35,6 +35,11 @@ abstract class MessageSource extends ChangeNotifier
     notifyListeners();
   }
 
+  bool get shouldBlockImages;
+  bool get isJunk;
+  bool get isArchive;
+  bool get supportsMessageFolders;
+
   Future<bool> init();
 
   Future<void> waitForDownload();
@@ -129,6 +134,7 @@ abstract class MessageSource extends ChangeNotifier
               await message.mailClient.undoDeleteMessages(response.result);
           if (undoResponse.isOkStatus) {
             //TODO update mimeMessage's UID and sequence ID?
+            // TODO add mime message to mime source again?
             _cache.insert(message);
             notifyListeners();
           }
@@ -138,10 +144,41 @@ abstract class MessageSource extends ChangeNotifier
     return response;
   }
 
-  bool get shouldBlockImages;
-  bool get isJunk;
-  bool get isArchive;
-  bool get supportsMessageFolders;
+  Future<void> deleteMessages(
+      BuildContext context, List<Message> messages) async {
+    for (final message in messages) {
+      remove(message);
+      _cache.remove(message);
+    }
+    notifyListeners();
+    final sequenceByClient = orderByClient(messages);
+    final resultsByClient = <MailClient, DeleteResult>{};
+    for (final client in sequenceByClient.keys) {
+      final sequence = sequenceByClient[client];
+      final response = await client.deleteMessages(sequence);
+      if (response.isOkStatus && response.result?.isUndoable == true) {
+        resultsByClient[client] = response.result;
+      }
+    }
+    if (context != null && resultsByClient.isNotEmpty) {
+      locator<ScaffoldService>().showTextSnackBar(
+        context,
+        'Deleted ${messages.length} message(s)',
+        undo: () async {
+          for (final client in resultsByClient.keys) {
+            await client.undoDeleteMessages(resultsByClient[client]);
+          }
+          //TODO update mimeMessage's UID and sequence ID?
+          // TODO add mime message to mime source again?
+          // TODO what should I do when not all delete are undoable?
+          for (final message in messages) {
+            _cache.insert(message);
+          }
+          notifyListeners();
+        },
+      );
+    }
+  }
 
   Future<MailResponse> markAsJunk(BuildContext context, Message message) {
     return moveMessage(context, message, MailboxFlag.junk, 'Marked as spam');
@@ -175,6 +212,43 @@ abstract class MessageSource extends ChangeNotifier
     return response;
   }
 
+  Future<void> moveMessages(BuildContext context, List<Message> messages,
+      MailboxFlag targetMailboxFlag, String notification) async {
+    for (final message in messages) {
+      remove(message);
+      _cache.remove(message);
+    }
+    notifyListeners();
+    final sequenceByClient = orderByClient(messages);
+    final resultsByClient = <MailClient, MoveResult>{};
+    for (final client in sequenceByClient.keys) {
+      final sequence = sequenceByClient[client];
+      final response =
+          await client.moveMessagesToFlag(sequence, targetMailboxFlag);
+      if (response.isOkStatus && response.result?.isUndoable == true) {
+        resultsByClient[client] = response.result;
+      }
+    }
+    if (context != null && resultsByClient.isNotEmpty) {
+      locator<ScaffoldService>().showTextSnackBar(
+        context,
+        notification,
+        undo: () async {
+          for (final client in resultsByClient.keys) {
+            await client.undoMove(resultsByClient[client]);
+          }
+          //TODO update mimeMessage's UID and sequence ID?
+          // TODO add mime message to mime source again?
+          // TODO what should I do when not all delete are undoable?
+          for (final message in messages) {
+            _cache.insert(message);
+          }
+          notifyListeners();
+        },
+      );
+    }
+  }
+
   Future<MailResponse> moveToInbox(
       BuildContext context, Message message) async {
     return moveMessage(context, message, MailboxFlag.inbox, 'Moved to inbox');
@@ -182,6 +256,50 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<MailResponse> archive(BuildContext context, Message message) {
     return moveMessage(context, message, MailboxFlag.archive, 'Archived');
+  }
+
+  Future<MailResponse> markAsSeen(Message msg, bool seen) {
+    msg.isSeen = seen;
+    return msg.mailClient.flagMessage(msg.mimeMessage, isSeen: seen);
+  }
+
+  Future<MailResponse> markAsFlagged(Message msg, bool flagged) {
+    msg.isFlagged = flagged;
+    return msg.mailClient.flagMessage(msg.mimeMessage, isFlagged: flagged);
+  }
+
+  Future<void> markMessagesAsSeen(List<Message> messages, bool seen) {
+    messages.forEach((msg) => msg.isSeen = seen);
+    return storeMessageFlags(messages, MessageFlags.seen,
+        seen ? StoreAction.add : StoreAction.remove);
+  }
+
+  Future<void> markMessagesAsFlagged(List<Message> messages, bool flagged) {
+    messages.forEach((msg) => msg.isFlagged = flagged);
+    return storeMessageFlags(messages, MessageFlags.flagged,
+        flagged ? StoreAction.add : StoreAction.remove);
+  }
+
+  Map<MailClient, MessageSequence> orderByClient(List<Message> messages) {
+    final sequenceByClient = <MailClient, MessageSequence>{};
+    for (final msg in messages) {
+      final client = msg.mailClient;
+      if (sequenceByClient.containsKey(client)) {
+        sequenceByClient[client].addMessage(msg.mimeMessage);
+      } else {
+        sequenceByClient[client] = MessageSequence.fromMessage(msg.mimeMessage);
+      }
+    }
+    return sequenceByClient;
+  }
+
+  Future<void> storeMessageFlags(
+      List<Message> messages, String flag, StoreAction action) async {
+    final sequenceByClient = orderByClient(messages);
+    for (final client in sequenceByClient.keys) {
+      final sequence = sequenceByClient[client];
+      await client.store(sequence, [flag], action: action);
+    }
   }
 }
 
