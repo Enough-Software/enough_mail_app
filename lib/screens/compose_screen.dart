@@ -94,11 +94,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
     var mimeMessage = buildMimeMessage();
     //TODO enable global busy indicator
     //TODO check first if message can be sent or catch errors
-    var response = await mailClient.sendMessage(mimeMessage,
-        from: from.account.fromAddress);
-    print('message sent successfully: ${response.isOkStatus}');
-    //TODO disable global busy indicator
-    if (response.isOkStatus) {
+    try {
+      await mailClient.sendMessage(mimeMessage, from: from.account.fromAddress);
+      //TODO disable global busy indicator
       var storeFlags = true;
       final message = widget.data.originalMessage;
       switch (widget.data.action) {
@@ -118,7 +116,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
             message.mimeMessage.flags,
             action: StoreAction.replace);
       }
-    }
+    } on MailException catch (e) {}
   }
 
   List<MailAddress> parse(String text) {

@@ -84,30 +84,26 @@ class _ComposeScreenState2 extends State<ComposeScreen2> {
     var mimeMessage = buildMimeMessage();
     //TODO enable global busy indicator
     //TODO check first if message can be sent or catch errors
-    var response = await mailClient.sendMessage(mimeMessage,
-        from: from.account.fromAddress);
-    print('message sent successfully: ${response.isOkStatus}');
+    await mailClient.sendMessage(mimeMessage, from: from.account.fromAddress);
     //TODO disable global busy indicator
-    if (response.isOkStatus) {
-      var storeFlags = true;
-      final message = widget.data.originalMessage;
-      switch (widget.data.action) {
-        case ComposeAction.answer:
-          message.isAnswered = true;
-          break;
-        case ComposeAction.forward:
-          message.isForwarded = true;
-          break;
-        case ComposeAction.newMessage:
-          storeFlags = false;
-          // no action to do
-          break;
-      }
-      if (storeFlags) {
-        await mailClient.store(MessageSequence.fromMessage(message.mimeMessage),
-            message.mimeMessage.flags,
-            action: StoreAction.replace);
-      }
+    var storeFlags = true;
+    final message = widget.data.originalMessage;
+    switch (widget.data.action) {
+      case ComposeAction.answer:
+        message.isAnswered = true;
+        break;
+      case ComposeAction.forward:
+        message.isForwarded = true;
+        break;
+      case ComposeAction.newMessage:
+        storeFlags = false;
+        // no action to do
+        break;
+    }
+    if (storeFlags) {
+      await mailClient.store(MessageSequence.fromMessage(message.mimeMessage),
+          message.mimeMessage.flags,
+          action: StoreAction.replace);
     }
   }
 

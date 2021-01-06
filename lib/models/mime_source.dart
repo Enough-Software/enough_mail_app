@@ -41,20 +41,14 @@ class MimeSource {
   get supportsMessageFolders => (mailClient.mailboxes?.length != 0);
 
   Future<bool> init() async {
-    MailResponse<Mailbox> selectResponse;
     if (mailbox == null) {
-      selectResponse = await mailClient.selectInbox();
+      mailbox = await mailClient.selectInbox();
     } else {
-      selectResponse = await mailClient.selectMailbox(mailbox);
+      mailbox = await mailClient.selectMailbox(mailbox);
     }
-    if (selectResponse.isOkStatus) {
-      mailbox = selectResponse.result;
-      // pre-cache first page:
-      await _download(0);
-      return true;
-    } else {
-      return false;
-    }
+    // pre-cache first page:
+    await _download(0);
+    return true;
   }
 
   void dispose() {
@@ -205,23 +199,22 @@ class MimeSource {
   Future<void> _download(int pageIndex) async {
     //print('downloading $pageIndex');
     await mailClient.stopPollingIfNeeded();
-    final response = await mailClient.fetchMessages(
+    final mimeMessages = await mailClient.fetchMessages(
         count: _pageSize,
         page: (pageIndex + 1),
         fetchPreference: FetchPreference.envelope);
-    if (response.isOkStatus) {
-      _requestedPages.remove(pageIndex);
-      for (final mime in response.result) {
-        final cached = _getMessageFromCache(mime.sequenceId);
-        if (cached == null) {
-          _cache.add(mime);
-        }
-        _notifyLoaded(mime);
+    _requestedPages.remove(pageIndex);
+    for (final mime in mimeMessages) {
+      final cached = _getMessageFromCache(mime.sequenceId);
+      if (cached == null) {
+        _cache.add(mime);
       }
-      if (_cache.length > _cacheSize) {
-        _cache.removeRange(0, _cache.length - _cacheSize);
-      }
+      _notifyLoaded(mime);
     }
+    if (_cache.length > _cacheSize) {
+      _cache.removeRange(0, _cache.length - _cacheSize);
+    }
+
     if (_requestedPages.isNotEmpty) {
       pageIndex = _requestedPages.first;
       _downloadFuture = _download(pageIndex);
@@ -237,12 +230,9 @@ class MimeSource {
   }
 
   Future<List<DeleteResult>> deleteAllMessages() async {
-    final response = await mailClient.deleteAllMessages(mailbox);
-    if (response.isOkStatus) {
-      mailbox.messagesExists = 0;
-      return [response.result];
-    }
-    return null;
+    final deleteResult = await mailClient.deleteAllMessages(mailbox);
+    mailbox.messagesExists = 0;
+    return [deleteResult];
   }
 
   void remove(MimeMessage mimeMessage) {

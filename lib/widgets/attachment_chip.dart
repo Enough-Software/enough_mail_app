@@ -40,14 +40,17 @@ class _AttachmentChipState extends State<AttachmentChip> {
       setState(() {
         _isDownloading = true;
       });
-      var response = await widget.message.mailClient
-          .fetchMessagePart(widget.message.mimeMessage, widget.info.fetchId);
-      if (response.isOkStatus) {
-        _mimePart = response.result;
+      try {
+        _mimePart = await widget.message.mailClient
+            .fetchMessagePart(widget.message.mimeMessage, widget.info.fetchId);
+        showAttachment();
+      } on MailException catch (e) {
+        print(
+            'Unable to download attachment with id ${widget.info.fetchId}: $e');
+      } finally {
         setState(() {
           _isDownloading = false;
         });
-        showAttachment();
       }
     } else {
       showAttachment();

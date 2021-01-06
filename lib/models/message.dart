@@ -192,10 +192,8 @@ extension NewsLetter on MimeMessage {
         (uri) => uri.scheme.toLowerCase() == 'mailto',
         orElse: () => null);
     if (mailtoUri != null) {
-      var sendResponse = await sendMailto(mailtoUri, client, 'unsubscribe');
-      if (sendResponse.isOkStatus) {
-        return true;
-      }
+      await sendMailto(mailtoUri, client, 'unsubscribe');
+      return true;
     }
     // manually open unsubscribe web page:
     if (httpUri != null) {
@@ -214,10 +212,8 @@ extension NewsLetter on MimeMessage {
         (uri) => uri.scheme.toLowerCase() == 'mailto',
         orElse: () => null);
     if (mailtoUri != null) {
-      var sendResponse = await sendMailto(mailtoUri, client, 'subscribe');
-      if (sendResponse.isOkStatus) {
-        return true;
-      }
+      await sendMailto(mailtoUri, client, 'subscribe');
+      return true;
     }
     // manually open subscribe web page:
     final httpUri = uris.firstWhere(
@@ -237,7 +233,7 @@ extension NewsLetter on MimeMessage {
     return request.send();
   }
 
-  Future<MailResponse> sendMailto(
+  Future<void> sendMailto(
       Uri mailtoUri, MailClient client, String defaultSubject) {
     final account = client.account;
     var me = findRecipient(account.fromAddress,
