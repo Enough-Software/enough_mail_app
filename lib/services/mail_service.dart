@@ -255,11 +255,9 @@ class MailService {
       print('Unable to find account for ${client.account}');
       return;
     }
-    var mailboxTreeResponse =
+    final mailboxTree =
         await client.listMailboxesAsTree(createIntermediate: false);
-    if (mailboxTreeResponse.isOkStatus) {
-      _mailboxesPerAccount[account] = mailboxTreeResponse.result;
-    }
+    _mailboxesPerAccount[account] = mailboxTree;
   }
 
   Tree<Mailbox> getMailboxTreeFor(Account account) {
@@ -331,9 +329,9 @@ class MailService {
   Future<MailClient> connect(MailAccount mailAccount) async {
     var mailClient = MailClient(mailAccount,
         isLogEnabled: true, eventBus: AppEventBus.eventBus);
-    var response = await mailClient.connect();
-    print('login success: ${response.isOkStatus}');
-    if (response.isFailedStatus) {
+    try {
+      await mailClient.connect();
+    } on MailException {
       var preferredUserName =
           mailAccount.incoming.serverConfig.getUserName(mailAccount.userName);
       if (preferredUserName == null || preferredUserName == mailAccount.email) {
@@ -349,10 +347,13 @@ class MailService {
         }
         mailClient = MailClient(mailAccount,
             isLogEnabled: true, eventBus: AppEventBus.eventBus);
-        response = await mailClient.connect();
-        print('subsequent login success: ${response.isOkStatus}');
+        try {
+          await mailClient.connect();
+        } on MailException {
+          return null;
+        }
       }
     }
-    return response.isOkStatus ? mailClient : null;
+    return mailClient;
   }
 }

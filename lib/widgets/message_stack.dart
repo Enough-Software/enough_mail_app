@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
@@ -514,14 +515,15 @@ class _MessageCardState extends State<MessageCard> {
   }
 
   Future<Message> downloadMessageContents(Message message) async {
-    var mimeResponse =
-        await message.mailClient.fetchMessageContents(message.mimeMessage);
-    if (mimeResponse.isOkStatus) {
-      final mime = mimeResponse.result;
+    try {
+      final mime =
+          await message.mailClient.fetchMessageContents(message.mimeMessage);
       message.updateMime(mime);
       if (mime.isNewsletter || mime.hasAttachments()) {
         setState(() {});
       }
+    } on MailException catch (e) {
+      print('unable to download message contents: $e');
     }
     return message;
   }

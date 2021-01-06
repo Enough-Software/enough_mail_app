@@ -119,29 +119,24 @@ abstract class MessageSource extends ChangeNotifier
     notifyListeners();
   }
 
-  Future<MailResponse> deleteMessage(
-      BuildContext context, Message message) async {
+  Future<void> deleteMessage(BuildContext context, Message message) async {
     remove(message);
     removeFromCache(message);
-    final response =
+    final deleteResult =
         await message.mailClient.deleteMessage(message.mimeMessage);
-    if (response.result?.isUndoable == true) {
+    if (deleteResult?.isUndoable == true) {
       locator<ScaffoldService>().showTextSnackBar(
         context,
         'Deleted',
         undo: () async {
-          final undoResponse =
-              await message.mailClient.undoDeleteMessages(response.result);
-          if (undoResponse.isOkStatus) {
-            //TODO update mimeMessage's UID and sequence ID?
-            // TODO add mime message to mime source again?
-            _cache.insert(message);
-            notifyListeners();
-          }
+          await message.mailClient.undoDeleteMessages(deleteResult);
+          //TODO update mimeMessage's UID and sequence ID?
+          // TODO add mime message to mime source again?
+          _cache.insert(message);
+          notifyListeners();
         },
       );
     }
-    return response;
   }
 
   Future<void> deleteMessages(
@@ -155,9 +150,9 @@ abstract class MessageSource extends ChangeNotifier
     final resultsByClient = <MailClient, DeleteResult>{};
     for (final client in sequenceByClient.keys) {
       final sequence = sequenceByClient[client];
-      final response = await client.deleteMessages(sequence);
-      if (response.isOkStatus && response.result?.isUndoable == true) {
-        resultsByClient[client] = response.result;
+      final deleteResult = await client.deleteMessages(sequence);
+      if (deleteResult?.isUndoable == true) {
+        resultsByClient[client] = deleteResult;
       }
     }
     if (context != null && resultsByClient.isNotEmpty) {
@@ -180,36 +175,32 @@ abstract class MessageSource extends ChangeNotifier
     }
   }
 
-  Future<MailResponse> markAsJunk(BuildContext context, Message message) {
+  Future<void> markAsJunk(BuildContext context, Message message) {
     return moveMessage(context, message, MailboxFlag.junk, 'Marked as spam');
   }
 
-  Future<MailResponse> markAsNotJunk(BuildContext context, Message message) {
+  Future<void> markAsNotJunk(BuildContext context, Message message) {
     return moveMessage(context, message, MailboxFlag.inbox, 'Moved to inbox');
   }
 
-  Future<MailResponse> moveMessage(BuildContext context, Message message,
+  Future<void> moveMessage(BuildContext context, Message message,
       MailboxFlag targetMailboxFlag, String notification) async {
     remove(message);
     removeFromCache(message);
-    final response = await message.mailClient
+    final moveResult = await message.mailClient
         .moveMessageToFlag(message.mimeMessage, targetMailboxFlag);
-    if (response.result?.isUndoable == true) {
+    if (moveResult?.isUndoable == true) {
       locator<ScaffoldService>().showTextSnackBar(
         context,
         notification,
         undo: () async {
-          final undoResponse =
-              await message.mailClient.undoMove(response.result);
-          if (undoResponse.isOkStatus) {
-            //TODO update message's UID and sequence ID?
-            _cache.insert(message);
-            notifyListeners();
-          }
+          final undoResponse = await message.mailClient.undoMove(moveResult);
+          //TODO update message's UID and sequence ID?
+          _cache.insert(message);
+          notifyListeners();
         },
       );
     }
-    return response;
   }
 
   Future<void> moveMessages(BuildContext context, List<Message> messages,
@@ -223,10 +214,10 @@ abstract class MessageSource extends ChangeNotifier
     final resultsByClient = <MailClient, MoveResult>{};
     for (final client in sequenceByClient.keys) {
       final sequence = sequenceByClient[client];
-      final response =
+      final moveResult =
           await client.moveMessagesToFlag(sequence, targetMailboxFlag);
-      if (response.isOkStatus && response.result?.isUndoable == true) {
-        resultsByClient[client] = response.result;
+      if (moveResult?.isUndoable == true) {
+        resultsByClient[client] = moveResult;
       }
     }
     if (context != null && resultsByClient.isNotEmpty) {
@@ -249,21 +240,20 @@ abstract class MessageSource extends ChangeNotifier
     }
   }
 
-  Future<MailResponse> moveToInbox(
-      BuildContext context, Message message) async {
+  Future<void> moveToInbox(BuildContext context, Message message) async {
     return moveMessage(context, message, MailboxFlag.inbox, 'Moved to inbox');
   }
 
-  Future<MailResponse> archive(BuildContext context, Message message) {
+  Future<void> archive(BuildContext context, Message message) {
     return moveMessage(context, message, MailboxFlag.archive, 'Archived');
   }
 
-  Future<MailResponse> markAsSeen(Message msg, bool seen) {
+  Future<void> markAsSeen(Message msg, bool seen) {
     msg.isSeen = seen;
     return msg.mailClient.flagMessage(msg.mimeMessage, isSeen: seen);
   }
 
-  Future<MailResponse> markAsFlagged(Message msg, bool flagged) {
+  Future<void> markAsFlagged(Message msg, bool flagged) {
     msg.isFlagged = flagged;
     return msg.mailClient.flagMessage(msg.mimeMessage, isFlagged: flagged);
   }

@@ -1,4 +1,3 @@
-import 'package:enough_mail/mail/mail_response.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/date_service.dart';
@@ -91,7 +90,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<MailResponse> deleteMessage(BuildContext context, Message message) {
+  Future<void> deleteMessage(BuildContext context, Message message) {
     return messageSource.deleteMessage(context, message);
   }
 }
