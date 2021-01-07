@@ -11,7 +11,7 @@ abstract class MessageSource extends ChangeNotifier
     implements MimeSourceSubscriber {
   int get size;
   bool get isEmpty => (size == 0);
-  final _cache = MessageCache();
+  final cache = MessageCache();
   String _description;
   set description(String value) {
     _description = value;
@@ -53,13 +53,13 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Message _getFromCache(int index) {
-    return _cache[index];
+    return cache[index];
   }
 
   Message _getUncachedMessage(int index);
 
   void addToCache(Message message) {
-    _cache.add(message);
+    cache.add(message);
   }
 
   Message getMessageAt(int index) {
@@ -82,13 +82,13 @@ abstract class MessageSource extends ChangeNotifier
   void remove(Message message);
 
   void removeFromCache(Message message) {
-    _cache.remove(message);
+    cache.remove(message);
     notifyListeners();
   }
 
   @override
   void onMailFlagsUpdated(MimeMessage mime, MimeSource source) {
-    final message = _cache.getWithMime(mime, source.mailClient);
+    final message = cache.getWithMime(mime, source.mailClient);
     if (message != null) {
       message.updateFlags(mime.flags);
     }
@@ -97,7 +97,7 @@ abstract class MessageSource extends ChangeNotifier
   @override
   void onMailLoaded(MimeMessage mime, MimeSource source) {
     final message =
-        _cache.getWithMimeSequenceId(mime.sequenceId, source.mailClient);
+        cache.getWithMimeSequenceId(mime.sequenceId, source.mailClient);
     // print('onMailLoaded: updating $message for mime ${mime.sequenceId}');
     if (message != null) {
       message.updateMime(mime);
@@ -106,7 +106,7 @@ abstract class MessageSource extends ChangeNotifier
 
   @override
   void onMailVanished(MimeMessage mime, MimeSource source) {
-    final message = _cache.getWithMime(mime, source.mailClient);
+    final message = cache.getWithMime(mime, source.mailClient);
     remove(message);
   }
 
@@ -114,7 +114,7 @@ abstract class MessageSource extends ChangeNotifier
   void onMailAdded(MimeMessage mime, MimeSource source) {
     // the source index is rather 0, here:
     final message = Message(mime, source.mailClient, this, 0);
-    _cache.insert(message);
+    cache.insert(message);
     print('onMailAdded: ${mime.decodeSubject()}');
     notifyListeners();
   }
@@ -132,7 +132,7 @@ abstract class MessageSource extends ChangeNotifier
           await message.mailClient.undoDeleteMessages(deleteResult);
           //TODO update mimeMessage's UID and sequence ID?
           // TODO add mime message to mime source again?
-          _cache.insert(message);
+          cache.insert(message);
           notifyListeners();
         },
       );
@@ -143,7 +143,7 @@ abstract class MessageSource extends ChangeNotifier
       BuildContext context, List<Message> messages) async {
     for (final message in messages) {
       remove(message);
-      _cache.remove(message);
+      cache.remove(message);
     }
     notifyListeners();
     final sequenceByClient = orderByClient(messages);
@@ -167,7 +167,7 @@ abstract class MessageSource extends ChangeNotifier
           // TODO add mime message to mime source again?
           // TODO what should I do when not all delete are undoable?
           for (final message in messages) {
-            _cache.insert(message);
+            cache.insert(message);
           }
           notifyListeners();
         },
@@ -196,7 +196,7 @@ abstract class MessageSource extends ChangeNotifier
         undo: () async {
           final undoResponse = await message.mailClient.undoMove(moveResult);
           //TODO update message's UID and sequence ID?
-          _cache.insert(message);
+          cache.insert(message);
           notifyListeners();
         },
       );
@@ -207,7 +207,7 @@ abstract class MessageSource extends ChangeNotifier
       MailboxFlag targetMailboxFlag, String notification) async {
     for (final message in messages) {
       remove(message);
-      _cache.remove(message);
+      cache.remove(message);
     }
     notifyListeners();
     final sequenceByClient = orderByClient(messages);
@@ -232,7 +232,7 @@ abstract class MessageSource extends ChangeNotifier
           // TODO add mime message to mime source again?
           // TODO what should I do when not all delete are undoable?
           for (final message in messages) {
-            _cache.insert(message);
+            cache.insert(message);
           }
           notifyListeners();
         },
@@ -343,7 +343,7 @@ class MailboxMessageSource extends MessageSource {
   Future<List<DeleteResult>> deleteAllMessages() async {
     final results = await _mimeSource.deleteAllMessages();
     if (results?.isNotEmpty ?? false) {
-      _cache.clear();
+      cache.clear();
       notifyListeners();
     }
     return results;
@@ -484,7 +484,7 @@ class MultipleMessageSource extends MessageSource {
       }
     }
     if (results.isNotEmpty) {
-      _cache.clear();
+      cache.clear();
       notifyListeners();
     }
     return results;
