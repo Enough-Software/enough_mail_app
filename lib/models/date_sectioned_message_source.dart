@@ -28,7 +28,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
   Future<bool> init() async {
     bool success = await this.messageSource.init();
     if (success) {
-      _sections = await getDateSections();
+      _sections = await downloadDateSections();
       _numberOfSections = _sections.length;
       isInitialized = true;
       notifyListeners();
@@ -43,17 +43,26 @@ class DateSectionedMessageSource extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<List<MessageDateSection>> getDateSections(
+  Future<List<MessageDateSection>> downloadDateSections(
       {int numberOfMessagesToBeConsidered = 40}) async {
-    final sections = <MessageDateSection>[];
-    DateSectionRange lastRange;
-    int foundSections = 0;
     final max = messageSource.size;
     if (numberOfMessagesToBeConsidered > max) {
       numberOfMessagesToBeConsidered = max;
     }
+    final messages = <Message>[];
     for (var i = 0; i < numberOfMessagesToBeConsidered; i++) {
       final message = await messageSource.waitForMessageAt(i);
+      messages.add(message);
+    }
+    return getDateSections(messages);
+  }
+
+  List<MessageDateSection> getDateSections(List<Message> messages) {
+    final sections = <MessageDateSection>[];
+    DateSectionRange lastRange;
+    int foundSections = 0;
+    for (var i = 0; i < messages.length; i++) {
+      final message = messages[i];
       final dateTime = message.mimeMessage.decodeDate()?.toLocal();
       if (dateTime != null) {
         final range = locator<DateService>().determineDateSection(dateTime);
@@ -86,12 +95,28 @@ class DateSectionedMessageSource extends ChangeNotifier {
     return SectionElement(null, message);
   }
 
+  List<Message> _getTopMessages(int length) {
+    final max = messageSource.size;
+    if (length > max) {
+      length = max;
+    }
+    final messages = <Message>[];
+    for (int i = 0; i < length; i++) {
+      final message = messageSource.cache.getWithSourceIndex(i);
+      if (message != null) {
+        messages.add(message);
+      }
+    }
+    return messages;
+  }
+
   void _update() {
+    _sections = getDateSections(_getTopMessages(40));
     notifyListeners();
   }
 
-  Future<void> deleteMessage(BuildContext context, Message message) {
-    return messageSource.deleteMessage(context, message);
+  Future<void> deleteMessage(BuildContext context, Message message) async {
+    await messageSource.deleteMessage(context, message);
   }
 }
 

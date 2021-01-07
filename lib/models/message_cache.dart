@@ -31,6 +31,11 @@ class MessageCache {
         orElse: () => null);
   }
 
+  Message getWithSourceIndex(int sourceIndex) {
+    return _messages.firstWhere((m) => m.sourceIndex == sourceIndex,
+        orElse: () => null);
+  }
+
   void add(Message message) {
     _messages.add(message);
     if (_messages.length > maxSize) {
