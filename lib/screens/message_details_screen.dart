@@ -93,10 +93,17 @@ class _MessageContent extends StatefulWidget {
 class _MessageContentState extends State<_MessageContent> {
   bool _showSource = false;
   bool _blockExternalImages;
+  bool _messageDownloadError;
 
   @override
   void initState() {
-    _blockExternalImages = false;
+    final mime = widget.message.mimeMessage;
+    if (mime.isDownloaded) {
+      _blockExternalImages = shouldImagesBeBlocked(mime);
+    } else {
+      _blockExternalImages = false;
+    }
+    _messageDownloadError = false;
     super.initState();
   }
 
@@ -130,6 +137,9 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   Widget buildMailDetails() {
+    if (_messageDownloadError) {
+      return Text('Message could not be downloaded.');
+    }
     if (_showSource) {
       return SingleChildScrollView(
           child: Text(widget.message.mimeMessage.renderMessage()));
@@ -287,14 +297,13 @@ class _MessageContentState extends State<_MessageContent> {
       mailClient: widget.message.mailClient,
       markAsSeen: true,
       onDownloaded: onMimeMessageDownloaded,
+      onDownloadError: onMimeMessageDownloadError,
       blockExternalImages: _blockExternalImages,
       mailtoDelegate: handleMailto,
     );
   }
 
-  // Update view after message has been downloaded successfully
-  void onMimeMessageDownloaded(MimeMessage mimeMessage) {
-    widget.message.updateMime(mimeMessage);
+  bool shouldImagesBeBlocked(MimeMessage mimeMessage) {
     var blockExternalImages =
         locator<SettingsService>().settings.blockExternalImages ||
             widget.message.source.shouldBlockImages;
@@ -305,6 +314,13 @@ class _MessageContentState extends State<_MessageContent> {
         blockExternalImages = false;
       }
     }
+    return blockExternalImages;
+  }
+
+  // Update view after message has been downloaded successfully
+  void onMimeMessageDownloaded(MimeMessage mimeMessage) {
+    widget.message.updateMime(mimeMessage);
+    final blockExternalImages = shouldImagesBeBlocked(mimeMessage);
     if (mimeMessage.isSeen ||
         mimeMessage.isNewsletter ||
         mimeMessage.hasAttachments() ||
@@ -313,6 +329,13 @@ class _MessageContentState extends State<_MessageContent> {
         _blockExternalImages = blockExternalImages;
       });
     }
+  }
+
+  void onMimeMessageDownloadError(MailException e) {
+    print('message could not be downloaded: $e');
+    setState(() {
+      _messageDownloadError = true;
+    });
   }
 
   Future handleMailto(Uri mailto, MimeMessage mimeMessage) {
