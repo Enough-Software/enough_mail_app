@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "CLA Signature Bot"
-        uses: https://github.com/roblox/cla-assistant@2.0.0
+        uses: roblox/cla-assistant
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
