@@ -1,7 +1,5 @@
 name: "CLA Signature Bot"
 on:
-  issue_comment:
-    types: [created]
   pull_request:
     types: [opened,closed,synchronize]
 
