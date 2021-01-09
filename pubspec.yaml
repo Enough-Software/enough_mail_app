@@ -26,20 +26,20 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   enough_mail: #^0.0.36
-    git:
-      url: https://github.com/Enough-Software/enough_mail.git
-      ref: main
-    # path: ../enough_mail
+    # git:
+    #   url: https://github.com/Enough-Software/enough_mail.git
+    #   ref: main
+    path: ../enough_mail
   enough_mail_html: #any
-    git:
-      url: https://github.com/Enough-Software/enough_mail_html.git
-      ref: main
-    # path: ../enough_mail_html
+    # git:
+    #   url: https://github.com/Enough-Software/enough_mail_html.git
+    #   ref: main
+    path: ../enough_mail_html
   enough_mail_flutter: #any
-    git:
-      url: https://github.com/Enough-Software/enough_mail_flutter.git
-      ref: main
-    # path: ../enough_mail_flutter
+    # git:
+    #   url: https://github.com/Enough-Software/enough_mail_flutter.git
+    #   ref: main
+    path: ../enough_mail_flutter
   enough_serialization:
     any
     # git:

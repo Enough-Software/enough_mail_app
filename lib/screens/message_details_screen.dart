@@ -171,14 +171,14 @@ class _MessageContentState extends State<_MessageContent> {
               1: FlexColumnWidth()
             },
             children: [
-              TableRow(children: <Widget>[
+              TableRow(children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                   child: Text('From'),
                 ),
                 buildMailAddresses(mime.from)
               ]),
-              TableRow(children: <Widget>[
+              TableRow(children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                   child: Text('To'),
@@ -186,7 +186,7 @@ class _MessageContentState extends State<_MessageContent> {
                 buildMailAddresses(mime.to)
               ]),
               if (mime.cc?.isNotEmpty ?? false) ...{
-                TableRow(children: <Widget>[
+                TableRow(children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                     child: Text('CC'),
@@ -194,7 +194,7 @@ class _MessageContentState extends State<_MessageContent> {
                   buildMailAddresses(mime.cc)
                 ]),
               },
-              TableRow(children: <Widget>[
+              TableRow(children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                   child: Text('Date'),
@@ -203,7 +203,7 @@ class _MessageContentState extends State<_MessageContent> {
               ]),
             ]),
         SelectableText(
-          subject,
+          subject ?? '<none>',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         buildAttachments(attachments),
