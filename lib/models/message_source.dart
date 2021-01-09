@@ -155,22 +155,24 @@ abstract class MessageSource extends ChangeNotifier
         resultsByClient[client] = deleteResult;
       }
     }
-    if (context != null && resultsByClient.isNotEmpty) {
+    if (context != null) {
       locator<ScaffoldService>().showTextSnackBar(
         context,
         'Deleted ${messages.length} message(s)',
-        undo: () async {
-          for (final client in resultsByClient.keys) {
-            await client.undoDeleteMessages(resultsByClient[client]);
-          }
-          //TODO update mimeMessage's UID and sequence ID?
-          // TODO add mime message to mime source again?
-          // TODO what should I do when not all delete are undoable?
-          for (final message in messages) {
-            cache.insert(message);
-          }
-          notifyListeners();
-        },
+        undo: resultsByClient.isEmpty
+            ? null
+            : () async {
+                for (final client in resultsByClient.keys) {
+                  await client.undoDeleteMessages(resultsByClient[client]);
+                }
+                //TODO update mimeMessage's UID and sequence ID?
+                // TODO add mime message to mime source again?
+                // TODO what should I do when not all delete are undoable?
+                for (final message in messages) {
+                  cache.insert(message);
+                }
+                notifyListeners();
+              },
       );
     }
   }
