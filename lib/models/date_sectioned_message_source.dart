@@ -112,6 +112,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
 
   void _update() {
     _sections = getDateSections(_getTopMessages(40));
+    _numberOfSections = _sections.length;
     notifyListeners();
   }
 
