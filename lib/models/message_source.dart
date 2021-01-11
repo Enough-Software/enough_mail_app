@@ -196,7 +196,8 @@ abstract class MessageSource extends ChangeNotifier
         context,
         notification,
         undo: () async {
-          final undoResponse = await message.mailClient.undoMove(moveResult);
+          final undoResponse =
+              await message.mailClient.undoMoveMessages(moveResult);
           //TODO update message's UID and sequence ID?
           cache.insert(message);
           notifyListeners();
@@ -228,7 +229,7 @@ abstract class MessageSource extends ChangeNotifier
         notification,
         undo: () async {
           for (final client in resultsByClient.keys) {
-            await client.undoMove(resultsByClient[client]);
+            await client.undoMoveMessages(resultsByClient[client]);
           }
           //TODO update mimeMessage's UID and sequence ID?
           // TODO add mime message to mime source again?
