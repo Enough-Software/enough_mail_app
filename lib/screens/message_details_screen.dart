@@ -300,6 +300,7 @@ class _MessageContentState extends State<_MessageContent> {
       onDownloadError: onMimeMessageDownloadError,
       blockExternalImages: _blockExternalImages,
       mailtoDelegate: handleMailto,
+      maxImageWidth: 320,
     );
   }
 
