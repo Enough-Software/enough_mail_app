@@ -1,5 +1,9 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message.dart';
+import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
 
 class AttachmentChip extends StatefulWidget {
@@ -58,13 +62,10 @@ class _AttachmentChipState extends State<AttachmentChip> {
   }
 
   void showAttachment() {
-    //TODO open attachment view
-    if (widget.info.contentType?.mediaType?.top == MediaToptype.image) {
-      var imageData = _mimePart.decodeContentBinary();
-      _showDialog(buildImageDialog(Image.memory(imageData)));
-    } else {
-      _showTextDialog('${widget.info.fileName} cannot be shown');
-    }
+    final mediaViewer =
+        MediaViewer(widget.message.mimeMessage, _mimePart, _mimePart.mediaType);
+    locator<NavigationService>()
+        .push(Routes.mediaViewer, arguments: mediaViewer);
   }
 
   Widget buildImageDialog(Image image) {

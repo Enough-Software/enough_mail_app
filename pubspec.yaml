@@ -55,12 +55,13 @@ dependencies:
   get_it: ^4.0.4
   webview_flutter: ^1.0.7
   photo_view: ^0.10.3
+  syncfusion_flutter_pdfviewer: ^18.4.34-beta
   # html_editor: ^1.0.1
   # zefyr: ^0.11.0
   # flutter_html: ^1.0.2
   url_launcher: ^5.5.0
   simple_gravatar: ^1.0.5
-  image: ^2.1.14
+  image: ^2.1.19
   flutter_icons: ^1.1.0
 
   # The following adds the Cupertino Icons font to your application.

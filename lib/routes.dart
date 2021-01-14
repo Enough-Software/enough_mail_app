@@ -3,6 +3,7 @@ import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
+import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
 
 class Routes {
@@ -16,6 +17,8 @@ class Routes {
   static const String mailCompose = 'mailCompose';
   static const String welcome = 'welcome';
   static const String splash = 'splash';
+
+  static const String mediaViewer = 'mediaViewer';
 }
 
 class AppRouter {
@@ -38,18 +41,6 @@ class AppRouter {
         page = AccountEditScreen(account: arguments as Account);
         break;
       case Routes.messageSource:
-        // if (arguments is MailClient) {
-        //   page = MailboxScreen(arguments.account, mailClient: arguments);
-        // } else if (arguments is MailAccount) {
-        //   page = MailboxScreen(arguments);
-        // } else {
-        //   var mailService = locator<MailService>();
-        //   page = MailboxScreen(
-        //     mailService.current.account,
-        //     mailClient: mailService.current,
-        //     mailbox: arguments as Mailbox,
-        //   );
-        // }
         page = MessageSourceScreen(arguments as MessageSource);
         break;
       case Routes.mailDetails:
@@ -59,6 +50,10 @@ class AppRouter {
       case Routes.mailCompose:
         var composeData = arguments as ComposeData;
         page = ComposeScreen(data: composeData);
+        break;
+      case Routes.mediaViewer:
+        final mediaViewer = arguments as MediaViewer;
+        page = MediaScreen(mediaViewer: mediaViewer);
         break;
       case Routes.splash:
         page = SplashScreen();
