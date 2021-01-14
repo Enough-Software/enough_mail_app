@@ -301,6 +301,7 @@ class _MessageContentState extends State<_MessageContent> {
       blockExternalImages: _blockExternalImages,
       mailtoDelegate: handleMailto,
       maxImageWidth: 320,
+      showMediaDelegate: navigateToMedia,
     );
   }
 
@@ -345,6 +346,11 @@ class _MessageContentState extends State<_MessageContent> {
         ComposeData(widget.message, messageBuilder, ComposeAction.newMessage);
     return locator<NavigationService>()
         .push(Routes.mailCompose, arguments: composeData);
+  }
+
+  Future navigateToMedia(MediaViewer mediaWidget) {
+    return locator<NavigationService>()
+        .push(Routes.mediaViewer, arguments: mediaWidget);
   }
 
   void showSourceCode() {
