@@ -9,7 +9,9 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Maily"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:fullBackupContent="@xml/backup_rules">
+        >
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
