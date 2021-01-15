@@ -51,6 +51,7 @@ dependencies:
   webview_flutter: ^1.0.7
   photo_view: ^0.10.3
   syncfusion_flutter_pdfviewer: ^18.4.34-beta
+  flutter_sound_lite: ^7.5.1+2
   # html_editor: ^1.0.1
   # zefyr: ^0.11.0
   # flutter_html: ^1.0.2

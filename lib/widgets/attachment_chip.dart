@@ -68,44 +68,6 @@ class _AttachmentChipState extends State<AttachmentChip> {
         .push(Routes.mediaViewer, arguments: mediaViewer);
   }
 
-  Widget buildImageDialog(Image image) {
-    return AlertDialog(
-      content: image,
-      actions: [
-        TextButton(
-          child: Text('Done'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
-    );
-  }
-
-  void _showDialog(Widget dialog) {
-    showDialog(
-      context: context,
-      builder: (_) => dialog,
-    );
-  }
-
-  void _showTextDialog(String text) {
-    showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-              title: Text("Material Dialog"),
-              content: Text(text),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Close me!'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            ));
-  }
-
   Widget buildIcon() {
     if (_isDownloading) {
       return CircularProgressIndicator();
@@ -148,7 +110,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
           break;
       }
     }
-
-    return Icon(icon);
+    final color = (_mimePart != null) ? Colors.black : Colors.grey[700];
+    return Icon(icon, color: color);
   }
 }
