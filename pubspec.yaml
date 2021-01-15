@@ -18,7 +18,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.10.0 <3.0.0"
+  sdk: '>=2.10.0 <3.0.0'
 
 dependencies:
   flutter:
@@ -59,6 +59,8 @@ dependencies:
   simple_gravatar: ^1.0.5
   image: ^2.1.19
   flutter_icons: ^1.1.0
+  path_provider: ^1.6.27
+  share: '>=0.6.5+4 <2.0.0'
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
