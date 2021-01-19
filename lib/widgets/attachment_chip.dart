@@ -25,9 +25,11 @@ class _AttachmentChipState extends State<AttachmentChip> {
 
   @override
   void initState() {
-    _mimePart = widget.message.mimeMessage.getPart(widget.info.fetchId);
+    final mimeMessage = widget.message.mimeMessage;
+    _mimePart = mimeMessage.getPart(widget.info.fetchId);
     if (_mimePart != null) {
-      _mediaProvider = MimeMediaProviderFactory.fromMime(_mimePart);
+      _mediaProvider =
+          MimeMediaProviderFactory.fromMime(mimeMessage, _mimePart);
     }
     super.initState();
   }
@@ -158,7 +160,8 @@ class _AttachmentChipState extends State<AttachmentChip> {
     try {
       _mimePart = await widget.message.mailClient
           .fetchMessagePart(widget.message.mimeMessage, widget.info.fetchId);
-      _mediaProvider = MimeMediaProviderFactory.fromMime(_mimePart);
+      _mediaProvider = MimeMediaProviderFactory.fromMime(
+          widget.message.mimeMessage, _mimePart);
       final media = InteractiveMediaWidget(mediaProvider: _mediaProvider);
       showAttachment(media);
     } on MailException catch (e) {
