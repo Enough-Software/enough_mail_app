@@ -17,6 +17,7 @@ import 'package:enough_mail_app/widgets/attachment_chip.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_mail_app/widgets/message_actions.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
+import 'package:enough_media/enough_media.dart';
 import 'package:flutter/material.dart';
 
 class MessageDetailsScreen extends StatefulWidget {
@@ -348,9 +349,9 @@ class _MessageContentState extends State<_MessageContent> {
         .push(Routes.mailCompose, arguments: composeData);
   }
 
-  Future navigateToMedia(MediaViewer mediaWidget) {
+  Future navigateToMedia(InteractiveMediaWidget mediaWidget) {
     return locator<NavigationService>()
-        .push(Routes.mediaViewer, arguments: mediaWidget);
+        .push(Routes.interactiveMedia, arguments: mediaWidget);
   }
 
   void showSourceCode() {
