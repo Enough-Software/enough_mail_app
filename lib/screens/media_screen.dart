@@ -33,6 +33,19 @@ class InteractiveMediaScreen extends StatelessWidget {
 
   void share() async {
     final provider = mediaWidget.mediaProvider;
+    if (provider is TextMediaProvider) {
+      await shareText(provider);
+    } else if (provider is MemoryMediaProvider) {
+      shareFile(provider);
+    }
+  }
+
+  Future shareText(TextMediaProvider provider) async {
+    await Share.share(provider.text,
+        subject: provider.description ?? provider.name);
+  }
+
+  Future shareFile(MemoryMediaProvider provider) async {
     final tempDir = await pathprovider.getTemporaryDirectory();
     final originalFileName =
         provider.name ?? 'unknown_${DateTime.now().millisecondsSinceEpoch}';
@@ -42,15 +55,14 @@ class InteractiveMediaScreen extends StatelessWidget {
     final safeFileName = filterNonAscii(originalFileName);
     final path = '${tempDir.path}/$safeFileName$ext';
     final file = File(path);
-    if (provider is MemoryMediaProvider) {
-      // this should always be true for now...
-      await file.writeAsBytes(provider.data);
-    }
+    await file.writeAsBytes(provider.data);
 
     final paths = [path];
     final mimeTypes = provider.mediaType != null ? [provider.mediaType] : null;
     await Share.shareFiles(paths,
-        mimeTypes: mimeTypes, subject: originalFileName);
+        mimeTypes: mimeTypes,
+        subject: originalFileName,
+        text: provider.description);
   }
 
   static String filterNonAscii(String input) {
