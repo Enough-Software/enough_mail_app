@@ -4,6 +4,7 @@ import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
+import 'package:enough_media/enough_media.dart';
 import 'package:flutter/material.dart';
 
 class Routes {
@@ -17,8 +18,7 @@ class Routes {
   static const String mailCompose = 'mailCompose';
   static const String welcome = 'welcome';
   static const String splash = 'splash';
-
-  static const String mediaViewer = 'mediaViewer';
+  static const String interactiveMedia = 'interactiveMedia';
 }
 
 class AppRouter {
@@ -51,9 +51,9 @@ class AppRouter {
         var composeData = arguments as ComposeData;
         page = ComposeScreen(data: composeData);
         break;
-      case Routes.mediaViewer:
-        final mediaViewer = arguments as MediaViewer;
-        page = MediaScreen(mediaViewer: mediaViewer);
+      case Routes.interactiveMedia:
+        final mediaViewer = arguments as InteractiveMediaWidget;
+        page = InteractiveMediaScreen(mediaWidget: mediaViewer);
         break;
       case Routes.splash:
         page = SplashScreen();

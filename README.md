@@ -9,13 +9,15 @@ Current development state is very limted to say the least. But it should be enou
 * Mail management: delete, mark as read/unread
 * Unsubscribe from newslettters easily
 * View attachments - images only at this stage
-* Compose messages: compose text messages
+* Compose messages: compose plain text messages and reply to plain text messages
 * Swipe right to left to delete
 * Swipe left to right to mark as read/unread
 * Optionally you can block external images when viewing mails
 * You can specify aliases and check for + alias support by your mail provider
 * Swipe left or right in the message details to view the next/previous message
 * Experimental 'stack' display of messages
+* Share received attachments to other apps
+* Share files to Maily (Android only so far)
 
 ## Miss a feature or found a bug?
 
@@ -33,6 +35,8 @@ This is how you contribute:
 * Push changes to your personal repository: `git push origin`
 * Go to [enough_mail_app](https://github.com/enough-software/enough_mail_app/) and create a pull request.
 
+When you have compile problems this is usually due to not getting the latest version from git. Call `flutter pub upgrade` to ensure that you are on the latest version of all referenced projects.
+
 ## License
 `enough_mail_app` is licensed under the [GNU Public License 3.0 "GPL"](LICENSE). In a nutshell this means that you can play around as much as possible for private reasons, but that you need to publish your changes under the GPL, as soon as you the code commercially.
 
@@ -41,6 +45,7 @@ Check out these related projects:
 * [enough_mail](https://github.com/Enough-Software/enough_mail) mail libraries in pure Dart.
 * [enough_mail_html](https://github.com/Enough-Software/enough_mail_html) generates HTML out of a `MimeMessage`.
 * [enough_mail_flutter](https://github.com/Enough-Software/enough_mail_flutter) provides some common Flutter widgets for any mail app.
+* [enough_media](https://github.com/Enough-Software/enough_media) provides media rendering widgets.  
 * [enough_convert](https://github.com/Enough-Software/enough_convert) provides the encodings missing from `dart:convert`.  
 
 

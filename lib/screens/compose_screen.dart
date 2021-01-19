@@ -3,6 +3,7 @@ import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/sender.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
 import 'package:flutter/material.dart';
 
 import '../locator.dart';
@@ -271,6 +272,15 @@ class _ComposeScreenState extends State<ComposeScreen> {
                   decoration: InputDecoration(
                       labelText: 'Subject', hintText: 'Message subject'),
                 ),
+                if (widget.data.messageBuilder.attachments.isNotEmpty) ...{
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: AttachmentComposeBar(composeData: widget.data),
+                  ),
+                  Divider(
+                    color: Colors.grey,
+                  )
+                },
               ],
             ),
           ),
