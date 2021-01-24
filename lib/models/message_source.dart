@@ -430,6 +430,7 @@ class MultipleMessageSource extends MessageSource {
   final List<MimeSource> mimeSources;
   final _multipleMimeSources = <_MultipleMimeSource>[];
   int _lastUncachedIndex = 0;
+  MailboxFlag _flag;
 
   MultipleMessageSource(this.mimeSources, String name, MailboxFlag flag) {
     mimeSources.forEach((s) {
@@ -437,6 +438,7 @@ class MultipleMessageSource extends MessageSource {
       _multipleMimeSources.add(_MultipleMimeSource(s));
     });
     _name = name;
+    _flag = flag;
     supportsDeleteAll =
         (flag == MailboxFlag.trash) || (flag == MailboxFlag.junk);
     _description =
@@ -565,12 +567,20 @@ class MultipleMessageSource extends MessageSource {
   bool get isArchive => mimeSources.every((source) => source.isArchive);
 
   @override
-  bool get supportsSearching => false; //TODO implement universal search
+  bool get supportsSearching =>
+      mimeSources.every((source) => source.supportsSearching);
 
   @override
   MessageSource search(MailSearch search) {
-    // TODO: implement search
-    throw UnimplementedError();
+    final searchMimeSources = <MimeSource>[];
+    for (final mimeSource in mimeSources) {
+      final searchMimeSource = mimeSource.search(search);
+      searchMimeSources.add(searchMimeSource);
+    }
+    final searchMessageSource = MultipleMessageSource(
+        searchMimeSources, 'Search "${search.query}"', _flag);
+    searchMessageSource._description = 'Search in $name';
+    return searchMessageSource;
   }
 }
 
