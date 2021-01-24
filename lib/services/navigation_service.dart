@@ -10,6 +10,7 @@ class NavigationService {
       bool replace = false,
       bool fade = false,
       bool clear = false}) {
+    print('navigating to $routeName');
     final page = AppRouter.generatePage(routeName, arguments);
     Route route;
     if (fade) {

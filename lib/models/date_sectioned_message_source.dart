@@ -26,14 +26,19 @@ class DateSectionedMessageSource extends ChangeNotifier {
   }
 
   Future<bool> init() async {
-    bool success = await this.messageSource.init();
-    if (success) {
-      _sections = await downloadDateSections();
-      _numberOfSections = _sections.length;
-      isInitialized = true;
-      notifyListeners();
+    try {
+      bool success = await this.messageSource.init();
+      if (success) {
+        _sections = await downloadDateSections();
+        _numberOfSections = _sections.length;
+        isInitialized = true;
+        notifyListeners();
+      }
+      return success;
+    } catch (e, s) {
+      print('unexpected error $e at $s');
+      return false;
     }
-    return success;
   }
 
   @override

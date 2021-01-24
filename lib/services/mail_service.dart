@@ -117,7 +117,7 @@ class MailService {
           }
         }
 
-        mimeSources.add(MimeSource(client, accountMailbox));
+        mimeSources.add(MailboxMimeSource(client, accountMailbox));
       }
       return MultipleMessageSource(
         mimeSources,

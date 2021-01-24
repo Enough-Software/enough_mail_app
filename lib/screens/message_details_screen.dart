@@ -62,6 +62,7 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
   Widget build(BuildContext context) {
     return PageView.builder(
       controller: _pageController,
+      itemCount: source.size,
       itemBuilder: (context, index) => _MessageContent(getMessage(index)),
     );
   }
@@ -113,7 +114,7 @@ class _MessageContentState extends State<_MessageContent> {
     final msg = widget.message.mimeMessage;
     return Base.buildAppChrome(
       context,
-      title: msg.decodeSubject(),
+      title: msg.decodeSubject() ?? '',
       content: buildMailDetails(),
       appBarActions: [
         //IconButton(icon: Icon(Icons.reply), onPressed: reply),
@@ -139,6 +140,7 @@ class _MessageContentState extends State<_MessageContent> {
 
   Widget buildMailDetails() {
     if (_messageDownloadError) {
+      //TODO add retry button
       return Text('Message could not be downloaded.');
     }
     if (_showSource) {
