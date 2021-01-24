@@ -37,25 +37,28 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   DateSectionedMessageSource _sectionedMessageSource;
   bool isInSelectionMode = false;
   List<Message> selectedMessages = [];
+  bool isInSearchMode = false;
+  bool hasSearchInput = false;
+  TextEditingController searchEditingController;
 
   @override
   void initState() {
     super.initState();
+    searchEditingController = TextEditingController();
     _sectionedMessageSource = DateSectionedMessageSource(widget.messageSource);
-    //widget.messageSource.addListener(_update);
     _sectionedMessageSource.addListener(_update);
     _messageLoader = initMessageSource();
   }
 
   Future<bool> initMessageSource() {
-    print('${DateTime.now()}: loadMessages()');
+    //print('${DateTime.now()}: initMessageSource()');
     return _sectionedMessageSource.init();
     //print('${DateTime.now()}: loaded ${_sectionedMessageSource.size} messages');
   }
 
   @override
   void dispose() {
-    //widget.messageSource.removeListener(_update);
+    searchEditingController.dispose();
     _sectionedMessageSource.removeListener(_update);
     _sectionedMessageSource.dispose();
     super.dispose();
@@ -65,26 +68,91 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     setState(() {});
   }
 
+  void search(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        isInSearchMode = false;
+      });
+      return;
+    }
+    final search = MailSearch(query, SearchQueryType.allTextHeaders);
+    final searchSource = widget.messageSource.search(search);
+    locator<NavigationService>()
+        .push(Routes.messageSource, arguments: searchSource);
+    setState(() {
+      isInSearchMode = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appBarTitle = Base.buildTitle(widget.messageSource.name ?? '',
-        widget.messageSource.description ?? '');
+    final appBarTitle = isInSearchMode
+        ? TextField(
+            controller: searchEditingController,
+            textInputAction: TextInputAction.search,
+            decoration: InputDecoration(
+              hintText: 'Your search',
+              hintStyle: TextStyle(color: Colors.white30),
+              suffix: hasSearchInput
+                  ? IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        searchEditingController.text = '';
+                        setState(() {
+                          hasSearchInput = false;
+                        });
+                      },
+                    )
+                  : null,
+            ),
+            autofocus: true,
+            autocorrect: false,
+            style: TextStyle(color: Colors.white),
+            onSubmitted: search,
+            onChanged: (text) {
+              if (text.isNotEmpty != hasSearchInput) {
+                setState(() {
+                  hasSearchInput = text.isNotEmpty;
+                });
+              }
+            },
+          )
+        : Base.buildTitle(widget.messageSource.name ?? '',
+            widget.messageSource.description ?? '');
     final appBarActions = [
-      PopupMenuButton<_Visualization>(
-        onSelected: switchVisualization,
-        itemBuilder: (context) => [
-          _visualization == _Visualization.list
-              ? const PopupMenuItem<_Visualization>(
-                  value: _Visualization.stack,
-                  child: Text('Show as stack'),
-                )
-              : const PopupMenuItem<_Visualization>(
-                  value: _Visualization.list,
-                  child: Text('Show as list'),
-                ),
-        ],
-      ),
+      if (widget.messageSource.supportsSearching) ...{
+        IconButton(
+          icon: Icon(isInSearchMode ? Icons.arrow_back : Icons.search),
+          onPressed: () {
+            if (isInSearchMode) {
+              setState(() {
+                isInSearchMode = false;
+              });
+            } else {
+              setState(() {
+                isInSearchMode = true;
+              });
+            }
+          },
+        ),
+      },
+      if (!isInSearchMode) ...{
+        PopupMenuButton<_Visualization>(
+          onSelected: switchVisualization,
+          itemBuilder: (context) => [
+            _visualization == _Visualization.list
+                ? const PopupMenuItem<_Visualization>(
+                    value: _Visualization.stack,
+                    child: Text('Show as stack'),
+                  )
+                : const PopupMenuItem<_Visualization>(
+                    value: _Visualization.list,
+                    child: Text('Show as list'),
+                  ),
+          ],
+        ),
+      },
     ];
     final i18nService = locator<I18nService>();
     Widget zeroPosWidget;
@@ -186,7 +254,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   slivers: [
                     SliverAppBar(
                       title: appBarTitle,
-                      floating: true,
+                      floating: isInSearchMode ? false : true,
+                      pinned: isInSearchMode ? true : false,
                       stretch: true,
                       actions: appBarActions,
                     ),
@@ -423,6 +492,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       }
       setState(() {});
     } else {
+      print('mss $this taps for uid ${message.mimeMessage.uid}');
       locator<NavigationService>().push(Routes.mailDetails, arguments: message);
     }
   }

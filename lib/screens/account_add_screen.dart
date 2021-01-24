@@ -77,7 +77,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
 
   @override
   void initState() {
-    _availableSteps = 4;
+    _availableSteps = 3;
     super.initState();
   }
 

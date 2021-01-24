@@ -68,4 +68,18 @@ class MessageCache {
   void clear() {
     _messages.clear();
   }
+
+  List<Message> getWithSequence(MessageSequence sequence, MailClient client) {
+    final result = <Message>[];
+    final ids = sequence.toList();
+    for (final id in ids) {
+      final message = sequence.isUidSequence
+          ? getWithMimeUid(id, client)
+          : getWithMimeSequenceId(id, client);
+      if (message != null) {
+        result.add(message);
+      }
+    }
+    return result;
+  }
 }

@@ -39,6 +39,7 @@ abstract class MessageSource extends ChangeNotifier
   bool get isJunk;
   bool get isArchive;
   bool get supportsMessageFolders;
+  bool get supportsSearching;
 
   Future<bool> init();
 
@@ -48,7 +49,9 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<Message> waitForMessageAt(int index) async {
     var message = getMessageAt(index);
-    await waitForDownload();
+    if (message?.mimeMessage?.envelope == null) {
+      await waitForDownload();
+    }
     return message;
   }
 
@@ -96,9 +99,12 @@ abstract class MessageSource extends ChangeNotifier
 
   @override
   void onMailLoaded(MimeMessage mime, MimeSource source) {
-    final message =
-        cache.getWithMimeSequenceId(mime.sequenceId, source.mailClient);
-    // print('onMailLoaded: updating $message for mime ${mime.sequenceId}');
+    final message = source.isSequenceIdBased
+        ? cache.getWithMimeSequenceId(mime.sequenceId, source.mailClient)
+        : cache.getWithMimeUid(mime.uid, source.mailClient);
+
+    // print(
+    //     'onMailLoaded: updating $message for mime ${source.isSequenceIdBased ? 'ID' : 'UID'} ${source.isSequenceIdBased ? mime.sequenceId : mime.uid}');
     if (message != null) {
       message.updateMime(mime);
     }
@@ -133,6 +139,7 @@ abstract class MessageSource extends ChangeNotifier
           //TODO update mimeMessage's UID and sequence ID?
           // TODO add mime message to mime source again?
           cache.insert(message);
+          //TODO also add the message to the parent source, if it was present?
           notifyListeners();
         },
       );
@@ -294,6 +301,8 @@ abstract class MessageSource extends ChangeNotifier
       await client.store(sequence, [flag], action: action);
     }
   }
+
+  MessageSource search(MailSearch search);
 }
 
 class MailboxMessageSource extends MessageSource {
@@ -301,11 +310,21 @@ class MailboxMessageSource extends MessageSource {
   int get size => _mimeSource.size;
 
   MimeSource _mimeSource;
+  MessageSource _parentMessageSource;
 
   MailboxMessageSource(Mailbox mailbox, MailClient mailClient) {
-    _mimeSource = MimeSource(mailClient, mailbox, subscriber: this);
+    _mimeSource = MailboxMimeSource(mailClient, mailbox, subscriber: this);
     _description = mailClient.account.email;
     _name = mailbox?.name;
+  }
+
+  MailboxMessageSource.fromMimeSource(
+      this._mimeSource, String description, String name,
+      {MessageSource parent}) {
+    _description = description;
+    _name = name;
+    _parentMessageSource = parent;
+    _mimeSource.addSubscriber(this);
   }
 
   @override
@@ -325,11 +344,8 @@ class MailboxMessageSource extends MessageSource {
   @override
   Future<bool> init() async {
     final result = await _mimeSource.init();
-    final mailbox = _mimeSource.mailbox;
-    name ??= mailbox?.name;
-    if (mailbox != null) {
-      supportsDeleteAll = (mailbox.isTrash || mailbox.isJunk);
-    }
+    name ??= _mimeSource.name;
+    supportsDeleteAll = _mimeSource.suppportsDeleteAll;
     return result;
   }
 
@@ -348,6 +364,17 @@ class MailboxMessageSource extends MessageSource {
     if (results?.isNotEmpty ?? false) {
       cache.clear();
       notifyListeners();
+      if (_parentMessageSource != null) {
+        for (final deleteResult in results) {
+          final messages = _parentMessageSource.cache.getWithSequence(
+              deleteResult.originalSequence, _mimeSource.mailClient);
+          for (final message in messages) {
+            _parentMessageSource.remove(message);
+            _parentMessageSource.cache.remove(message);
+          }
+        }
+        _parentMessageSource.notifyListeners();
+      }
     }
     return results;
   }
@@ -355,6 +382,14 @@ class MailboxMessageSource extends MessageSource {
   @override
   void remove(Message message) {
     _mimeSource.remove(message.mimeMessage);
+    if (_parentMessageSource != null) {
+      final parentMessage = _parentMessageSource.cache
+          .getWithMime(message.mimeMessage, message.mailClient);
+      if (parentMessage != null) {
+        _parentMessageSource.remove(parentMessage);
+        _parentMessageSource.removeFromCache(parentMessage);
+      }
+    }
   }
 
   @override
@@ -368,6 +403,17 @@ class MailboxMessageSource extends MessageSource {
 
   @override
   bool get supportsMessageFolders => _mimeSource.supportsMessageFolders;
+
+  @override
+  bool get supportsSearching => _mimeSource.supportsSearching;
+
+  @override
+  MessageSource search(MailSearch search) {
+    final searchSource = _mimeSource.search(search);
+    return MailboxMessageSource.fromMimeSource(
+        searchSource, 'search in $name', 'Search "${search.query}"',
+        parent: this);
+  }
 }
 
 class MultipleMessageSource extends MessageSource {
@@ -517,6 +563,15 @@ class MultipleMessageSource extends MessageSource {
 
   @override
   bool get isArchive => mimeSources.every((source) => source.isArchive);
+
+  @override
+  bool get supportsSearching => false; //TODO implement universal search
+
+  @override
+  MessageSource search(MailSearch search) {
+    // TODO: implement search
+    throw UnimplementedError();
+  }
 }
 
 class _MultipleMimeSource {
