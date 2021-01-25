@@ -8,8 +8,8 @@ Current development state is very limted to say the least. But it should be enou
 * Unified account - when you have at least 2 accounts, a unified account will show up automatically - with unified inbox, sent, trash, etc
 * Mail management: delete, mark as read/unread
 * Unsubscribe from newslettters easily
-* View attachments - images only at this stage
-* Compose messages: compose plain text messages and reply to plain text messages
+* View attachments in app - photos, PDFs and audio files 
+* Compose messages: compose plain text messages and reply to/forward plain text messages
 * Swipe right to left to delete
 * Swipe left to right to mark as read/unread
 * Optionally you can block external images when viewing mails
@@ -18,6 +18,11 @@ Current development state is very limted to say the least. But it should be enou
 * Experimental 'stack' display of messages
 * Share received attachments to other apps
 * Share files to Maily (Android only so far)
+* Search for messages, including universal search
+* Delete all messages in trash and junk folders or in a search result
+* Archive messages
+* Mark messages as junk / not junk
+* Select several messages at once with a long press
 
 ## Miss a feature or found a bug?
 
