@@ -282,7 +282,7 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
                     var mailClient = await locator<MailService>()
                         .getClientFor(widget.account);
                     mailClient.addEventFilter(filter);
-                    mailClient.sendMessage(msg);
+                    mailClient.sendMessage(msg, appendToSent: false);
                     break;
                 }
               },

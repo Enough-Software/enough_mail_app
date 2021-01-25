@@ -17,6 +17,7 @@ class MailService {
   static const String attributeGravatarImageUrl = 'gravatar.img';
   static const String attributeExcludeFromUnified = 'excludeUnified';
   static const String attributePlusAliasTested = 'test.alias.plus';
+  static const String attributeSentMailAddedAutomatically = 'sendMailAdded';
   //MailClient current;
   MessageSource messageSource;
   Account currentAccount;
@@ -45,8 +46,12 @@ class MailService {
       for (var mailAccount in mailAccounts) {
         accounts.add(Account(mailAccount));
         // this is just for transition phase:
-        if (mailAccount.attributes[attributeGravatarImageUrl] == null) {
-          _addGravatar(mailAccount);
+        if (mailAccount.attributes[attributeSentMailAddedAutomatically] ==
+            null) {
+          mailAccount.attributes[attributeSentMailAddedAutomatically] = [
+            'outlook.office365.com',
+            'imap.gmail.com'
+          ].contains(mailAccount.incoming.serverConfig.hostname);
         }
       }
       _createUnifiedAccount();
@@ -146,6 +151,7 @@ class MailService {
     accounts.add(currentAccount);
     await loadMailboxesFor(mailClient);
     _mailClientsPerAccount[currentAccount] = mailClient;
+    await _checkForAddingSentMessages(mailAccount);
     _addGravatar(mailAccount);
     _mailAccounts.add(mailAccount);
     if (!mailAccount.hasAttribute(attributeExcludeFromUnified)) {
@@ -311,13 +317,6 @@ class MailService {
     await _saveAccounts();
   }
 
-  Future<bool> resolveMailAccount(MailAccount partialAccount) async {
-    final completed = await Discover.complete(partialAccount);
-    if (!completed) {
-      return false;
-    }
-  }
-
   String getEmailDomain(String email) {
     final startIndex = email.lastIndexOf('@');
     if (startIndex == -1) {
@@ -355,5 +354,13 @@ class MailService {
       }
     }
     return mailClient;
+  }
+
+  Future _checkForAddingSentMessages(MailAccount mailAccount) async {
+    mailAccount.attributes[attributeSentMailAddedAutomatically] = [
+      'outlook.office365.com',
+      'imap.gmail.com'
+    ].contains(mailAccount.incoming.serverConfig.hostname);
+    //TODO later test sending of messages
   }
 }
