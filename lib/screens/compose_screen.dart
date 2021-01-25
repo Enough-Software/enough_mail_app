@@ -96,7 +96,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
     //TODO enable global busy indicator
     //TODO check first if message can be sent or catch errors
     try {
-      await mailClient.sendMessage(mimeMessage, from: from.account.fromAddress);
+      final append = !from.account.addsSentMailAutomatically;
+      await mailClient.sendMessage(mimeMessage,
+          from: from.account.fromAddress, appendToSent: append);
       //TODO disable global busy indicator
       var storeFlags = true;
       final message = widget.data.originalMessage;

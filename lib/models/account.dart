@@ -63,6 +63,10 @@ class Account extends ChangeNotifier {
   String get imageUrlGravator =>
       account?.attributes[MailService.attributeGravatarImageUrl];
 
+  bool get addsSentMailAutomatically =>
+      account?.attributes[MailService.attributeSentMailAddedAutomatically] ??
+      false;
+
   String _key;
   String get key {
     if (_key == null) {
