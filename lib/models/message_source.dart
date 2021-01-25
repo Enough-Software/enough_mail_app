@@ -580,6 +580,7 @@ class MultipleMessageSource extends MessageSource {
     final searchMessageSource = MultipleMessageSource(
         searchMimeSources, 'Search "${search.query}"', _flag);
     searchMessageSource._description = 'Search in $name';
+    searchMessageSource._supportsDeleteAll = true;
     return searchMessageSource;
   }
 }
