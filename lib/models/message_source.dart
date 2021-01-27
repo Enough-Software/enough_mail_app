@@ -614,3 +614,53 @@ class _MultipleMimeSource {
     return mime;
   }
 }
+
+class SingleMessageSource extends MessageSource {
+  Message singleMessage;
+
+  @override
+  Message _getUncachedMessage(int index) {
+    return singleMessage;
+  }
+
+  @override
+  Future<List<DeleteResult>> deleteAllMessages() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> init() {
+    return Future.value(true);
+  }
+
+  @override
+  bool get isArchive => false;
+
+  @override
+  bool get isJunk => false;
+
+  @override
+  void remove(Message message) {}
+
+  @override
+  MessageSource search(MailSearch search) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool get shouldBlockImages => false;
+
+  @override
+  int get size => 1;
+
+  @override
+  bool get supportsMessageFolders => false;
+
+  @override
+  bool get supportsSearching => false;
+
+  @override
+  Future<void> waitForDownload() {
+    return Future.value();
+  }
+}

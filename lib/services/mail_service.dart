@@ -107,33 +107,47 @@ class MailService {
   Future<MessageSource> _createMessageSource(
       Mailbox mailbox, Account account) async {
     if (account is UnifiedAccount) {
-      final mimeSources = <MimeSource>[];
-      MailboxFlag flag = mailbox?.flags?.first;
-      for (final subAccount in account.accounts) {
-        final client = await getClientFor(subAccount);
-        await client.stopPollingIfNeeded();
-        Mailbox accountMailbox;
-        if (flag != null) {
-          accountMailbox = client.getMailbox(flag);
-          if (accountMailbox == null) {
-            print(
-                'unable to find mailbox with $flag in account ${subAccount.name}');
-            continue;
-          }
-        }
-
-        mimeSources.add(MailboxMimeSource(client, accountMailbox));
-      }
+      final mimeSources = await _getUnifiedMimeSources(mailbox, account);
       return MultipleMessageSource(
         mimeSources,
         mailbox == null ? 'Unified Inbox' : mailbox.name,
-        flag,
+        mailbox?.flags?.first ?? MailboxFlag.inbox,
       );
     } else {
       var mailClient = await getClientFor(account);
       await mailClient.stopPollingIfNeeded();
       return MailboxMessageSource(mailbox, mailClient);
     }
+  }
+
+  Future<List<MimeSource>> _getUnifiedMimeSources(
+      Mailbox mailbox, UnifiedAccount unifiedAccount) async {
+    final futures = <Future>[];
+    final mimeSources = <MimeSource>[];
+    MailboxFlag flag = mailbox?.flags?.first;
+    for (final subAccount in unifiedAccount.accounts) {
+      futures.add(_getClientAndStopPolling(subAccount));
+    }
+    final clients = await Future.wait(futures);
+    for (final client in clients) {
+      Mailbox accountMailbox;
+      if (flag != null) {
+        accountMailbox = client.getMailbox(flag);
+        if (accountMailbox == null) {
+          print(
+              'unable to find mailbox with $flag in account ${client.account.name}');
+          continue;
+        }
+      }
+      mimeSources.add(MailboxMimeSource(client, accountMailbox));
+    }
+    return mimeSources;
+  }
+
+  Future<MailClient> _getClientAndStopPolling(Account account) async {
+    final client = await getClientFor(account);
+    await client.stopPollingIfNeeded();
+    return client;
   }
 
   void _addGravatar(MailAccount account) {
@@ -240,6 +254,11 @@ class MailService {
     return client;
   }
 
+  Future<MailClient> getClientForAccountWithEmail(String accountEmail) {
+    final account = getAccountForEmail(accountEmail);
+    return getClientFor(account);
+  }
+
   Future<MessageSource> getMessageSourceFor(Account account,
       {Mailbox mailbox, bool switchToAccount}) async {
     var source = await _createMessageSource(mailbox, account);
@@ -252,6 +271,11 @@ class MailService {
 
   Account getAccountFor(MailAccount mailAccount) {
     return accounts.firstWhere((a) => a.account == mailAccount,
+        orElse: () => null);
+  }
+
+  Account getAccountForEmail(String accountEmail) {
+    return accounts.firstWhere((a) => a.email == accountEmail,
         orElse: () => null);
   }
 

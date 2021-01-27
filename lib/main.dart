@@ -5,6 +5,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -71,9 +72,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     await mailService.init();
 
     if (mailService.messageSource != null) {
+      /// the app has at least one configured account
       locator<NavigationService>().push(Routes.messageSource,
           arguments: mailService.messageSource, fade: true, replace: true);
-      checkForShare();
+      // check for a tapped notification that started the app:
+      final notificationInitResult =
+          await locator<NotificationService>().init();
+      if (notificationInitResult !=
+          NotificationServiceInitResult.appLaunchedByNotification) {
+        // the app has not been launched by a notification
+        await checkForShare();
+      }
     } else {
       // this app has no mail accounts yet, so switch to welcome screen:
       locator<NavigationService>().push(Routes.welcome, fade: true);
@@ -82,7 +91,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future checkForShare() async {
     final shared = await platform.invokeMethod("getSharedData");
-    print('SHARED DATA: $shared');
     if (shared != null) {
       composeWithSharedData(shared);
     }

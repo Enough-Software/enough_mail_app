@@ -68,22 +68,6 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
   }
 }
 
-// class MailDetailsScreen extends StatelessWidget {
-//   final Message message;
-//   const MailDetailsScreen({Key key, @required this.message}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return
-//         // header
-//         // attachments
-//         // details
-//         _MessageContent(message);
-//     // mail actions:
-//     // reply, reply all, forward, mark seen/unseen, mark spam/ham, delete, archive, redirect
-//   }
-// }
-
 class _MessageContent extends StatefulWidget {
   final Message message;
   const _MessageContent(this.message, {Key key}) : super(key: key);
@@ -96,6 +80,7 @@ class _MessageContentState extends State<_MessageContent> {
   bool _showSource = false;
   bool _blockExternalImages;
   bool _messageDownloadError;
+  bool _messageRequiresRefresh = false;
 
   @override
   void initState() {
@@ -103,6 +88,7 @@ class _MessageContentState extends State<_MessageContent> {
     if (mime.isDownloaded) {
       _blockExternalImages = shouldImagesBeBlocked(mime);
     } else {
+      _messageRequiresRefresh = widget.message.mimeMessage.envelope == null;
       _blockExternalImages = false;
     }
     _messageDownloadError = false;
@@ -140,8 +126,20 @@ class _MessageContentState extends State<_MessageContent> {
 
   Widget buildMailDetails() {
     if (_messageDownloadError) {
-      //TODO add retry button
-      return Text('Message could not be downloaded.');
+      return Column(
+        children: [
+          Text('Message could not be downloaded.'),
+          TextButton.icon(
+            icon: Icon(Icons.refresh),
+            label: Text('Reload'),
+            onPressed: () {
+              setState(() {
+                _messageDownloadError = false;
+              });
+            },
+          )
+        ],
+      );
     }
     if (_showSource) {
       return SingleChildScrollView(
@@ -326,7 +324,8 @@ class _MessageContentState extends State<_MessageContent> {
   void onMimeMessageDownloaded(MimeMessage mimeMessage) {
     widget.message.updateMime(mimeMessage);
     final blockExternalImages = shouldImagesBeBlocked(mimeMessage);
-    if (mimeMessage.isSeen ||
+    if (_messageRequiresRefresh ||
+        mimeMessage.isSeen ||
         mimeMessage.isNewsletter ||
         mimeMessage.hasAttachments() ||
         blockExternalImages) {
@@ -337,7 +336,6 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   void onMimeMessageDownloadError(MailException e) {
-    print('message could not be downloaded: $e');
     setState(() {
       _messageDownloadError = true;
     });
@@ -415,7 +413,12 @@ class _MessageContentState extends State<_MessageContent> {
     if (confirmation == true) {
       // TODO show busy indicator
       final mailClient = widget.message.mailClient;
-      var unsubscribed = await mime.unsubscribe(mailClient);
+      var unsubscribed = false;
+      try {
+        unsubscribed = await mime.unsubscribe(mailClient);
+      } catch (e, s) {
+        print('error during unsubscribe: $e $s');
+      }
       if (unsubscribed) {
         setState(() {
           widget.message.isNewsletterUnsubscribed = true;
