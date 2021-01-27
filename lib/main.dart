@@ -85,7 +85,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       }
     } else {
       // this app has no mail accounts yet, so switch to welcome screen:
-      locator<NavigationService>().push(Routes.welcome, fade: true);
+      locator<NavigationService>()
+          .push(Routes.welcome, fade: true, replace: true);
     }
   }
 

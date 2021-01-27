@@ -10,18 +10,19 @@ class SplashScreen extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Colors.green[300], Colors.green[900]],
-                ),
-              ),
+              color: Color(0xff99cc00),
+              // decoration: BoxDecoration(
+              //   gradient: LinearGradient(
+              //     begin: Alignment.topLeft,
+              //     end: Alignment.bottomRight,
+              //     colors: [Colors.green[300], Colors.green[900]],
+              //   ),
+              // ),
               child: Center(
                 child: Text(
                   'loading...',
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                      color: Colors.black87, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

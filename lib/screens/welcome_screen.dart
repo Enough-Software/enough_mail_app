@@ -19,31 +19,67 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Base.buildAppChrome(
       context,
-      title: 'Welcome',
+      title: 'Maily',
+      includeDrawer: false,
       content: ActionPageView(
         children: [
-          Text(
-            'Welcome to Maily, your fast and no-fuss email app.',
-            style: TextStyle(color: Colors.white),
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Welcome to Maily, your fast and no-fuss email app.',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 16.0,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 32.0),
+                  child: Image(
+                      image: AssetImage('assets/images/maily.png'),
+                      fit: BoxFit.contain),
+                ),
+              ],
+            ),
           ),
-          Text(
-            'You can define and use aliases and even let Maily generate + aliases, when your provider supports them.',
-            style: TextStyle(color: Colors.white),
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Center(
+              child: Text(
+                'You can define and use aliases and even let Maily generate + aliases, when your provider supports them.'
+                '\n\nFor example: "your-mail+shopping@domain.com"',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16.0,
+                ),
+              ),
+            ),
           ),
-          Text(
-            'Add an account to start.\n\nYou can also add several accounts.',
-            style: TextStyle(color: Colors.white),
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Center(
+              child: Text(
+                'Add an account to start.\n\nYou can also add several accounts.'
+                '\n\n\nYou can also search across all your accounts at the same time.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16.0,
+                ),
+              ),
+            ),
           )
         ],
-        action: ElevatedButton(
+        action: ElevatedButton.icon(
+          icon: Icon(Icons.add),
+          label: Text('Sign into your mail account'),
           onPressed: () {
             locator<NavigationService>().push(Routes.accountAdd);
           },
-          child: Row(
-              children: [Icon(Icons.add), Text('Sign into your mail account')]),
         ),
         gradients: [
-          [Colors.green[700], Colors.green[900]],
+          [Color(0xff99cc00), Color(0xff669900)],
           [Colors.orange[700], Colors.orange[900]],
           [Colors.blue, Colors.blue[800]]
         ],
