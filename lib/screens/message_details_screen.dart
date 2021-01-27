@@ -12,6 +12,7 @@ import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/attachment_chip.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
@@ -333,6 +334,8 @@ class _MessageContentState extends State<_MessageContent> {
         _blockExternalImages = blockExternalImages;
       });
     }
+    locator<NotificationService>()
+        .cancelNotificationForMailMessage(widget.message);
   }
 
   void onMimeMessageDownloadError(MailException e) {

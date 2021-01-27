@@ -89,8 +89,9 @@ abstract class MimeSource {
     if (e.mailClient == mailClient && matches(e.message)) {
       addMessage(e.message);
       _notifyMessageAdded(e.message);
-    } else {}
-    locator<NotificationService>().sendLocalNotificationForMailLoadEvent(e);
+    } else {
+      locator<NotificationService>().sendLocalNotificationForMailLoadEvent(e);
+    }
     // else {
     //   locator<ScaffoldService>().showTextSnackBar(e.message.decodeSubject());
     // }

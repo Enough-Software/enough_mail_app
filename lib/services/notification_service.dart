@@ -46,7 +46,6 @@ class NotificationService {
       try {
         final payload = _MailNotificationPayload();
         Serializer().deserialize(payloadText, payload);
-        print('got UID ${payload.uid} and ID ${payload.id}');
         final mailClient = await locator<MailService>()
             .getClientForAccountWithEmail(payload.accountEmail);
         if (mailClient.selectedMailbox == null) {
@@ -56,13 +55,6 @@ class NotificationService {
           ..sequenceId = payload.id
           ..uid = payload.uid
           ..size = payload.size;
-        // final sequence = payload.uid != null
-        //     ? MessageSequence.fromId(payload.uid, isUid: true)
-        //     : MessageSequence.fromId(payload.id);
-        // //TODO save size and decide on size if the whole message should be loaded
-        // final mimeMessages = await mailClient.fetchMessageSequence(sequence,
-        //     fetchPreference: FetchPreference.envelope);
-        // final mimeMessage = mimeMessages.first;
         final messageSource = SingleMessageSource();
         final message =
             maily.Message(mimeMessage, mailClient, messageSource, 0);
@@ -86,7 +78,6 @@ class NotificationService {
 
   Future sendLocalNotificationForMail(
       MimeMessage mimeMessage, MailClient mailClient) {
-    final email = mailClient.account.email;
     var from = mimeMessage.from?.isNotEmpty ?? false
         ? mimeMessage.from.first.personalName
         : mimeMessage.sender?.personalName;
@@ -98,11 +89,14 @@ class NotificationService {
     final subject = mimeMessage.decodeSubject();
     final payload = _MailNotificationPayload.fromMail(mimeMessage, mailClient);
     final payloadText = 'msg:' + Serializer().serialize(payload);
-    return sendLocalNotification(
-        email.hashCode + mimeMessage.uid + mimeMessage.sequenceId,
-        from,
-        subject,
+    return sendLocalNotification(getId(mimeMessage, mailClient), from, subject,
         payloadText: payloadText);
+  }
+
+  int getId(MimeMessage mimeMessage, MailClient mailClient) {
+    return mailClient.account.email.hashCode +
+        mimeMessage.uid +
+        mimeMessage.sequenceId;
   }
 
   Future sendLocalNotification(int id, String title, String text,
@@ -119,8 +113,17 @@ class NotificationService {
         .show(id, title, text, platformChannelSpecifics, payload: payloadText);
   }
 
-  void removeNotfication(int id) {
-    //_flutterLocalNotificationsPlugin.remove(id);
+  void cancelNotificationForMailMessage(maily.Message message) {
+    cancelNotificationForMail(message.mimeMessage, message.mailClient);
+  }
+
+  void cancelNotificationForMail(
+      MimeMessage mimeMessage, MailClient mailClient) {
+    cancelNotification(getId(mimeMessage, mailClient));
+  }
+
+  void cancelNotification(int id) {
+    _flutterLocalNotificationsPlugin.cancel(id);
   }
 }
 
