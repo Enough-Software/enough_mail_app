@@ -10,6 +10,7 @@ import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
 // import 'package:enough_style/enough_style.dart';
@@ -192,9 +193,14 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           ? null
           : FloatingActionButton(
               onPressed: () {
-                locator<NavigationService>().push(Routes.mailCompose,
-                    arguments: ComposeData(
-                        null, MessageBuilder(), ComposeAction.newMessage));
+                // locator<NotificationService>()
+                //     .sendLocalNotificationForMailMessage(
+                //         widget.messageSource.getMessageAt(3));
+                locator<NavigationService>().push(
+                  Routes.mailCompose,
+                  arguments: ComposeData(
+                      null, MessageBuilder(), ComposeAction.newMessage),
+                );
               },
               tooltip: 'New message',
               child: Icon(Icons.add),

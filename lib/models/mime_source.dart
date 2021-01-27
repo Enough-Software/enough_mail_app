@@ -1,6 +1,10 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'dart:async';
 
+import 'package:enough_mail_app/services/notification_service.dart';
+
+import '../locator.dart';
+
 abstract class MimeSourceSubscriber {
   void onMailLoaded(MimeMessage mime, MimeSource source);
   void onMailAdded(MimeMessage mime, MimeSource source);
@@ -85,7 +89,8 @@ abstract class MimeSource {
     if (e.mailClient == mailClient && matches(e.message)) {
       addMessage(e.message);
       _notifyMessageAdded(e.message);
-    }
+    } else {}
+    locator<NotificationService>().sendLocalNotificationForMailLoadEvent(e);
     // else {
     //   locator<ScaffoldService>().showTextSnackBar(e.message.decodeSubject());
     // }

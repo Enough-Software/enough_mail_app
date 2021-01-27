@@ -1,3 +1,4 @@
+import 'package:enough_mail/mime_message.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
