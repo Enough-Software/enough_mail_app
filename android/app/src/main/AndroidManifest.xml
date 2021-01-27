@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.enough_mail_app">
+    package="de.enough.enough_mail_app">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that

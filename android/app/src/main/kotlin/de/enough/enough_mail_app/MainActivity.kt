@@ -1,4 +1,4 @@
-package com.example.enough_mail_app
+package de.enough.enough_mail_app
 
 import android.content.ContentProviderClient
 import android.content.Intent
