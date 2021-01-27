@@ -78,6 +78,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   @override
   void initState() {
     _availableSteps = 3;
+    if (locator<MailService>().accounts?.isNotEmpty ?? false) {
+      _userNameController.text = locator<MailService>().accounts.first.userName;
+    }
     super.initState();
   }
 
