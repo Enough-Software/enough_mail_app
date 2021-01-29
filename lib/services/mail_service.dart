@@ -21,7 +21,7 @@ class MailService {
   //MailClient current;
   MessageSource messageSource;
   Account currentAccount;
-  List<MailAccount> _mailAccounts = <MailAccount>[];
+  List<MailAccount> mailAccounts = <MailAccount>[];
   final accounts = <Account>[];
   UnifiedAccount unifiedAccount;
 
@@ -37,31 +37,28 @@ class MailService {
   }
 
   Future<void> _loadAccounts() async {
+    mailAccounts = await loadMailAccounts();
+    for (var mailAccount in mailAccounts) {
+      accounts.add(Account(mailAccount));
+    }
+    _createUnifiedAccount();
+  }
+
+  Future<List<MailAccount>> loadMailAccounts() async {
     _storage ??= FlutterSecureStorage();
     var json = await _storage.read(key: _keyAccounts);
     if (json != null) {
-      var mailAccounts = <MailAccount>[];
-      Serializer().deserializeList(json, mailAccounts, (map) => MailAccount());
-      _mailAccounts = mailAccounts;
-      for (var mailAccount in mailAccounts) {
-        accounts.add(Account(mailAccount));
-        // this is just for transition phase:
-        if (mailAccount.attributes[attributeSentMailAddedAutomatically] ==
-            null) {
-          mailAccount.attributes[attributeSentMailAddedAutomatically] = [
-            'outlook.office365.com',
-            'imap.gmail.com'
-          ].contains(mailAccount.incoming.serverConfig.hostname);
-        }
-      }
-      _createUnifiedAccount();
+      final accounts = <MailAccount>[];
+      Serializer().deserializeList(json, accounts, (map) => MailAccount());
+      return accounts;
     }
+    return <MailAccount>[];
   }
 
   _createUnifiedAccount() {
     final mailAccountsForUnified = accounts
-        .where((account) =>
-            (!account.account.hasAttribute(attributeExcludeFromUnified)))
+        .where((account) => (!account.isVirtual &&
+            !account.account.hasAttribute(attributeExcludeFromUnified)))
         .toList();
     if (mailAccountsForUnified.length > 1) {
       unifiedAccount = UnifiedAccount(mailAccountsForUnified);
@@ -167,7 +164,7 @@ class MailService {
     _mailClientsPerAccount[currentAccount] = mailClient;
     await _checkForAddingSentMessages(mailAccount);
     _addGravatar(mailAccount);
-    _mailAccounts.add(mailAccount);
+    mailAccounts.add(mailAccount);
     if (!mailAccount.hasAttribute(attributeExcludeFromUnified)) {
       if (unifiedAccount != null) {
         unifiedAccount.accounts.add(currentAccount);
@@ -234,7 +231,7 @@ class MailService {
   }
 
   Future<void> _saveAccounts() {
-    final json = Serializer().serializeList(_mailAccounts);
+    final json = Serializer().serializeList(mailAccounts);
     print(json);
     _storage ??= FlutterSecureStorage();
     return _storage.write(key: _keyAccounts, value: json);
@@ -326,7 +323,7 @@ class MailService {
 
   Future<void> removeAccount(Account account) async {
     accounts.remove(account);
-    _mailAccounts.remove(account.account);
+    mailAccounts.remove(account.account);
     _mailboxesPerAccount[account] = null;
     _mailClientsPerAccount[account] = null;
     // TODO handle the case when an account is removed that is used in the current mail source
@@ -386,5 +383,25 @@ class MailService {
       'imap.gmail.com'
     ].contains(mailAccount.incoming.serverConfig.hostname);
     //TODO later test sending of messages
+  }
+
+  /// Retrieves the state for each account's inbox in a list
+  Future<List<int>> getInboxNextUids([Iterable<Account> checkAccounts]) async {
+    final futures = <Future<Mailbox>>[];
+    checkAccounts ??= accounts;
+    for (final account in checkAccounts) {
+      if (!account.isVirtual) {
+        final future = getInboxForAccount(account);
+        futures.add(future);
+      }
+    }
+    final inboxes = await Future.wait(futures);
+    final modSequences = inboxes.map((mailbox) => mailbox.uidNext).toList();
+    return modSequences;
+  }
+
+  Future<Mailbox> getInboxForAccount(Account account) async {
+    final client = await getClientFor(account);
+    return client.selectInbox();
   }
 }

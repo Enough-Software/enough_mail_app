@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/services/background_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
@@ -49,19 +50,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    //print('state = $state');
+    print('state = $state');
     switch (state) {
       case AppLifecycleState.resumed:
-        checkForShare();
+        await checkForShare();
         break;
       case AppLifecycleState.inactive:
-        // TODO: Handle this case.
+        // TODO: Check if AppLifecycleState.inactive needs to be handled
         break;
       case AppLifecycleState.paused:
-        // TODO: Handle this case.
+        await locator<BackgroundService>().saveStateOnPause();
         break;
       case AppLifecycleState.detached:
-        // TODO: Handle this case.
+        // TODO: Check if AppLifecycleState.detached needs to be handled
         break;
     }
   }
@@ -88,10 +89,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       locator<NavigationService>()
           .push(Routes.welcome, fade: true, replace: true);
     }
+    await locator<BackgroundService>().init();
   }
 
   Future checkForShare() async {
     final shared = await platform.invokeMethod("getSharedData");
+    print('checkForShare: received data: $shared');
     if (shared != null) {
       composeWithSharedData(shared);
     }

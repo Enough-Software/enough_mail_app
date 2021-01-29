@@ -303,6 +303,14 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   MessageSource search(MailSearch search);
+
+  void removeMime(MimeMessage mimeMessage, MailClient mailClient) {
+    final existingMessage = cache.getWithMime(mimeMessage, mailClient);
+    if (existingMessage != null) {
+      remove(existingMessage);
+      removeFromCache(existingMessage);
+    }
+  }
 }
 
 class MailboxMessageSource extends MessageSource {
@@ -383,12 +391,7 @@ class MailboxMessageSource extends MessageSource {
   void remove(Message message) {
     _mimeSource.remove(message.mimeMessage);
     if (_parentMessageSource != null) {
-      final parentMessage = _parentMessageSource.cache
-          .getWithMime(message.mimeMessage, message.mailClient);
-      if (parentMessage != null) {
-        _parentMessageSource.remove(parentMessage);
-        _parentMessageSource.removeFromCache(parentMessage);
-      }
+      _parentMessageSource.removeMime(message.mimeMessage, message.mailClient);
     }
   }
 
@@ -617,6 +620,9 @@ class _MultipleMimeSource {
 
 class SingleMessageSource extends MessageSource {
   Message singleMessage;
+  final MessageSource parent;
+
+  SingleMessageSource(this.parent);
 
   @override
   Message _getUncachedMessage(int index) {
@@ -640,7 +646,11 @@ class SingleMessageSource extends MessageSource {
   bool get isJunk => false;
 
   @override
-  void remove(Message message) {}
+  void remove(Message message) {
+    if (parent != null) {
+      parent.removeMime(message.mimeMessage, message.mailClient);
+    }
+  }
 
   @override
   MessageSource search(MailSearch search) {

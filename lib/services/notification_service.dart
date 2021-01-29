@@ -14,7 +14,8 @@ enum NotificationServiceInitResult { appLaunchedByNotification, normal }
 class NotificationService {
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  Future<NotificationServiceInitResult> init() async {
+  Future<NotificationServiceInitResult> init(
+      {bool checkForLaunchDetails = true}) async {
     // set up local notifications:
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
     final android = AndroidInitializationSettings('ic_stat_notification');
@@ -25,11 +26,13 @@ class NotificationService {
         InitializationSettings(android: android, iOS: ios, macOS: macos);
     await _flutterLocalNotificationsPlugin.initialize(initSettings,
         onSelectNotification: _selectNotification);
-    final launchDetails = await _flutterLocalNotificationsPlugin
-        .getNotificationAppLaunchDetails();
-    if (launchDetails?.payload != null) {
-      //await _selectNotification(launchDetails.payload); // apparently this is called automatically by getNotificationAppLaunchDetails
-      return NotificationServiceInitResult.appLaunchedByNotification;
+    if (checkForLaunchDetails) {
+      final launchDetails = await _flutterLocalNotificationsPlugin
+          .getNotificationAppLaunchDetails();
+      if (launchDetails?.payload != null) {
+        //await _selectNotification(launchDetails.payload); // apparently this is called automatically by getNotificationAppLaunchDetails
+        return NotificationServiceInitResult.appLaunchedByNotification;
+      }
     }
     return NotificationServiceInitResult.normal;
   }
@@ -55,10 +58,11 @@ class NotificationService {
           ..sequenceId = payload.id
           ..uid = payload.uid
           ..size = payload.size;
-        final messageSource = SingleMessageSource();
+        final currentMessageSource = locator<MailService>().messageSource;
+        final messageSource = SingleMessageSource(currentMessageSource);
         final message =
             maily.Message(mimeMessage, mailClient, messageSource, 0);
-
+        messageSource.singleMessage = message;
         locator<NavigationService>()
             .push(Routes.mailDetails, arguments: message);
       } on MailException catch (e, s) {
@@ -90,7 +94,7 @@ class NotificationService {
     final payload = _MailNotificationPayload.fromMail(mimeMessage, mailClient);
     final payloadText = 'msg:' + Serializer().serialize(payload);
     return sendLocalNotification(getId(mimeMessage, mailClient), from, subject,
-        payloadText: payloadText);
+        payloadText: payloadText, when: mimeMessage.decodeDate());
   }
 
   int getId(MimeMessage mimeMessage, MailClient mailClient) {
@@ -100,14 +104,16 @@ class NotificationService {
   }
 
   Future sendLocalNotification(int id, String title, String text,
-      {String payloadText}) async {
-    const androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      {String payloadText, DateTime when, bool channelShowBadge = true}) async {
+    final androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'maily', 'Mail', 'You have new mail',
         importance: Importance.max,
         priority: Priority.high,
+        channelShowBadge: channelShowBadge,
         showWhen: true,
+        when: when?.millisecondsSinceEpoch,
         playSound: false);
-    const NotificationDetails platformChannelSpecifics =
+    NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
     await _flutterLocalNotificationsPlugin
         .show(id, title, text, platformChannelSpecifics, payload: payloadText);
