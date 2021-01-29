@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.enough.enough_mail_app">
+    package="de.enough.enough_mail_app"
+     xmlns:tools="http://schemas.android.com/tools"
+     >
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
@@ -8,10 +10,11 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
+        tools:replace="android:label"
         android:name="io.flutter.app.FlutterApplication"
         android:label="Maily"
         android:icon="@mipmap/ic_launcher"
-        android:fullBackupContent="@xml/backup_rules">
+        android:fullBackupContent="@xml/backup_rules"
         >
         <activity
             android:name=".MainActivity"
