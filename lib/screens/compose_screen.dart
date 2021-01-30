@@ -5,6 +5,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 
 import '../locator.dart';
 import 'base.dart';
@@ -249,11 +250,20 @@ class _ComposeScreenState extends State<ComposeScreen> {
                   decoration: InputDecoration(
                     labelText: 'To',
                     hintText: 'Recipient email',
-                    suffixIcon: ElevatedButton(
-                      child: Text('CC/BCC'),
-                      onPressed: () => setState(
-                        () => _isCcBccVisible = !_isCcBccVisible,
-                      ),
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextButton(
+                          child: Text('CC'),
+                          onPressed: () => setState(
+                            () => _isCcBccVisible = !_isCcBccVisible,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.contacts),
+                          onPressed: () => _pickContact(_toController),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -262,13 +272,25 @@ class _ComposeScreenState extends State<ComposeScreen> {
                     controller: _ccController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                        labelText: 'CC', hintText: 'Recipient email'),
+                      labelText: 'CC',
+                      hintText: 'Recipient email',
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.contacts),
+                        onPressed: () => _pickContact(_ccController),
+                      ),
+                    ),
                   ),
                   TextField(
                     controller: _bccController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                        labelText: 'BCC', hintText: 'Recipient email'),
+                      labelText: 'BCC',
+                      hintText: 'Recipient email',
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.contacts),
+                        onPressed: () => _pickContact(_bccController),
+                      ),
+                    ),
                   ),
                 },
                 TextField(
@@ -313,9 +335,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   void initRecipient(
       List<MailAddress> addresses, TextEditingController textController) {
-    textController.text = addresses?.isEmpty ?? true
-        ? ''
-        : addresses.map((a) => a.email).join('; ');
+    if (addresses?.isEmpty ?? true) {
+      textController.text = '';
+    } else {
+      textController.text = addresses.map((a) => a.email).join('; ');
+      textController.selection =
+          TextSelection.collapsed(offset: textController.text.length);
+    }
   }
 
   void showSourceCode() {
@@ -337,4 +363,18 @@ class _ComposeScreenState extends State<ComposeScreen> {
   }
 
   void saveAsDraft() {}
+
+  void _pickContact(TextEditingController textController) async {
+    final contact =
+        await FlutterContactPicker.pickEmailContact(askForPermission: true);
+    if (contact != null) {
+      if (textController.text.isNotEmpty) {
+        textController.text += '; ' + contact.email.email;
+      } else {
+        textController.text = contact.email.email;
+      }
+      textController.selection =
+          TextSelection.collapsed(offset: textController.text.length);
+    }
+  }
 }
