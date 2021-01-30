@@ -144,6 +144,10 @@ class _ComposeScreenState extends State<ComposeScreen> {
       content: buildContent(),
       appBarActions: [
         IconButton(
+          icon: Icon(Icons.add),
+          onPressed: addAttachment,
+        ),
+        IconButton(
           icon: Icon(Icons.send),
           onPressed: send,
         ),
@@ -158,8 +162,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                 break;
             }
           },
-          itemBuilder: (BuildContext context) =>
-              <PopupMenuEntry<_OverflowMenuChoice>>[
+          itemBuilder: (BuildContext context) => [
             const PopupMenuItem<_OverflowMenuChoice>(
               value: _OverflowMenuChoice.showSourceCode,
               child: Text('View source'),
@@ -325,28 +328,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
     });
   }
 
+  Future addAttachment() async {
+    final added =
+        await AttachmentComposeBar.addAttachmentTo(widget.data.messageBuilder);
+    if (added) {
+      setState(() {});
+    }
+  }
+
   void saveAsDraft() {}
 }
-
-// class AppProfile {
-//   final String name;
-//   final String email;
-//   final String imageUrl;
-
-//   const AppProfile(this.name, this.email, this.imageUrl);
-
-//   @override
-//   bool operator ==(Object other) =>
-//       identical(this, other) ||
-//       other is AppProfile &&
-//           runtimeType == other.runtimeType &&
-//           name == other.name;
-
-//   @override
-//   int get hashCode => name.hashCode;
-
-//   @override
-//   String toString() {
-//     return name;
-//   }
-// }

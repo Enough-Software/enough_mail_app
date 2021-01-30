@@ -28,22 +28,18 @@ dependencies:
   enough_mail: #^0.1.0
     git:
       url: https://github.com/Enough-Software/enough_mail.git
-      ref: main
     # path: ../enough_mail
   enough_mail_flutter: #any
     git:
       url: https://github.com/Enough-Software/enough_mail_flutter.git
-      ref: main
     # path: ../enough_mail_flutter
   enough_media: #0.1.0
     git:
       url: https://github.com/Enough-Software/enough_media.git
-      ref: main
     # path: ../enough_media
   enough_serialization: any
     # git:
     #   url: https://github.com/Enough-Software/enough_serialization.git
-    #   ref: main
     #path: ../enough_serialization
   #  enough_style:
   #    path: ../enough_style
@@ -68,6 +64,8 @@ dependencies:
   background_fetch: ^0.6.0
     # git:
     #   url: https://github.com/transistorsoft/flutter_background_fetch
+  file_picker: ^2.1.5
+   
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: 1.0.0
