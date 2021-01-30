@@ -385,23 +385,16 @@ class MailService {
     //TODO later test sending of messages
   }
 
-  /// Retrieves the state for each account's inbox in a list
-  Future<List<int>> getInboxNextUids([Iterable<Account> checkAccounts]) async {
-    final futures = <Future<Mailbox>>[];
-    checkAccounts ??= accounts;
-    for (final account in checkAccounts) {
-      if (!account.isVirtual) {
-        final future = getInboxForAccount(account);
-        futures.add(future);
-      }
+  List<MailClient> getMailClients() {
+    final mailClients = <MailClient>[];
+    final existingMailClients = _mailClientsPerAccount.values;
+    for (final mailAccount in mailAccounts) {
+      var client = existingMailClients.firstWhere(
+          (client) => client.account == mailAccount,
+          orElse: () => null);
+      client ??= MailClient(mailAccount);
+      mailClients.add(client);
     }
-    final inboxes = await Future.wait(futures);
-    final modSequences = inboxes.map((mailbox) => mailbox.uidNext).toList();
-    return modSequences;
-  }
-
-  Future<Mailbox> getInboxForAccount(Account account) async {
-    final client = await getClientFor(account);
-    return client.selectInbox();
+    return mailClients;
   }
 }
