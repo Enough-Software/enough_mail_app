@@ -43,10 +43,35 @@ class BackgroundService {
   }
 
   Future saveStateOnPause() async {
-    final nextUids = await locator<MailService>().getInboxNextUids();
+    final mailClients = locator<MailService>().getMailClients();
+    final futures = <Future<int>>[];
+    for (final client in mailClients) {
+      futures.add(getNextUidFor(client));
+    }
+    final nextUids = await Future.wait(futures);
     final stringValue = _SharedPrefsHelper.renderIntList(nextUids);
+    print('nextUids: $stringValue');
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyInboxUids, stringValue);
+  }
+
+  Future<int> getNextUidFor(MailClient mailClient) async {
+    try {
+      if (mailClient.selectedMailbox == null) {
+        await mailClient.connect();
+        await mailClient.selectInbox();
+      } else if (!mailClient.selectedMailbox.isInbox) {
+        // do not interfere with other operations
+        mailClient = MailClient(mailClient.account);
+        await mailClient.connect();
+        await mailClient.selectInbox();
+      }
+      return mailClient.selectedMailbox.uidNext;
+    } catch (e, s) {
+      print(
+          'Error while getting Inbox.nextUids for ${mailClient.account.email}: $e $s');
+    }
+    return 0;
   }
 
   static Future checkForNewMail() async {
