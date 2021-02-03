@@ -17,7 +17,7 @@ class IconService {
         return Icons.audiotrack;
 
       case MediaToptype.video:
-        return Icons.personal_video;
+        return Icons.ondemand_video;
 
       case MediaToptype.application:
         return Icons.apps;
