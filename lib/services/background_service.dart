@@ -23,8 +23,8 @@ class BackgroundService {
         requiresDeviceIdle: false,
         requiredNetworkType: NetworkType.ANY,
       ),
-      (String taskId) {
-        //print('ignoring foreground task $taskId');
+      (String taskId) async {
+        await locator<MailService>().resume();
         BackgroundFetch.finish(taskId);
       },
     );
