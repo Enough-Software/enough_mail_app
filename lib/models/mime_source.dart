@@ -340,7 +340,7 @@ class SearchMimeSource extends MimeSource {
   Future<List<DeleteResult>> deleteAllMessages() async {
     final deleteResult =
         await mailClient.deleteMessages(searchResult.messageSequence);
-    searchResult = MailSearchResult.empty();
+    searchResult = MailSearchResult.empty;
     _size = 0;
     return [deleteResult];
   }
