@@ -1,6 +1,7 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/sender.dart';
+import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
@@ -34,6 +35,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
   List<Sender> senders;
   _Autofocus _focus;
   bool _isCcBccVisible = false;
+
+  MessageEncoding _usedTextEncoding;
 
   @override
   void initState() {
@@ -79,48 +82,65 @@ class _ComposeScreenState extends State<ComposeScreen> {
     super.dispose();
   }
 
-  MimeMessage buildMimeMessage() {
+  Future<MimeMessage> buildMimeMessage(MailClient mailClient) async {
     final mb = widget.data.messageBuilder;
     mb.to = parse(_toController.text);
     mb.cc = parse(_ccController.text);
     mb.bcc = parse(_bccController.text);
     mb.subject = _subjectController.text;
     mb.text = _contentController.text;
+    bool supports8BitEncoding = await mailClient.supports8BitEncoding();
+    _usedTextEncoding = mb.setRecommendedTextEncoding(supports8BitEncoding);
     var mimeMessage = mb.buildMimeMessage();
     return mimeMessage;
   }
 
   Future<void> send() async {
     locator<NavigationService>().pop();
-    var mailClient = await locator<MailService>().getClientFor(from.account);
-    var mimeMessage = buildMimeMessage();
+    final mailClient = await locator<MailService>().getClientFor(from.account);
+    final mimeMessage = await buildMimeMessage(mailClient);
     //TODO enable global busy indicator
     //TODO check first if message can be sent or catch errors
     try {
       final append = !from.account.addsSentMailAutomatically;
-      await mailClient.sendMessage(mimeMessage,
-          from: from.account.fromAddress, appendToSent: append);
-      //TODO disable global busy indicator
-      var storeFlags = true;
-      final message = widget.data.originalMessage;
-      switch (widget.data.action) {
-        case ComposeAction.answer:
-          message.isAnswered = true;
-          break;
-        case ComposeAction.forward:
-          message.isForwarded = true;
-          break;
-        case ComposeAction.newMessage:
-          storeFlags = false;
-          // no action to do
-          break;
-      }
-      if (storeFlags) {
+      final use8Bit = (_usedTextEncoding == MessageEncoding.eightBit);
+      await mailClient.sendMessage(
+        mimeMessage,
+        from: from.account.fromAddress,
+        appendToSent: append,
+        use8BitEncoding: use8Bit,
+      );
+    } on MailException catch (e, s) {
+      print('Unable to send or append mail: $e $s');
+      locator<AlertService>().showTextDialog(context, 'Error',
+          'Sorry, your mail could not be send. We received the following error: $e $s');
+      return;
+    }
+    //TODO disable global busy indicator
+    var storeFlags = true;
+    final message = widget.data.originalMessage;
+    switch (widget.data.action) {
+      case ComposeAction.answer:
+        message.isAnswered = true;
+        break;
+      case ComposeAction.forward:
+        message.isForwarded = true;
+        break;
+      case ComposeAction.newMessage:
+        storeFlags = false;
+        // no action to do
+        break;
+    }
+    if (storeFlags) {
+      try {
         await mailClient.store(MessageSequence.fromMessage(message.mimeMessage),
             message.mimeMessage.flags,
             action: StoreAction.replace);
+      } on MailException catch (e, s) {
+        print('Unable to update message flags: $e $s'); // otherwise ignore
+
       }
-    } on MailException catch (e) {}
+    }
   }
 
   List<MailAddress> parse(String text) {
@@ -344,9 +364,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
     }
   }
 
-  void showSourceCode() {
+  void showSourceCode() async {
     if (!_showSource) {
-      var message = buildMimeMessage();
+      final mailClient =
+          await locator<MailService>().getClientFor(from.account);
+      var message = await buildMimeMessage(mailClient);
       _source = message.renderMessage();
     }
     setState(() {

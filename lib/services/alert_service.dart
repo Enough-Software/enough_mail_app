@@ -34,4 +34,20 @@ class AlertService {
       context: context,
     );
   }
+
+  Future showTextDialog(BuildContext context, String title, String text) {
+    return showDialog(
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(title),
+        actions: [
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+      context: context,
+    );
+  }
 }
