@@ -397,4 +397,13 @@ class MailService {
     }
     return mailClients;
   }
+
+  /// Checks the connection status and resumes the connection if necessary
+  Future resume() {
+    final futures = <Future>[];
+    for (final client in _mailClientsPerAccount.values) {
+      futures.add(client.resume());
+    }
+    return Future.wait(futures);
+  }
 }
