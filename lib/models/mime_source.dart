@@ -86,11 +86,13 @@ abstract class MimeSource {
 
   void _onMessageAdded(MailLoadEvent e) {
     print('${DateTime.now()}: ${e.message.decodeSubject()}');
-    if (e.mailClient == mailClient && matches(e.message)) {
-      addMessage(e.message);
-      _notifyMessageAdded(e.message);
-    } else {
-      locator<NotificationService>().sendLocalNotificationForMailLoadEvent(e);
+    if (e.mailClient == mailClient) {
+      if (matches(e.message)) {
+        addMessage(e.message);
+        _notifyMessageAdded(e.message);
+      } else {
+        locator<NotificationService>().sendLocalNotificationForMailLoadEvent(e);
+      }
     }
     // else {
     //   locator<ScaffoldService>().showTextSnackBar(e.message.decodeSubject());
