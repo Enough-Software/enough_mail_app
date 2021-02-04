@@ -54,6 +54,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         await checkForShare();
+        await locator<MailService>().resume();
         break;
       case AppLifecycleState.inactive:
         // TODO: Check if AppLifecycleState.inactive needs to be handled
