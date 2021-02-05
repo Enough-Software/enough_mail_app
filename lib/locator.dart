@@ -1,4 +1,5 @@
 import 'package:enough_mail_app/services/alert_service.dart';
+import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/background_service.dart';
 import 'package:enough_mail_app/services/date_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
@@ -23,4 +24,5 @@ void setupLocator() {
   locator.registerSingleton(IconService());
   locator.registerLazySingleton(() => NotificationService());
   locator.registerLazySingleton(() => BackgroundService());
+  locator.registerLazySingleton(() => AppService());
 }

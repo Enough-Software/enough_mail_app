@@ -1,21 +1,16 @@
 import 'dart:async';
-import 'dart:io';
-
-import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/background_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_absolute_path/flutter_absolute_path.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 // import 'package:enough_style/enough_style.dart';
 // import 'app_styles.dart';
 import 'locator.dart';
-import 'models/compose_data.dart';
 
 // AppStyles appStyles = AppStyles.instance;
 
@@ -33,7 +28,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Future<void> _appInitialization;
-  static const platform = const MethodChannel('app.channel.shared.data');
 
   @override
   void initState() {
@@ -49,23 +43,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    print('state = $state');
-    switch (state) {
-      case AppLifecycleState.resumed:
-        await checkForShare();
-        await locator<MailService>().resume();
-        break;
-      case AppLifecycleState.inactive:
-        // TODO: Check if AppLifecycleState.inactive needs to be handled
-        break;
-      case AppLifecycleState.paused:
-        await locator<BackgroundService>().saveStateOnPause();
-        break;
-      case AppLifecycleState.detached:
-        // TODO: Check if AppLifecycleState.detached needs to be handled
-        break;
-    }
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    locator<AppService>().didChangeAppLifecycleState(state);
   }
 
   Future<void> initApp() async {
@@ -83,7 +62,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       if (notificationInitResult !=
           NotificationServiceInitResult.appLaunchedByNotification) {
         // the app has not been launched by a notification
-        await checkForShare();
+        await locator<AppService>().checkForShare();
       }
     } else {
       // this app has no mail accounts yet, so switch to welcome screen:
@@ -91,69 +70,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           .push(Routes.welcome, fade: true, replace: true);
     }
     await locator<BackgroundService>().init();
-  }
-
-  Future checkForShare() async {
-    final shared = await platform.invokeMethod("getSharedData");
-    print('checkForShare: received data: $shared');
-    if (shared != null) {
-      composeWithSharedData(shared);
-    }
-  }
-
-  Future composeWithSharedData(String shared) async {
-    // structure is:
-    // mimetype:[<<uri>>,<<uri>>]:text
-    final uriStartIndex = shared.indexOf(':[<<');
-    final uriEndIndex = shared.indexOf('>>]:');
-    if (uriStartIndex == -1 || uriEndIndex <= uriStartIndex) {
-      print('invalid share: "$shared"');
-      return Future.value();
-    }
-    final urls = shared
-        .substring(uriStartIndex + ':[<<'.length, uriEndIndex)
-        .split('>>, <<');
-    print(urls);
-    MessageBuilder builder;
-    if (urls.first.startsWith('mailto:')) {
-      builder = MessageBuilder.prepareMailtoBasedMessage(Uri.parse(urls.first),
-          locator<MailService>().currentAccount.fromAddress);
-    } else {
-      final mediaTypeText = shared.substring(0, uriStartIndex);
-      final mediaType = (mediaTypeText != 'null' &&
-              mediaTypeText != null &&
-              !mediaTypeText.contains('*'))
-          ? MediaType.fromText(mediaTypeText)
-          : null;
-      builder = MessageBuilder();
-      for (final url in urls) {
-        final filePath = await FlutterAbsolutePath.getAbsolutePath(url);
-        final file = File(filePath);
-        //final file = File.fromUri(Uri.parse(url));
-        MediaType fileMediaType = mediaType ?? _guessMediaTypeFromFile(file);
-        await builder.addFile(file, fileMediaType);
-      }
-    }
-    var sharedText = uriEndIndex < (shared.length - '>>]:'.length)
-        ? shared.substring(uriEndIndex + '>>]:'.length)
-        : null;
-    if (sharedText != null && sharedText != 'null') {
-      builder.text = sharedText;
-    }
-
-    final composeData = ComposeData(null, builder, ComposeAction.newMessage);
-    return locator<NavigationService>()
-        .push(Routes.mailCompose, arguments: composeData, fade: true);
-  }
-
-  MediaType _guessMediaTypeFromFile(File file) {
-    print('guess media type for "${file.path}"...');
-    final extIndex = file.path.lastIndexOf('.');
-    if (extIndex != -1) {
-      final ext = file.path.substring(extIndex + 1);
-      return MediaType.guessFromFileExtension(ext);
-    }
-    return MediaType.fromSubtype(MediaSubtype.applicationOctetStream);
   }
 
   @override
