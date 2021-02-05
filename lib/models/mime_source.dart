@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/services/app_service.dart';
 import 'dart:async';
 
 import 'package:enough_mail_app/services/notification_service.dart';
@@ -87,10 +88,15 @@ abstract class MimeSource {
   void _onMessageAdded(MailLoadEvent e) {
     print('${DateTime.now()}: ${e.message.decodeSubject()}');
     if (e.mailClient == mailClient) {
+      bool sendNotification;
       if (matches(e.message)) {
         addMessage(e.message);
         _notifyMessageAdded(e.message);
+        sendNotification = locator<AppService>().isInBackground;
       } else {
+        sendNotification = true;
+      }
+      if (sendNotification) {
         locator<NotificationService>().sendLocalNotificationForMailLoadEvent(e);
       }
     }

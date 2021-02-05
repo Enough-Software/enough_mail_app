@@ -14,6 +14,8 @@ enum NotificationServiceInitResult { appLaunchedByNotification, normal }
 class NotificationService {
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
+  int _lastNotificationId;
+
   Future<NotificationServiceInitResult> init(
       {bool checkForLaunchDetails = true}) async {
     // set up local notifications:
@@ -82,6 +84,11 @@ class NotificationService {
 
   Future sendLocalNotificationForMail(
       MimeMessage mimeMessage, MailClient mailClient) {
+    final notificationId = getId(mimeMessage, mailClient);
+    if (notificationId == _lastNotificationId) {
+      return Future.value();
+    }
+    _lastNotificationId = notificationId;
     var from = mimeMessage.from?.isNotEmpty ?? false
         ? mimeMessage.from.first.personalName
         : mimeMessage.sender?.personalName;
@@ -93,7 +100,7 @@ class NotificationService {
     final subject = mimeMessage.decodeSubject();
     final payload = _MailNotificationPayload.fromMail(mimeMessage, mailClient);
     final payloadText = 'msg:' + Serializer().serialize(payload);
-    return sendLocalNotification(getId(mimeMessage, mailClient), from, subject,
+    return sendLocalNotification(notificationId, from, subject,
         payloadText: payloadText, when: mimeMessage.decodeDate());
   }
 
