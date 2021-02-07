@@ -325,11 +325,12 @@ class _MessageContentState extends State<_MessageContent> {
   void onMimeMessageDownloaded(MimeMessage mimeMessage) {
     widget.message.updateMime(mimeMessage);
     final blockExternalImages = shouldImagesBeBlocked(mimeMessage);
-    if (_messageRequiresRefresh ||
-        mimeMessage.isSeen ||
-        mimeMessage.isNewsletter ||
-        mimeMessage.hasAttachments() ||
-        blockExternalImages) {
+    if (mounted &&
+        (_messageRequiresRefresh ||
+            mimeMessage.isSeen ||
+            mimeMessage.isNewsletter ||
+            mimeMessage.hasAttachments() ||
+            blockExternalImages)) {
       setState(() {
         _blockExternalImages = blockExternalImages;
       });
@@ -339,9 +340,11 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   void onMimeMessageDownloadError(MailException e) {
-    setState(() {
-      _messageDownloadError = true;
-    });
+    if (mounted) {
+      setState(() {
+        _messageDownloadError = true;
+      });
+    }
   }
 
   Future handleMailto(Uri mailto, MimeMessage mimeMessage) {
