@@ -98,7 +98,7 @@ class Message extends ChangeNotifier {
 }
 
 extension NewsLetter on MimeMessage {
-  bool get isEmpty => (bodyRaw == null && envelope == null && body == null);
+  bool get isEmpty => (mimeData == null && envelope == null && body == null);
 
   /// Checks if this is a newsletter with a `list-unsubscribe` header.
   bool get isNewsletter => hasHeader('list-unsubscribe');
