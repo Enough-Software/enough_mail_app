@@ -248,6 +248,6 @@ extension NewsLetter on MimeMessage {
       builder.text = defaultSubject;
     }
     final message = builder.buildMimeMessage();
-    return client.sendMessage(message);
+    return client.sendMessage(message, appendToSent: false);
   }
 }
