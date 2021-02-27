@@ -37,6 +37,11 @@ dependencies:
     git:
       url: https://github.com/Enough-Software/enough_media.git
     # path: ../enough_media
+  enough_html_editor: #0.2.0
+    git:
+      url: https://github.com/Enough-Software/enough_html_editor.git
+    # path: ../enough_html_editor
+
   enough_serialization: any
     # git:
     #   url: https://github.com/Enough-Software/enough_serialization.git
@@ -49,9 +54,6 @@ dependencies:
   flutter_secure_storage: ^3.3.3
   get_it: ^5.0.4
   webview_flutter: ^1.0.7
-  # html_editor: ^1.0.1
-  # zefyr: ^0.11.0
-  # flutter_html: ^1.0.2
   url_launcher: ^5.5.0
   simple_gravatar: ^1.0.5
   image: ^2.1.19
@@ -66,10 +68,8 @@ dependencies:
     #   url: https://github.com/transistorsoft/flutter_background_fetch
   file_picker: ^2.1.5
   fluttercontactpicker: ^4.2.1
-   
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: 1.0.0
+  cupertino_icons: ^1.0.0
+  diff_match_patch: ^0.3.0
 
 dev_dependencies:
   flutter_test:

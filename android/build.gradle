@@ -1,6 +1,7 @@
 buildscript {
     ext.kotlin_version = '1.4.0'
     ext {
+       minSdkVersion       = 21                // or higher
        compileSdkVersion   = 28                // or higher
        targetSdkVersion    = 28                // or higher
        appCompatVersion    = "1.1.0"           // or higher
@@ -15,6 +16,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
+
 
 allprojects {
     repositories {
