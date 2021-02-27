@@ -165,7 +165,8 @@ class _AttachmentChipState extends State<AttachmentChip> {
       final media = InteractiveMediaWidget(mediaProvider: _mediaProvider);
       showAttachment(media);
     } on MailException catch (e) {
-      print('Unable to download attachment with id ${widget.info.fetchId}: $e');
+      print(
+          'Unable to download attachment with fetch id ${widget.info.fetchId}: $e');
     } finally {
       setState(() {
         _isDownloading = false;
