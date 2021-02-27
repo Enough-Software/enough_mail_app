@@ -132,7 +132,7 @@ class _MessageContentState extends State<_MessageContent> {
           Text('Message could not be downloaded.'),
           TextButton.icon(
             icon: Icon(Icons.refresh),
-            label: Text('Reload'),
+            label: Text('Retry'),
             onPressed: () {
               setState(() {
                 _messageDownloadError = false;
@@ -144,15 +144,18 @@ class _MessageContentState extends State<_MessageContent> {
     }
     if (_showSource) {
       return SingleChildScrollView(
-          child: Text(widget.message.mimeMessage.renderMessage()));
+          child: SelectableText(widget.message.mimeMessage.renderMessage()));
     }
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [buildHeader(), buildContent()],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: buildHeader(),
+          ),
+          buildContent(),
+        ],
       ),
     );
   }
@@ -270,17 +273,17 @@ class _MessageContentState extends State<_MessageContent> {
         ),
       );
     }
+
     return Wrap(
+      //TODO make expansible
       spacing: 2,
       runSpacing: 0,
       children: [
-        for (var address in addresses) ...{buildMailAddress(address)}
+        for (var address in addresses) ...{
+          MailAddressChip(mailAddress: address)
+        }
       ],
     );
-  }
-
-  Widget buildMailAddress(MailAddress address) {
-    return MailAddressChip(mailAddress: address);
   }
 
   Widget buildAttachments(List<ContentInfo> attachments) {
