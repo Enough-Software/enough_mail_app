@@ -224,8 +224,7 @@ class _MessageActionsState extends State<MessageActions> {
   }
 
   void reply({all = false}) {
-    //TODO in case of a unified account the current account is not bound to a single identity
-    final account = locator<MailService>().currentAccount;
+    final account = widget.message.mailClient.account;
 
     final builder = MessageBuilder.prepareReplyToMessage(
         widget.message.mimeMessage, account.fromAddress,
@@ -264,7 +263,7 @@ class _MessageActionsState extends State<MessageActions> {
   }
 
   void forward() {
-    var from = locator<MailService>().currentAccount.fromAddress;
+    var from = widget.message.mailClient.account.fromAddress;
     var builder = MessageBuilder.prepareForwardMessage(
       widget.message.mimeMessage,
       from: from,
