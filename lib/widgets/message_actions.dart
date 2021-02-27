@@ -227,10 +227,10 @@ class _MessageActionsState extends State<MessageActions> {
     //TODO in case of a unified account the current account is not bound to a single identity
     final account = locator<MailService>().currentAccount;
 
-    var builder = MessageBuilder.prepareReplyToMessage(
+    final builder = MessageBuilder.prepareReplyToMessage(
         widget.message.mimeMessage, account.fromAddress,
         aliases: account.aliases,
-        quoteOriginalText: true,
+        quoteOriginalText: false,
         handlePlusAliases: account.supportsPlusAliases ?? false,
         replyAll: all);
     navigateToCompose(widget.message, builder, ComposeAction.answer);
@@ -268,6 +268,7 @@ class _MessageActionsState extends State<MessageActions> {
     var builder = MessageBuilder.prepareForwardMessage(
       widget.message.mimeMessage,
       from: from,
+      quoteMessage: false,
     );
     navigateToCompose(widget.message, builder, ComposeAction.forward);
   }

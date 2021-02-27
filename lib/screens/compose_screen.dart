@@ -1,15 +1,19 @@
+import 'package:diff_match_patch/diff_match_patch.dart';
+import 'package:enough_html_editor/enough_html_editor.dart';
+import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/sender.dart';
 import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 
 import '../locator.dart';
-import 'base.dart';
 
 class ComposeScreen extends StatefulWidget {
   final ComposeData data;
@@ -27,7 +31,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
   TextEditingController _ccController = TextEditingController();
   TextEditingController _bccController = TextEditingController();
   TextEditingController _subjectController = TextEditingController();
-  TextEditingController _contentController = TextEditingController();
+  // TextEditingController _contentController = TextEditingController();
 
   bool _showSource = false;
   String _source;
@@ -35,8 +39,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
   List<Sender> senders;
   _Autofocus _focus;
   bool _isCcBccVisible = false;
-
   MessageEncoding _usedTextEncoding;
+  Future<String> loadMailTextFuture;
+  EditorApi _editorApi;
+  Future _downloadAttachmentsFuture;
+  String _originalMessageHtml;
 
   @override
   void initState() {
@@ -44,12 +51,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
     initRecipient(mb.to, _toController);
     initRecipient(mb.cc, _ccController);
     initRecipient(mb.bcc, _bccController);
+    _isCcBccVisible =
+        _ccController.text.isNotEmpty || _bccController.text.isNotEmpty;
     _subjectController.text = mb.subject;
-    final plainTextPart = mb.getTextPlainPart();
-    if (plainTextPart != null) {
-      _contentController.text = '\n' + (plainTextPart.text ?? '');
-      _contentController.selection = TextSelection.collapsed(offset: 0);
-    }
     _focus = ((_toController.text?.isEmpty ?? true) &&
             (_ccController.text?.isEmpty ?? true))
         ? _Autofocus.to
@@ -69,6 +73,29 @@ class _ComposeScreenState extends State<ComposeScreen> {
       from = Sender(mb.from.first, currentAccount);
       senders.insert(0, from);
     }
+    loadMailTextFuture = loadMailText();
+    if (widget.data.action == ComposeAction.forward &&
+        widget.data.originalMessage != null) {
+      // start initializing any attachments:
+      final attachments = mb.originalMessage
+          .findContentInfo(disposition: ContentDisposition.attachment);
+      if (attachments.isNotEmpty) {
+        final attachmentsToBeLoaded = <ContentInfo>[];
+        for (final attachment in attachments) {
+          final part = mb.originalMessage.getPart(attachment.fetchId);
+          if (part != null) {
+            mb.addPart(mimePart: part);
+          } else {
+            // add future part
+            attachmentsToBeLoaded.add(attachment);
+          }
+        }
+        if (attachmentsToBeLoaded.isNotEmpty) {
+          _downloadAttachmentsFuture = downloadAttachments(mb.originalMessage,
+              widget.data.originalMessage.mailClient, attachments);
+        }
+      }
+    }
     super.initState();
   }
 
@@ -78,8 +105,62 @@ class _ComposeScreenState extends State<ComposeScreen> {
     _ccController.dispose();
     _bccController.dispose();
     _subjectController.dispose();
-    _contentController.dispose();
+    // _contentController.dispose();
     super.dispose();
+  }
+
+  Future<void> downloadAttachments(MimeMessage mimeMessage,
+      MailClient mailClient, List<ContentInfo> attachments) async {
+    if (attachments.length == 1) {
+      // just download the attachment:
+      final part = await mailClient.fetchMessagePart(
+          mimeMessage, attachments.first.fetchId);
+      widget.data.messageBuilder.addPart(mimePart: part);
+    } else {
+      // download the full message:
+      final msg = await mailClient.fetchMessageContents(mimeMessage);
+      for (final attachment in attachments) {
+        final part = msg.getPart(attachment.fetchId);
+        if (part != null) {
+          widget.data.messageBuilder.addPart(mimePart: part);
+        }
+      }
+    }
+
+    setState(() {
+      _downloadAttachmentsFuture = null;
+    });
+  }
+
+  Future<String> loadMailText() async {
+    final mb = widget.data.messageBuilder;
+    if (mb.originalMessage == null) {
+      return '<p></p>';
+    } else {
+      final quoteTemplate = widget.data.action == ComposeAction.answer
+          ? MailConventions.defaultReplyHeaderTemplate
+          : widget.data.action == ComposeAction.forward
+              ? MailConventions.defaultForwardHeaderTemplate
+              : MailConventions.defaultReplyHeaderTemplate;
+      final blockExternalImages = false;
+      final emptyMessageText = 'empty message';
+      final maxImageWidth = 300;
+      final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
+          blockExternalImages, emptyMessageText, maxImageWidth);
+      final html = await compute(_generateHtmlImpl, args);
+      _originalMessageHtml = html;
+      return html;
+    }
+  }
+
+  static String _generateHtmlImpl(_HtmlGenerationArguments args) {
+    final html = args.mimeMessage.quoteToHtml(
+      quoteHeaderTemplate: args.quoteTemplate,
+      blockExternalImages: args.blockExternalImages,
+      emptyMessageText: args.emptyMessageText,
+      maxImageWidth: args.maxImageWidth,
+    );
+    return html;
   }
 
   Future<MimeMessage> buildMimeMessage(MailClient mailClient) async {
@@ -88,16 +169,78 @@ class _ComposeScreenState extends State<ComposeScreen> {
     mb.cc = parse(_ccController.text);
     mb.bcc = parse(_bccController.text);
     mb.subject = _subjectController.text;
-    mb.text = _contentController.text;
+
+    final htmlText = await _editorApi.getText();
+    // print('got html: $htmlText');
+    var newHtmlText = htmlText;
+    final htmlTagRegex =
+        RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
+    if (_originalMessageHtml != null) {
+      // check for simple case first:
+      var original = _originalMessageHtml;
+      int blockquoteStart = original.indexOf('<blockquote>');
+      if (blockquoteStart != -1) {
+        original = original.substring(blockquoteStart);
+      }
+      final originalStartIndex = htmlText.indexOf(original);
+      if (originalStartIndex != -1) {
+        newHtmlText = htmlText.replaceFirst(original, '', originalStartIndex);
+      } else {
+        //TODO Here the text should be added at the correct positions and not just at the front of the plain text message...
+        // create a diff between the original HTML and the new HTML:
+        final buffer = StringBuffer();
+        DiffMatchPatch dmp = new DiffMatchPatch();
+        List<Diff> diffs = dmp.diff(newHtmlText, _originalMessageHtml);
+        dmp.diffCleanupSemantic(diffs);
+        for (final diff in diffs) {
+          // print('diff: ${diff.operation}: ${diff.text}');
+          if (diff.operation == -1) {
+            // this is new text:
+            buffer.write(diff.text);
+          }
+        }
+        newHtmlText = buffer.toString();
+      }
+      print('newHtmlText=$newHtmlText');
+    }
+
+    // generate plain text from HTML code:
+    var plainText = newHtmlText.replaceAll(htmlTagRegex, '');
+    if (mb.originalMessage != null) {
+      final originalPlainText = mb.originalMessage.decodeTextPlainPart();
+      if (originalPlainText != null) {
+        if (widget.data.action == ComposeAction.forward) {
+          final forwardHeader = MessageBuilder.fillTemplate(
+              MailConventions.defaultForwardHeaderTemplate, mb.originalMessage);
+          plainText += forwardHeader + originalPlainText;
+        } else if (widget.data.action == ComposeAction.answer) {
+          final replyHeader = MessageBuilder.fillTemplate(
+              MailConventions.defaultForwardHeaderTemplate, mb.originalMessage);
+          plainText += '\r\n' +
+              MessageBuilder.quotePlainText(replyHeader, originalPlainText);
+        }
+      }
+    }
+    mb.addTextPlain(plainText);
+    final fullHtmlMessageText = await _editorApi.getFullHtml(content: htmlText);
+    mb.addTextHtml(fullHtmlMessageText);
+    //TODO check for attachments wait for all of them to be downloaded
     bool supports8BitEncoding = await mailClient.supports8BitEncoding();
     _usedTextEncoding = mb.setRecommendedTextEncoding(supports8BitEncoding);
-    var mimeMessage = mb.buildMimeMessage();
+    final mimeMessage = mb.buildMimeMessage();
+    // final mimeMessageText = mimeMessage.renderMessage();
+    // print('mime message:');
+    // print(mimeMessageText);
     return mimeMessage;
+  }
+
+  Future<MailClient> getMailClient() {
+    return locator<MailService>().getClientFor(from.account);
   }
 
   Future<void> send() async {
     locator<NavigationService>().pop();
-    final mailClient = await locator<MailService>().getClientFor(from.account);
+    final mailClient = await getMailClient();
     final mimeMessage = await buildMimeMessage(mailClient);
     //TODO enable global busy indicator
     //TODO check first if message can be sent or catch errors
@@ -155,200 +298,217 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Base.buildAppChrome(
-      context,
-      title: widget.data.action == ComposeAction.answer
-          ? 'Reply'
-          : widget.data.action == ComposeAction.forward
-              ? 'Forward'
-              : 'New message',
-      content: buildContent(),
-      appBarActions: [
-        IconButton(
-          icon: Icon(Icons.add),
-          onPressed: addAttachment,
-        ),
-        IconButton(
-          icon: Icon(Icons.send),
-          onPressed: send,
-        ),
-        PopupMenuButton<_OverflowMenuChoice>(
-          onSelected: (_OverflowMenuChoice result) {
-            switch (result) {
-              case _OverflowMenuChoice.showSourceCode:
-                showSourceCode();
-                break;
-              case _OverflowMenuChoice.saveAsDraft:
-                saveAsDraft();
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) => [
-            const PopupMenuItem<_OverflowMenuChoice>(
-              value: _OverflowMenuChoice.showSourceCode,
-              child: Text('View source'),
-            ),
-            const PopupMenuItem<_OverflowMenuChoice>(
-              value: _OverflowMenuChoice.saveAsDraft,
-              child: Text('Save as draft'),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget buildContent() {
-    if (_showSource) {
-      return SingleChildScrollView(
-        child: Text(_source),
-      );
-    }
-    return NestedScrollView(
-      headerSliverBuilder: (context, isInnerBoxScrolled) => [
-        SliverToBoxAdapter(
-          child: Container(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('From', style: Theme.of(context).textTheme?.caption),
-                DropdownButton<Sender>(
-                  isExpanded: true,
-                  items: senders
-                      .map(
-                        (s) => DropdownMenuItem<Sender>(
-                          value: s,
-                          child: Text(
-                            s.isPlaceHolderForPlusAlias
-                                ? 'Create new + alias...'
-                                : s.toString(),
-                            overflow: TextOverflow.fade,
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  // selectedItemBuilder: (context) => senders
-                  //     .map(
-                  //       (s) => Text(
-                  //         s.isPlaceHolderForPlusAlias
-                  //             ? 'Create new + alias...'
-                  //             : s.toString(),
-                  //         overflow: TextOverflow.fade,
-                  //       ),
-                  //     )
-                  //     .toList(),
-                  onChanged: (s) async {
-                    if (s.isPlaceHolderForPlusAlias) {
-                      final index = senders.indexOf(s);
-                      s = locator<MailService>()
-                          .generateRandomPlusAliasSender(s);
-                      setState(() {
-                        senders.insert(index, s);
-                      });
-                      // final newAliasAddress = await showDialog<MailAddress>(
-                      //   context: context,
-                      //   builder: (context) => AliasEditDialog(
-                      //       isNewAlias: true, alias: alias.address, account: Account(s.account),),
-                      // );
-                      // if (newAliasAddress != null) {
-
-                      // }
-                    }
-                    widget.data.messageBuilder.from = [s.address];
-                    setState(() {
-                      from = s;
-                    });
-                  },
-                  value: from,
-                  hint: Text('Sender'),
-                ),
-                TextField(
-                  controller: _toController,
-                  autofocus: _focus == _Autofocus.to,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: 'To',
-                    hintText: 'Recipient email',
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextButton(
-                          child: Text('CC'),
-                          onPressed: () => setState(
-                            () => _isCcBccVisible = !_isCcBccVisible,
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.contacts),
-                          onPressed: () => _pickContact(_toController),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (_isCcBccVisible) ...{
-                  TextField(
-                    controller: _ccController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'CC',
-                      hintText: 'Recipient email',
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.contacts),
-                        onPressed: () => _pickContact(_ccController),
-                      ),
-                    ),
-                  ),
-                  TextField(
-                    controller: _bccController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'BCC',
-                      hintText: 'Recipient email',
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.contacts),
-                        onPressed: () => _pickContact(_bccController),
-                      ),
-                    ),
-                  ),
+    final titleText = widget.data.action == ComposeAction.answer
+        ? 'Reply'
+        : widget.data.action == ComposeAction.forward
+            ? 'Forward'
+            : 'New message';
+    return Scaffold(
+      drawer: AppDrawer(),
+      body: CustomScrollView(
+        physics: BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            title: Text(titleText),
+            floating: false,
+            pinned: true,
+            stretch: true,
+            actions: [
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: addAttachment,
+              ),
+              IconButton(
+                icon: Icon(Icons.send),
+                onPressed: send,
+              ),
+              PopupMenuButton<_OverflowMenuChoice>(
+                onSelected: (_OverflowMenuChoice result) {
+                  switch (result) {
+                    case _OverflowMenuChoice.showSourceCode:
+                      showSourceCode();
+                      break;
+                    case _OverflowMenuChoice.saveAsDraft:
+                      saveAsDraft();
+                      break;
+                  }
                 },
-                TextField(
-                  controller: _subjectController,
-                  autofocus: _focus == _Autofocus.subject,
-                  decoration: InputDecoration(
-                      labelText: 'Subject', hintText: 'Message subject'),
-                ),
-                if (widget.data.messageBuilder.attachments.isNotEmpty) ...{
-                  Padding(
-                    padding: EdgeInsets.only(top: 8.0),
-                    child: AttachmentComposeBar(composeData: widget.data),
+                itemBuilder: (BuildContext context) => [
+                  const PopupMenuItem<_OverflowMenuChoice>(
+                    value: _OverflowMenuChoice.showSourceCode,
+                    child: Text('View source'),
                   ),
-                  Divider(
-                    color: Colors.grey,
-                  )
-                },
-              ],
-            ),
+                  const PopupMenuItem<_OverflowMenuChoice>(
+                    value: _OverflowMenuChoice.saveAsDraft,
+                    child: Text('Save as draft'),
+                  ),
+                ],
+              ),
+            ], // actions
           ),
-        ),
-      ],
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Builder(
-          builder: (context) {
-            final scrollController = PrimaryScrollController.of(context);
-            return TextField(
-              autofocus: _focus == _Autofocus.text,
-              controller: _contentController,
-              scrollController: scrollController,
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
-              textInputAction: TextInputAction.newline,
-              decoration: InputDecoration(hintText: 'Your message goes here'),
-            );
+          if (_showSource) ...{
+            SelectableText(_source),
+          } else ...{
+            SliverToBoxAdapter(
+              child: Container(
+                padding: EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('From', style: Theme.of(context).textTheme?.caption),
+                    DropdownButton<Sender>(
+                      isExpanded: true,
+                      items: senders
+                          .map(
+                            (s) => DropdownMenuItem<Sender>(
+                              value: s,
+                              child: Text(
+                                s.isPlaceHolderForPlusAlias
+                                    ? 'Create new + alias...'
+                                    : s.toString(),
+                                overflow: TextOverflow.fade,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      // selectedItemBuilder: (context) => senders
+                      //     .map(
+                      //       (s) => Text(
+                      //         s.isPlaceHolderForPlusAlias
+                      //             ? 'Create new + alias...'
+                      //             : s.toString(),
+                      //         overflow: TextOverflow.fade,
+                      //       ),
+                      //     )
+                      //     .toList(),
+                      onChanged: (s) async {
+                        if (s.isPlaceHolderForPlusAlias) {
+                          final index = senders.indexOf(s);
+                          s = locator<MailService>()
+                              .generateRandomPlusAliasSender(s);
+                          setState(() {
+                            senders.insert(index, s);
+                          });
+                          // final newAliasAddress = await showDialog<MailAddress>(
+                          //   context: context,
+                          //   builder: (context) => AliasEditDialog(
+                          //       isNewAlias: true, alias: alias.address, account: Account(s.account),),
+                          // );
+                          // if (newAliasAddress != null) {
+
+                          // }
+                        }
+                        widget.data.messageBuilder.from = [s.address];
+                        setState(() {
+                          from = s;
+                        });
+                      },
+                      value: from,
+                      hint: Text('Sender'),
+                    ),
+                    TextField(
+                      controller: _toController,
+                      autofocus: _focus == _Autofocus.to,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: 'To',
+                        hintText: 'Recipient email',
+                        suffixIcon: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextButton(
+                              child: Text('CC'),
+                              onPressed: () => setState(
+                                () => _isCcBccVisible = !_isCcBccVisible,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.contacts),
+                              onPressed: () => _pickContact(_toController),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (_isCcBccVisible) ...{
+                      TextField(
+                        controller: _ccController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'CC',
+                          hintText: 'Recipient email',
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.contacts),
+                            onPressed: () => _pickContact(_ccController),
+                          ),
+                        ),
+                      ),
+                      TextField(
+                        controller: _bccController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'BCC',
+                          hintText: 'Recipient email',
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.contacts),
+                            onPressed: () => _pickContact(_bccController),
+                          ),
+                        ),
+                      ),
+                    },
+                    TextField(
+                      controller: _subjectController,
+                      autofocus: _focus == _Autofocus.subject,
+                      decoration: InputDecoration(
+                          labelText: 'Subject', hintText: 'Message subject'),
+                    ),
+                    if (widget.data.messageBuilder.attachments.isNotEmpty ||
+                        (_downloadAttachmentsFuture != null)) ...{
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: AttachmentComposeBar(
+                            composeData: widget.data,
+                            isDownloading:
+                                (_downloadAttachmentsFuture != null)),
+                      ),
+                      Divider(
+                        color: Colors.grey,
+                      )
+                    },
+                  ],
+                ),
+              ),
+            ),
+            if (_editorApi != null) ...{
+              SliverHeaderHtmlEditorControls(editorApi: _editorApi),
+            },
+            SliverToBoxAdapter(
+              child: FutureBuilder<String>(
+                future: loadMailTextFuture,
+                builder: (widget, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      return Row(children: [CircularProgressIndicator()]);
+                      break;
+                    case ConnectionState.done:
+                      return HtmlEditor(
+                        onCreated: (api) {
+                          setState(() {
+                            _editorApi = api;
+                          });
+                        },
+                        initialContent: snapshot.data,
+                      );
+                      break;
+                  }
+                  return CircularProgressIndicator();
+                },
+              ),
+            ),
           },
-        ),
+        ],
       ),
     );
   }
@@ -399,4 +559,14 @@ class _ComposeScreenState extends State<ComposeScreen> {
           TextSelection.collapsed(offset: textController.text.length);
     }
   }
+}
+
+class _HtmlGenerationArguments {
+  final String quoteTemplate;
+  final MimeMessage mimeMessage;
+  final bool blockExternalImages;
+  final String emptyMessageText;
+  final int maxImageWidth;
+  _HtmlGenerationArguments(this.quoteTemplate, this.mimeMessage,
+      this.blockExternalImages, this.emptyMessageText, this.maxImageWidth);
 }
