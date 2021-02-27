@@ -93,6 +93,7 @@ abstract class MimeSource {
         addMessage(e.message);
         _notifyMessageAdded(e.message);
         sendNotification = locator<AppService>().isInBackground;
+        //TODO update uidNext for background service
       } else {
         sendNotification = true;
       }

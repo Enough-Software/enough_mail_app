@@ -1,7 +1,6 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,10 @@ class AttachmentMediaProviderFactory {
 
 class AttachmentComposeBar extends StatefulWidget {
   final ComposeData composeData;
-  AttachmentComposeBar({Key key, @required this.composeData}) : super(key: key);
+  final bool isDownloading;
+  AttachmentComposeBar(
+      {Key key, @required this.composeData, this.isDownloading = false})
+      : super(key: key);
 
   @override
   _AttachmentComposeBarState createState() => _AttachmentComposeBarState();
@@ -60,6 +62,9 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
             attachment: attachment,
             onRemove: removeAttachment,
           ),
+        },
+        if (widget.isDownloading) ...{
+          CircularProgressIndicator(),
         },
         ActionChip(
           avatar: Icon(Icons.add),
