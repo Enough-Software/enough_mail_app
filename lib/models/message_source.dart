@@ -55,10 +55,6 @@ abstract class MessageSource extends ChangeNotifier
     return message;
   }
 
-  Message _getFromCache(int index) {
-    return cache[index];
-  }
-
   Message _getUncachedMessage(int index);
 
   void addToCache(Message message) {
@@ -66,7 +62,7 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Message getMessageAt(int index) {
-    var message = _getFromCache(index);
+    var message = cache[index];
     if (message == null) {
       message = _getUncachedMessage(index);
       addToCache(message);
@@ -465,7 +461,6 @@ class MultipleMessageSource extends MessageSource {
   }
 
   Message _next() {
-    final mimes = <MimeMessage>[];
     var newestIndex = 0;
     DateTime newestTime;
     for (var i = 0; i < _multipleMimeSources.length; i++) {
@@ -476,7 +471,6 @@ class MultipleMessageSource extends MessageSource {
           //TODO
           //await waitForDownload();
         }
-        mimes.add(mime);
         var date = mime.decodeDate();
         if (date == null) {
           date = DateTime.now();
