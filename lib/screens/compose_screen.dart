@@ -83,9 +83,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
         final attachmentsToBeLoaded = <ContentInfo>[];
         for (final attachment in attachments) {
           final part = mb.originalMessage.getPart(attachment.fetchId);
-          if (part != null) {
-            mb.addPart(mimePart: part);
-          } else {
+          if (part == null) {
             // add future part
             attachmentsToBeLoaded.add(attachment);
           }
@@ -221,16 +219,26 @@ class _ComposeScreenState extends State<ComposeScreen> {
         }
       }
     }
-    mb.addTextPlain(plainText);
+    final textPartBuilder = mb.hasAttachments
+        ? mb.addPart(
+            mediaSubtype: MediaSubtype.multipartAlternative, insert: true)
+        : mb;
+    if (!mb.hasAttachments) {
+      mb.setContentType(
+          MediaType.fromSubtype(MediaSubtype.multipartAlternative));
+    }
+    textPartBuilder.addTextPlain(plainText);
     final fullHtmlMessageText = await _editorApi.getFullHtml(content: htmlText);
-    mb.addTextHtml(fullHtmlMessageText);
+    textPartBuilder.addTextHtml(fullHtmlMessageText);
     //TODO check for attachments wait for all of them to be downloaded
-    bool supports8BitEncoding = await mailClient.supports8BitEncoding();
-    _usedTextEncoding = mb.setRecommendedTextEncoding(supports8BitEncoding);
+    // bool supports8BitEncoding = await mailClient.supports8BitEncoding();
+    // _usedTextEncoding = mb.setRecommendedTextEncoding(supports8BitEncoding);
+    // problem with using 8bit encoding is that even in 2021 there are still mailsystems not supporting BDAT so
+    // even when the SMTP accepts a 8bit message via DATA, it may run into a problem with the recipient's SMTP.
+    // Yes I am looking at you, 1&1 (IONOS).
+    // So we better play safe than sorry and just always use the default quoted-printable 7bit encoding.
+    _usedTextEncoding = MessageEncoding.quotedPrintable;
     final mimeMessage = mb.buildMimeMessage();
-    // final mimeMessageText = mimeMessage.renderMessage();
-    // print('mime message:');
-    // print(mimeMessageText);
     return mimeMessage;
   }
 
