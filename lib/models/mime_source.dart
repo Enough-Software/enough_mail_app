@@ -92,7 +92,8 @@ abstract class MimeSource {
       if (matches(e.message)) {
         addMessage(e.message);
         _notifyMessageAdded(e.message);
-        sendNotification = locator<AppService>().isInBackground;
+        sendNotification = locator<AppService>()
+            .isInBackground; // it should also show a notification when the user is on a different page...
         //TODO update uidNext for background service
       } else {
         sendNotification = true;
@@ -167,7 +168,7 @@ abstract class MimeSource {
 class MailboxMimeSource extends MimeSource {
   Mailbox mailbox;
   final _requestedPages = <int>[];
-  final List<MimeMessage> _cache = <MimeMessage>[];
+  final _cache = <MimeMessage>[];
   final int pageSize;
   final int cacheSize;
 
@@ -193,7 +194,7 @@ class MailboxMimeSource extends MimeSource {
   bool get supportsSearching => true;
 
   MailboxMimeSource(MailClient mailClient, this.mailbox,
-      {this.pageSize = 20,
+      {this.pageSize = 30,
       this.cacheSize = 100,
       MimeSourceSubscriber subscriber})
       : super(mailClient, subscriber: subscriber);
@@ -268,6 +269,15 @@ class MailboxMimeSource extends MimeSource {
     if (index >= size) {
       throw StateError('Invalid index $index for MimeSource with size $size');
     }
+    // The problem here is that there is not necessarily a mapping between the sequenceId and the sorting
+    // Normally newer messages have higher sequence IDs, but even that is not always the case
+    // Consider wrapping MimeMessages into CachedMimeMessage with the index. But even when
+    // messages are downloaded in chunks and then sorted by date, there might be one messages with a date
+    // that is out of range of the current chunk... The probability for this problem is decreased with increased
+    // chunk sizes.
+    // When using source indeces instead of sequence IDs, additional maangement is necessary when adding and removing
+    // messages. With (growing) sequence IDs this is only necessary when a message is removed.
+    // UIDs have the benefit NOT to be updated when a message is removed.
     final sequenceId = (size - index);
     final existingMessage = _getMessageFromCache(sequenceId);
     if (existingMessage != null) {
@@ -310,6 +320,11 @@ class MailboxMimeSource extends MimeSource {
         page: (pageIndex + 1),
         fetchPreference: FetchPreference.envelope);
     _requestedPages.remove(pageIndex);
+    //TODO the sequence ID does not necessary reflect the desired sorting
+    // mimeMessages.sort((m1, m2) => (m1.sequenceId.compareTo(m2.sequenceId)));
+    // final now = DateTime.now();
+    // mimeMessages.sort(
+    //     (m1, m2) => (m1.decodeDate() ?? now).compareTo(m2.decodeDate() ?? now));
     for (final mime in mimeMessages) {
       final cached = _getMessageFromCache(mime.sequenceId);
       if (cached == null) {
@@ -488,4 +503,10 @@ class SearchMimeSource extends MimeSource {
   @override
   bool get isSequenceIdBased =>
       !(searchResult?.messageSequence?.isUidSequence ?? false);
+}
+
+class CachedMimeMessage {
+  final MimeMessage mimeMessage;
+  final int sourceIndex;
+  CachedMimeMessage(this.mimeMessage, this.sourceIndex);
 }
