@@ -25,7 +25,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  enough_mail: #^0.1.0
+  enough_mail: #^0.3.1
     git:
       url: https://github.com/Enough-Software/enough_mail.git
     # path: ../enough_mail
@@ -33,7 +33,7 @@ dependencies:
     git:
       url: https://github.com/Enough-Software/enough_mail_flutter.git
     # path: ../enough_mail_flutter
-  enough_media: #0.1.0
+  enough_media: #1.0.0
     git:
       url: https://github.com/Enough-Software/enough_media.git
     # path: ../enough_media
@@ -48,26 +48,22 @@ dependencies:
     #path: ../enough_serialization
   #  enough_style:
   #    path: ../enough_style
-  video_player: ^1.0.1
-  event_bus: ^1.1.1
-  intl: ^0.16.1
-  flutter_secure_storage: ^3.3.3
-  get_it: ^5.0.4
-  webview_flutter: ^1.0.7
-  url_launcher: ^5.5.0
-  simple_gravatar: ^1.0.5
-  image: ^2.1.19
+  event_bus: '>=2.0.0 <4.0.0'
+  intl: '>=0.17.0 <2.0.0'
+  flutter_secure_storage: '>=3.3.3 <5.0.0'
+  get_it: '>=6.0.0 <8.0.0'
+  url_launcher: '>=6.0.2 <8.0.0'
   flutter_icons: ^1.1.0
-  path_provider: ^1.6.27
+  path_provider: '>1.6.0 <4.0.0'
   share: '>=0.6.5+4 <2.0.0'
   flutter_absolute_path: ^1.0.6
-  flutter_local_notifications: ^3.0.3
-  shared_preferences: '>=0.5.12+4 <2.0.0'
-  background_fetch: ^0.6.0
+  flutter_local_notifications: '>=5.0.0-nullsafety.0 <7.0.0'
+  shared_preferences: '>=2.0.3 <4.0.0'
+  background_fetch: '>=0.7.0 <2.0.0'
     # git:
     #   url: https://github.com/transistorsoft/flutter_background_fetch
-  file_picker: ^2.1.5
-  fluttercontactpicker: ^4.2.1
+  file_picker:  '>2.0.0 <5.0.0'
+  fluttercontactpicker: '>3.0.0 <6.0.0'
   cupertino_icons: ^1.0.0
   diff_match_patch: ^0.3.0
 

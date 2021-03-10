@@ -6,10 +6,10 @@ import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/models/mime_source.dart';
 import 'package:enough_mail_app/models/sender.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/util/gravatar.dart';
 import 'package:enough_serialization/enough_serialization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:simple_gravatar/simple_gravatar.dart';
 
 import '../locator.dart';
 
@@ -148,8 +148,8 @@ class MailService {
   }
 
   void _addGravatar(MailAccount account) {
-    final gravatar = Gravatar(account.email);
-    final url = gravatar.imageUrl(
+    final url = Gravatar.imageUrl(
+      account.email,
       size: 400,
       defaultImage: GravatarImage.retro,
     );
