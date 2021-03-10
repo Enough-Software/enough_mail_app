@@ -2,6 +2,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message_cache.dart';
 import 'package:enough_mail_app/models/mime_source.dart';
+import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -122,8 +123,7 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> deleteMessage(BuildContext context, Message message) async {
-    remove(message);
-    removeFromCache(message);
+    _removeMessage(message, locator<NotificationService>());
     final deleteResult =
         await message.mailClient.deleteMessage(message.mimeMessage);
     if (deleteResult?.isUndoable == true) {
@@ -144,9 +144,9 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> deleteMessages(
       BuildContext context, List<Message> messages) async {
+    final notificationService = locator<NotificationService>();
     for (final message in messages) {
-      remove(message);
-      cache.remove(message);
+      _removeMessage(message, notificationService);
     }
     notifyListeners();
     final sequenceByClient = orderByClient(messages);
@@ -190,8 +190,7 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> moveMessage(BuildContext context, Message message,
       MailboxFlag targetMailboxFlag, String notification) async {
-    remove(message);
-    removeFromCache(message);
+    _removeMessage(message, locator<NotificationService>());
     final moveResult = await message.mailClient
         .moveMessageToFlag(message.mimeMessage, targetMailboxFlag);
     if (moveResult?.isUndoable == true) {
@@ -209,11 +208,18 @@ abstract class MessageSource extends ChangeNotifier
     }
   }
 
+  void _removeMessage(
+      Message message, NotificationService notificationService) {
+    remove(message);
+    removeFromCache(message);
+    notificationService.cancelNotificationForMailMessage(message);
+  }
+
   Future<void> moveMessages(BuildContext context, List<Message> messages,
       MailboxFlag targetMailboxFlag, String notification) async {
+    final notificationService = locator<NotificationService>();
     for (final message in messages) {
-      remove(message);
-      cache.remove(message);
+      _removeMessage(message, notificationService);
     }
     notifyListeners();
     final sequenceByClient = orderByClient(messages);
