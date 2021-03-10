@@ -259,21 +259,6 @@ class _MessageContentState extends State<_MessageContent> {
     if (addresses?.isEmpty ?? true) {
       return Container();
     }
-    if (false) {
-      return SizedBox(
-        height: 40,
-        child: ListView.builder(
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          itemCount: addresses.length,
-          itemBuilder: (_, index) => Padding(
-            padding: const EdgeInsets.only(right: 4.0),
-            child: MailAddressChip(mailAddress: addresses[index]),
-          ),
-        ),
-      );
-    }
-
     return Wrap(
       //TODO make expansible
       spacing: 2,

@@ -2,8 +2,8 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
@@ -238,8 +238,10 @@ class _MessageActionsState extends State<MessageActions> {
   void redirectMessage() {}
 
   void delete() async {
-    await widget.message.source.deleteMessage(context, widget.message);
     locator<NavigationService>().pop();
+    await widget.message.source.deleteMessage(context, widget.message);
+    locator<NotificationService>()
+        .cancelNotificationForMailMessage(widget.message);
   }
 
   void moveJunk() async {
@@ -247,6 +249,8 @@ class _MessageActionsState extends State<MessageActions> {
     if (source.isJunk) {
       await widget.message.source.markAsNotJunk(context, widget.message);
     } else {
+      locator<NotificationService>()
+          .cancelNotificationForMailMessage(widget.message);
       await widget.message.source.markAsJunk(context, widget.message);
     }
     locator<NavigationService>().pop();
@@ -257,6 +261,8 @@ class _MessageActionsState extends State<MessageActions> {
     if (source.isArchive) {
       await widget.message.source.moveToInbox(context, widget.message);
     } else {
+      locator<NotificationService>()
+          .cancelNotificationForMailMessage(widget.message);
       await widget.message.source.archive(context, widget.message);
     }
     locator<NavigationService>().pop();
