@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/account_change_event.dart';
+import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
+import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:flutter/material.dart';
@@ -18,12 +22,21 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
+  StreamSubscription eventSubscription;
+
   @override
   void initState() {
-    AppEventBus.eventBus.on<AccountChangeEvent>().listen((event) {
+    eventSubscription =
+        AppEventBus.eventBus.on<AccountsChangedEvent>().listen((event) {
       setState(() {});
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    eventSubscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -31,7 +44,11 @@ class _AppDrawerState extends State<AppDrawer> {
     final mailService = locator<MailService>();
     final theme = Theme.of(context);
     final currentAccount = mailService.currentAccount;
-    final accounts = mailService.accounts;
+    var accounts = mailService.accounts;
+    if (mailService.hasUnifiedAccount) {
+      accounts = accounts.toList();
+      accounts.insert(0, mailService.unifiedAccount);
+    }
     return Drawer(
       child: SafeArea(
         child: Column(
@@ -40,7 +57,8 @@ class _AppDrawerState extends State<AppDrawer> {
               elevation: 18,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: buildAccountHeader(currentAccount, theme),
+                child: buildAccountHeader(
+                    currentAccount, mailService.accounts, theme),
               ),
             ),
             Expanded(
@@ -51,6 +69,14 @@ class _AppDrawerState extends State<AppDrawer> {
                   children: [
                     buildAccountSelection(accounts, currentAccount),
                     buildFolderTree(mailService, currentAccount),
+                    Divider(),
+                    ListTile(
+                      leading: Icon(Icons.info),
+                      title: Text('About Maily'),
+                      onTap: () {
+                        locator<AlertService>().showAbout(context);
+                      },
+                    )
                   ],
                 ),
               ),
@@ -73,16 +99,17 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  Widget buildAccountHeader(Account currentAccount, ThemeData theme) {
+  Widget buildAccountHeader(
+      Account currentAccount, List<Account> accounts, ThemeData theme) {
+    final avatarAccount =
+        currentAccount.isVirtual ? accounts.first : currentAccount;
     return Row(
       children: [
         CircleAvatar(
           backgroundColor: theme.secondaryHeaderColor,
-          backgroundImage: currentAccount.isVirtual
-              ? null
-              : NetworkImage(
-                  currentAccount.imageUrlGravator,
-                ),
+          backgroundImage: NetworkImage(
+            avatarAccount.imageUrlGravator,
+          ),
           radius: 30,
         ),
         Padding(

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/events/app_event_bus.dart';
+import 'package:enough_mail_app/events/unified_messagesource_changed_event.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/date_sectioned_message_source.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -41,6 +43,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   bool isInSearchMode = false;
   bool hasSearchInput = false;
   TextEditingController searchEditingController;
+  StreamSubscription eventsSubscription;
 
   @override
   void initState() {
@@ -49,6 +52,18 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     _sectionedMessageSource = DateSectionedMessageSource(widget.messageSource);
     _sectionedMessageSource.addListener(_update);
     _messageLoader = initMessageSource();
+    eventsSubscription = AppEventBus.eventBus
+        .on<UnifiedMessageSourceChangedEvent>()
+        .listen((event) {
+      setState(() {
+        _sectionedMessageSource.removeListener(_update);
+        _sectionedMessageSource.dispose();
+        _sectionedMessageSource =
+            DateSectionedMessageSource(event.messageSource);
+        _sectionedMessageSource.addListener(_update);
+        _messageLoader = initMessageSource();
+      });
+    });
   }
 
   Future<bool> initMessageSource() {
@@ -62,6 +77,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     searchEditingController.dispose();
     _sectionedMessageSource.removeListener(_update);
     _sectionedMessageSource.dispose();
+    eventsSubscription.cancel();
     super.dispose();
   }
 

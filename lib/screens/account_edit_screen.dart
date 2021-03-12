@@ -45,7 +45,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
       context,
       title: 'Edit ${widget.account.name}',
       subtitle: widget.account.email,
-      content: Builder(builder: (context) => buildEditContent(context)),
+      content: buildEditContent(context),
     );
   }
 
@@ -62,7 +62,10 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 labelText: 'Account name',
                 hintText: 'Name of the account',
               ),
-              onChanged: (value) => widget.account.name = value,
+              onChanged: (value) async {
+                widget.account.name = value;
+                await locator<MailService>().saveAccounts();
+              },
             ),
             TextField(
               controller: userNameController,
@@ -70,8 +73,23 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 labelText: 'Your name',
                 hintText: 'The name that recipients see',
               ),
-              onChanged: (value) => widget.account.userName = value,
+              onChanged: (value) async {
+                widget.account.userName = value;
+                await locator<MailService>().saveAccounts();
+              },
             ),
+            if (locator<MailService>().hasUnifiedAccount) ...{
+              CheckboxListTile(
+                value: !widget.account.excludeFromUnified,
+                onChanged: (value) async {
+                  widget.account.excludeFromUnified = !value;
+                  setState(() {});
+                  await locator<MailService>()
+                      .excludeAccountFromUnified(widget.account, !value);
+                },
+                title: Text('Include in unified account'),
+              ),
+            },
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
               child: Text('Alias email addresses for ${widget.account.email}:'),
@@ -103,7 +121,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                     Container(color: Colors.red, child: Icon(Icons.delete)),
                 onDismissed: (direction) async {
                   await widget.account.removeAlias(alias);
-                  Scaffold.of(context).showSnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text("${alias.email} alias removed")));
                 },
               ),
@@ -124,9 +142,10 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
             ),
             // section to test plus alias support
             CheckboxListTile(
-                value: widget.account.supportsPlusAliases,
-                onChanged: null,
-                title: Text('Supports plus aliases')),
+              value: widget.account.supportsPlusAliases,
+              onChanged: null,
+              title: Text('Supports plus aliases'),
+            ),
             //if (!widget.account.supportsPlusAliases) ...{
             ElevatedButton(
               child: Text('Test support for plus aliases'),

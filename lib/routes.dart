@@ -1,10 +1,8 @@
-import 'package:enough_mail/mime_message.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
-import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +11,7 @@ class Routes {
   static const String accountAdd = 'accountAdd';
   static const String accountEdit = 'accountEdit';
   static const String accountServerDetails = 'accountServerDetails';
+  static const String accountsReorder = 'accountsReorder';
   static const String settings = 'settings';
   static const String messageSource = 'messageSource';
   static const String mailDetails = 'mailDetails';
@@ -41,6 +40,10 @@ class AppRouter {
       case Routes.accountEdit:
         page = AccountEditScreen(account: arguments as Account);
         break;
+      case Routes.accountsReorder:
+        page = AccountsReorderScreen();
+        break;
+
       case Routes.messageSource:
         page = MessageSourceScreen(arguments as MessageSource);
         break;

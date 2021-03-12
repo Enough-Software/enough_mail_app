@@ -1,6 +1,8 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/account_change_event.dart';
+import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
+import 'package:enough_mail_app/events/unified_messagesource_changed_event.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/models/mime_source.dart';
@@ -24,6 +26,7 @@ class MailService {
   List<MailAccount> mailAccounts = <MailAccount>[];
   final accounts = <Account>[];
   UnifiedAccount unifiedAccount;
+  bool get hasUnifiedAccount => (unifiedAccount != null);
 
   static const String _keyAccounts = 'accts';
   FlutterSecureStorage _storage;
@@ -31,7 +34,6 @@ class MailService {
   final _mailboxesPerAccount = <Account, Tree<Mailbox>>{};
 
   Future<void> init() async {
-    _registerForEvents();
     await _loadAccounts();
     messageSource = await _initMessageSource();
   }
@@ -62,7 +64,7 @@ class MailService {
         .toList();
     if (mailAccountsForUnified.length > 1) {
       unifiedAccount = UnifiedAccount(mailAccountsForUnified);
-      accounts.insert(0, unifiedAccount);
+      //accounts.insert(0, unifiedAccount);
       final mailboxes = [
         Mailbox()
           ..name = 'Unified Inbox'
@@ -175,18 +177,8 @@ class MailService {
     final source = await getMessageSourceFor(currentAccount);
     messageSource = source;
     AppEventBus.eventBus.fire(AccountChangeEvent(mailClient, mailAccount));
-    await _saveAccounts();
+    await saveAccounts();
     return true;
-  }
-
-  void _registerForEvents() {
-    AppEventBus.eventBus.on<AppLifecycleState>().listen((e) async {
-      if (e == AppLifecycleState.resumed) {
-        // the application has been resumed from the background
-        //TODO let current mail source resume its work:
-        //await mailSource.resume();
-      }
-    });
   }
 
   List<Sender> getSenders({bool includePlaceholdersForPlusAliases = true}) {
@@ -230,9 +222,18 @@ class MailService {
     return MessageBuilder.prepareMailtoBasedMessage(mailto, fromAddress);
   }
 
-  Future<void> _saveAccounts() {
+  Future<void> reorderAccounts(List<Account> newOrder) {
+    accounts.clear();
+    accounts.addAll(newOrder);
+    final newOrderMailAccounts = newOrder.map((a) => a.account).toList();
+    mailAccounts = newOrderMailAccounts;
+    return saveAccounts();
+  }
+
+  Future<void> saveAccounts() {
+    AppEventBus.eventBus.fire(AccountsChangedEvent());
     final json = Serializer().serializeList(mailAccounts);
-    print(json);
+    // print(json);
     _storage ??= FlutterSecureStorage();
     return _storage.write(key: _keyAccounts, value: json);
   }
@@ -293,7 +294,7 @@ class MailService {
 
   Future<void> saveAccount(MailAccount account) {
     // print('saving account ${account.name}');
-    return _saveAccounts();
+    return saveAccounts();
   }
 
   void markAccountAsTestedForPlusAlias(Account account) {
@@ -335,7 +336,7 @@ class MailService {
     //     current = null;
     //   }
     // }
-    await _saveAccounts();
+    await saveAccounts();
   }
 
   String getEmailDomain(String email) {
@@ -405,5 +406,26 @@ class MailService {
       futures.add(client.resume());
     }
     return Future.wait(futures);
+  }
+
+  Future excludeAccountFromUnified(Account account, bool exclude) async {
+    account.excludeFromUnified = exclude;
+    if (exclude) {
+      if (unifiedAccount != null) {
+        unifiedAccount.removeAccount(account);
+      }
+    } else {
+      if (unifiedAccount == null) {
+        _createUnifiedAccount();
+      } else {
+        unifiedAccount.addAccount(account);
+      }
+    }
+    if (currentAccount == unifiedAccount) {
+      messageSource = await _createMessageSource(null, unifiedAccount);
+      AppEventBus.eventBus
+          .fire(UnifiedMessageSourceChangedEvent(messageSource));
+    }
+    return saveAccounts();
   }
 }

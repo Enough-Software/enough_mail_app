@@ -365,13 +365,4 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
             arguments: service.messageSource, replace: true, fade: true);
     }
   }
-
-  void showSnackBarMessage(String message, [MaterialColor color = Colors.red]) {
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-      ),
-    );
-  }
 }
