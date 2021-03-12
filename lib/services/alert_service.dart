@@ -50,4 +50,36 @@ class AlertService {
       context: context,
     );
   }
+
+  Future showWidgetDialog(BuildContext context, String title, Widget content) {
+    return showDialog(
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: content,
+        actions: [
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+      context: context,
+    );
+  }
+
+  void showAbout(BuildContext context) {
+    showAboutDialog(
+      context: context,
+      applicationName: 'Maily',
+      applicationVersion: '1.0.0-Beta',
+      applicationIcon: Icon(Icons.email),
+      applicationLegalese:
+          'Maily is free software published under the GNU General Public License.',
+      children: [
+        ElevatedButton(onPressed: () {}, child: Text('Suggest a feature')),
+        ElevatedButton(onPressed: () {}, child: Text('Report a problem')),
+        ElevatedButton(onPressed: () {}, child: Text('Help developing Maily')),
+      ],
+    );
+  }
 }

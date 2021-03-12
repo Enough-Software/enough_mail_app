@@ -12,6 +12,17 @@ class Account extends ChangeNotifier {
   bool get isVirtual => false;
 
   String get name => account?.name;
+
+  bool get excludeFromUnified =>
+      account.hasAttribute(MailService.attributeExcludeFromUnified);
+  set excludeFromUnified(bool value) {
+    if (value) {
+      account.attributes[MailService.attributeExcludeFromUnified] = value;
+    } else {
+      account.attributes.remove(MailService.attributeExcludeFromUnified);
+    }
+  }
+
   set name(String value) {
     account.name = value;
     notifyListeners();
@@ -97,4 +108,12 @@ class UnifiedAccount extends Account {
 
   @override
   String get email => accounts.map((a) => a.email).join(';');
+
+  void removeAccount(Account account) {
+    accounts.remove(account);
+  }
+
+  void addAccount(Account account) {
+    accounts.add(account);
+  }
 }
