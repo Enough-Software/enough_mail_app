@@ -12,22 +12,26 @@ class BackgroundService {
 
   Future init() async {
     await BackgroundFetch.configure(
-      BackgroundFetchConfig(
-        minimumFetchInterval: 15,
-        startOnBoot: true,
-        stopOnTerminate: false,
-        enableHeadless: true,
-        requiresBatteryNotLow: false,
-        requiresCharging: false,
-        requiresStorageNotLow: false,
-        requiresDeviceIdle: false,
-        requiredNetworkType: NetworkType.ANY,
-      ),
-      (String taskId) async {
+        BackgroundFetchConfig(
+          minimumFetchInterval: 15,
+          startOnBoot: true,
+          stopOnTerminate: false,
+          enableHeadless: true,
+          requiresBatteryNotLow: false,
+          requiresCharging: false,
+          requiresStorageNotLow: false,
+          requiresDeviceIdle: false,
+          requiredNetworkType: NetworkType.ANY,
+        ), (String taskId) async {
+      try {
         await locator<MailService>().resume();
-        BackgroundFetch.finish(taskId);
-      },
-    );
+      } catch (e, s) {
+        print('Error: Unable to finish foreground backkground fetch: $e $s');
+      }
+      BackgroundFetch.finish(taskId);
+    }, (String taskId) {
+      BackgroundFetch.finish(taskId);
+    });
     await BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   }
 
