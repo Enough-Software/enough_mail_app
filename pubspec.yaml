@@ -25,7 +25,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  enough_mail: #^0.3.1
+  enough_mail: #^1.0.0
     git:
       url: https://github.com/Enough-Software/enough_mail.git
     # path: ../enough_mail
@@ -42,7 +42,7 @@ dependencies:
       url: https://github.com/Enough-Software/enough_html_editor.git
     # path: ../enough_html_editor
 
-  enough_serialization: any
+  enough_serialization: ^1.0.0
     # git:
     #   url: https://github.com/Enough-Software/enough_serialization.git
     #path: ../enough_serialization
@@ -60,12 +60,11 @@ dependencies:
   flutter_local_notifications: '>=5.0.0-nullsafety.0 <7.0.0'
   shared_preferences: '>=2.0.3 <4.0.0'
   background_fetch: '>=0.7.0 <2.0.0'
-    # git:
-    #   url: https://github.com/transistorsoft/flutter_background_fetch
-  file_picker:  '>2.0.0 <5.0.0'
+  file_picker:  '>=3.0.0 <5.0.0'
   fluttercontactpicker: '>3.0.0 <6.0.0'
   cupertino_icons: ^1.0.0
   diff_match_patch: ^0.3.0
+  liquid_swipe: ^2.0.0
 
 dev_dependencies:
   flutter_test:
