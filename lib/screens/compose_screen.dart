@@ -39,7 +39,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
   List<Sender> senders;
   _Autofocus _focus;
   bool _isCcBccVisible = false;
-  MessageEncoding _usedTextEncoding;
+  TransferEncoding _usedTextEncoding;
   Future<String> loadMailTextFuture;
   EditorApi _editorApi;
   Future _downloadAttachmentsFuture;
@@ -237,7 +237,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     // even when the SMTP accepts a 8bit message via DATA, it may run into a problem with the recipient's SMTP.
     // Yes I am looking at you, 1&1 (IONOS).
     // So we better play safe than sorry and just always use the default quoted-printable 7bit encoding.
-    _usedTextEncoding = MessageEncoding.quotedPrintable;
+    _usedTextEncoding = TransferEncoding.automatic;
     final mimeMessage = mb.buildMimeMessage();
     return mimeMessage;
   }
@@ -254,7 +254,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     //TODO check first if message can be sent or catch errors
     try {
       final append = !from.account.addsSentMailAutomatically;
-      final use8Bit = (_usedTextEncoding == MessageEncoding.eightBit);
+      final use8Bit = (_usedTextEncoding == TransferEncoding.eightBit);
       await mailClient.sendMessage(
         mimeMessage,
         from: from.account.fromAddress,
