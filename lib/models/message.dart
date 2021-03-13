@@ -1,5 +1,4 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/util/html_util.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' as urlLauncher;
@@ -85,11 +84,6 @@ class Message extends ChangeNotifier {
   void updateMime(MimeMessage mime) {
     this.mimeMessage = mime;
     notifyListeners();
-  }
-
-  String decodeAndStripHtml() {
-    var html = mimeMessage.decodeTextHtmlPart();
-    return HtmlUtil.stripConditionals(html);
   }
 
   void toggleSelected() {

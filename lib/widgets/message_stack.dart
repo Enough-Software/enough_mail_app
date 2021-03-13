@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
@@ -7,7 +6,6 @@ import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:math' as math;
 
 enum DragAction { noted, later, delete, reply }
@@ -529,25 +527,25 @@ class _MessageCardState extends State<MessageCard> {
   }
 
   Widget buildMessageContent(BuildContext context) {
-    var html = widget.message.decodeAndStripHtml();
-    if (html != null && false) {
-      String contentBase64 = base64Encode(const Utf8Encoder().convert(html));
-      return WebView(
-        key: ValueKey(widget.message),
-        javascriptMode: JavascriptMode.disabled,
-        gestureRecognizers: null,
-        initialUrl: 'data:text/html;base64,$contentBase64',
-        onWebViewCreated: (controller) {
-          //_webViewController = controller;
-          //controller.
-          print('created webview');
-        },
-        onPageFinished: (url) {
-          print('finished loading page');
-          //TODO inject JS to query size?
-        },
-      );
-    }
+    // var html = widget.message.decodeAndStripHtml();
+    // if (html != null && false) {
+    //   String contentBase64 = base64Encode(const Utf8Encoder().convert(html));
+    // return WebView(
+    //   key: ValueKey(widget.message),
+    //   javascriptMode: JavascriptMode.disabled,
+    //   gestureRecognizers: null,
+    //   initialUrl: 'data:text/html;base64,$contentBase64',
+    //   onWebViewCreated: (controller) {
+    //     //_webViewController = controller;
+    //     //controller.
+    //     print('created webview');
+    //   },
+    //   onPageFinished: (url) {
+    //     print('finished loading page');
+    //     //TODO inject JS to query size?
+    //   },
+    // );
+    // }
     // if (html != null && html.indexOf(' colspan=') == -1) {
     //   Html(
     //     data: html,
