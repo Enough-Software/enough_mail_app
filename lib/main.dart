@@ -104,6 +104,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         const Locale('en', ''),
         const Locale('de', ''),
       ],
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+      ),
       // localeResolutionCallback: (deviceLocale, supportedLocales) {
       //   print('new locale: $deviceLocale');
       //   if (!supportedLocales.contains(deviceLocale)) {
