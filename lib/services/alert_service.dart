@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
 
 class AlertService {
   Future<bool> askForConfirmation(BuildContext context,
@@ -76,9 +77,25 @@ class AlertService {
       applicationLegalese:
           'Maily is free software published under the GNU General Public License.',
       children: [
-        ElevatedButton(onPressed: () {}, child: Text('Suggest a feature')),
-        ElevatedButton(onPressed: () {}, child: Text('Report a problem')),
-        ElevatedButton(onPressed: () {}, child: Text('Help developing Maily')),
+        ElevatedButton(
+          child: Text('Suggest a feature'),
+          onPressed: () async {
+            await launcher.launch('https://maily.userecho.com/');
+          },
+        ),
+        ElevatedButton(
+          child: Text('Report a problem'),
+          onPressed: () async {
+            await launcher.launch('https://maily.userecho.com/');
+          },
+        ),
+        ElevatedButton(
+          child: Text('Help developing Maily'),
+          onPressed: () async {
+            await launcher
+                .launch('https://github.com/Enough-Software/enough_mail_app');
+          },
+        ),
       ],
     );
   }
