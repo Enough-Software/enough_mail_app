@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
+
 import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/models/settings.dart';
@@ -7,7 +10,6 @@ import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:flutter/material.dart';
 
 import '../locator.dart';
 import '../routes.dart';
@@ -105,6 +107,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
+              Divider(),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
@@ -112,6 +115,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     locator<AlertService>().showAbout(context);
                   },
                   child: Text('About Maily'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  child: Text('Suggest a feature'),
+                  onPressed: () async {
+                    await launcher.launch('https://maily.userecho.com/');
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  child: Text('Report a problem'),
+                  onPressed: () async {
+                    await launcher.launch('https://maily.userecho.com/');
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  child: Text('Help developing Maily'),
+                  onPressed: () async {
+                    await launcher.launch(
+                        'https://github.com/Enough-Software/enough_mail_app');
+                  },
                 ),
               ),
               Padding(
