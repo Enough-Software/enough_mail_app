@@ -1,5 +1,6 @@
 import 'package:diff_match_patch/diff_match_patch.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
+import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
@@ -261,7 +262,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
         appendToSent: append,
         use8BitEncoding: use8Bit,
       );
+      locator<ScaffoldMessengerService>().showTextSnackBar('Mail sent 😊');
     } on MailException catch (e, s) {
+      //TODO latest here persist the mail for further retries in the future
       print('Unable to send or append mail: $e $s');
       locator<AlertService>().showTextDialog(context, 'Error',
           'Sorry, your mail could not be send. We received the following error: $e $s');

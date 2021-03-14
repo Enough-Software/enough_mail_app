@@ -3,7 +3,7 @@ import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message_cache.dart';
 import 'package:enough_mail_app/models/mime_source.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
-import 'package:enough_mail_app/services/scaffold_service.dart';
+import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'message.dart';
@@ -122,13 +122,12 @@ abstract class MessageSource extends ChangeNotifier
     notifyListeners();
   }
 
-  Future<void> deleteMessage(BuildContext context, Message message) async {
+  Future<void> deleteMessage(Message message) async {
     _removeMessage(message, locator<NotificationService>());
     final deleteResult =
         await message.mailClient.deleteMessage(message.mimeMessage);
     if (deleteResult?.isUndoable == true) {
-      locator<ScaffoldService>().showTextSnackBar(
-        context,
+      locator<ScaffoldMessengerService>().showTextSnackBar(
         'Deleted',
         undo: () async {
           await message.mailClient.undoDeleteMessages(deleteResult);
@@ -142,8 +141,7 @@ abstract class MessageSource extends ChangeNotifier
     }
   }
 
-  Future<void> deleteMessages(
-      BuildContext context, List<Message> messages) async {
+  Future<void> deleteMessages(List<Message> messages) async {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
       _removeMessage(message, notificationService);
@@ -158,44 +156,40 @@ abstract class MessageSource extends ChangeNotifier
         resultsByClient[client] = deleteResult;
       }
     }
-    if (context != null) {
-      locator<ScaffoldService>().showTextSnackBar(
-        context,
-        'Deleted ${messages.length} message(s)',
-        undo: resultsByClient.isEmpty
-            ? null
-            : () async {
-                for (final client in resultsByClient.keys) {
-                  await client.undoDeleteMessages(resultsByClient[client]);
-                }
-                //TODO update mimeMessage's UID and sequence ID?
-                // TODO add mime message to mime source again?
-                // TODO what should I do when not all delete are undoable?
-                for (final message in messages) {
-                  cache.insert(message);
-                }
-                notifyListeners();
-              },
-      );
-    }
+    locator<ScaffoldMessengerService>().showTextSnackBar(
+      'Deleted ${messages.length} message(s)',
+      undo: resultsByClient.isEmpty
+          ? null
+          : () async {
+              for (final client in resultsByClient.keys) {
+                await client.undoDeleteMessages(resultsByClient[client]);
+              }
+              //TODO update mimeMessage's UID and sequence ID?
+              // TODO add mime message to mime source again?
+              // TODO what should I do when not all delete are undoable?
+              for (final message in messages) {
+                cache.insert(message);
+              }
+              notifyListeners();
+            },
+    );
   }
 
-  Future<void> markAsJunk(BuildContext context, Message message) {
-    return moveMessage(context, message, MailboxFlag.junk, 'Marked as spam');
+  Future<void> markAsJunk(Message message) {
+    return moveMessage(message, MailboxFlag.junk, 'Marked as spam');
   }
 
-  Future<void> markAsNotJunk(BuildContext context, Message message) {
-    return moveMessage(context, message, MailboxFlag.inbox, 'Moved to inbox');
+  Future<void> markAsNotJunk(Message message) {
+    return moveMessage(message, MailboxFlag.inbox, 'Moved to inbox');
   }
 
-  Future<void> moveMessage(BuildContext context, Message message,
-      MailboxFlag targetMailboxFlag, String notification) async {
+  Future<void> moveMessage(Message message, MailboxFlag targetMailboxFlag,
+      String notification) async {
     _removeMessage(message, locator<NotificationService>());
     final moveResult = await message.mailClient
         .moveMessageToFlag(message.mimeMessage, targetMailboxFlag);
     if (moveResult?.isUndoable == true) {
-      locator<ScaffoldService>().showTextSnackBar(
-        context,
+      locator<ScaffoldMessengerService>().showTextSnackBar(
         notification,
         undo: () async {
           final undoResponse =
@@ -215,7 +209,7 @@ abstract class MessageSource extends ChangeNotifier
     notificationService.cancelNotificationForMailMessage(message);
   }
 
-  Future<void> moveMessages(BuildContext context, List<Message> messages,
+  Future<void> moveMessages(List<Message> messages,
       MailboxFlag targetMailboxFlag, String notification) async {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
@@ -232,9 +226,8 @@ abstract class MessageSource extends ChangeNotifier
         resultsByClient[client] = moveResult;
       }
     }
-    if (context != null && resultsByClient.isNotEmpty) {
-      locator<ScaffoldService>().showTextSnackBar(
-        context,
+    if (resultsByClient.isNotEmpty) {
+      locator<ScaffoldMessengerService>().showTextSnackBar(
         notification,
         undo: () async {
           for (final client in resultsByClient.keys) {
@@ -252,12 +245,12 @@ abstract class MessageSource extends ChangeNotifier
     }
   }
 
-  Future<void> moveToInbox(BuildContext context, Message message) async {
-    return moveMessage(context, message, MailboxFlag.inbox, 'Moved to inbox');
+  Future<void> moveToInbox(Message message) async {
+    return moveMessage(message, MailboxFlag.inbox, 'Moved to inbox');
   }
 
-  Future<void> archive(BuildContext context, Message message) {
-    return moveMessage(context, message, MailboxFlag.archive, 'Archived');
+  Future<void> archive(Message message) {
+    return moveMessage(message, MailboxFlag.archive, 'Archived');
   }
 
   Future<void> markAsSeen(Message msg, bool seen) {

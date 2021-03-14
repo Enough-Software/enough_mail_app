@@ -365,8 +365,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 // is already handled in confirmDismiss
                               } else {
                                 // right to left swipe action:
-                                await _sectionedMessageSource.deleteMessage(
-                                    context, message);
+                                await _sectionedMessageSource
+                                    .deleteMessage(message);
                               }
                             },
                             confirmDismiss: (direction) async {
@@ -459,7 +459,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           : 'Marked ${selectedMessages.length} message(s) as spam';
                       //TODO replace null with context when Scaffold Change becomes live, compare https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
                       await widget.messageSource.moveMessages(
-                          null, selectedMessages, targetFlag, notification);
+                          selectedMessages, targetFlag, notification);
                       leaveSelectionMode();
                     },
                   ),
@@ -476,7 +476,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           : 'Archived ${selectedMessages.length} message(s)';
                       //TODO replace null with context when Scaffold Change becomes live, compare https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
                       await widget.messageSource.moveMessages(
-                          null, selectedMessages, targetFlag, notification);
+                          selectedMessages, targetFlag, notification);
                       leaveSelectionMode();
                     },
                   ),
@@ -486,7 +486,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       onPressed: () async {
                         //TODO replace null with context when Scaffold Change becomes live, compare https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
                         await widget.messageSource
-                            .deleteMessages(null, selectedMessages);
+                            .deleteMessages(selectedMessages);
                         leaveSelectionMode();
                       }),
                   IconButton(

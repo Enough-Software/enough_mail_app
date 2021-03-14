@@ -121,8 +121,8 @@ class DateSectionedMessageSource extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteMessage(BuildContext context, Message message) async {
-    await messageSource.deleteMessage(context, message);
+  Future<void> deleteMessage(Message message) async {
+    await messageSource.deleteMessage(message);
   }
 }
 

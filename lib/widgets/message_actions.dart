@@ -239,7 +239,7 @@ class _MessageActionsState extends State<MessageActions> {
 
   void delete() async {
     locator<NavigationService>().pop();
-    await widget.message.source.deleteMessage(context, widget.message);
+    await widget.message.source.deleteMessage(widget.message);
     locator<NotificationService>()
         .cancelNotificationForMailMessage(widget.message);
   }
@@ -247,11 +247,11 @@ class _MessageActionsState extends State<MessageActions> {
   void moveJunk() async {
     final source = widget.message.source;
     if (source.isJunk) {
-      await widget.message.source.markAsNotJunk(context, widget.message);
+      await widget.message.source.markAsNotJunk(widget.message);
     } else {
       locator<NotificationService>()
           .cancelNotificationForMailMessage(widget.message);
-      await widget.message.source.markAsJunk(context, widget.message);
+      await widget.message.source.markAsJunk(widget.message);
     }
     locator<NavigationService>().pop();
   }
@@ -259,11 +259,11 @@ class _MessageActionsState extends State<MessageActions> {
   void moveArchive() async {
     final source = widget.message.source;
     if (source.isArchive) {
-      await widget.message.source.moveToInbox(context, widget.message);
+      await widget.message.source.moveToInbox(widget.message);
     } else {
       locator<NotificationService>()
           .cancelNotificationForMailMessage(widget.message);
-      await widget.message.source.archive(context, widget.message);
+      await widget.message.source.archive(widget.message);
     }
     locator<NavigationService>().pop();
   }

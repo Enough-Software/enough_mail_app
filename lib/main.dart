@@ -5,6 +5,7 @@ import 'package:enough_mail_app/services/background_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
+import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -95,6 +96,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     //     builder: (context, snapshot) {
     //       print('switching to theme/stylesheet ${snapshot.data?.name}');
     return MaterialApp(
+      scaffoldMessengerKey:
+          locator<ScaffoldMessengerService>().scaffoldMessengerKey,
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
