@@ -35,8 +35,14 @@ class BackgroundService {
     await BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   }
 
-  static void backgroundFetchHeadlessTask(String taskId) async {
-    print('backgroundFetchHeadlessTask with taskId $taskId');
+  static void backgroundFetchHeadlessTask(HeadlessTask task) async {
+    final taskId = task.taskId;
+    print(
+        'backgroundFetchHeadlessTask with taskId $taskId, timeout=${task.timeout}');
+    if (task.timeout) {
+      BackgroundFetch.finish(taskId);
+      return;
+    }
     try {
       await checkForNewMail();
     } catch (e, s) {
