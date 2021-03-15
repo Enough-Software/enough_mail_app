@@ -110,6 +110,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.green,
+      ),
+
       // localeResolutionCallback: (deviceLocale, supportedLocales) {
       //   print('new locale: $deviceLocale');
       //   if (!supportedLocales.contains(deviceLocale)) {
