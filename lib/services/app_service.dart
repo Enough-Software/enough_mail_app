@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail/message_builder.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
+import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_absolute_path/flutter_absolute_path.dart';
 
@@ -23,8 +24,9 @@ class AppService {
     appLifecycleState = state;
     switch (state) {
       case AppLifecycleState.resumed:
-        await checkForShare();
-        await locator<MailService>().resume();
+        locator<ThemeService>().checkForChangedTheme();
+        final futures = [checkForShare(), locator<MailService>().resume()];
+        await Future.wait(futures);
         break;
       case AppLifecycleState.inactive:
         // TODO: Check if AppLifecycleState.inactive needs to be handled

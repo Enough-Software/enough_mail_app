@@ -13,6 +13,7 @@ class Routes {
   static const String accountServerDetails = 'accountServerDetails';
   static const String accountsReorder = 'accountsReorder';
   static const String settings = 'settings';
+  static const String settingsDesign = 'settingsDesign';
   static const String messageSource = 'messageSource';
   static const String mailDetails = 'mailDetails';
   static const String mailCompose = 'mailCompose';
@@ -30,6 +31,9 @@ class AppRouter {
         break;
       case Routes.settings:
         page = SettingsScreen();
+        break;
+      case Routes.settingsDesign:
+        page = SettingsThemeScreen();
         break;
       case Routes.accountAdd:
         page = AccountAddScreen();

@@ -7,10 +7,9 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-// import 'package:enough_style/enough_style.dart';
-// import 'app_styles.dart';
 import 'locator.dart';
 
 // AppStyles appStyles = AppStyles.instance;
@@ -24,11 +23,13 @@ class MyApp extends StatefulWidget {
   MyApp({Key key}) : super(key: key);
 
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Future<void> _appInitialization;
+  ThemeMode themeMode = ThemeMode.system;
+  ThemeService themeService;
 
   @override
   void initState() {
@@ -49,7 +50,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   Future<void> initApp() async {
-    await locator<SettingsService>().init();
+    final settings = await locator<SettingsService>().init();
+    themeService = locator<ThemeService>();
+    themeService.addListener(() => setState(() {
+          themeMode = themeService.themeMode;
+        }));
+    themeService.init(settings);
     final mailService = locator<MailService>();
     await mailService.init();
 
@@ -107,13 +113,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         const Locale('en', ''),
         const Locale('de', ''),
       ],
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.green,
-      ),
+      theme: themeService?.lightTheme ?? ThemeService.defaultLightTheme,
+      darkTheme: themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
+      themeMode: themeMode,
 
       // localeResolutionCallback: (deviceLocale, supportedLocales) {
       //   print('new locale: $deviceLocale');
