@@ -10,13 +10,14 @@ class SettingsService {
   Settings _settings;
   Settings get settings => _settings;
 
-  Future<void> init() async {
+  Future<Settings> init() async {
     _storage ??= FlutterSecureStorage();
     final json = await _storage.read(key: _keySettings);
     _settings = Settings();
     if (json != null) {
       _serializer.deserialize(json, _settings);
     }
+    return _settings;
   }
 
   Future<void> save() async {

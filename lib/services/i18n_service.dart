@@ -153,4 +153,11 @@ class I18nService {
     }
     return '<uncategorized>';
   }
+
+  String formatTimeOfDay(TimeOfDay timeOfDay, BuildContext context) {
+    if (timeOfDay == null) {
+      return 'undefined'; //TODO
+    }
+    return timeOfDay.format(context);
+  }
 }

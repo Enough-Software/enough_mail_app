@@ -71,6 +71,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Text('Block external images'),
                 ],
               ),
+              Divider(),
+              ListTile(
+                title: const Text('Design'),
+                onTap: () {
+                  locator<NavigationService>().push(Routes.settingsDesign);
+                },
+              ),
+              Divider(),
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4.0),
