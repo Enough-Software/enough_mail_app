@@ -11,9 +11,10 @@ class Routes {
   static const String accountAdd = 'accountAdd';
   static const String accountEdit = 'accountEdit';
   static const String accountServerDetails = 'accountServerDetails';
-  static const String accountsReorder = 'accountsReorder';
   static const String settings = 'settings';
+  static const String settingsAccounts = 'settingsAccounts';
   static const String settingsDesign = 'settingsDesign';
+  static const String settingsFeedback = 'settingsFeedback';
   static const String messageSource = 'messageSource';
   static const String mailDetails = 'mailDetails';
   static const String mailCompose = 'mailCompose';
@@ -29,12 +30,6 @@ class AppRouter {
       case Routes.home:
         page = HomeScreen();
         break;
-      case Routes.settings:
-        page = SettingsScreen();
-        break;
-      case Routes.settingsDesign:
-        page = SettingsThemeScreen();
-        break;
       case Routes.accountAdd:
         page = AccountAddScreen();
         break;
@@ -44,8 +39,17 @@ class AppRouter {
       case Routes.accountEdit:
         page = AccountEditScreen(account: arguments as Account);
         break;
-      case Routes.accountsReorder:
-        page = AccountsReorderScreen();
+      case Routes.settings:
+        page = SettingsScreen();
+        break;
+      case Routes.settingsAccounts:
+        page = SettingsAccountsScreen();
+        break;
+      case Routes.settingsDesign:
+        page = SettingsThemeScreen();
+        break;
+      case Routes.settingsFeedback:
+        page = SettingsFeedbackScreen();
         break;
 
       case Routes.messageSource:

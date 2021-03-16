@@ -29,15 +29,15 @@ dependencies:
     git:
       url: https://github.com/Enough-Software/enough_mail.git
     # path: ../enough_mail
-  enough_mail_flutter: #any
+  enough_mail_flutter: #^1.0.0
     git:
       url: https://github.com/Enough-Software/enough_mail_flutter.git
     # path: ../enough_mail_flutter
-  enough_media: #1.0.0
+  enough_media: #^1.0.0
     git:
       url: https://github.com/Enough-Software/enough_media.git
     # path: ../enough_media
-  enough_html_editor: #0.2.0
+  enough_html_editor: #^0.0.3
     git:
       url: https://github.com/Enough-Software/enough_html_editor.git
     # path: ../enough_html_editor
@@ -65,6 +65,8 @@ dependencies:
   cupertino_icons: ^1.0.0
   diff_match_patch: ^0.3.0
   liquid_swipe: ^2.0.0
+  package_info: ^2.0.0
+  device_info: ^2.0.0
 
 dev_dependencies:
   flutter_test:
