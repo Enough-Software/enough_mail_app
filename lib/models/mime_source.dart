@@ -167,6 +167,7 @@ abstract class MimeSource {
 
 class MailboxMimeSource extends MimeSource {
   Mailbox mailbox;
+  int messagesExistAtInit;
   final _requestedPages = <int>[];
   final _cache = <MimeMessage>[];
   final int pageSize;
@@ -206,6 +207,7 @@ class MailboxMimeSource extends MimeSource {
     } else {
       mailbox = await mailClient.selectMailbox(mailbox);
     }
+    messagesExistAtInit = mailbox.messagesExists;
     // pre-cache first page:
     await _download(0);
     return true;
@@ -315,16 +317,11 @@ class MailboxMimeSource extends MimeSource {
   Future<void> _download(int pageIndex) async {
     //print('downloading $pageIndex');
     await mailClient.stopPollingIfNeeded();
-    final mimeMessages = await mailClient.fetchMessages(
-        count: pageSize,
-        page: (pageIndex + 1),
+    final sequence =
+        MessageSequence.fromPage(pageIndex + 1, pageSize, messagesExistAtInit);
+    final mimeMessages = await mailClient.fetchMessageSequence(sequence,
         fetchPreference: FetchPreference.envelope);
     _requestedPages.remove(pageIndex);
-    //TODO the sequence ID does not necessary reflect the desired sorting
-    // mimeMessages.sort((m1, m2) => (m1.sequenceId.compareTo(m2.sequenceId)));
-    // final now = DateTime.now();
-    // mimeMessages.sort(
-    //     (m1, m2) => (m1.decodeDate() ?? now).compareTo(m2.decodeDate() ?? now));
     for (final mime in mimeMessages) {
       final cached = _getMessageFromCache(mime.sequenceId);
       if (cached == null) {
