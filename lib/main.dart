@@ -95,12 +95,6 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   Widget buildApp(BuildContext context) {
-    //final mailService = locator<MailService>();
-    // return StreamBuilder<StyleSheet>(
-    //     stream: appStyles.styleSheetManager.streamController.stream,
-    //     initialData: appStyles.styleSheetManager.current,
-    //     builder: (context, snapshot) {
-    //       print('switching to theme/stylesheet ${snapshot.data?.name}');
     return MaterialApp(
       scaffoldMessengerKey:
           locator<ScaffoldMessengerService>().scaffoldMessengerKey,
@@ -130,12 +124,10 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
       // },
       debugShowCheckedModeBanner: false,
       title: 'Enough Mail',
-      // theme: snapshot.data.themeData,
       onGenerateRoute: AppRouter.generateRoute,
       initialRoute: Routes.splash,
       //mailService.current == null ? Routes.welcome : Routes.mailbox,
       navigatorKey: locator<NavigationService>().navigatorKey,
     );
-    // });
   }
 }
