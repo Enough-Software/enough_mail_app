@@ -1,3 +1,5 @@
+import 'package:enough_mail_app/locator.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:flutter/material.dart';
 
 class ScaffoldMessengerService {
@@ -10,7 +12,7 @@ class ScaffoldMessengerService {
       action: undo == null
           ? null
           : SnackBarAction(
-              label: 'Undo',
+              label: locator<I18nService>().localizations.actionUndo,
               onPressed: undo,
             ),
     );

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/events/account_change_event.dart';
 import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/locator.dart';
@@ -11,6 +10,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../routes.dart';
 
@@ -43,6 +43,7 @@ class _AppDrawerState extends State<AppDrawer> {
   Widget build(BuildContext context) {
     final mailService = locator<MailService>();
     final theme = Theme.of(context);
+    final localizations = AppLocalizations.of(context);
     final currentAccount = mailService.currentAccount;
     var accounts = mailService.accounts;
     if (mailService.hasUnifiedAccount) {
@@ -67,12 +68,13 @@ class _AppDrawerState extends State<AppDrawer> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    buildAccountSelection(accounts, currentAccount),
+                    buildAccountSelection(
+                        mailService, accounts, currentAccount, localizations),
                     buildFolderTree(mailService, currentAccount),
                     Divider(),
                     ListTile(
                       leading: Icon(Icons.info),
-                      title: Text('About Maily'),
+                      title: Text(localizations.drawerEntryAbout),
                       onTap: () {
                         locator<AlertService>().showAbout(context);
                       },
@@ -85,7 +87,7 @@ class _AppDrawerState extends State<AppDrawer> {
               elevation: 18,
               child: ListTile(
                 leading: Icon(Icons.settings),
-                title: Text('Settings'),
+                title: Text(localizations.drawerEntrySettings),
                 onTap: () {
                   final navService = locator<NavigationService>();
                   navService.pop();
@@ -139,10 +141,12 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  Widget buildAccountSelection(List<Account> accounts, Account currentAccount) {
+  Widget buildAccountSelection(MailService mailService, List<Account> accounts,
+      Account currentAccount, AppLocalizations localizations) {
     if (accounts.length > 1) {
       return ExpansionTile(
-        title: Text('${accounts.length} accounts'),
+        title: Text(localizations
+            .drawerAccountsSectionTitle(mailService.accounts.length)),
         children: [
           for (final account in accounts) ...{
             ListTile(
@@ -158,18 +162,18 @@ class _AppDrawerState extends State<AppDrawer> {
               },
             ),
           },
-          buildAddAccountTile(),
+          buildAddAccountTile(localizations),
         ],
       );
     } else {
-      return buildAddAccountTile();
+      return buildAddAccountTile(localizations);
     }
   }
 
-  Widget buildAddAccountTile() {
+  Widget buildAddAccountTile(AppLocalizations localizations) {
     return ListTile(
       leading: Icon(Icons.add),
-      title: Text('Add account'),
+      title: Text(localizations.drawerEntryAddAccount),
       onTap: () {
         final navService = locator<NavigationService>();
         navService.pop();
@@ -192,23 +196,24 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Widget buildMailboxElement(TreeElement<Mailbox> element, final int level) {
+    final mailbox = element.value;
     final title = Padding(
       padding: EdgeInsets.only(left: level * 8.0),
-      child: Text(element.value.name),
+      child: Text(mailbox.name),
     );
     if (element.children == null) {
       var iconData = MaterialCommunityIcons.folder_outline;
-      if (element.value.isInbox) {
+      if (mailbox.isInbox) {
         iconData = MaterialCommunityIcons.inbox;
-      } else if (element.value.isDrafts) {
+      } else if (mailbox.isDrafts) {
         iconData = MaterialCommunityIcons.email_edit_outline;
-      } else if (element.value.isTrash) {
+      } else if (mailbox.isTrash) {
         iconData = MaterialCommunityIcons.trash_can_outline;
-      } else if (element.value.isSent) {
+      } else if (mailbox.isSent) {
         iconData = MaterialCommunityIcons.inbox_arrow_up;
-      } else if (element.value.isArchive) {
+      } else if (mailbox.isArchive) {
         iconData = MaterialCommunityIcons.archive;
-      } else if (element.value.isJunk) {
+      } else if (mailbox.isJunk) {
         iconData = Entypo.bug;
       }
       return ListTile(

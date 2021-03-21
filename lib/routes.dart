@@ -27,9 +27,6 @@ class AppRouter {
   static Widget generatePage(String name, Object arguments) {
     Widget page;
     switch (name) {
-      case Routes.home:
-        page = HomeScreen();
-        break;
       case Routes.accountAdd:
         page = AccountAddScreen();
         break;

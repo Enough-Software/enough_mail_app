@@ -1,15 +1,11 @@
 import 'dart:io';
 
 import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:share/share.dart';
 import 'package:path_provider/path_provider.dart' as pathprovider;
-
-import '../locator.dart';
 
 class InteractiveMediaScreen extends StatelessWidget {
   final InteractiveMediaWidget mediaWidget;

@@ -9,6 +9,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AccountServerDetailsScreen extends StatefulWidget {
   final Account account;
@@ -92,7 +93,7 @@ class _AccountServerDetailsScreenState
     super.dispose();
   }
 
-  Future<void> testConnection() async {
+  Future<void> testConnection(AppLocalizations localizations) async {
     final mailAccount = widget.account.account;
     mailAccount.email = emailController.text;
     final userName = userNameController.text?.isEmpty ?? true
@@ -139,9 +140,10 @@ class _AccountServerDetailsScreenState
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text(
-              'Unable to verify your account settings. Please check your incoming server setting "${incomingHostDomainController.text}" and your outgoing server setting "${outgoingHostDomainController.text}".'),
+          title: Text(localizations.errorTitle),
+          content: Text(localizations.accountDetailsErrorHostProblem(
+              incomingHostDomainController.text,
+              outgoingHostDomainController.text)),
         ),
       );
       return;
@@ -166,9 +168,9 @@ class _AccountServerDetailsScreenState
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text(
-              'Unable to log your in. Please check your user name "$incomingUserName" and your password "$password".'),
+          title: Text(localizations.errorTitle),
+          content: Text(localizations.accountDetailsErrorLoginProblem(
+              incomingUserName, password)),
         ),
       );
     }
@@ -176,21 +178,24 @@ class _AccountServerDetailsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Base.buildAppChrome(
       context,
-      title: widget.title ?? widget.account.name ?? 'Server settings',
-      content: buildContent(context),
+      title: widget.title ??
+          widget.account.name ??
+          localizations.accountDetailsFallbackTitle,
+      content: buildContent(localizations, context),
       includeDrawer: widget.includeDrawer,
       appBarActions: [
         IconButton(
           icon: Icon(Icons.save),
-          onPressed: testConnection,
+          onPressed: () => testConnection(localizations),
         ),
       ],
     );
   }
 
-  Widget buildContent(BuildContext context) {
+  Widget buildContent(AppLocalizations localizations, BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -199,50 +204,58 @@ class _AccountServerDetailsScreenState
             TextField(
               controller: emailController,
               decoration: InputDecoration(
-                labelText: 'Email',
-                hintText: 'Your email address',
+                labelText: localizations.addAccountEmailLabel,
+                hintText: localizations.addAccountEmailHint,
               ),
             ),
             TextField(
               controller: userNameController,
               decoration: InputDecoration(
-                labelText: 'Login name',
-                hintText: 'Your user name, if different from email',
+                labelText: localizations.accountDetailsUserNameLabel,
+                hintText: localizations.accountDetailsUserNameHint,
               ),
             ),
             PasswordField(
                 controller: passwordController,
-                labelText: 'Login password',
-                hintText: 'Your password'),
+                labelText: localizations.accountDetailsPasswordLabel,
+                hintText: localizations.accountDetailsPasswordHint),
             ExpansionTile(
-              title: Text('Base settings'),
+              title: Text(localizations.accountDetailsBaseSectionTitle),
               initiallyExpanded: true,
               children: [
                 TextField(
                   controller: incomingHostDomainController,
                   decoration: InputDecoration(
-                    labelText: 'Incoming server',
-                    hintText: 'Domain like imap.domain.com',
+                    labelText: localizations.accountDetailsIncomingLabel,
+                    hintText: localizations.accountDetailsIncomingHint,
                   ),
                 ),
                 TextField(
                   controller: outgoingHostDomainController,
                   decoration: InputDecoration(
-                      labelText: 'Outgoing server',
-                      hintText: 'Domain like smtp.domain.com'),
+                    labelText: localizations.accountDetailsOutgoingLabel,
+                    hintText: localizations.accountDetailsOutgoingHint,
+                  ),
                 ),
               ],
             ),
             ExpansionTile(
-              title: Text('Advanced incoming settings'),
+              title: Text(
+                  localizations.accountDetailsAdvancedIncomingSectionTitle),
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('Incoming type:  '),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(
+                          localizations.accountDetailsIncomingServerTypeLabel),
+                    ),
                     DropdownButton<ServerType>(
                         items: [
-                          DropdownMenuItem(child: Text('automatic')),
+                          DropdownMenuItem(
+                              child: Text(
+                                  localizations.accountDetailsOptionAutomatic)),
                           DropdownMenuItem(
                             child: Text('IMAP'),
                             value: ServerType.imap,
@@ -260,10 +273,16 @@ class _AccountServerDetailsScreenState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('Incoming security:  '),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(
+                          localizations.accountDetailsIncomingSecurityLabel),
+                    ),
                     DropdownButton<SocketType>(
                         items: [
-                          DropdownMenuItem(child: Text('automatic')),
+                          DropdownMenuItem(
+                              child: Text(
+                                  localizations.accountDetailsOptionAutomatic)),
                           DropdownMenuItem(
                             child: Text('SSL'),
                             value: SocketType.ssl,
@@ -273,7 +292,8 @@ class _AccountServerDetailsScreenState
                             value: SocketType.starttls,
                           ),
                           DropdownMenuItem(
-                            child: Text('Plain (no encryption)'),
+                            child: Text(
+                                localizations.accountDetailsSecurityOptionNone),
                             value: SocketType.plain,
                           ),
                         ],
@@ -287,33 +307,44 @@ class _AccountServerDetailsScreenState
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   decoration: InputDecoration(
-                    labelText: 'Incoming port',
-                    hintText: 'Leave empty to determine automatically',
+                    labelText: localizations.accountDetailsIncomingPortLabel,
+                    hintText: localizations.accountDetailsPortHint,
                   ),
                 ),
                 TextField(
                   controller: incomingUserNameController,
                   decoration: InputDecoration(
-                    labelText: 'Incoming login name',
-                    hintText: 'Your user name, if different from above',
+                    labelText:
+                        localizations.accountDetailsIncomingUserNameLabel,
+                    hintText:
+                        localizations.accountDetailsAlternativeUserNameHint,
                   ),
                 ),
                 PasswordField(
                     controller: incomingPasswordController,
-                    labelText: 'Incoming login password',
-                    hintText: 'Your password, if different from above'),
+                    labelText:
+                        localizations.accountDetailsIncomingPasswordLabel,
+                    hintText:
+                        localizations.accountDetailsAlternativePasswordHint),
               ],
             ),
             ExpansionTile(
-              title: Text('Advanced outgoing settings'),
+              title: Text(
+                  localizations.accountDetailsAdvancedOutgoingSectionTitle),
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('Outgoing type:  '),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(
+                          localizations.accountDetailsOutgoingServerTypeLabel),
+                    ),
                     DropdownButton<ServerType>(
                         items: [
-                          DropdownMenuItem(child: Text('automatic')),
+                          DropdownMenuItem(
+                              child: Text(
+                                  localizations.accountDetailsOptionAutomatic)),
                           DropdownMenuItem(
                             child: Text('SMTP'),
                             value: ServerType.smtp,
@@ -327,10 +358,16 @@ class _AccountServerDetailsScreenState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('Outgoing security:  '),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(
+                          localizations.accountDetailsOutgoingSecurityLabel),
+                    ),
                     DropdownButton<SocketType>(
                         items: [
-                          DropdownMenuItem(child: Text('automatic')),
+                          DropdownMenuItem(
+                              child: Text(
+                                  localizations.accountDetailsOptionAutomatic)),
                           DropdownMenuItem(
                             child: Text('SSL'),
                             value: SocketType.ssl,
@@ -340,7 +377,8 @@ class _AccountServerDetailsScreenState
                             value: SocketType.starttls,
                           ),
                           DropdownMenuItem(
-                            child: Text('Plain (no encryption)'),
+                            child: Text(
+                                localizations.accountDetailsSecurityOptionNone),
                             value: SocketType.plain,
                           ),
                         ],
@@ -354,21 +392,24 @@ class _AccountServerDetailsScreenState
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   decoration: InputDecoration(
-                    labelText: 'Outgoing port',
-                    hintText: 'Leave empty to determine automatically',
+                    labelText: localizations.accountDetailsOutgoingPortLabel,
+                    hintText: localizations.accountDetailsPortHint,
                   ),
                 ),
                 TextField(
                   controller: outgoingUserNameController,
                   decoration: InputDecoration(
-                    labelText: 'Outgoing login name',
-                    hintText: 'Your user name, if different from above',
+                    labelText:
+                        localizations.accountDetailsOutgoingUserNameLabel,
+                    hintText:
+                        localizations.accountDetailsAlternativeUserNameHint,
                   ),
                 ),
                 PasswordField(
-                    controller: outgoingPasswordController,
-                    labelText: 'Outgoing login password',
-                    hintText: 'Your password, if different from above'),
+                  controller: outgoingPasswordController,
+                  labelText: localizations.accountDetailsOutgoingPasswordLabel,
+                  hintText: localizations.accountDetailsAlternativePasswordHint,
+                ),
               ],
             ),
           ],

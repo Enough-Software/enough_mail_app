@@ -20,6 +20,7 @@ import 'package:enough_mail_app/widgets/message_actions.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MessageDetailsScreen extends StatefulWidget {
   final Message message;
@@ -99,10 +100,11 @@ class _MessageContentState extends State<_MessageContent> {
   @override
   Widget build(BuildContext context) {
     final msg = widget.message.mimeMessage;
+    final localizations = AppLocalizations.of(context);
     return Base.buildAppChrome(
       context,
       title: msg.decodeSubject() ?? '',
-      content: buildMailDetails(),
+      content: buildMailDetails(localizations),
       appBarActions: [
         //IconButton(icon: Icon(Icons.reply), onPressed: reply),
         PopupMenuButton<_OverflowMenuChoice>(
@@ -114,9 +116,9 @@ class _MessageContentState extends State<_MessageContent> {
             }
           },
           itemBuilder: (BuildContext context) => [
-            const PopupMenuItem<_OverflowMenuChoice>(
+            PopupMenuItem<_OverflowMenuChoice>(
               value: _OverflowMenuChoice.showSourceCode,
-              child: Text('View source'),
+              child: Text(localizations.viewSourceAction),
             ),
           ],
         ),
@@ -125,14 +127,14 @@ class _MessageContentState extends State<_MessageContent> {
     );
   }
 
-  Widget buildMailDetails() {
+  Widget buildMailDetails(AppLocalizations localizations) {
     if (_messageDownloadError) {
       return Column(
         children: [
-          Text('Message could not be downloaded.'),
+          Text(localizations.detailsErrorDownloadInfo),
           TextButton.icon(
             icon: Icon(Icons.refresh),
-            label: Text('Retry'),
+            label: Text(localizations.detailsErrorDownloadRetry),
             onPressed: () {
               setState(() {
                 _messageDownloadError = false;
@@ -152,7 +154,7 @@ class _MessageContentState extends State<_MessageContent> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: buildHeader(),
+            child: buildHeader(localizations),
           ),
           buildContent(),
         ],
@@ -160,10 +162,10 @@ class _MessageContentState extends State<_MessageContent> {
     );
   }
 
-  Widget buildHeader() {
+  Widget buildHeader(AppLocalizations localizations) {
     final mime = widget.message.mimeMessage;
     final attachments = mime.findContentInfo();
-    final date = locator<I18nService>().formatDate(mime.decodeDate(), context);
+    final date = locator<I18nService>().formatDate(mime.decodeDate());
     final subject = mime.decodeSubject();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,14 +181,14 @@ class _MessageContentState extends State<_MessageContent> {
               TableRow(children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-                  child: Text('From'),
+                  child: Text(localizations.detailsHeaderFrom),
                 ),
                 buildMailAddresses(mime.from)
               ]),
               TableRow(children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-                  child: Text('To'),
+                  child: Text(localizations.detailsHeaderTo),
                 ),
                 buildMailAddresses(mime.to)
               ]),
@@ -194,7 +196,7 @@ class _MessageContentState extends State<_MessageContent> {
                 TableRow(children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-                    child: Text('CC'),
+                    child: Text(localizations.detailsHeaderCc),
                   ),
                   buildMailAddresses(mime.cc)
                 ]),
@@ -202,13 +204,13 @@ class _MessageContentState extends State<_MessageContent> {
               TableRow(children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-                  child: Text('Date'),
+                  child: Text(localizations.detailsHeaderDate),
                 ),
                 Text(date),
               ]),
             ]),
         SelectableText(
-          subject ?? '<none>',
+          subject ?? localizations.subjectUndefined,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         buildAttachments(attachments),
@@ -224,7 +226,7 @@ class _MessageContentState extends State<_MessageContent> {
             children: [
               if (_blockExternalImages) ...{
                 ElevatedButton(
-                  child: Text('Show images'),
+                  child: Text(localizations.detailsActionShowImages),
                   onPressed: () => setState(() {
                     _blockExternalImages = false;
                   }),
@@ -234,16 +236,18 @@ class _MessageContentState extends State<_MessageContent> {
                 if (widget.message.isNewsletterUnsubscribed) ...{
                   widget.message.isNewsLetterSubscribable
                       ? ElevatedButton(
-                          child: Text('Re-subscribe'),
+                          child: Text(
+                              localizations.detailsNewsletterActionResubscribe),
                           onPressed: resubscribe,
                         )
                       : Text(
-                          'Unsubscribed',
+                          localizations.detailsNewsletterStatusUnsubscribed,
                           style: TextStyle(fontStyle: FontStyle.italic),
                         ),
                 } else ...{
                   ElevatedButton(
-                    child: Text('Unsubscribe'),
+                    child:
+                        Text(localizations.detailsNewsletterActionUnsubscribe),
                     onPressed: unsubscribe,
                   ),
                 },
@@ -355,54 +359,50 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   void resubscribe() async {
+    final localizations = AppLocalizations.of(context);
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName();
     final confirmation = await locator<AlertService>().askForConfirmation(
         context,
-        title: 'Resubscribe',
-        action: 'Subscribe',
+        title: localizations.detailsNewsletterResubscribeDialogTitle,
+        action: localizations.detailsNewsletterResubscribeDialogAction,
         query:
-            'Do you want to subscribe to this mailing list $listName again?');
+            localizations.detailsNewsletterResubscribeDialogQuestion(listName));
     if (confirmation == true) {
       // TODO show busy indicator
       final mailClient = widget.message.mailClient;
-      var unsubscribed = await mime.unsubscribe(mailClient);
-      if (unsubscribed) {
+      final subscribed = await mime.subscribe(mailClient);
+      if (subscribed) {
         setState(() {
-          widget.message.isNewsletterUnsubscribed = true;
+          widget.message.isNewsletterUnsubscribed = false;
         });
         //TODO store flag only when server/mailbox supports abritrary flags?
         await mailClient.store(MessageSequence.fromMessage(mime),
             [Message.keywordFlagUnsubscribed],
-            action: StoreAction.add);
+            action: StoreAction.remove);
       }
-      await showDialog(
-        builder: (context) => AlertDialog(
-          title: Text(unsubscribed ? 'Subscribed' : 'Not subscribed'),
-          content: Text(unsubscribed
-              ? 'You are now subscribed to the mailing list $listName.'
-              : 'Sorry, but the subscribe request has failed.'),
-          actions: [
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () => Navigator.of(context).pop(false),
-            ),
-          ],
-        ),
-        context: context,
-      );
-      //locator<NavigationService>().pop();
+      await locator<AlertService>().showTextDialog(
+          context,
+          subscribed
+              ? localizations.detailsNewsletterResubscribeSuccessTitle
+              : localizations.detailsNewsletterResubscribeFailureTitle,
+          subscribed
+              ? localizations
+                  .detailsNewsletterResubscribeSuccessMessage(listName)
+              : localizations
+                  .detailsNewsletterResubscribeFailureMessage(listName));
     }
   }
 
   void unsubscribe() async {
+    final localizations = AppLocalizations.of(context);
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName();
     final confirmation = await locator<AlertService>().askForConfirmation(
       context,
-      title: 'Unsubscribe',
-      action: 'Unsubscribe',
-      query: 'Do you want to unsubscribe from this mailing list $listName?',
+      title: localizations.detailsNewsletterUnsubscribeDialogTitle,
+      action: localizations.detailsNewsletterUnsubscribeDialogAction,
+      query: localizations.detailsNewsletterUnsubscribeDialogQuestion(listName),
     );
     if (confirmation == true) {
       // TODO show busy indicator
@@ -418,26 +418,24 @@ class _MessageContentState extends State<_MessageContent> {
           widget.message.isNewsletterUnsubscribed = true;
         });
         //TODO store flag only when server/mailbox supports abritrary flags?
-        await mailClient.store(MessageSequence.fromMessage(mime),
-            [Message.keywordFlagUnsubscribed],
-            action: StoreAction.add);
+        try {
+          await mailClient.store(MessageSequence.fromMessage(mime),
+              [Message.keywordFlagUnsubscribed],
+              action: StoreAction.add);
+        } catch (e, s) {
+          print('error during unsubscribe flag store operation: $e $s');
+        }
       }
-      await showDialog(
-        builder: (context) => AlertDialog(
-          title: Text(unsubscribed ? 'Unsubscribed' : 'Not unsubscribed'),
-          content: Text(unsubscribed
-              ? 'You are now unsubscribed from the mailing list $listName.'
-              : 'Sorry, but the unsubscribe request has failed.'),
-          actions: [
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () => Navigator.of(context).pop(false),
-            ),
-          ],
-        ),
-        context: context,
-      );
-      //locator<NavigationService>().pop();
+      await locator<AlertService>().showTextDialog(
+          context,
+          unsubscribed
+              ? localizations.detailsNewsletterUnsubscribeSuccessTitle
+              : localizations.detailsNewsletterUnsubscribeFailureTitle,
+          unsubscribed
+              ? localizations
+                  .detailsNewsletterUnsubscribeSuccessMessage(listName)
+              : localizations
+                  .detailsNewsletterUnsubscribeFailureMessage(listName));
     }
   }
 

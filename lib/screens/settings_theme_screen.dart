@@ -2,7 +2,7 @@ import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 import 'base.dart';
 
@@ -36,22 +36,24 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     final darkThemeStartTime = themeSettings.themeDarkStartTime;
     final darkThemeEndTime = themeSettings.themeDarkEndTime;
     final availableColors = themeSettings.availableColors;
     final theme = Theme.of(context);
     return Base.buildAppChrome(
       context,
-      title: 'Design Settings',
+      title: localizations.designTitle,
       content: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Theme', style: theme.textTheme.subtitle1),
+              Text(localizations.designSectionThemeTitle,
+                  style: theme.textTheme.subtitle1),
               ListTile(
-                title: const Text('Light'),
+                title: Text(localizations.designThemeOptionLight),
                 leading: Radio<ThemeModeSetting>(
                   value: ThemeModeSetting.light,
                   groupValue: _themeModeSetting,
@@ -63,7 +65,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                 ),
               ),
               ListTile(
-                title: const Text('Dark'),
+                title: Text(localizations.designThemeOptionDark),
                 leading: Radio<ThemeModeSetting>(
                   value: ThemeModeSetting.dark,
                   groupValue: _themeModeSetting,
@@ -75,7 +77,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                 ),
               ),
               ListTile(
-                title: const Text('System'),
+                title: Text(localizations.designThemeOptionSystem),
                 leading: Radio<ThemeModeSetting>(
                   value: ThemeModeSetting.system,
                   groupValue: _themeModeSetting,
@@ -87,7 +89,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                 ),
               ),
               ListTile(
-                title: const Text('Custom'),
+                title: Text(localizations.designThemeOptionCustom),
                 leading: Radio<ThemeModeSetting>(
                   value: ThemeModeSetting.custom,
                   groupValue: _themeModeSetting,
@@ -99,12 +101,14 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                 ),
               ),
               if (_themeModeSetting == ThemeModeSetting.custom) ...{
-                Text('Enable dark theme', style: theme.textTheme.subtitle1),
+                Text(localizations.designSectionCustomTitle,
+                    style: theme.textTheme.subtitle1),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     TextButton(
-                      child: Text('From ${darkThemeStartTime.format(context)}'),
+                      child: Text(localizations.designThemeCustomStart(
+                          darkThemeStartTime.format(context))),
                       onPressed: () async {
                         final pickedTime = await showTimePicker(
                           context: context,
@@ -121,7 +125,8 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                       },
                     ),
                     TextButton(
-                      child: Text('until ${darkThemeEndTime.format(context)}'),
+                      child: Text(localizations.designThemeCustomEnd(
+                          darkThemeEndTime.format(context))),
                       onPressed: () async {
                         final pickedTime = await showTimePicker(
                           context: context,
@@ -141,7 +146,8 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                 ),
               },
               Divider(),
-              Text('Color scheme', style: theme.textTheme.subtitle1),
+              Text(localizations.designSectionColorTitle,
+                  style: theme.textTheme.subtitle1),
               GridView.count(
                 crossAxisCount: 4,
                 primary: false,

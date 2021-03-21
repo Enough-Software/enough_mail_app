@@ -95,13 +95,17 @@ class Account extends ChangeNotifier {
 
 class UnifiedAccount extends Account {
   final List<Account> accounts;
-  UnifiedAccount(this.accounts) : super(null);
+  final String _name;
+
+  UnifiedAccount(this.accounts, String name)
+      : _name = name,
+        super(null);
 
   @override
   bool get isVirtual => true;
 
   @override
-  String get name => 'Unified Account';
+  String get name => _name;
 
   @override
   MailAddress get fromAddress => accounts.first.fromAddress;

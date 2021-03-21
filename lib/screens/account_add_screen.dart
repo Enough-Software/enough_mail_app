@@ -11,6 +11,7 @@ import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AccountAddScreen extends StatefulWidget {
   @override
@@ -86,10 +87,11 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('build: current step=$_currentStep');
+    // print('build: current step=$_currentStep');
+    final localizations = AppLocalizations.of(context);
     return Base.buildAppChrome(
       context,
-      title: 'Add Account',
+      title: localizations.addAccountTitle,
       content: Column(
         children: [
           Expanded(
@@ -119,7 +121,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
               },
               steps: [
                 Step(
-                  title: Text('Email'),
+                  title: Text(localizations.addAccountEmailLabel),
                   content: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -138,8 +140,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                           }
                         },
                         decoration: InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'Please enter your email address',
+                          labelText: localizations.addAccountEmailLabel,
+                          hintText: localizations.addAccountEmailHint,
                           icon: const Icon(Icons.email),
                         ),
                       ),
@@ -149,7 +151,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                   isActive: true,
                 ),
                 Step(
-                  title: Text('Password'),
+                  title: Text(localizations.addAccountPasswordLabel),
                   //state: StepState.complete,
                   isActive: _currentStep >= 1,
                   content: Column(
@@ -162,7 +164,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                 padding: EdgeInsets.all(8),
                                 child: CircularProgressIndicator()),
                             Expanded(
-                              child: Text('Resolving ${account.email}...'),
+                              child: Text(
+                                  localizations.addAccountResolvingSetingsLabel(
+                                      account.email)),
                             ),
                           ],
                         ),
@@ -170,14 +174,15 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                         Column(
                           children: [
                             if (_providerAppplicationPasswordUrl != null) ...{
-                              Text(
-                                  'For this provider you need to set up an app specific password.'),
+                              Text(localizations
+                                  .addAccountApplicationPasswordRequiredInfo),
                               ElevatedButton(
                                 onPressed: () async {
                                   await launcher
                                       .launch(_providerAppplicationPasswordUrl);
                                 },
-                                child: Text('Setup app specific password'),
+                                child: Text(localizations
+                                    .addAccountApplicationPasswordRequiredButton),
                               ),
                               CheckboxListTile(
                                 onChanged: (value) => setState(() =>
@@ -185,7 +190,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                         value),
                                 value:
                                     _isApplicationSpecificPasswordAcknowledged,
-                                title: Text('Understood'),
+                                title: Text(localizations
+                                    .addAccountApplicationPasswordRequiredAcknowledged),
                               ),
                             },
                             if (_providerAppplicationPasswordUrl == null ||
@@ -202,13 +208,15 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                     });
                                   }
                                 },
-                                labelText: 'Password',
-                                hintText: 'Please enter your password',
+                                labelText:
+                                    localizations.addAccountPasswordLabel,
+                                hintText: localizations.addAccountPasswordHint,
                               ),
                               ElevatedButton(
                                 onPressed: navigateToManualSettings,
-                                child: Text(
-                                    'Not on ${_clientConfig?.displayName}?'),
+                                child: Text(localizations
+                                    .addAccountResolvedSettingsWrongAction(
+                                        _clientConfig?.displayName)),
                               ),
                             },
                           ],
@@ -217,10 +225,12 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                                'Unable to resolve ${account.email}. Please go back to change it or set up the account manually.'),
+                            Text(localizations
+                                .addAccountResolvingSetingsFailedInfo(
+                                    account.email)),
                             ElevatedButton(
-                              child: Text('Edit manually'),
+                              child: Text(
+                                  localizations.addAccountEditManuallyAction),
                               onPressed: navigateToManualSettings,
                             )
                           ],
@@ -230,7 +240,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                   ),
                 ),
                 Step(
-                  title: Text('Verification'),
+                  title: Text(localizations.addAccountVerificationStep),
                   content: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -241,12 +251,15 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                 padding: EdgeInsets.all(8),
                                 child: CircularProgressIndicator()),
                             Expanded(
-                              child: Text('Verifying ${account.email}...'),
+                              child: Text(localizations
+                                  .addAccountVerifyingSettingsLabel(
+                                      account.email)),
                             ),
                           ],
                         ),
                       } else if (_isAccountVerified) ...{
-                        Text('Successfully signed into ${account.email}.'),
+                        Text(localizations
+                            .addAccountVerifyingSuccessInfo(account.email)),
                         TextField(
                           controller: _userNameController,
                           keyboardType: TextInputType.text,
@@ -260,8 +273,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             }
                           },
                           decoration: InputDecoration(
-                            labelText: 'Your name',
-                            hintText: 'Please enter your name',
+                            labelText: localizations.addAccountNameOfUserLabel,
+                            hintText: localizations.addAccountNameOfUserHint,
                             icon: const Icon(Icons.account_circle),
                           ),
                         ),
@@ -278,14 +291,15 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             }
                           },
                           decoration: InputDecoration(
-                            labelText: 'Account name',
-                            hintText: 'Please enter the name of your account',
+                            labelText:
+                                localizations.addAccountNameOfAccountLabel,
+                            hintText: localizations.addAccountNameOfAccountHint,
                             icon: const Icon(Icons.email),
                           ),
                         ),
                       } else ...{
-                        Text(
-                            'Sorry, but there was a problem. Please check your email ${account.email} and password.'),
+                        Text(localizations
+                            .addAccountVerifyingFailedInfo(account.email)),
                       }
                     ],
                   ),

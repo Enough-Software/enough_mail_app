@@ -7,7 +7,7 @@ import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 import '../routes.dart';
 
@@ -41,15 +41,18 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Base.buildAppChrome(
       context,
-      title: 'Accounts',
-      content:
-          reorderAccounts ? buildReorderableListView() : buildAccountSettings(),
+      title: localizations.accountsTitle,
+      content: reorderAccounts
+          ? buildReorderableListView()
+          : buildAccountSettings(localizations),
     );
   }
 
-  Widget buildAccountSettings() {
+  Widget buildAccountSettings(AppLocalizations localizations) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -63,7 +66,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
         },
         ListTile(
           leading: Icon(Icons.add),
-          title: Text('Add account'),
+          title: Text(localizations.drawerEntryAddAccount),
           onTap: () => locator<NavigationService>().push(Routes.accountAdd),
         ),
         if (accounts.length > 1) ...{
@@ -75,7 +78,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
                   reorderAccounts = true;
                 });
               },
-              child: Text('Reorder accounts'),
+              child: Text(localizations.accountsActionReorder),
             ),
           ),
         },
