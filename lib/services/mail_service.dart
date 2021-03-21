@@ -10,8 +10,8 @@ import 'package:enough_mail_app/models/sender.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/gravatar.dart';
 import 'package:enough_serialization/enough_serialization.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../locator.dart';
 
@@ -32,8 +32,42 @@ class MailService {
   FlutterSecureStorage _storage;
   final _mailClientsPerAccount = <Account, MailClient>{};
   final _mailboxesPerAccount = <Account, Tree<Mailbox>>{};
+  AppLocalizations _localizations;
+  AppLocalizations get localizations => _localizations;
+  set localizations(AppLocalizations value) {
+    if (value != _localizations) {
+      _localizations = value;
+      if (unifiedAccount != null) {
+        unifiedAccount.name = value.unifiedAccountName;
+        final mailboxes = _mailboxesPerAccount[unifiedAccount]
+            .root
+            .children
+            .map((c) => c.value);
+        for (final mailbox in mailboxes) {
+          String name;
+          if (mailbox.isInbox) {
+            name = value.unifiedFolderInbox;
+          } else if (mailbox.isDrafts) {
+            name = value.unifiedFolderDrafts;
+          } else if (mailbox.isTrash) {
+            name = value.unifiedFolderTrash;
+          } else if (mailbox.isSent) {
+            name = value.unifiedFolderSent;
+          } else if (mailbox.isArchive) {
+            name = value.unifiedFolderArchive;
+          } else if (mailbox.isJunk) {
+            name = value.unifiedFolderJunk;
+          }
+          if (name != null) {
+            mailbox.name = name;
+          }
+        }
+      }
+    }
+  }
 
-  Future<void> init() async {
+  Future<void> init(AppLocalizations localizations) async {
+    _localizations = localizations;
     await _loadAccounts();
     messageSource = await _initMessageSource();
   }
@@ -63,26 +97,26 @@ class MailService {
             !account.account.hasAttribute(attributeExcludeFromUnified)))
         .toList();
     if (mailAccountsForUnified.length > 1) {
-      unifiedAccount = UnifiedAccount(mailAccountsForUnified);
-      //accounts.insert(0, unifiedAccount);
+      unifiedAccount = UnifiedAccount(
+          mailAccountsForUnified, _localizations.unifiedAccountName);
       final mailboxes = [
         Mailbox()
-          ..name = 'Unified Inbox'
+          ..name = _localizations.unifiedFolderInbox
           ..flags = [MailboxFlag.inbox],
         Mailbox()
-          ..name = 'Unified Drafts'
+          ..name = _localizations.unifiedFolderDrafts
           ..flags = [MailboxFlag.drafts],
         Mailbox()
-          ..name = 'Unified Sent'
+          ..name = _localizations.unifiedFolderSent
           ..flags = [MailboxFlag.sent],
         Mailbox()
-          ..name = 'Unified Trash'
+          ..name = _localizations.unifiedFolderTrash
           ..flags = [MailboxFlag.trash],
         Mailbox()
-          ..name = 'Unified Archive'
+          ..name = _localizations.unifiedFolderArchive
           ..flags = [MailboxFlag.archive],
         Mailbox()
-          ..name = 'Unified Spam'
+          ..name = _localizations.unifiedFolderJunk
           ..flags = [MailboxFlag.junk],
       ];
       final tree = Tree<Mailbox>(Mailbox())
@@ -109,7 +143,7 @@ class MailService {
       final mimeSources = await _getUnifiedMimeSources(mailbox, account);
       return MultipleMessageSource(
         mimeSources,
-        mailbox == null ? 'Unified Inbox' : mailbox.name,
+        mailbox == null ? _localizations.unifiedFolderInbox : mailbox.name,
         mailbox?.flags?.first ?? MailboxFlag.inbox,
       );
     } else {

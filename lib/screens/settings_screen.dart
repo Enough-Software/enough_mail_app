@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart' as launcher;
-
 import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 import '../routes.dart';
 import 'base.dart';
@@ -30,9 +28,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Base.buildAppChrome(
       context,
-      title: 'Settings',
+      title: localizations.settingsTitle,
       content: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -51,25 +50,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       await locator<SettingsService>().save();
                     },
                   ),
-                  Text('Block external images'),
+                  Text(localizations.settingsSecurityBlockExternalImages),
                 ],
               ),
               Divider(),
               ListTile(
-                title: const Text('Manage accounts'),
+                title: Text(localizations.settingsActionAccounts),
                 onTap: () {
                   locator<NavigationService>().push(Routes.settingsAccounts);
                 },
               ),
               ListTile(
-                title: const Text('Design'),
+                title: Text(localizations.settingsActionDesign),
                 onTap: () {
                   locator<NavigationService>().push(Routes.settingsDesign);
                 },
               ),
               Divider(),
               ListTile(
-                title: const Text('Feedback'),
+                title: Text(localizations.settingsActionFeedback),
                 onTap: () {
                   locator<NavigationService>().push(Routes.settingsFeedback);
                 },
@@ -78,13 +77,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () {
                   locator<AlertService>().showAbout(context);
                 },
-                title: const Text('About Maily'),
+                title: Text(localizations.drawerEntryAbout),
               ),
               ListTile(
                 onTap: () {
                   locator<NavigationService>().push(Routes.welcome);
                 },
-                title: const Text('Show welcome'),
+                title: Text(localizations.settingsActionWelcome),
               ),
             ],
           ),

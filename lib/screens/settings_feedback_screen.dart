@@ -2,21 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
+import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
-
-import 'package:enough_mail_app/events/accounts_changed_event.dart';
-import 'package:enough_mail_app/events/app_event_bus.dart';
-import 'package:enough_mail_app/models/settings.dart';
-import 'package:enough_mail_app/services/alert_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/settings_service.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
-import '../routes.dart';
 import 'base.dart';
 
 class SettingsFeedbackScreen extends StatefulWidget {
@@ -60,9 +52,11 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final localizations = AppLocalizations.of(context);
+
     return Base.buildAppChrome(
       context,
-      title: 'Feedback',
+      title: localizations.feedbackTitle,
       content: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -71,7 +65,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('Thank you for testing Maily!',
+                child: Text(localizations.feedbackIntro,
                     style: theme.textTheme.subtitle1),
               ),
               if (info == null) ...{
@@ -83,7 +77,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    'Please provide this information when you report a problem:',
+                    localizations.feedbackProvideInfoRequest,
                     style: theme.textTheme.caption,
                   ),
                 ),
@@ -97,6 +91,8 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                     icon: Icon(Icons.copy),
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: info));
+                      locator<ScaffoldMessengerService>().showTextSnackBar(
+                          localizations.feedbackResultInfoCopied);
                     },
                   ),
                 ),
@@ -104,7 +100,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  child: Text('Suggest a feature'),
+                  child: Text(localizations.feedbackActionSuggestFeature),
                   onPressed: () async {
                     await launcher.launch('https://maily.userecho.com/');
                   },
@@ -113,7 +109,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  child: Text('Report a problem'),
+                  child: Text(localizations.feedbackActionReportProblem),
                   onPressed: () async {
                     await launcher.launch('https://maily.userecho.com/');
                   },
@@ -122,7 +118,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  child: Text('Help developing Maily'),
+                  child: Text(localizations.feedbackActionHelpDeveloping),
                   onPressed: () async {
                     await launcher.launch(
                         'https://github.com/Enough-Software/enough_mail_app');

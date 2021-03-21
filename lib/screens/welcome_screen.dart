@@ -6,14 +6,21 @@ import '../locator.dart';
 
 import 'dart:math';
 import 'package:liquid_swipe/liquid_swipe.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  static final style = TextStyle(
-    fontSize: 30,
+  static final textStyleLight = TextStyle(
+    fontSize: 26,
     fontFamily: "Billy",
     fontWeight: FontWeight.w600,
+    color: Colors.white,
   );
-
+  static final textStyleDark = TextStyle(
+    fontSize: 26,
+    fontFamily: "Billy",
+    fontWeight: FontWeight.w600,
+    color: Colors.black,
+  );
   WelcomeScreen({Key key}) : super(key: key);
 
   @override
@@ -92,7 +99,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton.icon(
                   icon: Icon(Icons.email),
-                  label: Text('Sign into your mail account'),
+                  label: Text(AppLocalizations.of(context).welcomeActionSignIn),
                   onPressed: () {
                     locator<NavigationService>().push(Routes.accountAdd);
                   },
@@ -101,7 +108,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ],
           ),
         ),
-
       ],
     );
   }
@@ -122,24 +128,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 fit: BoxFit.cover,
               ),
             ),
-            Column(
-              children: [
-                Text(
-                  'Welcome',
-                  style: WelcomeScreen.style,
-                ),
-                Text(
-                  'to Maily!',
-                  style: WelcomeScreen.style,
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
+              child: Text(
+                AppLocalizations.of(context).welcomePanel1,
+                style: WelcomeScreen.textStyleLight,
+                textAlign: TextAlign.center,
+              ),
             ),
             Padding(padding: EdgeInsets.only(top: 20.0)),
           ],
         ),
       ),
       Container(
-        color: Colors.deepPurpleAccent,
+        color: Color(0xff543226),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
@@ -152,28 +154,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: EdgeInsets.all(20.0),
             ),
-            Column(
-              children: [
-                Text(
-                  "Add",
-                  style: WelcomeScreen.style,
-                ),
-                Text(
-                  "unlimited",
-                  style: WelcomeScreen.style,
-                ),
-                Text(
-                  "accounts.",
-                  style: WelcomeScreen.style,
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
+              child: Text(
+                AppLocalizations.of(context).welcomePanel2,
+                style: WelcomeScreen.textStyleLight,
+                textAlign: TextAlign.center,
+              ),
             ),
             Padding(padding: EdgeInsets.only(top: 20.0)),
           ],
         ),
       ),
       Container(
-        color: Colors.pink,
+        color: Color(0xff761711),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
@@ -186,17 +180,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: EdgeInsets.all(10.0),
             ),
-            Column(
-              children: [
-                Text(
-                  "Manage your email",
-                  style: WelcomeScreen.style,
-                ),
-                Text(
-                  "efficiently.",
-                  style: WelcomeScreen.style,
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
+              child: Text(
+                AppLocalizations.of(context).welcomePanel3,
+                style: WelcomeScreen.textStyleLight,
+                textAlign: TextAlign.center,
+              ),
             ),
             Padding(padding: EdgeInsets.only(top: 20.0)),
           ],
@@ -216,21 +206,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: EdgeInsets.all(20.0),
             ),
-            Column(
-              children: [
-                Text(
-                  'Unsubcribe newsletters',
-                  style: WelcomeScreen.style,
-                ),
-                Text(
-                  'with just one',
-                  style: WelcomeScreen.style,
-                ),
-                Text(
-                  'tap.',
-                  style: WelcomeScreen.style,
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
+              child: Text(
+                AppLocalizations.of(context).welcomePanel4,
+                style: WelcomeScreen.textStyleDark,
+                textAlign: TextAlign.center,
+              ),
             ),
             Padding(padding: EdgeInsets.only(top: 20.0)),
           ],

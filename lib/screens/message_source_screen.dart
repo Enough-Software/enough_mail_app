@@ -12,12 +12,12 @@ import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/alert_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
 // import 'package:enough_style/enough_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../locator.dart';
 
@@ -104,12 +104,13 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final localizations = AppLocalizations.of(context);
     final appBarTitle = isInSearchMode
         ? TextField(
             controller: searchEditingController,
             textInputAction: TextInputAction.search,
             decoration: InputDecoration(
-              hintText: 'Your search',
+              hintText: localizations.homeSearchHint,
               hintStyle: TextStyle(color: Colors.white30),
               suffix: hasSearchInput
                   ? IconButton(
@@ -159,13 +160,13 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           onSelected: switchVisualization,
           itemBuilder: (context) => [
             _visualization == _Visualization.list
-                ? const PopupMenuItem<_Visualization>(
+                ? PopupMenuItem<_Visualization>(
                     value: _Visualization.stack,
-                    child: Text('Show as stack'),
+                    child: Text(localizations.homeActionsShowAsStack),
                   )
-                : const PopupMenuItem<_Visualization>(
+                : PopupMenuItem<_Visualization>(
                     value: _Visualization.list,
-                    child: Text('Show as list'),
+                    child: Text(localizations.homeActionsShowAsList),
                   ),
           ],
         ),
@@ -175,9 +176,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     Widget zeroPosWidget;
     if (_sectionedMessageSource.isInitialized &&
         widget.messageSource.size == 0) {
+      final emptyMessage = isInSearchMode
+          ? localizations.homeEmptySearchMessage
+          : localizations.homeEmptyFolderMessage;
       zeroPosWidget = Padding(
         padding: EdgeInsets.symmetric(vertical: 32, horizontal: 32),
-        child: Text('All done!\n\nThere are no messages in this folder.'),
+        child: Text(emptyMessage),
       );
     } else if (widget.messageSource.supportsDeleteAll) {
       final style = TextButton.styleFrom(primary: Colors.grey[600]);
@@ -188,13 +192,13 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         child: TextButton.icon(
           style: style,
           icon: Icon(Icons.delete),
-          label: Text('Delete all', style: textStyle),
+          label: Text(localizations.homeDeleteAllAction, style: textStyle),
           onPressed: () async {
             bool confirmed = await locator<AlertService>().askForConfirmation(
                 context,
-                title: 'Confirm',
-                query: 'Really delete all messages?',
-                action: 'Delete all',
+                title: localizations.homeDeleteAllTitle,
+                query: localizations.homeDeleteAllQuestion,
+                action: localizations.homeDeleteAllAction,
                 isDangerousAction: true);
             if (confirmed == true) {
               await widget.messageSource.deleteAllMessages();
@@ -218,7 +222,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       null, MessageBuilder(), ComposeAction.newMessage),
                 );
               },
-              tooltip: 'New message',
+              tooltip: localizations.homeFabTooltip,
               child: Icon(Icons.add),
               elevation: 2.0,
             ),
@@ -245,8 +249,9 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                            'loading messages for ${widget.messageSource.name ?? widget.messageSource.description}...'),
+                        child: Text(localizations.homeLoading(
+                            widget.messageSource.name ??
+                                widget.messageSource.description)),
                       ),
                     ),
                   ],
@@ -326,11 +331,16 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                             },
                             background: Container(
                               color: Colors.amber[700],
-                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
                               alignment: AlignmentDirectional.centerStart,
                               child: Row(
                                 children: [
-                                  Text(' mark as read/unread '),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child: Text(
+                                        localizations.swipeActionToggleRead),
+                                  ),
                                   Icon(
                                     Feather.circle,
                                     color: Colors.white,
@@ -340,7 +350,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                             ),
                             secondaryBackground: Container(
                               color: Colors.red,
-                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
                               alignment: AlignmentDirectional.centerEnd,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -349,7 +359,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                     Icons.delete,
                                     color: Colors.white,
                                   ),
-                                  Text('delete '),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child:
+                                        Text(localizations.swipeActionDelete),
+                                  ),
                                 ],
                               ),
                             ),
@@ -455,9 +470,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           ? MailboxFlag.inbox
                           : MailboxFlag.junk;
                       final notification = widget.messageSource.isJunk
-                          ? 'Moved ${selectedMessages.length} message(s) to inbox'
-                          : 'Marked ${selectedMessages.length} message(s) as spam';
-                      //TODO replace null with context when Scaffold Change becomes live, compare https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
+                          ? localizations
+                              .multipleMovedToInbox(selectedMessages.length)
+                          : localizations
+                              .multipleMovedToJunk(selectedMessages.length);
                       await widget.messageSource.moveMessages(
                           selectedMessages, targetFlag, notification);
                       leaveSelectionMode();
@@ -472,9 +488,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           ? MailboxFlag.inbox
                           : MailboxFlag.archive;
                       final notification = widget.messageSource.isArchive
-                          ? 'Moved ${selectedMessages.length} message(s) to inbox'
-                          : 'Archived ${selectedMessages.length} message(s)';
-                      //TODO replace null with context when Scaffold Change becomes live, compare https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
+                          ? localizations
+                              .multipleMovedToInbox(selectedMessages.length)
+                          : localizations
+                              .multipleMovedToArchive(selectedMessages.length);
                       await widget.messageSource.moveMessages(
                           selectedMessages, targetFlag, notification);
                       leaveSelectionMode();
@@ -484,9 +501,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () async {
-                        //TODO replace null with context when Scaffold Change becomes live, compare https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
+                        final notification = localizations
+                            .multipleMovedToTrash(selectedMessages.length);
                         await widget.messageSource
-                            .deleteMessages(selectedMessages);
+                            .deleteMessages(selectedMessages, notification);
                         leaveSelectionMode();
                       }),
                   IconButton(
@@ -514,7 +532,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       }
       setState(() {});
     } else {
-      print('mss $this taps for uid ${message.mimeMessage.uid}');
       locator<NavigationService>().push(Routes.mailDetails, arguments: message);
     }
   }
@@ -599,9 +616,9 @@ class _MessageOverviewState extends State<MessageOverview> {
         ? from.personalName
         : from?.email != null
             ? from.email
-            : '<no sender>';
+            : AppLocalizations.of(context).emailSenderUnknown;
     hasAttachments = mime.hasAttachments();
-    date = locator<I18nService>().formatDate(mime.decodeDate(), context);
+    date = locator<I18nService>().formatDate(mime.decodeDate());
     final overview = buildMessageOverview();
     return (widget.animationController != null)
         ? SizeTransition(

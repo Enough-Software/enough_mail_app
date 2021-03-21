@@ -1,33 +1,33 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+    final texts = [
+      localizations.splashLoading1,
+      localizations.splashLoading2,
+      localizations.splashLoading3
+    ];
+    final index = Random().nextInt(texts.length);
+    final text = texts[index];
+    final timeOfDay = TimeOfDay.now();
+    final isNight = timeOfDay.hour >= 22 || timeOfDay.hour <= 6;
+    final splashColor = isNight ? Colors.black87 : Color(0xff99cc00);
+    final textColor = isNight ? Colors.white : Colors.black87;
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Container(
-              color: Color(0xff99cc00),
-              // decoration: BoxDecoration(
-              //   gradient: LinearGradient(
-              //     begin: Alignment.topLeft,
-              //     end: Alignment.bottomRight,
-              //     colors: [Colors.green[300], Colors.green[900]],
-              //   ),
-              // ),
-              child: Center(
-                child: Text(
-                  'loading...',
-                  style: TextStyle(
-                      color: Colors.black87, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
+      body: Container(
+        color: splashColor,
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
           ),
-        ],
+        ),
       ),
     );
   }

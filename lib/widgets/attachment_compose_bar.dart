@@ -5,6 +5,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_media/enough_media.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 
 class AttachmentMediaProviderFactory {
@@ -55,6 +56,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Wrap(
       children: [
         for (final attachment in attachments) ...{
@@ -69,7 +71,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
         ActionChip(
           avatar: Icon(Icons.add),
           visualDensity: VisualDensity.compact,
-          label: Text('add'),
+          label: Text(localizations.composeAddAttachmentAction),
           onPressed: addAttachment,
         ),
       ],
@@ -102,6 +104,7 @@ class ComposeAttachment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ClipRRect(
@@ -117,7 +120,8 @@ class ComposeAttachment extends StatelessWidget {
           },
           contextMenuEntries: [
             PopupMenuItem<String>(
-              child: Text('Remove ${attachment.name}'),
+              child: Text(
+                  localizations.composeRemoveAttachmentAction(attachment.name)),
               value: 'remove',
             ),
           ],

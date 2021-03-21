@@ -1,6 +1,7 @@
 import 'package:enough_mail_app/services/date_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class I18nService {
   /// Day of week for countries (in two letter code) for which the week does not start on Monday
@@ -57,22 +58,9 @@ class I18nService {
   int firstDayOfWeek = DateTime.monday;
   Locale _locale;
   Locale get locale => _locale;
-  set locale(Locale value) {
-    _locale = value;
-    var countryCode = value?.countryCode?.toLowerCase();
-    firstDayOfWeek =
-        firstDayOfWeekPerCountryCode[countryCode] ?? DateTime.monday;
-    var localeText = value.toString();
-    _dateFormatToday = intl.DateFormat.jm(localeText);
-    _dateFormatLastWeek = intl.DateFormat.E(localeText).add_jm();
-    _dateFormat = intl.DateFormat.yMd(localeText).add_jm();
-    _dateFormatDayInLastWeek = intl.DateFormat.E(localeText);
-    _dateFormatDayBeforeLastWeek = intl.DateFormat.yMd(localeText);
-    _dateFormatMonth = intl.DateFormat.MMMM(localeText);
-  }
 
-  Map<DateSectionRange, intl.DateFormat> _messageListFormats = {};
-  Map<DateSectionRange, intl.DateFormat> _messageSectionHeaderFormats = {};
+  AppLocalizations _localizations;
+  AppLocalizations get localizations => _localizations;
 
   intl.DateFormat _dateFormatToday;
   intl.DateFormat _dateFormatLastWeek;
@@ -81,12 +69,28 @@ class I18nService {
   intl.DateFormat _dateFormatDayBeforeLastWeek;
   intl.DateFormat _dateFormatMonth;
 
-  String formatDate(DateTime dateTime, BuildContext context) {
-    if (_locale == null) {
-      locale = Localizations.localeOf(context);
+  void init(AppLocalizations localizations, Locale locale) {
+    _localizations = localizations;
+    _locale = locale;
+    final countryCode = locale?.countryCode?.toLowerCase();
+    if (countryCode == null) {
+      firstDayOfWeek = DateTime.monday;
+    } else {
+      firstDayOfWeek =
+          firstDayOfWeekPerCountryCode[countryCode] ?? DateTime.monday;
     }
+    final localeText = locale.toString();
+    _dateFormatToday = intl.DateFormat.jm(localeText);
+    _dateFormatLastWeek = intl.DateFormat.E(localeText).add_jm();
+    _dateFormat = intl.DateFormat.yMd(localeText).add_jm();
+    _dateFormatDayInLastWeek = intl.DateFormat.E(localeText);
+    _dateFormatDayBeforeLastWeek = intl.DateFormat.yMd(localeText);
+    _dateFormatMonth = intl.DateFormat.MMMM(localeText);
+  }
+
+  String formatDate(DateTime dateTime) {
     if (dateTime == null) {
-      return 'undefined'; //TODO
+      return _localizations.dateUndefined;
     }
     //TODO use DateService
     final messageDate = dateTime.toLocal();
@@ -108,10 +112,7 @@ class I18nService {
     return date;
   }
 
-  String formatDay(DateTime dateTime, BuildContext context) {
-    if (_locale == null) {
-      locale = Localizations.localeOf(context);
-    }
+  String formatDay(DateTime dateTime) {
     final messageDate = dateTime.toLocal();
     final nw = DateTime.now();
     final today = nw.subtract(Duration(
@@ -120,11 +121,12 @@ class I18nService {
         seconds: nw.second,
         milliseconds: nw.millisecond));
     if (messageDate.isAfter(today)) {
-      return 'today';
+      return localizations.dateDayToday;
     } else if (messageDate.isAfter(today.subtract(Duration(days: 1)))) {
-      return 'yesterday';
+      return localizations.dateDayYesterday;
     } else if (messageDate.isAfter(today.subtract(Duration(days: 7)))) {
-      return 'last ${_dateFormatDayInLastWeek.format(messageDate)}';
+      return localizations
+          .dateDayLastWeekday(_dateFormatDayInLastWeek.format(messageDate));
     } else {
       return _dateFormatDayBeforeLastWeek.format(messageDate);
     }
@@ -133,30 +135,30 @@ class I18nService {
   String formatDateRange(DateSectionRange range, DateTime dateTime) {
     switch (range) {
       case DateSectionRange.future:
-        return 'future';
+        return _localizations.dateRangeFuture;
       case DateSectionRange.tomorrow:
-        return 'tomorrow';
+        return _localizations.dateRangeTomorrow;
       case DateSectionRange.today:
-        return 'today';
+        return _localizations.dateRangeToday;
       case DateSectionRange.yesterday:
-        return 'yesterday';
+        return _localizations.dateRangeYesterday;
       case DateSectionRange.thisWeek:
-        return 'this week';
+        return _localizations.dateRangeCurrentWeek;
       case DateSectionRange.lastWeek:
-        return 'last week';
+        return _localizations.dateRangeLastWeek;
       case DateSectionRange.thisMonth:
-        return 'this month';
+        return _localizations.dateRangeCurrentMonth;
       case DateSectionRange.monthOfThisYear:
-        return 'this year';
+        return _localizations.dateRangeCurrentYear;
       case DateSectionRange.monthAndYear:
-        return 'long ago';
+        return _localizations.dateRangeLongAgo;
     }
     return '<uncategorized>';
   }
 
   String formatTimeOfDay(TimeOfDay timeOfDay, BuildContext context) {
     if (timeOfDay == null) {
-      return 'undefined'; //TODO
+      return _localizations.dateUndefined;
     }
     return timeOfDay.format(context);
   }

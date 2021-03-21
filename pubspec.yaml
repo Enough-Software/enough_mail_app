@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=2.10.0 <3.0.0'
@@ -29,7 +29,7 @@ dependencies:
     git:
       url: https://github.com/Enough-Software/enough_mail.git
     # path: ../enough_mail
-  enough_mail_flutter: #^1.0.0
+  enough_mail_flutter: #any
     git:
       url: https://github.com/Enough-Software/enough_mail_flutter.git
     # path: ../enough_mail_flutter
@@ -82,6 +82,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  # For localization / l10n:
+  generate: true
+  
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/

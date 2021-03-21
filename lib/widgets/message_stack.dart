@@ -75,9 +75,8 @@ class _MessageStackState extends State<MessageStack> {
   Widget build(BuildContext context) {
     final quickReplies = ['OK', 'Thank you!', '👍', '😊'];
     final dateTime = currentMessage.mimeMessage.decodeDate();
-    final dayName = dateTime == null
-        ? ''
-        : locator<I18nService>().formatDay(dateTime, context);
+    final dayName =
+        dateTime == null ? '' : locator<I18nService>().formatDay(dateTime);
     return Stack(
       alignment: Alignment.center,
       fit: StackFit.expand,

@@ -6,7 +6,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 
 class MessageActions extends StatefulWidget {
@@ -47,6 +47,7 @@ class _MessageActionsState extends State<MessageActions> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Material(
       elevation: 16,
       child: Row(
@@ -72,99 +73,85 @@ class _MessageActionsState extends State<MessageActions> {
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: _OverflowMenuChoice.reply,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.reply),
-                    Text(' reply'),
-                  ],
+                child: ListTile(
+                  leading: Icon(Icons.reply),
+                  title: Text(localizations.messageActionReply),
                 ),
               ),
               PopupMenuItem(
                 value: _OverflowMenuChoice.replyAll,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.reply_all),
-                    Text(' reply all'),
-                  ],
+                child: ListTile(
+                  leading: Icon(Icons.reply_all),
+                  title: Text(localizations.messageActionReplyAll),
                 ),
               ),
               PopupMenuItem(
                 value: _OverflowMenuChoice.forward,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.forward),
-                    Text(' forward'),
-                  ],
+                child: ListTile(
+                  leading: Icon(Icons.forward),
+                  title: Text(localizations.messageActionForward),
                 ),
               ),
               PopupMenuItem(
                 value: _OverflowMenuChoice.delete,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.delete),
-                    Text(' delete'),
-                  ],
+                child: ListTile(
+                  leading: Icon(Icons.delete),
+                  title: Text(localizations.messageActionDelete),
                 ),
               ),
               PopupMenuDivider(),
               PopupMenuItem(
                 value: _OverflowMenuChoice.seen,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(widget.message.isSeen
-                        ? Feather.circle
-                        : Entypo.mail_with_circle),
-                    Text(widget.message.isSeen ? ' is read' : ' is not read'),
-                  ],
+                child: ListTile(
+                  leading: Icon(widget.message.isSeen
+                      ? Feather.circle
+                      : Entypo.mail_with_circle),
+                  title: Text(
+                    widget.message.isSeen
+                        ? localizations.messageStatusSeen
+                        : localizations.messageStatusUnseen,
+                  ),
                 ),
               ),
               PopupMenuItem(
                 value: _OverflowMenuChoice.flag,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(widget.message.isFlagged
-                        ? Icons.flag
-                        : Icons.outlined_flag),
-                    Text(widget.message.isFlagged
-                        ? ' is flagged'
-                        : ' is not flagged'),
-                  ],
+                child: ListTile(
+                  leading: Icon(widget.message.isFlagged
+                      ? Icons.flag
+                      : Icons.outlined_flag),
+                  title: Text(
+                    widget.message.isFlagged
+                        ? localizations.messageStatusFlagged
+                        : localizations.messageStatusUnflagged,
+                  ),
                 ),
               ),
               if (widget.message.source.supportsMessageFolders) ...{
                 PopupMenuDivider(),
                 PopupMenuItem(
                   value: _OverflowMenuChoice.junk,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(widget.message.source.isJunk
-                          ? Entypo.check
-                          : Entypo.bug),
-                      Text(widget.message.source.isJunk
-                          ? ' mark as not junk'
-                          : ' mark as junk'),
-                    ],
+                  child: ListTile(
+                    leading: Icon(widget.message.source.isJunk
+                        ? Entypo.check
+                        : Entypo.bug),
+                    title: Text(
+                      widget.message.source.isJunk
+                          ? localizations.messageActionMarkAsNotJunk
+                          : localizations.messageActionMarkAsJunk,
+                    ),
                   ),
                 ),
                 PopupMenuItem(
                   value: _OverflowMenuChoice.archive,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(widget.message.source.isArchive
-                          ? Entypo.inbox
-                          : Entypo.archive),
-                      Text(widget.message.source.isArchive
-                          ? ' move to inbox'
-                          : ' archive'),
-                    ],
+                  child: ListTile(
+                    leading: Icon(widget.message.source.isArchive
+                        ? Entypo.inbox
+                        : Entypo.archive),
+                    title: Text(
+                      widget.message.source.isArchive
+                          ? localizations.messageActionUnarchive
+                          : localizations.messageActionArchive,
+                    ),
                   ),
                 ),
               },

@@ -8,6 +8,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AccountEditScreen extends StatefulWidget {
   final Account account;
@@ -41,15 +42,17 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Base.buildAppChrome(
       context,
-      title: 'Edit ${widget.account.name}',
+      title: localizations.editAccountTitle(widget.account.name),
       subtitle: widget.account.email,
-      content: buildEditContent(context),
+      content: buildEditContent(localizations, context),
     );
   }
 
-  Widget buildEditContent(BuildContext context) {
+  Widget buildEditContent(
+      AppLocalizations localizations, BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -59,8 +62,8 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
             TextField(
               controller: accountNameController,
               decoration: InputDecoration(
-                labelText: 'Account name',
-                hintText: 'Name of the account',
+                labelText: localizations.addAccountNameOfAccountLabel,
+                hintText: localizations.addAccountNameOfAccountHint,
               ),
               onChanged: (value) async {
                 widget.account.name = value;
@@ -70,8 +73,8 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
             TextField(
               controller: userNameController,
               decoration: InputDecoration(
-                labelText: 'Your name',
-                hintText: 'The name that recipients see',
+                labelText: localizations.addAccountNameOfUserLabel,
+                hintText: localizations.addAccountNameOfUserHint,
               ),
               onChanged: (value) async {
                 widget.account.userName = value;
@@ -87,17 +90,18 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   await locator<MailService>()
                       .excludeAccountFromUnified(widget.account, !value);
                 },
-                title: Text('Include in unified account'),
+                title: Text(localizations.editAccountIncludeInUnifedLabel),
               ),
             },
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-              child: Text('Alias email addresses for ${widget.account.email}:'),
+              child: Text(
+                  localizations.editAccountAliasLabel(widget.account.email)),
             ),
             if (widget.account.hasNoAlias) ...{
               Padding(
                 padding: const EdgeInsets.all(8),
-                child: Text('You have no known aliases for this account yet.',
+                child: Text(localizations.editAccountNoAliasesInfo,
                     style: TextStyle(fontStyle: FontStyle.italic)),
               ),
             },
@@ -121,14 +125,15 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                     Container(color: Colors.red, child: Icon(Icons.delete)),
                 onDismissed: (direction) async {
                   await widget.account.removeAlias(alias);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("${alias.email} alias removed")));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          localizations.editAccountAliasRemoved(alias.email))));
                 },
               ),
             },
             ListTile(
               leading: Icon(Icons.add),
-              title: Text('Add alias'),
+              title: Text(localizations.editAccountAddAliasAction),
               onTap: () {
                 var email = widget.account.email;
                 email = email.substring(email.lastIndexOf('@'));
@@ -144,11 +149,11 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
             CheckboxListTile(
               value: widget.account.supportsPlusAliases,
               onChanged: null,
-              title: Text('Supports plus aliases'),
+              title: Text(localizations.editAccountPlusAliasesSupported),
             ),
             //if (!widget.account.supportsPlusAliases) ...{
             ElevatedButton(
-              child: Text('Test support for plus aliases'),
+              child: Text(localizations.editAccountCheckPlusAliasAction),
               onPressed: () async {
                 var result = await showDialog<bool>(
                   context: context,
@@ -165,29 +170,38 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
               },
             ),
             Divider(),
+            ElevatedButton.icon(
+                onPressed: () => locator<NavigationService>().push(
+                    Routes.accountServerDetails,
+                    arguments: widget.account),
+                icon: Icon(Icons.edit),
+                label: Text(localizations.editAccountServerSettingsAction)),
+            Divider(),
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
-              child: TextButton.icon(
+              child: ElevatedButton.icon(
                 style: TextButton.styleFrom(backgroundColor: Colors.red),
                 icon: Icon(
                   Icons.delete,
                   color: Colors.white,
                 ),
                 label: Text(
-                  'Delete account',
+                  localizations.editAccountDeleteAccountAction,
                   style: Theme.of(context)
                       .textTheme
                       .button
                       .copyWith(color: Colors.white),
                 ),
                 onPressed: () async {
-                  final result = await locator<AlertService>().askForConfirmation(
-                      context,
-                      title: 'Confirm',
-                      query:
-                          'Do you want to delete the account ${accountNameController.text}?',
-                      action: 'Delete',
-                      isDangerousAction: true);
+                  final result = await locator<AlertService>()
+                      .askForConfirmation(context,
+                          title: localizations
+                              .editAccountDeleteAccountConfirmationTitle,
+                          query: localizations
+                              .editAccountDeleteAccountConfirmationQuery(
+                                  accountNameController.text),
+                          action: localizations.actionDelete,
+                          isDangerousAction: true);
                   if (result == true) {
                     final mailService = locator<MailService>();
                     await mailService.removeAccount(widget.account);
@@ -274,8 +288,10 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text('+ Aliases for ${widget.account.name}'),
+      title: Text(
+          localizations.editAccountTestPlusAliasTitle(widget.account.name)),
       content: Stepper(
         onStepCancel: step == 3 ? null : () => Navigator.of(context).pop(),
         onStepContinue: !isContinueAvailable
@@ -307,27 +323,28 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
               },
         steps: [
           Step(
-            title: Text('Introduction'),
+            title: Text(
+                localizations.editAccountTestPlusAliasStepIntroductionTitle),
             content: Text(
-              'Your account ${widget.account.name} might support so called + aliases like $generatedAliasAdddress.'
-              '\nA + alias helps you to protect your identity and helps you against spam.'
-              '\nTo test this, a test message will be sent to this generated address. If it arrives, your provider supports + aliases and you can easily generate them on demand when writing a new mail message.',
+              localizations.editAccountTestPlusAliasStepIntroductionText(
+                  widget.account.name, generatedAliasAdddress),
               style: TextStyle(fontSize: 12),
             ),
             isActive: (step == 0),
           ),
           Step(
-            title: Text('Verification'),
+            title: Text(localizations.editAccountTestPlusAliasStepTestingTitle),
             content: Center(child: CircularProgressIndicator()),
             isActive: (step == 1),
           ),
           Step(
-            title: Text('Result'),
+            title: Text(localizations.editAccountTestPlusAliasStepResultTitle),
             content: widget.account.supportsPlusAliases
-                ? Text(
-                    'Your account ${widget.account.name} supports + aliases.')
+                ? Text(localizations.editAccountTestPlusAliasStepResultSuccess(
+                    widget.account.name))
                 : Text(
-                    'Your account ${widget.account.name} does not support + aliases.'),
+                    localizations.editAccountTestPlusAliasStepResultNoSuccess(
+                        widget.account.name)),
             isActive: (step == 3),
             state: StepState.complete,
           ),
@@ -370,16 +387,22 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text(widget.isNewAlias ? 'Add alias' : 'Edit alias'),
-      content: isSaving ? CircularProgressIndicator() : buildContent(),
+      title: Text(widget.isNewAlias
+          ? localizations.editAccountAddAliasTitle
+          : localizations.editAccountEditAliasTitle),
+      content:
+          isSaving ? CircularProgressIndicator() : buildContent(localizations),
       actions: [
         TextButton(
-          child: const Text('Cancel'),
+          child: Text(localizations.actionCancel),
           onPressed: () => Navigator.of(context).pop(),
         ),
         TextButton(
-          child: Text(widget.isNewAlias ? 'Add' : 'Update'),
+          child: Text(widget.isNewAlias
+              ? localizations.editAccountAliasAddAction
+              : localizations.editAccountAliasUpdateAction),
           onPressed: isEmailValid
               ? () async {
                   setState(() {
@@ -396,7 +419,7 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
     );
   }
 
-  Widget buildContent() {
+  Widget buildContent(AppLocalizations localizations) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -404,13 +427,14 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
         TextField(
           controller: nameController,
           decoration: InputDecoration(
-              labelText: 'Alias name',
-              hintText: 'The name that recipients see'),
+              labelText: localizations.editAccountEditAliasNameLabel,
+              hintText: localizations.addAccountNameOfUserHint),
         ),
         TextField(
           controller: emailController,
           decoration: InputDecoration(
-              labelText: 'Alias email', hintText: 'Your alias email address'),
+              labelText: localizations.editAccountEditAliasEmailLabel,
+              hintText: localizations.editAccountEditAliasEmailHint),
           onChanged: (value) {
             bool isValid = Validator.validateEmail(value);
             final emailValue = value.toLowerCase();
@@ -420,7 +444,8 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
                   orElse: () => null);
               if (existingAlias != null && existingAlias != widget.alias) {
                 setState(() {
-                  errorMessage = 'There is already an alias with $value.';
+                  errorMessage =
+                      localizations.editAccountEditAliasDuplicateError(value);
                 });
               } else if (errorMessage != null) {
                 setState(() {

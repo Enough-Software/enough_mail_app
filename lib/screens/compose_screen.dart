@@ -1,5 +1,6 @@
 import 'package:diff_match_patch/diff_match_patch.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:enough_mail/enough_mail.dart';
@@ -13,7 +14,7 @@ import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 
 class ComposeScreen extends StatefulWidget {
@@ -142,7 +143,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
               ? MailConventions.defaultForwardHeaderTemplate
               : MailConventions.defaultReplyHeaderTemplate;
       final blockExternalImages = false;
-      final emptyMessageText = 'empty message';
+      final emptyMessageText =
+          locator<I18nService>().localizations.composeEmptyMessage;
       final maxImageWidth = 300;
       final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
           blockExternalImages, emptyMessageText, maxImageWidth);
@@ -200,7 +202,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
         }
         newHtmlText = buffer.toString();
       }
-      print('newHtmlText=$newHtmlText');
+      //print('newHtmlText=$newHtmlText');
     }
 
     // generate plain text from HTML code:
@@ -231,13 +233,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
     textPartBuilder.addTextPlain(plainText);
     final fullHtmlMessageText = await _editorApi.getFullHtml(content: htmlText);
     textPartBuilder.addTextHtml(fullHtmlMessageText);
-    //TODO check for attachments wait for all of them to be downloaded
-    // bool supports8BitEncoding = await mailClient.supports8BitEncoding();
-    // _usedTextEncoding = mb.setRecommendedTextEncoding(supports8BitEncoding);
-    // problem with using 8bit encoding is that even in 2021 there are still mailsystems not supporting BDAT so
-    // even when the SMTP accepts a 8bit message via DATA, it may run into a problem with the recipient's SMTP.
-    // Yes I am looking at you, 1&1 (IONOS).
-    // So we better play safe than sorry and just always use the default quoted-printable 7bit encoding.
     _usedTextEncoding = TransferEncoding.automatic;
     final mimeMessage = mb.buildMimeMessage();
     return mimeMessage;
@@ -247,7 +242,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     return locator<MailService>().getClientFor(from.account);
   }
 
-  Future<void> send() async {
+  Future<void> send(AppLocalizations localizations) async {
     locator<NavigationService>().pop();
     final mailClient = await getMailClient();
     final mimeMessage = await buildMimeMessage(mailClient);
@@ -262,12 +257,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
         appendToSent: append,
         use8BitEncoding: use8Bit,
       );
-      locator<ScaffoldMessengerService>().showTextSnackBar('Mail sent 😊');
+      locator<ScaffoldMessengerService>()
+          .showTextSnackBar(localizations.composeMailSendSuccess);
     } on MailException catch (e, s) {
       //TODO latest here persist the mail for further retries in the future
       print('Unable to send or append mail: $e $s');
-      locator<AlertService>().showTextDialog(context, 'Error',
-          'Sorry, your mail could not be send. We received the following error: $e $s');
+      locator<AlertService>().showTextDialog(context, localizations.errorTitle,
+          localizations.composeSendErrorInfo(e.toString()));
       return;
     }
     //TODO disable global busy indicator
@@ -309,11 +305,12 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     final titleText = widget.data.action == ComposeAction.answer
-        ? 'Reply'
+        ? localizations.composeTitleReply
         : widget.data.action == ComposeAction.forward
-            ? 'Forward'
-            : 'New message';
+            ? localizations.composeTitleForward
+            : localizations.composeTitleNew;
     return Scaffold(
       drawer: AppDrawer(),
       body: CustomScrollView(
@@ -331,7 +328,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
               ),
               IconButton(
                 icon: Icon(Icons.send),
-                onPressed: send,
+                onPressed: () => send(localizations),
               ),
               PopupMenuButton<_OverflowMenuChoice>(
                 onSelected: (_OverflowMenuChoice result) {
@@ -345,13 +342,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
                   }
                 },
                 itemBuilder: (BuildContext context) => [
-                  const PopupMenuItem<_OverflowMenuChoice>(
+                  PopupMenuItem<_OverflowMenuChoice>(
                     value: _OverflowMenuChoice.showSourceCode,
-                    child: Text('View source'),
+                    child: Text(localizations.viewSourceAction),
                   ),
-                  const PopupMenuItem<_OverflowMenuChoice>(
+                  PopupMenuItem<_OverflowMenuChoice>(
                     value: _OverflowMenuChoice.saveAsDraft,
-                    child: Text('Save as draft'),
+                    child: Text(localizations.composeSaveDraftAction),
                   ),
                 ],
               ),
@@ -366,7 +363,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('From', style: Theme.of(context).textTheme?.caption),
+                    Text(localizations.detailsHeaderFrom,
+                        style: Theme.of(context).textTheme?.caption),
                     DropdownButton<Sender>(
                       isExpanded: true,
                       items: senders
@@ -375,23 +373,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
                               value: s,
                               child: Text(
                                 s.isPlaceHolderForPlusAlias
-                                    ? 'Create new + alias...'
+                                    ? localizations.composeCreatePlusAliasAction
                                     : s.toString(),
                                 overflow: TextOverflow.fade,
                               ),
                             ),
                           )
                           .toList(),
-                      // selectedItemBuilder: (context) => senders
-                      //     .map(
-                      //       (s) => Text(
-                      //         s.isPlaceHolderForPlusAlias
-                      //             ? 'Create new + alias...'
-                      //             : s.toString(),
-                      //         overflow: TextOverflow.fade,
-                      //       ),
-                      //     )
-                      //     .toList(),
                       onChanged: (s) async {
                         if (s.isPlaceHolderForPlusAlias) {
                           final index = senders.indexOf(s);
@@ -400,14 +388,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           setState(() {
                             senders.insert(index, s);
                           });
-                          // final newAliasAddress = await showDialog<MailAddress>(
-                          //   context: context,
-                          //   builder: (context) => AliasEditDialog(
-                          //       isNewAlias: true, alias: alias.address, account: Account(s.account),),
-                          // );
-                          // if (newAliasAddress != null) {
-
-                          // }
                         }
                         widget.data.messageBuilder.from = [s.address];
                         setState(() {
@@ -415,15 +395,15 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         });
                       },
                       value: from,
-                      hint: Text('Sender'),
+                      hint: Text(localizations.composeSenderHint),
                     ),
                     TextField(
                       controller: _toController,
                       autofocus: _focus == _Autofocus.to,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        labelText: 'To',
-                        hintText: 'Recipient email',
+                        labelText: localizations.detailsHeaderTo,
+                        hintText: localizations.composeRecipientHint,
                         suffixIcon: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -447,7 +427,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'CC',
-                          hintText: 'Recipient email',
+                          hintText: localizations.composeRecipientHint,
                           suffixIcon: IconButton(
                             icon: Icon(Icons.contacts),
                             onPressed: () => _pickContact(_ccController),
@@ -459,7 +439,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'BCC',
-                          hintText: 'Recipient email',
+                          hintText: localizations.composeRecipientHint,
                           suffixIcon: IconButton(
                             icon: Icon(Icons.contacts),
                             onPressed: () => _pickContact(_bccController),
@@ -471,7 +451,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       controller: _subjectController,
                       autofocus: _focus == _Autofocus.subject,
                       decoration: InputDecoration(
-                          labelText: 'Subject', hintText: 'Message subject'),
+                        labelText: localizations.composeSubjectLabel,
+                        hintText: localizations.composeSubjectHint,
+                      ),
                     ),
                     if (widget.data.messageBuilder.attachments.isNotEmpty ||
                         (_downloadAttachmentsFuture != null)) ...{

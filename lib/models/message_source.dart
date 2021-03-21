@@ -2,6 +2,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message_cache.dart';
 import 'package:enough_mail_app/models/mime_source.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:flutter/foundation.dart';
@@ -128,7 +129,7 @@ abstract class MessageSource extends ChangeNotifier
         await message.mailClient.deleteMessage(message.mimeMessage);
     if (deleteResult?.isUndoable == true) {
       locator<ScaffoldMessengerService>().showTextSnackBar(
-        'Deleted',
+        locator<I18nService>().localizations.resultDeleted,
         undo: () async {
           await message.mailClient.undoDeleteMessages(deleteResult);
           //TODO update mimeMessage's UID and sequence ID?
@@ -141,7 +142,8 @@ abstract class MessageSource extends ChangeNotifier
     }
   }
 
-  Future<void> deleteMessages(List<Message> messages) async {
+  Future<void> deleteMessages(
+      List<Message> messages, String notification) async {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
       _removeMessage(message, notificationService);
@@ -157,7 +159,7 @@ abstract class MessageSource extends ChangeNotifier
       }
     }
     locator<ScaffoldMessengerService>().showTextSnackBar(
-      'Deleted ${messages.length} message(s)',
+      notification,
       undo: resultsByClient.isEmpty
           ? null
           : () async {
@@ -176,11 +178,13 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> markAsJunk(Message message) {
-    return moveMessage(message, MailboxFlag.junk, 'Marked as spam');
+    return moveMessage(message, MailboxFlag.junk,
+        locator<I18nService>().localizations.resultMovedToJunk);
   }
 
   Future<void> markAsNotJunk(Message message) {
-    return moveMessage(message, MailboxFlag.inbox, 'Moved to inbox');
+    return moveMessage(message, MailboxFlag.inbox,
+        locator<I18nService>().localizations.resultMovedToInbox);
   }
 
   Future<void> moveMessage(Message message, MailboxFlag targetMailboxFlag,
@@ -246,11 +250,13 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> moveToInbox(Message message) async {
-    return moveMessage(message, MailboxFlag.inbox, 'Moved to inbox');
+    return moveMessage(message, MailboxFlag.inbox,
+        locator<I18nService>().localizations.resultMovedToInbox);
   }
 
   Future<void> archive(Message message) {
-    return moveMessage(message, MailboxFlag.archive, 'Archived');
+    return moveMessage(message, MailboxFlag.archive,
+        locator<I18nService>().localizations.resultArchived);
   }
 
   Future<void> markAsSeen(Message msg, bool seen) {
@@ -408,8 +414,11 @@ class MailboxMessageSource extends MessageSource {
   @override
   MessageSource search(MailSearch search) {
     final searchSource = _mimeSource.search(search);
+    final localizations = locator<I18nService>().localizations;
     return MailboxMessageSource.fromMimeSource(
-        searchSource, 'search in $name', 'Search "${search.query}"',
+        searchSource,
+        localizations.searchQueryDescription(name),
+        localizations.searchQueryTitle(search.query),
         parent: this);
   }
 }
@@ -573,9 +582,11 @@ class MultipleMessageSource extends MessageSource {
       final searchMimeSource = mimeSource.search(search);
       searchMimeSources.add(searchMimeSource);
     }
+    final localizations = locator<I18nService>().localizations;
     final searchMessageSource = MultipleMessageSource(
-        searchMimeSources, 'Search "${search.query}"', _flag);
-    searchMessageSource._description = 'Search in $name';
+        searchMimeSources, localizations.searchQueryTitle(search.query), _flag);
+    searchMessageSource._description =
+        localizations.searchQueryDescription(name);
     searchMessageSource._supportsDeleteAll = true;
     return searchMessageSource;
   }

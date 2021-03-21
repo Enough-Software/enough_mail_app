@@ -1,0 +1,1095 @@
+{
+  "actionCancel": "cancel",
+  "@actionCancel": {
+    "description": "Generic cancel action"
+  },
+  "actionOk": "OK",
+  "@actionOk": {
+    "description": "Generic OK action"
+  },
+  "actionUndo": "undo",
+  "@actionUndo": {
+    "description": "Generic undo action"
+  },
+  "actionDelete": "delete",
+  "@actionDelete": {
+    "description": "Generic delete action"
+  },
+  "splashLoading1": "Maily starting...",
+  "@splashLoading1": {
+    "description": "Message shown on splash screen while loading"
+  },
+  "splashLoading2": "Getting your Maily engine ready...",
+  "@splashLoading2": {
+    "description": "Message shown on splash screen while loading"
+  },
+  "splashLoading3": "Launching Maily in 10, 9, 8...",
+  "@splashLoading3": {
+    "description": "Message shown on splash screen while loading"
+  },
+  "welcomePanel1": "Welcome to Maily!",
+  "@welcomePanel1": {
+    "description": "Welcome message shown on first panel"
+  },
+  "welcomePanel2": "Manage unlimited email accounts.",
+  "@welcomePanel2": {
+    "description": "Welcome message shown on second panel"
+  },
+  "welcomePanel3": "Swipe your mails to delete them or to mark them read. Long-press a message to manage several messages at once.",
+  "@welcomePanel3": {
+    "description": "Welcome message shown on third panel"
+  },
+  "welcomePanel4": "Unsubscribe newsletters with just one tap.",
+  "@welcomePanel4": {
+    "description": "Welcome message shown on fourth panel"
+  },
+  "welcomeActionSignIn": "Sign into your mail account",
+  "@welcomeActionSignIn": {
+    "description": "Button showing login option"
+  },
+  "homeSearchHint": "Your search",
+  "@homeSearchHint": {
+    "description": "Hint shown in empty search field"
+  },
+  "homeActionsShowAsStack": "Show as stack",
+  "@homeActionsShowAsStack": {
+    "description": "Action to show mails as stack"
+  },
+  "homeActionsShowAsList": "Show as list",
+  "@homeActionsShowAsList": {
+    "description": "Action to show mails as list"
+  },
+  "homeEmptyFolderMessage": "All done!\n\nThere are no messages in this folder.",
+  "@homeEmptyFolderMessage": {
+    "description": "Message shown when there are no messages in the folder"
+  },
+  "homeEmptySearchMessage": "No messages found.",
+  "@homeEmptySearchMessage": {
+    "description": "Message shown when there are no messages found in a search query"
+  },
+  "homeDeleteAllTitle": "Confirm",
+  "@homeDeleteAllTitle": {
+    "description": "Title of confirmation dialog when deleting all messages"
+  },
+  "homeDeleteAllQuestion": "Really delete all messages?",
+  "@homeDeleteAllQuestion": {
+    "description": "Question in confirmation dialog when deleting all messages"
+  },
+  "homeDeleteAllAction": "Delete all",
+  "@homeDeleteAllAction": {
+    "description": "Action to tap to delete all messages (must be short)."
+  },
+  "homeFabTooltip": "New message",
+  "@homeFabTooltip": {
+    "description": "Tooltip for 'compose new message' floating action button."
+  },
+  "homeLoading": "loading {name}...",
+  "@homeLoading": {
+    "description": "Message shown while loading message.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Inbox"
+      }
+    }  
+  },
+  "swipeActionToggleRead": "mark as read/unread",
+  "@swipeActionToggleRead": {
+    "description": "Swipe action for marking a message as read / unread."
+  },
+  "swipeActionDelete": "delete",
+  "@swipeActionDelete": {
+    "description": "Swipe action for deleting a message."
+  },
+  "multipleMovedToJunk": "{number,plural, =1{One message marked as junk} other{Marked {number} messages as junk}}",
+  "@multipleMovedToJunk": {
+    "description": "Message shown after moving messages to junk. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "multipleMovedToInbox": "{number,plural, =1{Moved one message to inbox} other{Moved {number} messages to inbox}}",
+  "@multipleMovedToInbox": {
+    "description": "Message shown after moving messages from junk, trash or archive back to the Inbox. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "multipleMovedToArchive": "{number,plural, =1{Archived one message} other{Archived {number} messages}}",
+  "@multipleMovedToArchive": {
+    "description": "Message shown after moving messages to archive. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "multipleMovedToTrash": "{number,plural, =1{Deleted one message} other{Deleted {number} messages}}",
+  "@multipleMovedToTrash": {
+    "description": "Message shown after moving messages to trash. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "emailSenderUnknown": "<no sender>",
+  "@emailSenderUnknown": {
+    "description": "Shown as replacement when there is no known sender of a message."
+  },
+  "dateRangeFuture": "future",
+  "@dateRangeFuture": {
+    "description": "Date range title."
+  },
+  "dateRangeTomorrow": "tomorrow",
+  "@dateRangeTomorrow": {
+    "description": "Date range title."
+  },
+  "dateRangeToday": "today",
+  "@dateRangeToday": {
+    "description": "Date range title."
+  },
+  "dateRangeYesterday": "yesterday",
+  "@dateRangeYesterday": {
+    "description": "Date range title."
+  },
+  "dateRangeCurrentWeek": "this week",
+  "@dateRangeCurrentWeek": {
+    "description": "Date range title."
+  },
+  "dateRangeLastWeek": "last week",
+  "@dateRangeLastWeek": {
+    "description": "Date range title."
+  },
+  "dateRangeCurrentMonth": "this month",
+  "@dateRangeCurrentMonth": {
+    "description": "Date range title."
+  },
+  "dateRangeLastMonth": "last month",
+  "@dateRangeLastMonth": {
+    "description": "Date range title."
+  },
+  "dateRangeCurrentYear": "this year",
+  "@dateRangeCurrentYear": {
+    "description": "Date range title."
+  },
+  "dateRangeLongAgo": "long ago",
+  "@dateRangeLongAgo": {
+    "description": "Date range title."
+  },
+  "dateUndefined": "undefined",
+  "@dateUndefined": {
+    "description": "Unknown date."
+  },
+  "dateDayToday": "today",
+  "@dateDayToday": {
+    "description": "Message data is today."
+  },
+  "dateDayYesterday": "yesterday",
+  "@dateDayYesterday": {
+    "description": "Message data is yesterday."
+  },
+  "dateDayLastWeekday": "last {day}",
+  "@dateDayLastWeekday": {
+    "description": "Message data is a recent weekday.",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "Tuesday"
+      }
+    }
+  },
+  "drawerEntryAbout": "About Maily",
+  "@drawerEntryAbout": {
+    "description": "Menu entry for about."
+  },
+  "drawerEntrySettings": "Settings",
+  "@drawerEntrySettings": {
+    "description": "Menu entry for settings."
+  },
+  "drawerAccountsSectionTitle": "{number,plural, =1{One account} other{{number} accounts}}",
+  "@drawerAccountsSectionTitle": {
+    "description": "Title shown for accounts drop down. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "drawerEntryAddAccount": "Add account",
+  "@drawerEntryAddAccount": {
+    "description": "Menu entry for adding a new account."
+  },
+  "unifiedAccountName": "Unified account",
+  "@unifiedAccountName": {
+    "description": "Name of unified account."
+  },
+  "unifiedFolderInbox": "Unified Inbox",
+  "@unifiedFolderInbox": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderSent": "Unified Sent",
+  "@unifiedFolderSent": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderDrafts": "Unified Drafts",
+  "@unifiedFolderDrafts": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderTrash": "Unified Trash",
+  "@unifiedFolderTrash": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderArchive": "Unified Archive",
+  "@unifiedFolderArchive": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderJunk": "Unified Junk",
+  "@unifiedFolderJunk": {
+    "description": "Folder name of unified account."
+  },
+  "viewSourceAction": "View source",
+  "@viewSourceAction": {
+    "description": "Show source code of a message."
+  },
+  "detailsErrorDownloadInfo": "Message could not be downloaded.",
+  "@detailsErrorDownloadInfo": {
+    "description": "Info shown when an email could not be downloaded."
+  },
+  "detailsErrorDownloadRetry": "retry",
+  "@detailsErrorDownloadRetry": {
+    "description": "Retry action shown when an email could not be downloaded."
+  },
+  "detailsHeaderFrom": "From",
+  "@detailsHeaderFrom": {
+    "description": "Label for sender(s) of email."
+  },
+  "detailsHeaderTo": "To",
+  "@detailsHeaderTo": {
+    "description": "Label for [to] recipient(s) of email."
+  },
+  "detailsHeaderCc": "CC",
+  "@detailsHeaderCc": {
+    "description": "Label for [CC] recipient(s) of email."
+  },
+  "detailsHeaderDate": "Date",
+  "@detailsHeaderDate": {
+    "description": "Label for date of email."
+  },
+  "subjectUndefined": "<without subject>",
+  "@subjectUndefined": {
+    "description": "Shown instead of the subject when it is undefined."
+  },
+  "detailsActionShowImages": "Show images",
+  "@detailsActionShowImages": {
+    "description": "Action for showing images. Only visible when external images are blocked."
+  },
+  "detailsNewsletterActionUnsubscribe": "Unsubscribe",
+  "@detailsNewsletterActionUnsubscribe": {
+    "description": "Action shown for unsubscribable newsletter."
+  },
+  "detailsNewsletterActionResubscribe": "Re-subscribe",
+  "@detailsNewsletterActionResubscribe": {
+    "description": "Action shown after re-subscribable newsletter has been unsubscribed."
+  },
+  "detailsNewsletterStatusUnsubscribed": "Unsubscribed",
+  "@detailsNewsletterStatusUnsubscribed": {
+    "description": "Status shown for unsubscribed newsletter."
+  },
+  "detailsNewsletterUnsubscribeDialogTitle": "Unsubscribe",
+  "@detailsNewsletterUnsubscribeDialogTitle": {
+    "description": "Title for unsubscribe newsletter dialog."
+  },
+  "detailsNewsletterUnsubscribeDialogQuestion": "Do you want to unsubscribe to this mailing list {listName}?",
+  "@detailsNewsletterUnsubscribeDialogQuestion": {
+    "description": "Question for unsubscribe newsletter dialog.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsNewsletterUnsubscribeDialogAction": "Unsubscribe",
+  "@detailsNewsletterUnsubscribeDialogAction": {
+    "description": "Action for unsubscribe newsletter dialog."
+  },
+  "detailsNewsletterUnsubscribeSuccessTitle": "Unsubscribed",
+  "@detailsNewsletterUnsubscribeSuccessTitle": {
+    "description": "Title for dialog after unsubscribing newsletter successfully."
+  },
+  "detailsNewsletterUnsubscribeSuccessMessage": "You are now unsubscribed from the mailing list {listName}.",
+  "@detailsNewsletterUnsubscribeSuccessMessage": {
+    "description": "Text confirmation after successfully unsubscribing a newsletter.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsNewsletterUnsubscribeFailureTitle": "Not unsubscribed",
+  "@detailsNewsletterUnsubscribeFailureTitle": {
+    "description": "Title for dialog after unsubscribing newsletter failed."
+  },
+  "detailsNewsletterUnsubscribeFailureMessage": "Sorry, but I was unable to unsubscribe you from {listName} automatically.",
+  "@detailsNewsletterUnsubscribeFailureMessage": {
+    "description": "Text confirmation after unsubscribing a newsletter failed.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsNewsletterResubscribeDialogTitle": "Re-subscribe",
+  "@detailsNewsletterResubscribeDialogTitle": {
+    "description": "Title for re-subscribe newsletter dialog."
+  },
+  "detailsNewsletterResubscribeDialogQuestion": "Do you want to subscribe to this mailing list {listName} again?",
+  "@detailsNewsletterResubscribeDialogQuestion": {
+    "description": "Question for re-subscribe newsletter dialog.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsNewsletterResubscribeDialogAction": "Subscribe",
+  "@detailsNewsletterResubscribeDialogAction": {
+    "description": "Action for re-subscribe newsletter dialog."
+  },
+  "detailsNewsletterResubscribeSuccessTitle": "Subscribed",
+  "@detailsNewsletterResubscribeSuccessTitle": {
+    "description": "Title for dialog after re-subscribed newsletter successfully."
+  },
+  "detailsNewsletterResubscribeSuccessMessage": "You are now subscribed to the mailing list {listName} again.",
+  "@detailsNewsletterResubscribeSuccessMessage": {
+    "description": "Text confirmation after successfully re-subscribing a newsletter.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsNewsletterResubscribeFailureTitle": "Not subscribed",
+  "@detailsNewsletterResubscribeFailureTitle": {
+    "description": "Title for dialog after re-subscribing newsletter failed."
+  },
+  "detailsNewsletterResubscribeFailureMessage": "Sorry, but the subscribe request has failed for mailing list {listName}.",
+  "@detailsNewsletterResubscribeFailureMessage": {
+    "description": "Text confirmation after re-subscribing a newsletter failed.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "messageActionReply": "reply",
+  "@messageActionReply": {
+    "description": "Action for single message."
+  },
+  "messageActionReplyAll": "reply all",
+  "@messageActionReplyAll": {
+    "description": "Action for single message."
+  },
+  "messageActionForward": "forward",
+  "@messageActionForward": {
+    "description": "Action for single message."
+  },
+  "messageActionDelete": "delete",
+  "@messageActionDelete": {
+    "description": "Action for single message."
+  },
+  "messageStatusSeen": "is read",
+  "@messageStatusSeen": {
+    "description": "Status of single message."
+  },
+  "messageStatusUnseen": "is unread",
+  "@messageStatusUnseen": {
+    "description": "Status of single message."
+  },
+  "messageStatusFlagged": "is flagged",
+  "@messageStatusFlagged": {
+    "description": "Status of single message."
+  },
+  "messageStatusUnflagged": "is not flagged",
+  "@messageStatusUnflagged": {
+    "description": "Status of single message."
+  },
+  "messageActionMarkAsJunk": "mark as junk",
+  "@messageActionMarkAsJunk": {
+    "description": "Action for single message."
+  },
+  "messageActionMarkAsNotJunk": "mark as not junk",
+  "@messageActionMarkAsNotJunk": {
+    "description": "Action for single message."
+  },
+  "messageActionArchive": "archive",
+  "@messageActionArchive": {
+    "description": "Action for single message."
+  },
+  "messageActionUnarchive": "move to Inbox",
+  "@messageActionUnarchive": {
+    "description": "Action for single message."
+  },
+  "resultDeleted": "deleted",
+  "@resultDeleted": {
+    "description": "Successful short snackbar message after deleting message(s)."
+  },
+  "resultMovedToJunk": "marked as junk",
+  "@resultMovedToJunk": {
+    "description": "Successful short snackbar message after moving message(s) to junk."
+  },
+  "resultMovedToInbox": "moved to Inbox",
+  "@resultMovedToInbox": {
+    "description": "Successful short snackbar message after moving message(s) to inbox."
+  },
+  "resultArchived": "archived",
+  "@resultArchived": {
+    "description": "Successful short snackbar message after moving message(s) to archive."
+  },
+  "searchQueryDescription": "search in {folder}...",
+  "@searchQueryDescription": {
+    "description": "Description of search within the given folder.",
+    "placeholders": {
+      "folder": {
+        "type": "String",
+        "example": "Inbox"
+      }
+    }  
+  },
+  "searchQueryTitle": "Search \"{query}\"",
+  "@searchQueryTitle": {
+    "description": "Title for a search with the given query.",
+    "placeholders": {
+      "query": {
+        "type": "String",
+        "example": "a sender name"
+      }
+    }  
+  },
+  "aboutApplicationLegalese": "Maily is free software published under the GNU General Public License.",
+  "@aboutApplicationLegalese": {
+    "description": "Legal info shown in about dialog."
+  },
+  "feedbackActionSuggestFeature": "Suggest a feature",
+  "@feedbackActionSuggestFeature": {
+    "description": "Action to suggest a feature."
+  },
+  "feedbackActionReportProblem": "Report a problem",
+  "@feedbackActionReportProblem": {
+    "description": "Action to report a problem."
+  },
+  "feedbackActionHelpDeveloping": "Help developing Maily",
+  "@feedbackActionHelpDeveloping": {
+    "description": "Action to help developing."
+  },
+  "feedbackTitle": "Feedback",
+  "@feedbackTitle": {
+    "description": "Title of feedback settings screen."
+  },
+  "feedbackIntro": "Thank you for testing Maily!",
+  "@feedbackIntro": {
+    "description": "Intro for feedback settings screen."
+  },
+  "feedbackProvideInfoRequest": "Please provide this information when you report a problem:",
+  "@feedbackProvideInfoRequest": {
+    "description": "Request to provide device and app information when reporting a problem."
+  },
+  "feedbackResultInfoCopied": "Copied to clipboard",
+  "@feedbackResultInfoCopied": {
+    "description": "Info shown after copying device and app info to clipboard."
+  },
+  "accountsTitle": "Accounts",
+  "@accountsTitle": {
+    "description": "Title of accounts settings screen."
+  },
+  "accountsActionReorder": "Reorder accounts",
+  "@accountActionReorder": {
+    "description": "Action to start reordering accounts."
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Title of base settings screen."
+  },
+  "settingsSecurityBlockExternalImages": "Block external images",
+  "@settingsSecurityBlockExternalImages": {
+    "description": "Settings option to block external options."
+  },
+  "settingsActionAccounts": "Manage accounts",
+  "@settingsActionAccounts": {
+    "description": "Settings action to manage accounts."
+  },
+  "settingsActionDesign": "Change design",
+  "@settingsActionDesign": {
+    "description": "Settings action to manage the visualization of the app."
+  },
+  "settingsActionFeedback": "Provide feedback",
+  "@settingsActionFeedback": {
+    "description": "Settings action to provide feedback about the app."
+  },
+  "settingsActionWelcome": "Show welcome",
+  "@settingsActionWelcome": {
+    "description": "Settings action to show welcome screen of the app again."
+  },
+  "designTitle": "Design Settings",
+  "@designTitle": {
+    "description": "Title of design settings screen."
+  },
+  "designSectionThemeTitle": "Theme",
+  "@designSectionThemeTitle": {
+    "description": "Title of theme section on design settings screen."
+  },
+  "designThemeOptionLight": "Light",
+  "@designThemeOptionLight": {
+    "description": "Theme option."
+  },
+  "designThemeOptionDark": "Dark",
+  "@designThemeOptionDark": {
+    "description": "Theme option."
+  },
+  "designThemeOptionSystem": "System",
+  "@designThemeOptionSystem": {
+    "description": "Theme option."
+  },
+  "designThemeOptionCustom": "Custom",
+  "@designThemeOptionCustom": {
+    "description": "Theme option."
+  },
+  "designSectionCustomTitle": "Enable dark theme",
+  "@designSectionCustomTitle": {
+    "description": "Title of custom theme option section on design settings screen."
+  },
+  "designThemeCustomStart": "from {time}",
+  "@designThemeCustomStart": {
+    "description": "Start time of custom theme setting.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "10 PM"
+      }
+    }  
+  },
+  "designThemeCustomEnd": "until {time}",
+  "@designThemeCustomEnd": {
+    "description": "End time of custom theme setting.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "7 AM"
+      }
+    }  
+  },
+  "designSectionColorTitle": "Color Scheme",
+  "@designSectionColorTitle": {
+    "description": "Title of color section on design settings screen."
+  },
+  "addAccountTitle": "Add Account",
+  "@addAccountTitle": {
+    "description": "Title ofadd account screen."
+  },
+  "addAccountEmailLabel": "Email",
+  "@addAccountEmailLabel": {
+    "description": "Label and section header of email address input field."
+  },
+  "addAccountEmailHint": "Please enter your email address",
+  "@addAccountEmailHint": {
+    "description": "Hint text of email address input field."
+  },
+  "addAccountResolvingSetingsLabel": "Resolving {email}...",
+  "@addAccountResolvingSetingsLabel": {
+    "description": "Label shown while resolving the settings for the specified email address.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }  
+  },
+  "addAccountResolvedSettingsWrongAction": "Not on {provider}?",
+  "@addAccountResolvedSettingsWrongAction": {
+    "description": "Button text shown for the user to edit server settings manually when the resolving was successful but turned out a different than expected provider name.",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "gmail"
+      }
+    }  
+  },
+  "addAccountResolvingSetingsFailedInfo": "Unable to resolve {email}. Please go back to change it or set up the account manually.",
+  "@addAccountResolvingSetingsFailedInfo": {
+    "description": "Info shown after resolving the settings for the specified email address failed.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }  
+  },
+  "addAccountEditManuallyAction": "Edit manually",
+  "@addAccountEditManuallyAction": {
+    "description": "Action shown after account settings could not be automatically be discovered."
+  },
+  "addAccountPasswordLabel": "Password",
+  "@addAccountPasswordLabel": {
+    "description": "Label and section header of password input field."
+  },
+  "addAccountPasswordHint": "Please enter your password",
+  "@addAccountPasswordHint": {
+    "description": "Hint text of password input field."
+  },
+  "addAccountApplicationPasswordRequiredInfo": "This provider requires you to set up an app specific password.",
+  "@addAccountApplicationPasswordRequiredInfo": {
+    "description": "Text shown when the provider of the email account requires app specific passwords to be set up."
+  },
+  "addAccountApplicationPasswordRequiredButton": "Setup app specific password",
+  "@addAccountApplicationPasswordRequiredButton": {
+    "description": "Button text for setting up app specific password."
+  },
+  "addAccountApplicationPasswordRequiredAcknowledged": "Understood",
+  "@addAccountApplicationPasswordRequiredAcknowledged": {
+    "description": "Acknowldegement to be confirmed by user to acknowledge the fact that an app specific password is required."
+  },
+  "addAccountVerificationStep": "Verification",
+  "@addAccountVerificationStep": {
+    "description": "Section header of verification/log in step."
+  },
+  "addAccountVerifyingSettingsLabel": "Verifying {email}...",
+  "@addAccountVerifyingSettingsLabel": {
+    "description": "Info shown while the account settings for the given email are verified.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }  
+  },
+  "addAccountVerifyingSuccessInfo": "Successfully signed into {email}.",
+  "@addAccountVerifyingSuccessInfo": {
+    "description": "Info shown after the account settings for the given email have been verified.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }  
+  },
+  "addAccountVerifyingFailedInfo": "Sorry, but there was a problem. Please check your email {email} and password.",
+  "@addAccountVerifyingFailedInfo": {
+    "description": "Info shown after the account settings for the given email could not be verified.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }  
+  },
+  "addAccountNameOfUserLabel": "Your name",
+  "@addAccountNameOfUserLabel": {
+    "description": "Label for user name input field."
+  },
+  "addAccountNameOfUserHint": "The name that recipients see",
+  "@addAccountNameOfUserHint": {
+    "description": "Hint for user name input field."
+  },
+  "addAccountNameOfAccountLabel": "Account name",
+  "@addAccountNameOfAccountLabel": {
+    "description": "Label for account name input field."
+  },
+  "addAccountNameOfAccountHint": "Please enter the name of your account",
+  "@addAccountNameOfAccountHint": {
+    "description": "Hint for account name input field."
+  },
+  "editAccountTitle": "Edit {name}",
+  "@editAccountTitle": {
+    "description": "Title for screen when editing the account with the given name.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }  
+  },
+  "editAccountIncludeInUnifedLabel": "Include in unified account",
+  "@editAccountIncludeInUnifedLabel": {
+    "description": "Label for opting this account in/out of the unified account."
+  },
+  "editAccountAliasLabel": "Alias email addresses for {email}:",
+  "@editAccountAliasLabel": {
+    "description": "Label for any alias addresses that have been specified for the given email address.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }  
+  },
+  "editAccountNoAliasesInfo": "You have no known aliases for this account yet.",
+  "@editAccountNoAliasesInfo": {
+    "description": "Info when there have been no aliases specified for this account."
+  },
+  "editAccountAliasRemoved": "{email} alias removed",
+  "@editAccountAliasRemoved": {
+    "description": "Info given after an alias was removed.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }  
+  },
+  "editAccountAddAliasAction": "Add alias",
+  "@editAccountAddAliasAction": {
+    "description": "Button text for adding an alias to this account."
+  },
+  "editAccountPlusAliasesSupported": "Supports + aliases",
+  "@editAccountPlusAliasesSupported": {
+    "description": "Info shown when + aliases are supported by this account."
+  },
+  "editAccountCheckPlusAliasAction": "Test support for + aliases",
+  "@editAccountCheckPlusAliasAction": {
+    "description": "Button text for testing of + aliases are supported by this account."
+  },
+  "editAccountServerSettingsAction": "Edit server settings",
+  "@editAccountServerSettingsAction": {
+    "description": "Button text for editing the server settingg of  this account."
+  },
+  "editAccountDeleteAccountAction": "Delete account",
+  "@editAccountDeleteAccountAction": {
+    "description": "Button text for deleting this account."
+  },
+  "editAccountDeleteAccountConfirmationTitle": "Confirm",
+  "@editAccountDeleteAccountConfirmationTitle": {
+    "description": "Title for confirmation dialog when deleting this account."
+  },
+  "editAccountDeleteAccountConfirmationQuery": "Do you want to delete the account {name}?",
+  "@editAccountDeleteAccountConfirmationQuery": {
+    "description": "Request to confirm when deleting this account.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }  
+  },
+  "editAccountTestPlusAliasTitle": "+ Aliases for {name}",
+  "@editAccountTestPlusAliasTitle": {
+    "description": "Title for dialog shown while testing + alias support",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }  
+  },
+  "editAccountTestPlusAliasStepIntroductionTitle": "Introduction",
+  "@editAccountTestPlusAliasStepIntroductionTitle": {
+    "description": "Title for introducing concept of + aliases."
+  },
+  "editAccountTestPlusAliasStepIntroductionText": "Your account {accountName} might support so called + aliases like {example}.\nA + alias helps you to protect your identity and helps you against spam.\nTo test this, a test message will be sent to this generated address. If it arrives, your provider supports + aliases and you can easily generate them on demand when writing a new mail message.",
+  "@editAccountTestPlusAliasStepIntroductionText": {
+    "description": "Text for introducing concept of + aliases.",
+    "placeholders": {
+      "accountName": {
+        "type": "String",
+        "example": "domain.com"
+      },
+      "example": {
+        "type": "String",
+        "example": "someone+example@domain.com"
+      }
+    }  
+  },
+  "editAccountTestPlusAliasStepTestingTitle": "Testing",
+  "@editAccountTestPlusAliasStepTestingTitle": {
+    "description": "Title while testing concept of + aliases."
+  },
+  "editAccountTestPlusAliasStepResultTitle": "Result",
+  "@editAccountTestPlusAliasStepResultTitle": {
+    "description": "Title after testing concept of + aliases."
+  },
+  "editAccountTestPlusAliasStepResultSuccess": "Your account {name} supports + aliases.",
+  "@editAccountTestPlusAliasStepResultSuccess": {
+    "description": "Result when account supports + aliases",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }  
+  },
+  "editAccountTestPlusAliasStepResultNoSuccess": "Your account {name} does not support + aliases.",
+  "@editAccountTestPlusAliasStepResultNoSuccess": {
+    "description": "Result when account does not supports + aliases",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }  
+  },
+  "editAccountAddAliasTitle": "Add alias",
+  "@editAccountAddAliasTitle": {
+    "description": "Title when adding new alias."
+  },
+  "editAccountEditAliasTitle": "Edit alias",
+  "@editAccountEditAliasTitle": {
+    "description": "Title when editing alias."
+  },
+  "editAccountAliasAddAction": "add",
+  "@editAccountAliasAddAction": {
+    "description": "Action when adding new alias."
+  },
+  "editAccountAliasUpdateAction": "update",
+  "@editAccountAliasUpdateAction": {
+    "description": "Action when editing alias."
+  },
+  "editAccountEditAliasNameLabel": "Alias name",
+  "@editAccountEditAliasNameLabel": {
+    "description": "Label for alias name input field."
+  },
+  "editAccountEditAliasEmailLabel": "Alias email",
+  "@editAccountEditAliasEmailLabel": {
+    "description": "Label for alias email input field."
+  },
+  "editAccountEditAliasEmailHint": "Your alias email address",
+  "@editAccountEditAliasEmailHint": {
+    "description": "Hint for alias email input field."
+  },
+  "editAccountEditAliasDuplicateError": "There is already an alias with {email}.",
+  "@editAccountEditAliasDuplicateError": {
+    "description": "Error when the alias email is already known",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "you@domain.com"
+      }
+    }  
+  },
+  "accountDetailsFallbackTitle": "Server Settings",
+  "@accountDetailsFallbackTitle": {
+    "description": "Title shown when account name is not set."
+  },
+  "errorTitle": "Error",
+  "@errorTitle": {
+    "description": "Title for error dialogs."
+  },
+  "accountDetailsErrorHostProblem": "Maily cannot reach the specified mail server. Please check your incoming server setting \"{incomingHost}\" and your outgoing server setting \"{outgoingHost}\".",
+  "@accountDetailsErrorHostProblem": {
+    "description": "Error details when no connection to server could be established at all",
+    "placeholders": {
+      "incomingHost": {
+        "type": "String",
+        "example": "imap@domain.com"
+      },
+      "outgoingHost": {
+        "type": "String",
+        "example": "smtp@domain.com"
+      }
+    }  
+  },
+  "accountDetailsErrorLoginProblem": "Unable to log your in. Please check your user name \"{userName}\" and your password \"{password}\".",
+  "@accountDetailsErrorLoginProblem": {
+    "description": "Error details when login fails",
+    "placeholders": {
+      "userName": {
+        "type": "String",
+        "example": "email@domain.com"
+      },
+      "password": {
+        "type": "String",
+        "example": "secret"
+      }
+    }  
+  },
+  "accountDetailsUserNameLabel": "Login name",
+  "@accountDetailsUserNameLabel": {
+    "description": "Label for user name input field."
+  },
+  "accountDetailsUserNameHint": "Your user name, if different from email",
+  "@accountDetailsUserNameHint": {
+    "description": "Hint for user name input field."
+  },
+  "accountDetailsPasswordLabel": "Login password",
+  "@accountDetailsPasswordLabel": {
+    "description": "Label for password input field."
+  },
+  "accountDetailsPasswordHint": "Your password",
+  "@accountDetailsPasswordHint": {
+    "description": "Hint for user password input field."
+  },
+  "accountDetailsBaseSectionTitle": "Base settings",
+  "@accountDetailsBaseSectionTitle": {
+    "description": "Title of base settings section."
+  },
+  "accountDetailsIncomingLabel": "Incoming server",
+  "@accountDetailsIncomingLabel": {
+    "description": "Label for incoming server domain field."
+  },
+  "accountDetailsIncomingHint": "Domain like imap.domain.com",
+  "@accountDetailsIncomingHint": {
+    "description": "Hint for incoming server domain field."
+  },
+  "accountDetailsOutgoingLabel": "Outgoing server",
+  "@accountDetailsOutgoingLabel": {
+    "description": "Label for outgoing server domain field."
+  },
+  "accountDetailsOutgoingHint": "Domain like smtp.domain.com",
+  "@accountDetailsOutgoingHint": {
+    "description": "Hint for outgoing server domain field."
+  },
+  "accountDetailsAdvancedIncomingSectionTitle": "Advanced incoming settings",
+  "@accountDetailsAdvancedIncomingSectionTitle": {
+    "description": "Title of incoming settings section."
+  },
+  "accountDetailsIncomingServerTypeLabel": "Incoming type:",
+  "@accountDetailsIncomingServerTypeLabel": {
+    "description": "Label for server type dropdown."
+  },
+  "accountDetailsOptionAutomatic": "automatic",
+  "@accountDetailsOptionAutomatic": {
+    "description": "Option when the server type/security should be discovered automatically."
+  },
+  "accountDetailsIncomingSecurityLabel": "Incoming security:",
+  "@accountDetailsIncomingSecurityLabel": {
+    "description": "Label for server security dropdown."
+  },
+  "accountDetailsSecurityOptionNone": "Plain (no encryption)",
+  "@accountDetailsSecurityOptionNone": {
+    "description": "Label for security dropdown option without anycryption."
+  },
+  "accountDetailsIncomingPortLabel": "Incoming port",
+  "@accountDetailsIncomingPortLabel": {
+    "description": "Label for incoming port input field."
+  },
+  "accountDetailsPortHint": "Leave empty to determine automatically",
+  "@accountDetailsPortHint": {
+    "description": "Hint for port input fields."
+  },
+  "accountDetailsIncomingUserNameLabel": "Incoming user name",
+  "@accountDetailsIncomingUserNameLabel": {
+    "description": "Label for incoming user name input field."
+  },
+  "accountDetailsAlternativeUserNameHint": "Your user name, if different from above",
+  "@accountDetailsAlternativeUserNameHint": {
+    "description": "Label for alternative user name input fields."
+  },
+  "accountDetailsIncomingPasswordLabel": "Incoming password",
+  "@accountDetailsIncomingPasswordLabel": {
+    "description": "Label for incoming password input field."
+  },
+  "accountDetailsAlternativePasswordHint": "Your password, if different from above",
+  "@accountDetailsAlternativePasswordHint": {
+    "description": "Label for alternative user name input fields."
+  },
+  "accountDetailsAdvancedOutgoingSectionTitle": "Advanced outgoing settings",
+  "@accountDetailsAdvancedOutgoingSectionTitle": {
+    "description": "Title of incoming settings section."
+  },
+  "accountDetailsOutgoingServerTypeLabel": "Outgoing type:",
+  "@accountDetailsOutgoingServerTypeLabel": {
+    "description": "Label for server type dropdown."
+  },
+  "accountDetailsOutgoingSecurityLabel": "Outgoing security:",
+  "@accountDetailsOutgoingSecurityLabel": {
+    "description": "Label for server security dropdown."
+  },
+  "accountDetailsOutgoingPortLabel": "Outgoing port",
+  "@accountDetailsOutgoingPortLabel": {
+    "description": "Label for outgoing port input field."
+  },
+  "accountDetailsOutgoingUserNameLabel": "Outgoing user name",
+  "@accountDetailsOutgoingUserNameLabel": {
+    "description": "Label for outgoing user name input field."
+  },
+  "accountDetailsOutgoingPasswordLabel": "Outgoing password",
+  "@accountDetailsOutgoingPasswordLabel": {
+    "description": "Label for outgoing password input field."
+  },
+  "composeTitleNew": "New message",
+  "@composeTitleNew": {
+    "description": "Title for compose screen when a new message is created."
+  },
+  "composeTitleForward": "Forward",
+  "@composeTitleForward": {
+    "description": "Title for compose screen when a message is forwarded."
+  },
+  "composeTitleReply": "Reply",
+  "@composeTitleReply": {
+    "description": "Title for compose screen when a message is replied."
+  },
+  "composeEmptyMessage": "empty message",
+  "@composeEmptyMessage": {
+    "description": "Message text for message without text."
+  },
+  "composeMailSendSuccess": "Mail sent 😊",
+  "@composeMailSendSuccess": {
+    "description": "Notification shown after a mail was sent successfully."
+  },
+  "composeSendErrorInfo": "Sorry, your mail could not be send. We received the following error:\n{details}.",
+  "@composeSendErrorInfo": {
+    "description": "Error shown when email could not be send",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "554-Reject due to policy restrictions."
+      }
+    }  
+  },
+  "composeSaveDraftAction": "Save as draft",
+  "@composeSaveDraftAction": {
+    "description": "Action to save a message as draft"
+  },
+  "composeCreatePlusAliasAction": "Create new + alias...",
+  "@composeCreatePlusAliasAction": {
+    "description": "Action to create a new + alias as a sender"
+  },
+  "composeSenderHint": "Sender",
+  "@composeSenderHint": {
+    "description": "Hint for From input field"
+  },
+  "composeRecipientHint": "Recipient email",
+  "@composeRecipientHint": {
+    "description": "Hint for To input field"
+  },
+  "composeSubjectLabel": "Subject",
+  "@composeSubjectLabel": {
+    "description": "Label for Subject input field"
+  },
+  "composeSubjectHint": "Message subject",
+  "@composeSubjectHint": {
+    "description": "Hint for Subject input field"
+  },
+  "composeAddAttachmentAction": "add",
+  "@composeAddAttachmentAction": {
+    "description": "Action to add an attachment - should be short!"
+  },
+  "composeRemoveAttachmentAction": "remove {name}",
+  "@composeRemoveAttachmentAction": {
+    "description": "Action to remove an attachment",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "funny.png"
+      }
+    }  
+  }
+}
