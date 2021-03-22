@@ -21,6 +21,7 @@ class Routes {
   static const String welcome = 'welcome';
   static const String splash = 'splash';
   static const String interactiveMedia = 'interactiveMedia';
+  static const String locationPicker = 'locationPicker';
 }
 
 class AppRouter {
@@ -63,6 +64,9 @@ class AppRouter {
       case Routes.interactiveMedia:
         final mediaViewer = arguments as InteractiveMediaWidget;
         page = InteractiveMediaScreen(mediaWidget: mediaViewer);
+        break;
+      case Routes.locationPicker:
+        page = LocationScreen();
         break;
       case Routes.splash:
         page = SplashScreen();

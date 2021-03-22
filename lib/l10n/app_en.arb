@@ -284,7 +284,11 @@
   },
   "detailsHeaderCc": "CC",
   "@detailsHeaderCc": {
-    "description": "Label for [CC] recipient(s) of email."
+    "description": "Label for [CC] - carbon copy - recipient(s) of email."
+  },
+  "detailsHeaderBcc": "BCC",
+  "@detailsHeaderBcc": {
+    "description": "Label for [BCC] - blind carbon copy - recipient(s) of email."
   },
   "detailsHeaderDate": "Date",
   "@detailsHeaderDate": {
@@ -1091,5 +1095,25 @@
         "example": "funny.png"
       }
     }  
+  },
+  "attachTypeFile": "File",
+  "@attachTypeFile": {
+    "description": "Attachmment type to add"
+  },
+  "attachTypePhoto": "Photo",
+  "@attachTypePhoto": {
+    "description": "Attachmment type to add"
+  },
+  "attachTypeVideo": "Video",
+  "@attachTypeVideo": {
+    "description": "Attachmment type to add"
+  },
+  "attachTypeAudio": "Audio",
+  "@attachTypeAudio": {
+    "description": "Attachmment type to add"
+  },
+  "attachTypeLocation": "Location",
+  "@attachTypeLocation": {
+    "description": "Attachmment type to add"
   }
 }

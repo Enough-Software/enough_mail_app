@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/models/settings.dart';
-import 'package:enough_mail_app/services/alert_service.dart';
+import 'package:enough_mail_app/services/dialog_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -75,7 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               ListTile(
                 onTap: () {
-                  locator<AlertService>().showAbout(context);
+                  locator<DialogService>().showAbout(context);
                 },
                 title: Text(localizations.drawerEntryAbout),
               ),

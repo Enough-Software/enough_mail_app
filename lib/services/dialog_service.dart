@@ -3,7 +3,7 @@ import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class AlertService {
+class DialogService {
   Future<bool> askForConfirmation(
     BuildContext context, {
     @required String title,
@@ -64,7 +64,7 @@ class AlertService {
 
     return showDialog(
       builder: (context) => AlertDialog(
-        title: Text(title),
+        title: title == null ? null : Text(title),
         content: content,
         actions: [
           TextButton(

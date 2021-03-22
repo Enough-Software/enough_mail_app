@@ -1,9 +1,10 @@
-import 'package:enough_mail_app/services/alert_service.dart';
+import 'package:enough_mail_app/services/dialog_service.dart';
 import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/background_service.dart';
 import 'package:enough_mail_app/services/date_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
+import 'package:enough_mail_app/services/location_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
@@ -21,10 +22,11 @@ void setupLocator() {
   locator.registerLazySingleton(() => ScaffoldMessengerService());
   locator.registerLazySingleton(() => DateService());
   locator.registerLazySingleton(() => SettingsService());
-  locator.registerLazySingleton(() => AlertService());
+  locator.registerLazySingleton(() => DialogService());
   locator.registerSingleton(IconService());
   locator.registerLazySingleton(() => NotificationService());
   locator.registerLazySingleton(() => BackgroundService());
   locator.registerLazySingleton(() => AppService());
   locator.registerLazySingleton(() => ThemeService());
+  locator.registerLazySingleton(() => LocationService());
 }

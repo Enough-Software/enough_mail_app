@@ -6,7 +6,7 @@ import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/sender.dart';
-import 'package:enough_mail_app/services/alert_service.dart';
+import 'package:enough_mail_app/services/dialog_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
@@ -262,7 +262,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     } on MailException catch (e, s) {
       //TODO latest here persist the mail for further retries in the future
       print('Unable to send or append mail: $e $s');
-      locator<AlertService>().showTextDialog(context, localizations.errorTitle,
+      locator<DialogService>().showTextDialog(context, localizations.errorTitle,
           localizations.composeSendErrorInfo(e.toString()));
       return;
     }
@@ -322,16 +322,16 @@ class _ComposeScreenState extends State<ComposeScreen> {
             pinned: true,
             stretch: true,
             actions: [
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: addAttachment,
+              AddAttachmentPopupButton(
+                messageBuilder: widget.data.messageBuilder,
+                update: () => setState(() {}),
               ),
               IconButton(
                 icon: Icon(Icons.send),
                 onPressed: () => send(localizations),
               ),
               PopupMenuButton<_OverflowMenuChoice>(
-                onSelected: (_OverflowMenuChoice result) {
+                onSelected: (result) {
                   switch (result) {
                     case _OverflowMenuChoice.showSourceCode:
                       showSourceCode();
@@ -341,7 +341,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       break;
                   }
                 },
-                itemBuilder: (BuildContext context) => [
+                itemBuilder: (context) => [
                   PopupMenuItem<_OverflowMenuChoice>(
                     value: _OverflowMenuChoice.showSourceCode,
                     child: Text(localizations.viewSourceAction),
@@ -426,7 +426,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         controller: _ccController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          labelText: 'CC',
+                          labelText: localizations.detailsHeaderCc,
                           hintText: localizations.composeRecipientHint,
                           suffixIcon: IconButton(
                             icon: Icon(Icons.contacts),
@@ -438,7 +438,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         controller: _bccController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          labelText: 'BCC',
+                          labelText: localizations.detailsHeaderBcc,
                           hintText: localizations.composeRecipientHint,
                           suffixIcon: IconButton(
                             icon: Icon(Icons.contacts),
