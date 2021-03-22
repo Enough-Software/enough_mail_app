@@ -123,23 +123,9 @@ abstract class MessageSource extends ChangeNotifier
     notifyListeners();
   }
 
-  Future<void> deleteMessage(Message message) async {
-    _removeMessage(message, locator<NotificationService>());
-    final deleteResult =
-        await message.mailClient.deleteMessage(message.mimeMessage);
-    if (deleteResult?.isUndoable == true) {
-      locator<ScaffoldMessengerService>().showTextSnackBar(
-        locator<I18nService>().localizations.resultDeleted,
-        undo: () async {
-          await message.mailClient.undoDeleteMessages(deleteResult);
-          //TODO update mimeMessage's UID and sequence ID?
-          // TODO add mime message to mime source again?
-          cache.insert(message);
-          //TODO also add the message to the parent source, if it was present?
-          notifyListeners();
-        },
-      );
-    }
+  Future<void> deleteMessage(Message message) {
+    return deleteMessages(
+        [message], locator<I18nService>().localizations.resultDeleted);
   }
 
   Future<void> deleteMessages(
@@ -164,10 +150,22 @@ abstract class MessageSource extends ChangeNotifier
           ? null
           : () async {
               for (final client in resultsByClient.keys) {
-                await client.undoDeleteMessages(resultsByClient[client]);
+                final undelete =
+                    await client.undoDeleteMessages(resultsByClient[client]);
+                if (undelete.originalSequence?.isNotEmpty() == true) {
+                  final originalUids = undelete.originalSequence.toList();
+                  final newUids = undelete.targetSequence.toList();
+                  for (var i = 0; i < originalUids.length; i++) {
+                    final originalUid = originalUids[i];
+                    final message = messages.firstWhere(
+                        (m) => m.mimeMessage.uid == originalUid,
+                        orElse: () => null);
+                    if (message != null) {
+                      message.mimeMessage.uid = newUids[i];
+                    }
+                  }
+                }
               }
-              //TODO update mimeMessage's UID and sequence ID?
-              // TODO add mime message to mime source again?
               // TODO what should I do when not all delete are undoable?
               for (final message in messages) {
                 cache.insert(message);
