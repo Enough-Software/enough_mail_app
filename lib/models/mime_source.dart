@@ -208,8 +208,10 @@ class MailboxMimeSource extends MimeSource {
       mailbox = await mailClient.selectMailbox(mailbox);
     }
     messagesExistAtInit = mailbox.messagesExists;
-    // pre-cache first page:
-    await _download(0);
+    if (messagesExistAtInit > 0) {
+      // pre-cache first page:
+      await _download(0);
+    }
     return true;
   }
 
