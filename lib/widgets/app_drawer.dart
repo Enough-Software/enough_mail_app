@@ -233,13 +233,11 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   void navigateToMailbox(Mailbox mailbox) async {
-    final navService = locator<NavigationService>();
     final mailService = locator<MailService>();
-    navService.pop();
     final account = mailService.currentAccount;
     final messageSource =
         await mailService.getMessageSourceFor(account, mailbox: mailbox);
-    navService.push(Routes.messageSource,
+    locator<NavigationService>().push(Routes.messageSource,
         arguments: messageSource, replace: true, fade: true);
   }
 }
