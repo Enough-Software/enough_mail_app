@@ -41,37 +41,26 @@ class DialogService {
     );
   }
 
-  Future showTextDialog(BuildContext context, String title, String text) {
-    final localizations = AppLocalizations.of(context);
-
-    return showDialog(
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(title),
-        actions: [
-          TextButton(
-            child: Text(localizations.actionOk),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-      context: context,
-    );
+  Future showTextDialog(BuildContext context, String title, String text,
+      {List<Widget> actions}) {
+    return showWidgetDialog(context, title, Text(text), actions: actions);
   }
 
-  Future showWidgetDialog(BuildContext context, String title, Widget content) {
+  Future showWidgetDialog(BuildContext context, String title, Widget content,
+      {List<Widget> actions}) {
     final localizations = AppLocalizations.of(context);
+    actions ??= [
+      TextButton(
+        child: Text(localizations.actionOk),
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+    ];
 
     return showDialog(
       builder: (context) => AlertDialog(
         title: title == null ? null : Text(title),
         content: content,
-        actions: [
-          TextButton(
-            child: Text(localizations.actionOk),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
+        actions: actions,
       ),
       context: context,
     );
