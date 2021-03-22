@@ -59,6 +59,7 @@
   "detailsHeaderFrom": "Von",
   "detailsHeaderTo": "An",
   "detailsHeaderCc": "CC",
+  "detailsHeaderBcc": "BCC",
   "detailsHeaderDate": "Datum",
   "subjectUndefined": "<ohne Betreff>",
   "detailsActionShowImages": "Bilder anzeigen",
@@ -213,5 +214,10 @@
   "composeSubjectLabel": "Betreff",
   "composeSubjectHint": "Betreff der Nachricht",
   "composeAddAttachmentAction": "hinzufügen",
-  "composeRemoveAttachmentAction": "{name} entfernen"
+  "composeRemoveAttachmentAction": "{name} entfernen",
+  "attachTypeFile": "Datei",
+  "attachTypePhoto": "Foto",
+  "attachTypeVideo": "Video",
+  "attachTypeAudio": "Audio",
+  "attachTypeLocation": "Ort"
 }

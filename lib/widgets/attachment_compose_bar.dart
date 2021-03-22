@@ -56,7 +56,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    // final localizations = AppLocalizations.of(context);
     return Wrap(
       children: [
         for (final attachment in attachments) ...{
@@ -68,12 +68,16 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
         if (widget.isDownloading) ...{
           CircularProgressIndicator(),
         },
-        ActionChip(
-          avatar: Icon(Icons.add),
-          visualDensity: VisualDensity.compact,
-          label: Text(localizations.composeAddAttachmentAction),
-          onPressed: addAttachment,
+        AddAttachmentPopupButton(
+          messageBuilder: widget.composeData.messageBuilder,
+          update: () => setState(() {}),
         ),
+        // ActionChip(
+        //   avatar: Icon(Icons.add),
+        //   visualDensity: VisualDensity.compact,
+        //   label: Text(localizations.composeAddAttachmentAction),
+        //   onPressed: addAttachment,
+        // ),
       ],
     );
   }
@@ -84,13 +88,109 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
       attachments.remove(attachment);
     });
   }
+}
 
-  Future addAttachment() async {
-    final added = await AttachmentComposeBar.addAttachmentTo(
-        widget.composeData.messageBuilder);
-    if (added) {
-      setState(() {});
+class AddAttachmentPopupButton extends StatelessWidget {
+  final MessageBuilder messageBuilder;
+  final Function() update;
+  const AddAttachmentPopupButton(
+      {Key key, @required this.messageBuilder, @required this.update})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
+    return PopupMenuButton<int>(
+      icon: Icon(Icons.add),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: 0,
+          child: ListTile(
+            leading: Icon(Icons.insert_drive_file_outlined),
+            title: Text(localizations.attachTypeFile),
+          ),
+        ),
+        PopupMenuItem(
+          value: 1,
+          child: ListTile(
+            leading: Icon(Icons.photo_outlined),
+            title: Text(localizations.attachTypePhoto),
+          ),
+        ),
+        PopupMenuItem(
+          value: 2,
+          child: ListTile(
+            leading: Icon(Icons.video_collection_outlined),
+            title: Text(localizations.attachTypeVideo),
+          ),
+        ),
+        PopupMenuItem(
+          value: 3,
+          child: ListTile(
+            leading: Icon(Icons.audiotrack_outlined),
+            title: Text(localizations.attachTypeAudio),
+          ),
+        ),
+        PopupMenuItem(
+          value: 4,
+          child: ListTile(
+            leading: Icon(Icons.location_on_outlined),
+            title: Text(localizations.attachTypeLocation),
+          ),
+        ),
+      ],
+      onSelected: (value) async {
+        var changed = false;
+        switch (value) {
+          case 0: // any file
+            changed = await addAttachmentFile();
+            break;
+          case 1: // photo file
+            changed = await addAttachmentFile(fileType: FileType.image);
+            break;
+          case 2: // video file
+            changed = await addAttachmentFile(fileType: FileType.video);
+            break;
+          case 3: // audio file
+            changed = await addAttachmentFile(fileType: FileType.audio);
+            break;
+          case 4: // location
+            final result =
+                await locator<NavigationService>().push(Routes.locationPicker);
+            if (result != null) {
+              messageBuilder.addBinary(
+                  result, MediaType.fromSubtype(MediaSubtype.imagePng),
+                  filename: "location.jpg");
+              changed = true;
+            }
+            break;
+        }
+        if (changed) {
+          update();
+        }
+      },
+    );
+  }
+
+  Future<bool> addAttachmentFile({FileType fileType = FileType.any}) async {
+    final result = await FilePicker.platform
+        .pickFiles(type: fileType, allowMultiple: true, withData: true);
+    if (result == null) {
+      return false;
     }
+    for (final file in result.files) {
+      final lastDotIndex = file.path.lastIndexOf('.');
+      MediaType mediaType;
+      if (lastDotIndex == -1 || lastDotIndex == file.path.length - 1) {
+        mediaType = MediaType.fromSubtype(MediaSubtype.applicationOctetStream);
+      } else {
+        final ext = file.path.substring(lastDotIndex + 1);
+        mediaType = MediaType.guessFromFileExtension(ext);
+      }
+      messageBuilder.addBinary(file.bytes, mediaType, filename: file.name);
+    }
+    return true;
   }
 }
 

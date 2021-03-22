@@ -8,7 +8,7 @@ import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/alert_service.dart';
+import 'package:enough_mail_app/services/dialog_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
@@ -362,7 +362,7 @@ class _MessageContentState extends State<_MessageContent> {
     final localizations = AppLocalizations.of(context);
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName();
-    final confirmation = await locator<AlertService>().askForConfirmation(
+    final confirmation = await locator<DialogService>().askForConfirmation(
         context,
         title: localizations.detailsNewsletterResubscribeDialogTitle,
         action: localizations.detailsNewsletterResubscribeDialogAction,
@@ -381,7 +381,7 @@ class _MessageContentState extends State<_MessageContent> {
             [Message.keywordFlagUnsubscribed],
             action: StoreAction.remove);
       }
-      await locator<AlertService>().showTextDialog(
+      await locator<DialogService>().showTextDialog(
           context,
           subscribed
               ? localizations.detailsNewsletterResubscribeSuccessTitle
@@ -398,7 +398,7 @@ class _MessageContentState extends State<_MessageContent> {
     final localizations = AppLocalizations.of(context);
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName();
-    final confirmation = await locator<AlertService>().askForConfirmation(
+    final confirmation = await locator<DialogService>().askForConfirmation(
       context,
       title: localizations.detailsNewsletterUnsubscribeDialogTitle,
       action: localizations.detailsNewsletterUnsubscribeDialogAction,
@@ -426,7 +426,7 @@ class _MessageContentState extends State<_MessageContent> {
           print('error during unsubscribe flag store operation: $e $s');
         }
       }
-      await locator<AlertService>().showTextDialog(
+      await locator<DialogService>().showTextDialog(
           context,
           unsubscribed
               ? localizations.detailsNewsletterUnsubscribeSuccessTitle

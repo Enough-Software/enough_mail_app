@@ -12,3 +12,4 @@ export 'message_details_screen.dart';
 export 'message_source_screen.dart';
 export 'compose_screen.dart';
 export 'media_screen.dart';
+export 'location_screen.dart';
