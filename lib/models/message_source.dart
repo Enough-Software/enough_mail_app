@@ -37,6 +37,10 @@ abstract class MessageSource extends ChangeNotifier
     notifyListeners();
   }
 
+  final MessageSource _parentMessageSource;
+
+  MessageSource({MessageSource parent}) : _parentMessageSource = parent;
+
   bool get shouldBlockImages;
   bool get isJunk;
   bool get isArchive;
@@ -80,10 +84,15 @@ abstract class MessageSource extends ChangeNotifier
     return getMessageAt(current.sourceIndex - 1);
   }
 
-  void remove(Message message);
+  MimeSource getMimeSource(Message message);
 
-  void removeFromCache(Message message) {
+  void remove(Message message) {
+    final mimeSource = getMimeSource(message);
+    mimeSource.remove(message.mimeMessage);
     cache.remove(message);
+    if (_parentMessageSource != null) {
+      _parentMessageSource.removeMime(message.mimeMessage, message.mailClient);
+    }
     notifyListeners();
   }
 
@@ -132,7 +141,7 @@ abstract class MessageSource extends ChangeNotifier
       List<Message> messages, String notification) async {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
-      _removeMessage(message, notificationService);
+      _removeMessageAndCancelNotification(message, notificationService);
     }
     notifyListeners();
     final sequenceByClient = orderByClient(messages);
@@ -187,7 +196,8 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> moveMessage(Message message, MailboxFlag targetMailboxFlag,
       String notification) async {
-    _removeMessage(message, locator<NotificationService>());
+    _removeMessageAndCancelNotification(
+        message, locator<NotificationService>());
     final moveResult = await message.mailClient
         .moveMessageToFlag(message.mimeMessage, targetMailboxFlag);
     if (moveResult?.isUndoable == true) {
@@ -204,10 +214,9 @@ abstract class MessageSource extends ChangeNotifier
     }
   }
 
-  void _removeMessage(
+  void _removeMessageAndCancelNotification(
       Message message, NotificationService notificationService) {
     remove(message);
-    removeFromCache(message);
     notificationService.cancelNotificationForMailMessage(message);
   }
 
@@ -215,7 +224,7 @@ abstract class MessageSource extends ChangeNotifier
       MailboxFlag targetMailboxFlag, String notification) async {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
-      _removeMessage(message, notificationService);
+      _removeMessageAndCancelNotification(message, notificationService);
     }
     notifyListeners();
     final sequenceByClient = orderByClient(messages);
@@ -307,8 +316,14 @@ abstract class MessageSource extends ChangeNotifier
     final existingMessage = cache.getWithMime(mimeMessage, mailClient);
     if (existingMessage != null) {
       remove(existingMessage);
-      removeFromCache(existingMessage);
     }
+  }
+
+  void replaceMime(Message message, MimeMessage mime) {
+    final mimeSource = getMimeSource(message);
+    remove(message);
+    mimeSource.addMessage(mime);
+    onMailAdded(mime, mimeSource);
   }
 }
 
@@ -317,7 +332,6 @@ class MailboxMessageSource extends MessageSource {
   int get size => _mimeSource.size;
 
   MimeSource _mimeSource;
-  MessageSource _parentMessageSource;
 
   MailboxMessageSource(Mailbox mailbox, MailClient mailClient) {
     _mimeSource = MailboxMimeSource(mailClient, mailbox, subscriber: this);
@@ -327,10 +341,10 @@ class MailboxMessageSource extends MessageSource {
 
   MailboxMessageSource.fromMimeSource(
       this._mimeSource, String description, String name,
-      {MessageSource parent}) {
+      {MessageSource parent})
+      : super(parent: parent) {
     _description = description;
     _name = name;
-    _parentMessageSource = parent;
     _mimeSource.addSubscriber(this);
   }
 
@@ -387,14 +401,6 @@ class MailboxMessageSource extends MessageSource {
   }
 
   @override
-  void remove(Message message) {
-    _mimeSource.remove(message.mimeMessage);
-    if (_parentMessageSource != null) {
-      _parentMessageSource.removeMime(message.mimeMessage, message.mailClient);
-    }
-  }
-
-  @override
   bool get shouldBlockImages => _mimeSource.shouldBlockImages;
 
   @override
@@ -418,6 +424,11 @@ class MailboxMessageSource extends MessageSource {
         localizations.searchQueryDescription(name),
         localizations.searchQueryTitle(search.query),
         parent: this);
+  }
+
+  @override
+  MimeSource getMimeSource(Message message) {
+    return _mimeSource;
   }
 }
 
@@ -544,15 +555,10 @@ class MultipleMessageSource extends MessageSource {
     return results;
   }
 
+  @override
   MimeSource getMimeSource(Message message) {
     return mimeSources
         .firstWhere((source) => source.mailClient == message.mailClient);
-  }
-
-  @override
-  void remove(Message message) {
-    final mimeSource = getMimeSource(message);
-    mimeSource.remove(message.mimeMessage);
   }
 
   @override
@@ -622,9 +628,7 @@ class _MultipleMimeSource {
 
 class SingleMessageSource extends MessageSource {
   Message singleMessage;
-  final MessageSource parent;
-
-  SingleMessageSource(this.parent);
+  SingleMessageSource(MessageSource parent) : super(parent: parent);
 
   @override
   Message _getUncachedMessage(int index) {
@@ -648,13 +652,6 @@ class SingleMessageSource extends MessageSource {
   bool get isJunk => false;
 
   @override
-  void remove(Message message) {
-    if (parent != null) {
-      parent.removeMime(message.mimeMessage, message.mailClient);
-    }
-  }
-
-  @override
   MessageSource search(MailSearch search) {
     throw UnimplementedError();
   }
@@ -674,5 +671,10 @@ class SingleMessageSource extends MessageSource {
   @override
   Future<void> waitForDownload() {
     return Future.value();
+  }
+
+  @override
+  MimeSource getMimeSource(Message message) {
+    return _parentMessageSource?.getMimeSource(message);
   }
 }

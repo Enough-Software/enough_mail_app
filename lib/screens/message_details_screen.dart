@@ -79,7 +79,6 @@ class _MessageContent extends StatefulWidget {
 }
 
 class _MessageContentState extends State<_MessageContent> {
-  bool _showSource = false;
   bool _blockExternalImages;
   bool _messageDownloadError;
   bool _messageRequiresRefresh = false;
@@ -143,10 +142,6 @@ class _MessageContentState extends State<_MessageContent> {
           )
         ],
       );
-    }
-    if (_showSource) {
-      return SingleChildScrollView(
-          child: SelectableText(widget.message.mimeMessage.renderMessage()));
     }
     return SingleChildScrollView(
       child: Column(
@@ -353,9 +348,8 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   void showSourceCode() {
-    setState(() {
-      _showSource = !_showSource;
-    });
+    locator<NavigationService>()
+        .push(Routes.sourceCode, arguments: widget.message.mimeMessage);
   }
 
   void resubscribe() async {

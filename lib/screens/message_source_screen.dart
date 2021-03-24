@@ -368,12 +368,15 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 ],
                               ),
                             ),
-                            child: MessageOverview(
-                              element.message,
-                              isInSelectionMode,
-                              onMessageTap,
-                              onMessageLongPress,
-                            ),
+                            child: (element.message?.mimeMessage?.sequenceId ==
+                                    null)
+                                ? Text('...')
+                                : MessageOverview(
+                                    element.message,
+                                    isInSelectionMode,
+                                    onMessageTap,
+                                    onMessageLongPress,
+                                  ),
                             onDismissed: (direction) async {
                               if (direction == DismissDirection.startToEnd) {
                                 // left to right swipe action:
@@ -522,7 +525,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     });
   }
 
-  void onMessageTap(Message message) {
+  void onMessageTap(Message message) async {
     if (isInSelectionMode) {
       message.toggleSelected();
       if (message.isSelected) {
@@ -532,7 +535,20 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       }
       setState(() {});
     } else {
-      locator<NavigationService>().push(Routes.mailDetails, arguments: message);
+      if (message.mimeMessage.hasFlag(MessageFlags.draft)) {
+        // continue to edit message:
+        // first download message:
+        final mime =
+            await message.mailClient.fetchMessageContents(message.mimeMessage);
+        //message.updateMime(mime);
+        final builder = MessageBuilder.prepareFromDraft(mime);
+        final data = ComposeData(message, builder, ComposeAction.newMessage);
+        locator<NavigationService>().push(Routes.mailCompose, arguments: data);
+      } else {
+        // move to mail details:
+        locator<NavigationService>()
+            .push(Routes.mailDetails, arguments: message);
+      }
     }
   }
 

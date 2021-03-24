@@ -1062,6 +1062,24 @@
   "@composeSaveDraftAction": {
     "description": "Action to save a message as draft"
   },
+  "composeMessageSavedAsDraft": "Draft saved",
+  "@composeMessageSavedAsDraft": {
+    "description": "Info shown when message was saved as draft successfully"
+  },
+  "composeMessageSavedAsDraftErrorInfo": "Your draft could not be saved with the following error:\n{details}",
+  "@composeMessageSavedAsDraftErrorInfo": {
+    "description": "Info shown when message could not be saved as a draft",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Invalid header: XX"
+      }
+    }  
+  },
+  "composeContinueEditingWhenDraftCannotBeSavedAction": "continue editing",
+  "@composeContinueEditingWhenDraftCannotBeSavedAction": {
+    "description": "Action to return to compose screen when draft cannot be saved"
+  },
   "composeCreatePlusAliasAction": "Create new + alias...",
   "@composeCreatePlusAliasAction": {
     "description": "Action to create a new + alias as a sender"
@@ -1095,6 +1113,10 @@
         "example": "funny.png"
       }
     }  
+  },
+  "composeLeftByMistake": "Left by mistake?",
+  "@composeLeftByMistake": {
+    "description": "Info shown after leaving compose screen to allow an easy return"
   },
   "attachTypeFile": "File",
   "@attachTypeFile": {
