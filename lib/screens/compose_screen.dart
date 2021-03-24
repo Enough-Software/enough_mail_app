@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
+import '../routes.dart';
 
 class ComposeScreen extends StatefulWidget {
   final ComposeData data;
@@ -35,8 +36,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
   TextEditingController _subjectController = TextEditingController();
   // TextEditingController _contentController = TextEditingController();
 
-  bool _showSource = false;
-  String _source;
   Sender from;
   List<Sender> senders;
   _Autofocus _focus;
@@ -46,6 +45,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
   EditorApi _editorApi;
   Future _downloadAttachmentsFuture;
   String _originalMessageHtml;
+  ComposeData _resumeComposeData;
 
   @override
   void initState() {
@@ -75,24 +75,28 @@ class _ComposeScreenState extends State<ComposeScreen> {
       from = Sender(mb.from.first, currentAccount);
       senders.insert(0, from);
     }
-    loadMailTextFuture = loadMailText();
-    if (widget.data.action == ComposeAction.forward &&
-        widget.data.originalMessage != null) {
-      // start initializing any attachments:
-      final attachments = mb.originalMessage
-          .findContentInfo(disposition: ContentDisposition.attachment);
-      if (attachments.isNotEmpty) {
-        final attachmentsToBeLoaded = <ContentInfo>[];
-        for (final attachment in attachments) {
-          final part = mb.originalMessage.getPart(attachment.fetchId);
-          if (part == null) {
-            // add future part
-            attachmentsToBeLoaded.add(attachment);
+    if (widget.data.resumeHtmlText != null) {
+      loadMailTextFuture = loadMailTextFromComposeData();
+    } else {
+      loadMailTextFuture = loadMailTextFromMessage();
+      if (widget.data.action == ComposeAction.forward &&
+          widget.data.originalMessage != null) {
+        // start initializing any attachments:
+        final attachments = mb.originalMessage
+            .findContentInfo(disposition: ContentDisposition.attachment);
+        if (attachments.isNotEmpty) {
+          final attachmentsToBeLoaded = <ContentInfo>[];
+          for (final attachment in attachments) {
+            final part = mb.originalMessage.getPart(attachment.fetchId);
+            if (part == null) {
+              // add future part
+              attachmentsToBeLoaded.add(attachment);
+            }
           }
-        }
-        if (attachmentsToBeLoaded.isNotEmpty) {
-          _downloadAttachmentsFuture = downloadAttachments(mb.originalMessage,
-              widget.data.originalMessage.mailClient, attachments);
+          if (attachmentsToBeLoaded.isNotEmpty) {
+            _downloadAttachmentsFuture = downloadAttachments(mb.originalMessage,
+                widget.data.originalMessage.mailClient, attachments);
+          }
         }
       }
     }
@@ -132,29 +136,41 @@ class _ComposeScreenState extends State<ComposeScreen> {
     });
   }
 
-  Future<String> loadMailText() async {
+  Future<String> loadMailTextFromComposeData() {
+    return Future.value(widget.data.resumeHtmlText);
+  }
+
+  Future<String> loadMailTextFromMessage() async {
     final mb = widget.data.messageBuilder;
     if (mb.originalMessage == null) {
       return '<p></p>';
     } else {
+      final blockExternalImages = false;
+      final emptyMessageText =
+          locator<I18nService>().localizations.composeEmptyMessage;
+      final maxImageWidth = 300;
+      if (widget.data.action == ComposeAction.newMessage) {
+        // continue with draft:
+        final args = _HtmlGenerationArguments(null, mb.originalMessage,
+            blockExternalImages, emptyMessageText, maxImageWidth);
+        final html = await compute(_generateDraftHtmlImpl, args);
+        _originalMessageHtml = html;
+        return html;
+      }
       final quoteTemplate = widget.data.action == ComposeAction.answer
           ? MailConventions.defaultReplyHeaderTemplate
           : widget.data.action == ComposeAction.forward
               ? MailConventions.defaultForwardHeaderTemplate
               : MailConventions.defaultReplyHeaderTemplate;
-      final blockExternalImages = false;
-      final emptyMessageText =
-          locator<I18nService>().localizations.composeEmptyMessage;
-      final maxImageWidth = 300;
       final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
           blockExternalImages, emptyMessageText, maxImageWidth);
-      final html = await compute(_generateHtmlImpl, args);
+      final html = await compute(_generateQuoteHtmlImpl, args);
       _originalMessageHtml = html;
       return html;
     }
   }
 
-  static String _generateHtmlImpl(_HtmlGenerationArguments args) {
+  static String _generateQuoteHtmlImpl(_HtmlGenerationArguments args) {
     final html = args.mimeMessage.quoteToHtml(
       quoteHeaderTemplate: args.quoteTemplate,
       blockExternalImages: args.blockExternalImages,
@@ -164,7 +180,15 @@ class _ComposeScreenState extends State<ComposeScreen> {
     return html;
   }
 
-  Future<MimeMessage> buildMimeMessage(MailClient mailClient) async {
+  static String _generateDraftHtmlImpl(_HtmlGenerationArguments args) {
+    final html = args.mimeMessage.transformToHtml(
+        emptyMessageText: args.emptyMessageText,
+        maxImageWidth: args.maxImageWidth,
+        blockExternalImages: args.blockExternalImages);
+    return html;
+  }
+
+  Future<void> populateMessageBuilder({bool storeHtmlForResume = false}) async {
     final mb = widget.data.messageBuilder;
     mb.to = parse(_toController.text);
     mb.cc = parse(_ccController.text);
@@ -172,67 +196,90 @@ class _ComposeScreenState extends State<ComposeScreen> {
     mb.subject = _subjectController.text;
 
     final htmlText = await _editorApi.getText();
-    // print('got html: $htmlText');
-    var newHtmlText = htmlText;
-    final htmlTagRegex =
-        RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
-    if (_originalMessageHtml != null) {
-      // check for simple case first:
-      var original = _originalMessageHtml;
-      int blockquoteStart = original.indexOf('<blockquote>');
-      if (blockquoteStart != -1) {
-        original = original.substring(blockquoteStart);
+    if (storeHtmlForResume) {
+      _resumeComposeData = widget.data.resume(htmlText);
+    } else {
+      // print('got html: $htmlText');
+      var newHtmlText = htmlText;
+      final htmlTagRegex =
+          RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
+      if (_originalMessageHtml != null) {
+        // check for simple case first:
+        var original = _originalMessageHtml;
+        int blockquoteStart = original.indexOf('<blockquote>');
+        if (blockquoteStart != -1) {
+          original = original.substring(blockquoteStart);
+        }
+        final originalStartIndex = htmlText.indexOf(original);
+        if (originalStartIndex != -1) {
+          newHtmlText = htmlText.replaceFirst(original, '', originalStartIndex);
+        } else {
+          //TODO Here the text should be added at the correct positions and not just at the front of the plain text message...
+          // create a diff between the original HTML and the new HTML:
+          final buffer = StringBuffer();
+          DiffMatchPatch dmp = new DiffMatchPatch();
+          List<Diff> diffs = dmp.diff(newHtmlText, _originalMessageHtml);
+          dmp.diffCleanupSemantic(diffs);
+          for (final diff in diffs) {
+            // print('diff: ${diff.operation}: ${diff.text}');
+            if (diff.operation == -1) {
+              // this is new text:
+              buffer.write(diff.text);
+            }
+          }
+          newHtmlText = buffer.toString();
+        }
+        //print('newHtmlText=$newHtmlText');
       }
-      final originalStartIndex = htmlText.indexOf(original);
-      if (originalStartIndex != -1) {
-        newHtmlText = htmlText.replaceFirst(original, '', originalStartIndex);
-      } else {
-        //TODO Here the text should be added at the correct positions and not just at the front of the plain text message...
-        // create a diff between the original HTML and the new HTML:
-        final buffer = StringBuffer();
-        DiffMatchPatch dmp = new DiffMatchPatch();
-        List<Diff> diffs = dmp.diff(newHtmlText, _originalMessageHtml);
-        dmp.diffCleanupSemantic(diffs);
-        for (final diff in diffs) {
-          // print('diff: ${diff.operation}: ${diff.text}');
-          if (diff.operation == -1) {
-            // this is new text:
-            buffer.write(diff.text);
+
+      // generate plain text from HTML code:
+      var plainText = newHtmlText.replaceAll(htmlTagRegex, '');
+      if (mb.originalMessage != null) {
+        final originalPlainText = mb.originalMessage.decodeTextPlainPart();
+        if (originalPlainText != null) {
+          if (widget.data.action == ComposeAction.forward) {
+            final forwardHeader = MessageBuilder.fillTemplate(
+                MailConventions.defaultForwardHeaderTemplate,
+                mb.originalMessage);
+            plainText += forwardHeader + originalPlainText;
+          } else if (widget.data.action == ComposeAction.answer) {
+            final replyHeader = MessageBuilder.fillTemplate(
+                MailConventions.defaultForwardHeaderTemplate,
+                mb.originalMessage);
+            plainText += '\r\n' +
+                MessageBuilder.quotePlainText(replyHeader, originalPlainText);
           }
         }
-        newHtmlText = buffer.toString();
       }
-      //print('newHtmlText=$newHtmlText');
+      final textPartBuilder = mb.hasAttachments
+          ? mb.getPart(MediaSubtype.multipartAlternative) ??
+              mb.addPart(
+                  mediaSubtype: MediaSubtype.multipartAlternative, insert: true)
+          : mb;
+      if (!mb.hasAttachments) {
+        mb.setContentType(
+            MediaType.fromSubtype(MediaSubtype.multipartAlternative));
+      }
+      final plainTextBuilder = textPartBuilder.getTextPlainPart();
+      if (plainTextBuilder != null) {
+        plainTextBuilder.text = plainText;
+      } else {
+        textPartBuilder.addTextPlain(plainText);
+      }
+      final fullHtmlMessageText =
+          await _editorApi.getFullHtml(content: htmlText);
+      final htmlTextBuilder = textPartBuilder.getTextHtmlPart();
+      if (htmlTextBuilder != null) {
+        htmlTextBuilder.text = fullHtmlMessageText;
+      } else {
+        textPartBuilder.addTextHtml(fullHtmlMessageText);
+      }
     }
+  }
 
-    // generate plain text from HTML code:
-    var plainText = newHtmlText.replaceAll(htmlTagRegex, '');
-    if (mb.originalMessage != null) {
-      final originalPlainText = mb.originalMessage.decodeTextPlainPart();
-      if (originalPlainText != null) {
-        if (widget.data.action == ComposeAction.forward) {
-          final forwardHeader = MessageBuilder.fillTemplate(
-              MailConventions.defaultForwardHeaderTemplate, mb.originalMessage);
-          plainText += forwardHeader + originalPlainText;
-        } else if (widget.data.action == ComposeAction.answer) {
-          final replyHeader = MessageBuilder.fillTemplate(
-              MailConventions.defaultForwardHeaderTemplate, mb.originalMessage);
-          plainText += '\r\n' +
-              MessageBuilder.quotePlainText(replyHeader, originalPlainText);
-        }
-      }
-    }
-    final textPartBuilder = mb.hasAttachments
-        ? mb.addPart(
-            mediaSubtype: MediaSubtype.multipartAlternative, insert: true)
-        : mb;
-    if (!mb.hasAttachments) {
-      mb.setContentType(
-          MediaType.fromSubtype(MediaSubtype.multipartAlternative));
-    }
-    textPartBuilder.addTextPlain(plainText);
-    final fullHtmlMessageText = await _editorApi.getFullHtml(content: htmlText);
-    textPartBuilder.addTextHtml(fullHtmlMessageText);
+  Future<MimeMessage> buildMimeMessage(MailClient mailClient) async {
+    await populateMessageBuilder();
+    final mb = widget.data.messageBuilder;
     _usedTextEncoding = TransferEncoding.automatic;
     final mimeMessage = mb.buildMimeMessage();
     return mimeMessage;
@@ -268,13 +315,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
     }
     //TODO disable global busy indicator
     var storeFlags = true;
-    final message = widget.data.originalMessage;
+    final originalMessage = widget.data.originalMessage;
     switch (widget.data.action) {
       case ComposeAction.answer:
-        message.isAnswered = true;
+        originalMessage.isAnswered = true;
         break;
       case ComposeAction.forward:
-        message.isForwarded = true;
+        originalMessage.isForwarded = true;
         break;
       case ComposeAction.newMessage:
         storeFlags = false;
@@ -283,10 +330,23 @@ class _ComposeScreenState extends State<ComposeScreen> {
     }
     if (storeFlags) {
       try {
-        await mailClient.store(MessageSequence.fromMessage(message.mimeMessage),
-            message.mimeMessage.flags,
+        await mailClient.store(
+            MessageSequence.fromMessage(originalMessage.mimeMessage),
+            originalMessage.mimeMessage.flags,
             action: StoreAction.replace);
-      } on MailException catch (e, s) {
+      } catch (e, s) {
+        print('Unable to update message flags: $e $s'); // otherwise ignore
+
+      }
+    } else if (originalMessage != null &&
+        originalMessage.mimeMessage.hasFlag(MessageFlags.draft)) {
+      // delete draft message:
+      try {
+        final source = originalMessage.source;
+        source.remove(originalMessage);
+        await mailClient.flagMessage(originalMessage.mimeMessage,
+            isDeleted: true);
+      } catch (e, s) {
         print('Unable to update message flags: $e $s'); // otherwise ignore
 
       }
@@ -311,52 +371,58 @@ class _ComposeScreenState extends State<ComposeScreen> {
         : widget.data.action == ComposeAction.forward
             ? localizations.composeTitleForward
             : localizations.composeTitleNew;
-    return Scaffold(
-      drawer: AppDrawer(),
-      body: CustomScrollView(
-        physics: BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            title: Text(titleText),
-            floating: false,
-            pinned: true,
-            stretch: true,
-            actions: [
-              AddAttachmentPopupButton(
-                messageBuilder: widget.data.messageBuilder,
-                update: () => setState(() {}),
-              ),
-              IconButton(
-                icon: Icon(Icons.send),
-                onPressed: () => send(localizations),
-              ),
-              PopupMenuButton<_OverflowMenuChoice>(
-                onSelected: (result) {
-                  switch (result) {
-                    case _OverflowMenuChoice.showSourceCode:
-                      showSourceCode();
-                      break;
-                    case _OverflowMenuChoice.saveAsDraft:
-                      saveAsDraft();
-                      break;
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem<_OverflowMenuChoice>(
-                    value: _OverflowMenuChoice.showSourceCode,
-                    child: Text(localizations.viewSourceAction),
-                  ),
-                  PopupMenuItem<_OverflowMenuChoice>(
-                    value: _OverflowMenuChoice.saveAsDraft,
-                    child: Text(localizations.composeSaveDraftAction),
-                  ),
-                ],
-              ),
-            ], // actions
-          ),
-          if (_showSource) ...{
-            SelectableText(_source),
-          } else ...{
+    return WillPopScope(
+      onWillPop: () async {
+        // let it pop but show snackbar to return:
+        await populateMessageBuilder(storeHtmlForResume: true);
+        locator<ScaffoldMessengerService>().showTextSnackBar(
+            localizations.composeLeftByMistake,
+            undo: returnToCompose);
+        return true;
+      },
+      child: Scaffold(
+        drawer: AppDrawer(),
+        body: CustomScrollView(
+          physics: BouncingScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              title: Text(titleText),
+              floating: false,
+              pinned: true,
+              stretch: true,
+              actions: [
+                AddAttachmentPopupButton(
+                  messageBuilder: widget.data.messageBuilder,
+                  update: () => setState(() {}),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () => send(localizations),
+                ),
+                PopupMenuButton<_OverflowMenuChoice>(
+                  onSelected: (result) {
+                    switch (result) {
+                      case _OverflowMenuChoice.showSourceCode:
+                        showSourceCode();
+                        break;
+                      case _OverflowMenuChoice.saveAsDraft:
+                        saveAsDraft();
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem<_OverflowMenuChoice>(
+                      value: _OverflowMenuChoice.saveAsDraft,
+                      child: Text(localizations.composeSaveDraftAction),
+                    ),
+                    PopupMenuItem<_OverflowMenuChoice>(
+                      value: _OverflowMenuChoice.showSourceCode,
+                      child: Text(localizations.viewSourceAction),
+                    ),
+                  ],
+                ),
+              ], // actions
+            ),
             SliverToBoxAdapter(
               child: Container(
                 padding: EdgeInsets.all(8),
@@ -408,7 +474,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             TextButton(
-                              child: Text('CC'),
+                              child: Text(localizations.detailsHeaderCc),
                               onPressed: () => setState(
                                 () => _isCcBccVisible = !_isCcBccVisible,
                               ),
@@ -483,16 +549,17 @@ class _ComposeScreenState extends State<ComposeScreen> {
                     case ConnectionState.none:
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      return Row(children: [CircularProgressIndicator()]);
+                      return Center(child: CircularProgressIndicator());
                       break;
                     case ConnectionState.done:
+                      final text = snapshot.data ?? '<p></p>';
                       return HtmlEditor(
                         onCreated: (api) {
                           setState(() {
                             _editorApi = api;
                           });
                         },
-                        initialContent: snapshot.data,
+                        initialContent: text,
                       );
                       break;
                   }
@@ -500,8 +567,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
                 },
               ),
             ),
-          },
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -518,15 +585,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
   }
 
   void showSourceCode() async {
-    if (!_showSource) {
-      final mailClient =
-          await locator<MailService>().getClientFor(from.account);
-      var message = await buildMimeMessage(mailClient);
-      _source = message.renderMessage();
-    }
-    setState(() {
-      _showSource = !_showSource;
-    });
+    final mailClient = await locator<MailService>().getClientFor(from.account);
+    final mime = await buildMimeMessage(mailClient);
+    locator<NavigationService>().push(Routes.sourceCode, arguments: mime);
   }
 
   Future addAttachment() async {
@@ -537,7 +598,51 @@ class _ComposeScreenState extends State<ComposeScreen> {
     }
   }
 
-  void saveAsDraft() {}
+  Future<void> saveAsDraft() async {
+    locator<NavigationService>().pop();
+    final localizations = locator<I18nService>().localizations;
+    final mailClient = await locator<MailService>().getClientFor(from.account);
+    final mime = await buildMimeMessage(mailClient);
+    try {
+      await mailClient.saveDraftMessage(mime);
+      locator<ScaffoldMessengerService>()
+          .showTextSnackBar(localizations.composeMessageSavedAsDraft);
+      final originalMessage = widget.data.originalMessage;
+      if (originalMessage != null) {
+        await Future.delayed(const Duration(milliseconds: 20));
+        originalMessage.source.remove(originalMessage);
+        final originalMime = widget.data.messageBuilder.originalMessage;
+        if (originalMime != null && originalMime.hasFlag(MessageFlags.draft)) {
+          // delete previous draft message:
+          try {
+            await mailClient.flagMessage(originalMime, isDeleted: true);
+          } catch (e, s) {
+            print('(ignored) unable to delete previous draft message $e $s');
+          }
+        }
+      }
+    } catch (e, s) {
+      print('unable to save draft message $e $s');
+      locator<DialogService>().showTextDialog(context, localizations.errorTitle,
+          localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),
+          actions: [
+            TextButton(
+              child: Text(localizations.actionCancel),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: Text(localizations
+                  .composeContinueEditingWhenDraftCannotBeSavedAction),
+              onPressed: returnToCompose,
+            ),
+          ]);
+    }
+  }
+
+  void returnToCompose() {
+    locator<NavigationService>()
+        .push(Routes.mailCompose, arguments: _resumeComposeData);
+  }
 
   void _pickContact(TextEditingController textController) async {
     final contact =

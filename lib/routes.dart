@@ -1,3 +1,4 @@
+import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -22,6 +23,7 @@ class Routes {
   static const String splash = 'splash';
   static const String interactiveMedia = 'interactiveMedia';
   static const String locationPicker = 'locationPicker';
+  static const String sourceCode = 'sourceCode';
 }
 
 class AppRouter {
@@ -73,6 +75,10 @@ class AppRouter {
         break;
       case Routes.welcome:
         page = WelcomeScreen();
+        break;
+      case Routes.sourceCode:
+        final mime = arguments as MimeMessage;
+        page = SourceCodeScreen(mimeMessage: mime);
         break;
       default:
         print('Unknown route: $name');
