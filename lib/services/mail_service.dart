@@ -12,7 +12,7 @@ import 'package:enough_mail_app/util/gravatar.dart';
 import 'package:enough_serialization/enough_serialization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
+import 'package:flutter/foundation.dart' as foundation;
 import '../locator.dart';
 
 class MailService {
@@ -277,7 +277,8 @@ class MailService {
     if (client == null) {
       client = MailClient(account.account,
           eventBus: AppEventBus.eventBus,
-          isLogEnabled: true,
+          isLogEnabled:
+              foundation.kDebugMode, // enable log only for debug  mode
           logName: account.account.name);
       _mailClientsPerAccount[account] = client;
       await client.connect();
