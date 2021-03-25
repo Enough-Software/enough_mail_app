@@ -1137,5 +1137,34 @@
   "attachTypeLocation": "Location",
   "@attachTypeLocation": {
     "description": "Attachmment type to add"
+  },
+  "languageSettingTitle": "Language",
+  "@languageSettingTitle": {
+    "description": "Title of language setting screen"
+  },
+  "languageSettingLabel": "Choose the language for Maily:",
+  "@languageSettingLabel": {
+    "description": "Label for language setting dropdown screen"
+  },
+  "languageSettingSystemOption": "System language",
+  "@languageSettingSystemOption": {
+    "description": "Option to use the system's settings"
+  },
+  "languageSettingConfirmationTitle": "Use English for Maily?",
+  "@languageSettingConfirmationTitle": {
+    "description": "Title of dialog to confirm when switching the language"
+  },
+  "languageSettingConfirmationQuery": "Please confirm to use English as your chosen language.",
+  "@languageSettingConfirmationQuery": {
+    "description": "Query to be confirmed by user when switching the language"
+  },
+  "languageSetInfo": "Maily is now shown in English. Please restart the app to take effect.",
+  "@languageSetInfo": {
+    "description": "Info text after having specified the language."
+  },
+  "languageSystemSetInfo": "Maily will now use the system's language or English if the system's language is not supported. Please restart the app to take effect.",
+  "@languageSystemSetInfo": {
+    "description": "Info text after choosing the system's language for Maily."
   }
+
 }

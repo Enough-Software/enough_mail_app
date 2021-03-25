@@ -15,6 +15,9 @@ class Settings extends SerializableObject {
   set preferredComposeMailAddress(String value) =>
       attributes['preferredComposeMailAddress'] = value;
 
+  String get languageTag => attributes['languageTag'];
+  set languageTag(String value) => attributes['languageTag'] = value;
+
   ThemeSettings get themeSettings {
     var themeSettings = attributes['themeSettings'];
     if (themeSettings == null) {
