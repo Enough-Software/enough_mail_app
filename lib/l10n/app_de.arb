@@ -223,5 +223,12 @@
   "attachTypePhoto": "Foto",
   "attachTypeVideo": "Video",
   "attachTypeAudio": "Audio",
-  "attachTypeLocation": "Ort"
+  "attachTypeLocation": "Ort",
+  "languageSettingTitle": "Sprache (Language)",
+  "languageSettingLabel": "Währe die Sprache für Maily:",
+  "languageSettingSystemOption": "Systemsprache",
+  "languageSettingConfirmationTitle": "Deutsch für Maily nutzen?",
+  "languageSettingConfirmationQuery": "Bitte bestätige, dass deutsch als Sprache verwendet werden soll.",
+  "languageSetInfo": "Maily ist nun auf deutsch. Bitte starte die App neu.",
+  "languageSystemSetInfo": "Maily wird nun die Systemsprache oder englisch nutzen, wenn die Systemprache nicht unterstützt wird. Bitte starte die App neu."
 }

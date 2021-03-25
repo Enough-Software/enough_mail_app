@@ -11,7 +11,6 @@ import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'locator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 // AppStyles appStyles = AppStyles.instance;
@@ -32,6 +31,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Future<void> _appInitialization;
   ThemeMode themeMode = ThemeMode.system;
   ThemeService themeService;
+  Locale locale;
 
   @override
   void initState() {
@@ -58,6 +58,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           themeMode = themeService.themeMode;
         }));
     themeService.init(settings);
+    final languageTag = settings.languageTag;
+    if (languageTag != null) {
+      final settingsLocale = AppLocalizations.supportedLocales.firstWhere(
+          (l) => l.toLanguageTag() == languageTag,
+          orElse: () => null);
+      if (settingsLocale != null) {
+        final settingsLocalizations =
+            await AppLocalizations.delegate.load(settingsLocale);
+        locator<I18nService>().init(settingsLocalizations, settingsLocale);
+        setState(() {
+          locale = settingsLocale;
+        });
+      }
+    }
     final mailService = locator<MailService>();
     await mailService.init(locator<I18nService>().localizations);
 
@@ -89,6 +103,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           locator<ScaffoldMessengerService>().scaffoldMessengerKey,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
+      locale: locale,
       theme: themeService?.lightTheme ?? ThemeService.defaultLightTheme,
       darkTheme: themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
       themeMode: themeMode,

@@ -66,6 +66,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   locator<NavigationService>().push(Routes.settingsDesign);
                 },
               ),
+              ListTile(
+                title: Text(localizations.languageSettingTitle),
+                onTap: () {
+                  locator<NavigationService>().push(Routes.settingsLanguage);
+                },
+              ),
               Divider(),
               ListTile(
                 title: Text(localizations.settingsActionFeedback),

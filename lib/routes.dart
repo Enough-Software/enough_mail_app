@@ -16,6 +16,7 @@ class Routes {
   static const String settingsAccounts = 'settingsAccounts';
   static const String settingsDesign = 'settingsDesign';
   static const String settingsFeedback = 'settingsFeedback';
+  static const String settingsLanguage = 'settingsLanguage';
   static const String messageSource = 'messageSource';
   static const String mailDetails = 'mailDetails';
   static const String mailCompose = 'mailCompose';
@@ -51,7 +52,9 @@ class AppRouter {
       case Routes.settingsFeedback:
         page = SettingsFeedbackScreen();
         break;
-
+      case Routes.settingsLanguage:
+        page = SettingsLanguageScreen();
+        break;
       case Routes.messageSource:
         page = MessageSourceScreen(arguments as MessageSource);
         break;
