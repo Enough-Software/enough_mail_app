@@ -1,8 +1,10 @@
 # Codename: Maily
 Mail app for iOS, Android and hopefully more platforms in the future. Developed with [Flutter](https://flutter.dev).
 
+## Test Maily
+You can test an early access version of Maily today on [Google Play](https://play.google.com/store/apps/details?id=de.enough.enough_mail_app).
+
 ## Features
-Current development state is very limted to say the least. But it should be enough for interested developers to play around. 
 * POP and IMAP service providers are supported, though  POP accounts are not tested at this moment
 * Multiple account support
 * Unified account - when you have at least 2 accounts, a unified account will show up automatically - with unified inbox, sent, trash, etc
@@ -10,6 +12,8 @@ Current development state is very limted to say the least. But it should be enou
 * Unsubscribe from newslettters easily
 * View attachments in app - photos, PDFs and audio files 
 * Compose messages: compose plain text messages and reply to/forward plain text messages
+* Save and continue draft messages
+* Attach photo-, audio-, video- or generic files. Attach your current location.
 * Swipe right to left to delete
 * Swipe left to right to mark as read/unread
 * Optionally you can block external images when viewing mails
@@ -17,12 +21,13 @@ Current development state is very limted to say the least. But it should be enou
 * Swipe left or right in the message details to view the next/previous message
 * Experimental 'stack' display of messages
 * Share received attachments to other apps
-* Share files to Maily (Android only so far)
+* Share files to Maily
 * Search for messages, including universal search
 * Delete all messages in trash and junk folders or in a search result
 * Archive messages
 * Mark messages as junk / not junk
 * Select several messages at once with a long press
+* Localized in English and German
 
 ## Miss a feature or found a bug?
 
