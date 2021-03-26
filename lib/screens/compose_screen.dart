@@ -143,7 +143,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
   Future<String> loadMailTextFromMessage() async {
     final mb = widget.data.messageBuilder;
     if (mb.originalMessage == null) {
-      return '<p></p>';
+      return '<p>${mb.text ?? ''}</p>';
     } else {
       final blockExternalImages = false;
       final emptyMessageText =
