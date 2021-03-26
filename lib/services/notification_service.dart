@@ -18,6 +18,7 @@ class NotificationService {
 
   Future<NotificationServiceInitResult> init(
       {bool checkForLaunchDetails = true}) async {
+    // print('init notification service...');
     // set up local notifications:
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
     final android = AndroidInitializationSettings('ic_stat_notification');
@@ -32,10 +33,13 @@ class NotificationService {
       final launchDetails = await _flutterLocalNotificationsPlugin
           .getNotificationAppLaunchDetails();
       if (launchDetails?.payload != null) {
-        //await _selectNotification(launchDetails.payload); // apparently this is called automatically by getNotificationAppLaunchDetails
+        // print(
+        //     'got notification launched details: $launchDetails with payload ${launchDetails?.payload}');
+        await _selectNotification(launchDetails.payload);
         return NotificationServiceInitResult.appLaunchedByNotification;
       }
     }
+
     return NotificationServiceInitResult.normal;
   }
 
