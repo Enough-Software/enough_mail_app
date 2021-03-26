@@ -97,6 +97,7 @@ class BackgroundService {
     final mailService = MailService();
     final accounts = await mailService.loadMailAccounts();
     final notificationService = NotificationService();
+    await notificationService.init(checkForLaunchDetails: false);
     final futures = <Future<int>>[];
     for (var index = 0;
         index < math.min(prevUids.length, accounts.length);
