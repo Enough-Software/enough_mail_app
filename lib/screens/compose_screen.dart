@@ -196,8 +196,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
     mb.subject = _subjectController.text;
 
     final htmlText = await _editorApi.getText();
+    _resumeComposeData = widget.data.resume(htmlText);
     if (storeHtmlForResume) {
-      _resumeComposeData = widget.data.resume(htmlText);
+      return;
     } else {
       // print('got html: $htmlText');
       var newHtmlText = htmlText;
@@ -293,7 +294,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
     locator<NavigationService>().pop();
     final mailClient = await getMailClient();
     final mimeMessage = await buildMimeMessage(mailClient);
-    //TODO enable global busy indicator
     //TODO check first if message can be sent or catch errors
     try {
       final append = !from.account.addsSentMailAutomatically;
@@ -306,14 +306,25 @@ class _ComposeScreenState extends State<ComposeScreen> {
       );
       locator<ScaffoldMessengerService>()
           .showTextSnackBar(localizations.composeMailSendSuccess);
-    } on MailException catch (e, s) {
-      //TODO latest here persist the mail for further retries in the future
+    } catch (e, s) {
       print('Unable to send or append mail: $e $s');
-      locator<DialogService>().showTextDialog(context, localizations.errorTitle,
-          localizations.composeSendErrorInfo(e.toString()));
+      locator<DialogService>().showTextDialog(
+        context,
+        localizations.errorTitle,
+        localizations.composeSendErrorInfo(e.toString()),
+        actions: [
+          TextButton(
+            child: Text(localizations.actionCancel),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: Text(localizations.composeContinueEditingAction),
+            onPressed: returnToCompose,
+          ),
+        ],
+      );
       return;
     }
-    //TODO disable global busy indicator
     var storeFlags = true;
     final originalMessage = widget.data.originalMessage;
     switch (widget.data.action) {
@@ -623,19 +634,21 @@ class _ComposeScreenState extends State<ComposeScreen> {
       }
     } catch (e, s) {
       print('unable to save draft message $e $s');
-      locator<DialogService>().showTextDialog(context, localizations.errorTitle,
-          localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),
-          actions: [
-            TextButton(
-              child: Text(localizations.actionCancel),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: Text(localizations
-                  .composeContinueEditingWhenDraftCannotBeSavedAction),
-              onPressed: returnToCompose,
-            ),
-          ]);
+      locator<DialogService>().showTextDialog(
+        context,
+        localizations.errorTitle,
+        localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),
+        actions: [
+          TextButton(
+            child: Text(localizations.actionCancel),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: Text(localizations.composeContinueEditingAction),
+            onPressed: returnToCompose,
+          ),
+        ],
+      );
     }
   }
 

@@ -1076,8 +1076,8 @@
       }
     }  
   },
-  "composeContinueEditingWhenDraftCannotBeSavedAction": "continue editing",
-  "@composeContinueEditingWhenDraftCannotBeSavedAction": {
+  "composeContinueEditingAction": "continue editing",
+  "@composeContinueEditingAction": {
     "description": "Action to return to compose screen when draft cannot be saved"
   },
   "composeCreatePlusAliasAction": "Create new + alias...",
