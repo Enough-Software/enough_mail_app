@@ -210,7 +210,7 @@
   "composeSaveDraftAction": "Als Entwurf speichern",
   "composeMessageSavedAsDraft": "Entwurf gespeichert",
   "composeMessageSavedAsDraftErrorInfo": "Der Entwurf konnte nicht gespeichert werden.\nDie Fehlermeldung lautet:\n{details}",
-  "composeContinueEditingWhenDraftCannotBeSavedAction": "weiter bearbeiten",
+  "composeContinueEditingAction": "weiter bearbeiten",
   "composeCreatePlusAliasAction": "Neuen + Alias erstellen...",
   "composeSenderHint": "Absender:in",
   "composeRecipientHint": "Emails der Empfänger:innen",
