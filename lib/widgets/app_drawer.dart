@@ -5,7 +5,7 @@ import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/services/dialog_service.dart';
+import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +76,7 @@ class _AppDrawerState extends State<AppDrawer> {
                       leading: Icon(Icons.info),
                       title: Text(localizations.drawerEntryAbout),
                       onTap: () {
-                        locator<DialogService>().showAbout(context);
+                        DialogHelper.showAbout(context);
                       },
                     )
                   ],

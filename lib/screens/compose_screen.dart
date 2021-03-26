@@ -6,7 +6,7 @@ import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/sender.dart';
-import 'package:enough_mail_app/services/dialog_service.dart';
+import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
@@ -308,7 +308,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
           .showTextSnackBar(localizations.composeMailSendSuccess);
     } catch (e, s) {
       print('Unable to send or append mail: $e $s');
-      locator<DialogService>().showTextDialog(
+      DialogHelper.showTextDialog(
         context,
         localizations.errorTitle,
         localizations.composeSendErrorInfo(e.toString()),
@@ -634,7 +634,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
       }
     } catch (e, s) {
       print('unable to save draft message $e $s');
-      locator<DialogService>().showTextDialog(
+      DialogHelper.showTextDialog(
         context,
         localizations.errorTitle,
         localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),

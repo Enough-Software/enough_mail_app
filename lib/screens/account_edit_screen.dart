@@ -3,9 +3,9 @@ import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/dialog_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -193,15 +193,14 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                       .copyWith(color: Colors.white),
                 ),
                 onPressed: () async {
-                  final result = await locator<DialogService>()
-                      .askForConfirmation(context,
-                          title: localizations
-                              .editAccountDeleteAccountConfirmationTitle,
-                          query: localizations
-                              .editAccountDeleteAccountConfirmationQuery(
-                                  accountNameController.text),
-                          action: localizations.actionDelete,
-                          isDangerousAction: true);
+                  final result = await DialogHelper.askForConfirmation(context,
+                      title: localizations
+                          .editAccountDeleteAccountConfirmationTitle,
+                      query: localizations
+                          .editAccountDeleteAccountConfirmationQuery(
+                              accountNameController.text),
+                      action: localizations.actionDelete,
+                      isDangerousAction: true);
                   if (result == true) {
                     final mailService = locator<MailService>();
                     await mailService.removeAccount(widget.account);
