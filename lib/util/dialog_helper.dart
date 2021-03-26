@@ -3,8 +3,8 @@ import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class DialogService {
-  Future<bool> askForConfirmation(
+class DialogHelper {
+  static Future<bool> askForConfirmation(
     BuildContext context, {
     @required String title,
     @required String query,
@@ -41,12 +41,13 @@ class DialogService {
     );
   }
 
-  Future showTextDialog(BuildContext context, String title, String text,
+  static Future showTextDialog(BuildContext context, String title, String text,
       {List<Widget> actions}) {
     return showWidgetDialog(context, title, Text(text), actions: actions);
   }
 
-  Future showWidgetDialog(BuildContext context, String title, Widget content,
+  static Future showWidgetDialog(
+      BuildContext context, String title, Widget content,
       {List<Widget> actions}) {
     final localizations = AppLocalizations.of(context);
     actions ??= [
@@ -66,7 +67,7 @@ class DialogService {
     );
   }
 
-  void showAbout(BuildContext context) async {
+  static void showAbout(BuildContext context) async {
     final localizations = AppLocalizations.of(context);
     final packageInfo = await PackageInfo.fromPlatform();
     var version = 'v${packageInfo.version}+${packageInfo.buildNumber}';

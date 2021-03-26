@@ -9,7 +9,7 @@ import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/dialog_service.dart';
+import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
@@ -194,8 +194,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           icon: Icon(Icons.delete),
           label: Text(localizations.homeDeleteAllAction, style: textStyle),
           onPressed: () async {
-            bool confirmed = await locator<DialogService>().askForConfirmation(
-                context,
+            bool confirmed = await DialogHelper.askForConfirmation(context,
                 title: localizations.homeDeleteAllTitle,
                 query: localizations.homeDeleteAllQuestion,
                 action: localizations.homeDeleteAllAction,

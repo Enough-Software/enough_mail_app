@@ -1,4 +1,4 @@
-import 'package:enough_mail_app/services/dialog_service.dart';
+import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter/material.dart';
@@ -74,14 +74,11 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                   }
                   final selectedLocalizations =
                       await AppLocalizations.delegate.load(value.locale);
-                  final confirmed = await locator<DialogService>()
-                      .showTextDialog(
-                          context,
-                          selectedLocalizations
-                              .languageSettingConfirmationTitle,
-                          selectedLocalizations
-                              .languageSettingConfirmationQuery,
-                          actions: [
+                  final confirmed = await DialogHelper.showTextDialog(
+                      context,
+                      selectedLocalizations.languageSettingConfirmationTitle,
+                      selectedLocalizations.languageSettingConfirmationQuery,
+                      actions: [
                         TextButton(
                           child: Text(selectedLocalizations.actionCancel),
                           onPressed: () => Navigator.of(context).pop(false),
