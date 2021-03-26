@@ -206,7 +206,10 @@ abstract class MessageSource extends ChangeNotifier
         undo: () async {
           final undoResponse =
               await message.mailClient.undoMoveMessages(moveResult);
-          //TODO update message's UID and sequence ID?
+          if (undoResponse.targetSequence?.isNotEmpty() == true) {
+            message.mimeMessage.uid =
+                undoResponse.targetSequence.toList().first;
+          }
           cache.insert(message);
           notifyListeners();
         },
