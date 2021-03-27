@@ -44,6 +44,7 @@ abstract class MessageSource extends ChangeNotifier
   bool get shouldBlockImages;
   bool get isJunk;
   bool get isArchive;
+  bool get isTrash;
   bool get supportsMessageFolders;
   bool get supportsSearching;
 
@@ -429,6 +430,9 @@ class MailboxMessageSource extends MessageSource {
   bool get isArchive => _mimeSource.isArchive;
 
   @override
+  bool get isTrash => _mimeSource.isTrash;
+
+  @override
   bool get supportsMessageFolders => _mimeSource.supportsMessageFolders;
 
   @override
@@ -593,6 +597,9 @@ class MultipleMessageSource extends MessageSource {
   bool get isArchive => mimeSources.every((source) => source.isArchive);
 
   @override
+  bool get isTrash => mimeSources.every((source) => source.isTrash);
+
+  @override
   bool get supportsSearching =>
       mimeSources.every((source) => source.supportsSearching);
 
@@ -678,6 +685,9 @@ class SingleMessageSource extends MessageSource {
 
   @override
   bool get isJunk => false;
+
+  @override
+  bool get isTrash => false;
 
   @override
   MessageSource search(MailSearch search) {

@@ -2,6 +2,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ enum _OverflowMenuChoice {
   replyAll,
   forward,
   delete,
+  inbox,
   junk,
   seen,
   flag,
@@ -67,7 +69,11 @@ class _MessageActionsState extends State<MessageActions> {
           IconButton(icon: Icon(Icons.reply), onPressed: reply),
           IconButton(icon: Icon(Icons.reply_all), onPressed: replyAll),
           IconButton(icon: Icon(Icons.forward), onPressed: forward),
-          IconButton(icon: Icon(Icons.delete), onPressed: delete),
+          if (widget.message.source.isTrash) ...{
+            IconButton(icon: Icon(Entypo.inbox), onPressed: moveToInbox),
+          } else ...{
+            IconButton(icon: Icon(Icons.delete), onPressed: delete),
+          },
           PopupMenuButton<_OverflowMenuChoice>(
             onSelected: onOverflowChoiceSelected,
             itemBuilder: (context) => [
@@ -92,13 +98,23 @@ class _MessageActionsState extends State<MessageActions> {
                   title: Text(localizations.messageActionForward),
                 ),
               ),
-              PopupMenuItem(
-                value: _OverflowMenuChoice.delete,
-                child: ListTile(
-                  leading: Icon(Icons.delete),
-                  title: Text(localizations.messageActionDelete),
+              if (widget.message.source.isTrash) ...{
+                PopupMenuItem(
+                  value: _OverflowMenuChoice.inbox,
+                  child: ListTile(
+                    leading: Icon(Entypo.inbox),
+                    title: Text(localizations.messageActionMoveToInbox),
+                  ),
                 ),
-              ),
+              } else ...{
+                PopupMenuItem(
+                  value: _OverflowMenuChoice.delete,
+                  child: ListTile(
+                    leading: Icon(Icons.delete),
+                    title: Text(localizations.messageActionDelete),
+                  ),
+                ),
+              },
               PopupMenuDivider(),
               PopupMenuItem(
                 value: _OverflowMenuChoice.seen,
@@ -176,6 +192,9 @@ class _MessageActionsState extends State<MessageActions> {
       case _OverflowMenuChoice.delete:
         delete();
         break;
+      case _OverflowMenuChoice.inbox:
+        moveToInbox();
+        break;
       case _OverflowMenuChoice.seen:
         toggleSeen();
         break;
@@ -234,23 +253,30 @@ class _MessageActionsState extends State<MessageActions> {
   void moveJunk() async {
     final source = widget.message.source;
     if (source.isJunk) {
-      await widget.message.source.markAsNotJunk(widget.message);
+      await source.markAsNotJunk(widget.message);
     } else {
       locator<NotificationService>()
           .cancelNotificationForMailMessage(widget.message);
-      await widget.message.source.markAsJunk(widget.message);
+      await source.markAsJunk(widget.message);
     }
+    locator<NavigationService>().pop();
+  }
+
+  void moveToInbox() async {
+    final source = widget.message.source;
+    source.moveMessage(widget.message, MailboxFlag.inbox,
+        locator<I18nService>().localizations.resultMovedToInbox);
     locator<NavigationService>().pop();
   }
 
   void moveArchive() async {
     final source = widget.message.source;
     if (source.isArchive) {
-      await widget.message.source.moveToInbox(widget.message);
+      await source.moveToInbox(widget.message);
     } else {
       locator<NotificationService>()
           .cancelNotificationForMailMessage(widget.message);
-      await widget.message.source.archive(widget.message);
+      await source.archive(widget.message);
     }
     locator<NavigationService>().pop();
   }

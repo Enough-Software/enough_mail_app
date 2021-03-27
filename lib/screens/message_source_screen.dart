@@ -486,9 +486,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     ),
                   },
                   IconButton(
-                    icon: Icon(widget.messageSource.isJunk
-                        ? Entypo.inbox
-                        : Entypo.bug),
+                    icon: Icon(
+                        widget.messageSource.isJunk ? Icons.check : Entypo.bug),
                     onPressed: () async {
                       final targetFlag = widget.messageSource.isJunk
                           ? MailboxFlag.inbox
@@ -523,12 +522,23 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   ),
                   Spacer(),
                   IconButton(
-                      icon: Icon(Icons.delete),
+                      icon: Icon(widget.messageSource.isTrash
+                          ? Entypo.inbox
+                          : Icons.delete),
                       onPressed: () async {
-                        final notification = localizations
-                            .multipleMovedToTrash(selectedMessages.length);
-                        await widget.messageSource
-                            .deleteMessages(selectedMessages, notification);
+                        if (widget.messageSource.isTrash) {
+                          final notification = localizations
+                              .multipleMovedToInbox(selectedMessages.length);
+                          await widget.messageSource.moveMessages(
+                              selectedMessages,
+                              MailboxFlag.inbox,
+                              notification);
+                        } else {
+                          final notification = localizations
+                              .multipleMovedToTrash(selectedMessages.length);
+                          await widget.messageSource
+                              .deleteMessages(selectedMessages, notification);
+                        }
                         leaveSelectionMode();
                       }),
                   IconButton(
