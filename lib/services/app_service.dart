@@ -74,11 +74,13 @@ class AppService {
           : null;
       builder = MessageBuilder();
       for (final url in urls) {
-        final filePath = await FlutterAbsolutePath.getAbsolutePath(url);
-        final file = File(filePath);
-        //final file = File.fromUri(Uri.parse(url));
-        MediaType fileMediaType = mediaType ?? _guessMediaTypeFromFile(file);
-        await builder.addFile(file, fileMediaType);
+        if (url != 'null') {
+          final filePath = await FlutterAbsolutePath.getAbsolutePath(url);
+          final file = File(filePath);
+          //final file = File.fromUri(Uri.parse(url));
+          MediaType fileMediaType = mediaType ?? _guessMediaTypeFromFile(file);
+          await builder.addFile(file, fileMediaType);
+        }
       }
     }
     var sharedText = uriEndIndex < (shared.length - '>>]:'.length)
