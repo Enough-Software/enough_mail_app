@@ -87,6 +87,7 @@
   "messageActionReplyAll": "allen antworten",
   "messageActionForward": "weiterleiten",
   "messageActionDelete": "löschen",
+  "messageActionMoveToInbox": "in Posteingang verschieben",
   "messageStatusSeen": "ist gelesen",
   "messageStatusUnseen": "ist ungelesen",
   "messageStatusFlagged": "ist markiert",

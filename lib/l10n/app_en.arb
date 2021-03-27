@@ -434,6 +434,10 @@
   "@messageActionDelete": {
     "description": "Action for single message."
   },
+  "messageActionMoveToInbox": "move to inbox",
+  "@messageActionMoveToInbox": {
+    "description": "Action for single message."
+  },
   "messageStatusSeen": "is read",
   "@messageStatusSeen": {
     "description": "Status of single message."
