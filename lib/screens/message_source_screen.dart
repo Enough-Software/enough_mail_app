@@ -189,7 +189,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           Theme.of(context).textTheme.button; //.copyWith(color: Colors.white);
       zeroPosWidget = Padding(
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Row(
+        child: Wrap(
           children: [
             TextButton.icon(
               style: style,
