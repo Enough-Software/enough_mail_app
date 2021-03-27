@@ -163,6 +163,12 @@ abstract class MimeSource {
       subscriber.onMailLoaded(mime, this);
     }
   }
+
+  /// Marks all messages as seen (read) `true` or unseen (unread) when `false` is given
+  ///
+  /// Only available when `supportsDeleteAll` is `true`
+  /// Returns `true` when the call succeeded
+  Future<bool> markAllMessagesSeen(bool seen);
 }
 
 class MailboxMimeSource extends MimeSource {
@@ -345,6 +351,19 @@ class MailboxMimeSource extends MimeSource {
 
   @override
   bool get isSequenceIdBased => true;
+
+  @override
+  Future<bool> markAllMessagesSeen(bool seen) async {
+    final sequence = MessageSequence.fromAll();
+    try {
+      await mailClient.store(sequence, [MessageFlags.seen],
+          action: seen ? StoreAction.add : StoreAction.remove);
+      return true;
+    } catch (e, s) {
+      print('unable to mark all messages as seen($seen): $e $s');
+    }
+    return false;
+  }
 }
 
 class SearchMimeSource extends MimeSource {
@@ -502,6 +521,23 @@ class SearchMimeSource extends MimeSource {
   @override
   bool get isSequenceIdBased =>
       !(searchResult?.messageSequence?.isUidSequence ?? false);
+
+  @override
+  Future<bool> markAllMessagesSeen(bool seen) async {
+    final sequence = searchResult.messageSequence;
+
+    if (sequence == null || sequence.isEmpty()) {
+      return Future.value(true);
+    }
+    try {
+      await mailClient.store(sequence, [MessageFlags.seen],
+          action: seen ? StoreAction.add : StoreAction.remove);
+      return true;
+    } catch (e, s) {
+      print('unable to mark searched message sequence as seen($seen): $e $s');
+    }
+    return false;
+  }
 }
 
 class CachedMimeMessage {

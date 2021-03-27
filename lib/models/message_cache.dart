@@ -82,4 +82,10 @@ class MessageCache {
     }
     return result;
   }
+
+  void markAllMessageSeen(bool seen) {
+    for (final message in _messages) {
+      message.isSeen = seen;
+    }
+  }
 }

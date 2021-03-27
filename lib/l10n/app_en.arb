@@ -79,6 +79,14 @@
   "@homeDeleteAllAction": {
     "description": "Action to tap to delete all messages (must be short)."
   },
+  "homeMarkAllSeenAction": "All read",
+  "@homeMarkAllSeenAction": {
+    "description": "Action to tap to mark all messages as seen / read (must be short)."
+  },
+  "homeMarkAllUnseenAction": "All unread",
+  "@homeMarkAllUnseenAction": {
+    "description": "Action to tap to mark all messages as unseen / unread (must be short)."
+  },
   "homeFabTooltip": "New message",
   "@homeFabTooltip": {
     "description": "Tooltip for 'compose new message' floating action button."
