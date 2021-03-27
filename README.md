@@ -28,6 +28,7 @@ You can test an early access version of Maily today on [Google Play](https://pla
 * Mark messages as junk / not junk
 * Select several messages at once with a long press
 * Localized in English and German
+* Supports dark and light theme and you can also change the color scheme.
 
 ## Miss a feature or found a bug?
 

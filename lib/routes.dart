@@ -19,6 +19,7 @@ class Routes {
   static const String settingsLanguage = 'settingsLanguage';
   static const String messageSource = 'messageSource';
   static const String mailDetails = 'mailDetails';
+  static const String mailContents = 'mailContents';
   static const String mailCompose = 'mailCompose';
   static const String welcome = 'welcome';
   static const String splash = 'splash';
@@ -59,11 +60,15 @@ class AppRouter {
         page = MessageSourceScreen(arguments as MessageSource);
         break;
       case Routes.mailDetails:
-        var message = arguments as Message;
+        final message = arguments as Message;
         page = MessageDetailsScreen(message: message);
         break;
+      case Routes.mailContents:
+        final message = arguments as Message;
+        page = MessageContentsScreen(message: message);
+        break;
       case Routes.mailCompose:
-        var composeData = arguments as ComposeData;
+        final composeData = arguments as ComposeData;
         page = ComposeScreen(data: composeData);
         break;
       case Routes.interactiveMedia:

@@ -53,6 +53,7 @@
   "unifiedFolderTrash": "Alle Gelöschten",
   "unifiedFolderArchive": "Alle Archivierten",
   "unifiedFolderJunk": "Alle Spam Nachrichten",
+  "viewContentsAction": "Inhalt anzeigen",
   "viewSourceAction": "Sourcecode anzeigen",
   "detailsErrorDownloadInfo": "Email konnte nicht geladen werden.",
   "detailsErrorDownloadRetry": "wiederholen",

@@ -31,7 +31,7 @@ class MessageDetailsScreen extends StatefulWidget {
   _DetailsScreenState createState() => _DetailsScreenState();
 }
 
-enum _OverflowMenuChoice { showSourceCode }
+enum _OverflowMenuChoice { showContents, showSourceCode }
 
 class _DetailsScreenState extends State<MessageDetailsScreen> {
   PageController _pageController;
@@ -102,19 +102,27 @@ class _MessageContentState extends State<_MessageContent> {
     final localizations = AppLocalizations.of(context);
     return Base.buildAppChrome(
       context,
-      title: msg.decodeSubject() ?? '',
+      title: msg.decodeSubject() ?? localizations.subjectUndefined,
       content: buildMailDetails(localizations),
       appBarActions: [
         //IconButton(icon: Icon(Icons.reply), onPressed: reply),
         PopupMenuButton<_OverflowMenuChoice>(
           onSelected: (_OverflowMenuChoice result) {
             switch (result) {
+              case _OverflowMenuChoice.showContents:
+                locator<NavigationService>()
+                    .push(Routes.mailContents, arguments: widget.message);
+                break;
               case _OverflowMenuChoice.showSourceCode:
                 showSourceCode();
                 break;
             }
           },
           itemBuilder: (BuildContext context) => [
+            PopupMenuItem<_OverflowMenuChoice>(
+              value: _OverflowMenuChoice.showContents,
+              child: Text(localizations.viewContentsAction),
+            ),
             PopupMenuItem<_OverflowMenuChoice>(
               value: _OverflowMenuChoice.showSourceCode,
               child: Text(localizations.viewSourceAction),
@@ -129,6 +137,8 @@ class _MessageContentState extends State<_MessageContent> {
   Widget buildMailDetails(AppLocalizations localizations) {
     if (_messageDownloadError) {
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(localizations.detailsErrorDownloadInfo),
           TextButton.icon(
@@ -445,5 +455,39 @@ class _MessageContentState extends State<_MessageContent> {
       locator<NavigationService>()
           .push(Routes.mailDetails, arguments: message, replace: true);
     }
+  }
+}
+
+class MessageContentsScreen extends StatelessWidget {
+  final Message message;
+  const MessageContentsScreen({Key key, @required this.message})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Base.buildAppChrome(
+      context,
+      title: message.mimeMessage.decodeSubject() ??
+          AppLocalizations.of(context).subjectUndefined,
+      content: MimeMessageViewer(
+        mimeMessage: message.mimeMessage,
+        adjustHeight: false,
+        mailtoDelegate: handleMailto,
+        showMediaDelegate: navigateToMedia,
+      ),
+    );
+  }
+
+  Future handleMailto(Uri mailto, MimeMessage mimeMessage) {
+    final messageBuilder = locator<MailService>().mailto(mailto, mimeMessage);
+    final composeData =
+        ComposeData(message, messageBuilder, ComposeAction.newMessage);
+    return locator<NavigationService>()
+        .push(Routes.mailCompose, arguments: composeData);
+  }
+
+  Future navigateToMedia(InteractiveMediaWidget mediaWidget) {
+    return locator<NavigationService>()
+        .push(Routes.interactiveMedia, arguments: mediaWidget);
   }
 }

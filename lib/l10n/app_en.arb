@@ -262,6 +262,10 @@
   "@unifiedFolderJunk": {
     "description": "Folder name of unified account."
   },
+  "viewContentsAction": "View contents",
+  "@viewContentsAction": {
+    "description": "Show contents of a message on a separate screen."
+  },
   "viewSourceAction": "View source",
   "@viewSourceAction": {
     "description": "Show source code of a message."
