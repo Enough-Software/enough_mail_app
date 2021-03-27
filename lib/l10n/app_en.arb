@@ -15,6 +15,18 @@
   "@actionDelete": {
     "description": "Generic delete action"
   },
+  "actionAddressCopy": "copy",
+  "@actionAddressCopy": {
+    "description": "Copy action for email addresses"
+  },
+  "actionAddressCompose": "new message",
+  "@actionAddressCompose": {
+    "description": "Compose action for email addresses"
+  },
+  "actionAddressSearch": "search",
+  "@actionAddressSearch": {
+    "description": "Search action for email addresses"
+  },
   "splashLoading1": "Maily starting...",
   "@splashLoading1": {
     "description": "Message shown on splash screen while loading"

@@ -91,6 +91,21 @@ class MailService {
     return <MailAccount>[];
   }
 
+  Future<MessageSource> search(MailSearch search) async {
+    final currentSource = messageSource;
+    if (currentSource != null && currentSource.supportsSearching) {
+      return currentSource.search(search);
+    }
+    final account = currentAccount != null
+        ? currentAccount
+        : (unifiedAccount != null)
+            ? unifiedAccount
+            : mailAccounts.first;
+    currentAccount = account;
+    messageSource = await _createMessageSource(null, account);
+    return messageSource.search(search);
+  }
+
   _createUnifiedAccount() {
     final mailAccountsForUnified = accounts
         .where((account) => (!account.isVirtual &&
