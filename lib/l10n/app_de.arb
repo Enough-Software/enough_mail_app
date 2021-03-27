@@ -19,6 +19,8 @@
   "homeDeleteAllTitle": "Bestätigung",
   "homeDeleteAllQuestion": "Wirklich alle Emails löschen?",
   "homeDeleteAllAction": "Alle löschen",
+  "homeMarkAllSeenAction": "Ale gelesen",
+  "homeMarkAllUnseenAction": "Alle ungelesen",
   "homeFabTooltip": "Neue Email",
   "homeLoading": "Lade {name}...",
   "swipeActionToggleRead": "Gelesen / ungelesen",

@@ -51,7 +51,16 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> waitForDownload();
 
+  /// Deletes all messages
+  ///
+  /// Only available when `supportsDeleteAll` is `true`
   Future<List<DeleteResult>> deleteAllMessages();
+
+  /// Marks all messages as seen (read) `true` or unseen (unread) when `false` is given
+  ///
+  /// Only available when `supportsDeleteAll` is `true`
+  /// Returns `true` when the call succeeded
+  Future<bool> markAllMessagesSeen(bool seen);
 
   Future<Message> waitForMessageAt(int index) async {
     var message = getMessageAt(index);
@@ -384,10 +393,10 @@ class MailboxMessageSource extends MessageSource {
 
   @override
   Future<List<DeleteResult>> deleteAllMessages() async {
+    cache.clear();
+    notifyListeners();
     final results = await _mimeSource.deleteAllMessages();
     if (results?.isNotEmpty ?? false) {
-      cache.clear();
-      notifyListeners();
       if (_parentMessageSource != null) {
         for (final deleteResult in results) {
           final messages = _parentMessageSource.cache.getWithSequence(
@@ -401,6 +410,13 @@ class MailboxMessageSource extends MessageSource {
       }
     }
     return results;
+  }
+
+  @override
+  Future<bool> markAllMessagesSeen(bool seen) async {
+    cache.markAllMessageSeen(seen);
+    final marked = await _mimeSource.markAllMessagesSeen(seen);
+    return marked;
   }
 
   @override
@@ -544,16 +560,14 @@ class MultipleMessageSource extends MessageSource {
 
   @override
   Future<List<DeleteResult>> deleteAllMessages() async {
+    cache.clear();
+    notifyListeners();
     final results = <DeleteResult>[];
     for (final mimeSource in mimeSources) {
       final mimeResults = await mimeSource.deleteAllMessages();
       if (mimeResults != null) {
         results.addAll(mimeResults);
       }
-    }
-    if (results.isNotEmpty) {
-      cache.clear();
-      notifyListeners();
     }
     return results;
   }
@@ -596,6 +610,17 @@ class MultipleMessageSource extends MessageSource {
         localizations.searchQueryDescription(name);
     searchMessageSource._supportsDeleteAll = true;
     return searchMessageSource;
+  }
+
+  @override
+  Future<bool> markAllMessagesSeen(bool seen) async {
+    cache.markAllMessageSeen(seen);
+    final futures = <Future>[];
+    for (final mimeSource in mimeSources) {
+      futures.add(mimeSource.markAllMessagesSeen(seen));
+    }
+    final result = await Future.wait(futures);
+    return result.every((element) => element == true);
   }
 }
 
@@ -679,5 +704,10 @@ class SingleMessageSource extends MessageSource {
   @override
   MimeSource getMimeSource(Message message) {
     return _parentMessageSource?.getMimeSource(message);
+  }
+
+  @override
+  Future<bool> markAllMessagesSeen(bool seen) {
+    return Future.value(false);
   }
 }

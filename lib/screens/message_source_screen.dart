@@ -189,20 +189,42 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           Theme.of(context).textTheme.button; //.copyWith(color: Colors.white);
       zeroPosWidget = Padding(
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: TextButton.icon(
-          style: style,
-          icon: Icon(Icons.delete),
-          label: Text(localizations.homeDeleteAllAction, style: textStyle),
-          onPressed: () async {
-            bool confirmed = await DialogHelper.askForConfirmation(context,
-                title: localizations.homeDeleteAllTitle,
-                query: localizations.homeDeleteAllQuestion,
-                action: localizations.homeDeleteAllAction,
-                isDangerousAction: true);
-            if (confirmed == true) {
-              await widget.messageSource.deleteAllMessages();
-            }
-          },
+        child: Row(
+          children: [
+            TextButton.icon(
+              style: style,
+              icon: Icon(Icons.delete),
+              label: Text(localizations.homeDeleteAllAction, style: textStyle),
+              onPressed: () async {
+                bool confirmed = await DialogHelper.askForConfirmation(context,
+                    title: localizations.homeDeleteAllTitle,
+                    query: localizations.homeDeleteAllQuestion,
+                    action: localizations.homeDeleteAllAction,
+                    isDangerousAction: true);
+                if (confirmed == true) {
+                  await widget.messageSource.deleteAllMessages();
+                }
+              },
+            ),
+            TextButton.icon(
+              style: style,
+              icon: Icon(Feather.circle),
+              label:
+                  Text(localizations.homeMarkAllSeenAction, style: textStyle),
+              onPressed: () async {
+                await widget.messageSource.markAllMessagesSeen(true);
+              },
+            ),
+            TextButton.icon(
+              style: style,
+              icon: Icon(Entypo.mail_with_circle),
+              label:
+                  Text(localizations.homeMarkAllUnseenAction, style: textStyle),
+              onPressed: () async {
+                await widget.messageSource.markAllMessagesSeen(false);
+              },
+            ),
+          ],
         ),
       );
     }

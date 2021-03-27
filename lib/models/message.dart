@@ -31,38 +31,50 @@ class Message extends ChangeNotifier {
 
   bool get isSeen => mimeMessage.isSeen;
   set isSeen(bool value) {
-    mimeMessage.isSeen = value;
-    notifyListeners();
+    if (value != mimeMessage.isSeen) {
+      mimeMessage.isSeen = value;
+      notifyListeners();
+    }
   }
 
   bool get isFlagged => mimeMessage.isFlagged;
   set isFlagged(bool value) {
-    mimeMessage.isFlagged = value;
-    notifyListeners();
+    if (value != mimeMessage.isFlagged) {
+      mimeMessage.isFlagged = value;
+      notifyListeners();
+    }
   }
 
   bool get isAnswered => mimeMessage.isAnswered;
   set isAnswered(bool value) {
-    mimeMessage.isAnswered = value;
-    notifyListeners();
+    if (value != mimeMessage.isAnswered) {
+      mimeMessage.isAnswered = value;
+      notifyListeners();
+    }
   }
 
   bool get isForwarded => mimeMessage.isForwarded;
   set isForwarded(bool value) {
-    mimeMessage.isForwarded = value;
-    notifyListeners();
+    if (value != mimeMessage.isForwarded) {
+      mimeMessage.isForwarded = value;
+      notifyListeners();
+    }
   }
 
   bool get isDeleted => mimeMessage.isDeleted;
   set isDeleted(bool value) {
-    mimeMessage.isDeleted = value;
-    notifyListeners();
+    if (value != mimeMessage.isDeleted) {
+      mimeMessage.isDeleted = value;
+      notifyListeners();
+    }
   }
 
   bool get isMdnSent => mimeMessage.isMdnSent;
   set isMdnSent(bool value) {
-    mimeMessage.isMdnSent = value;
-    notifyListeners();
+    if (value != mimeMessage.isMdnSent) {
+      mimeMessage.isMdnSent = value;
+      notifyListeners();
+    }
   }
 
   bool get isNewsLetter => mimeMessage.isNewsletter;
