@@ -26,7 +26,7 @@ class BackgroundService {
       try {
         await locator<MailService>().resume();
       } catch (e, s) {
-        print('Error: Unable to finish foreground backkground fetch: $e $s');
+        print('Error: Unable to finish foreground background fetch: $e $s');
       }
       BackgroundFetch.finish(taskId);
     }, (String taskId) {
