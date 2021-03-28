@@ -56,16 +56,20 @@ class MainActivity: FlutterActivity() {
         if (action == Intent.ACTION_SEND_MULTIPLE) {
             var uris = shareIntent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM);
             //println("got uris $uris")
-            var strings = uris.map { "<<$it>>" }
-//            val mimeType: String? = shareIntent.data?.let { returnUri ->
-//                contentResolver.getType(returnUri)
-//            }
-//            println('got mime')
-            // val client: ContentProviderClient? = shareIntent.data?.let { returnUri ->
-            //     contentResolver.acquireContentProviderClient(returnUri)
-            // }
-            //client.localContentProvider.openFile()
-            uriText = strings.toString()
+            uriText = if (uris == null) {
+                "<<null>>"
+            } else {
+                 uris.map { "<<$it>>" }.toString()
+    //            val mimeType: String? = shareIntent.data?.let { returnUri ->
+    //                contentResolver.getType(returnUri)
+    //            }
+    //            println('got mime')
+                // val client: ContentProviderClient? = shareIntent.data?.let { returnUri ->
+                //     contentResolver.acquireContentProviderClient(returnUri)
+                // }
+                //client.localContentProvider.openFile()
+                //strings.toString()
+            }
         } else if (action == Intent.ACTION_SENDTO || action == Intent.ACTION_VIEW) {
             //println("$action: with data ${shareIntent.data} dataString ${shareIntent.dataString}")
             uriText = "[<<${shareIntent.dataString}>>]"
