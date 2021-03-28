@@ -117,13 +117,17 @@ class NotificationService {
   Future sendLocalNotification(int id, String title, String text,
       {String payloadText, DateTime when, bool channelShowBadge = true}) async {
     final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'maily', 'Mail', 'You have new mail',
-        importance: Importance.max,
-        priority: Priority.high,
-        channelShowBadge: channelShowBadge,
-        showWhen: true,
-        when: when?.millisecondsSinceEpoch,
-        playSound: false);
+      'maily',
+      'Mail',
+      'Maily',
+      importance: Importance.max,
+      priority: Priority.high,
+      channelShowBadge: channelShowBadge,
+      showWhen: (when != null),
+      when: when?.millisecondsSinceEpoch,
+      playSound: true,
+      sound: RawResourceAndroidNotificationSound('pop'),
+    );
     NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
     await _flutterLocalNotificationsPlugin
