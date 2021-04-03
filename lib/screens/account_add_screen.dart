@@ -366,7 +366,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         setState(() {
           _isAccountVerifying = false;
           _isAccountVerified = isVerified;
-          _isContinueAvailable = false;
+          _isContinueAvailable =
+              isVerified && _userNameController.text.isNotEmpty;
         });
         break;
       case 3:
