@@ -13,6 +13,7 @@ import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
+import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
 // import 'package:enough_style/enough_style.dart';
 import 'package:flutter/material.dart';
@@ -617,11 +618,6 @@ class MessageOverview extends StatefulWidget {
 }
 
 class _MessageOverviewState extends State<MessageOverview> {
-  String subject;
-  String sender;
-  String date;
-  bool hasAttachments;
-
   _MessageOverviewState();
 
   @override
@@ -646,36 +642,19 @@ class _MessageOverviewState extends State<MessageOverview> {
     if (mime.isEmpty) {
       return ListTile(
         visualDensity: VisualDensity.compact,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text(''), Text('...')],
-        ),
+        title: Text('...'),
       );
     }
-    subject = mime.decodeSubject();
-    MailAddress from;
-    if (mime.from?.isNotEmpty ?? false) {
-      from = mime.from.first;
-    } else {
-      from = mime.sender;
-    }
-    sender = sender = (from?.personalName?.isNotEmpty ?? false)
-        ? from.personalName
-        : from?.email != null
-            ? from.email
-            : AppLocalizations.of(context).emailSenderUnknown;
-    hasAttachments = mime.hasAttachments();
-    date = locator<I18nService>().formatDate(mime.decodeDate());
-    final overview = buildMessageOverview();
+
     return (widget.animationController != null)
         ? SizeTransition(
             sizeFactor: CurvedAnimation(
               parent: widget.animationController,
               curve: Curves.easeOut,
             ),
-            child: overview,
+            child: buildMessageOverview(),
           )
-        : overview;
+        : buildMessageOverview();
   }
 
   Widget buildMessageOverview() {
@@ -683,81 +662,14 @@ class _MessageOverviewState extends State<MessageOverview> {
         ? CheckboxListTile(
             value: widget.message.isSelected,
             selected: widget.message.isSelected,
-            title: buildMessageDetails(),
+            title: MessageOverviewContent(message: widget.message),
             onChanged: (value) => widget.onTap(widget.message),
           )
         : ListTile(
             visualDensity: VisualDensity.compact,
-            title: buildMessageDetails(),
+            title: MessageOverviewContent(message: widget.message),
             onTap: () => widget.onTap(widget.message),
             onLongPress: () => widget.onLongPress(widget.message),
           );
-  }
-
-  Widget buildMessageDetails() {
-    final message = widget.message;
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-      color: message.isFlagged ? Colors.amber[50] : null,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Text(
-                    sender,
-                    overflow: TextOverflow.fade,
-                    softWrap: false,
-                    style: TextStyle(
-                        fontWeight: message.isSeen
-                            ? FontWeight.normal
-                            : FontWeight.bold),
-                  ),
-                ),
-              ),
-              Text(date, style: TextStyle(fontSize: 12)),
-              if (hasAttachments ||
-                  message.isAnswered ||
-                  message.isForwarded ||
-                  message.isFlagged) ...{
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Row(
-                    children: [
-                      if (message.isFlagged) ...{
-                        Icon(Icons.outlined_flag, size: 12),
-                      },
-                      if (hasAttachments) ...{
-                        Icon(Icons.attach_file, size: 12),
-                      },
-                      if (message.isAnswered) ...{
-                        Icon(Icons.reply, size: 12),
-                      },
-                      if (message.isForwarded) ...{
-                        Icon(Icons.forward, size: 12),
-                      },
-                    ],
-                  ),
-                ),
-              }
-            ],
-          ),
-          Text(
-            subject ?? '',
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                fontStyle: FontStyle.italic,
-                fontWeight:
-                    message.isSeen ? FontWeight.normal : FontWeight.bold),
-          ),
-        ],
-      ),
-    );
   }
 }
