@@ -68,7 +68,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
     int foundSections = 0;
     for (var i = 0; i < messages.length; i++) {
       final message = messages[i];
-      final dateTime = message.mimeMessage.decodeDate()?.toLocal();
+      final dateTime = message.mimeMessage.decodeDate();
       if (dateTime != null) {
         final range = locator<DateService>().determineDateSection(dateTime);
         if (range != lastRange) {

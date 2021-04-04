@@ -93,7 +93,7 @@ class I18nService {
       return _localizations.dateUndefined;
     }
     //TODO use DateService
-    final messageDate = dateTime.toLocal();
+    final messageDate = dateTime;
     final nw = DateTime.now();
     final today = nw.subtract(Duration(
         hours: nw.hour,
@@ -113,7 +113,7 @@ class I18nService {
   }
 
   String formatDay(DateTime dateTime) {
-    final messageDate = dateTime.toLocal();
+    final messageDate = dateTime;
     final nw = DateTime.now();
     final today = nw.subtract(Duration(
         hours: nw.hour,
