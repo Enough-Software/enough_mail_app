@@ -1,5 +1,6 @@
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:flutter/material.dart';
 
 import '../locator.dart';
@@ -36,6 +37,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void initState() {
     liquidController = LiquidController();
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final localizations = AppLocalizations.of(context);
+      DialogHelper.showTextDialog(context, localizations.welcomeBetaTitle,
+          localizations.welcomeBetaText);
+    });
   }
 
   Widget _buildDot(int index) {
