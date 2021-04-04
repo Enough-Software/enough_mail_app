@@ -40,4 +40,27 @@ class IconService {
         return Icons.attachment;
     }
   }
+
+  static Widget buildNumericIcon(int value, {double size}) {
+    switch (value) {
+      case 1:
+        return Icon(
+          Icons.looks_one_outlined,
+          size: size,
+        );
+      case 2:
+        return Icon(Icons.looks_two_outlined, size: size);
+      case 3:
+        return Icon(Icons.looks_3_outlined, size: size);
+      case 4:
+        return Icon(Icons.looks_4_outlined, size: size);
+      case 5:
+        return Icon(Icons.looks_5_outlined, size: size);
+      case 6:
+        return Icon(Icons.looks_6_outlined, size: size);
+      default:
+        final style = size == null ? null : TextStyle(fontSize: size);
+        return Text(value.toString(), style: style);
+    }
+  }
 }

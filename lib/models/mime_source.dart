@@ -201,7 +201,7 @@ class MailboxMimeSource extends MimeSource {
   bool get supportsSearching => true;
 
   MailboxMimeSource(MailClient mailClient, this.mailbox,
-      {this.pageSize = 30,
+      {this.pageSize = 40,
       this.cacheSize = 100,
       MimeSourceSubscriber subscriber})
       : super(mailClient, subscriber: subscriber);
@@ -216,6 +216,15 @@ class MailboxMimeSource extends MimeSource {
     messagesExistAtInit = mailbox.messagesExists;
     if (messagesExistAtInit > 0) {
       // pre-cache first page:
+      if (mailClient.supportsThreading &&
+          !(mailbox.isTrash ||
+              mailbox.isSent ||
+              mailbox.isDrafts ||
+              mailbox.isJunk)) {
+        final since = DateTime.now().subtract(const Duration(days: 90));
+        await mailClient.fetchThreadData(
+            since: since, setThreadSequences: true);
+      }
       await _download(0);
     }
     return true;
@@ -379,6 +388,14 @@ class SearchMimeSource extends MimeSource {
       : super(mailClient);
 
   @override
+  Future<bool> init() async {
+    searchResult = await mailClient.searchMessages(mailSearch);
+    messages = searchResult.messages.elements;
+    _size = searchResult.size;
+    return true;
+  }
+
+  @override
   Future<List<DeleteResult>> deleteAllMessages() async {
     if (_size == 0) {
       return [];
@@ -388,14 +405,6 @@ class SearchMimeSource extends MimeSource {
     searchResult = MailSearchResult.empty;
     _size = 0;
     return [deleteResult];
-  }
-
-  @override
-  Future<bool> init() async {
-    searchResult = await mailClient.searchMessages(mailSearch);
-    messages = searchResult.messages.elements;
-    _size = searchResult.size;
-    return true;
   }
 
   @override
@@ -526,7 +535,7 @@ class SearchMimeSource extends MimeSource {
   Future<bool> markAllMessagesSeen(bool seen) async {
     final sequence = searchResult.messageSequence;
 
-    if (sequence == null || sequence.isEmpty()) {
+    if (sequence == null || sequence.isEmpty) {
       return Future.value(true);
     }
     try {
@@ -540,8 +549,122 @@ class SearchMimeSource extends MimeSource {
   }
 }
 
-class CachedMimeMessage {
-  final MimeMessage mimeMessage;
-  final int sourceIndex;
-  CachedMimeMessage(this.mimeMessage, this.sourceIndex);
+// class CachedMimeMessage {
+//   final MimeMessage mimeMessage;
+//   final int sourceIndex;
+//   CachedMimeMessage(this.mimeMessage, this.sourceIndex);
+// }
+
+class ThreadedMimeSource extends MimeSource {
+  Mailbox mailbox;
+  ThreadResult threadResult;
+
+  @override
+  bool get isArchive => mailbox.isArchive;
+
+  @override
+  bool get isJunk => mailbox.isJunk;
+
+  @override
+  bool get isSequenceIdBased => false;
+
+  @override
+  bool get isTrash => mailbox.isTrash;
+
+  @override
+  String get name => mailbox.name;
+
+  @override
+  int get size => threadResult
+      .length; //there can be more messages, depending on the used `since` parameter
+
+  ThreadedMimeSource(this.mailbox, MailClient mailClient,
+      {MimeSourceSubscriber subscriber})
+      : super(mailClient, subscriber: subscriber);
+
+  @override
+  Future<bool> init() async {
+    if (mailbox == null) {
+      mailbox = await mailClient.selectInbox();
+    }
+    final since = DateTime.now().subtract(const Duration(days: 90));
+    threadResult = await mailClient.fetchThreads(
+      mailbox: mailbox,
+      since: since,
+      threadPreference: ThreadPreference.latest,
+      fetchPreference: FetchPreference.envelope,
+      pageSize: 40,
+    );
+    return true;
+  }
+
+  @override
+  MimeMessage getMessageAt(int index) {
+    int sourceIndex = threadResult.length - (index + 1);
+    final thread = threadResult[sourceIndex];
+    if (thread != null) {
+      return thread.latest;
+    }
+    final id = threadResult.threadData[sourceIndex].latestId;
+    print(
+        'thread at $index: needs to be loaded for ${threadResult.isUidBased ? 'uid' : 'seqId'} $id');
+    final mime = MimeMessage();
+    if (threadResult.isUidBased) {
+      mime.uid = id;
+    } else {
+      mime.sequenceId = id;
+    }
+    // this fetches n pages for n unloaded messages:
+    if (!threadResult.isPageRequestedFor(sourceIndex)) {
+      print('request next page for $index');
+      _downloadFuture =
+          mailClient.fetchThreadsNextPage(threadResult).then((messages) {
+        for (final mime in messages) {
+          _notifyLoaded(mime);
+        }
+      });
+    }
+    return mime;
+  }
+
+  @override
+  void addMessage(MimeMessage message) {
+    // TODO: implement addMessage
+  }
+
+  @override
+  Future<List<DeleteResult>> deleteAllMessages() {
+    // TODO: implement deleteAllMessages
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> markAllMessagesSeen(bool seen) {
+    // TODO: implement markAllMessagesSeen
+    throw UnimplementedError();
+  }
+
+  @override
+  void remove(MimeMessage mimeMessage) {
+    // TODO: implement remove
+  }
+
+  @override
+  void removeVanishedMessages(MessageSequence sequence) {
+    // TODO: implement removeVanishedMessages
+  }
+
+  @override
+  MimeSource search(MailSearch search) {
+    // TODO: implement search
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement supportsSearching
+  bool get supportsSearching => false;
+
+  @override
+  // TODO: implement suppportsDeleteAll
+  bool get suppportsDeleteAll => false;
 }

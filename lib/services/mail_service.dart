@@ -162,7 +162,7 @@ class MailService {
         mailbox?.flags?.first ?? MailboxFlag.inbox,
       );
     } else {
-      var mailClient = await getClientFor(account);
+      final mailClient = await getClientFor(account);
       await mailClient.stopPollingIfNeeded();
       return MailboxMessageSource(mailbox, mailClient);
     }

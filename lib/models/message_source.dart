@@ -171,7 +171,7 @@ abstract class MessageSource extends ChangeNotifier
               for (final client in resultsByClient.keys) {
                 final undelete =
                     await client.undoDeleteMessages(resultsByClient[client]);
-                if (undelete.originalSequence?.isNotEmpty() == true) {
+                if (undelete.originalSequence?.isNotEmpty == true) {
                   final originalUids = undelete.originalSequence.toList();
                   final newUids = undelete.targetSequence.toList();
                   for (var i = 0; i < originalUids.length; i++) {
@@ -216,7 +216,7 @@ abstract class MessageSource extends ChangeNotifier
         undo: () async {
           final undoResponse =
               await message.mailClient.undoMoveMessages(moveResult);
-          if (undoResponse.targetSequence?.isNotEmpty() == true) {
+          if (undoResponse.targetSequence?.isNotEmpty == true) {
             message.mimeMessage.uid =
                 undoResponse.targetSequence.toList().first;
           }
@@ -332,12 +332,12 @@ abstract class MessageSource extends ChangeNotifier
     }
   }
 
-  void replaceMime(Message message, MimeMessage mime) {
-    final mimeSource = getMimeSource(message);
-    remove(message);
-    mimeSource.addMessage(mime);
-    onMailAdded(mime, mimeSource);
-  }
+  // void replaceMime(Message message, MimeMessage mime) {
+  //   final mimeSource = getMimeSource(message);
+  //   remove(message);
+  //   mimeSource.addMessage(mime);
+  //   onMailAdded(mime, mimeSource);
+  // }
 }
 
 class MailboxMessageSource extends MessageSource {
@@ -517,12 +517,6 @@ class MultipleMessageSource extends MessageSource {
           print(
               'unable to decode date for $_lastUncachedIndex on ${mimeSources[i].mailClient.account.name} message is empty: ${mime.isEmpty}.');
         }
-
-        //PROBLEM: initially the MIME messages will just be empty
-        // and are only populated after successful loading....
-        // if (mime.decodeDate() == null) {
-        //   print('UNABLE TO DECODE DATE FOR mime ${mime.bodyRaw}');
-        // }
         if (newestTime == null || date.isAfter(newestTime)) {
           newestIndex = i;
           newestTime = date;
@@ -719,5 +713,72 @@ class SingleMessageSource extends MessageSource {
   @override
   Future<bool> markAllMessagesSeen(bool seen) {
     return Future.value(false);
+  }
+}
+
+class ListMessageSource extends MessageSource {
+  List<Message> messages;
+  ListMessageSource(MessageSource parent) : super(parent: parent);
+
+  @override
+  Message _getUncachedMessage(int index) => messages[index];
+
+  @override
+  Future<List<DeleteResult>> deleteAllMessages() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> init() {
+    return Future.value(true);
+  }
+
+  @override
+  bool get isArchive => false;
+
+  @override
+  bool get isJunk => false;
+
+  @override
+  bool get isTrash => false;
+
+  @override
+  MessageSource search(MailSearch search) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool get shouldBlockImages => false;
+
+  @override
+  int get size => messages.length;
+
+  @override
+  bool get supportsMessageFolders => false;
+
+  @override
+  bool get supportsSearching => false;
+
+  @override
+  Future<void> waitForDownload() {
+    return Future.value();
+  }
+
+  @override
+  MimeSource getMimeSource(Message message) {
+    return _parentMessageSource?.getMimeSource(message);
+  }
+
+  @override
+  Future<bool> markAllMessagesSeen(bool seen) {
+    return Future.value(false);
+  }
+}
+
+class ThreadedMailboxMessageSource extends MailboxMessageSource {
+  ThreadedMailboxMessageSource(Mailbox mailbox, MailClient mailClient)
+      : super.fromMimeSource(ThreadedMimeSource(mailbox, mailClient),
+            mailClient.account.email, mailbox?.name) {
+    _mimeSource.addSubscriber(this);
   }
 }

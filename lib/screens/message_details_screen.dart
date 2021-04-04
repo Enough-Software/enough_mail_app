@@ -8,6 +8,7 @@ import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
@@ -17,6 +18,7 @@ import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/attachment_chip.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_mail_app/widgets/message_actions.dart';
+import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/material.dart';
@@ -172,6 +174,9 @@ class _MessageContentState extends State<_MessageContent> {
     final attachments = mime.findContentInfo();
     final date = locator<I18nService>().formatDate(mime.decodeDate());
     final subject = mime.decodeSubject();
+    final threadLength =
+        mime.threadSequence != null ? mime.threadSequence.toList().length : 0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -223,11 +228,14 @@ class _MessageContentState extends State<_MessageContent> {
           padding: const EdgeInsets.all(8.0),
           child: Divider(height: 2),
         ),
-        if (_blockExternalImages || mime.isNewsletter) ...{
+        if (_blockExternalImages ||
+            mime.isNewsletter ||
+            mime.threadSequence != null) ...{
           Row(
-            mainAxisAlignment: _blockExternalImages
-                ? MainAxisAlignment.spaceBetween
-                : MainAxisAlignment.end,
+            mainAxisAlignment:
+                (_blockExternalImages || mime.threadSequence != null)
+                    ? MainAxisAlignment.spaceBetween
+                    : MainAxisAlignment.end,
             children: [
               if (_blockExternalImages) ...{
                 ElevatedButton(
@@ -236,6 +244,9 @@ class _MessageContentState extends State<_MessageContent> {
                     _blockExternalImages = false;
                   }),
                 ),
+              },
+              if (mime.threadSequence != null) ...{
+                ThreadSequenceButton(message: widget.message),
               },
               if (mime.isNewsletter) ...{
                 if (widget.message.isNewsletterUnsubscribed) ...{
@@ -489,5 +500,135 @@ class MessageContentsScreen extends StatelessWidget {
   Future navigateToMedia(InteractiveMediaWidget mediaWidget) {
     return locator<NavigationService>()
         .push(Routes.interactiveMedia, arguments: mediaWidget);
+  }
+}
+
+class ThreadSequenceButton extends StatefulWidget {
+  final Message message;
+  ThreadSequenceButton({Key key, @required this.message}) : super(key: key);
+
+  @override
+  _ThreadSequenceButtonState createState() => _ThreadSequenceButtonState();
+}
+
+class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
+  OverlayEntry _overlayEntry;
+  Future<List<Message>> _loadingFuture;
+
+  @override
+  void dispose() {
+    if (_overlayEntry != null) {
+      removeOverlay();
+    }
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadingFuture = loadMessages();
+  }
+
+  Future<List<Message>> loadMessages() async {
+    final existingSource = widget.message.source;
+    if (existingSource is ListMessageSource) {
+      return existingSource.messages;
+    }
+    final mailClient = widget.message.mailClient;
+    final mimeMessages = await mailClient.fetchMessageSequence(
+        widget.message.mimeMessage.threadSequence,
+        fetchPreference: FetchPreference.envelope);
+    final source = ListMessageSource(widget.message.source);
+    final messages = <Message>[];
+    for (var i = 0; i < mimeMessages.length; i++) {
+      final mime = mimeMessages[i];
+      final message = Message(mime, mailClient, source, i);
+      messages.add(message);
+    }
+    source.messages = messages;
+    return messages;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final length = widget.message.mimeMessage.threadSequence?.length ?? 0;
+    return WillPopScope(
+      onWillPop: () {
+        if (_overlayEntry == null) {
+          return Future.value(true);
+        }
+        removeOverlay();
+        return Future.value(false);
+      },
+      child: IconButton(
+        icon: IconService.buildNumericIcon(length),
+        onPressed: () {
+          _overlayEntry = _buildThreadsOverlay();
+          Overlay.of(context).insert(_overlayEntry);
+        },
+      ),
+    );
+  }
+
+  void removeOverlay() {
+    _overlayEntry.remove();
+    _overlayEntry = null;
+  }
+
+  void select(Message message) {
+    removeOverlay();
+    locator<NavigationService>()
+        .push(Routes.mailDetails, arguments: message, replace: false);
+  }
+
+  OverlayEntry _buildThreadsOverlay() {
+    RenderBox renderBox = context.findRenderObject();
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final renderSize = renderBox.size;
+    final size = MediaQuery.of(context).size;
+    final currentUid = widget.message.mimeMessage.uid;
+
+    return OverlayEntry(
+      builder: (context) => GestureDetector(
+        onTap: () {
+          removeOverlay();
+        },
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Container(color: Color(0xdd000000)),
+            Positioned(
+              left: offset.dx,
+              top: offset.dy + renderSize.height + 5.0,
+              width: size.width - offset.dx - 16,
+              child: Material(
+                elevation: 4.0,
+                child: FutureBuilder<List<Message>>(
+                  future: _loadingFuture,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return CircularProgressIndicator();
+                    }
+                    final messages = snapshot.data;
+                    return ListView(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      children: messages
+                          .map((message) => ListTile(
+                                title: MessageOverviewContent(message: message),
+                                onTap: () => select(message),
+                                selected:
+                                    (message.mimeMessage.uid == currentUid),
+                              ))
+                          .toList(),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
