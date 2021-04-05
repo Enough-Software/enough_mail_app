@@ -84,6 +84,9 @@ class _MessageContentState extends State<_MessageContent> {
   bool _blockExternalImages;
   bool _messageDownloadError;
   bool _messageRequiresRefresh = false;
+  InAppWebViewController _webViewController;
+  double _webViewZoomFactor;
+  bool _isWebViewZoomedOut = false;
 
   @override
   void initState() {
@@ -174,8 +177,6 @@ class _MessageContentState extends State<_MessageContent> {
     final attachments = mime.findContentInfo();
     final date = locator<I18nService>().formatDate(mime.decodeDate());
     final subject = mime.decodeSubject();
-    final threadLength =
-        mime.threadSequence != null ? mime.threadSequence.toList().length : 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,13 +231,27 @@ class _MessageContentState extends State<_MessageContent> {
         ),
         if (_blockExternalImages ||
             mime.isNewsletter ||
-            mime.threadSequence != null) ...{
+            mime.threadSequence != null ||
+            _isWebViewZoomedOut) ...{
           Row(
-            mainAxisAlignment:
-                (_blockExternalImages || mime.threadSequence != null)
-                    ? MainAxisAlignment.spaceBetween
-                    : MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              if (mime.threadSequence != null) ...{
+                ThreadSequenceButton(message: widget.message),
+              } else ...{
+                Container(),
+              },
+              if (_isWebViewZoomedOut) ...{
+                IconButton(
+                  icon: Icon(Icons.zoom_in),
+                  onPressed: () {
+                    locator<NavigationService>()
+                        .push(Routes.mailContents, arguments: widget.message);
+                  },
+                ),
+              } else ...{
+                Container(),
+              },
               if (_blockExternalImages) ...{
                 ElevatedButton(
                   child: Text(localizations.detailsActionShowImages),
@@ -244,9 +259,8 @@ class _MessageContentState extends State<_MessageContent> {
                     _blockExternalImages = false;
                   }),
                 ),
-              },
-              if (mime.threadSequence != null) ...{
-                ThreadSequenceButton(message: widget.message),
+              } else ...{
+                Container(),
               },
               if (mime.isNewsletter) ...{
                 if (widget.message.isNewsletterUnsubscribed) ...{
@@ -267,6 +281,8 @@ class _MessageContentState extends State<_MessageContent> {
                     onPressed: unsubscribe,
                   ),
                 },
+              } else ...{
+                Container(),
               },
             ],
           ),
@@ -312,6 +328,15 @@ class _MessageContentState extends State<_MessageContent> {
       mailtoDelegate: handleMailto,
       maxImageWidth: 320,
       showMediaDelegate: navigateToMedia,
+      onZoomed: (controller, factor) {
+        if (factor < 0.9) {
+          _webViewController = controller;
+          _webViewZoomFactor = factor;
+          setState(() {
+            _isWebViewZoomedOut = true;
+          });
+        }
+      },
     );
   }
 
