@@ -59,8 +59,11 @@ class IconService {
       case 6:
         return Icon(Icons.looks_6_outlined, size: size);
       default:
-        final style = size == null ? null : TextStyle(fontSize: size);
-        return Text(value.toString(), style: style);
+        final style = size == null ? null : TextStyle(fontSize: (size * 0.8));
+        return Container(
+          decoration: BoxDecoration(border: Border.all()),
+          child: Text(value.toString(), style: style),
+        );
     }
   }
 }

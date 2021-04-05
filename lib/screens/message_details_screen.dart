@@ -587,6 +587,8 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
     final renderSize = renderBox.size;
     final size = MediaQuery.of(context).size;
     final currentUid = widget.message.mimeMessage.uid;
+    final top = offset.dy + renderSize.height + 5.0;
+    final height = size.height - top - 16;
 
     return OverlayEntry(
       builder: (context) => GestureDetector(
@@ -599,7 +601,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
             Container(color: Color(0xdd000000)),
             Positioned(
               left: offset.dx,
-              top: offset.dy + renderSize.height + 5.0,
+              top: top,
               width: size.width - offset.dx - 16,
               child: Material(
                 elevation: 4.0,
@@ -610,17 +612,21 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                       return CircularProgressIndicator();
                     }
                     final messages = snapshot.data;
-                    return ListView(
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      children: messages
-                          .map((message) => ListTile(
-                                title: MessageOverviewContent(message: message),
-                                onTap: () => select(message),
-                                selected:
-                                    (message.mimeMessage.uid == currentUid),
-                              ))
-                          .toList(),
+                    return ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: height),
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        children: messages
+                            .map((message) => ListTile(
+                                  title:
+                                      MessageOverviewContent(message: message),
+                                  onTap: () => select(message),
+                                  selected:
+                                      (message.mimeMessage.uid == currentUid),
+                                ))
+                            .toList(),
+                      ),
                     );
                   },
                 ),
