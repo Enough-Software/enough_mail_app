@@ -390,7 +390,7 @@ class SearchMimeSource extends MimeSource {
   @override
   Future<bool> init() async {
     searchResult = await mailClient.searchMessages(mailSearch);
-    messages = searchResult.messages.elements;
+    messages = searchResult.messages;
     _size = searchResult.size;
     return true;
   }
@@ -401,7 +401,7 @@ class SearchMimeSource extends MimeSource {
       return [];
     }
     final deleteResult =
-        await mailClient.deleteMessages(searchResult.messageSequence);
+        await mailClient.deleteMessages(searchResult.messageSequence.sequence);
     searchResult = MailSearchResult.empty;
     _size = 0;
     return [deleteResult];
@@ -448,7 +448,7 @@ class SearchMimeSource extends MimeSource {
     }
     _queue(index);
     final message = MimeMessage();
-    final id = searchResult.messageSequence
+    final id = searchResult.messageSequence.sequence
         .elementAt(_size - 1 - index); // sequence is loaded from end to front
     if (searchResult.messageSequence.isUidSequence) {
       message.uid = id;
@@ -459,14 +459,14 @@ class SearchMimeSource extends MimeSource {
   }
 
   void _queue(int index) {
-    final pageSize = searchResult.messages.pageSize;
+    final pageSize = searchResult.messageSequence.pageSize;
     final pageIndex = index ~/ pageSize;
     if (_requestedPages.contains(pageIndex)) {
       return;
     }
     _requestedPages.insert(0, pageIndex);
     if (_requestedPages.length > 5) {
-      // just skip the olded referenced messages
+      // just skip the oldesd referenced messages
       _requestedPages.removeLast();
     }
     if (_requestedPages.length == 1) {
@@ -477,8 +477,8 @@ class SearchMimeSource extends MimeSource {
   Future<void> _download(int pageIndex) async {
     //print('downloading $pageIndex');
     await mailClient.stopPollingIfNeeded();
-    final pageSize = searchResult.messages.pageSize;
-    final requestSequence = searchResult.messageSequence
+    final pageSize = searchResult.messageSequence.pageSize;
+    final requestSequence = searchResult.messageSequence.sequence
         .subsequenceFromPage(pageIndex + 1, pageSize);
     final mimeMessages = await mailClient.fetchMessageSequence(requestSequence,
         fetchPreference: FetchPreference.envelope);
@@ -533,7 +533,7 @@ class SearchMimeSource extends MimeSource {
 
   @override
   Future<bool> markAllMessagesSeen(bool seen) async {
-    final sequence = searchResult.messageSequence;
+    final sequence = searchResult.messageSequence.sequence;
 
     if (sequence == null || sequence.isEmpty) {
       return Future.value(true);
