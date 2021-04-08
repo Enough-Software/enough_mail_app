@@ -1,11 +1,17 @@
 import 'dart:io';
 
+import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:share/share.dart';
 import 'package:path_provider/path_provider.dart' as pathprovider;
+
+import '../locator.dart';
+import '../routes.dart';
 
 class InteractiveMediaScreen extends StatelessWidget {
   final InteractiveMediaWidget mediaWidget;
@@ -20,11 +26,37 @@ class InteractiveMediaScreen extends StatelessWidget {
       content: mediaWidget,
       appBarActions: [
         IconButton(
+          icon: Icon(Icons.forward),
+          onPressed: forward,
+        ),
+        IconButton(
           icon: Icon(Icons.share),
           onPressed: share,
         ),
       ],
     );
+  }
+
+  void forward() {
+    final provider = mediaWidget.mediaProvider;
+    final messageBuilder = MessageBuilder()..subject = provider.name;
+
+    if (provider is TextMediaProvider) {
+      final disposition = ContentDispositionHeader.from(
+          ContentDisposition.attachment,
+          filename: provider.name);
+      messageBuilder.addText(provider.text,
+          mediaType: MediaType.fromText(provider.mediaType),
+          disposition: disposition);
+    } else if (provider is MemoryMediaProvider) {
+      messageBuilder.addBinary(
+          provider.data, MediaType.fromText(provider.mediaType),
+          filename: provider.name);
+    }
+    final composeData =
+        ComposeData(null, messageBuilder, ComposeAction.newMessage);
+    locator<NavigationService>()
+        .push(Routes.mailCompose, arguments: composeData);
   }
 
   void share() async {
