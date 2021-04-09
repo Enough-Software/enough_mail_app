@@ -164,6 +164,8 @@ class MailService {
     } else {
       final mailClient = await getClientFor(account);
       await mailClient.stopPollingIfNeeded();
+      // consider "just" showing threads later
+      //return ThreadedMailboxMessageSource(mailbox, mailClient);
       return MailboxMessageSource(mailbox, mailClient);
     }
   }

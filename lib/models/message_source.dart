@@ -120,10 +120,11 @@ abstract class MessageSource extends ChangeNotifier
         ? cache.getWithMimeSequenceId(mime.sequenceId, source.mailClient)
         : cache.getWithMimeUid(mime.uid, source.mailClient);
 
-    // print(
-    //     'onMailLoaded: updating $message for mime ${source.isSequenceIdBased ? 'ID' : 'UID'} ${source.isSequenceIdBased ? mime.sequenceId : mime.uid}');
     if (message != null) {
       message.updateMime(mime);
+      // } else {
+      //   print(
+      //       'onMailLoaded: message not found for mime ${source.isSequenceIdBased ? 'ID' : 'UID'} ${source.isSequenceIdBased ? mime.sequenceId : mime.uid}');
     }
   }
 
