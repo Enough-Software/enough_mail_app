@@ -390,15 +390,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 ],
                               ),
                             ),
-                            child: (element.message?.mimeMessage?.sequenceId ==
-                                    null)
-                                ? Text('...')
-                                : MessageOverview(
-                                    element.message,
-                                    isInSelectionMode,
-                                    onMessageTap,
-                                    onMessageLongPress,
-                                  ),
+                            child: MessageOverview(
+                              element.message,
+                              isInSelectionMode,
+                              onMessageTap,
+                              onMessageLongPress,
+                            ),
                             onDismissed: (direction) async {
                               if (direction == DismissDirection.startToEnd) {
                                 // left to right swipe action:
@@ -640,9 +637,12 @@ class _MessageOverviewState extends State<MessageOverview> {
   Widget build(BuildContext context) {
     final mime = widget.message.mimeMessage;
     if (mime.isEmpty) {
-      return ListTile(
-        visualDensity: VisualDensity.compact,
-        title: Text('...'),
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListTile(
+          title: Text('...'),
+          subtitle: Text('-'),
+        ),
       );
     }
 

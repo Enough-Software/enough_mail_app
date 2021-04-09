@@ -379,10 +379,8 @@ class SearchMimeSource extends MimeSource {
   final MailSearch mailSearch;
   final Mailbox mailbox;
   MailSearchResult searchResult;
-  int _size = 0;
-  int loadedPage = 1;
-  List<MimeMessage> messages;
-  final _requestedPages = <int>[];
+  @override
+  int get size => searchResult.length;
 
   SearchMimeSource(MailClient mailClient, this.mailSearch, this.mailbox)
       : super(mailClient);
@@ -390,20 +388,17 @@ class SearchMimeSource extends MimeSource {
   @override
   Future<bool> init() async {
     searchResult = await mailClient.searchMessages(mailSearch);
-    messages = searchResult.messages;
-    _size = searchResult.size;
     return true;
   }
 
   @override
   Future<List<DeleteResult>> deleteAllMessages() async {
-    if (_size == 0) {
+    if (size == 0) {
       return [];
     }
     final deleteResult =
-        await mailClient.deleteMessages(searchResult.messageSequence.sequence);
-    searchResult = MailSearchResult.empty;
-    _size = 0;
+        await mailClient.deleteMessages(searchResult.pagedSequence.sequence);
+    searchResult = MailSearchResult.empty(mailSearch);
     return [deleteResult];
   }
 
@@ -433,9 +428,6 @@ class SearchMimeSource extends MimeSource {
   bool get shouldBlockImages => isTrash || isJunk;
 
   @override
-  int get size => _size;
-
-  @override
   bool get supportsSearching => false;
 
   @override
@@ -443,14 +435,21 @@ class SearchMimeSource extends MimeSource {
 
   @override
   MimeMessage getMessageAt(int index) {
-    if (index < messages.length) {
-      return messages[index];
+    if (searchResult.isAvailable(index)) {
+      return searchResult[index];
     }
-    _queue(index);
+    if (!searchResult.isPageRequestedFor(index)) {
+      _downloadFuture =
+          mailClient.searchMessagesNextPage(searchResult).then((messages) {
+        for (final mime in messages) {
+          _notifyLoaded(mime);
+        }
+      });
+    }
     final message = MimeMessage();
-    final id = searchResult.messageSequence.sequence
-        .elementAt(_size - 1 - index); // sequence is loaded from end to front
-    if (searchResult.messageSequence.isUidSequence) {
+    final id = searchResult.messageIdAt(index);
+    print('getMessageAt($index) yields empty $id');
+    if (searchResult.isUidBased) {
       message.uid = id;
     } else {
       message.sequenceId = id;
@@ -458,82 +457,30 @@ class SearchMimeSource extends MimeSource {
     return message;
   }
 
-  void _queue(int index) {
-    final pageSize = searchResult.messageSequence.pageSize;
-    final pageIndex = index ~/ pageSize;
-    if (_requestedPages.contains(pageIndex)) {
-      return;
-    }
-    _requestedPages.insert(0, pageIndex);
-    if (_requestedPages.length > 5) {
-      // just skip the oldesd referenced messages
-      _requestedPages.removeLast();
-    }
-    if (_requestedPages.length == 1) {
-      _downloadFuture = _download(pageIndex);
-    }
-  }
-
-  Future<void> _download(int pageIndex) async {
-    //print('downloading $pageIndex');
-    await mailClient.stopPollingIfNeeded();
-    final pageSize = searchResult.messageSequence.pageSize;
-    final requestSequence = searchResult.messageSequence.sequence
-        .subsequenceFromPage(pageIndex + 1, pageSize);
-    final mimeMessages = await mailClient.fetchMessageSequence(requestSequence,
-        fetchPreference: FetchPreference.envelope);
-    _requestedPages.remove(pageIndex);
-    for (final mime in mimeMessages) {
-      messages.add(mime);
-      _notifyLoaded(mime);
-    }
-    if (_requestedPages.isNotEmpty) {
-      pageIndex = _requestedPages.first;
-      _downloadFuture = _download(pageIndex);
-    } else {
-      mailClient.startPolling();
-    }
-  }
-
   @override
   void addMessage(MimeMessage message) {
-    messages.insert(0, message);
-    _size++;
+    searchResult.addMessage(message);
   }
 
   @override
   void remove(MimeMessage mimeMessage) {
-    if (messages.remove(mimeMessage)) {
-      _size--;
-    }
+    searchResult.removeMessage(mimeMessage);
   }
 
   @override
   void removeVanishedMessages(MessageSequence sequence) {
-    final ids = sequence.toList();
-    MimeMessage message;
-    for (var id in ids) {
-      if (sequence.isUidSequence == true) {
-        message =
-            messages.firstWhere((msg) => msg.uid == id, orElse: () => null);
-      } else {
-        message = messages.firstWhere((msg) => msg.sequenceId == id,
-            orElse: () => null);
-      }
-      if (message != null) {
-        remove(message);
-        _notifyVanished(message);
-      }
+    final messages = searchResult.removeMessageSequence(sequence);
+    for (final message in messages) {
+      _notifyVanished(message);
     }
   }
 
   @override
-  bool get isSequenceIdBased =>
-      !(searchResult?.messageSequence?.isUidSequence ?? false);
+  bool get isSequenceIdBased => !searchResult.isUidBased;
 
   @override
   Future<bool> markAllMessagesSeen(bool seen) async {
-    final sequence = searchResult.messageSequence.sequence;
+    final sequence = searchResult.pagedSequence.sequence;
 
     if (sequence == null || sequence.isEmpty) {
       return Future.value(true);
