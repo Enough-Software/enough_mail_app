@@ -78,6 +78,7 @@ class Gravatar {
       case GravatarImage.blank:
         return 'blank';
     }
+    return '404';
   }
 
   static String _ratingString(GravatarRating value) {
@@ -91,5 +92,6 @@ class Gravatar {
       case GravatarRating.x:
         return 'x';
     }
+    return 'g';
   }
 }
