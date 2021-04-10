@@ -1,7 +1,10 @@
 import 'package:diff_match_patch/diff_match_patch.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
+import 'package:enough_mail_app/models/account.dart';
+import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
@@ -13,7 +16,6 @@ import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 import '../routes.dart';
@@ -30,12 +32,10 @@ enum _OverflowMenuChoice { showSourceCode, saveAsDraft }
 enum _Autofocus { to, subject, text }
 
 class _ComposeScreenState extends State<ComposeScreen> {
-  TextEditingController _toController = TextEditingController();
-  TextEditingController _ccController = TextEditingController();
-  TextEditingController _bccController = TextEditingController();
+  List<MailAddress> _toRecipients;
+  List<MailAddress> _ccRecipients;
+  List<MailAddress> _bccRecipients;
   TextEditingController _subjectController = TextEditingController();
-  // TextEditingController _contentController = TextEditingController();
-
   Sender from;
   List<Sender> senders;
   _Autofocus _focus;
@@ -50,14 +50,12 @@ class _ComposeScreenState extends State<ComposeScreen> {
   @override
   void initState() {
     final mb = widget.data.messageBuilder;
-    initRecipient(mb.to, _toController);
-    initRecipient(mb.cc, _ccController);
-    initRecipient(mb.bcc, _bccController);
-    _isCcBccVisible =
-        _ccController.text.isNotEmpty || _bccController.text.isNotEmpty;
+    _toRecipients = mb.to ?? [];
+    _ccRecipients = mb.cc ?? [];
+    _bccRecipients = mb.bcc ?? [];
+    _isCcBccVisible = _ccRecipients.isNotEmpty || _bccRecipients.isNotEmpty;
     _subjectController.text = mb.subject;
-    _focus = ((_toController.text?.isEmpty ?? true) &&
-            (_ccController.text?.isEmpty ?? true))
+    _focus = (_toRecipients.isEmpty && _ccRecipients.isEmpty)
         ? _Autofocus.to
         : (_subjectController.text?.isEmpty ?? true)
             ? _Autofocus.subject
@@ -75,6 +73,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
       from = Sender(mb.from.first, currentAccount);
       senders.insert(0, from);
     }
+    _checkAccountContactManager(from.account);
     if (widget.data.resumeHtmlText != null) {
       loadMailTextFuture = loadMailTextFromComposeData();
     } else {
@@ -105,11 +104,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   @override
   void dispose() {
-    _toController.dispose();
-    _ccController.dispose();
-    _bccController.dispose();
     _subjectController.dispose();
-    // _contentController.dispose();
     super.dispose();
   }
 
@@ -190,9 +185,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   Future<void> populateMessageBuilder({bool storeHtmlForResume = false}) async {
     final mb = widget.data.messageBuilder;
-    mb.to = parse(_toController.text);
-    mb.cc = parse(_ccController.text);
-    mb.bcc = parse(_bccController.text);
+    mb.to = _toRecipients;
+    mb.cc = _ccRecipients;
+    mb.bcc = _bccRecipients;
     mb.subject = _subjectController.text;
 
     final htmlText = await _editorApi.getText();
@@ -470,58 +465,36 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         setState(() {
                           from = s;
                         });
+                        _checkAccountContactManager(from.account);
                       },
                       value: from,
                       hint: Text(localizations.composeSenderHint),
                     ),
-                    TextField(
-                      controller: _toController,
+                    RecipientInputField(
+                      contactManager: from.account.contactManager,
+                      addresses: _toRecipients,
                       autofocus: _focus == _Autofocus.to,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: localizations.detailsHeaderTo,
-                        hintText: localizations.composeRecipientHint,
-                        suffixIcon: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextButton(
-                              child: Text(localizations.detailsHeaderCc),
-                              onPressed: () => setState(
-                                () => _isCcBccVisible = !_isCcBccVisible,
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.contacts),
-                              onPressed: () => _pickContact(_toController),
-                            ),
-                          ],
+                      labelText: localizations.detailsHeaderTo,
+                      hintText: localizations.composeRecipientHint,
+                      additionalSuffixIcon: TextButton(
+                        child: Text(localizations.detailsHeaderCc),
+                        onPressed: () => setState(
+                          () => _isCcBccVisible = !_isCcBccVisible,
                         ),
                       ),
                     ),
                     if (_isCcBccVisible) ...{
-                      TextField(
-                        controller: _ccController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: localizations.detailsHeaderCc,
-                          hintText: localizations.composeRecipientHint,
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.contacts),
-                            onPressed: () => _pickContact(_ccController),
-                          ),
-                        ),
+                      RecipientInputField(
+                        addresses: _ccRecipients,
+                        contactManager: from.account.contactManager,
+                        labelText: localizations.detailsHeaderCc,
+                        hintText: localizations.composeRecipientHint,
                       ),
-                      TextField(
-                        controller: _bccController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: localizations.detailsHeaderBcc,
-                          hintText: localizations.composeRecipientHint,
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.contacts),
-                            onPressed: () => _pickContact(_bccController),
-                          ),
-                        ),
+                      RecipientInputField(
+                        addresses: _bccRecipients,
+                        contactManager: from.account.contactManager,
+                        labelText: localizations.detailsHeaderBcc,
+                        hintText: localizations.composeRecipientHint,
                       ),
                     },
                     TextField(
@@ -582,17 +555,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
         ),
       ),
     );
-  }
-
-  void initRecipient(
-      List<MailAddress> addresses, TextEditingController textController) {
-    if (addresses?.isEmpty ?? true) {
-      textController.text = '';
-    } else {
-      textController.text = addresses.map((a) => a.email).join('; ');
-      textController.selection =
-          TextSelection.collapsed(offset: textController.text.length);
-    }
   }
 
   void showSourceCode() async {
@@ -657,17 +619,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
         .push(Routes.mailCompose, arguments: _resumeComposeData);
   }
 
-  void _pickContact(TextEditingController textController) async {
-    final contact =
-        await FlutterContactPicker.pickEmailContact(askForPermission: true);
-    if (contact != null) {
-      if (textController.text.isNotEmpty) {
-        textController.text += '; ' + contact.email.email;
-      } else {
-        textController.text = contact.email.email;
-      }
-      textController.selection =
-          TextSelection.collapsed(offset: textController.text.length);
+  void _checkAccountContactManager(Account account) {
+    if (account.contactManager == null) {
+      locator<ContactService>().getForAccount(account).then((value) {
+        setState(() {});
+      });
     }
   }
 }
