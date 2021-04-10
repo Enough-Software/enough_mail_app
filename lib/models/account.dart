@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/models/contact.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -47,6 +48,8 @@ class Account extends ChangeNotifier {
     account.supportsPlusAliases = value;
     notifyListeners();
   }
+
+  ContactManager contactManager;
 
   Future<void> addAlias(MailAddress alias) {
     account.aliases ??= <MailAddress>[];

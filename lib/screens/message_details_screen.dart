@@ -84,8 +84,6 @@ class _MessageContentState extends State<_MessageContent> {
   bool _blockExternalImages;
   bool _messageDownloadError;
   bool _messageRequiresRefresh = false;
-  InAppWebViewController _webViewController;
-  double _webViewZoomFactor;
   bool _isWebViewZoomedOut = false;
 
   @override
@@ -330,8 +328,6 @@ class _MessageContentState extends State<_MessageContent> {
       showMediaDelegate: navigateToMedia,
       onZoomed: (controller, factor) {
         if (factor < 0.9) {
-          _webViewController = controller;
-          _webViewZoomFactor = factor;
           setState(() {
             _isWebViewZoomedOut = true;
           });

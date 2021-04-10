@@ -41,7 +41,7 @@ class _MailAddressChipState extends State<MailAddressChip> {
           value: _AddressAction.none,
           child: Column(
             children: [
-              if (widget.mailAddress.personalName?.isNotEmpty ?? false) ...{
+              if (widget.mailAddress.hasPersonalName) ...{
                 Text(widget.mailAddress.personalName),
               },
               Text(widget.mailAddress.email, style: theme.textTheme.caption),
