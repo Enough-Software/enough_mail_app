@@ -7,8 +7,10 @@ import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/date_sectioned_message_source.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
+import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
@@ -19,7 +21,6 @@ import 'package:enough_mail_app/widgets/message_stack.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import '../locator.dart';
 
 enum _Visualization { stack, list }
@@ -218,7 +219,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             ),
             TextButton.icon(
               style: style,
-              icon: Icon(Entypo.mail_with_circle),
+              icon: Icon(Icons.circle),
               label:
                   Text(localizations.homeMarkAllUnseenAction, style: textStyle),
               onPressed: () async {
@@ -343,16 +344,23 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                             );
                           }
                           final message = element.message;
+                          final settings = locator<SettingsService>().settings;
+                          final swipeLeftToRightAction =
+                              settings.swipeLeftToRightAction;
+                          final swipeRightToLeftAction =
+                              settings.swipeRightToLeftAction;
                           // print(
                           //     '$index subject=${message.mimeMessage?.decodeSubject()}');
                           return Dismissible(
                             key: ValueKey(message),
                             dismissThresholds: {
-                              DismissDirection.startToEnd: 0.3,
-                              DismissDirection.endToStart: 0.5
+                              DismissDirection.startToEnd:
+                                  swipeLeftToRightAction.dismissThreshold,
+                              DismissDirection.endToStart:
+                                  swipeRightToLeftAction.dismissThreshold,
                             },
                             background: Container(
-                              color: Colors.amber[700],
+                              color: swipeLeftToRightAction.colorBackground,
                               padding: EdgeInsets.symmetric(horizontal: 8.0),
                               alignment: AlignmentDirectional.centerStart,
                               child: Row(
@@ -361,31 +369,39 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8.0),
                                     child: Text(
-                                        localizations.swipeActionToggleRead),
+                                      swipeLeftToRightAction
+                                          .name(localizations),
+                                      style: TextStyle(
+                                          color: swipeLeftToRightAction
+                                              .colorForeground),
+                                    ),
                                   ),
-                                  Icon(
-                                    Feather.circle,
-                                    color: Colors.white,
-                                  ),
+                                  Icon(swipeLeftToRightAction.icon,
+                                      color: swipeLeftToRightAction.colorIcon),
                                 ],
                               ),
                             ),
                             secondaryBackground: Container(
-                              color: Colors.red,
+                              color: swipeRightToLeftAction.colorBackground,
                               padding: EdgeInsets.symmetric(horizontal: 8.0),
                               alignment: AlignmentDirectional.centerEnd,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Icon(
-                                    Icons.delete,
-                                    color: Colors.white,
+                                    swipeRightToLeftAction.icon,
+                                    color: swipeRightToLeftAction.colorIcon,
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8.0),
-                                    child:
-                                        Text(localizations.swipeActionDelete),
+                                    child: Text(
+                                      swipeRightToLeftAction
+                                          .name(localizations),
+                                      style: TextStyle(
+                                          color: swipeRightToLeftAction
+                                              .colorForeground),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -396,26 +412,32 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                               onMessageTap,
                               onMessageLongPress,
                             ),
-                            onDismissed: (direction) async {
-                              if (direction == DismissDirection.startToEnd) {
-                                // left to right swipe action:
-                                // is already handled in confirmDismiss
-                              } else {
-                                // right to left swipe action:
-                                await _sectionedMessageSource
-                                    .deleteMessage(message);
+                            onDismissed: (direction) {
+                              final action =
+                                  (direction == DismissDirection.startToEnd)
+                                      ? swipeLeftToRightAction
+                                      : swipeRightToLeftAction;
+                              if (action.isMessageMoving) {
+                                fireSwipeAction(action, message);
                               }
                             },
-                            confirmDismiss: (direction) async {
+                            confirmDismiss: (direction) {
                               if (direction == DismissDirection.startToEnd) {
-                                final isSeen = !message.isSeen;
-                                message.isSeen = isSeen;
-                                await message.mailClient.flagMessage(
-                                    message.mimeMessage,
-                                    isSeen: isSeen);
-                                return false;
+                                if (swipeLeftToRightAction.isMessageMoving) {
+                                  return Future.value(true);
+                                } else {
+                                  fireSwipeAction(
+                                      swipeLeftToRightAction, message);
+                                  return Future.value(false);
+                                }
                               } else {
-                                return true;
+                                if (swipeRightToLeftAction.isMessageMoving) {
+                                  return Future.value(true);
+                                } else {
+                                  fireSwipeAction(
+                                      swipeRightToLeftAction, message);
+                                  return Future.value(false);
+                                }
                               }
                             },
                           );
@@ -447,7 +469,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   ),
                   if (selectedMessages.any((m) => !m.isSeen)) ...{
                     IconButton(
-                      icon: Icon(Entypo.mail_with_circle),
+                      icon: Icon(Icons.circle),
                       onPressed: () async {
                         await widget.messageSource
                             .markMessagesAsSeen(selectedMessages, true);
@@ -595,6 +617,32 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     setState(() {
       isInSelectionMode = false;
     });
+  }
+
+  void fireSwipeAction(SwipeAction action, Message message) async {
+    switch (action) {
+      case SwipeAction.markRead:
+        final isSeen = !message.isSeen;
+        message.isSeen = isSeen;
+        await message.mailClient
+            .flagMessage(message.mimeMessage, isSeen: isSeen);
+        break;
+      case SwipeAction.archive:
+        await _sectionedMessageSource.messageSource.archive(message);
+        break;
+      case SwipeAction.markJunk:
+        await _sectionedMessageSource.messageSource.markAsJunk(message);
+        break;
+      case SwipeAction.delete:
+        await _sectionedMessageSource.deleteMessage(message);
+        break;
+      case SwipeAction.flag:
+        final isFlagged = !message.isFlagged;
+        message.isFlagged = isFlagged;
+        await message.mailClient
+            .flagMessage(message.mimeMessage, isFlagged: isFlagged);
+        break;
+    }
   }
 }
 

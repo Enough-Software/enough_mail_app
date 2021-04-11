@@ -10,17 +10,18 @@ You can test an early access version of Maily today on [Google Play](https://pla
 * Unified account - when you have at least 2 accounts, a unified account will show up automatically - with unified inbox, sent, trash, etc
 * Mail management: delete, mark as read/unread
 * Unsubscribe from newslettters easily
-* View attachments in app - photos, PDFs and audio files 
-* Compose messages: compose plain text messages and reply to/forward plain text messages
+* View attachments in app - photos, PDFs, video and audio files 
+* Compose messages: compose new messages and reply to/forward mails with WYSIWG editor
 * Save and continue draft messages
 * Attach photo-, audio-, video- or generic files. Attach your current location.
 * Swipe right to left to delete
 * Swipe left to right to mark as read/unread
+* Personalizae swipe actions
 * Optionally you can block external images when viewing mails
 * You can specify aliases and check for + alias support by your mail provider
 * Swipe left or right in the message details to view the next/previous message
 * Experimental 'stack' display of messages
-* Share received attachments to other apps
+* Share received attachments to other apps and forward attachments to a new message
 * Share files to Maily
 * Search for messages, including universal search
 * Delete all messages in trash and junk folders or in a search result
@@ -29,6 +30,7 @@ You can test an early access version of Maily today on [Google Play](https://pla
 * Select several messages at once with a long press
 * Localized in English and German
 * Supports dark and light theme and you can also change the color scheme.
+* Shows thread information and allows to access the full thread when the mail service supports the `THREAD` IMAP extension.
 
 ## Miss a feature or found a bug?
 
@@ -46,7 +48,7 @@ This is how you contribute:
 * Push changes to your personal repository: `git push origin`
 * Go to [enough_mail_app](https://github.com/enough-software/enough_mail_app/) and create a pull request.
 
-When you have compile problems this is usually due to not getting the latest version from git. Call `flutter pub upgrade` to ensure that you are on the latest version of all referenced projects.
+When you have compile problems this is usually due to not getting the latest version from git. Call `flutter pub upgrade` to ensure that you are on the latest version of all referenced projects. Since translations are generated you can ignore all translation problems, just start the build, afterwards the localization compilation problems will be gone.
 
 ## License
 `enough_mail_app` is licensed under the [GNU Public License 3.0 "GPL"](LICENSE). In a nutshell this means that you can play around as much as possible for private reasons, but that you need to publish your changes under the GPL, as soon as you the code commercially.

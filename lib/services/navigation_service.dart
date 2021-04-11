@@ -5,7 +5,7 @@ class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey =
       new GlobalKey<NavigatorState>();
 
-  final history = _NavigationHistory();
+  // final history = _NavigationHistory();
 
   Future<dynamic> push(String routeName,
       {Object arguments,
@@ -23,37 +23,37 @@ class NavigationService {
       navigatorKey.currentState.popUntil((route) => false);
     }
     if (replace) {
-      history.replace(routeName, route);
+      // history.replace(routeName, route);
       return navigatorKey.currentState.pushReplacement(route);
     } else {
-      history.push(routeName, route);
+      // history.push(routeName, route);
       return navigatorKey.currentState.push(route);
     }
   }
 
-  void replace(String oldRouteName, String newRouteName, {Object arguments}) {
-    final page = AppRouter.generatePage(newRouteName, arguments);
-    final newRoute = MaterialPageRoute(builder: (context) => page);
-    final oldRoute = history.getRoute(oldRouteName);
-    navigatorKey.currentState.replace(oldRoute: oldRoute, newRoute: newRoute);
-  }
+  // void replace(String oldRouteName, String newRouteName, {Object arguments}) {
+  //   final page = AppRouter.generatePage(newRouteName, arguments);
+  //   final newRoute = MaterialPageRoute(builder: (context) => page);
+  //   final oldRoute = history.getRoute(oldRouteName);
+  //   navigatorKey.currentState.replace(oldRoute: oldRoute, newRoute: newRoute);
+  // }
 
-  void replaceBelow(String anchorRouteName, String newRouteName,
-      {Object arguments}) {
-    final page = AppRouter.generatePage(newRouteName, arguments);
-    final newRoute = MaterialPageRoute(builder: (context) => page);
-    final anchorRoute = history.getRoute(anchorRouteName);
-    navigatorKey.currentState
-        .replaceRouteBelow(anchorRoute: anchorRoute, newRoute: newRoute);
-  }
+  // void replaceBelow(String anchorRouteName, String newRouteName,
+  //     {Object arguments}) {
+  //   final page = AppRouter.generatePage(newRouteName, arguments);
+  //   final newRoute = MaterialPageRoute(builder: (context) => page);
+  //   final anchorRoute = history.getRoute(anchorRouteName);
+  //   navigatorKey.currentState
+  //       .replaceRouteBelow(anchorRoute: anchorRoute, newRoute: newRoute);
+  // }
 
   void popUntil(String routeName) {
-    history.popUntil(routeName);
+    // history.popUntil(routeName);
     navigatorKey.currentState.popUntil(ModalRoute.withName(routeName));
   }
 
   void pop([Object result]) {
-    history.pop();
+    // history.pop();
     navigatorKey.currentState.pop(result);
   }
 }

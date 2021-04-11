@@ -1,9 +1,14 @@
+import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:enough_serialization/enough_serialization.dart';
 
 class Settings extends SerializableObject {
   Settings() {
     objectCreators['themeSettings'] = (map) => ThemeSettings();
+    transformers['swipeLeftToRightAction'] = (value) =>
+        value is SwipeAction ? value.index : SwipeAction.values[value];
+    transformers['swipeRightToLeftAction'] = (value) =>
+        value is SwipeAction ? value.index : SwipeAction.values[value];
   }
 
   bool get blockExternalImages => attributes['blockExternalImages'] ?? false;
@@ -28,4 +33,14 @@ class Settings extends SerializableObject {
   }
 
   set themeSettings(ThemeSettings value) => attributes['themeSettings'] = value;
+
+  SwipeAction get swipeLeftToRightAction =>
+      attributes['swipeLeftToRightAction'] ?? SwipeAction.markRead;
+  set swipeLeftToRightAction(SwipeAction value) =>
+      attributes['swipeLeftToRightAction'] = value;
+
+  SwipeAction get swipeRightToLeftAction =>
+      attributes['swipeRightToLeftAction'] ?? SwipeAction.delete;
+  set swipeRightToLeftAction(SwipeAction value) =>
+      attributes['swipeRightToLeftAction'] = value;
 }

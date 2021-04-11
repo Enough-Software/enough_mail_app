@@ -57,7 +57,7 @@ class _MessageActionsState extends State<MessageActions> {
           IconButton(
             icon: Icon(widget.message.isSeen
                 ? Feather.circle // Icons.check_circle_outline
-                : Entypo.mail_with_circle), //Icons.check_circle),
+                : Icons.circle), //Icons.check_circle),
             onPressed: toggleSeen,
           ),
           IconButton(
@@ -119,9 +119,8 @@ class _MessageActionsState extends State<MessageActions> {
               PopupMenuItem(
                 value: _OverflowMenuChoice.seen,
                 child: ListTile(
-                  leading: Icon(widget.message.isSeen
-                      ? Feather.circle
-                      : Entypo.mail_with_circle),
+                  leading: Icon(
+                      widget.message.isSeen ? Feather.circle : Icons.circle),
                   title: Text(
                     widget.message.isSeen
                         ? localizations.messageStatusSeen

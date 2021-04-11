@@ -3,6 +3,7 @@ export 'settings_accounts_screen.dart';
 export 'settings_theme_screen.dart';
 export 'settings_feedback_screen.dart';
 export 'settings_language_screen.dart';
+export 'settings_swipe_screen.dart';
 export 'account_add_screen.dart';
 export 'account_edit_screen.dart';
 export 'account_server_details_screen.dart';

@@ -21,6 +21,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
 
   @override
   void initState() {
+    //TODO display names should be localized in the arb files
     final displayNames = {
       'de': 'deutsch',
       'en': 'English',
