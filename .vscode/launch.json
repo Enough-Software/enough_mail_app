@@ -9,7 +9,7 @@
             "type": "dart",
             "request": "launch",
             "program": "lib/main.dart",
-            // "flutterMode": "profile",
+            // "flutterMode": "release",
         }
     ]
 }

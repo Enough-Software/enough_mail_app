@@ -129,6 +129,18 @@
   "@swipeActionDelete": {
     "description": "Swipe action for deleting a message."
   },
+  "swipeActionMarkJunk": "mark as junk",
+  "@swipeActionMarkJunk": {
+    "description": "Swipe action for moving a message to junk."
+  },
+  "swipeActionArchive": "archive",
+  "@swipeActionArchive": {
+    "description": "Swipe action for moving a message to archive."
+  },
+  "swipeActionFlag": "flag / unflag",
+  "@swipeActionFlag": {
+    "description": "Swipe action for marking a message as flagged / unflagged."
+  },
   "multipleMovedToJunk": "{number,plural, =1{One message marked as junk} other{Marked {number} messages as junk}}",
   "@multipleMovedToJunk": {
     "description": "Message shown after moving messages to junk. Message formatted using the plural JSON scheme.",
@@ -1201,6 +1213,22 @@
   "languageSystemSetInfo": "Maily will now use the system's language or English if the system's language is not supported. Please restart the app to take effect.",
   "@languageSystemSetInfo": {
     "description": "Info text after choosing the system's language for Maily."
+  },
+  "swipeSettingTitle": "Swipe gestures",
+  "@swipeSettingTitle": {
+    "description": "Title of swipe setting screen"
+  },
+  "swipeSettingLeftToRightLabel": "Left to right swipe",
+  "@swipeSettingLeftToRightLabel": {
+    "description": "Label for swipe gesture"
+  },
+  "swipeSettingRightToLeftLabel": "Right to left swipe",
+  "@swipeSettingRightToLeftLabel": {
+    "description": "Label for swipe gesture"
+  },
+  "swipeSettingChangeAction": "change",
+  "@swipeSettingChangeAction": {
+    "description": "Action for changing a swipe gesture"
   }
 
 }

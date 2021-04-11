@@ -61,6 +61,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               ListTile(
+                title: Text(localizations.swipeSettingTitle),
+                onTap: () {
+                  locator<NavigationService>().push(Routes.settingsSwipe);
+                },
+              ),
+              ListTile(
                 title: Text(localizations.settingsActionDesign),
                 onTap: () {
                   locator<NavigationService>().push(Routes.settingsDesign);

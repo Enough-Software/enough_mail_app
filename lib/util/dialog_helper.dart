@@ -3,6 +3,8 @@ import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+enum DialogActions { ok, cancel, okAndCancel }
+
 class DialogHelper {
   static Future<bool> askForConfirmation(
     BuildContext context, {
@@ -48,13 +50,23 @@ class DialogHelper {
 
   static Future showWidgetDialog(
       BuildContext context, String title, Widget content,
-      {List<Widget> actions}) {
+      {List<Widget> actions, DialogActions defaultActions = DialogActions.ok}) {
     final localizations = AppLocalizations.of(context);
     actions ??= [
-      TextButton(
-        child: Text(localizations.actionOk),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
+      if (defaultActions == DialogActions.ok ||
+          defaultActions == DialogActions.okAndCancel) ...{
+        TextButton(
+          child: Text(localizations.actionOk),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      },
+      if (defaultActions == DialogActions.cancel ||
+          defaultActions == DialogActions.okAndCancel) ...{
+        TextButton(
+          child: Text(localizations.actionCancel),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      },
     ];
 
     return showDialog(
