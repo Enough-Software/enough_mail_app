@@ -330,6 +330,7 @@ class _MessageContentState extends State<_MessageContent> {
       mailtoDelegate: handleMailto,
       maxImageWidth: 320,
       showMediaDelegate: navigateToMedia,
+      includedInlineTypes: [MediaToptype.image],
       onZoomed: (controller, factor) {
         if (factor < 0.9) {
           setState(() {
