@@ -43,4 +43,13 @@ class Settings extends SerializableObject {
       attributes['swipeRightToLeftAction'] ?? SwipeAction.delete;
   set swipeRightToLeftAction(SwipeAction value) =>
       attributes['swipeRightToLeftAction'] = value;
+
+  bool get useInternationalizedStandardFoldersNames =>
+      attributes['useI18nFolders'] ?? true;
+  set useInternationalizedStandardFoldersNames(bool value) =>
+      attributes['useI18nFolders'] = value;
+
+  String get customStandardFolderNames => attributes['customFolderNames'];
+  set customStandardFolderNames(String value) =>
+      attributes['customFolderNames'] = value;
 }

@@ -164,7 +164,6 @@ class MailService {
     } else {
       final mailClient = await getClientFor(account);
       await mailClient.stopPollingIfNeeded();
-      // consider "just" showing threads later
       //return ThreadedMailboxMessageSource(mailbox, mailClient);
       return MailboxMessageSource(mailbox, mailClient);
     }
@@ -337,6 +336,25 @@ class MailService {
     }
     final mailboxTree =
         await client.listMailboxesAsTree(createIntermediate: false);
+    final settings = locator<SettingsService>().settings;
+    if (settings.useInternationalizedStandardFoldersNames) {
+      for (final mailbox in client.mailboxes) {
+        if (mailbox == null || mailbox.isInbox) {
+          mailbox.name = localizations.folderInbox;
+        } else if (mailbox.isDrafts) {
+          mailbox.name = localizations.folderDrafts;
+        } else if (mailbox.isSent) {
+          mailbox.name = localizations.folderSent;
+        } else if (mailbox.isTrash) {
+          mailbox.name = localizations.folderTrash;
+        } else if (mailbox.isJunk) {
+          mailbox.name = localizations.folderJunk;
+        } else if (mailbox.isArchive) {
+          mailbox.name = localizations.folderArchive;
+        }
+      }
+    }
+
     _mailboxesPerAccount[account] = mailboxTree;
   }
 
