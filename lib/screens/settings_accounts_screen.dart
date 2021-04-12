@@ -19,13 +19,11 @@ class SettingsAccountsScreen extends StatefulWidget {
 }
 
 class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
-  List<Account> accounts;
   bool reorderAccounts = false;
   StreamSubscription eventsSubscription;
 
   @override
   void initState() {
-    accounts = locator<MailService>().accounts.toList();
     eventsSubscription =
         AppEventBus.eventBus.on<AccountsChangedEvent>().listen((event) {
       setState(() {});
@@ -53,6 +51,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
   }
 
   Widget buildAccountSettings(AppLocalizations localizations) {
+    final accounts = locator<MailService>().accounts.toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -87,6 +86,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
   }
 
   Widget buildReorderableListView() {
+    final accounts = locator<MailService>().accounts.toList();
     return WillPopScope(
       onWillPop: () {
         setState(() {
@@ -96,7 +96,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
       },
       child: ReorderableListView(
         onReorder: (oldIndex, newIndex) async {
-          print('moved $oldIndex to $newIndex');
+          // print('moved $oldIndex to $newIndex');
           final account = accounts.removeAt(oldIndex);
           if (newIndex > accounts.length) {
             accounts.add(account);

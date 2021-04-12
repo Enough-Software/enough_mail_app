@@ -1,4 +1,6 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/events/accounts_changed_event.dart';
+import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/routes.dart';
@@ -7,6 +9,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
+import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -204,6 +207,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   if (result == true) {
                     final mailService = locator<MailService>();
                     await mailService.removeAccount(widget.account);
+                    AppEventBus.eventBus.fire(AccountsChangedEvent());
                     if (mailService.accounts.isEmpty) {
                       locator<NavigationService>()
                           .push(Routes.welcome, clear: true);
