@@ -302,6 +302,30 @@
   "@unifiedFolderJunk": {
     "description": "Folder name of unified account."
   },
+  "folderInbox": "Inbox",
+  "@folderInbox": {
+    "description": "Folder name."
+  },
+  "folderSent": "Sent",
+  "@folderSent": {
+    "description": "Folder name."
+  },
+  "folderDrafts": "Drafts",
+  "@folderDrafts": {
+    "description": "Folder name."
+  },
+  "folderTrash": "Trash",
+  "@folderTrash": {
+    "description": "Folder name."
+  },
+  "folderArchive": "Archive",
+  "@folderArchive": {
+    "description": "Folder name."
+  },
+  "folderJunk": "Junk",
+  "@folderJunk": {
+    "description": "Folder name."
+  },
   "viewContentsAction": "View contents",
   "@viewContentsAction": {
     "description": "Show contents of a message on a separate screen."
