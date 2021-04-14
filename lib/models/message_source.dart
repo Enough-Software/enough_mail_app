@@ -38,8 +38,10 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   final MessageSource _parentMessageSource;
+  final bool isSearch;
 
-  MessageSource({MessageSource parent}) : _parentMessageSource = parent;
+  MessageSource({MessageSource parent, this.isSearch = false})
+      : _parentMessageSource = parent;
 
   bool get shouldBlockImages;
   bool get isJunk;
@@ -361,8 +363,8 @@ class MailboxMessageSource extends MessageSource {
 
   MailboxMessageSource.fromMimeSource(
       this._mimeSource, String description, String name,
-      {MessageSource parent})
-      : super(parent: parent) {
+      {MessageSource parent, bool isSearch = false})
+      : super(parent: parent, isSearch: isSearch) {
     _description = description;
     _name = name;
     _mimeSource.addSubscriber(this);
@@ -449,7 +451,8 @@ class MailboxMessageSource extends MessageSource {
         searchSource,
         localizations.searchQueryDescription(name),
         localizations.searchQueryTitle(search.query),
-        parent: this);
+        parent: this,
+        isSearch: true);
   }
 
   @override
@@ -479,8 +482,8 @@ class MultipleMessageSource extends MessageSource {
   MailboxFlag _flag;
 
   MultipleMessageSource(this.mimeSources, String name, MailboxFlag flag,
-      {MessageSource parent})
-      : super(parent: parent) {
+      {MessageSource parent, bool isSearch = false})
+      : super(parent: parent, isSearch: isSearch) {
     mimeSources.forEach((s) {
       s.addSubscriber(this);
       _multipleMimeSources.add(_MultipleMimeSource(s));
@@ -629,7 +632,7 @@ class MultipleMessageSource extends MessageSource {
     final localizations = locator<I18nService>().localizations;
     final searchMessageSource = MultipleMessageSource(
         searchMimeSources, localizations.searchQueryTitle(search.query), _flag,
-        parent: this);
+        parent: this, isSearch: true);
     searchMessageSource._description =
         localizations.searchQueryDescription(name);
     searchMessageSource._supportsDeleteAll = true;
