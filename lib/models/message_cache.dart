@@ -1,17 +1,18 @@
 import 'package:enough_mail/enough_mail.dart';
 
 import 'message.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 
 class MessageCache {
   static const int defaultMaxSize = 100;
   final List<Message> _messages = <Message>[];
+  List<Message> get allMessages => _messages;
   final int maxSize;
 
   MessageCache({this.maxSize = defaultMaxSize});
 
   Message operator [](int index) =>
-      _messages.firstWhere((message) => message.sourceIndex == index,
-          orElse: () => null);
+      _messages.firstWhereOrNull((message) => message.sourceIndex == index);
 
   Message getWithMime(MimeMessage mime, MailClient client) {
     return mime.uid != null
@@ -20,23 +21,21 @@ class MessageCache {
   }
 
   Message getWithMimeSequenceId(int id, MailClient client) {
-    return _messages.firstWhere(
-        (m) => m.mimeMessage.sequenceId == id && m.mailClient == client,
-        orElse: () => null);
+    return _messages.firstWhereOrNull(
+        (m) => m.mimeMessage.sequenceId == id && m.mailClient == client);
   }
 
   Message getWithMimeUid(int uid, MailClient client) {
-    return _messages.firstWhere(
-        (m) => m.mimeMessage.uid == uid && m.mailClient == client,
-        orElse: () => null);
+    return _messages.firstWhereOrNull(
+        (m) => m.mimeMessage.uid == uid && m.mailClient == client);
   }
 
   Message getWithSourceIndex(int sourceIndex) {
-    return _messages.firstWhere((m) => m.sourceIndex == sourceIndex,
-        orElse: () => null);
+    return _messages.firstWhereOrNull((m) => m.sourceIndex == sourceIndex);
   }
 
   void add(Message message) {
+    assert(message.mimeMessage != null);
     _messages.add(message);
     if (_messages.length > maxSize) {
       _messages.removeAt(0);
