@@ -178,7 +178,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     Widget zeroPosWidget;
     if (_sectionedMessageSource.isInitialized &&
         widget.messageSource.size == 0) {
-      final emptyMessage = isInSearchMode
+      final emptyMessage = widget.messageSource.isSearch
           ? localizations.homeEmptySearchMessage
           : localizations.homeEmptyFolderMessage;
       zeroPosWidget = Padding(
