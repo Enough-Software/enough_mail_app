@@ -1,6 +1,7 @@
 import 'package:enough_mail/mime_message.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class SourceCodeScreen extends StatelessWidget {
   final MimeMessage mimeMessage;
@@ -9,11 +10,33 @@ class SourceCodeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sizeFormat = NumberFormat('###.0#');
+    final sizeKb = mimeMessage.size / 1024;
+    final sizeMb = sizeKb / 1024;
+    final sizeText = sizeMb > 1
+        ? 'Size: ${sizeFormat.format(sizeKb)} kb  /   ${sizeFormat.format(sizeMb)} mb'
+        : 'Size: ${sizeFormat.format(sizeKb)} kb  /   ${mimeMessage.size} bytes';
     return Base.buildAppChrome(
       context,
       title: mimeMessage.decodeSubject() ?? '<no subject>',
       content: SingleChildScrollView(
-        child: SelectableText(mimeMessage.renderMessage()),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SelectableText('ID: ${mimeMessage.sequenceId}'),
+            SelectableText('UID: ${mimeMessage.uid}'),
+            SelectableText(sizeText),
+            if (mimeMessage.body != null) ...{
+              SelectableText('BODY: ${mimeMessage.body}'),
+            },
+            Divider(
+              color: Theme.of(context).accentColor,
+              thickness: 1,
+              height: 16,
+            ),
+            SelectableText(mimeMessage.renderMessage()),
+          ],
+        ),
       ),
     );
   }

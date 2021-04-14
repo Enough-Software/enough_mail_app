@@ -169,6 +169,8 @@ abstract class MimeSource {
   /// Only available when `supportsDeleteAll` is `true`
   /// Returns `true` when the call succeeded
   Future<bool> markAllMessagesSeen(bool seen);
+
+  void clear();
 }
 
 class MailboxMimeSource extends MimeSource {
@@ -208,26 +210,31 @@ class MailboxMimeSource extends MimeSource {
 
   @override
   Future<bool> init() async {
-    if (mailbox == null) {
-      mailbox = await mailClient.selectInbox();
-    } else {
-      mailbox = await mailClient.selectMailbox(mailbox);
-    }
-    messagesExistAtInit = mailbox.messagesExists;
-    if (messagesExistAtInit > 0) {
-      // pre-cache first page:
-      if (mailClient.supportsThreading &&
-          !(mailbox.isTrash ||
-              mailbox.isSent ||
-              mailbox.isDrafts ||
-              mailbox.isJunk)) {
-        final since = DateTime.now().subtract(const Duration(days: 90));
-        await mailClient.fetchThreadData(
-            since: since, setThreadSequences: true);
+    try {
+      if (mailbox == null) {
+        mailbox = await mailClient.selectInbox();
+      } else {
+        mailbox = await mailClient.selectMailbox(mailbox);
       }
-      await _download(0);
+      messagesExistAtInit = mailbox.messagesExists;
+      if (messagesExistAtInit > 0) {
+        // pre-cache first page:
+        if (mailClient.supportsThreading &&
+            !(mailbox.isTrash ||
+                mailbox.isSent ||
+                mailbox.isDrafts ||
+                mailbox.isJunk)) {
+          final since = DateTime.now().subtract(const Duration(days: 90));
+          await mailClient.fetchThreadData(
+              since: since, setThreadSequences: true);
+        }
+        await _download(0);
+      }
+      return true;
+    } catch (e, s) {
+      print('Error while initializing mime source for $mailbox: $e $s');
+      return false;
     }
-    return true;
   }
 
   @override
@@ -306,7 +313,7 @@ class MailboxMimeSource extends MimeSource {
     if (!_requestedPages.contains(pageIndex)) {
       _queue(pageIndex);
     }
-    print('getMessageAt($index) yields ID $sequenceId');
+    //print('getMessageAt($index) yields ID $sequenceId');
     return MimeMessage()..sequenceId = sequenceId;
   }
 
@@ -332,7 +339,7 @@ class MailboxMimeSource extends MimeSource {
   }
 
   Future<void> _download(int pageIndex) async {
-    //print('downloading $pageIndex');
+    // print('downloading $pageIndex');
     await mailClient.stopPollingIfNeeded();
     final sequence =
         MessageSequence.fromPage(pageIndex + 1, pageSize, messagesExistAtInit);
@@ -372,6 +379,14 @@ class MailboxMimeSource extends MimeSource {
       print('unable to mark all messages as seen($seen): $e $s');
     }
     return false;
+  }
+
+  @override
+  void clear() {
+    _cache.clear();
+    _requestedPages.clear();
+    mailbox.messagesExists = 0;
+    //mailbox = Mailbox()..messagesExists = 0;
   }
 }
 
@@ -494,6 +509,11 @@ class SearchMimeSource extends MimeSource {
     }
     return false;
   }
+
+  @override
+  void clear() {
+    searchResult = MailSearchResult.empty(mailSearch);
+  }
 }
 
 // class CachedMimeMessage {
@@ -614,4 +634,9 @@ class ThreadedMimeSource extends MimeSource {
   @override
   // TODO: implement suppportsDeleteAll
   bool get suppportsDeleteAll => false;
+
+  @override
+  void clear() {
+    // TODO: implement clear
+  }
 }

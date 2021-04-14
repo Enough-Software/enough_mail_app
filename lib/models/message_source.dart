@@ -73,15 +73,11 @@ abstract class MessageSource extends ChangeNotifier
 
   Message _getUncachedMessage(int index);
 
-  void addToCache(Message message) {
-    cache.add(message);
-  }
-
   Message getMessageAt(int index) {
     var message = cache[index];
     if (message == null) {
       message = _getUncachedMessage(index);
-      addToCache(message);
+      cache.add(message);
     }
     return message;
   }
@@ -333,6 +329,16 @@ abstract class MessageSource extends ChangeNotifier
     }
   }
 
+  Future<bool> refresh() async {
+    clear();
+    cache.clear();
+    final result = await init();
+    notifyListeners();
+    return result;
+  }
+
+  void clear();
+
   // void replaceMime(Message message, MimeMessage mime) {
   //   final mimeSource = getMimeSource(message);
   //   remove(message);
@@ -395,20 +401,16 @@ class MailboxMessageSource extends MessageSource {
 
   @override
   Future<List<DeleteResult>> deleteAllMessages() async {
+    final removedMessages = cache.allMessages.toList();
     cache.clear();
+    final futureResults = _mimeSource.deleteAllMessages();
+    clear();
     notifyListeners();
-    final results = await _mimeSource.deleteAllMessages();
-    if (results?.isNotEmpty ?? false) {
-      if (_parentMessageSource != null) {
-        for (final deleteResult in results) {
-          final messages = _parentMessageSource.cache.getWithSequence(
-              deleteResult.originalSequence, _mimeSource.mailClient);
-          for (final message in messages) {
-            _parentMessageSource.remove(message);
-            _parentMessageSource.cache.remove(message);
-          }
-        }
-        _parentMessageSource.notifyListeners();
+    final results = await futureResults;
+    if (_parentMessageSource != null) {
+      for (final removedMessage in removedMessages) {
+        _parentMessageSource.removeMime(
+            removedMessage.mimeMessage, removedMessage.mailClient);
       }
     }
     return results;
@@ -454,6 +456,10 @@ class MailboxMessageSource extends MessageSource {
   MimeSource getMimeSource(Message message) {
     return _mimeSource;
   }
+
+  void clear() {
+    _mimeSource.clear();
+  }
 }
 
 class MultipleMessageSource extends MessageSource {
@@ -472,7 +478,9 @@ class MultipleMessageSource extends MessageSource {
   int _lastUncachedIndex = 0;
   MailboxFlag _flag;
 
-  MultipleMessageSource(this.mimeSources, String name, MailboxFlag flag) {
+  MultipleMessageSource(this.mimeSources, String name, MailboxFlag flag,
+      {MessageSource parent})
+      : super(parent: parent) {
     mimeSources.forEach((s) {
       s.addSubscriber(this);
       _multipleMimeSources.add(_MultipleMimeSource(s));
@@ -531,12 +539,13 @@ class MultipleMessageSource extends MessageSource {
 
   @override
   Message _getUncachedMessage(int index) {
-    //print('get uncached $index');
+    // print(
+    //     'get uncached $index with lastUncachedIndex=$_lastUncachedIndex and size $size');
     int diff = (index - _lastUncachedIndex);
     while (diff > 1) {
       final nextMessage = _next();
       nextMessage.sourceIndex = index - diff;
-      addToCache(nextMessage);
+      cache.add(nextMessage);
       diff--;
     }
     // problem: what if user scrolls up a loooong way again?
@@ -559,13 +568,25 @@ class MultipleMessageSource extends MessageSource {
 
   @override
   Future<List<DeleteResult>> deleteAllMessages() async {
+    final removedMessages = cache.allMessages.toList();
     cache.clear();
-    notifyListeners();
-    final results = <DeleteResult>[];
+    final futures = <Future<List<DeleteResult>>>[];
     for (final mimeSource in mimeSources) {
-      final mimeResults = await mimeSource.deleteAllMessages();
-      if (mimeResults != null) {
-        results.addAll(mimeResults);
+      futures.add(mimeSource.deleteAllMessages());
+    }
+    clear();
+    notifyListeners();
+    if (_parentMessageSource != null) {
+      for (final removedMessage in removedMessages) {
+        _parentMessageSource.removeMime(
+            removedMessage.mimeMessage, removedMessage.mailClient);
+      }
+    }
+    final futureResults = await Future.wait(futures);
+    final results = <DeleteResult>[];
+    for (final result in futureResults) {
+      if (result != null) {
+        results.addAll(result);
       }
     }
     return results;
@@ -607,7 +628,8 @@ class MultipleMessageSource extends MessageSource {
     }
     final localizations = locator<I18nService>().localizations;
     final searchMessageSource = MultipleMessageSource(
-        searchMimeSources, localizations.searchQueryTitle(search.query), _flag);
+        searchMimeSources, localizations.searchQueryTitle(search.query), _flag,
+        parent: this);
     searchMessageSource._description =
         localizations.searchQueryDescription(name);
     searchMessageSource._supportsDeleteAll = true;
@@ -623,6 +645,14 @@ class MultipleMessageSource extends MessageSource {
     }
     final result = await Future.wait(futures);
     return result.every((element) => element == true);
+  }
+
+  @override
+  void clear() {
+    _lastUncachedIndex = 0;
+    for (final multipleSource in _multipleMimeSources) {
+      multipleSource.clear();
+    }
   }
 }
 
@@ -653,6 +683,12 @@ class _MultipleMimeSource {
     final mime = mimeSource.getMessageAt(_currentIndex);
     _currentIndex++;
     return mime;
+  }
+
+  void clear() {
+    _currentIndex = 0;
+    _currentMessage = null;
+    mimeSource.clear();
   }
 }
 
@@ -715,6 +751,11 @@ class SingleMessageSource extends MessageSource {
   Future<bool> markAllMessagesSeen(bool seen) {
     return Future.value(false);
   }
+
+  @override
+  void clear() {
+    // nothing to implement
+  }
 }
 
 class ListMessageSource extends MessageSource {
@@ -774,12 +815,17 @@ class ListMessageSource extends MessageSource {
   Future<bool> markAllMessagesSeen(bool seen) {
     return Future.value(false);
   }
-}
 
-class ThreadedMailboxMessageSource extends MailboxMessageSource {
-  ThreadedMailboxMessageSource(Mailbox mailbox, MailClient mailClient)
-      : super.fromMimeSource(ThreadedMimeSource(mailbox, mailClient),
-            mailClient.account.email, mailbox?.name) {
-    _mimeSource.addSubscriber(this);
+  @override
+  void clear() {
+    messages.clear();
   }
 }
+
+// class ThreadedMailboxMessageSource extends MailboxMessageSource {
+//   ThreadedMailboxMessageSource(Mailbox mailbox, MailClient mailClient)
+//       : super.fromMimeSource(ThreadedMimeSource(mailbox, mailClient),
+//             mailClient.account.email, mailbox?.name) {
+//     _mimeSource.addSubscriber(this);
+//   }
+// }

@@ -299,160 +299,169 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   }
                   return Future.value(true);
                 },
-                child: CustomScrollView(
-                  physics: BouncingScrollPhysics(),
-                  slivers: [
-                    SliverAppBar(
-                      title: appBarTitle,
-                      floating: isInSearchMode ? false : true,
-                      pinned: isInSearchMode ? true : false,
-                      stretch: true,
-                      actions: appBarActions,
-                    ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          //print('building message item at $index');
-                          if (zeroPosWidget != null) {
-                            if (index == 0) {
-                              return zeroPosWidget;
-                            }
-                            index--;
-                          }
-                          var element =
-                              _sectionedMessageSource.getElementAt(index);
-                          if (element.section != null) {
-                            final text = i18nService.formatDateRange(
-                                element.section.range, element.section.date);
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 16.0,
-                                    right: 8.0,
-                                    bottom: 4.0,
-                                    top: 16.0,
-                                  ),
-                                  child: Text(
-                                    text,
-                                    style: TextStyle(color: theme.accentColor),
-                                  ),
-                                ),
-                                Divider()
-                              ],
-                            );
-                          }
-                          final message = element.message;
-                          final settings = locator<SettingsService>().settings;
-                          final swipeLeftToRightAction =
-                              settings.swipeLeftToRightAction;
-                          final swipeRightToLeftAction =
-                              settings.swipeRightToLeftAction;
-                          // print(
-                          //     '$index subject=${message.mimeMessage?.decodeSubject()}');
-                          return Dismissible(
-                            key: ValueKey(message),
-                            dismissThresholds: {
-                              DismissDirection.startToEnd:
-                                  swipeLeftToRightAction.dismissThreshold,
-                              DismissDirection.endToStart:
-                                  swipeRightToLeftAction.dismissThreshold,
-                            },
-                            background: Container(
-                              color: swipeLeftToRightAction.colorBackground,
-                              padding: EdgeInsets.symmetric(horizontal: 8.0),
-                              alignment: AlignmentDirectional.centerStart,
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Text(
-                                      swipeLeftToRightAction
-                                          .name(localizations),
-                                      style: TextStyle(
-                                          color: swipeLeftToRightAction
-                                              .colorForeground),
-                                    ),
-                                  ),
-                                  Icon(swipeLeftToRightAction.icon,
-                                      color: swipeLeftToRightAction.colorIcon),
-                                ],
-                              ),
-                            ),
-                            secondaryBackground: Container(
-                              color: swipeRightToLeftAction.colorBackground,
-                              padding: EdgeInsets.symmetric(horizontal: 8.0),
-                              alignment: AlignmentDirectional.centerEnd,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Icon(
-                                    swipeRightToLeftAction.icon,
-                                    color: swipeRightToLeftAction.colorIcon,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Text(
-                                      swipeRightToLeftAction
-                                          .name(localizations),
-                                      style: TextStyle(
-                                          color: swipeRightToLeftAction
-                                              .colorForeground),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            child: MessageOverview(
-                              element.message,
-                              isInSelectionMode,
-                              onMessageTap,
-                              onMessageLongPress,
-                            ),
-                            onDismissed: (direction) {
-                              final action =
-                                  (direction == DismissDirection.startToEnd)
-                                      ? swipeLeftToRightAction
-                                      : swipeRightToLeftAction;
-                              if (action.isMessageMoving) {
-                                fireSwipeAction(action, message);
-                              }
-                            },
-                            confirmDismiss: (direction) {
-                              if (direction == DismissDirection.startToEnd) {
-                                if (swipeLeftToRightAction.isMessageMoving) {
-                                  return Future.value(true);
-                                } else {
-                                  fireSwipeAction(
-                                      swipeLeftToRightAction, message);
-                                  return Future.value(false);
-                                }
-                              } else {
-                                if (swipeRightToLeftAction.isMessageMoving) {
-                                  return Future.value(true);
-                                } else {
-                                  fireSwipeAction(
-                                      swipeRightToLeftAction, message);
-                                  return Future.value(false);
-                                }
-                              }
-                            },
-                          );
-                        },
-                        childCount: _sectionedMessageSource.size +
-                            ((zeroPosWidget != null) ? 1 : 0),
-                        semanticIndexCallback: (Widget widget, int localIndex) {
-                          if (widget is MessageOverview) {
-                            return widget.message.sourceIndex;
-                          }
-                          return null;
-                        },
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await _sectionedMessageSource.refresh();
+                  },
+                  child: CustomScrollView(
+                    physics: BouncingScrollPhysics(),
+                    slivers: [
+                      SliverAppBar(
+                        title: appBarTitle,
+                        floating: isInSearchMode ? false : true,
+                        pinned: isInSearchMode ? true : false,
+                        stretch: true,
+                        actions: appBarActions,
                       ),
-                    ),
-                  ],
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            //print('building message item at $index');
+                            if (zeroPosWidget != null) {
+                              if (index == 0) {
+                                return zeroPosWidget;
+                              }
+                              index--;
+                            }
+                            var element =
+                                _sectionedMessageSource.getElementAt(index);
+                            if (element.section != null) {
+                              final text = i18nService.formatDateRange(
+                                  element.section.range, element.section.date);
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 16.0,
+                                      right: 8.0,
+                                      bottom: 4.0,
+                                      top: 16.0,
+                                    ),
+                                    child: Text(
+                                      text,
+                                      style:
+                                          TextStyle(color: theme.accentColor),
+                                    ),
+                                  ),
+                                  Divider()
+                                ],
+                              );
+                            }
+                            final message = element.message;
+                            final settings =
+                                locator<SettingsService>().settings;
+                            final swipeLeftToRightAction =
+                                settings.swipeLeftToRightAction;
+                            final swipeRightToLeftAction =
+                                settings.swipeRightToLeftAction;
+                            // print(
+                            //     '$index subject=${message.mimeMessage?.decodeSubject()}');
+                            return Dismissible(
+                              key: ValueKey(message),
+                              dismissThresholds: {
+                                DismissDirection.startToEnd:
+                                    swipeLeftToRightAction.dismissThreshold,
+                                DismissDirection.endToStart:
+                                    swipeRightToLeftAction.dismissThreshold,
+                              },
+                              background: Container(
+                                color: swipeLeftToRightAction.colorBackground,
+                                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                alignment: AlignmentDirectional.centerStart,
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: Text(
+                                        swipeLeftToRightAction
+                                            .name(localizations),
+                                        style: TextStyle(
+                                            color: swipeLeftToRightAction
+                                                .colorForeground),
+                                      ),
+                                    ),
+                                    Icon(swipeLeftToRightAction.icon,
+                                        color:
+                                            swipeLeftToRightAction.colorIcon),
+                                  ],
+                                ),
+                              ),
+                              secondaryBackground: Container(
+                                color: swipeRightToLeftAction.colorBackground,
+                                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                alignment: AlignmentDirectional.centerEnd,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Icon(
+                                      swipeRightToLeftAction.icon,
+                                      color: swipeRightToLeftAction.colorIcon,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: Text(
+                                        swipeRightToLeftAction
+                                            .name(localizations),
+                                        style: TextStyle(
+                                            color: swipeRightToLeftAction
+                                                .colorForeground),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              child: MessageOverview(
+                                element.message,
+                                isInSelectionMode,
+                                onMessageTap,
+                                onMessageLongPress,
+                              ),
+                              onDismissed: (direction) {
+                                final action =
+                                    (direction == DismissDirection.startToEnd)
+                                        ? swipeLeftToRightAction
+                                        : swipeRightToLeftAction;
+                                if (action.isMessageMoving) {
+                                  fireSwipeAction(action, message);
+                                }
+                              },
+                              confirmDismiss: (direction) {
+                                if (direction == DismissDirection.startToEnd) {
+                                  if (swipeLeftToRightAction.isMessageMoving) {
+                                    return Future.value(true);
+                                  } else {
+                                    fireSwipeAction(
+                                        swipeLeftToRightAction, message);
+                                    return Future.value(false);
+                                  }
+                                } else {
+                                  if (swipeRightToLeftAction.isMessageMoving) {
+                                    return Future.value(true);
+                                  } else {
+                                    fireSwipeAction(
+                                        swipeRightToLeftAction, message);
+                                    return Future.value(false);
+                                  }
+                                }
+                              },
+                            );
+                          },
+                          childCount: _sectionedMessageSource.size +
+                              ((zeroPosWidget != null) ? 1 : 0),
+                          semanticIndexCallback:
+                              (Widget widget, int localIndex) {
+                            if (widget is MessageOverview) {
+                              return widget.message.sourceIndex;
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
           }
