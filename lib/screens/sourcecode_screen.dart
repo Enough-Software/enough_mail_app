@@ -10,12 +10,16 @@ class SourceCodeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sizeFormat = NumberFormat('###.0#');
-    final sizeKb = mimeMessage.size / 1024;
-    final sizeMb = sizeKb / 1024;
-    final sizeText = sizeMb > 1
-        ? 'Size: ${sizeFormat.format(sizeKb)} kb  /   ${sizeFormat.format(sizeMb)} mb'
-        : 'Size: ${sizeFormat.format(sizeKb)} kb  /   ${mimeMessage.size} bytes';
+    String sizeText;
+    if (mimeMessage.size != null) {
+      final sizeFormat = NumberFormat('###.0#');
+
+      final sizeKb = mimeMessage.size / 1024;
+      final sizeMb = sizeKb / 1024;
+      sizeText = sizeMb > 1
+          ? 'Size: ${sizeFormat.format(sizeKb)} kb  /   ${sizeFormat.format(sizeMb)} mb'
+          : 'Size: ${sizeFormat.format(sizeKb)} kb  /   ${mimeMessage.size} bytes';
+    }
     return Base.buildAppChrome(
       context,
       title: mimeMessage.decodeSubject() ?? '<no subject>',
@@ -25,7 +29,9 @@ class SourceCodeScreen extends StatelessWidget {
           children: [
             SelectableText('ID: ${mimeMessage.sequenceId}'),
             SelectableText('UID: ${mimeMessage.uid}'),
-            SelectableText(sizeText),
+            if (sizeText != null) ...{
+              SelectableText(sizeText),
+            },
             if (mimeMessage.body != null) ...{
               SelectableText('BODY: ${mimeMessage.body}'),
             },

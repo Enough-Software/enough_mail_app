@@ -17,6 +17,7 @@ class Routes {
   static const String settingsDesign = 'settingsDesign';
   static const String settingsFeedback = 'settingsFeedback';
   static const String settingsLanguage = 'settingsLanguage';
+  static const String settingsDeveloperMode = 'settingsDeveloperMode';
   static const String settingsSwipe = 'settingsSwipe';
   static const String messageSource = 'messageSource';
   static const String mailDetails = 'mailDetails';
@@ -56,6 +57,9 @@ class AppRouter {
         break;
       case Routes.settingsLanguage:
         page = SettingsLanguageScreen();
+        break;
+      case Routes.settingsDeveloperMode:
+        page = SettingsDeveloperModeScreen();
         break;
       case Routes.settingsSwipe:
         page = SettingsSwipeScreen();

@@ -4,6 +4,7 @@ import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:enough_mail/enough_mail.dart';
@@ -421,10 +422,14 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       value: _OverflowMenuChoice.saveAsDraft,
                       child: Text(localizations.composeSaveDraftAction),
                     ),
-                    PopupMenuItem<_OverflowMenuChoice>(
-                      value: _OverflowMenuChoice.showSourceCode,
-                      child: Text(localizations.viewSourceAction),
-                    ),
+                    if (locator<SettingsService>()
+                        .settings
+                        .enableDeveloperMode) ...{
+                      PopupMenuItem<_OverflowMenuChoice>(
+                        value: _OverflowMenuChoice.showSourceCode,
+                        child: Text(localizations.viewSourceAction),
+                      ),
+                    }
                   ],
                 ),
               ], // actions
