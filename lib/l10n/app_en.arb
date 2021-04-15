@@ -626,6 +626,26 @@
   "@settingsActionWelcome": {
     "description": "Settings action to show welcome screen of the app again."
   },
+  "settingsDeveloperMode": "Development mode",
+  "@settingsDeveloperMode": {
+    "description": "Settings action to enable or disable the development mode."
+  },
+  "developerModeIntroduction": "If you enable the development mode you will be able to view the source code of messages and convert text attachments to messages.",
+  "@developerModeIntroduction": {
+    "description": "Text explaining the development mode."
+  },
+  "developerModeEnable": "Enable development mode",
+  "@developerModeEnable": {
+    "description": "Text in checkbox to enable the development mode."
+  },
+  "developerShowAsEmail": "Convert text to email",
+  "@developerShowAsEmail": {
+    "description": "Action to convert text into an email."
+  },
+  "developerShowAsEmailFailed": "This text cannot be converted into a MIME message.",
+  "@developerShowAsEmailFailed": {
+    "description": "Text shown when text cannot be converted into an email."
+  },
   "designTitle": "Design Settings",
   "@designTitle": {
     "description": "Title of design settings screen."

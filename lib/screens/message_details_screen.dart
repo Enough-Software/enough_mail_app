@@ -126,10 +126,12 @@ class _MessageContentState extends State<_MessageContent> {
               value: _OverflowMenuChoice.showContents,
               child: Text(localizations.viewContentsAction),
             ),
-            PopupMenuItem<_OverflowMenuChoice>(
-              value: _OverflowMenuChoice.showSourceCode,
-              child: Text(localizations.viewSourceAction),
-            ),
+            if (locator<SettingsService>().settings.enableDeveloperMode) ...{
+              PopupMenuItem<_OverflowMenuChoice>(
+                value: _OverflowMenuChoice.showSourceCode,
+                child: Text(localizations.viewSourceAction),
+              ),
+            },
           ],
         ),
       ],

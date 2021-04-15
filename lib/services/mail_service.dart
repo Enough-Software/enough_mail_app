@@ -289,6 +289,9 @@ class MailService {
   }
 
   Future<MailClient> getClientFor(Account account) async {
+    if (account is UnifiedAccount) {
+      account = (account as UnifiedAccount).accounts.first;
+    }
     var client = _mailClientsPerAccount[account];
     if (client == null) {
       client = MailClient(account.account,

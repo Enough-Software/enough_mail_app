@@ -52,4 +52,8 @@ class Settings extends SerializableObject {
   String get customStandardFolderNames => attributes['customFolderNames'];
   set customStandardFolderNames(String value) =>
       attributes['customFolderNames'] = value;
+
+  bool get enableDeveloperMode => attributes['enableDeveloperMode'] ?? false;
+  set enableDeveloperMode(bool value) =>
+      attributes['enableDeveloperMode'] = value;
 }
