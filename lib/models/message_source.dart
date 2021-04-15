@@ -735,7 +735,8 @@ class SingleMessageSource extends MessageSource {
   int get size => 1;
 
   @override
-  bool get supportsMessageFolders => false;
+  bool get supportsMessageFolders =>
+      _parentMessageSource?.supportsMessageFolders ?? false;
 
   @override
   bool get supportsSearching => false;
