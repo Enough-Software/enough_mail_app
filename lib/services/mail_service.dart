@@ -7,6 +7,7 @@ import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/models/mime_source.dart';
 import 'package:enough_mail_app/models/sender.dart';
+import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/gravatar.dart';
 import 'package:enough_serialization/enough_serialization.dart';
@@ -331,6 +332,52 @@ class MailService {
         orElse: () => null);
   }
 
+  void applyFolderNameSettings(Settings settings) {
+    for (final client in _mailClientsPerAccount.values) {
+      _setMaiboxNames(settings, client);
+    }
+  }
+
+  void _setMaiboxNames(Settings settings, MailClient client) {
+    final folderNameSetting = settings.folderNameSetting;
+    if (client.mailboxes == null) {
+      return;
+    }
+    if (folderNameSetting == FolderNameSetting.server) {
+      for (final mailbox in client.mailboxes) {
+        mailbox.setNameFromPath();
+      }
+    } else {
+      var names = settings.customFolderNames;
+      if (names == null || folderNameSetting == FolderNameSetting.localized) {
+        final l = localizations;
+        names = [
+          l.folderInbox,
+          l.folderDrafts,
+          l.folderSent,
+          l.folderTrash,
+          l.folderArchive,
+          l.folderJunk
+        ];
+      }
+      for (final mailbox in client.mailboxes) {
+        if (mailbox == null || mailbox.isInbox) {
+          mailbox.name = names[0];
+        } else if (mailbox.isDrafts) {
+          mailbox.name = names[1];
+        } else if (mailbox.isSent) {
+          mailbox.name = names[2];
+        } else if (mailbox.isTrash) {
+          mailbox.name = names[3];
+        } else if (mailbox.isArchive) {
+          mailbox.name = names[4];
+        } else if (mailbox.isJunk) {
+          mailbox.name = names[5];
+        }
+      }
+    }
+  }
+
   Future<void> loadMailboxesFor(MailClient client) async {
     final account = getAccountFor(client.account);
     if (account == null) {
@@ -340,22 +387,8 @@ class MailService {
     final mailboxTree =
         await client.listMailboxesAsTree(createIntermediate: false);
     final settings = locator<SettingsService>().settings;
-    if (settings.useInternationalizedStandardFoldersNames) {
-      for (final mailbox in client.mailboxes) {
-        if (mailbox == null || mailbox.isInbox) {
-          mailbox.name = localizations.folderInbox;
-        } else if (mailbox.isDrafts) {
-          mailbox.name = localizations.folderDrafts;
-        } else if (mailbox.isSent) {
-          mailbox.name = localizations.folderSent;
-        } else if (mailbox.isTrash) {
-          mailbox.name = localizations.folderTrash;
-        } else if (mailbox.isJunk) {
-          mailbox.name = localizations.folderJunk;
-        } else if (mailbox.isArchive) {
-          mailbox.name = localizations.folderArchive;
-        }
-      }
+    if (settings.folderNameSetting != FolderNameSetting.server) {
+      _setMaiboxNames(settings, client);
     }
 
     _mailboxesPerAccount[account] = mailboxTree;
