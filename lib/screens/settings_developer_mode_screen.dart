@@ -1,5 +1,3 @@
-import 'package:enough_mail_app/util/dialog_helper.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -56,10 +54,4 @@ class _SettingsDeveloperModeScreenState
       ),
     );
   }
-}
-
-class _Language {
-  final Locale locale;
-  final String displayName;
-  _Language(this.locale, this.displayName);
 }

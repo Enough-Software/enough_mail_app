@@ -626,6 +626,34 @@
   "@settingsActionWelcome": {
     "description": "Settings action to show welcome screen of the app again."
   },
+  "settingsFolders": "Folders",
+  "@settingsFolders": {
+    "description": "Settings action to customize folders."
+  },
+  "folderNamesIntroduction": "What names do you prefer for your folders?",
+  "@folderNamesIntroduction": {
+    "description": "Introduction for folder names setting."
+  },
+  "folderNamesSettingLocalized": "Names given by Maily",
+  "@folderNamesSettingLocalized": {
+    "description": "Folder name setting option."
+  },
+  "folderNamesSettingServer": "Names given by the service",
+  "@folderNamesSettingServer": {
+    "description": "Folder name setting option."
+  },
+  "folderNamesSettingCustom": "My own custom names",
+  "@folderNamesSettingCustom": {
+    "description": "Folder name setting option."
+  },
+  "folderNamesEditAction": "Edit custom names",
+  "@folderNamesEditAction": {
+    "description": "Action to specify custom folder names."
+  },
+  "folderNamesCustomTitle": "Custom names",
+  "@folderNamesCustomTitle": {
+    "description": "Title of dialog to specify custom folder names."
+  },
   "settingsDeveloperMode": "Development mode",
   "@settingsDeveloperMode": {
     "description": "Settings action to enable or disable the development mode."
