@@ -57,14 +57,14 @@ class DialogHelper {
           defaultActions == DialogActions.okAndCancel) ...{
         TextButton(
           child: Text(localizations.actionOk),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).pop(true),
         ),
       },
       if (defaultActions == DialogActions.cancel ||
           defaultActions == DialogActions.okAndCancel) ...{
         TextButton(
           child: Text(localizations.actionCancel),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).pop(false),
         ),
       },
     ];
