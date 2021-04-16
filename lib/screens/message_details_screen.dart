@@ -22,6 +22,7 @@ import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MessageDetailsScreen extends StatefulWidget {
@@ -85,6 +86,8 @@ class _MessageContentState extends State<_MessageContent> {
   bool _messageDownloadError;
   bool _messageRequiresRefresh = false;
   bool _isWebViewZoomedOut = false;
+  Object errorObject;
+  StackTrace errorStackTrace;
 
   @override
   void initState() {
@@ -140,24 +143,6 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   Widget buildMailDetails(AppLocalizations localizations) {
-    if (_messageDownloadError) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(localizations.detailsErrorDownloadInfo),
-          TextButton.icon(
-            icon: Icon(Icons.refresh),
-            label: Text(localizations.detailsErrorDownloadRetry),
-            onPressed: () {
-              setState(() {
-                _messageDownloadError = false;
-              });
-            },
-          )
-        ],
-      );
-    }
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,7 +151,7 @@ class _MessageContentState extends State<_MessageContent> {
             padding: const EdgeInsets.all(8.0),
             child: buildHeader(localizations),
           ),
-          buildContent(),
+          buildContent(localizations),
         ],
       ),
     );
@@ -321,13 +306,51 @@ class _MessageContentState extends State<_MessageContent> {
     );
   }
 
-  Widget buildContent() {
+  Widget buildContent(AppLocalizations localizations) {
+    if (_messageDownloadError) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(localizations.detailsErrorDownloadInfo),
+          ),
+          TextButton.icon(
+            icon: Icon(Icons.refresh),
+            label: Text(localizations.detailsErrorDownloadRetry),
+            onPressed: () {
+              setState(() {
+                _messageDownloadError = false;
+              });
+            },
+          ),
+          if (locator<SettingsService>().settings.enableDeveloperMode) ...{
+            Text('Details:'),
+            Text(errorObject?.toString() ?? '<unknown error>'),
+            Text(errorStackTrace?.toString() ?? '<no stacktrace>'),
+            TextButton.icon(
+              icon: Icon(Icons.copy),
+              label: Text('Copy to clipboard'),
+              onPressed: () {
+                final text = errorObject?.toString() ??
+                    '<unknown error>' + '\n\n' + errorStackTrace?.toString() ??
+                    '<no stacktrace>';
+                final data = ClipboardData(text: text);
+                Clipboard.setData(data);
+              },
+            ),
+          },
+        ],
+      );
+    }
+
     return MimeMessageDownloader(
       mimeMessage: widget.message.mimeMessage,
       mailClient: widget.message.mailClient,
       markAsSeen: true,
       onDownloaded: onMimeMessageDownloaded,
-      onDownloadError: onMimeMessageDownloadError,
+      onError: onMimeMessageError,
       blockExternalImages: _blockExternalImages,
       mailtoDelegate: handleMailto,
       maxImageWidth: 320,
@@ -375,9 +398,11 @@ class _MessageContentState extends State<_MessageContent> {
         .cancelNotificationForMailMessage(widget.message);
   }
 
-  void onMimeMessageDownloadError(MailException e) {
+  void onMimeMessageError(Object e, StackTrace s) {
     if (mounted) {
       setState(() {
+        errorObject = e;
+        errorStackTrace = s;
         _messageDownloadError = true;
       });
     }
