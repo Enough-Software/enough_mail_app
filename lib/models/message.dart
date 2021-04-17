@@ -22,7 +22,17 @@ class Message extends ChangeNotifier {
     }
   }
 
+  bool isEmbedded = false;
+
   Message(this.mimeMessage, this.mailClient, this.source, this.sourceIndex);
+
+  Message.embedded(this.mimeMessage, Message parent)
+      : mailClient = parent.mailClient,
+        source = SingleMessageSource(parent.source),
+        sourceIndex = 0 {
+    (source as SingleMessageSource).singleMessage = this;
+    isEmbedded = true;
+  }
 
   bool get hasNext => (next != null);
   Message get next => source.next(this);

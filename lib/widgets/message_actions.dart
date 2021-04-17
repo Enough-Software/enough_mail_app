@@ -54,24 +54,26 @@ class _MessageActionsState extends State<MessageActions> {
       elevation: 16,
       child: Row(
         children: [
-          IconButton(
-            icon: Icon(widget.message.isSeen
-                ? Feather.circle // Icons.check_circle_outline
-                : Icons.circle), //Icons.check_circle),
-            onPressed: toggleSeen,
-          ),
-          IconButton(
-            icon: Icon(
-                widget.message.isFlagged ? Icons.flag : Icons.outlined_flag),
-            onPressed: toggleFlagged,
-          ),
+          if (!widget.message.isEmbedded) ...{
+            IconButton(
+              icon: Icon(widget.message.isSeen
+                  ? Feather.circle // Icons.check_circle_outline
+                  : Icons.circle), //Icons.check_circle),
+              onPressed: toggleSeen,
+            ),
+            IconButton(
+              icon: Icon(
+                  widget.message.isFlagged ? Icons.flag : Icons.outlined_flag),
+              onPressed: toggleFlagged,
+            ),
+          },
           Spacer(),
           IconButton(icon: Icon(Icons.reply), onPressed: reply),
           IconButton(icon: Icon(Icons.reply_all), onPressed: replyAll),
           IconButton(icon: Icon(Icons.forward), onPressed: forward),
           if (widget.message.source.isTrash) ...{
             IconButton(icon: Icon(Entypo.inbox), onPressed: moveToInbox),
-          } else ...{
+          } else if (!widget.message.isEmbedded) ...{
             IconButton(icon: Icon(Icons.delete), onPressed: delete),
           },
           PopupMenuButton<_OverflowMenuChoice>(
@@ -106,7 +108,7 @@ class _MessageActionsState extends State<MessageActions> {
                     title: Text(localizations.messageActionMoveToInbox),
                   ),
                 ),
-              } else ...{
+              } else if (!widget.message.isEmbedded) ...{
                 PopupMenuItem(
                   value: _OverflowMenuChoice.delete,
                   child: ListTile(
@@ -115,60 +117,62 @@ class _MessageActionsState extends State<MessageActions> {
                   ),
                 ),
               },
-              PopupMenuDivider(),
-              PopupMenuItem(
-                value: _OverflowMenuChoice.seen,
-                child: ListTile(
-                  leading: Icon(
-                      widget.message.isSeen ? Feather.circle : Icons.circle),
-                  title: Text(
-                    widget.message.isSeen
-                        ? localizations.messageStatusSeen
-                        : localizations.messageStatusUnseen,
-                  ),
-                ),
-              ),
-              PopupMenuItem(
-                value: _OverflowMenuChoice.flag,
-                child: ListTile(
-                  leading: Icon(widget.message.isFlagged
-                      ? Icons.flag
-                      : Icons.outlined_flag),
-                  title: Text(
-                    widget.message.isFlagged
-                        ? localizations.messageStatusFlagged
-                        : localizations.messageStatusUnflagged,
-                  ),
-                ),
-              ),
-              if (widget.message.source.supportsMessageFolders) ...{
+              if (!widget.message.isEmbedded) ...{
                 PopupMenuDivider(),
                 PopupMenuItem(
-                  value: _OverflowMenuChoice.junk,
+                  value: _OverflowMenuChoice.seen,
                   child: ListTile(
-                    leading: Icon(widget.message.source.isJunk
-                        ? Entypo.check
-                        : Entypo.bug),
+                    leading: Icon(
+                        widget.message.isSeen ? Feather.circle : Icons.circle),
                     title: Text(
-                      widget.message.source.isJunk
-                          ? localizations.messageActionMarkAsNotJunk
-                          : localizations.messageActionMarkAsJunk,
+                      widget.message.isSeen
+                          ? localizations.messageStatusSeen
+                          : localizations.messageStatusUnseen,
                     ),
                   ),
                 ),
                 PopupMenuItem(
-                  value: _OverflowMenuChoice.archive,
+                  value: _OverflowMenuChoice.flag,
                   child: ListTile(
-                    leading: Icon(widget.message.source.isArchive
-                        ? Entypo.inbox
-                        : Entypo.archive),
+                    leading: Icon(widget.message.isFlagged
+                        ? Icons.flag
+                        : Icons.outlined_flag),
                     title: Text(
-                      widget.message.source.isArchive
-                          ? localizations.messageActionUnarchive
-                          : localizations.messageActionArchive,
+                      widget.message.isFlagged
+                          ? localizations.messageStatusFlagged
+                          : localizations.messageStatusUnflagged,
                     ),
                   ),
                 ),
+                if (widget.message.source.supportsMessageFolders) ...{
+                  PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: _OverflowMenuChoice.junk,
+                    child: ListTile(
+                      leading: Icon(widget.message.source.isJunk
+                          ? Entypo.check
+                          : Entypo.bug),
+                      title: Text(
+                        widget.message.source.isJunk
+                            ? localizations.messageActionMarkAsNotJunk
+                            : localizations.messageActionMarkAsJunk,
+                      ),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: _OverflowMenuChoice.archive,
+                    child: ListTile(
+                      leading: Icon(widget.message.source.isArchive
+                          ? Entypo.inbox
+                          : Entypo.archive),
+                      title: Text(
+                        widget.message.source.isArchive
+                            ? localizations.messageActionUnarchive
+                            : localizations.messageActionArchive,
+                      ),
+                    ),
+                  ),
+                },
               },
             ],
           ),

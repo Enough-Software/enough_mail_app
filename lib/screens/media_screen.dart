@@ -68,6 +68,7 @@ class InteractiveMediaScreen extends StatelessWidget {
                       final source =
                           SingleMessageSource(mailService.messageSource);
                       final message = Message(mime, client, source, 0);
+                      message.isEmbedded = true;
                       source.singleMessage = message;
                       showErrorMessage = false;
                       locator<NavigationService>()

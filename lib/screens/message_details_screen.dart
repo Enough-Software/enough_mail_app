@@ -416,7 +416,7 @@ class _MessageContentState extends State<_MessageContent> {
         .push(Routes.mailCompose, arguments: composeData);
   }
 
-  Future navigateToMedia(InteractiveMediaWidget mediaWidget) {
+  Future navigateToMedia(InteractiveMediaWidget mediaWidget) async {
     return locator<NavigationService>()
         .push(Routes.interactiveMedia, arguments: mediaWidget);
   }
