@@ -14,11 +14,11 @@ class MessageOverviewContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final msg = message;
+    final mime = msg.mimeMessage;
     final localizations = AppLocalizations.of(context);
-    final threadLength = message.mimeMessage.threadSequence != null
-        ? message.mimeMessage.threadSequence.toList().length
-        : 0;
-    final mime = message.mimeMessage;
+    final threadLength =
+        mime.threadSequence != null ? mime.threadSequence.toList().length : 0;
     final subject = mime.decodeSubject() ?? localizations.subjectUndefined;
     MailAddress from;
     if (mime.from?.isNotEmpty ?? false) {
@@ -31,11 +31,11 @@ class MessageOverviewContent extends StatelessWidget {
         : from?.email != null
             ? from.email
             : localizations.emailSenderUnknown;
-    final hasAttachments = mime.hasAttachments();
+    final hasAttachments = msg.hasAttachment;
     final date = locator<I18nService>().formatDate(mime.decodeDate());
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-      color: message.isFlagged ? Colors.amber[50] : null,
+      color: msg.isFlagged ? Colors.amber[50] : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -51,32 +51,31 @@ class MessageOverviewContent extends StatelessWidget {
                     overflow: TextOverflow.fade,
                     softWrap: false,
                     style: TextStyle(
-                        fontWeight: message.isSeen
-                            ? FontWeight.normal
-                            : FontWeight.bold),
+                        fontWeight:
+                            msg.isSeen ? FontWeight.normal : FontWeight.bold),
                   ),
                 ),
               ),
               Text(date, style: TextStyle(fontSize: 12)),
               if (hasAttachments ||
-                  message.isAnswered ||
-                  message.isForwarded ||
-                  message.isFlagged ||
-                  threadLength != null) ...{
+                  msg.isAnswered ||
+                  msg.isForwarded ||
+                  msg.isFlagged ||
+                  threadLength != 0) ...{
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Row(
                     children: [
-                      if (message.isFlagged) ...{
+                      if (msg.isFlagged) ...{
                         Icon(Icons.outlined_flag, size: 12),
                       },
                       if (hasAttachments) ...{
                         Icon(Icons.attach_file, size: 12),
                       },
-                      if (message.isAnswered) ...{
+                      if (msg.isAnswered) ...{
                         Icon(Icons.reply, size: 12),
                       },
-                      if (message.isForwarded) ...{
+                      if (msg.isForwarded) ...{
                         Icon(Icons.forward, size: 12),
                       },
                       if (threadLength != 0) ...{
@@ -93,8 +92,7 @@ class MessageOverviewContent extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
                 fontStyle: FontStyle.italic,
-                fontWeight:
-                    message.isSeen ? FontWeight.normal : FontWeight.bold),
+                fontWeight: msg.isSeen ? FontWeight.normal : FontWeight.bold),
           ),
         ],
       ),

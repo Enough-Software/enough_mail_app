@@ -98,6 +98,17 @@ class Message extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get hasAttachment {
+    final mime = mimeMessage;
+    final size = mime.size;
+    // when only the envelope is downloaded, the content-type header ergo mediaType is not yet available
+    return mime.hasAttachments() ||
+        (mime.mimeData == null &&
+            mime.body == null &&
+            size != null &&
+            size > 256 * 1024);
+  }
+
   void updateFlags(List<String> flags) {
     mimeMessage.flags = flags;
     notifyListeners();
