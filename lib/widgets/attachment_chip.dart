@@ -1,8 +1,10 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message.dart';
+import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
+import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_media/enough_media.dart';
@@ -168,13 +170,23 @@ class _AttachmentChipState extends State<AttachmentChip> {
       print(
           'Unable to download attachment with fetch id ${widget.info.fetchId}: $e');
     } finally {
-      setState(() {
-        _isDownloading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isDownloading = false;
+        });
+      }
     }
   }
 
   Future showAttachment(InteractiveMediaWidget media) {
+    if (_mimePart.mediaType.sub == MediaSubtype.messageRfc822) {
+      final mime = _mimePart.decodeContentMessage();
+      if (mime != null) {
+        final message = Message.embedded(mime, widget.message);
+        return locator<NavigationService>()
+            .push(Routes.mailDetails, arguments: message);
+      }
+    }
     return locator<NavigationService>()
         .push(Routes.interactiveMedia, arguments: media);
   }
