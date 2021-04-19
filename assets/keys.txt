@@ -1,0 +1,2 @@
+# private keys file, do no not check in with filled in keys
+#giphy:YOUR KEY HERE

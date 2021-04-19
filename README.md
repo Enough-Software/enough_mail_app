@@ -31,13 +31,15 @@ You can test an early access version of Maily today on [Google Play](https://pla
 * Localized in English and German
 * Supports dark and light theme and you can also change the color scheme.
 * Shows thread information and allows to access the full thread when the mail service supports the `THREAD` IMAP extension.
+* Add animated GIFs and stickers (powered by Giphy)
+* Display attached messages
 
 ## Miss a feature or found a bug?
 
 Please file feature requests and bugs at the [issue tracker](https://github.com/Enough-Software/enough_mail_app/issues).
 
 
-## Contributions
+## Contributions and Setup
 Every contribution is welcome. Since the project is licensed under the [GPL](LICENSE), signing the [Contributor License Agreement](CLA.md) is required.  
 
 This is how you contribute:
@@ -49,6 +51,9 @@ This is how you contribute:
 * Go to [enough_mail_app](https://github.com/enough-software/enough_mail_app/) and create a pull request.
 
 When you have compile problems this is usually due to not getting the latest version from git. Call `flutter pub upgrade` to ensure that you are on the latest version of all referenced projects. Since translations are generated you can ignore all translation problems, just start the build, afterwards the localization compilation problems will be gone.
+
+For some features you will need to add the relevant keys to *assets/keys.txt*, currently the following key is required:
+* giphy: https://developers.giphy.com/ 
 
 ## License
 `enough_mail_app` is licensed under the [GNU Public License 3.0 "GPL"](LICENSE). In a nutshell this means that you can play around as much as possible for private reasons, but that you need to publish your changes under the GPL, as soon as you the code commercially.
