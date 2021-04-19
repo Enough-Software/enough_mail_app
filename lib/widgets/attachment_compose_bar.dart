@@ -1,11 +1,17 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/util/api_keys.dart';
+import 'package:enough_mail_app/util/dialog_helper.dart';
+import 'package:enough_mail_app/util/http_helper.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:giphy_picker/giphy_picker.dart';
 import '../locator.dart';
 
 class AttachmentMediaProviderFactory {
@@ -139,6 +145,20 @@ class AddAttachmentPopupButton extends StatelessWidget {
             title: Text(localizations.attachTypeLocation),
           ),
         ),
+        PopupMenuItem(
+          value: 5,
+          child: ListTile(
+            leading: Icon(Icons.gif),
+            title: Text(localizations.attachTypeGif),
+          ),
+        ),
+        PopupMenuItem(
+          value: 6,
+          child: ListTile(
+            leading: Icon(MaterialCommunityIcons.sticker),
+            title: Text(localizations.attachTypeSticker),
+          ),
+        ),
       ],
       onSelected: (value) async {
         var changed = false;
@@ -165,6 +185,13 @@ class AddAttachmentPopupButton extends StatelessWidget {
               changed = true;
             }
             break;
+          case 5: // gif file
+            changed = await addAttachmentGif(context, localizations);
+            break;
+          case 6: // gif sticker file
+            changed = await addAttachmentGif(context, localizations,
+                searchSticker: true);
+            break;
         }
         if (changed) {
           update();
@@ -190,6 +217,41 @@ class AddAttachmentPopupButton extends StatelessWidget {
       }
       messageBuilder.addBinary(file.bytes, mediaType, filename: file.name);
     }
+    return true;
+  }
+
+  Future<bool> addAttachmentGif(
+      BuildContext context, AppLocalizations localizations,
+      {bool searchSticker = false}) async {
+    if (!ApiKeys.isInitialized) {
+      await ApiKeys.init();
+    }
+    if (ApiKeys.giphy == null) {
+      DialogHelper.showTextDialog(context, localizations.errorTitle,
+          'No GIPHY API key found. Please check set up instructions.');
+      return false;
+    }
+
+    final gif = await GiphyPicker.pickGif(
+        context: context,
+        apiKey: ApiKeys.giphy,
+        searchText: searchSticker
+            ? localizations.attachTypeStickerSearch
+            : localizations.attachTypeGifSearch,
+        lang: locator<I18nService>().locale.languageCode,
+        sticker: searchSticker,
+        showPreviewPage: false);
+    if (gif == null) {
+      return false;
+    }
+    final result = await HttpHelper.httpGet(gif.images.original.url);
+    if (result.data == null) {
+      return false;
+    }
+    messageBuilder.addBinary(
+        result.data, MediaType.fromSubtype(MediaSubtype.imageGif),
+        filename: gif.title + '.gif');
+
     return true;
   }
 }
