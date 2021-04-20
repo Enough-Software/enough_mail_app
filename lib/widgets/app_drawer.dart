@@ -160,6 +160,11 @@ class _AppDrawerState extends State<AppDrawer> {
                 navService.push(Routes.messageSource,
                     arguments: messageSource, replace: true, fade: true);
               },
+              onLongPress: () {
+                final navService = locator<NavigationService>();
+                navService.push(Routes.accountEdit,
+                    arguments: account, fade: true);
+              },
             ),
           },
           buildAddAccountTile(localizations),
