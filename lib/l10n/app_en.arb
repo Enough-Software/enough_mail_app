@@ -1317,6 +1317,101 @@
   "swipeSettingChangeAction": "change",
   "@swipeSettingChangeAction": {
     "description": "Action for changing a swipe gesture"
+  },
+  "editorArtInputLabel": "Your input",
+  "@editorArtInputLabel": {
+    "description": "Label of input field when inserting a formatted text"
+  },
+  "editorArtInputHint": "Enter text here",
+  "@editorArtInputHint": {
+    "description": "Hint of input field when inserting a formatted text"
+  },
+  "editorArtWaitingForInputHint": "waiting for input...",
+  "@editorArtWaitingForInputHint": {
+    "description": "Text shown while waiting for input"
+  },
+  "fontSerifBold": "Serif bold",
+  "@fontSerifBold": {
+    "description": "Font name"
+  },
+  "fontSerifItalic": "Serif italic",
+  "@fontSerifItalic": {
+    "description": "Font name"
+  },
+  "fontSerifBoldItalic": "Serif bold italic",
+  "@fontSerifBoldItalic": {
+    "description": "Font name"
+  },
+  "fontSans": "Sans",
+  "@fontSans": {
+    "description": "Font name"
+  },
+  "fontSansBold": "Sans bold",
+  "@fontSansBold": {
+    "description": "Font name"
+  },
+  "fontSansItalic": "Sans italic",
+  "@fontSansItalic": {
+    "description": "Font name"
+  },
+  "fontSansBoldItalic": "Sans bold italic",
+  "@fontSansBoldItalic": {
+    "description": "Font name"
+  },
+  "fontScript": "Script",
+  "@fontScript": {
+    "description": "Font name"
+  },
+  "fontScriptBold": "Script bold",
+  "@fontScriptBold": {
+    "description": "Font name"
+  },
+  "fontFraktur": "Fraktur",
+  "@fontFraktur": {
+    "description": "Font name"
+  },
+  "fontFrakturBold": "Fraktur bold",
+  "@fontFrakturBold": {
+    "description": "Font name"
+  },
+  "fontMonospace": "Monospace",
+  "@fontMonospace": {
+    "description": "Font name"
+  },
+  "fontFullwidth": "Fullwidth",
+  "@fontFullwidth": {
+    "description": "Font name"
+  },
+  "fontDoublestruck": "Double struck",
+  "@fontDoublestruck": {
+    "description": "Font name"
+  },
+  "fontCapitalized": "Capitalized",
+  "@fontCapitalized": {
+    "description": "Font name"
+  },
+  "fontCircled": "Circled",
+  "@fontCircled": {
+    "description": "Font name"
+  },
+  "fontParenthesized": "Parenthesized",
+  "@fontParenthesized": {
+    "description": "Font name"
+  },
+  "fontUnderlinedSingle": "Underlined",
+  "@fontUnderlinedSingle": {
+    "description": "Font name"
+  },
+  "fontUnderlinedDouble": "Underlined double",
+  "@fontUnderlinedDouble": {
+    "description": "Font name"
+  },
+  "fontStrikethroughSingle": "Strike through",
+  "@fontStrikethroughSingle": {
+    "description": "Font name"
+  },
+  "fontCrosshatch": "Crosshatch",
+  "@fontCrosshatch": {
+    "description": "Font name"
   }
-
 }
