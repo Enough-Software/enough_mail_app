@@ -5,6 +5,7 @@ import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/widgets/editor_extensions.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:enough_mail/enough_mail.dart';
@@ -43,7 +44,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
   bool _isCcBccVisible = false;
   TransferEncoding _usedTextEncoding;
   Future<String> loadMailTextFuture;
-  EditorApi _editorApi;
+  HtmlEditorApi _editorApi;
   Future _downloadAttachmentsFuture;
   String _originalMessageHtml;
   ComposeData _resumeComposeData;
@@ -528,7 +529,10 @@ class _ComposeScreenState extends State<ComposeScreen> {
               ),
             ),
             if (_editorApi != null) ...{
-              SliverHeaderHtmlEditorControls(editorApi: _editorApi),
+              SliverHeaderHtmlEditorControls(
+                editorApi: _editorApi,
+                suffix: EditorArtExtensionButton(editorApi: _editorApi),
+              ),
             },
             SliverToBoxAdapter(
               child: FutureBuilder<String>(
