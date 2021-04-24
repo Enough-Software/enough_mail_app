@@ -465,18 +465,20 @@ class MailService {
         final atIndex = mailAccount.email.lastIndexOf('@');
         preferredUserName = mailAccount.email.substring(0, atIndex);
         final incomingAuth = mailAccount.incoming.authentication;
-        if (incomingAuth is PlainAuthentication) {
+        if (incomingAuth is UserNameBasedAuthentication) {
           incomingAuth.userName = preferredUserName;
         }
         final outgoingAuth = mailAccount.outgoing.authentication;
-        if (outgoingAuth is PlainAuthentication) {
+        if (outgoingAuth is UserNameBasedAuthentication) {
           outgoingAuth.userName = preferredUserName;
         }
+        mailClient.disconnect();
         mailClient = MailClient(mailAccount,
             isLogEnabled: true, eventBus: AppEventBus.eventBus);
         try {
           await mailClient.connect();
         } on MailException {
+          mailClient.disconnect();
           return null;
         }
       }
