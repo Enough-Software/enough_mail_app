@@ -54,10 +54,9 @@ dependencies:
   flutter_icons: ^1.1.0
   path_provider: ^2.0.1
   share: ^2.0.1
-  flutter_absolute_path: ^1.0.6
   flutter_local_notifications: ^5.0.0
   shared_preferences: ^2.0.5
-  background_fetch: ^1.0.0-nullsafety.1
+  background_fetch: ^1.0.0-nullsafety.2
   file_picker: ^3.0.0
   fluttercontactpicker: ^4.4.0
   cupertino_icons: ^1.0.2

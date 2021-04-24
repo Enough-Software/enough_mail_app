@@ -1,6 +1,8 @@
 import 'package:diff_match_patch/diff_match_patch.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail_app/models/account.dart';
+import 'package:enough_mail_app/models/shared_data.dart';
+import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
@@ -51,6 +53,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   @override
   void initState() {
+    locator<AppService>().onSharedData = _onSharedData;
     final mb = widget.data.messageBuilder;
     _toRecipients = mb.to ?? [];
     _ccRecipients = mb.cc ?? [];
@@ -107,6 +110,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
   @override
   void dispose() {
     _subjectController.dispose();
+    locator<AppService>().onSharedData = null;
     super.dispose();
   }
 
@@ -633,6 +637,18 @@ class _ComposeScreenState extends State<ComposeScreen> {
       locator<ContactService>().getForAccount(account).then((value) {
         setState(() {});
       });
+    }
+  }
+
+  Future _onSharedData(List<SharedData> sharedData) {
+    final firstData = sharedData.first;
+    if (firstData is SharedMailto) {
+      //TODO add the recipients, set the subject, set the text?
+    } else {
+      for (final data in sharedData) {
+        data.addToMessageBuilder(widget.data.messageBuilder);
+        data.addToEditor(_editorApi);
+      }
     }
   }
 }

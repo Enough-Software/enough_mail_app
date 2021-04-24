@@ -12,8 +12,11 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugins.GeneratedPluginRegistrant
 
+import java.io.File
+
 class MainActivity: FlutterActivity() {
-    var sharedData : String? = null
+    var sharedDataMap : Map<String, Any>? = null;
+
     private val CHANNEL = "app.channel.shared.data"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,6 +25,7 @@ class MainActivity: FlutterActivity() {
     }
     
     override fun onNewIntent(newIntent: Intent) {
+        //println("maily onNewIntent: $newIntent")
         checkForShareIntent(newIntent)
         super.onNewIntent(newIntent)
     }
@@ -44,66 +48,75 @@ class MainActivity: FlutterActivity() {
 
         channel.setMethodCallHandler { call, result ->
             if (call.method == "getSharedData") {
-                result.success(sharedData)
-                sharedData = null;
+                result.success(sharedDataMap)
+                sharedDataMap = null;
             }
         }
     }
 
     private fun extractShareData(shareIntent: Intent, action: String, type: String?) {
         //println("extract share data from $shareIntent")
-        var uriText : String?
+        val result: MutableMap<String,Any> = HashMap<String, Any>();
+         if (type != null) {
+            result["mimeType"] = type
+        }
         if (action == Intent.ACTION_SEND_MULTIPLE) {
-            var uris = shareIntent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM);
-            //println("got uris $uris")
-            uriText = if (uris == null) {
-                "<<null>>"
+            val uris = shareIntent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM);
+            if (uris == null) {
+                result["length"] = 0
             } else {
-                 uris.map { "<<$it>>" }.toString()
-    //            val mimeType: String? = shareIntent.data?.let { returnUri ->
-    //                contentResolver.getType(returnUri)
-    //            }
-    //            println('got mime')
-                // val client: ContentProviderClient? = shareIntent.data?.let { returnUri ->
-                //     contentResolver.acquireContentProviderClient(returnUri)
-                // }
-                //client.localContentProvider.openFile()
-                //strings.toString()
+                val count = uris.count()
+                result["length"] = count
+                for (i in 0 until count) {
+                    val uri = uris[i]
+                    result["data.$i"] = loadUriData(uri)
+                    result["name.$i"] = getFileName(uri)
+                    result["type.$i"] = getMimeType(uri)
+                }
             }
         } else if (action == Intent.ACTION_SENDTO || action == Intent.ACTION_VIEW) {
             //println("$action: with data ${shareIntent.data} dataString ${shareIntent.dataString}")
-            uriText = "[<<${shareIntent.dataString}>>]"
+            val dataString = shareIntent.dataString;
+            if (dataString != null) {
+                result["text"] = dataString 
+            }
         } else {
-            var uri = shareIntent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+            val uri = shareIntent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
             //println("got uri $uri")
-            uriText =  "[<<$uri>>]"
+            if (uri != null) {
+                result["length"] = 1
+                result["data.0"] = loadUriData(uri)
+                result["name.0"] = getFileName(uri)
+                result["type.0"] = getMimeType(uri)
+            }
         }
-        sharedData = type + ":" + uriText + ":" + shareIntent.getStringExtra(Intent.EXTRA_TEXT)
-        //println("sharedData $sharedData")
+        sharedDataMap = result;
     }
 
-    private fun uriToInfo(uri: Uri) {
-        /*
-     * Get the file's content URI from the incoming Intent,
-     * then query the server app to get the file's display name
-     * and size.
-     */
+    private fun getMimeType(uri: Uri): String {
+        return  contentResolver.getType(uri) ?: "null"
+    }
 
-        contentResolver.query(uri, null, null, null, null)
-        ?.use { cursor ->
-            /*
-             * Get the column indexes of the data in the Cursor,
-             * move to the first row in the Cursor, get the data,
-             * and display it.
-             */
+    private fun getFileName(uri: Uri): String {
+        return contentResolver.query(uri, null, null, null, null)?.use { cursor -> 
             val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
             cursor.moveToFirst()
-            val name = cursor.getString(nameIndex)
-            val size = cursor.getLong(sizeIndex).toString()
-
-        }
+            cursor.getString(nameIndex)
+        } ?: File(uri.path).name 
+        // int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        // cursor.moveToFirst();
+        // nameView.setText(cursor.getString(nameIndex));
+        // val path = uri.path;
+        // if (path != null) {
+        //     return File(path).name;
+        // }
+        // return "null";
     }
 
-
+    private fun loadUriData(uri: Uri): ByteArray {
+        val inputStream = contentResolver.openInputStream(uri)!!
+        val bytes = inputStream.readBytes()        
+        inputStream.close()
+        return bytes
+    }
 }
