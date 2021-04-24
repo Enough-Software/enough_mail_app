@@ -105,39 +105,50 @@ class _AppDrawerState extends State<AppDrawer> {
       Account currentAccount, List<Account> accounts, ThemeData theme) {
     final avatarAccount =
         currentAccount.isVirtual ? accounts.first : currentAccount;
-    return Row(
-      children: [
-        CircleAvatar(
-          backgroundColor: theme.secondaryHeaderColor,
-          backgroundImage: NetworkImage(
-            avatarAccount.imageUrlGravator,
+    return ListTile(
+      onTap: () {
+        final navService = locator<NavigationService>();
+        if (currentAccount is UnifiedAccount) {
+          navService.push(Routes.settingsAccounts, fade: true);
+        } else {
+          navService.push(Routes.accountEdit,
+              arguments: currentAccount, fade: true);
+        }
+      },
+      title: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: theme.secondaryHeaderColor,
+            backgroundImage: NetworkImage(
+              avatarAccount.imageUrlGravator,
+            ),
+            radius: 30,
           ),
-          radius: 30,
-        ),
-        Padding(
-          padding: EdgeInsets.only(left: 8),
-        ),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                currentAccount.name ?? '',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                currentAccount.userName ?? '',
-                style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
-              ),
-              Text(
-                currentAccount.email ?? '',
-                style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
-              ),
-            ],
+          Padding(
+            padding: EdgeInsets.only(left: 8),
           ),
-        ),
-      ],
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  currentAccount.name ?? '',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  currentAccount.userName ?? '',
+                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
+                ),
+                Text(
+                  currentAccount.email ?? '',
+                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -162,8 +173,12 @@ class _AppDrawerState extends State<AppDrawer> {
               },
               onLongPress: () {
                 final navService = locator<NavigationService>();
-                navService.push(Routes.accountEdit,
-                    arguments: account, fade: true);
+                if (account is UnifiedAccount) {
+                  navService.push(Routes.settingsAccounts, fade: true);
+                } else {
+                  navService.push(Routes.accountEdit,
+                      arguments: account, fade: true);
+                }
               },
             ),
           },
