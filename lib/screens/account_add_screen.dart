@@ -355,8 +355,11 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         setState(() {
           _isAccountVerifying = true;
         });
-        var mailAccount = MailAccount.fromDiscoveredSettings('account name',
-            _emailController.text, _passwordController.text, _clientConfig);
+        var mailAccount = MailAccount.fromDiscoveredSettings(
+            _emailController.text,
+            _emailController.text,
+            _passwordController.text,
+            _clientConfig);
         mailClient = await locator<MailService>().connect(mailAccount);
 
         final isVerified = mailClient?.isConnected ?? false;
