@@ -651,7 +651,6 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Container(color: Color(0xdd000000)),
             Positioned(
               left: offset.dx,
               top: top,
