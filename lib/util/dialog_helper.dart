@@ -53,18 +53,18 @@ class DialogHelper {
       {List<Widget> actions, DialogActions defaultActions = DialogActions.ok}) {
     final localizations = AppLocalizations.of(context);
     actions ??= [
-      if (defaultActions == DialogActions.ok ||
-          defaultActions == DialogActions.okAndCancel) ...{
-        TextButton(
-          child: Text(localizations.actionOk),
-          onPressed: () => Navigator.of(context).pop(true),
-        ),
-      },
       if (defaultActions == DialogActions.cancel ||
           defaultActions == DialogActions.okAndCancel) ...{
         TextButton(
           child: Text(localizations.actionCancel),
           onPressed: () => Navigator.of(context).pop(false),
+        ),
+      },
+      if (defaultActions == DialogActions.ok ||
+          defaultActions == DialogActions.okAndCancel) ...{
+        TextButton(
+          child: Text(localizations.actionOk),
+          onPressed: () => Navigator.of(context).pop(true),
         ),
       },
     ];
