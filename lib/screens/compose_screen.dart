@@ -650,6 +650,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
         data.addToEditor(_editorApi);
       }
     }
+    return Future.value();
   }
 }
 
