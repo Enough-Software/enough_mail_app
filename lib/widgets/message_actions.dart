@@ -2,9 +2,14 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
+import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
+import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_mail_app/util/dialog_helper.dart';
+import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -27,7 +32,8 @@ enum _OverflowMenuChoice {
   junk,
   seen,
   flag,
-  archive
+  archive,
+  redirect,
 }
 
 class _MessageActionsState extends State<MessageActions> {
@@ -173,6 +179,15 @@ class _MessageActionsState extends State<MessageActions> {
                     ),
                   ),
                 },
+                PopupMenuItem(
+                  value: _OverflowMenuChoice.redirect,
+                  child: ListTile(
+                    leading: Icon(Icons.compare_arrows),
+                    title: Text(
+                      localizations.messageActionRedirect,
+                    ),
+                  ),
+                ),
               },
             ],
           ),
@@ -210,6 +225,9 @@ class _MessageActionsState extends State<MessageActions> {
       case _OverflowMenuChoice.archive:
         moveArchive();
         break;
+      case _OverflowMenuChoice.redirect:
+        redirectMessage();
+        break;
     }
   }
 
@@ -244,7 +262,67 @@ class _MessageActionsState extends State<MessageActions> {
     navigateToCompose(widget.message, builder, ComposeAction.answer);
   }
 
-  void redirectMessage() {}
+  void redirectMessage() async {
+    final mailClient = widget.message.mailClient;
+    final account = locator<MailService>().getAccountFor(mailClient.account);
+    if (account.contactManager == null) {
+      await locator<ContactService>().getForAccount(account);
+    }
+
+    final List<MailAddress> recipients = [];
+    final localizations = AppLocalizations.of(context);
+    final size = MediaQuery.of(context).size;
+    final redirect = await DialogHelper.showWidgetDialog(
+      context,
+      localizations.redirectTitle,
+      SingleChildScrollView(
+        child: SizedBox(
+          width: size.width - 32,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(localizations.redirectInfo,
+                  style: Theme.of(context).textTheme.caption),
+              RecipientInputField(
+                addresses: recipients,
+                contactManager: account.contactManager,
+                labelText: localizations.detailsHeaderTo,
+                hintText: localizations.composeRecipientHint,
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: Text(localizations.actionCancel),
+          onPressed: () => Navigator.of(context).pop(false),
+        ),
+        TextButton(
+          child: Text(localizations.messageActionRedirect),
+          onPressed: () => Navigator.of(context).pop(true),
+        ),
+      ],
+    );
+    if (redirect == true && recipients.isNotEmpty) {
+      final mime = widget.message.mimeMessage;
+      if (mime.mimeData == null) {
+        // download complete message first
+        await mailClient.fetchMessageContents(mime);
+      }
+      try {
+        mailClient.sendMessage(mime,
+            recipients: recipients, appendToSent: false);
+        locator<ScaffoldMessengerService>()
+            .showTextSnackBar(localizations.resultRedirectedSuccess);
+      } catch (e, s) {
+        print('message could not get redirected: $e $s');
+        locator<ScaffoldMessengerService>()
+            .showTextSnackBar(localizations.resultRedirectedFailure);
+      }
+    }
+  }
 
   void delete() async {
     locator<NavigationService>().pop();

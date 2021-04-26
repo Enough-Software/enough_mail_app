@@ -526,6 +526,10 @@
   "@messageActionUnarchive": {
     "description": "Action for single message."
   },
+  "messageActionRedirect": "redirect",
+  "@messageActionRedirect": {
+    "description": "Action for single message."
+  },
   "resultDeleted": "deleted",
   "@resultDeleted": {
     "description": "Successful short snackbar message after deleting message(s)."
@@ -541,6 +545,22 @@
   "resultArchived": "archived",
   "@resultArchived": {
     "description": "Successful short snackbar message after moving message(s) to archive."
+  },
+  "resultRedirectedSuccess": "Message redirected 👍",
+  "@resultRedirectedSuccess": {
+    "description": "Successful snackbar message after redirecting message to new recipient(s)."
+  },
+  "resultRedirectedFailure": "Unable to redirect message.",
+  "@resultRedirectedFailure": {
+    "description": "Failure snackbar message after failed to redirect message to new recipient(s)."
+  },
+  "redirectTitle": "Redirect",
+  "@redirectTitle": {
+    "description": "Title of redirect dialog."
+  },
+  "redirectInfo": "Redirect this message to the following recpient(s). Redirecting does not alter the message.",
+  "@redirectInfo": {
+    "description": "Short explanation of redirect action in redirect dialog."
   },
   "searchQueryDescription": "search in {folder}...",
   "@searchQueryDescription": {
