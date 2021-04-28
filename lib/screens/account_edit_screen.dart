@@ -4,6 +4,7 @@ import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
@@ -56,6 +57,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
 
   Widget buildEditContent(
       AppLocalizations localizations, BuildContext context) {
+    final theme = Theme.of(context);
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -93,9 +95,16 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   await locator<MailService>()
                       .excludeAccountFromUnified(widget.account, !value);
                 },
-                title: Text(localizations.editAccountIncludeInUnifedLabel),
+                title: Text(localizations.editAccountIncludeInUnifiedLabel),
               ),
             },
+            Divider(),
+            Text(localizations.signatureSettingsTitle,
+                style: theme.textTheme.subtitle1),
+            SignatureWidget(
+              account: widget.account,
+            ),
+            Divider(),
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
               child: Text(

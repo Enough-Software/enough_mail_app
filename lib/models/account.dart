@@ -6,6 +6,13 @@ import 'package:flutter/cupertino.dart';
 import '../locator.dart';
 
 class Account extends ChangeNotifier {
+  static const String attributeGravatarImageUrl = 'gravatar.img';
+  static const String attributeExcludeFromUnified = 'excludeUnified';
+  static const String attributePlusAliasTested = 'test.alias.plus';
+  static const String attributeSentMailAddedAutomatically = 'sendMailAdded';
+  static const String attributeSignatureHtml = 'signatureHtml';
+  static const String attributeSignaturePlain = 'signaturePlain';
+
   final MailAccount account;
 
   Account(this.account);
@@ -15,12 +22,38 @@ class Account extends ChangeNotifier {
   String get name => account?.name;
 
   bool get excludeFromUnified =>
-      account.hasAttribute(MailService.attributeExcludeFromUnified);
+      account.hasAttribute(attributeExcludeFromUnified);
   set excludeFromUnified(bool value) {
     if (value) {
-      account.attributes[MailService.attributeExcludeFromUnified] = value;
+      account.attributes[attributeExcludeFromUnified] = value;
     } else {
-      account.attributes.remove(MailService.attributeExcludeFromUnified);
+      account.attributes.remove(attributeExcludeFromUnified);
+    }
+  }
+
+  dynamic getAttribute(String key) {
+    return account.attributes[key];
+  }
+
+  void setAttribute(String key, dynamic value) {
+    account.attributes[key] = value;
+  }
+
+  String get signatureHtml => account.attributes[attributeSignatureHtml];
+  set signatureHtml(String value) {
+    if (value == null) {
+      account.attributes.remove(attributeSignatureHtml);
+    } else {
+      account.attributes[attributeSignatureHtml] = value;
+    }
+  }
+
+  String get signaturePlain => account.attributes[attributeSignaturePlain];
+  set signaturePlain(String value) {
+    if (value == null) {
+      account.attributes.remove(attributeSignaturePlain);
+    } else {
+      account.attributes[attributeSignaturePlain] = value;
     }
   }
 
@@ -74,12 +107,10 @@ class Account extends ChangeNotifier {
   bool get hasAlias => account?.aliases?.isNotEmpty ?? false;
   bool get hasNoAlias => !hasAlias;
 
-  String get imageUrlGravator =>
-      account?.attributes[MailService.attributeGravatarImageUrl];
+  String get imageUrlGravator => account?.attributes[attributeGravatarImageUrl];
 
   bool get addsSentMailAutomatically =>
-      account?.attributes[MailService.attributeSentMailAddedAutomatically] ??
-      false;
+      account?.attributes[attributeSentMailAddedAutomatically] ?? false;
 
   String _key;
   String get key {

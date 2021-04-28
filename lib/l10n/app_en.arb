@@ -1,4 +1,8 @@
 {
+  "signature": "Sent with Maily",
+  "@signature": {
+    "description": "Default signature text"
+  },  
   "actionCancel": "cancel",
   "@actionCancel": {
     "description": "Generic cancel action"
@@ -872,8 +876,8 @@
       }
     }  
   },
-  "editAccountIncludeInUnifedLabel": "Include in unified account",
-  "@editAccountIncludeInUnifedLabel": {
+  "editAccountIncludeInUnifiedLabel": "Include in unified account",
+  "@editAccountIncludeInUnifiedLabel": {
     "description": "Label for opting this account in/out of the unified account."
   },
   "editAccountAliasLabel": "Alias email addresses for {email}:",
@@ -1337,6 +1341,28 @@
   "swipeSettingChangeAction": "change",
   "@swipeSettingChangeAction": {
     "description": "Action for changing a swipe gesture"
+  },
+  "signatureSettingsTitle": "Signature",
+  "@signatureSettingsTitle": {
+    "description": "Title of signature setting screen"
+  },
+  "signatureSettingsComposeActionsInfo": "Enable the signature for the following messages:",
+  "@signatureSettingsComposeActionsInfo": {
+    "description": "Text before selecting message types for a signature (new, forward, reply)."
+  },
+  "signatureSettingsAccountInfo": "You can specify account specific signatures in the account settings.",
+  "@signatureSettingsAccountInfo": {
+    "description": "Informational text before showing link to account settings."
+  },
+  "signatureSettingsAddForAccount": "Add signature for {account}",
+  "@signatureSettingsAddForAccount": {
+    "description": "Action to add account specific signature.",
+    "placeholders": {
+      "account": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }  
   },
   "editorArtInputLabel": "Your input",
   "@editorArtInputLabel": {

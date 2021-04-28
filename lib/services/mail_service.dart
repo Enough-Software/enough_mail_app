@@ -17,10 +17,6 @@ import 'package:flutter/foundation.dart' as foundation;
 import '../locator.dart';
 
 class MailService {
-  static const String attributeGravatarImageUrl = 'gravatar.img';
-  static const String attributeExcludeFromUnified = 'excludeUnified';
-  static const String attributePlusAliasTested = 'test.alias.plus';
-  static const String attributeSentMailAddedAutomatically = 'sendMailAdded';
   //MailClient current;
   MessageSource messageSource;
   Account currentAccount;
@@ -110,7 +106,7 @@ class MailService {
   _createUnifiedAccount() {
     final mailAccountsForUnified = accounts
         .where((account) => (!account.isVirtual &&
-            !account.account.hasAttribute(attributeExcludeFromUnified)))
+            !account.account.hasAttribute(Account.attributeExcludeFromUnified)))
         .toList();
     if (mailAccountsForUnified.length > 1) {
       unifiedAccount = UnifiedAccount(
@@ -206,7 +202,7 @@ class MailService {
       size: 400,
       defaultImage: GravatarImage.retro,
     );
-    account.attributes[attributeGravatarImageUrl] = url;
+    account.attributes[Account.attributeGravatarImageUrl] = url;
   }
 
   Future<bool> addAccount(
@@ -218,7 +214,7 @@ class MailService {
     await _checkForAddingSentMessages(mailAccount);
     _addGravatar(mailAccount);
     mailAccounts.add(mailAccount);
-    if (!mailAccount.hasAttribute(attributeExcludeFromUnified)) {
+    if (!mailAccount.hasAttribute(Account.attributeExcludeFromUnified)) {
       if (unifiedAccount != null) {
         unifiedAccount.accounts.add(currentAccount);
       } else {
@@ -404,11 +400,12 @@ class MailService {
   }
 
   void markAccountAsTestedForPlusAlias(Account account) {
-    account.account.attributes[attributePlusAliasTested] = true;
+    account.account.attributes[Account.attributePlusAliasTested] = true;
   }
 
   bool hasAccountBeenTestedForPlusAlias(Account account) {
-    return account?.account?.attributes[attributePlusAliasTested] ?? false;
+    return account?.account?.attributes[Account.attributePlusAliasTested] ??
+        false;
   }
 
   /// Creates a new random plus alias based on the primary email address of this account.
@@ -487,7 +484,7 @@ class MailService {
   }
 
   Future _checkForAddingSentMessages(MailAccount mailAccount) async {
-    mailAccount.attributes[attributeSentMailAddedAutomatically] = [
+    mailAccount.attributes[Account.attributeSentMailAddedAutomatically] = [
       'outlook.office365.com',
       'imap.gmail.com'
     ].contains(mailAccount.incoming.serverConfig.hostname);
