@@ -1,3 +1,4 @@
+import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:enough_serialization/enough_serialization.dart';
@@ -15,6 +16,8 @@ class Settings extends SerializableObject {
     transformers['folderNameSetting'] = (value) => value is FolderNameSetting
         ? value.index
         : FolderNameSetting.values[value];
+    transformers['signatureActions'] = (value) =>
+        value is ComposeAction ? value.index : ComposeAction.values[value];
   }
 
   bool get blockExternalImages => attributes['blockExternalImages'] ?? false;
@@ -62,4 +65,15 @@ class Settings extends SerializableObject {
   bool get enableDeveloperMode => attributes['enableDeveloperMode'] ?? false;
   set enableDeveloperMode(bool value) =>
       attributes['enableDeveloperMode'] = value;
+
+  String get signatureHtml => attributes['signatureHtml'];
+  set signatureHtml(String value) => attributes['signatureHtml'] = value;
+
+  String get signaturePlain => attributes['signaturePlain'];
+  set signaturePlain(String value) => attributes['signaturePlain'] = value;
+
+  List<ComposeAction> get signatureActions =>
+      attributes['signatureActions'] ?? [ComposeAction.newMessage];
+  set signatureActions(List<ComposeAction> value) =>
+      attributes['signatureActions'] = value;
 }

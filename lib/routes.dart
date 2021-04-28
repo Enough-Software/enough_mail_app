@@ -20,6 +20,7 @@ class Routes {
   static const String settingsFolders = 'settingsFolders';
   static const String settingsDeveloperMode = 'settingsDeveloperMode';
   static const String settingsSwipe = 'settingsSwipe';
+  static const String settingsSignature = 'settingsSignature';
   static const String messageSource = 'messageSource';
   static const String mailDetails = 'mailDetails';
   static const String mailContents = 'mailContents';
@@ -67,6 +68,9 @@ class AppRouter {
         break;
       case Routes.settingsSwipe:
         page = SettingsSwipeScreen();
+        break;
+      case Routes.settingsSignature:
+        page = SettingsSignatureScreen();
         break;
       case Routes.messageSource:
         page = MessageSourceScreen(arguments as MessageSource);

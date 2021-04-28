@@ -142,9 +142,12 @@ class _ComposeScreenState extends State<ComposeScreen> {
   }
 
   Future<String> loadMailTextFromMessage() async {
+    // find out signature:
+    final signature = locator<SettingsService>()
+        .getSignatureHtml(from.account, widget.data.action);
     final mb = widget.data.messageBuilder;
     if (mb.originalMessage == null) {
-      return '<p>${mb.text ?? ''}</p>';
+      return '<p>${mb.text ?? '&nbsp;'}</p>$signature';
     } else {
       final blockExternalImages = false;
       final emptyMessageText =
@@ -154,7 +157,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
         // continue with draft:
         final args = _HtmlGenerationArguments(null, mb.originalMessage,
             blockExternalImages, emptyMessageText, maxImageWidth);
-        final html = await compute(_generateDraftHtmlImpl, args);
+        final html = await compute(_generateDraftHtmlImpl, args) + signature;
         _originalMessageHtml = html;
         return html;
       }
@@ -165,7 +168,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
               : MailConventions.defaultReplyHeaderTemplate;
       final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
           blockExternalImages, emptyMessageText, maxImageWidth);
-      final html = await compute(_generateQuoteHtmlImpl, args);
+      final html = await compute(_generateQuoteHtmlImpl, args) + signature;
       _originalMessageHtml = html;
       return html;
     }

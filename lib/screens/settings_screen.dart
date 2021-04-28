@@ -67,6 +67,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               ListTile(
+                title: Text(localizations.signatureSettingsTitle),
+                onTap: () {
+                  locator<NavigationService>().push(Routes.settingsSignature);
+                },
+              ),
+              ListTile(
                 title: Text(localizations.settingsActionDesign),
                 onTap: () {
                   locator<NavigationService>().push(Routes.settingsDesign);
