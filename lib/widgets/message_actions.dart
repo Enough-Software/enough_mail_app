@@ -27,6 +27,7 @@ enum _OverflowMenuChoice {
   reply,
   replyAll,
   forward,
+  forwardAsAttachment,
   delete,
   inbox,
   junk,
@@ -104,6 +105,13 @@ class _MessageActionsState extends State<MessageActions> {
                 child: ListTile(
                   leading: Icon(Icons.forward),
                   title: Text(localizations.messageActionForward),
+                ),
+              ),
+              PopupMenuItem(
+                value: _OverflowMenuChoice.forwardAsAttachment,
+                child: ListTile(
+                  leading: Icon(Icons.attach_file),
+                  title: Text(localizations.messageActionForwardAsAttachment),
                 ),
               ),
               if (widget.message.source.isTrash) ...{
@@ -206,6 +214,9 @@ class _MessageActionsState extends State<MessageActions> {
         break;
       case _OverflowMenuChoice.forward:
         forward();
+        break;
+      case _OverflowMenuChoice.forwardAsAttachment:
+        forwardAsAttachment();
         break;
       case _OverflowMenuChoice.delete:
         delete();
@@ -363,12 +374,31 @@ class _MessageActionsState extends State<MessageActions> {
   }
 
   void forward() {
-    var from = widget.message.mailClient.account.fromAddress;
-    var builder = MessageBuilder.prepareForwardMessage(
+    final from = widget.message.mailClient.account.fromAddress;
+    final builder = MessageBuilder.prepareForwardMessage(
       widget.message.mimeMessage,
       from: from,
       quoteMessage: false,
     );
+    navigateToCompose(widget.message, builder, ComposeAction.forward);
+  }
+
+  void forwardAsAttachment() async {
+    final message = widget.message;
+    final mailClient = message.mailClient;
+    final from = mailClient.account.fromAddress;
+    var mime = message.mimeMessage;
+    final builder = MessageBuilder();
+    builder.from = [from];
+
+    builder.subject = MessageBuilder.createForwardSubject(mime.decodeSubject());
+    if (mime.mimeData == null) {
+      //TODO move to background
+      final updated = await mailClient.fetchMessageContents(mime);
+      message.updateMime(updated);
+      mime = updated;
+    }
+    builder.addMessagePart(mime);
     navigateToCompose(widget.message, builder, ComposeAction.forward);
   }
 

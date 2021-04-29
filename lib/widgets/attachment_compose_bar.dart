@@ -1,11 +1,13 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
+import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/api_keys.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
+import 'package:enough_mail_app/widgets/message_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_media/enough_media.dart';
@@ -277,6 +279,13 @@ class ComposeAttachment extends StatelessWidget {
           width: 60,
           height: 60,
           showInteractiveDelegate: (interactiveMedia) {
+            if (attachment.mediaType.sub == MediaSubtype.messageRfc822) {
+              final mime = MimeMessage.parseFromData(attachment.data);
+              final message = Message.embedded(mime, Message.of(context));
+              return locator<NavigationService>()
+                  .push(Routes.mailDetails, arguments: message);
+            }
+
             return locator<NavigationService>()
                 .push(Routes.interactiveMedia, arguments: interactiveMedia);
           },

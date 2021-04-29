@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/widgets/message_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' as urlLauncher;
@@ -122,6 +123,8 @@ class Message extends ChangeNotifier {
   void toggleSelected() {
     isSelected = !_isSelected;
   }
+
+  static Message of(BuildContext context) => MessageWidget.of(context)?.message;
 }
 
 extension NewsLetter on MimeMessage {
