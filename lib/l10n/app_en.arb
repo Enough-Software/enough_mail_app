@@ -490,6 +490,10 @@
   "@messageActionForward": {
     "description": "Action for single message."
   },
+  "messageActionForwardAsAttachment": "forward as attachment",
+  "@messageActionForwardAsAttachment": {
+    "description": "Action for single message."
+  },
   "messageActionDelete": "delete",
   "@messageActionDelete": {
     "description": "Action for single message."
