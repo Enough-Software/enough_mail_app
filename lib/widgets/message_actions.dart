@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
+import 'mailbox_tree.dart';
 
 class MessageActions extends StatefulWidget {
   final Message message;
@@ -31,9 +32,10 @@ enum _OverflowMenuChoice {
   forwardAttachments,
   delete,
   inbox,
-  junk,
   seen,
   flag,
+  move,
+  junk,
   archive,
   redirect,
 }
@@ -173,6 +175,13 @@ class _MessageActionsState extends State<MessageActions> {
                 if (widget.message.source.supportsMessageFolders) ...{
                   PopupMenuDivider(),
                   PopupMenuItem(
+                    value: _OverflowMenuChoice.move,
+                    child: ListTile(
+                      leading: Icon(MaterialCommunityIcons.file_move),
+                      title: Text(localizations.messageActionMove),
+                    ),
+                  ),
+                  PopupMenuItem(
                     value: _OverflowMenuChoice.junk,
                     child: ListTile(
                       leading: Icon(widget.message.source.isJunk
@@ -244,6 +253,9 @@ class _MessageActionsState extends State<MessageActions> {
         break;
       case _OverflowMenuChoice.flag:
         toggleFlagged();
+        break;
+      case _OverflowMenuChoice.move:
+        move();
         break;
       case _OverflowMenuChoice.junk:
         moveJunk();
@@ -357,6 +369,32 @@ class _MessageActionsState extends State<MessageActions> {
         .cancelNotificationForMailMessage(widget.message);
   }
 
+  void move() {
+    final localizations = locator<I18nService>().localizations;
+    DialogHelper.showWidgetDialog(
+      context,
+      localizations.moveTitle,
+      SingleChildScrollView(
+        child: MailboxTree(
+          account: widget.message.account,
+          onSelected: moveTo,
+          current: widget.message.mailClient.selectedMailbox,
+        ),
+      ),
+      defaultActions: DialogActions.cancel,
+    );
+  }
+
+  void moveTo(Mailbox mailbox) async {
+    locator<NavigationService>().pop(); // alert
+    locator<NavigationService>().pop(); // detail view
+    final localizations = locator<I18nService>().localizations;
+    final message = widget.message;
+    final source = message.source;
+    await source.moveMessage(
+        message, mailbox, localizations.moveSuccess(mailbox.name));
+  }
+
   void moveJunk() async {
     final source = widget.message.source;
     if (source.isJunk) {
@@ -371,7 +409,7 @@ class _MessageActionsState extends State<MessageActions> {
 
   void moveToInbox() async {
     final source = widget.message.source;
-    source.moveMessage(widget.message, MailboxFlag.inbox,
+    source.moveMessageToFlag(widget.message, MailboxFlag.inbox,
         locator<I18nService>().localizations.resultMovedToInbox);
     locator<NavigationService>().pop();
   }

@@ -194,21 +194,27 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> markAsJunk(Message message) {
-    return moveMessage(message, MailboxFlag.junk,
+    return moveMessageToFlag(message, MailboxFlag.junk,
         locator<I18nService>().localizations.resultMovedToJunk);
   }
 
   Future<void> markAsNotJunk(Message message) {
-    return moveMessage(message, MailboxFlag.inbox,
+    return moveMessageToFlag(message, MailboxFlag.inbox,
         locator<I18nService>().localizations.resultMovedToInbox);
   }
 
-  Future<void> moveMessage(Message message, MailboxFlag targetMailboxFlag,
-      String notification) async {
+  Future<void> moveMessageToFlag(
+      Message message, MailboxFlag targetMailboxFlag, String notification) {
+    return moveMessage(message,
+        message.mailClient.getMailbox(targetMailboxFlag), notification);
+  }
+
+  Future<void> moveMessage(
+      Message message, Mailbox targetMailbox, String notification) async {
     _removeMessageAndCancelNotification(
         message, locator<NotificationService>());
     final moveResult = await message.mailClient
-        .moveMessageToFlag(message.mimeMessage, targetMailboxFlag);
+        .moveMessage(message.mimeMessage, targetMailbox);
     if (moveResult?.isUndoable == true) {
       locator<ScaffoldMessengerService>().showTextSnackBar(
         notification,
@@ -269,12 +275,12 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> moveToInbox(Message message) async {
-    return moveMessage(message, MailboxFlag.inbox,
+    return moveMessageToFlag(message, MailboxFlag.inbox,
         locator<I18nService>().localizations.resultMovedToInbox);
   }
 
   Future<void> archive(Message message) {
-    return moveMessage(message, MailboxFlag.archive,
+    return moveMessageToFlag(message, MailboxFlag.archive,
         locator<I18nService>().localizations.resultArchived);
   }
 
