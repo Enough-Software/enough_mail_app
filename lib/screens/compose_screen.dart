@@ -84,26 +84,15 @@ class _ComposeScreenState extends State<ComposeScreen> {
       loadMailTextFuture = loadMailTextFromComposeData();
     } else {
       loadMailTextFuture = loadMailTextFromMessage();
-      if (widget.data.action == ComposeAction.forward &&
-          mb.originalMessage != null) {
-        // start initializing any attachments:
-        final attachments = mb.originalMessage
-            .findContentInfo(disposition: ContentDisposition.attachment);
-        if (attachments.isNotEmpty) {
-          final attachmentsToBeLoaded = <ContentInfo>[];
-          for (final attachment in attachments) {
-            final part = mb.originalMessage.getPart(attachment.fetchId);
-            if (part == null) {
-              // add future part
-              attachmentsToBeLoaded.add(attachment);
-            }
-          }
-          if (attachmentsToBeLoaded.isNotEmpty) {
-            _downloadAttachmentsFuture = downloadAttachments(mb.originalMessage,
-                widget.data.originalMessage.mailClient, attachments);
-          }
-        }
-      }
+    }
+    final future = widget.data.future;
+    if (future != null) {
+      _downloadAttachmentsFuture = future;
+      future.then((value) {
+        setState(() {
+          _downloadAttachmentsFuture = null;
+        });
+      });
     }
     super.initState();
   }
@@ -113,29 +102,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
     _subjectController.dispose();
     locator<AppService>().onSharedData = null;
     super.dispose();
-  }
-
-  Future<void> downloadAttachments(MimeMessage mimeMessage,
-      MailClient mailClient, List<ContentInfo> attachments) async {
-    if (attachments.length == 1) {
-      // just download the attachment:
-      final part = await mailClient.fetchMessagePart(
-          mimeMessage, attachments.first.fetchId);
-      widget.data.messageBuilder.addPart(mimePart: part);
-    } else {
-      // download the full message:
-      final msg = await mailClient.fetchMessageContents(mimeMessage);
-      for (final attachment in attachments) {
-        final part = msg.getPart(attachment.fetchId);
-        if (part != null) {
-          widget.data.messageBuilder.addPart(mimePart: part);
-        }
-      }
-    }
-
-    setState(() {
-      _downloadAttachmentsFuture = null;
-    });
   }
 
   Future<String> loadMailTextFromComposeData() {
@@ -148,7 +114,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
         .getSignatureHtml(from.account, widget.data.action);
     final mb = widget.data.messageBuilder;
     if (mb.originalMessage == null) {
-      return '<p>${mb.text ?? '&nbsp;'}</p>$signature';
+      final html = '<p>${mb.text ?? '&nbsp;'}</p>$signature';
+      _originalMessageHtml = html;
+      return html;
     } else {
       final blockExternalImages = false;
       final emptyMessageText =

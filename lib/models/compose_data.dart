@@ -8,9 +8,10 @@ class ComposeData {
   final MessageBuilder messageBuilder;
   final ComposeAction action;
   final String resumeHtmlText;
+  final Future future;
 
   ComposeData(this.originalMessage, this.messageBuilder, this.action,
-      {this.resumeHtmlText});
+      {this.resumeHtmlText, this.future});
 
   ComposeData resume(String htmlText) {
     return ComposeData(originalMessage, messageBuilder, action,

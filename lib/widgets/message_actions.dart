@@ -28,6 +28,7 @@ enum _OverflowMenuChoice {
   replyAll,
   forward,
   forwardAsAttachment,
+  forwardAttachments,
   delete,
   inbox,
   junk,
@@ -57,6 +58,7 @@ class _MessageActionsState extends State<MessageActions> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
+    final attachments = widget.message.attachments;
     return Material(
       elevation: 16,
       child: Row(
@@ -110,10 +112,20 @@ class _MessageActionsState extends State<MessageActions> {
               PopupMenuItem(
                 value: _OverflowMenuChoice.forwardAsAttachment,
                 child: ListTile(
-                  leading: Icon(Icons.attach_file),
+                  leading: Icon(Icons.forward_to_inbox),
                   title: Text(localizations.messageActionForwardAsAttachment),
                 ),
               ),
+              if (attachments.isNotEmpty) ...{
+                PopupMenuItem(
+                  value: _OverflowMenuChoice.forwardAttachments,
+                  child: ListTile(
+                    leading: Icon(Icons.attach_file),
+                    title: Text(localizations
+                        .messageActionForwardAttachments(attachments.length)),
+                  ),
+                ),
+              },
               if (widget.message.source.isTrash) ...{
                 PopupMenuItem(
                   value: _OverflowMenuChoice.inbox,
@@ -217,6 +229,9 @@ class _MessageActionsState extends State<MessageActions> {
         break;
       case _OverflowMenuChoice.forwardAsAttachment:
         forwardAsAttachment();
+        break;
+      case _OverflowMenuChoice.forwardAttachments:
+        forwardAttachments();
         break;
       case _OverflowMenuChoice.delete:
         delete();
@@ -380,7 +395,9 @@ class _MessageActionsState extends State<MessageActions> {
       from: from,
       quoteMessage: false,
     );
-    navigateToCompose(widget.message, builder, ComposeAction.forward);
+    final composeFuture = addAttachments(widget.message, builder);
+    navigateToCompose(
+        widget.message, builder, ComposeAction.forward, composeFuture);
   }
 
   void forwardAsAttachment() async {
@@ -392,14 +409,61 @@ class _MessageActionsState extends State<MessageActions> {
     builder.from = [from];
 
     builder.subject = MessageBuilder.createForwardSubject(mime.decodeSubject());
+    Future composeFuture;
     if (mime.mimeData == null) {
-      //TODO move to background
-      final updated = await mailClient.fetchMessageContents(mime);
-      message.updateMime(updated);
-      mime = updated;
+      composeFuture = mailClient.fetchMessageContents(mime).then((value) {
+        message.updateMime(value);
+        builder.addMessagePart(value);
+      });
+    } else {
+      builder.addMessagePart(mime);
     }
-    builder.addMessagePart(mime);
-    navigateToCompose(widget.message, builder, ComposeAction.forward);
+    navigateToCompose(
+        widget.message, builder, ComposeAction.forward, composeFuture);
+  }
+
+  void forwardAttachments() async {
+    final message = widget.message;
+    final mailClient = message.mailClient;
+    final from = mailClient.account.fromAddress;
+    var mime = message.mimeMessage;
+    final builder = MessageBuilder();
+    builder.from = [from];
+    builder.subject = MessageBuilder.createForwardSubject(mime.decodeSubject());
+    final composeFuture = addAttachments(message, builder);
+    navigateToCompose(message, builder, ComposeAction.forward, composeFuture);
+  }
+
+  Future addAttachments(Message message, MessageBuilder builder) {
+    final attachments = message.attachments;
+    final mailClient = message.mailClient;
+    var mime = message.mimeMessage;
+    Future composeFuture;
+    if (mime.mimeData == null && attachments.length > 1) {
+      composeFuture = mailClient.fetchMessageContents(mime).then((value) {
+        message.updateMime(value);
+        for (final attachment in attachments) {
+          var part = value.getPart(attachment.fetchId);
+          builder.addPart(mimePart: part);
+        }
+      });
+    } else {
+      final futures = <Future>[];
+      for (final attachment in message.attachments) {
+        final part = mime.getPart(attachment.fetchId);
+        if (part != null) {
+          builder.addPart(mimePart: part);
+        } else {
+          futures.add(mailClient
+              .fetchMessagePart(mime, attachment.fetchId)
+              .then((value) {
+            builder.addPart(mimePart: value);
+          }));
+        }
+        composeFuture = futures.isEmpty ? null : Future.wait(futures);
+      }
+    }
+    return composeFuture;
   }
 
   void toggleFlagged() async {
@@ -415,8 +479,9 @@ class _MessageActionsState extends State<MessageActions> {
   }
 
   void navigateToCompose(
-      Message message, MessageBuilder builder, ComposeAction action) {
-    final data = ComposeData(message, builder, action);
+      Message message, MessageBuilder builder, ComposeAction action,
+      [Future composeFuture]) {
+    final data = ComposeData(message, builder, action, future: composeFuture);
     locator<NavigationService>()
         .push(Routes.mailCompose, arguments: data, replace: true);
   }

@@ -102,6 +102,7 @@
   "messageActionReplyAll": "allen antworten",
   "messageActionForward": "weiterleiten",
   "messageActionForwardAsAttachment": "als Anhang weiterleiten",
+  "messageActionForwardAttachments": "{number,plural, =1{Anhang weiterleiten} other{{number} Anhänge weiterleiten}}",
   "messageActionDelete": "löschen",
   "messageActionMoveToInbox": "in Posteingang verschieben",
   "messageStatusSeen": "ist gelesen",
