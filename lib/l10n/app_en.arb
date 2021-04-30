@@ -505,13 +505,16 @@
       }
     }  
   },
-  
   "messageActionDelete": "delete",
   "@messageActionDelete": {
     "description": "Action for single message."
   },
   "messageActionMoveToInbox": "move to inbox",
   "@messageActionMoveToInbox": {
+    "description": "Action for single message."
+  },
+  "messageActionMove": "move",
+  "@messageActionMove": {
     "description": "Action for single message."
   },
   "messageStatusSeen": "is read",
@@ -1377,6 +1380,20 @@
       "account": {
         "type": "String",
         "example": "domain.com"
+      }
+    }  
+  },
+  "moveTitle": "Move message",
+  "@moveTitle": {
+    "description": "Title of move to mailbox dialog."
+  },
+  "moveSuccess": "Messaged moved to {mailbox}.",
+  "@moveSuccess": {
+    "description": "Message after moving message successfully.",
+    "placeholders": {
+      "mailbox": {
+        "type": "String",
+        "example": "Inbox"
       }
     }  
   },

@@ -5,9 +5,11 @@ import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -70,7 +72,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   children: [
                     buildAccountSelection(
                         mailService, accounts, currentAccount, localizations),
-                    buildFolderTree(mailService, currentAccount),
+                    buildFolderTree(currentAccount),
                     Divider(),
                     ListTile(
                       leading: Icon(Icons.info),
@@ -202,54 +204,8 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  Widget buildFolderTree(MailService mailService, Account account) {
-    final mailboxTreeData = mailService.getMailboxTreeFor(account);
-    final mailboxTreeElements = mailboxTreeData.root.children;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (final element in mailboxTreeElements) ...{
-          buildMailboxElement(element, 0),
-        },
-      ],
-    );
-  }
-
-  Widget buildMailboxElement(TreeElement<Mailbox> element, final int level) {
-    final mailbox = element.value;
-    final title = Padding(
-      padding: EdgeInsets.only(left: level * 8.0),
-      child: Text(mailbox.name),
-    );
-    if (element.children == null) {
-      var iconData = MaterialCommunityIcons.folder_outline;
-      if (mailbox.isInbox) {
-        iconData = MaterialCommunityIcons.inbox;
-      } else if (mailbox.isDrafts) {
-        iconData = MaterialCommunityIcons.email_edit_outline;
-      } else if (mailbox.isTrash) {
-        iconData = MaterialCommunityIcons.trash_can_outline;
-      } else if (mailbox.isSent) {
-        iconData = MaterialCommunityIcons.inbox_arrow_up;
-      } else if (mailbox.isArchive) {
-        iconData = MaterialCommunityIcons.archive;
-      } else if (mailbox.isJunk) {
-        iconData = Entypo.bug;
-      }
-      return ListTile(
-        leading: Icon(iconData),
-        title: title,
-        onTap: () async => navigateToMailbox(element.value),
-      );
-    }
-    return ExpansionTile(
-      title: title,
-      children: [
-        for (final childElement in element.children) ...{
-          buildMailboxElement(childElement, level + 1),
-        },
-      ],
-    );
+  Widget buildFolderTree(Account account) {
+    return MailboxTree(account: account, onSelected: navigateToMailbox);
   }
 
   void navigateToMailbox(Mailbox mailbox) async {

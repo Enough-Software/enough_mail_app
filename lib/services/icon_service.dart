@@ -1,5 +1,6 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 class IconService {
   IconData getForMediaType(MediaType mediaType) {
@@ -39,6 +40,24 @@ class IconService {
       default:
         return Icons.attachment;
     }
+  }
+
+  IconData getForMailbox(Mailbox mailbox) {
+    var iconData = MaterialCommunityIcons.folder_outline;
+    if (mailbox.isInbox) {
+      iconData = MaterialCommunityIcons.inbox;
+    } else if (mailbox.isDrafts) {
+      iconData = MaterialCommunityIcons.email_edit_outline;
+    } else if (mailbox.isTrash) {
+      iconData = MaterialCommunityIcons.trash_can_outline;
+    } else if (mailbox.isSent) {
+      iconData = MaterialCommunityIcons.inbox_arrow_up;
+    } else if (mailbox.isArchive) {
+      iconData = MaterialCommunityIcons.archive;
+    } else if (mailbox.isJunk) {
+      iconData = Entypo.bug;
+    }
+    return iconData;
   }
 
   static Widget buildNumericIcon(int value, {double size}) {
