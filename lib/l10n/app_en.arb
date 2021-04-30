@@ -494,6 +494,18 @@
   "@messageActionForwardAsAttachment": {
     "description": "Action for single message."
   },
+  "messageActionForwardAttachments": "{number,plural, =1{forward attachment} other{forward {number} attachments}}",
+  "@messageActionForwardAttachments": {
+    "description": "Action for single message to forward the given number of attachments.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  
   "messageActionDelete": "delete",
   "@messageActionDelete": {
     "description": "Action for single message."

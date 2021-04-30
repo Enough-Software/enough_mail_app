@@ -163,11 +163,7 @@ class _MessageContentState extends State<_MessageContent> {
 
   Widget buildHeader(AppLocalizations localizations) {
     final mime = widget.message.mimeMessage;
-    final attachments = mime.findContentInfo();
-    final inlineAttachments = mime
-        .findContentInfo(disposition: ContentDisposition.inline)
-        .where((info) => !(info.contentType?.mediaType?.isText ?? false));
-    attachments.addAll(inlineAttachments);
+    final attachments = widget.message.attachments;
     final date = locator<I18nService>().formatDate(mime.decodeDate());
     final subject = mime.decodeSubject();
 

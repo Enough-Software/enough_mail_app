@@ -16,6 +16,21 @@ class Message extends ChangeNotifier {
 
   bool _isSelected = false;
   bool get isSelected => _isSelected;
+
+  List<ContentInfo> _attachments;
+  List<ContentInfo> get attachments {
+    var infos = _attachments;
+    if (infos == null) {
+      infos = mimeMessage.findContentInfo();
+      final inlineAttachments = mimeMessage
+          .findContentInfo(disposition: ContentDisposition.inline)
+          .where((info) => !(info.isText || info.isImage));
+      infos.addAll(inlineAttachments);
+      _attachments = infos;
+    }
+    return infos;
+  }
+
   set isSelected(bool value) {
     if (value != _isSelected) {
       _isSelected = value;
@@ -117,6 +132,7 @@ class Message extends ChangeNotifier {
 
   void updateMime(MimeMessage mime) {
     this.mimeMessage = mime;
+    _attachments = null;
     notifyListeners();
   }
 
