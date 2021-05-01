@@ -519,7 +519,7 @@ class _MessageActionsState extends State<MessageActions> {
   void navigateToCompose(
       Message message, MessageBuilder builder, ComposeAction action,
       [Future composeFuture]) {
-    final data = ComposeData(message, builder, action, future: composeFuture);
+    final data = ComposeData([message], builder, action, future: composeFuture);
     locator<NavigationService>()
         .push(Routes.mailCompose, arguments: data, replace: true);
   }

@@ -298,41 +298,35 @@ class _ComposeScreenState extends State<ComposeScreen> {
       );
       return;
     }
-    var storeFlags = true;
-    final originalMessage = widget.data.originalMessage;
-    switch (widget.data.action) {
-      case ComposeAction.answer:
-        originalMessage.isAnswered = true;
-        break;
-      case ComposeAction.forward:
-        originalMessage.isForwarded = true;
-        break;
-      case ComposeAction.newMessage:
-        storeFlags = false;
-        // no action to do
-        break;
-    }
+    final action = widget.data.action;
+    final storeFlags = action != ComposeAction.newMessage;
     if (storeFlags) {
-      try {
-        await mailClient.store(
-            MessageSequence.fromMessage(originalMessage.mimeMessage),
-            originalMessage.mimeMessage.flags,
-            action: StoreAction.replace);
-      } catch (e, s) {
-        print('Unable to update message flags: $e $s'); // otherwise ignore
-
+      for (final originalMessage in widget.data.originalMessages) {
+        if (action == ComposeAction.answer) {
+          originalMessage.isAnswered = true;
+        } else {
+          originalMessage.isForwarded = true;
+        }
+        try {
+          await mailClient.store(
+              MessageSequence.fromMessage(originalMessage.mimeMessage),
+              originalMessage.mimeMessage.flags,
+              action: StoreAction.replace);
+        } catch (e, s) {
+          print('Unable to update message flags: $e $s'); // otherwise ignore
+        }
       }
-    } else if (originalMessage != null &&
-        originalMessage.mimeMessage.hasFlag(MessageFlags.draft)) {
+    } else if ((widget.data.originalMessage != null) &&
+        widget.data.originalMessage.mimeMessage.hasFlag(MessageFlags.draft)) {
       // delete draft message:
       try {
+        final originalMessage = widget.data.originalMessage;
         final source = originalMessage.source;
         source.remove(originalMessage);
         await mailClient.flagMessage(originalMessage.mimeMessage,
             isDeleted: true);
       } catch (e, s) {
         print('Unable to update message flags: $e $s'); // otherwise ignore
-
       }
     }
   }
@@ -349,8 +343,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        'COMPOSE: originalMessage there: ${widget.data.originalMessage != null}');
     final localizations = AppLocalizations.of(context);
     final titleText = widget.data.action == ComposeAction.answer
         ? localizations.composeTitleReply

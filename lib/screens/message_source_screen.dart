@@ -10,11 +10,15 @@ import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/mail_service.dart';
+import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/util/string_helper.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
+import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
 // import 'package:enough_style/enough_style.dart';
@@ -468,115 +472,406 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           return Container();
         },
       ),
-      bottomNavigationBar: isInSelectionMode
-          ? BottomAppBar(
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text('${selectedMessages.length}'),
-                  ),
-                  if (selectedMessages.any((m) => !m.isSeen)) ...{
-                    IconButton(
-                      icon: Icon(Icons.circle),
-                      onPressed: () async {
-                        await widget.messageSource
-                            .markMessagesAsSeen(selectedMessages, true);
-                        setState(() {});
-                      },
-                    ),
-                  } else ...{
-                    IconButton(
-                      icon: Icon(Feather.circle),
-                      onPressed: () async {
-                        await widget.messageSource
-                            .markMessagesAsSeen(selectedMessages, false);
-                        setState(() {});
-                      },
-                    ),
-                  },
-                  if (selectedMessages.any((m) => !m.isFlagged)) ...{
-                    IconButton(
-                      icon: Icon(Icons.flag_outlined),
-                      onPressed: () async {
-                        await widget.messageSource
-                            .markMessagesAsFlagged(selectedMessages, true);
-                        setState(() {});
-                      },
-                    ),
-                  } else ...{
-                    IconButton(
-                      icon: Icon(Icons.flag),
-                      onPressed: () async {
-                        await widget.messageSource
-                            .markMessagesAsFlagged(selectedMessages, false);
-                        setState(() {});
-                      },
-                    ),
-                  },
-                  IconButton(
-                    icon: Icon(
-                        widget.messageSource.isJunk ? Icons.check : Entypo.bug),
-                    onPressed: () async {
-                      final targetFlag = widget.messageSource.isJunk
-                          ? MailboxFlag.inbox
-                          : MailboxFlag.junk;
-                      final notification = widget.messageSource.isJunk
-                          ? localizations
-                              .multipleMovedToInbox(selectedMessages.length)
-                          : localizations
-                              .multipleMovedToJunk(selectedMessages.length);
-                      await widget.messageSource.moveMessages(
-                          selectedMessages, targetFlag, notification);
-                      leaveSelectionMode();
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(widget.messageSource.isArchive
-                        ? Entypo.inbox
-                        : Entypo.archive),
-                    onPressed: () async {
-                      final targetFlag = widget.messageSource.isJunk
-                          ? MailboxFlag.inbox
-                          : MailboxFlag.archive;
-                      final notification = widget.messageSource.isArchive
-                          ? localizations
-                              .multipleMovedToInbox(selectedMessages.length)
-                          : localizations
-                              .multipleMovedToArchive(selectedMessages.length);
-                      await widget.messageSource.moveMessages(
-                          selectedMessages, targetFlag, notification);
-                      leaveSelectionMode();
-                    },
-                  ),
-                  Spacer(),
-                  IconButton(
-                      icon: Icon(widget.messageSource.isTrash
-                          ? Entypo.inbox
-                          : Icons.delete),
-                      onPressed: () async {
-                        if (widget.messageSource.isTrash) {
-                          final notification = localizations
-                              .multipleMovedToInbox(selectedMessages.length);
-                          await widget.messageSource.moveMessages(
-                              selectedMessages,
-                              MailboxFlag.inbox,
-                              notification);
-                        } else {
-                          final notification = localizations
-                              .multipleMovedToTrash(selectedMessages.length);
-                          await widget.messageSource
-                              .deleteMessages(selectedMessages, notification);
-                        }
-                        leaveSelectionMode();
-                      }),
-                  IconButton(
-                      icon: Icon(Icons.close), onPressed: leaveSelectionMode),
-                ],
-              ),
-            )
-          : null,
+      bottomNavigationBar:
+          isInSelectionMode ? buildSelectionModeBottomBar(localizations) : null,
     );
+  }
+
+  Widget buildSelectionModeBottomBar(AppLocalizations localizations) {
+    final isTrash = widget.messageSource.isTrash;
+    final isJunk = widget.messageSource.isJunk;
+    final isAnyUnseen = selectedMessages.any((m) => !m.isSeen);
+    final isAnyUnflagged = selectedMessages.any((m) => !m.isFlagged);
+    return BottomAppBar(
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('${selectedMessages.length}'),
+          ),
+          if (isAnyUnseen) ...{
+            IconButton(
+              icon: Icon(Icons.circle),
+              onPressed: () => handleMultipleChoice(_MultipleChoice.seen),
+            ),
+          } else ...{
+            IconButton(
+              icon: Icon(Feather.circle),
+              onPressed: () => handleMultipleChoice(_MultipleChoice.unseen),
+            ),
+          },
+          if (isAnyUnflagged) ...{
+            IconButton(
+              icon: Icon(Icons.flag_outlined),
+              onPressed: () => handleMultipleChoice(_MultipleChoice.flag),
+            ),
+          } else ...{
+            IconButton(
+              icon: Icon(Icons.flag),
+              onPressed: () => handleMultipleChoice(_MultipleChoice.unflag),
+            ),
+          },
+          if (isJunk) ...{
+            IconButton(
+              icon: Icon(Icons.check),
+              onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
+            ),
+          } else ...{
+            IconButton(
+              icon: Icon(Entypo.bug),
+              onPressed: () => handleMultipleChoice(_MultipleChoice.junk),
+            ),
+          },
+          Spacer(),
+          if (isTrash) ...{
+            IconButton(
+              icon: Icon(Entypo.inbox),
+              onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
+            ),
+          } else ...{
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () => handleMultipleChoice(_MultipleChoice.delete),
+            ),
+          },
+          IconButton(
+            icon: Icon(Icons.close),
+            onPressed: leaveSelectionMode,
+          ),
+          PopupMenuButton<_MultipleChoice>(
+            onSelected: handleMultipleChoice,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _MultipleChoice.forwardAsAttachment,
+                child: ListTile(
+                  leading: Icon(Icons.forward_to_inbox),
+                  title: Text(localizations.messageActionForwardAsAttachment),
+                ),
+              ),
+              PopupMenuItem(
+                value: _MultipleChoice.forwardAttachments,
+                child: ListTile(
+                  leading: Icon(Icons.attach_file),
+                  title: Text(localizations.messagesActionForwardAttachments),
+                ),
+              ),
+              if (isTrash) ...{
+                PopupMenuItem(
+                  value: _MultipleChoice.inbox,
+                  child: ListTile(
+                    leading: Icon(Entypo.inbox),
+                    title: Text(localizations.messageActionMoveToInbox),
+                  ),
+                ),
+              } else ...{
+                PopupMenuItem(
+                  value: _MultipleChoice.delete,
+                  child: ListTile(
+                    leading: Icon(Icons.delete),
+                    title: Text(localizations.messageActionDelete),
+                  ),
+                ),
+              },
+              PopupMenuDivider(),
+              if (isAnyUnseen) ...{
+                PopupMenuItem(
+                  value: _MultipleChoice.seen,
+                  child: ListTile(
+                    leading: Icon(Icons.circle),
+                    title: Text(localizations.messageActionMultipleMarkSeen),
+                  ),
+                ),
+              } else ...{
+                PopupMenuItem(
+                  value: _MultipleChoice.unseen,
+                  child: ListTile(
+                    leading: Icon(Feather.circle),
+                    title: Text(localizations.messageActionMultipleMarkUnseen),
+                  ),
+                ),
+              },
+              if (isAnyUnflagged) ...{
+                PopupMenuItem(
+                  value: _MultipleChoice.flag,
+                  child: ListTile(
+                    leading: Icon(Icons.outlined_flag),
+                    title: Text(localizations.messageActionMultipleMarkFlagged),
+                  ),
+                ),
+              } else ...{
+                PopupMenuItem(
+                  value: _MultipleChoice.unflag,
+                  child: ListTile(
+                    leading: Icon(Icons.flag),
+                    title:
+                        Text(localizations.messageActionMultipleMarkUnflagged),
+                  ),
+                ),
+              },
+              if (widget.messageSource.supportsMessageFolders) ...{
+                PopupMenuDivider(),
+                PopupMenuItem(
+                  value: _MultipleChoice.move,
+                  child: ListTile(
+                    leading: Icon(MaterialCommunityIcons.file_move),
+                    title: Text(localizations.messageActionMove),
+                  ),
+                ),
+                if (isJunk) ...{
+                  PopupMenuItem(
+                    value: _MultipleChoice.inbox,
+                    child: ListTile(
+                      leading: Icon(Entypo.check),
+                      title: Text(localizations.messageActionMarkAsNotJunk),
+                    ),
+                  ),
+                } else ...{
+                  PopupMenuItem(
+                    value: _MultipleChoice.junk,
+                    child: ListTile(
+                      leading: Icon(Entypo.bug),
+                      title: Text(localizations.messageActionMarkAsJunk),
+                    ),
+                  ),
+                },
+                if (widget.messageSource.isArchive) ...{
+                  PopupMenuItem(
+                    value: _MultipleChoice.inbox,
+                    child: ListTile(
+                      leading: Icon(Entypo.inbox),
+                      title: Text(localizations.messageActionUnarchive),
+                    ),
+                  ),
+                } else ...{
+                  PopupMenuItem(
+                    value: _MultipleChoice.archive,
+                    child: ListTile(
+                      leading: Icon(Entypo.archive),
+                      title: Text(localizations.messageActionArchive),
+                    ),
+                  ),
+                },
+              },
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void handleMultipleChoice(_MultipleChoice choice) async {
+    final localizations = locator<I18nService>().localizations;
+    if (selectedMessages.isEmpty) {
+      locator<ScaffoldMessengerService>()
+          .showTextSnackBar(localizations.multipleSelectionNeededInfo);
+      return;
+    }
+    var endSelectionMode = true;
+    switch (choice) {
+      case _MultipleChoice.forwardAsAttachment:
+        forwardAsAttachments();
+        break;
+      case _MultipleChoice.forwardAttachments:
+        forwardAttachments();
+        break;
+      case _MultipleChoice.delete:
+        final notification =
+            localizations.multipleMovedToTrash(selectedMessages.length);
+        await widget.messageSource
+            .deleteMessages(selectedMessages, notification);
+        break;
+      case _MultipleChoice.inbox:
+        final notification =
+            localizations.multipleMovedToInbox(selectedMessages.length);
+        await widget.messageSource.moveMessagesToFlag(
+            selectedMessages, MailboxFlag.inbox, notification);
+        break;
+      case _MultipleChoice.seen:
+        endSelectionMode = false;
+        await widget.messageSource.markMessagesAsSeen(selectedMessages, true);
+        setState(() {});
+        break;
+      case _MultipleChoice.unseen:
+        endSelectionMode = false;
+        await widget.messageSource.markMessagesAsSeen(selectedMessages, false);
+        setState(() {});
+        break;
+      case _MultipleChoice.flag:
+        endSelectionMode = false;
+        await widget.messageSource
+            .markMessagesAsFlagged(selectedMessages, true);
+        setState(() {});
+        break;
+      case _MultipleChoice.unflag:
+        endSelectionMode = false;
+        await widget.messageSource
+            .markMessagesAsFlagged(selectedMessages, false);
+        setState(() {});
+        break;
+      case _MultipleChoice.move:
+        endSelectionMode = false;
+        move();
+        break;
+      case _MultipleChoice.junk:
+        final notification =
+            localizations.multipleMovedToJunk(selectedMessages.length);
+        await widget.messageSource.moveMessagesToFlag(
+            selectedMessages, MailboxFlag.junk, notification);
+        break;
+      case _MultipleChoice.archive:
+        final notification =
+            localizations.multipleMovedToArchive(selectedMessages.length);
+        await widget.messageSource.moveMessagesToFlag(
+            selectedMessages, MailboxFlag.archive, notification);
+        break;
+    }
+    if (endSelectionMode) {
+      setState(() {
+        isInSelectionMode = false;
+      });
+    }
+  }
+
+  void forwardAsAttachments() async {
+    forwardAttachmentsLike(addMessageAttachment);
+  }
+
+  void forwardAttachments() {
+    forwardAttachmentsLike(addAttachments);
+  }
+
+  void forwardAttachmentsLike(
+      Future Function(Message, MessageBuilder) loader) async {
+    final builder = MessageBuilder();
+    final fromAddresses = <MailAddress>[];
+    final subjects = <String>[];
+    final futures = <Future>[];
+    for (final message in selectedMessages) {
+      message.isSelected = false;
+      final mailClient = message.mailClient;
+      final from = mailClient.account.fromAddress;
+      if (!fromAddresses.contains(from)) {
+        fromAddresses.add(from);
+      }
+      var mime = message.mimeMessage;
+      final subject = mime.decodeSubject();
+      if (subject?.isNotEmpty ?? false) {
+        subjects.add(subject.replaceAll('\r\n ', '').replaceAll('\n', ''));
+      }
+      final composeFuture = loader(message, builder);
+      if (composeFuture != null) {
+        futures.add(composeFuture);
+      }
+    }
+    if (fromAddresses.length == 1) {
+      builder.from = fromAddresses;
+    }
+    final lcs = StringHelper.largestCommonSequence(subjects);
+    // print('lcs for $subjects is "$lcs"');
+    if (lcs != null && lcs.length > 3) {
+      builder.subject = MessageBuilder.createForwardSubject(lcs);
+    }
+    final composeFuture = futures.isEmpty ? null : Future.wait(futures);
+    final composeData = ComposeData(
+        selectedMessages, builder, ComposeAction.forward,
+        future: composeFuture);
+    locator<NavigationService>()
+        .push(Routes.mailCompose, arguments: composeData, fade: true);
+  }
+
+  Future addMessageAttachment(Message message, MessageBuilder builder) {
+    final mime = message.mimeMessage;
+    if (mime.mimeData == null) {
+      return message.mailClient.fetchMessageContents(mime).then((value) {
+        message.updateMime(value);
+        builder.addMessagePart(value);
+      });
+    } else {
+      builder.addMessagePart(mime);
+    }
+    return null;
+  }
+
+  Future addAttachments(Message message, MessageBuilder builder) {
+    final mailClient = message.mailClient;
+    var mime = message.mimeMessage;
+    Future composeFuture;
+    if (mime.mimeData == null) {
+      composeFuture = mailClient.fetchMessageContents(mime).then((value) {
+        message.updateMime(value);
+        for (final attachment in message.attachments) {
+          var part = value.getPart(attachment.fetchId);
+          builder.addPart(mimePart: part);
+        }
+      });
+    } else {
+      final futures = <Future>[];
+      for (final attachment in message.attachments) {
+        final part = mime.getPart(attachment.fetchId);
+        if (part != null) {
+          builder.addPart(mimePart: part);
+        } else {
+          futures.add(mailClient
+              .fetchMessagePart(mime, attachment.fetchId)
+              .then((value) {
+            builder.addPart(mimePart: value);
+          }));
+        }
+        composeFuture = futures.isEmpty ? null : Future.wait(futures);
+      }
+    }
+    return composeFuture;
+  }
+
+  void move() {
+    final localizations = locator<I18nService>().localizations;
+    var account = locator<MailService>().currentAccount;
+    if (account.isVirtual) {
+      // check how many mailclient are involved in the current selection to either show the mailboxes of the unified account
+      // or of the real account
+      final mailClients = <MailClient>[];
+      for (final message in selectedMessages) {
+        if (!mailClients.contains(message.mailClient)) {
+          mailClients.add(message.mailClient);
+        }
+      }
+      if (mailClients.length == 1) {
+        // ok, all messages belong to one account:
+        account =
+            locator<MailService>().getAccountFor(mailClients.first.account);
+      }
+    }
+    final mailbox = account.isVirtual
+        ? null // //TODO set current mailbox, e.g.  current: widget.messageSource.currentMailbox,
+        : selectedMessages.first.mailClient.selectedMailbox;
+    DialogHelper.showWidgetDialog(
+      context,
+      localizations.multipleMoveTitle(selectedMessages.length),
+      SingleChildScrollView(
+        child: MailboxTree(
+          account: account,
+          onSelected: moveTo,
+          current: mailbox,
+        ),
+      ),
+      defaultActions: DialogActions.cancel,
+    );
+  }
+
+  void moveTo(Mailbox mailbox) async {
+    setState(() {
+      isInSelectionMode = false;
+    });
+    locator<NavigationService>().pop(); // alert
+    final localizations = locator<I18nService>().localizations;
+    final account = locator<MailService>().currentAccount;
+    if (account.isVirtual) {
+      await widget.messageSource.moveMessagesToFlag(selectedMessages,
+          mailbox.flags.first, localizations.moveSuccess(mailbox.name));
+    } else {
+      await widget.messageSource.moveMessages(
+          selectedMessages, mailbox, localizations.moveSuccess(mailbox.name));
+    }
   }
 
   void switchVisualization(_Visualization result) {
@@ -602,7 +897,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             await message.mailClient.fetchMessageContents(message.mimeMessage);
         //message.updateMime(mime);
         final builder = MessageBuilder.prepareFromDraft(mime);
-        final data = ComposeData(message, builder, ComposeAction.newMessage);
+        final data = ComposeData([message], builder, ComposeAction.newMessage);
         locator<NavigationService>().push(Routes.mailCompose, arguments: data);
       } else {
         // move to mail details:
@@ -653,6 +948,20 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         break;
     }
   }
+}
+
+enum _MultipleChoice {
+  forwardAsAttachment,
+  forwardAttachments,
+  delete,
+  inbox,
+  seen,
+  unseen,
+  flag,
+  unflag,
+  move,
+  junk,
+  archive,
 }
 
 class MessageOverview extends StatefulWidget {
