@@ -1,6 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_serialization/enough_serialization.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class Group extends SerializableObject {
   String get name => attributes['name'];

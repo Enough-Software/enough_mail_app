@@ -189,6 +189,36 @@
       }
     }  
   },
+  "multipleSelectionNeededInfo": "Please select messages first.",
+  "@multipleSelectionNeededInfo": {
+    "description": "Short info shown when a multiple message action is triggered without selecting at least one message first."
+  },
+  "multipleMoveTitle":  "{number,plural, =1{Move message} other{Move {number} messages}}",
+  "@multipleMoveTitle": {
+    "description": "Title of move dialog for multiple messages. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "messageActionMultipleMarkSeen": "mark as read",
+  "@messageActionMultipleMarkSeen": {
+    "description": "Action for several messages."
+  },
+  "messageActionMultipleMarkUnseen": "mark as unread",
+  "@messageActionMultipleMarkUnseen": {
+    "description": "Action for several messages."
+  },  "messageActionMultipleMarkFlagged": "flag messages",
+  "@messageActionMultipleMarkFlagged": {
+    "description": "Action for several messages."
+  },
+  "messageActionMultipleMarkUnflagged": "unflag messages",
+  "@messageActionMultipleMarkUnflagged": {
+    "description": "Action for several messages."
+  },
   "emailSenderUnknown": "<no sender>",
   "@emailSenderUnknown": {
     "description": "Shown as replacement when there is no known sender of a message."
@@ -504,6 +534,10 @@
         "format": "compactLong"
       }
     }  
+  },
+  "messagesActionForwardAttachments": "forward attachments",
+  "@messagesActionForwardAttachments": {
+    "description": "Action for multiple selected messages to forward all attachments of the messages."
   },
   "messageActionDelete": "delete",
   "@messageActionDelete": {

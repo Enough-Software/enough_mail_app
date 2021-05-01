@@ -411,7 +411,7 @@ class _MessageContentState extends State<_MessageContent> {
   Future handleMailto(Uri mailto, MimeMessage mimeMessage) {
     final messageBuilder = locator<MailService>().mailto(mailto, mimeMessage);
     final composeData =
-        ComposeData(widget.message, messageBuilder, ComposeAction.newMessage);
+        ComposeData([widget.message], messageBuilder, ComposeAction.newMessage);
     return locator<NavigationService>()
         .push(Routes.mailCompose, arguments: composeData);
   }
@@ -545,7 +545,7 @@ class MessageContentsScreen extends StatelessWidget {
   Future handleMailto(Uri mailto, MimeMessage mimeMessage) {
     final messageBuilder = locator<MailService>().mailto(mailto, mimeMessage);
     final composeData =
-        ComposeData(message, messageBuilder, ComposeAction.newMessage);
+        ComposeData([message], messageBuilder, ComposeAction.newMessage);
     return locator<NavigationService>()
         .push(Routes.mailCompose, arguments: composeData);
   }

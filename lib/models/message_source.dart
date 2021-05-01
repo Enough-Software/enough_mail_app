@@ -238,7 +238,7 @@ abstract class MessageSource extends ChangeNotifier
     notificationService.cancelNotificationForMailMessage(message);
   }
 
-  Future<void> moveMessages(List<Message> messages,
+  Future<void> moveMessagesToFlag(List<Message> messages,
       MailboxFlag targetMailboxFlag, String notification) async {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
@@ -272,6 +272,34 @@ abstract class MessageSource extends ChangeNotifier
         },
       );
     }
+  }
+
+  Future<void> moveMessages(List<Message> messages, Mailbox targetMailbox,
+      String notification) async {
+    final notificationService = locator<NotificationService>();
+    for (final message in messages) {
+      _removeMessageAndCancelNotification(message, notificationService);
+    }
+    notifyListeners();
+    final mailClient = messages.first.mailClient;
+    final uids = messages.map((message) => message.mimeMessage.uid).toList();
+    final sequence = MessageSequence.fromIds(uids, isUid: true);
+    final moveResult = await mailClient.moveMessages(sequence, targetMailbox);
+    locator<ScaffoldMessengerService>().showTextSnackBar(
+      notification,
+      undo: moveResult.isUndoable
+          ? () async {
+              await mailClient.undoMoveMessages(moveResult);
+              //TODO update mimeMessage's UID and sequence ID?
+              // TODO add mime message to mime source again?
+              // TODO what should I do when not all delete are undoable?
+              for (final message in messages) {
+                cache.insert(message);
+              }
+              notifyListeners();
+            }
+          : null,
+    );
   }
 
   Future<void> moveToInbox(Message message) async {
