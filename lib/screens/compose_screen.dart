@@ -108,10 +108,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
     return Future.value(widget.data.resumeHtmlText);
   }
 
+  String get signature => locator<SettingsService>()
+      .getSignatureHtml(from.account, widget.data.action);
+
   Future<String> loadMailTextFromMessage() async {
     // find out signature:
-    final signature = locator<SettingsService>()
-        .getSignatureHtml(from.account, widget.data.action);
     final mb = widget.data.messageBuilder;
     if (mb.originalMessage == null) {
       final html = '<p>${mb.text ?? '&nbsp;'}</p>$signature';
@@ -441,9 +442,14 @@ class _ComposeScreenState extends State<ComposeScreen> {
                             });
                           }
                           widget.data.messageBuilder.from = [s.address];
-                          setState(() {
-                            from = s;
-                          });
+                          final lastSignature = signature;
+                          from = s;
+                          final newSignature = signature;
+                          if (newSignature != lastSignature) {
+                            _editorApi.replaceAll(lastSignature, newSignature);
+                          }
+                          setState(() {});
+
                           _checkAccountContactManager(from.account);
                         },
                         value: from,

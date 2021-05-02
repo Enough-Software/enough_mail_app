@@ -228,7 +228,7 @@ class MailService {
     return true;
   }
 
-  List<Sender> getSenders({bool includePlaceholdersForPlusAliases = true}) {
+  List<Sender> getSenders({bool includePlaceholdersForPlusAliases = false}) {
     final senders = <Sender>[];
     for (final account in accounts) {
       if (account.isVirtual) {
