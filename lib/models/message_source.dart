@@ -526,8 +526,7 @@ class MultipleMessageSource extends MessageSource {
     _flag = flag;
     supportsDeleteAll =
         (flag == MailboxFlag.trash) || (flag == MailboxFlag.junk);
-    _description =
-        mimeSources.map((s) => s.mailClient.account.email).join(', ');
+    _description = mimeSources.map((s) => s.mailClient.account.name).join(', ');
   }
 
   @override
