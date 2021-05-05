@@ -508,6 +508,18 @@
       }
     }
   },
+  "detailsSendReadReceiptAction": "Send read receipt",
+  "@detailsSendReadReceiptAction": {
+    "description": "Action to send the read receipt for the shown message."
+  },
+  "detailsReadReceiptSentStatus": "Read receipt sent ✔",
+  "@detailsReadReceiptSentStatus": {
+    "description": "Status after sending the read receipt for the shown message."
+  },
+  "detailsReadReceiptSubject": "Read receipt",
+  "@detailsReadReceiptSubject": {
+    "description": "Message subject for read receipts."
+  },
   "messageActionReply": "reply",
   "@messageActionReply": {
     "description": "Action for single message."
@@ -702,6 +714,22 @@
   "settingsActionWelcome": "Show welcome",
   "@settingsActionWelcome": {
     "description": "Settings action to show welcome screen of the app again."
+  },
+  "settingsReadReceipts": "Read receipts",
+  "@settingsReadReceipts": {
+    "description": "Settings action to customize read receipts."
+  },
+  "readReceiptsSettingsIntroduction": "Do you want to display read receipt requests?",
+  "@readReceiptsSettingsIntroduction": {
+    "description": "Introduction text for managing read receipt requests."
+  },
+  "readReceiptOptionAlways": "Always",
+  "@readReceiptOptionAlways": {
+    "description": "Display option for read receipt requests."
+  },
+  "readReceiptOptionNever": "Never",
+  "@readReceiptOptionNever": {
+    "description": "Display option for read receipt requests."
   },
   "settingsFolders": "Folders",
   "@settingsFolders": {
@@ -1254,6 +1282,10 @@
         "example": "554-Reject due to policy restrictions."
       }
     }  
+  },
+  "composeRequestReadReceiptAction": "Request read receipt",
+  "@composeRequestReadReceiptAction": {
+    "description": "Action to request a read receipt for this message"
   },
   "composeSaveDraftAction": "Save as draft",
   "@composeSaveDraftAction": {

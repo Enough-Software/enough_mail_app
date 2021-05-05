@@ -6,6 +6,7 @@ import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
+import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
@@ -105,11 +106,11 @@ class _MessageContentState extends State<_MessageContent> {
 
   @override
   Widget build(BuildContext context) {
-    final msg = widget.message.mimeMessage;
     final localizations = AppLocalizations.of(context);
     return Base.buildAppChrome(
       context,
-      title: msg.decodeSubject() ?? localizations.subjectUndefined,
+      title: widget.message.mimeMessage.decodeSubject() ??
+          localizations.subjectUndefined,
       content: MessageWidget(
         message: widget.message,
         child: buildMailDetails(localizations),
@@ -166,7 +167,6 @@ class _MessageContentState extends State<_MessageContent> {
     final attachments = widget.message.attachments;
     final date = locator<I18nService>().formatDate(mime.decodeDate());
     final subject = mime.decodeSubject();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -276,6 +276,9 @@ class _MessageContentState extends State<_MessageContent> {
             ],
           ),
         },
+        if (ReadReceiptButton.shouldBeShown(mime)) ...{
+          ReadReceiptButton(),
+        }
       ],
     );
   }
@@ -688,5 +691,55 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
         ),
       ),
     );
+  }
+}
+
+class ReadReceiptButton extends StatefulWidget {
+  ReadReceiptButton({Key key}) : super(key: key);
+
+  @override
+  _ReadReceiptButtonState createState() => _ReadReceiptButtonState();
+
+  static bool shouldBeShown(MimeMessage mime) =>
+      (mime.isReadReceiptSent || mime.isReadReceiptRequested) &&
+      (locator<SettingsService>().settings.readReceiptDisplaySetting !=
+          ReadReceiptDisplaySetting.never);
+}
+
+class _ReadReceiptButtonState extends State<ReadReceiptButton> {
+  bool _isSendingReadReceipt = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final message = Message.of(context);
+    final mime = message.mimeMessage;
+    final localizations = AppLocalizations.of(context);
+    if (mime.isReadReceiptSent) {
+      return Text(localizations.detailsReadReceiptSentStatus,
+          style: Theme.of(context).textTheme.caption);
+    } else if (_isSendingReadReceipt) {
+      return CircularProgressIndicator();
+    } else {
+      return ElevatedButton(
+        child: Text(localizations.detailsSendReadReceiptAction),
+        onPressed: () async {
+          setState(() {
+            _isSendingReadReceipt = true;
+          });
+          final readReceipt = MessageBuilder.buildReadReceipt(
+            mime,
+            message.account.fromAddress,
+            reportingUa: 'Maily 1.0',
+            subject: localizations.detailsReadReceiptSubject,
+          );
+          await message.mailClient
+              .sendMessage(readReceipt, appendToSent: false);
+          await message.mailClient.flagMessage(mime, isReadReceiptSent: true);
+          setState(() {
+            _isSendingReadReceipt = false;
+          });
+        },
+      );
+    }
   }
 }
