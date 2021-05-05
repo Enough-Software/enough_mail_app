@@ -18,6 +18,7 @@ class Routes {
   static const String settingsFeedback = 'settingsFeedback';
   static const String settingsLanguage = 'settingsLanguage';
   static const String settingsFolders = 'settingsFolders';
+  static const String settingsReadReceipts = 'settingsReadReceipts';
   static const String settingsDeveloperMode = 'settingsDeveloperMode';
   static const String settingsSwipe = 'settingsSwipe';
   static const String settingsSignature = 'settingsSignature';
@@ -62,6 +63,9 @@ class AppRouter {
         break;
       case Routes.settingsFolders:
         page = SettingsFoldersScreen();
+        break;
+      case Routes.settingsReadReceipts:
+        page = SettingsReadReceiptsScreen();
         break;
       case Routes.settingsDeveloperMode:
         page = SettingsDeveloperModeScreen();

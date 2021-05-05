@@ -33,7 +33,7 @@ class ComposeScreen extends StatefulWidget {
   _ComposeScreenState createState() => _ComposeScreenState();
 }
 
-enum _OverflowMenuChoice { showSourceCode, saveAsDraft }
+enum _OverflowMenuChoice { showSourceCode, saveAsDraft, requestReadReceipt }
 enum _Autofocus { to, subject, text }
 
 class _ComposeScreenState extends State<ComposeScreen> {
@@ -51,6 +51,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
   Future _downloadAttachmentsFuture;
   String _originalMessageHtml;
   ComposeData _resumeComposeData;
+  bool _isReadReceiptRequested = false;
 
   @override
   void initState() {
@@ -389,12 +390,20 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         case _OverflowMenuChoice.saveAsDraft:
                           saveAsDraft();
                           break;
+                        case _OverflowMenuChoice.requestReadReceipt:
+                          requestReadReceipt();
+                          break;
                       }
                     },
                     itemBuilder: (context) => [
                       PopupMenuItem<_OverflowMenuChoice>(
                         value: _OverflowMenuChoice.saveAsDraft,
                         child: Text(localizations.composeSaveDraftAction),
+                      ),
+                      PopupMenuItem<_OverflowMenuChoice>(
+                        value: _OverflowMenuChoice.requestReadReceipt,
+                        child:
+                            Text(localizations.composeRequestReadReceiptAction),
                       ),
                       if (locator<SettingsService>()
                           .settings
@@ -433,6 +442,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                             )
                             .toList(),
                         onChanged: (s) async {
+                          final builder = widget.data.messageBuilder;
                           if (s.isPlaceHolderForPlusAlias) {
                             final index = senders.indexOf(s);
                             s = locator<MailService>()
@@ -441,12 +451,15 @@ class _ComposeScreenState extends State<ComposeScreen> {
                               senders.insert(index, s);
                             });
                           }
-                          widget.data.messageBuilder.from = [s.address];
+                          builder.from = [s.address];
                           final lastSignature = signature;
                           from = s;
                           final newSignature = signature;
                           if (newSignature != lastSignature) {
                             _editorApi.replaceAll(lastSignature, newSignature);
+                          }
+                          if (_isReadReceiptRequested) {
+                            builder.requestReadReceipt(recipient: from.address);
                           }
                           setState(() {});
 
@@ -507,6 +520,17 @@ class _ComposeScreenState extends State<ComposeScreen> {
                   ),
                 ),
               ),
+              if (_isReadReceiptRequested) ...{
+                SliverToBoxAdapter(
+                  child: CheckboxListTile(
+                    value: true,
+                    title: Text(localizations.composeRequestReadReceiptAction),
+                    onChanged: (value) {
+                      removeReadReceiptRequest();
+                    },
+                  ),
+                ),
+              },
               if (_editorApi != null) ...{
                 SliverHeaderHtmlEditorControls(
                   editorApi: _editorApi,
@@ -601,6 +625,20 @@ class _ComposeScreenState extends State<ComposeScreen> {
         ],
       );
     }
+  }
+
+  void requestReadReceipt() {
+    widget.data.messageBuilder.requestReadReceipt(recipient: from.address);
+    setState(() {
+      _isReadReceiptRequested = true;
+    });
+  }
+
+  void removeReadReceiptRequest() {
+    widget.data.messageBuilder.removeReadReceiptRequest();
+    setState(() {
+      _isReadReceiptRequested = false;
+    });
   }
 
   void returnToCompose() {

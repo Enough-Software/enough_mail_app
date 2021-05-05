@@ -6,6 +6,7 @@ export 'settings_language_screen.dart';
 export 'settings_swipe_screen.dart';
 export 'settings_signature_screen.dart';
 export 'settings_folders_screen.dart';
+export 'settings_readreceipts_screen.dart';
 export 'settings_developer_mode_screen.dart';
 export 'account_add_screen.dart';
 export 'account_edit_screen.dart';

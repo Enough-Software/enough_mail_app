@@ -5,6 +5,11 @@ import 'package:enough_serialization/enough_serialization.dart';
 
 enum FolderNameSetting { server, localized, custom }
 
+enum ReadReceiptDisplaySetting {
+  always,
+  never, // forContacts
+}
+
 class Settings extends SerializableObject {
   Settings() {
     objectCreators['themeSettings'] = (map) => ThemeSettings();
@@ -16,6 +21,10 @@ class Settings extends SerializableObject {
     transformers['folderNameSetting'] = (value) => value is FolderNameSetting
         ? value.index
         : FolderNameSetting.values[value];
+    transformers['readReceiptDisplaySetting'] = (value) =>
+        value is ReadReceiptDisplaySetting
+            ? value.index
+            : ReadReceiptDisplaySetting.values[value];
     transformers['signatureActions'] = (value) =>
         value is ComposeAction ? value.index : ComposeAction.values[value];
   }
@@ -76,4 +85,10 @@ class Settings extends SerializableObject {
       attributes['signatureActions'] ?? [ComposeAction.newMessage];
   set signatureActions(List<ComposeAction> value) =>
       attributes['signatureActions'] = value;
+
+  ReadReceiptDisplaySetting get readReceiptDisplaySetting =>
+      attributes['readReceiptDisplaySetting'] ??
+      ReadReceiptDisplaySetting.always;
+  set readReceiptDisplaySetting(ReadReceiptDisplaySetting value) =>
+      attributes['readReceiptDisplaySetting'] = value;
 }
