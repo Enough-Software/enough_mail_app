@@ -125,6 +125,7 @@ class _SwipeSettingState extends State<_SwipeSetting> {
                     children: [
                       _SwipeWidget(
                         swipeAction: action,
+                        isSmall: true,
                       ),
                       if (action == current) ...{
                         Align(
@@ -151,13 +152,19 @@ class _SwipeSettingState extends State<_SwipeSetting> {
       ),
       defaultActions: DialogActions.cancel,
     );
+    if (action == false) {
+      return null;
+    }
     return action;
   }
 }
 
 class _SwipeWidget extends StatelessWidget {
   final SwipeAction swipeAction;
-  const _SwipeWidget({Key key, @required this.swipeAction}) : super(key: key);
+  final bool isSmall;
+  const _SwipeWidget(
+      {Key key, @required this.swipeAction, this.isSmall = false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +193,9 @@ class _SwipeWidget extends StatelessWidget {
                 ),
                 Text(
                   swipeAction.name(localizations),
-                  style: TextStyle(color: swipeAction.colorForeground),
+                  style: TextStyle(
+                      color: swipeAction.colorForeground,
+                      fontSize: isSmall ? 10.0 : 12.0),
                 ),
               ],
             ),
