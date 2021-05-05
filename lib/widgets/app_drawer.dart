@@ -107,6 +107,7 @@ class _AppDrawerState extends State<AppDrawer> {
       Account currentAccount, List<Account> accounts, ThemeData theme) {
     final avatarAccount =
         currentAccount.isVirtual ? accounts.first : currentAccount;
+    final userName = currentAccount.userName;
     return ListTile(
       onTap: () {
         final navService = locator<NavigationService>();
@@ -138,12 +139,16 @@ class _AppDrawerState extends State<AppDrawer> {
                   currentAccount.name ?? '',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
+                if (userName != null) ...{
+                  Text(
+                    userName,
+                    style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
+                  ),
+                },
                 Text(
-                  currentAccount.userName ?? '',
-                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
-                ),
-                Text(
-                  currentAccount.email ?? '',
+                  currentAccount is UnifiedAccount
+                      ? currentAccount.accounts.map((a) => a.name).join(', ')
+                      : currentAccount.email ?? '',
                   style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
                 ),
               ],
