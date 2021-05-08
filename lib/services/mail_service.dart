@@ -3,6 +3,7 @@ import 'package:enough_mail_app/events/account_change_event.dart';
 import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/events/unified_messagesource_changed_event.dart';
+import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/models/mime_source.dart';
@@ -82,7 +83,8 @@ class MailService {
     var json = await _storage.read(key: _keyAccounts);
     if (json != null) {
       final accounts = <MailAccount>[];
-      Serializer().deserializeList(json, accounts, (map) => MailAccount());
+      Serializer().deserializeList(json, accounts,
+          (map) => MailAccount()..addExtensionSerializationConfiguration());
       return accounts;
     }
     return <MailAccount>[];
@@ -207,6 +209,15 @@ class MailService {
 
   Future<bool> addAccount(
       MailAccount mailAccount, MailClient mailClient) async {
+    //TODO check if other account with the same name already exists
+    //TODO how to save extension data?
+    final existing = mailAccounts.firstWhere(
+        (account) => account.email == mailAccount.email,
+        orElse: () => null);
+    if (existing != null) {
+      mailAccounts.remove(existing);
+      accounts.removeWhere((account) => account.email == mailAccount.email);
+    }
     currentAccount = Account(mailAccount);
     accounts.add(currentAccount);
     await loadMailboxesFor(mailClient);

@@ -4,6 +4,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 class HttpHelper {
+  HttpHelper._();
+
   static Future<HttpResult> httpGet(String url) async {
     try {
       final client = HttpClient();

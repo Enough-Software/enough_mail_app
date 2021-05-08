@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/models/contact.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -119,6 +120,9 @@ class Account extends ChangeNotifier {
     }
     return _key;
   }
+
+  List<AppExtension> get appExtensions => account.appExtensions;
+  set appExtensions(List<AppExtension> value) => account.appExtensions = value;
 
   @override
   operator ==(Object o) => o is Account && o.key == key;

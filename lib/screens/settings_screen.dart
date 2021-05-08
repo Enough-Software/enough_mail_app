@@ -118,10 +118,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               Divider(),
               ListTile(
-                title: Text(localizations.settingsDeveloperMode),
+                title: Text(localizations.settingsDevelopment),
                 onTap: () {
-                  locator<NavigationService>()
-                      .push(Routes.settingsDeveloperMode);
+                  locator<NavigationService>().push(Routes.settingsDevelopment);
                 },
               ),
             ],
