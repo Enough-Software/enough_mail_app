@@ -1,8 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/models/compose_data.dart';
-import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/models/message_source.dart';
+import 'package:enough_mail_app/models/models.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +16,7 @@ class Routes {
   static const String settingsLanguage = 'settingsLanguage';
   static const String settingsFolders = 'settingsFolders';
   static const String settingsReadReceipts = 'settingsReadReceipts';
-  static const String settingsDeveloperMode = 'settingsDeveloperMode';
+  static const String settingsDevelopment = 'settingsDeveloperMode';
   static const String settingsSwipe = 'settingsSwipe';
   static const String settingsSignature = 'settingsSignature';
   static const String messageSource = 'messageSource';
@@ -31,6 +28,7 @@ class Routes {
   static const String interactiveMedia = 'interactiveMedia';
   static const String locationPicker = 'locationPicker';
   static const String sourceCode = 'sourceCode';
+  static const String webview = 'webview';
 }
 
 class AppRouter {
@@ -67,7 +65,7 @@ class AppRouter {
       case Routes.settingsReadReceipts:
         page = SettingsReadReceiptsScreen();
         break;
-      case Routes.settingsDeveloperMode:
+      case Routes.settingsDevelopment:
         page = SettingsDeveloperModeScreen();
         break;
       case Routes.settingsSwipe:
@@ -107,6 +105,10 @@ class AppRouter {
       case Routes.sourceCode:
         final mime = arguments as MimeMessage;
         page = SourceCodeScreen(mimeMessage: mime);
+        break;
+      case Routes.webview:
+        final configuration = arguments as WebViewConfiguration;
+        page = WebViewScreen(configuration: configuration);
         break;
       default:
         print('Unknown route: $name');

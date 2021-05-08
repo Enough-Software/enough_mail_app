@@ -1,9 +1,11 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/account_add_event.dart';
+import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/validator.dart';
@@ -37,8 +39,10 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   bool _isAccountVerifying = false;
 
   bool _isAccountVerified = false;
-
+  List<AppExtension> _extensions;
   MailClient mailClient;
+
+  AppExtensionActionDescription _extensionForgotPassword;
 
   Future<void> navigateToManualSettings() async {
     if (_clientConfig == null) {
@@ -212,12 +216,32 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                     localizations.addAccountPasswordLabel,
                                 hintText: localizations.addAccountPasswordHint,
                               ),
-                              ElevatedButton(
+                              TextButton(
                                 onPressed: navigateToManualSettings,
                                 child: Text(localizations
                                     .addAccountResolvedSettingsWrongAction(
                                         _clientConfig?.displayName)),
                               ),
+                              if (_extensionForgotPassword != null) ...{
+                                TextButton(
+                                  onPressed: () {
+                                    final languageCode = locator<I18nService>()
+                                        .locale
+                                        .languageCode;
+                                    var url =
+                                        _extensionForgotPassword.action.url;
+                                    url = url
+                                      ..replaceAll(
+                                          '{user.email}', account.email)
+                                      ..replaceAll('{language}', languageCode);
+                                    launcher.launch(url);
+                                  },
+                                  child: Text(_extensionForgotPassword.getLabel(
+                                      locator<I18nService>()
+                                          .locale
+                                          .languageCode)),
+                                ),
+                              },
                             },
                           ],
                         ),
@@ -342,6 +366,15 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         var domainName =
             account.email.substring(account.email.lastIndexOf('@') + 1);
         _accountNameController.text = domainName;
+        if (clientConfig != null) {
+          final mailAccount = MailAccount.fromDiscoveredSettings(
+              _emailController.text,
+              _emailController.text,
+              _passwordController.text,
+              clientConfig);
+          _extensions = await AppExtension.loadFor(mailAccount);
+          _extensionForgotPassword = mailAccount.appExtensionForgotPassword;
+        }
 
         setState(() {
           _isClientConfigResolving = false;
@@ -355,7 +388,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         setState(() {
           _isAccountVerifying = true;
         });
-        var mailAccount = MailAccount.fromDiscoveredSettings(
+        final mailAccount = MailAccount.fromDiscoveredSettings(
             _emailController.text,
             _emailController.text,
             _passwordController.text,
@@ -364,6 +397,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
 
         final isVerified = mailClient?.isConnected ?? false;
         if (isVerified) {
+          mailAccount.appExtensions = _extensions;
           account = mailAccount;
         }
         setState(() {
@@ -378,9 +412,11 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         account.name = _accountNameController.text;
         account.userName = _userNameController.text;
         final service = locator<MailService>();
-        await service.addAccount(account, mailClient);
-        locator<NavigationService>().push(Routes.messageSource,
-            arguments: service.messageSource, replace: true, fade: true);
+        final added = await service.addAccount(account, mailClient);
+        if (added) {
+          locator<NavigationService>().push(Routes.messageSource,
+              arguments: service.messageSource, replace: true, fade: true);
+        }
     }
   }
 }

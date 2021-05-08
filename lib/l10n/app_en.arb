@@ -404,7 +404,7 @@
   "@detailsActionShowImages": {
     "description": "Action for showing images. Only visible when external images are blocked."
   },
-  "detailsNewsletterActionUnsubscribe": "Unsubscribe",
+  "detailsNewsletterActionUnsubscribe": "unsubscribe",
   "@detailsNewsletterActionUnsubscribe": {
     "description": "Action shown for unsubscribable newsletter."
   },
@@ -420,7 +420,7 @@
   "@detailsNewsletterUnsubscribeDialogTitle": {
     "description": "Title for unsubscribe newsletter dialog."
   },
-  "detailsNewsletterUnsubscribeDialogQuestion": "Do you want to unsubscribe to this mailing list {listName}?",
+  "detailsNewsletterUnsubscribeDialogQuestion": "Do you want to unsubscribe from the mailing list {listName}?",
   "@detailsNewsletterUnsubscribeDialogQuestion": {
     "description": "Question for unsubscribe newsletter dialog.",
     "placeholders": {
@@ -430,7 +430,7 @@
       }
     }
   },
-  "detailsNewsletterUnsubscribeDialogAction": "Unsubscribe",
+  "detailsNewsletterUnsubscribeDialogAction": "unsubscribe",
   "@detailsNewsletterUnsubscribeDialogAction": {
     "description": "Action for unsubscribe newsletter dialog."
   },
@@ -759,9 +759,13 @@
   "@folderNamesCustomTitle": {
     "description": "Title of dialog to specify custom folder names."
   },
-  "settingsDeveloperMode": "Development mode",
-  "@settingsDeveloperMode": {
-    "description": "Settings action to enable or disable the development mode."
+  "settingsDevelopment": "Development settings",
+  "@settingsDevelopment": {
+    "description": "Settings action to specify the development options."
+  },
+  "developerModeTitle": "Development mode",
+  "@developerModeTitle": {
+    "description": "Title of the development mode section."
   },
   "developerModeIntroduction": "If you enable the development mode you will be able to view the source code of messages and convert text attachments to messages.",
   "@developerModeIntroduction": {
@@ -1558,5 +1562,44 @@
   "fontCrosshatch": "Crosshatch",
   "@fontCrosshatch": {
     "description": "Font name"
+  },
+  "extensionsTitle": "Extensions",
+  "@extensionsTitle": {
+    "description": "Title of extension section within the development settings"
+  },
+  "extensionsIntro": "With extensions e-mail service providers, companies and developers can adapt Maily with useful functionalities.",
+  "@extensionsIntro": {
+    "description": "Explanation of extensions"
+  },
+  "extensionsLearnMoreAction": "Learn more about extensions",
+  "@extensionsLearnMoreAction": {
+    "description": "Label for launching a website with more information"
+  },
+  
+  "extensionsReloadAction": "Reload extensions",
+  "@extensionsReloadAction": {
+    "description": "Action to refresh extensions"
+  },
+  "extensionDeactivateAllAction": "Deactivate all extensions",
+  "@extensionDeactivateAllAction": {
+    "description": "Action to deactivate / unload any extension"
+  },
+  "extensionsManualAction": "Load manually",
+  "@extensionsManualAction": {
+    "description": "Action to load extension manually"
+  },
+  "extensionsManualUrlLabel": "Url of extension",
+  "@extensionsManualUrlLabel": {
+    "description": "Label for URL input field"
+  },
+  "extensionsManualLoardingError": "Unable to download extension from \"{url}\".",
+  "@extensionsManualLoardingError": {
+    "description": "Message shown when extensions could not be loaded.",
+    "placeholders": {
+      "url": {
+        "type": "String",
+        "example": "htttps://domain.com/.maily.json"
+      }
+    }  
   }
 }
