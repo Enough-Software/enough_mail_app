@@ -29,18 +29,19 @@ class RecipientInputField extends StatefulWidget {
 }
 
 class _RecipientInputFieldState extends State<RecipientInputField> {
-  final focusNode = FocusNode();
-  final controller = TextEditingController();
+  final _focusNode = FocusNode();
+  TextEditingController _controller;
 
   @override
   void initState() {
+    _controller = widget.controller ?? TextEditingController();
     super.initState();
-    focusNode.addListener(_update);
+    _focusNode.addListener(_update);
   }
 
   void _update() {
-    if (!focusNode.hasFocus) {
-      checkEmail(controller.text);
+    if (!_focusNode.hasFocus) {
+      checkEmail(_controller.text);
     }
     setState(() {});
   }
@@ -48,8 +49,8 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
   @override
   dispose() {
     super.dispose();
-    focusNode.dispose();
-    controller.dispose();
+    _focusNode.dispose();
+    _controller.dispose();
   }
 
   @override
@@ -57,10 +58,14 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
     final theme = Theme.of(context);
     return Wrap(children: [
       if (widget.addresses.isNotEmpty && widget.labelText != null) ...{
-        Text(
-          widget.labelText,
-          style: TextStyle(
-              color: focusNode.hasFocus ? theme.accentColor : theme.hintColor),
+        Padding(
+          padding: EdgeInsets.only(top: 8.0, right: 8.0),
+          child: Text(
+            widget.labelText,
+            style: TextStyle(
+                color:
+                    _focusNode.hasFocus ? theme.accentColor : theme.hintColor),
+          ),
         ),
       },
       for (final address in widget.addresses) ...{
@@ -86,8 +91,8 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
 
   Widget buildInput(ThemeData theme, BuildContext context) {
     return RawAutocomplete<MailAddress>(
-      focusNode: focusNode,
-      textEditingController: controller,
+      focusNode: _focusNode,
+      textEditingController: _controller,
       optionsBuilder: (textEditingValue) {
         final search = textEditingValue.text.toLowerCase();
         if (search.length < 2) {
@@ -115,7 +120,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
           onSubmitted: (text) {
             onFieldSubmitted();
           },
-          onEditingComplete: () => checkEmail(controller.text),
+          onEditingComplete: () => checkEmail(_controller.text),
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             labelText: widget.addresses.isNotEmpty ? null : widget.labelText,
@@ -163,7 +168,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                     onPressed: () {
                       if (!widget.addresses.contains(option)) {
                         widget.addresses.add(option);
-                        controller.text = '';
+                        _controller.text = '';
                         setState(() {});
                       }
                       onSelected(null);
@@ -182,7 +187,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
     if (Validator.validateEmail(input)) {
       final address = MailAddress(null, input);
       widget.addresses.add(address);
-      controller.text = '';
+      _controller.text = '';
       setState(() {});
     }
   }

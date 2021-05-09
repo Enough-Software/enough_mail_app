@@ -619,9 +619,15 @@
   "@resultRedirectedSuccess": {
     "description": "Successful snackbar message after redirecting message to new recipient(s)."
   },
-  "resultRedirectedFailure": "Unable to redirect message.",
+  "resultRedirectedFailure": "Unable to redirect message.\n\nThe server responded with the following details: \"{details}\"",
   "@resultRedirectedFailure": {
-    "description": "Failure snackbar message after failed to redirect message to new recipient(s)."
+    "description": "Failure snackbar message after failed to redirect message to new recipient(s).",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Invalid recipient"
+      }
+    }  
   },
   "redirectTitle": "Redirect",
   "@redirectTitle": {
@@ -630,6 +636,10 @@
   "redirectInfo": "Redirect this message to the following recpient(s). Redirecting does not alter the message.",
   "@redirectInfo": {
     "description": "Short explanation of redirect action in redirect dialog."
+  },
+  "redirectEmailInputRequired": "You need to add at least one valid email address.",
+  "@redirectEmailInputRequired": {
+    "description": "Information when redirect is wanted but no address has been entered."
   },
   "searchQueryDescription": "search in {folder}...",
   "@searchQueryDescription": {
