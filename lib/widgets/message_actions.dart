@@ -9,6 +9,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
+import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -310,6 +311,7 @@ class _MessageActionsState extends State<MessageActions> {
     final List<MailAddress> recipients = [];
     final localizations = AppLocalizations.of(context);
     final size = MediaQuery.of(context).size;
+    final textEditingController = TextEditingController();
     final redirect = await DialogHelper.showWidgetDialog(
       context,
       localizations.redirectTitle,
@@ -327,6 +329,7 @@ class _MessageActionsState extends State<MessageActions> {
                 contactManager: account.contactManager,
                 labelText: localizations.detailsHeaderTo,
                 hintText: localizations.composeRecipientHint,
+                controller: textEditingController,
               ),
             ],
           ),
@@ -339,25 +342,35 @@ class _MessageActionsState extends State<MessageActions> {
         ),
         TextButton(
           child: Text(localizations.messageActionRedirect),
-          onPressed: () => Navigator.of(context).pop(true),
+          onPressed: () {
+            if (Validator.validateEmail(textEditingController.text)) {
+              recipients.add(MailAddress(null, textEditingController.text));
+            }
+            Navigator.of(context).pop(true);
+          },
         ),
       ],
     );
-    if (redirect == true && recipients.isNotEmpty) {
-      final mime = widget.message.mimeMessage;
-      if (mime.mimeData == null) {
-        // download complete message first
-        await mailClient.fetchMessageContents(mime);
-      }
-      try {
-        mailClient.sendMessage(mime,
-            recipients: recipients, appendToSent: false);
-        locator<ScaffoldMessengerService>()
-            .showTextSnackBar(localizations.resultRedirectedSuccess);
-      } catch (e, s) {
-        print('message could not get redirected: $e $s');
-        locator<ScaffoldMessengerService>()
-            .showTextSnackBar(localizations.resultRedirectedFailure);
+    if (redirect == true) {
+      if (recipients.isEmpty) {
+        await DialogHelper.showTextDialog(context, localizations.errorTitle,
+            localizations.redirectEmailInputRequired);
+      } else {
+        final mime = widget.message.mimeMessage;
+        if (mime.mimeData == null) {
+          // download complete message first
+          await mailClient.fetchMessageContents(mime);
+        }
+        try {
+          await mailClient.sendMessage(mime,
+              recipients: recipients, appendToSent: false);
+          locator<ScaffoldMessengerService>()
+              .showTextSnackBar(localizations.resultRedirectedSuccess);
+        } catch (e, s) {
+          print('message could not get redirected: $e $s');
+          await DialogHelper.showTextDialog(context, localizations.errorTitle,
+              localizations.resultRedirectedFailure(e.message));
+        }
       }
     }
   }
