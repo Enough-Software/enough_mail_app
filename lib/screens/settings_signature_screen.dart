@@ -164,6 +164,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
           child: PackagedHtmlEditor(
             initialContent: _signature ??
                 locator<SettingsService>().getSignatureHtmlGlobal(),
+            excludeDocumentLevelControls: true,
             onCreated: (api) => editorApi = api,
           ),
         ),
