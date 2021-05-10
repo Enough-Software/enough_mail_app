@@ -2,11 +2,11 @@ import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
-import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
@@ -73,7 +73,7 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
                 ),
               },
               Divider(),
-              SignatureWidget(), // no account for global signature
+              SignatureWidget(), //  global signature
               if (accounts.length > 1) ...{
                 Divider(),
                 if (accountsWithSignature.isNotEmpty) ...{
@@ -168,7 +168,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
           ),
         ),
         defaultActions: DialogActions.okAndCancel,
-        actions: widget.account == null || _signature == null
+        actions: _signature == null
             ? null
             : [
                 TextButton(
@@ -178,8 +178,15 @@ class _SignatureWidgetState extends State<SignatureWidget> {
                       _signature = null;
                     });
                     Navigator.of(context).pop(false);
-                    widget.account.signatureHtml = null;
-                    await locator<MailService>().saveAccounts();
+                    if (widget.account != null) {
+                      widget.account.signatureHtml = null;
+                      await locator<MailService>().saveAccounts();
+                    } else {
+                      final service = locator<SettingsService>();
+                      service.settings.signatureHtml = null;
+                      _signature = service.getSignatureHtmlGlobal();
+                      await service.save();
+                    }
                   },
                 ),
                 TextButton(
