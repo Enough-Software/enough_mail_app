@@ -38,6 +38,7 @@ class AppExtension extends SerializableObject {
         (map) => <AppExtensionActionDescription>[];
     objectCreators['accountSideMenu.value'] =
         (map) => AppExtensionActionDescription();
+    objectCreators['signatureHtml'] = (map) => Map<String, String>();
   }
 
   int get version => attributes['version'];
@@ -45,6 +46,19 @@ class AppExtension extends SerializableObject {
       attributes['accountSideMenu'];
   AppExtensionActionDescription get forgotPasswordAction =>
       attributes['forgotPassword'];
+  Map<String, String> get signatureHtml => attributes['signatureHtml'];
+
+  String getSignatureHtml(String languageCode) {
+    final map = signatureHtml;
+    if (map == null) {
+      return null;
+    }
+    var sign = map[languageCode];
+    if (sign == null && languageCode != 'en') {
+      sign = map['en'];
+    }
+    return sign;
+  }
 
   static String urlFor(String domain) {
     return 'https://$domain/.maily.json';

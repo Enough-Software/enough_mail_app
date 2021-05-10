@@ -244,7 +244,12 @@ class _SettingsDeveloperModeScreenState
             Text('Forgot password:'),
             Text(
                 '"${data.forgotPasswordAction.getLabel('en')}": ${data.forgotPasswordAction.action.url}'),
-          }
+          },
+          if (data.signatureHtml != null) ...{
+            Divider(),
+            Text('Signature:'),
+            Text('${data.getSignatureHtml('en')}'),
+          },
         ],
       ),
     );

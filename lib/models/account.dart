@@ -1,6 +1,7 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/models/contact.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -40,7 +41,23 @@ class Account extends ChangeNotifier {
     account.attributes[key] = value;
   }
 
-  String get signatureHtml => account.attributes[attributeSignatureHtml];
+  String get signatureHtml {
+    var signature = account.attributes[attributeSignatureHtml];
+    if (signature == null) {
+      final extensions = account.appExtensions;
+      if (extensions != null) {
+        final languageCode = locator<I18nService>().locale.languageCode;
+        for (final extension in extensions) {
+          final signature = extension.getSignatureHtml(languageCode);
+          if (signature != null) {
+            return signature;
+          }
+        }
+      }
+    }
+    return signature;
+  }
+
   set signatureHtml(String value) {
     if (value == null) {
       account.attributes.remove(attributeSignatureHtml);
