@@ -3,7 +3,7 @@
   "@signature": {
     "description": "Default signature text"
   },  
-  "actionCancel": "cancel",
+  "actionCancel": "Cancel",
   "@actionCancel": {
     "description": "Generic cancel action"
   },
@@ -11,23 +11,23 @@
   "@actionOk": {
     "description": "Generic OK action"
   },
-  "actionUndo": "undo",
+  "actionUndo": "Undo",
   "@actionUndo": {
     "description": "Generic undo action"
   },
-  "actionDelete": "delete",
+  "actionDelete": "Delete",
   "@actionDelete": {
     "description": "Generic delete action"
   },
-  "actionAddressCopy": "copy",
+  "actionAddressCopy": "Copy",
   "@actionAddressCopy": {
     "description": "Copy action for email addresses"
   },
-  "actionAddressCompose": "new message",
+  "actionAddressCompose": "New message",
   "@actionAddressCompose": {
     "description": "Compose action for email addresses"
   },
-  "actionAddressSearch": "search",
+  "actionAddressSearch": "Search",
   "@actionAddressSearch": {
     "description": "Search action for email addresses"
   },
@@ -51,7 +51,7 @@
   "@welcomeBetaText": {
     "description": "Text for beta information dialog shown on welcome page"
   },
-  "welcomePanel1": "Welcome to Maily (beta)!",
+  "welcomePanel1": "Welcome to Maily!",
   "@welcomePanel1": {
     "description": "Welcome message shown on first panel"
   },
@@ -125,23 +125,23 @@
       }
     }  
   },
-  "swipeActionToggleRead": "mark as read/unread",
+  "swipeActionToggleRead": "Mark as read/unread",
   "@swipeActionToggleRead": {
     "description": "Swipe action for marking a message as read / unread."
   },
-  "swipeActionDelete": "delete",
+  "swipeActionDelete": "Delete",
   "@swipeActionDelete": {
     "description": "Swipe action for deleting a message."
   },
-  "swipeActionMarkJunk": "mark as junk",
+  "swipeActionMarkJunk": "Mark as junk",
   "@swipeActionMarkJunk": {
     "description": "Swipe action for moving a message to junk."
   },
-  "swipeActionArchive": "archive",
+  "swipeActionArchive": "Archive",
   "@swipeActionArchive": {
     "description": "Swipe action for moving a message to archive."
   },
-  "swipeActionFlag": "flag / unflag",
+  "swipeActionFlag": "Toggle flag",
   "@swipeActionFlag": {
     "description": "Swipe action for marking a message as flagged / unflagged."
   },
@@ -204,18 +204,18 @@
       }
     }  
   },
-  "messageActionMultipleMarkSeen": "mark as read",
+  "messageActionMultipleMarkSeen": "Mark as read",
   "@messageActionMultipleMarkSeen": {
     "description": "Action for several messages."
   },
-  "messageActionMultipleMarkUnseen": "mark as unread",
+  "messageActionMultipleMarkUnseen": "Mark as unread",
   "@messageActionMultipleMarkUnseen": {
     "description": "Action for several messages."
-  },  "messageActionMultipleMarkFlagged": "flag messages",
+  },  "messageActionMultipleMarkFlagged": "Flag messages",
   "@messageActionMultipleMarkFlagged": {
     "description": "Action for several messages."
   },
-  "messageActionMultipleMarkUnflagged": "unflag messages",
+  "messageActionMultipleMarkUnflagged": "Unflag messages",
   "@messageActionMultipleMarkUnflagged": {
     "description": "Action for several messages."
   },
@@ -372,7 +372,7 @@
   "@detailsErrorDownloadInfo": {
     "description": "Info shown when an email could not be downloaded."
   },
-  "detailsErrorDownloadRetry": "retry",
+  "detailsErrorDownloadRetry": "Retry",
   "@detailsErrorDownloadRetry": {
     "description": "Retry action shown when an email could not be downloaded."
   },
@@ -404,7 +404,7 @@
   "@detailsActionShowImages": {
     "description": "Action for showing images. Only visible when external images are blocked."
   },
-  "detailsNewsletterActionUnsubscribe": "unsubscribe",
+  "detailsNewsletterActionUnsubscribe": "Unsubscribe",
   "@detailsNewsletterActionUnsubscribe": {
     "description": "Action shown for unsubscribable newsletter."
   },
@@ -430,7 +430,7 @@
       }
     }
   },
-  "detailsNewsletterUnsubscribeDialogAction": "unsubscribe",
+  "detailsNewsletterUnsubscribeDialogAction": "Unsubscribe",
   "@detailsNewsletterUnsubscribeDialogAction": {
     "description": "Action for unsubscribe newsletter dialog."
   },
@@ -520,23 +520,23 @@
   "@detailsReadReceiptSubject": {
     "description": "Message subject for read receipts."
   },
-  "messageActionReply": "reply",
+  "messageActionReply": "Reply",
   "@messageActionReply": {
     "description": "Action for single message."
   },
-  "messageActionReplyAll": "reply all",
+  "messageActionReplyAll": "Reply all",
   "@messageActionReplyAll": {
     "description": "Action for single message."
   },
-  "messageActionForward": "forward",
+  "messageActionForward": "Forward",
   "@messageActionForward": {
     "description": "Action for single message."
   },
-  "messageActionForwardAsAttachment": "forward as attachment",
+  "messageActionForwardAsAttachment": "Forward as attachment",
   "@messageActionForwardAsAttachment": {
     "description": "Action for single message."
   },
-  "messageActionForwardAttachments": "{number,plural, =1{forward attachment} other{forward {number} attachments}}",
+  "messageActionForwardAttachments": "{number,plural, =1{Forward attachment} other{Forward {number} attachments}}",
   "@messageActionForwardAttachments": {
     "description": "Action for single message to forward the given number of attachments.",
     "placeholders": {
@@ -547,71 +547,71 @@
       }
     }  
   },
-  "messagesActionForwardAttachments": "forward attachments",
+  "messagesActionForwardAttachments": "Forward attachments",
   "@messagesActionForwardAttachments": {
     "description": "Action for multiple selected messages to forward all attachments of the messages."
   },
-  "messageActionDelete": "delete",
+  "messageActionDelete": "Delete",
   "@messageActionDelete": {
     "description": "Action for single message."
   },
-  "messageActionMoveToInbox": "move to inbox",
+  "messageActionMoveToInbox": "Move to inbox",
   "@messageActionMoveToInbox": {
     "description": "Action for single message."
   },
-  "messageActionMove": "move",
+  "messageActionMove": "Move",
   "@messageActionMove": {
     "description": "Action for single message."
   },
-  "messageStatusSeen": "is read",
+  "messageStatusSeen": "Is read",
   "@messageStatusSeen": {
     "description": "Status of single message."
   },
-  "messageStatusUnseen": "is unread",
+  "messageStatusUnseen": "Is unread",
   "@messageStatusUnseen": {
     "description": "Status of single message."
   },
-  "messageStatusFlagged": "is flagged",
+  "messageStatusFlagged": "Is flagged",
   "@messageStatusFlagged": {
     "description": "Status of single message."
   },
-  "messageStatusUnflagged": "is not flagged",
+  "messageStatusUnflagged": "Is not flagged",
   "@messageStatusUnflagged": {
     "description": "Status of single message."
   },
-  "messageActionMarkAsJunk": "mark as junk",
+  "messageActionMarkAsJunk": "Mark as junk",
   "@messageActionMarkAsJunk": {
     "description": "Action for single message."
   },
-  "messageActionMarkAsNotJunk": "mark as not junk",
+  "messageActionMarkAsNotJunk": "Mark as not junk",
   "@messageActionMarkAsNotJunk": {
     "description": "Action for single message."
   },
-  "messageActionArchive": "archive",
+  "messageActionArchive": "Archive",
   "@messageActionArchive": {
     "description": "Action for single message."
   },
-  "messageActionUnarchive": "move to Inbox",
+  "messageActionUnarchive": "Move to Inbox",
   "@messageActionUnarchive": {
     "description": "Action for single message."
   },
-  "messageActionRedirect": "redirect",
+  "messageActionRedirect": "Redirect",
   "@messageActionRedirect": {
     "description": "Action for single message."
   },
-  "resultDeleted": "deleted",
+  "resultDeleted": "Deleted",
   "@resultDeleted": {
     "description": "Successful short snackbar message after deleting message(s)."
   },
-  "resultMovedToJunk": "marked as junk",
+  "resultMovedToJunk": "Marked as junk",
   "@resultMovedToJunk": {
     "description": "Successful short snackbar message after moving message(s) to junk."
   },
-  "resultMovedToInbox": "moved to Inbox",
+  "resultMovedToInbox": "Moved to Inbox",
   "@resultMovedToInbox": {
     "description": "Successful short snackbar message after moving message(s) to inbox."
   },
-  "resultArchived": "archived",
+  "resultArchived": "Archived",
   "@resultArchived": {
     "description": "Successful short snackbar message after moving message(s) to archive."
   },
@@ -641,7 +641,7 @@
   "@redirectEmailInputRequired": {
     "description": "Information when redirect is wanted but no address has been entered."
   },
-  "searchQueryDescription": "search in {folder}...",
+  "searchQueryDescription": "Search in {folder}...",
   "@searchQueryDescription": {
     "description": "Description of search within the given folder.",
     "placeholders": {
@@ -1097,11 +1097,11 @@
   "@editAccountEditAliasTitle": {
     "description": "Title when editing alias."
   },
-  "editAccountAliasAddAction": "add",
+  "editAccountAliasAddAction": "Add",
   "@editAccountAliasAddAction": {
     "description": "Action when adding new alias."
   },
-  "editAccountAliasUpdateAction": "update",
+  "editAccountAliasUpdateAction": "Update",
   "@editAccountAliasUpdateAction": {
     "description": "Action when editing alias."
   },
@@ -1319,7 +1319,7 @@
       }
     }  
   },
-  "composeContinueEditingAction": "continue editing",
+  "composeContinueEditingAction": "Continue editing",
   "@composeContinueEditingAction": {
     "description": "Action to return to compose screen when draft cannot be saved"
   },
@@ -1343,11 +1343,11 @@
   "@composeSubjectHint": {
     "description": "Hint for Subject input field"
   },
-  "composeAddAttachmentAction": "add",
+  "composeAddAttachmentAction": "Add",
   "@composeAddAttachmentAction": {
     "description": "Action to add an attachment - should be short!"
   },
-  "composeRemoveAttachmentAction": "remove {name}",
+  "composeRemoveAttachmentAction": "Remove {name}",
   "@composeRemoveAttachmentAction": {
     "description": "Action to remove an attachment",
     "placeholders": {
@@ -1437,7 +1437,7 @@
   "@swipeSettingRightToLeftLabel": {
     "description": "Label for swipe gesture"
   },
-  "swipeSettingChangeAction": "change",
+  "swipeSettingChangeAction": "Change",
   "@swipeSettingChangeAction": {
     "description": "Action for changing a swipe gesture"
   },

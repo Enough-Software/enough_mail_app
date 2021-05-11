@@ -17,6 +17,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/attachment_chip.dart';
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_mail_app/widgets/message_actions.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
@@ -243,7 +244,7 @@ class _MessageContentState extends State<_MessageContent> {
               },
               if (_blockExternalImages) ...{
                 ElevatedButton(
-                  child: Text(localizations.detailsActionShowImages),
+                  child: ButtonText(localizations.detailsActionShowImages),
                   onPressed: () => setState(() {
                     _blockExternalImages = false;
                   }),
@@ -255,7 +256,7 @@ class _MessageContentState extends State<_MessageContent> {
                 if (widget.message.isNewsletterUnsubscribed) ...{
                   widget.message.isNewsLetterSubscribable
                       ? ElevatedButton(
-                          child: Text(
+                          child: ButtonText(
                               localizations.detailsNewsletterActionResubscribe),
                           onPressed: resubscribe,
                         )
@@ -265,8 +266,8 @@ class _MessageContentState extends State<_MessageContent> {
                         ),
                 } else ...{
                   ElevatedButton(
-                    child:
-                        Text(localizations.detailsNewsletterActionUnsubscribe),
+                    child: ButtonText(
+                        localizations.detailsNewsletterActionUnsubscribe),
                     onPressed: unsubscribe,
                   ),
                 },
@@ -321,7 +322,7 @@ class _MessageContentState extends State<_MessageContent> {
           ),
           TextButton.icon(
             icon: Icon(Icons.refresh),
-            label: Text(localizations.detailsErrorDownloadRetry),
+            label: ButtonText(localizations.detailsErrorDownloadRetry),
             onPressed: () {
               setState(() {
                 _messageDownloadError = false;
@@ -334,7 +335,7 @@ class _MessageContentState extends State<_MessageContent> {
             Text(errorStackTrace?.toString() ?? '<no stacktrace>'),
             TextButton.icon(
               icon: Icon(Icons.copy),
-              label: Text('Copy to clipboard'),
+              label: ButtonText('Copy to clipboard'),
               onPressed: () {
                 final text = errorObject?.toString() ??
                     '<unknown error>' + '\n\n' + errorStackTrace?.toString() ??
@@ -721,7 +722,7 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
       return CircularProgressIndicator();
     } else {
       return ElevatedButton(
-        child: Text(localizations.detailsSendReadReceiptAction),
+        child: ButtonText(localizations.detailsSendReadReceiptAction),
         onPressed: () async {
           setState(() {
             _isSendingReadReceipt = true;

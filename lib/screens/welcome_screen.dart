@@ -1,6 +1,7 @@
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:flutter/material.dart';
 
 import '../locator.dart';
@@ -105,7 +106,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton.icon(
                   icon: Icon(Icons.email),
-                  label: Text(AppLocalizations.of(context).welcomeActionSignIn),
+                  label: ButtonText(
+                      AppLocalizations.of(context).welcomeActionSignIn),
                   onPressed: () {
                     locator<NavigationService>().push(Routes.accountAdd);
                   },

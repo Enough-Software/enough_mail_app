@@ -6,6 +6,7 @@ import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
@@ -77,7 +78,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
                   reorderAccounts = true;
                 });
               },
-              child: Text(localizations.accountsActionReorder),
+              child: ButtonText(localizations.accountsActionReorder),
             ),
           ),
         },

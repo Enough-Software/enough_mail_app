@@ -7,6 +7,7 @@ import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/editor_extensions.dart';
 import 'package:enough_mail_app/widgets/message_widget.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
@@ -289,11 +290,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
         localizations.composeSendErrorInfo(e.toString()),
         actions: [
           TextButton(
-            child: Text(localizations.actionCancel),
+            child: ButtonText(localizations.actionCancel),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: Text(localizations.composeContinueEditingAction),
+            child: ButtonText(localizations.composeContinueEditingAction),
             onPressed: returnToCompose,
           ),
         ],
@@ -475,7 +476,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         labelText: localizations.detailsHeaderTo,
                         hintText: localizations.composeRecipientHint,
                         additionalSuffixIcon: TextButton(
-                          child: Text(localizations.detailsHeaderCc),
+                          child: ButtonText(localizations.detailsHeaderCc),
                           onPressed: () => setState(
                             () => _isCcBccVisible = !_isCcBccVisible,
                           ),
@@ -615,11 +616,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
         localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),
         actions: [
           TextButton(
-            child: Text(localizations.actionCancel),
+            child: ButtonText(localizations.actionCancel),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: Text(localizations.composeContinueEditingAction),
+            child: ButtonText(localizations.composeContinueEditingAction),
             onPressed: returnToCompose,
           ),
         ],

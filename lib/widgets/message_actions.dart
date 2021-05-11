@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
+import 'button_text.dart';
 import 'mailbox_tree.dart';
 
 class MessageActions extends StatefulWidget {
@@ -337,11 +338,11 @@ class _MessageActionsState extends State<MessageActions> {
       ),
       actions: [
         TextButton(
-          child: Text(localizations.actionCancel),
+          child: ButtonText(localizations.actionCancel),
           onPressed: () => Navigator.of(context).pop(false),
         ),
         TextButton(
-          child: Text(localizations.messageActionRedirect),
+          child: ButtonText(localizations.messageActionRedirect),
           onPressed: () {
             if (Validator.validateEmail(textEditingController.text)) {
               recipients.add(MailAddress(null, textEditingController.text));

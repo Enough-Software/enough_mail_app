@@ -1,3 +1,4 @@
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
@@ -16,11 +17,11 @@ class DialogHelper {
     final localizations = AppLocalizations.of(context);
     final theme = Theme.of(context);
     var actionButtonStyle = theme.textButtonTheme.style;
-    var actionTextStyle = theme.textTheme.button;
+    TextStyle actionTextStyle;
     if (isDangerousAction == true) {
       actionButtonStyle = TextButton.styleFrom(
           backgroundColor: Colors.red, onSurface: Colors.white);
-      actionTextStyle = actionTextStyle.copyWith(color: Colors.white);
+      actionTextStyle = theme.textTheme.button.copyWith(color: Colors.white);
     }
 
     return showDialog<bool>(
@@ -29,11 +30,11 @@ class DialogHelper {
         content: Text(query),
         actions: [
           TextButton(
-            child: Text(localizations.actionCancel),
+            child: ButtonText(localizations.actionCancel),
             onPressed: () => Navigator.of(context).pop(false),
           ),
           TextButton(
-            child: Text(action ?? title, style: actionTextStyle),
+            child: ButtonText(action ?? title, style: actionTextStyle),
             onPressed: () => Navigator.of(context).pop(true),
             style: actionButtonStyle,
           ),
@@ -56,14 +57,14 @@ class DialogHelper {
       if (defaultActions == DialogActions.cancel ||
           defaultActions == DialogActions.okAndCancel) ...{
         TextButton(
-          child: Text(localizations.actionCancel),
+          child: ButtonText(localizations.actionCancel),
           onPressed: () => Navigator.of(context).pop(false),
         ),
       },
       if (defaultActions == DialogActions.ok ||
           defaultActions == DialogActions.okAndCancel) ...{
         TextButton(
-          child: Text(localizations.actionOk),
+          child: ButtonText(localizations.actionOk),
           onPressed: () => Navigator.of(context).pop(true),
         ),
       },
@@ -90,20 +91,20 @@ class DialogHelper {
       applicationIcon: Icon(Icons.email),
       applicationLegalese: localizations.aboutApplicationLegalese,
       children: [
-        ElevatedButton(
-          child: Text(localizations.feedbackActionSuggestFeature),
+        TextButton(
+          child: ButtonText(localizations.feedbackActionSuggestFeature),
           onPressed: () async {
             await launcher.launch('https://maily.userecho.com/');
           },
         ),
-        ElevatedButton(
-          child: Text(localizations.feedbackActionReportProblem),
+        TextButton(
+          child: ButtonText(localizations.feedbackActionReportProblem),
           onPressed: () async {
             await launcher.launch('https://maily.userecho.com/');
           },
         ),
-        ElevatedButton(
-          child: Text(localizations.feedbackActionHelpDeveloping),
+        TextButton(
+          child: ButtonText(localizations.feedbackActionHelpDeveloping),
           onPressed: () async {
             await launcher
                 .launch('https://github.com/Enough-Software/enough_mail_app');

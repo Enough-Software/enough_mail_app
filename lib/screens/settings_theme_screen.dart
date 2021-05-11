@@ -1,5 +1,6 @@
 import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -107,7 +108,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     TextButton(
-                      child: Text(localizations.designThemeCustomStart(
+                      child: ButtonText(localizations.designThemeCustomStart(
                           darkThemeStartTime.format(context))),
                       onPressed: () async {
                         final pickedTime = await showTimePicker(
@@ -125,7 +126,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                       },
                     ),
                     TextButton(
-                      child: Text(localizations.designThemeCustomEnd(
+                      child: ButtonText(localizations.designThemeCustomEnd(
                           darkThemeEndTime.format(context))),
                       onPressed: () async {
                         final pickedTime = await showTimePicker(
