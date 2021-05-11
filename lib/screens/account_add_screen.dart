@@ -9,6 +9,7 @@ import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/validator.dart';
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -185,7 +186,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                   await launcher
                                       .launch(_providerAppplicationPasswordUrl);
                                 },
-                                child: Text(localizations
+                                child: ButtonText(localizations
                                     .addAccountApplicationPasswordRequiredButton),
                               ),
                               CheckboxListTile(
@@ -218,7 +219,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                               ),
                               TextButton(
                                 onPressed: navigateToManualSettings,
-                                child: Text(localizations
+                                child: ButtonText(localizations
                                     .addAccountResolvedSettingsWrongAction(
                                         _clientConfig?.displayName)),
                               ),
@@ -236,8 +237,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                       ..replaceAll('{language}', languageCode);
                                     launcher.launch(url);
                                   },
-                                  child: Text(_extensionForgotPassword.getLabel(
-                                      locator<I18nService>()
+                                  child: ButtonText(_extensionForgotPassword
+                                      .getLabel(locator<I18nService>()
                                           .locale
                                           .languageCode)),
                                 ),
@@ -253,7 +254,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                 .addAccountResolvingSetingsFailedInfo(
                                     account.email)),
                             ElevatedButton(
-                              child: Text(
+                              child: ButtonText(
                                   localizations.addAccountEditManuallyAction),
                               onPressed: navigateToManualSettings,
                             )

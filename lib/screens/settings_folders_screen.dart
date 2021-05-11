@@ -3,6 +3,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -63,7 +64,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
                 Divider(),
                 TextButton.icon(
                   icon: Icon(Icons.edit),
-                  label: Text(localizations.folderNamesEditAction),
+                  label: ButtonText(localizations.folderNamesEditAction),
                   onPressed: () async {
                     final service = locator<SettingsService>();
                     var customNames = service.settings.customFolderNames;

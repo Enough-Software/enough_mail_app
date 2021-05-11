@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
@@ -99,8 +100,8 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               },
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  child: Text(localizations.feedbackActionSuggestFeature),
+                child: TextButton(
+                  child: ButtonText(localizations.feedbackActionSuggestFeature),
                   onPressed: () async {
                     await launcher.launch('https://maily.userecho.com/');
                   },
@@ -108,8 +109,8 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  child: Text(localizations.feedbackActionReportProblem),
+                child: TextButton(
+                  child: ButtonText(localizations.feedbackActionReportProblem),
                   onPressed: () async {
                     await launcher.launch('https://maily.userecho.com/');
                   },
@@ -117,8 +118,8 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  child: Text(localizations.feedbackActionHelpDeveloping),
+                child: TextButton(
+                  child: ButtonText(localizations.feedbackActionHelpDeveloping),
                   onPressed: () async {
                     await launcher.launch(
                         'https://github.com/Enough-Software/enough_mail_app');

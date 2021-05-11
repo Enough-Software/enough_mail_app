@@ -10,6 +10,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -165,7 +166,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
             ),
             //if (!widget.account.supportsPlusAliases) ...{
             ElevatedButton(
-              child: Text(localizations.editAccountCheckPlusAliasAction),
+              child: ButtonText(localizations.editAccountCheckPlusAliasAction),
               onPressed: () async {
                 var result = await showDialog<bool>(
                   context: context,
@@ -187,7 +188,8 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                     Routes.accountServerDetails,
                     arguments: widget.account),
                 icon: Icon(Icons.edit),
-                label: Text(localizations.editAccountServerSettingsAction)),
+                label:
+                    ButtonText(localizations.editAccountServerSettingsAction)),
             Divider(),
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
@@ -197,7 +199,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   Icons.delete,
                   color: Colors.white,
                 ),
-                label: Text(
+                label: ButtonText(
                   localizations.editAccountDeleteAccountAction,
                   style: Theme.of(context)
                       .textTheme
@@ -408,11 +410,11 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
           isSaving ? CircularProgressIndicator() : buildContent(localizations),
       actions: [
         TextButton(
-          child: Text(localizations.actionCancel),
+          child: ButtonText(localizations.actionCancel),
           onPressed: () => Navigator.of(context).pop(),
         ),
         TextButton(
-          child: Text(widget.isNewAlias
+          child: ButtonText(widget.isNewAlias
               ? localizations.editAccountAliasAddAction
               : localizations.editAccountAliasUpdateAction),
           onPressed: isEmailValid

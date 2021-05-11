@@ -7,6 +7,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
+import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
@@ -90,7 +91,7 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
                   onPressed: () {
                     locator<NavigationService>().push(Routes.settingsAccounts);
                   },
-                  child: Text(localizations.settingsActionAccounts),
+                  child: ButtonText(localizations.settingsActionAccounts),
                 ),
               },
             ],
@@ -173,7 +174,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
             ? null
             : [
                 TextButton(
-                  child: Text(localizations.actionDelete),
+                  child: ButtonText(localizations.actionDelete),
                   onPressed: () async {
                     setState(() {
                       _signature = null;
@@ -191,11 +192,11 @@ class _SignatureWidgetState extends State<SignatureWidget> {
                   },
                 ),
                 TextButton(
-                  child: Text(localizations.actionCancel),
+                  child: ButtonText(localizations.actionCancel),
                   onPressed: () => Navigator.of(context).pop(false),
                 ),
                 TextButton(
-                  child: Text(localizations.actionOk),
+                  child: ButtonText(localizations.actionOk),
                   onPressed: () => Navigator.of(context).pop(true),
                 ),
               ]);
