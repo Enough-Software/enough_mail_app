@@ -4,6 +4,13 @@ Mail app for iOS, Android and hopefully more platforms in the future. Developed 
 ## Test Maily
 You can test an early access version of Maily today on [Google Play](https://play.google.com/store/apps/details?id=de.enough.enough_mail_app).
 
+## Screenshots 
+[<img src="screenshots/welcome.png" width="320"/>](screenshots/welcome.png)
+[<img src="screenshots/compose_honey.png" width="320"/>](screenshots/compose_honey.png)
+[<img src="screenshots/contact_interactions.png" width="320"/>](screenshots/contact_interactions.png)
+[<img src="screenshots/message_actions.png" width="320"/>](screenshots/message_actions.png)
+[<img src="screenshots/messages_actions.png" width="320"/>](screenshots/messages_actions.png)
+
 ## Features
 * POP and IMAP service providers are supported, though  POP accounts are not tested at this moment
 * Multiple account support
@@ -14,8 +21,7 @@ You can test an early access version of Maily today on [Google Play](https://pla
 * Compose messages: compose new messages and reply to/forward mails with WYSIWG editor
 * Save and continue draft messages
 * Attach photo-, audio-, video- or generic files. Attach your current location.
-* Swipe right to left to delete
-* Swipe left to right to mark as read/unread
+* Swipe right to left to delete and swipe left to right to mark as read/unread
 * Personalizae swipe actions
 * Optionally you can block external images when viewing mails
 * You can specify aliases and check for + alias support by your mail provider
@@ -27,12 +33,16 @@ You can test an early access version of Maily today on [Google Play](https://pla
 * Delete all messages in trash and junk folders or in a search result
 * Archive messages
 * Mark messages as junk / not junk
+* Forward messages as attachments - or forward only the attachments of the selected messages
 * Select several messages at once with a long press
 * Localized in English and German
 * Supports dark and light theme and you can also change the color scheme.
 * Shows thread information and allows to access the full thread when the mail service supports the `THREAD` IMAP extension.
 * Add animated GIFs and stickers (powered by Giphy)
 * Display attached messages
+* Request and send read receipts
+* Rich WYIWYG editor
+* Extensible by email service providers, companies and developers
 
 ## Miss a feature or found a bug?
 
