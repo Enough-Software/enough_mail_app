@@ -1,5 +1,5 @@
 # Codename: Maily
-Mail app for iOS, Android and hopefully more platforms in the future. Developed with [Flutter](https://flutter.dev).
+Mail app for iOS, Android and hopefully more platforms in the future. Developed in [Flutter](https://flutter.dev).
 
 ## Test Maily
 You can test an early access version of Maily today on [Google Play](https://play.google.com/store/apps/details?id=de.enough.enough_mail_app).
@@ -10,6 +10,7 @@ You can test an early access version of Maily today on [Google Play](https://pla
 [<img src="screenshots/contact_interactions.png" width="320"/>](screenshots/contact_interactions.png)
 [<img src="screenshots/message_actions.png" width="320"/>](screenshots/message_actions.png)
 [<img src="screenshots/messages_actions.png" width="320"/>](screenshots/messages_actions.png)
+[<img src="screenshots/design2.png" width="320"/>](screenshots/design2.png)
 
 ## Features
 * POP and IMAP service providers are supported, though  POP accounts are not tested at this moment
@@ -18,7 +19,7 @@ You can test an early access version of Maily today on [Google Play](https://pla
 * Mail management: delete, mark as read/unread
 * Unsubscribe from newslettters easily
 * View attachments in app - photos, PDFs, video and audio files 
-* Compose messages: compose new messages and reply to/forward mails with WYSIWG editor
+* Compose messages: compose new messages and reply to/forward mails with WYSIWG editor  
 * Save and continue draft messages
 * Attach photo-, audio-, video- or generic files. Attach your current location.
 * Swipe right to left to delete and swipe left to right to mark as read/unread
@@ -41,7 +42,6 @@ You can test an early access version of Maily today on [Google Play](https://pla
 * Add animated GIFs and stickers (powered by Giphy)
 * Display attached messages
 * Request and send read receipts
-* Rich WYIWYG editor
 * Extensible by email service providers, companies and developers
 
 ## Miss a feature or found a bug?
