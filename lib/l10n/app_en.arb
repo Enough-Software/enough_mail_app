@@ -67,7 +67,7 @@
   "@welcomePanel4": {
     "description": "Welcome message shown on fourth panel"
   },
-  "welcomeActionSignIn": "Sign into your mail account",
+  "welcomeActionSignIn": "Sign in to your mail account",
   "@welcomeActionSignIn": {
     "description": "Button showing login option"
   },
