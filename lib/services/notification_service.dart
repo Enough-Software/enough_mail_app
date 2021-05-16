@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
@@ -12,6 +14,7 @@ import '../routes.dart';
 enum NotificationServiceInitResult { appLaunchedByNotification, normal }
 
 class NotificationService {
+  static const String _messagePayloadStart = 'msg:';
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   int _lastNotificationId;
@@ -48,13 +51,45 @@ class NotificationService {
     print('iOS onDidReceiveLocalNotification $id $title $body $payload');
   }
 
+  Future<List<MailNotificationPayload>> getActiveMailNotifications() {
+    /// wait until active notification also return the payload
+    return Future.value([]);
+    // if (!Platform.isAndroid) {
+    //   return [];
+    // }
+    // final activeNotifications = await _flutterLocalNotificationsPlugin
+    //     .resolvePlatformSpecificImplementation<
+    //         AndroidFlutterLocalNotificationsPlugin>()
+    //     .getActiveNotifications();
+    // if (activeNotifications == null || activeNotifications.isEmpty) {
+    //   return [];
+    // }
+    // print('active Notifications:');
+    // for (final n in activeNotifications) {
+    //   print(
+    //       'body=${n.body}, title=${n.title}, id=${n.id}, channel=${n.channelId}');
+    // }
+    // return activeNotifications
+    //     .where((notification) =>
+    //         notification.body.startsWith(_messagePayloadStart))
+    //     .map((notification) => _deserialize(notification.body))
+    //     .toList();
+  }
+
+  MailNotificationPayload _deserialize(String payloadText) {
+    final serializer = Serializer();
+    final payload = MailNotificationPayload();
+    serializer.deserialize(
+        payloadText.substring(_messagePayloadStart.length), payload);
+    return payload;
+  }
+
   Future _selectNotification(String payloadText) async {
     print('select notification: $payloadText');
-    if (payloadText.startsWith('msg:')) {
-      payloadText = payloadText.substring('msg:'.length);
+    if (payloadText.startsWith(_messagePayloadStart)) {
       try {
-        final payload = _MailNotificationPayload();
-        Serializer().deserialize(payloadText, payload);
+        final payload = _deserialize(payloadText);
+
         final mailClient = await locator<MailService>()
             .getClientForAccountWithEmail(payload.accountEmail);
         if (mailClient.selectedMailbox == null) {
@@ -88,7 +123,7 @@ class NotificationService {
 
   Future sendLocalNotificationForMail(
       MimeMessage mimeMessage, MailClient mailClient) {
-    final notificationId = getId(mimeMessage, mailClient);
+    final notificationId = getNotificationIdForMail(mimeMessage, mailClient);
     if (notificationId == _lastNotificationId) {
       return Future.value();
     }
@@ -102,33 +137,38 @@ class NotificationService {
           : mimeMessage.sender?.email;
     }
     final subject = mimeMessage.decodeSubject();
-    final payload = _MailNotificationPayload.fromMail(mimeMessage, mailClient);
-    final payloadText = 'msg:' + Serializer().serialize(payload);
+    final payload = MailNotificationPayload.fromMail(mimeMessage, mailClient);
+    final payloadText = _messagePayloadStart + Serializer().serialize(payload);
     return sendLocalNotification(notificationId, from, subject,
         payloadText: payloadText, when: mimeMessage.decodeDate());
   }
 
-  int getId(MimeMessage mimeMessage, MailClient mailClient) {
-    return mailClient.account.email.hashCode +
-        mimeMessage.uid +
-        mimeMessage.sequenceId;
+  int getNotificationIdForMail(MimeMessage mimeMessage, MailClient mailClient) {
+    return getNotificationIdForUid(mimeMessage.uid, mailClient.account.email);
+  }
+
+  int getNotificationIdForUid(int uid, String email) {
+    return email.hashCode + uid;
   }
 
   Future sendLocalNotification(int id, String title, String text,
       {String payloadText, DateTime when, bool channelShowBadge = true}) async {
-    final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'maily',
-      'Mail',
-      'Maily',
-      importance: Importance.max,
-      priority: Priority.high,
-      channelShowBadge: channelShowBadge,
-      showWhen: (when != null),
-      when: when?.millisecondsSinceEpoch,
-      playSound: true,
-      sound: RawResourceAndroidNotificationSound('pop'),
-    );
-    NotificationDetails platformChannelSpecifics =
+    AndroidNotificationDetails androidPlatformChannelSpecifics;
+    if (Platform.isAndroid) {
+      androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'maily',
+        'Mail',
+        'Maily',
+        importance: Importance.max,
+        priority: Priority.high,
+        channelShowBadge: channelShowBadge,
+        showWhen: (when != null),
+        when: when?.millisecondsSinceEpoch,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound('pop'),
+      );
+    }
+    final platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
     await _flutterLocalNotificationsPlugin
         .show(id, title, text, platformChannelSpecifics, payload: payloadText);
@@ -140,7 +180,11 @@ class NotificationService {
 
   void cancelNotificationForMail(
       MimeMessage mimeMessage, MailClient mailClient) {
-    cancelNotification(getId(mimeMessage, mailClient));
+    cancelNotification(getNotificationIdForMail(mimeMessage, mailClient));
+  }
+
+  void cancelNotificationForUid(int uid, MailClient mailClient) {
+    cancelNotification(getNotificationIdForUid(uid, mailClient.account.email));
   }
 
   void cancelNotification(int id) {
@@ -148,7 +192,7 @@ class NotificationService {
   }
 }
 
-class _MailNotificationPayload extends SerializableObject {
+class MailNotificationPayload extends SerializableObject {
   int get uid => attributes['uid'];
   set uid(int value) => attributes['uid'] = value;
   int get id => attributes['id'];
@@ -160,9 +204,9 @@ class _MailNotificationPayload extends SerializableObject {
   int get size => attributes['size'];
   set size(int value) => attributes['size'] = value;
 
-  _MailNotificationPayload();
+  MailNotificationPayload();
 
-  _MailNotificationPayload.fromMail(
+  MailNotificationPayload.fromMail(
       MimeMessage mimeMessage, MailClient mailClient) {
     uid = mimeMessage.uid;
     id = mimeMessage.sequenceId;

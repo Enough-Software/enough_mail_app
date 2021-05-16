@@ -98,14 +98,23 @@ class BackgroundService {
     final accounts = await mailService.loadMailAccounts();
     final notificationService = NotificationService();
     await notificationService.init(checkForLaunchDetails: false);
+    final activeMailNotifications =
+        await notificationService.getActiveMailNotifications();
+    // print('background: got activeMailNotifications=$activeMailNotifications');
     final futures = <Future<int>>[];
     for (var index = 0;
         index < math.min(prevUids.length, accounts.length);
         index++) {
       int previousUidNext = prevUids[index];
       final account = accounts[index];
-      futures
-          .add(loadNewMessage(account, previousUidNext, notificationService));
+      final accountEmail = account.email;
+      futures.add(loadNewMessage(
+          account,
+          previousUidNext,
+          notificationService,
+          activeMailNotifications
+              .where((n) => n.accountEmail == accountEmail)
+              .toList()));
     }
     final newUids = await Future.wait(futures);
     final newPrefsValue = _SharedPrefsHelper.renderIntList(newUids);
@@ -115,14 +124,36 @@ class BackgroundService {
     }
   }
 
-  static Future<int> loadNewMessage(MailAccount account, int previousUidNext,
-      NotificationService notificationService) async {
+  static Future<int> loadNewMessage(
+      MailAccount account,
+      int previousUidNext,
+      NotificationService notificationService,
+      List<MailNotificationPayload> activeNotifications) async {
     final mailClient =
         MailClient(account, isLogEnabled: true, logName: account.name);
     await mailClient.connect();
     final inbox = await mailClient.selectInbox();
     if (inbox.uidNext == previousUidNext) {
-      print('no change for ${account.name}');
+      // print(
+      //     'no change for ${account.name}, activeNotifications=$activeNotifications');
+      // check outdated notifications that should be removed because the message is deleted or read elsewhere:
+      if (activeNotifications.isNotEmpty) {
+        final uids = activeNotifications.map((n) => n.uid).toList();
+        final sequence = MessageSequence.fromIds(uids, isUid: true);
+        final mimeMessages = await mailClient.fetchMessageSequence(sequence,
+            fetchPreference: FetchPreference.envelope);
+        for (final mimeMessage in mimeMessages) {
+          if (mimeMessage.isSeen) {
+            notificationService.cancelNotificationForMail(
+                mimeMessage, mailClient);
+          }
+          uids.remove(mimeMessage.uid);
+        }
+        // remove notifications for messages that have been deleted:
+        for (final uid in uids) {
+          notificationService.cancelNotificationForUid(uid, mailClient);
+        }
+      }
     } else {
       print(
           'new uidNext=${inbox.uidNext}, previous=$previousUidNext for ${account.name}');
@@ -131,8 +162,10 @@ class BackgroundService {
       final mimeMessages = await mailClient.fetchMessageSequence(sequence,
           fetchPreference: FetchPreference.envelope);
       for (final mimeMessage in mimeMessages) {
-        notificationService.sendLocalNotificationForMail(
-            mimeMessage, mailClient);
+        if (!mimeMessage.isSeen) {
+          notificationService.sendLocalNotificationForMail(
+              mimeMessage, mailClient);
+        }
       }
     }
 
