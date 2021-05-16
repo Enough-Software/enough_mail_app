@@ -4,16 +4,12 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/extensions/extension_action_tile.dart';
-import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/screens/all_screens.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
-import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 

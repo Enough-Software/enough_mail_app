@@ -29,9 +29,9 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Future<void> _appInitialization;
-  ThemeMode themeMode = ThemeMode.system;
-  ThemeService themeService;
-  Locale locale;
+  ThemeMode _themeMode = ThemeMode.system;
+  ThemeService _themeService;
+  Locale _locale;
 
   @override
   void initState() {
@@ -53,11 +53,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future<MailService> initApp() async {
     final settings = await locator<SettingsService>().init();
-    themeService = locator<ThemeService>();
-    themeService.addListener(() => setState(() {
-          themeMode = themeService.themeMode;
+    _themeService = locator<ThemeService>();
+    _themeService.addListener(() => setState(() {
+          _themeMode = _themeService.themeMode;
         }));
-    themeService.init(settings);
+    _themeService.init(settings);
     final languageTag = settings.languageTag;
     if (languageTag != null) {
       final settingsLocale = AppLocalizations.supportedLocales.firstWhere(
@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             await AppLocalizations.delegate.load(settingsLocale);
         locator<I18nService>().init(settingsLocalizations, settingsLocale);
         setState(() {
-          locale = settingsLocale;
+          _locale = settingsLocale;
         });
       }
     }
@@ -103,10 +103,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           locator<ScaffoldMessengerService>().scaffoldMessengerKey,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      locale: locale,
-      theme: themeService?.lightTheme ?? ThemeService.defaultLightTheme,
-      darkTheme: themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
-      themeMode: themeMode,
+      locale: _locale,
+      theme: _themeService?.lightTheme ?? ThemeService.defaultLightTheme,
+      darkTheme: _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
+      themeMode: _themeMode,
       debugShowCheckedModeBanner: false,
       title: 'Maily',
       onGenerateRoute: AppRouter.generateRoute,
