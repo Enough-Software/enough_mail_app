@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/models/mime_source.dart';
 
 import 'message.dart';
 import 'package:collection/collection.dart' show IterableExtension;
@@ -34,8 +35,13 @@ class MessageCache {
     return _messages.firstWhereOrNull((m) => m.sourceIndex == sourceIndex);
   }
 
+  Message getWithMimeSourceIndex(int mimeSourceIndex, MailClient client) {
+    return _messages.firstWhereOrNull(
+        (m) => m.sourceIndex == mimeSourceIndex && m.mailClient == client);
+  }
+
   void add(Message message) {
-    assert(message.mimeMessage != null);
+    // assert(message.mimeMessage != null);
     _messages.add(message);
     if (_messages.length > maxSize) {
       _messages.removeAt(0);

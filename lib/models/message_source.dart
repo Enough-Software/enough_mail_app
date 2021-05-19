@@ -113,10 +113,10 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   @override
-  void onMailLoaded(MimeMessage mime, MimeSource source) {
-    final message = source.isSequenceIdBased
-        ? cache.getWithMimeSequenceId(mime.sequenceId, source.mailClient)
-        : cache.getWithMimeUid(mime.uid, source.mailClient);
+  void onMailLoaded(MimeMessage mime, int mimeSourceIndex, MimeSource source) {
+    // problem: mimeSourceIndex != sourceIndex when there are several sources
+    final message =
+        cache.getWithMimeSourceIndex(mimeSourceIndex, source.mailClient);
 
     if (message != null) {
       message.updateMime(mime);
@@ -134,7 +134,7 @@ abstract class MessageSource extends ChangeNotifier
 
   @override
   void onMailAdded(MimeMessage mime, MimeSource source) {
-    // the source index is rather 0, here:
+    // the source index is 0 since this is the new first message:
     final message = Message(mime, source.mailClient, this, 0);
     cache.insert(message);
     print('onMailAdded: ${mime.decodeSubject()}');
@@ -414,7 +414,7 @@ class MailboxMessageSource extends MessageSource {
   @override
   Message _getUncachedMessage(int index) {
     //print('get uncached $index');
-    var mime = _mimeSource.getMessageAt(index);
+    final mime = _mimeSource.getMessageAt(index);
     return Message(mime, _mimeSource.mailClient, this, index);
   }
 
@@ -570,7 +570,8 @@ class MultipleMessageSource extends MessageSource {
     }
     final newestSource = _multipleMimeSources[newestIndex];
     final newestMime = newestSource.pop();
-    return Message(newestMime, newestSource.mimeSource.mailClient, this, null);
+    return Message(newestMime, newestSource.mimeSource.mailClient, this,
+        newestSource._currentIndex);
   }
 
   @override

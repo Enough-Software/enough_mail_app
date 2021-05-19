@@ -975,7 +975,7 @@ class MessageOverview extends StatefulWidget {
   MessageOverview(
       this.message, this.isInSelectionMode, this.onTap, this.onLongPress,
       {this.animationController})
-      : super(key: ValueKey(message.mimeMessage.sequenceId.toString()));
+      : super(key: ValueKey(message.sourceIndex));
 
   @override
   _MessageOverviewState createState() => _MessageOverviewState();
@@ -1003,7 +1003,7 @@ class _MessageOverviewState extends State<MessageOverview> {
   @override
   Widget build(BuildContext context) {
     final mime = widget.message.mimeMessage;
-    if (mime.isEmpty) {
+    if (mime == null) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListTile(
