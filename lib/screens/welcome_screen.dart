@@ -3,6 +3,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 
 import '../locator.dart';
 
@@ -95,25 +96,31 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: Column(
-            children: [
-              Expanded(child: SizedBox()),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List<Widget>.generate(pages.length, _buildDot),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.email),
-                  label: ButtonText(
-                      AppLocalizations.of(context).welcomeActionSignIn),
-                  onPressed: () {
-                    locator<NavigationService>().push(Routes.accountAdd);
-                  },
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List<Widget>.generate(pages.length, _buildDot),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Shimmer(
+                    duration: const Duration(seconds: 4),
+                    interval: const Duration(seconds: 6),
+                    child: ElevatedButton.icon(
+                      icon: Icon(Icons.email),
+                      label: ButtonText(
+                          AppLocalizations.of(context).welcomeActionSignIn),
+                      onPressed: () {
+                        locator<NavigationService>().push(Routes.accountAdd);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
