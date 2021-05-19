@@ -5,7 +5,7 @@ class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey =
       new GlobalKey<NavigatorState>();
 
-  // final history = _NavigationHistory();
+  BuildContext get currentContext => navigatorKey.currentContext;
 
   Future<dynamic> push(String routeName,
       {Object arguments,

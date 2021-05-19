@@ -284,8 +284,10 @@ class _ComposeScreenState extends State<ComposeScreen> {
           .showTextSnackBar(localizations.composeMailSendSuccess);
     } catch (e, s) {
       print('Unable to send or append mail: $e $s');
+      // this state's context is now invalid because this widget is not mounted anymore
+      final currentContext = locator<NavigationService>().currentContext;
       DialogHelper.showTextDialog(
-        context,
+        currentContext,
         localizations.errorTitle,
         localizations.composeSendErrorInfo(e.toString()),
         actions: [
