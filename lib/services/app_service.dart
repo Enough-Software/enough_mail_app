@@ -43,10 +43,12 @@ class AppService {
   }
 
   Future checkForShare() async {
-    final shared = await _platform.invokeMethod("getSharedData");
-    //print('checkForShare: received data: $shared');
-    if (shared != null) {
-      composeWithSharedData(shared);
+    if (Platform.isAndroid) {
+      final shared = await _platform.invokeMethod("getSharedData");
+      //print('checkForShare: received data: $shared');
+      if (shared != null) {
+        composeWithSharedData(shared);
+      }
     }
   }
 
