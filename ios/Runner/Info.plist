@@ -47,6 +47,12 @@
 	<array>
 	<string>fetch</string>
 	<string>remote-notification</string>
+	<!-- only required when calling BackgroundFetch.scheduleTask: -->
+	<!-- <string>processing</string>  -->
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+	<string>com.transistorsoft.fetch</string>
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allows you to attach photos to a message</string>
