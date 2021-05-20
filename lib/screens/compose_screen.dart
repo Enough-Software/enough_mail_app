@@ -579,14 +579,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
     locator<NavigationService>().push(Routes.sourceCode, arguments: mime);
   }
 
-  Future addAttachment() async {
-    final added =
-        await AttachmentComposeBar.addAttachmentTo(widget.data.messageBuilder);
-    if (added) {
-      setState(() {});
-    }
-  }
-
   Future<void> saveAsDraft() async {
     locator<NavigationService>().pop();
     final localizations = locator<I18nService>().localizations;

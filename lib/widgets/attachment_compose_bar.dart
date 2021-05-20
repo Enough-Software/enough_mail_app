@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -31,26 +33,6 @@ class AttachmentComposeBar extends StatefulWidget {
 
   @override
   _AttachmentComposeBarState createState() => _AttachmentComposeBarState();
-
-  static Future<bool> addAttachmentTo(MessageBuilder messageBuilder) async {
-    final result = await FilePicker.platform
-        .pickFiles(allowMultiple: true, withData: true);
-    if (result == null) {
-      return false;
-    }
-    for (final file in result.files) {
-      final lastDotIndex = file.path.lastIndexOf('.');
-      MediaType mediaType;
-      if (lastDotIndex == -1 || lastDotIndex == file.path.length - 1) {
-        mediaType = MediaType.fromSubtype(MediaSubtype.applicationOctetStream);
-      } else {
-        final ext = file.path.substring(lastDotIndex + 1);
-        mediaType = MediaType.guessFromFileExtension(ext);
-      }
-      messageBuilder.addBinary(file.bytes, mediaType, filename: file.name);
-    }
-    return true;
-  }
 }
 
 class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
@@ -181,8 +163,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
             final result =
                 await locator<NavigationService>().push(Routes.locationPicker);
             if (result != null) {
-              messageBuilder.addBinary(
-                  result, MediaType.fromSubtype(MediaSubtype.imagePng),
+              messageBuilder.addBinary(result, MediaSubtype.imagePng.mediaType,
                   filename: "location.jpg");
               changed = true;
             }
