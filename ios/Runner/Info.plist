@@ -50,7 +50,9 @@
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allows you to attach photos to a message</string>
-	<key>NSAppleMusicUsageDescription</key>
-	<string>Allows you to attach songs to a message</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allows you to attach your location to a message</string>
+	<!-- <key>NSLocationAlwaysUsageDescription</key>
+	<string>Allows you to attach you location to a message</string> -->
 </dict>
 </plist>
