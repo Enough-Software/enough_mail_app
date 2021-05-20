@@ -43,5 +43,14 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<string>yes</string>
+	<key>UIBackgroundModes</key>
+	<array>
+	<string>fetch</string>
+	<string>remote-notification</string>
+	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allows you to attach photos to a message</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Allows you to attach songs to a message</string>
 </dict>
 </plist>
