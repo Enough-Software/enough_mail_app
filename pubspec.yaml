@@ -59,7 +59,7 @@ dependencies:
   background_fetch: ^1.0.0-nullsafety.2
   file_picker: ^3.0.1
   fluttercontactpicker: ^4.4.0
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.3
   diff_match_patch: ^0.3.0
   liquid_swipe: ^2.1.0
   package_info: ^2.0.0
@@ -71,6 +71,10 @@ dependencies:
   giphy_picker: ^2.0.0
   flutter_widget_from_html_core: ^0.6.0
   shimmer_animation: ^2.0.0
+  enough_platform_widgets: 
+    git:
+      url: https://github.com/Enough-Software/enough_platform_widgets.git
+    # path: ../enough_platform_widgets
 
 dev_dependencies:
   flutter_test:

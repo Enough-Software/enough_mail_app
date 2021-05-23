@@ -11,6 +11,7 @@ import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -63,167 +64,164 @@ class _MessageActionsState extends State<MessageActions> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
     final attachments = widget.message.attachments;
-    return Material(
-      elevation: 16,
-      child: Row(
-        children: [
-          if (!widget.message.isEmbedded) ...{
-            IconButton(
-              icon: Icon(widget.message.isSeen
-                  ? Feather.circle // Icons.check_circle_outline
-                  : Icons.circle), //Icons.check_circle),
-              onPressed: toggleSeen,
-            ),
-            IconButton(
-              icon: Icon(
-                  widget.message.isFlagged ? Icons.flag : Icons.outlined_flag),
-              onPressed: toggleFlagged,
-            ),
-          },
-          Spacer(),
-          IconButton(icon: Icon(Icons.reply), onPressed: reply),
-          IconButton(icon: Icon(Icons.reply_all), onPressed: replyAll),
-          IconButton(icon: Icon(Icons.forward), onPressed: forward),
-          if (widget.message.source.isTrash) ...{
-            IconButton(icon: Icon(Entypo.inbox), onPressed: moveToInbox),
-          } else if (!widget.message.isEmbedded) ...{
-            IconButton(icon: Icon(Icons.delete), onPressed: delete),
-          },
-          PopupMenuButton<_OverflowMenuChoice>(
-            onSelected: onOverflowChoiceSelected,
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: _OverflowMenuChoice.reply,
-                child: ListTile(
-                  leading: Icon(Icons.reply),
-                  title: Text(localizations.messageActionReply),
-                ),
-              ),
-              PopupMenuItem(
-                value: _OverflowMenuChoice.replyAll,
-                child: ListTile(
-                  leading: Icon(Icons.reply_all),
-                  title: Text(localizations.messageActionReplyAll),
-                ),
-              ),
-              PopupMenuItem(
-                value: _OverflowMenuChoice.forward,
-                child: ListTile(
-                  leading: Icon(Icons.forward),
-                  title: Text(localizations.messageActionForward),
-                ),
-              ),
-              PopupMenuItem(
-                value: _OverflowMenuChoice.forwardAsAttachment,
-                child: ListTile(
-                  leading: Icon(Icons.forward_to_inbox),
-                  title: Text(localizations.messageActionForwardAsAttachment),
-                ),
-              ),
-              if (attachments.isNotEmpty) ...{
-                PopupMenuItem(
-                  value: _OverflowMenuChoice.forwardAttachments,
-                  child: ListTile(
-                    leading: Icon(Icons.attach_file),
-                    title: Text(localizations
-                        .messageActionForwardAttachments(attachments.length)),
-                  ),
-                ),
-              },
-              if (widget.message.source.isTrash) ...{
-                PopupMenuItem(
-                  value: _OverflowMenuChoice.inbox,
-                  child: ListTile(
-                    leading: Icon(Entypo.inbox),
-                    title: Text(localizations.messageActionMoveToInbox),
-                  ),
-                ),
-              } else if (!widget.message.isEmbedded) ...{
-                PopupMenuItem(
-                  value: _OverflowMenuChoice.delete,
-                  child: ListTile(
-                    leading: Icon(Icons.delete),
-                    title: Text(localizations.messageActionDelete),
-                  ),
-                ),
-              },
-              if (!widget.message.isEmbedded) ...{
-                PopupMenuDivider(),
-                PopupMenuItem(
-                  value: _OverflowMenuChoice.seen,
-                  child: ListTile(
-                    leading: Icon(
-                        widget.message.isSeen ? Feather.circle : Icons.circle),
-                    title: Text(
-                      widget.message.isSeen
-                          ? localizations.messageStatusSeen
-                          : localizations.messageStatusUnseen,
-                    ),
-                  ),
-                ),
-                PopupMenuItem(
-                  value: _OverflowMenuChoice.flag,
-                  child: ListTile(
-                    leading: Icon(widget.message.isFlagged
-                        ? Icons.flag
-                        : Icons.outlined_flag),
-                    title: Text(
-                      widget.message.isFlagged
-                          ? localizations.messageStatusFlagged
-                          : localizations.messageStatusUnflagged,
-                    ),
-                  ),
-                ),
-                if (widget.message.source.supportsMessageFolders) ...{
-                  PopupMenuDivider(),
-                  PopupMenuItem(
-                    value: _OverflowMenuChoice.move,
-                    child: ListTile(
-                      leading: Icon(MaterialCommunityIcons.file_move),
-                      title: Text(localizations.messageActionMove),
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: _OverflowMenuChoice.junk,
-                    child: ListTile(
-                      leading: Icon(widget.message.source.isJunk
-                          ? Entypo.check
-                          : Entypo.bug),
-                      title: Text(
-                        widget.message.source.isJunk
-                            ? localizations.messageActionMarkAsNotJunk
-                            : localizations.messageActionMarkAsJunk,
-                      ),
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: _OverflowMenuChoice.archive,
-                    child: ListTile(
-                      leading: Icon(widget.message.source.isArchive
-                          ? Entypo.inbox
-                          : Entypo.archive),
-                      title: Text(
-                        widget.message.source.isArchive
-                            ? localizations.messageActionUnarchive
-                            : localizations.messageActionArchive,
-                      ),
-                    ),
-                  ),
-                },
-                PopupMenuItem(
-                  value: _OverflowMenuChoice.redirect,
-                  child: ListTile(
-                    leading: Icon(Icons.compare_arrows),
-                    title: Text(
-                      localizations.messageActionRedirect,
-                    ),
-                  ),
-                ),
-              },
-            ],
+    return PlatformToolbar(
+      children: [
+        if (!widget.message.isEmbedded) ...{
+          PlatformIconButton(
+            icon: Icon(widget.message.isSeen
+                ? Feather.circle // Icons.check_circle_outline
+                : Icons.circle), //Icons.check_circle),
+            onPressed: toggleSeen,
           ),
-        ],
-      ),
+          PlatformIconButton(
+            icon: Icon(
+                widget.message.isFlagged ? Icons.flag : Icons.outlined_flag),
+            onPressed: toggleFlagged,
+          ),
+        },
+        Spacer(),
+        PlatformIconButton(icon: Icon(Icons.reply), onPressed: reply),
+        PlatformIconButton(icon: Icon(Icons.reply_all), onPressed: replyAll),
+        PlatformIconButton(icon: Icon(Icons.forward), onPressed: forward),
+        if (widget.message.source.isTrash) ...{
+          PlatformIconButton(icon: Icon(Entypo.inbox), onPressed: moveToInbox),
+        } else if (!widget.message.isEmbedded) ...{
+          PlatformIconButton(icon: Icon(Icons.delete), onPressed: delete),
+        },
+        PlatformPopupMenuButton<_OverflowMenuChoice>(
+          onSelected: onOverflowChoiceSelected,
+          itemBuilder: (context) => [
+            PlatformPopupMenuItem(
+              value: _OverflowMenuChoice.reply,
+              child: PlatformListTile(
+                leading: Icon(Icons.reply),
+                title: Text(localizations.messageActionReply),
+              ),
+            ),
+            PlatformPopupMenuItem(
+              value: _OverflowMenuChoice.replyAll,
+              child: PlatformListTile(
+                leading: Icon(Icons.reply_all),
+                title: Text(localizations.messageActionReplyAll),
+              ),
+            ),
+            PlatformPopupMenuItem(
+              value: _OverflowMenuChoice.forward,
+              child: PlatformListTile(
+                leading: Icon(Icons.forward),
+                title: Text(localizations.messageActionForward),
+              ),
+            ),
+            PlatformPopupMenuItem(
+              value: _OverflowMenuChoice.forwardAsAttachment,
+              child: PlatformListTile(
+                leading: Icon(Icons.forward_to_inbox),
+                title: Text(localizations.messageActionForwardAsAttachment),
+              ),
+            ),
+            if (attachments.isNotEmpty) ...{
+              PlatformPopupMenuItem(
+                value: _OverflowMenuChoice.forwardAttachments,
+                child: PlatformListTile(
+                  leading: Icon(Icons.attach_file),
+                  title: Text(localizations
+                      .messageActionForwardAttachments(attachments.length)),
+                ),
+              ),
+            },
+            if (widget.message.source.isTrash) ...{
+              PlatformPopupMenuItem(
+                value: _OverflowMenuChoice.inbox,
+                child: PlatformListTile(
+                  leading: Icon(Entypo.inbox),
+                  title: Text(localizations.messageActionMoveToInbox),
+                ),
+              ),
+            } else if (!widget.message.isEmbedded) ...{
+              PlatformPopupMenuItem(
+                value: _OverflowMenuChoice.delete,
+                child: PlatformListTile(
+                  leading: Icon(Icons.delete),
+                  title: Text(localizations.messageActionDelete),
+                ),
+              ),
+            },
+            if (!widget.message.isEmbedded) ...{
+              PlatformPopupDivider(),
+              PlatformPopupMenuItem(
+                value: _OverflowMenuChoice.seen,
+                child: PlatformListTile(
+                  leading: Icon(
+                      widget.message.isSeen ? Feather.circle : Icons.circle),
+                  title: Text(
+                    widget.message.isSeen
+                        ? localizations.messageStatusSeen
+                        : localizations.messageStatusUnseen,
+                  ),
+                ),
+              ),
+              PlatformPopupMenuItem(
+                value: _OverflowMenuChoice.flag,
+                child: PlatformListTile(
+                  leading: Icon(widget.message.isFlagged
+                      ? Icons.flag
+                      : Icons.outlined_flag),
+                  title: Text(
+                    widget.message.isFlagged
+                        ? localizations.messageStatusFlagged
+                        : localizations.messageStatusUnflagged,
+                  ),
+                ),
+              ),
+              if (widget.message.source.supportsMessageFolders) ...{
+                PlatformPopupDivider(),
+                PlatformPopupMenuItem(
+                  value: _OverflowMenuChoice.move,
+                  child: PlatformListTile(
+                    leading: Icon(MaterialCommunityIcons.file_move),
+                    title: Text(localizations.messageActionMove),
+                  ),
+                ),
+                PlatformPopupMenuItem(
+                  value: _OverflowMenuChoice.junk,
+                  child: PlatformListTile(
+                    leading: Icon(widget.message.source.isJunk
+                        ? Entypo.check
+                        : Entypo.bug),
+                    title: Text(
+                      widget.message.source.isJunk
+                          ? localizations.messageActionMarkAsNotJunk
+                          : localizations.messageActionMarkAsJunk,
+                    ),
+                  ),
+                ),
+                PlatformPopupMenuItem(
+                  value: _OverflowMenuChoice.archive,
+                  child: PlatformListTile(
+                    leading: Icon(widget.message.source.isArchive
+                        ? Entypo.inbox
+                        : Entypo.archive),
+                    title: Text(
+                      widget.message.source.isArchive
+                          ? localizations.messageActionUnarchive
+                          : localizations.messageActionArchive,
+                    ),
+                  ),
+                ),
+              },
+              PlatformPopupMenuItem(
+                value: _OverflowMenuChoice.redirect,
+                child: PlatformListTile(
+                  leading: Icon(Icons.compare_arrows),
+                  title: Text(
+                    localizations.messageActionRedirect,
+                  ),
+                ),
+              ),
+            },
+          ],
+        ),
+      ],
     );
   }
 

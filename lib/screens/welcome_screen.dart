@@ -97,6 +97,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         Align(
           alignment: Alignment.bottomCenter,
           child: SafeArea(
+            top: false,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
