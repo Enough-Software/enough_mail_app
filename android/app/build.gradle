@@ -5,13 +5,6 @@ if (localPropertiesFile.exists()) {
         localProperties.load(reader)
     }
 }
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-} else {
-    throw new GradleException("key.properties not found.")
-}
 
 def flutterRoot = localProperties.getProperty('flutter.sdk')
 if (flutterRoot == null) {
@@ -32,42 +25,75 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
-android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    def keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+ 
+     android {
+        compileSdkVersion rootProject.ext.compileSdkVersion
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
+        sourceSets {
+            main.java.srcDirs += 'src/main/kotlin'
+        }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
+        lintOptions {
+            disable 'InvalidPackage'
+        }
 
-    defaultConfig {
-        applicationId "de.enough.enough_mail_app"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-    }
+        defaultConfig {
+            applicationId "de.enough.enough_mail_app"
+            minSdkVersion rootProject.ext.minSdkVersion
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            versionCode flutterVersionCode.toInteger()
+            versionName flutterVersionName
+        }
 
-    signingConfigs {
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+        signingConfigs {
+            release {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+
+        buildTypes {
+            release {
+                signingConfig signingConfigs.release
+            }
         }
     }
+} else {
+    System.out.println("warning: android/key.properties not found, now using debug key.")
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.release
+    android {
+        compileSdkVersion rootProject.ext.compileSdkVersion
+
+        sourceSets {
+            main.java.srcDirs += 'src/main/kotlin'
+        }
+
+        lintOptions {
+            disable 'InvalidPackage'
+        }
+
+        defaultConfig {
+            applicationId "de.enough.enough_mail_app"
+            minSdkVersion rootProject.ext.minSdkVersion
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            versionCode flutterVersionCode.toInteger()
+            versionName flutterVersionName
+        }
+
+        buildTypes {
+            release {
+                signingConfig signingConfigs.debug
+            }
         }
     }
 }
+
 
 flutter {
     source '../..'
