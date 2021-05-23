@@ -11,6 +11,7 @@ import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'locator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 // AppStyles appStyles = AppStyles.instance;
@@ -36,7 +37,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-    _appInitialization = initApp();
     super.initState();
   }
 
@@ -58,6 +58,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           _themeMode = _themeService.themeMode;
         }));
     _themeService.init(settings);
+    final i18nService = locator<I18nService>();
     final languageTag = settings.languageTag;
     if (languageTag != null) {
       final settingsLocale = AppLocalizations.supportedLocales.firstWhere(
@@ -66,14 +67,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       if (settingsLocale != null) {
         final settingsLocalizations =
             await AppLocalizations.delegate.load(settingsLocale);
-        locator<I18nService>().init(settingsLocalizations, settingsLocale);
+        i18nService.init(settingsLocalizations, settingsLocale);
         setState(() {
           _locale = settingsLocale;
         });
       }
     }
     final mailService = locator<MailService>();
-    await mailService.init(locator<I18nService>().localizations);
+    await mailService.init(i18nService.localizations);
 
     if (mailService.messageSource != null) {
       /// the app has at least one configured account
@@ -98,6 +99,52 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    if (true) {
+      return PlatformApp(
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        locale: _locale,
+        debugShowCheckedModeBanner: false,
+        title: 'Maily',
+        onGenerateRoute: AppRouter.generateRoute,
+        // initialRoute: Routes.splash,
+        navigatorKey: locator<NavigationService>().navigatorKey,
+        home: Builder(
+          builder: (context) {
+            locator<I18nService>().init(
+                AppLocalizations.of(context), Localizations.localeOf(context));
+            _appInitialization ??= initApp();
+            return FutureBuilder<MailService>(
+              future: _appInitialization,
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                  case ConnectionState.active:
+                    return SplashScreen();
+                    break;
+                  case ConnectionState.done:
+                    // in the meantime the app has navigated away
+                    break;
+                }
+                return Container();
+              },
+            );
+          },
+        ),
+        material: (context, platform) => MaterialAppData(
+          theme: _themeService?.lightTheme ?? ThemeService.defaultLightTheme,
+          darkTheme: _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
+          themeMode: _themeMode,
+        ),
+        cupertino: (context, platform) => CupertinoAppData(
+          theme: (_themeService?.lightTheme ?? ThemeService.defaultLightTheme)
+              .cupertinoOverrideTheme,
+          // darkTheme: _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
+          // themeMode: _themeMode,
+        ),
+      );
+    }
     return MaterialApp(
       scaffoldMessengerKey:
           locator<ScaffoldMessengerService>().scaffoldMessengerKey,

@@ -1,7 +1,10 @@
 import 'package:enough_mail_app/widgets/app_drawer.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/cupertino.dart';
 // import 'package:enough_style/enough_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class Base {
   static Widget onBottom(Widget child) => align(child, Alignment.bottomCenter);
@@ -22,37 +25,53 @@ class Base {
       @required Widget content,
       FloatingActionButton floatingActionButton,
       List<Widget> appBarActions,
-      AppBar appBar,
+      PlatformAppBar appBar,
       Widget drawer,
       String subtitle,
       Widget bottom,
       bool includeDrawer}) {
-    appBar ??=
-        buildAppBar(context, title, actions: appBarActions, subtitle: subtitle);
+    appBar ??= buildAppBar(context, title,
+        actions: appBarActions,
+        subtitle: subtitle,
+        floatingActionButton: floatingActionButton);
     if (includeDrawer != false) {
       drawer ??= buildDrawer(context);
     }
 
-    return Scaffold(
+    return PlatformPageScaffold(
       appBar: appBar,
       body: content,
-      drawer: drawer,
-      floatingActionButton: floatingActionButton,
-      bottomNavigationBar: bottom,
+      bottomBar: bottom,
+      material: (context, platform) => MaterialScaffoldData(
+        drawer: drawer,
+        floatingActionButton: floatingActionButton,
+        // bottomNavBar: bottom,
+      ),
     );
   }
 
-  static AppBar buildAppBar(BuildContext context, String title,
-      {List<Widget> actions, String subtitle}) {
-    return AppBar(
-      elevation: 0,
+  static PlatformAppBar buildAppBar(BuildContext context, String title,
+      {List<Widget> actions,
+      String subtitle,
+      FloatingActionButton floatingActionButton}) {
+    return PlatformAppBar(
+      material: (context, platform) => MaterialAppBarData(
+        elevation: 0,
+      ),
+      cupertino: (context, platform) => CupertinoNavigationBarData(
+        trailing: floatingActionButton == null
+            ? null
+            : CupertinoButton(
+                child: floatingActionButton.child,
+                onPressed: floatingActionButton.onPressed),
+      ),
       // leading: Padding(
       //   padding: const EdgeInsets.all(16.0),
       //   child: Icon(Icons.menu),
       // ),
       title: buildTitle(title, subtitle),
-
-      actions: actions ?? [],
+      automaticallyImplyLeading: true,
+      trailingActions: actions ?? [],
     );
   }
 

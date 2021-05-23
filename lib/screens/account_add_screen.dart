@@ -11,6 +11,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/password_field.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
@@ -100,7 +101,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
       content: Column(
         children: [
           Expanded(
-            child: Stepper(
+            child: PlatformStepper(
               type: StepperType.vertical,
               onStepContinue: _isContinueAvailable
                   ? () async {

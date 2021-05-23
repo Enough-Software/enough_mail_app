@@ -18,14 +18,16 @@ import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/string_helper.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/cupertino.dart';
 // import 'package:enough_style/enough_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import '../locator.dart';
 
 enum _Visualization { stack, list }
@@ -235,29 +237,35 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         ),
       );
     }
-    return Scaffold(
-      drawer: AppDrawer(),
-      floatingActionButton: _visualization == _Visualization.stack
-          ? null
-          : FloatingActionButton(
-              onPressed: () {
-                // locator<NotificationService>()
-                //     .sendLocalNotificationForMailMessage(
-                //         widget.messageSource.getMessageAt(3));
-                locator<NavigationService>().push(
-                  Routes.mailCompose,
-                  arguments: ComposeData(
-                      null, MessageBuilder(), ComposeAction.newMessage),
-                );
-              },
-              tooltip: localizations.homeFabTooltip,
-              child: Icon(Icons.add),
-              elevation: 2.0,
-            ),
+    return PlatformScaffold(
+      material: (context, platform) => MaterialScaffoldData(
+        drawer: AppDrawer(),
+        floatingActionButton: _visualization == _Visualization.stack
+            ? null
+            : FloatingActionButton(
+                onPressed: () {
+                  // locator<NotificationService>()
+                  //     .sendLocalNotificationForMailMessage(
+                  //         widget.messageSource.getMessageAt(3));
+                  locator<NavigationService>().push(
+                    Routes.mailCompose,
+                    arguments: ComposeData(
+                        null, MessageBuilder(), ComposeAction.newMessage),
+                  );
+                },
+                tooltip: localizations.homeFabTooltip,
+                child: Icon(Icons.add),
+                elevation: 2.0,
+              ),
+        bottomNavBar: isInSelectionMode
+            ? buildSelectionModeBottomBar(localizations)
+            : null,
+      ),
+      // cupertino: (context, platform) => CupertinoPageScaffoldData(),
       appBar: (_visualization == _Visualization.stack)
-          ? AppBar(
+          ? PlatformAppBar(
               title: appBarTitle,
-              actions: appBarActions,
+              trailingActions: appBarActions,
             )
           : null,
       body: FutureBuilder<void>(
@@ -473,8 +481,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           return Container();
         },
       ),
-      bottomNavigationBar:
-          isInSelectionMode ? buildSelectionModeBottomBar(localizations) : null,
     );
   }
 
@@ -1006,9 +1012,12 @@ class _MessageOverviewState extends State<MessageOverview> {
     if (mime == null) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListTile(
-          title: Text('...'),
-          subtitle: Text('-'),
+        child: PlatformWidget(
+          material: (context, platform) => ListTile(
+            title: Text('...'),
+            subtitle: Text('-'),
+          ),
+          cupertino: (context, platform) => Text('...'),
         ),
       );
     }
@@ -1032,7 +1041,7 @@ class _MessageOverviewState extends State<MessageOverview> {
             title: MessageOverviewContent(message: widget.message),
             onChanged: (value) => widget.onTap(widget.message),
           )
-        : ListTile(
+        : PlatformListTile(
             visualDensity: VisualDensity.compact,
             title: MessageOverviewContent(message: widget.message),
             onTap: () => widget.onTap(widget.message),

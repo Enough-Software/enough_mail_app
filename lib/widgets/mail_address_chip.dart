@@ -5,6 +5,7 @@ import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
@@ -34,37 +35,30 @@ class _MailAddressChipState extends State<MailAddressChip> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    return PopupMenuButton<_AddressAction>(
-      child: Chip(label: Text(getText())),
+    return PlatformPopupMenuButton<_AddressAction>(
+      child: PlatformChip(label: Text(getText())),
+      title: widget.mailAddress.hasPersonalName
+          ? Text(widget.mailAddress.personalName)
+          : null,
+      message: Text(widget.mailAddress.email, style: theme.textTheme.caption),
       itemBuilder: (context) => [
-        PopupMenuItem(
-          value: _AddressAction.none,
-          child: Column(
-            children: [
-              if (widget.mailAddress.hasPersonalName) ...{
-                Text(widget.mailAddress.personalName),
-              },
-              Text(widget.mailAddress.email, style: theme.textTheme.caption),
-            ],
-          ),
-        ),
-        PopupMenuItem(
+        PlatformPopupMenuItem(
           value: _AddressAction.copy,
-          child: ListTile(
+          child: PlatformListTile(
             leading: Icon(Icons.copy),
             title: Text(localizations.actionAddressCopy),
           ),
         ),
-        PopupMenuItem(
+        PlatformPopupMenuItem(
           value: _AddressAction.compose,
-          child: ListTile(
+          child: PlatformListTile(
             leading: Icon(Icons.add),
             title: Text(localizations.actionAddressCompose),
           ),
         ),
-        PopupMenuItem(
+        PlatformPopupMenuItem(
           value: _AddressAction.search,
-          child: ListTile(
+          child: PlatformListTile(
             leading: Icon(Icons.search),
             title: Text(localizations.actionAddressSearch),
           ),
