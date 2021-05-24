@@ -351,6 +351,30 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                     isInSelectionMode = true;
                                   });
                                 },
+                                onTap: !isInSelectionMode
+                                    ? null
+                                    : () {
+                                        final sectionMessages =
+                                            _sectionedMessageSource
+                                                .getMessagesForSection(
+                                                    element.section);
+                                        final doSelect =
+                                            !sectionMessages.first.isSelected;
+                                        for (final msg in sectionMessages) {
+                                          if (doSelect) {
+                                            if (!msg.isSelected) {
+                                              msg.isSelected = true;
+                                              selectedMessages.add(msg);
+                                            }
+                                          } else {
+                                            if (msg.isSelected) {
+                                              msg.isSelected = false;
+                                              selectedMessages.remove(msg);
+                                            }
+                                          }
+                                        }
+                                        setState(() {});
+                                      },
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
