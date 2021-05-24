@@ -118,7 +118,7 @@ class _MessageContentState extends State<_MessageContent> {
         child: SafeArea(child: buildMailDetails(localizations)),
       ),
       appBarActions: [
-        //IconButton(icon: Icon(Icons.reply), onPressed: reply),
+        //PlatformIconButton(icon: Icon(Icons.reply), onPressed: reply),
         PlatformPopupMenuButton<_OverflowMenuChoice>(
           onSelected: (_OverflowMenuChoice result) {
             switch (result) {
@@ -233,7 +233,7 @@ class _MessageContentState extends State<_MessageContent> {
                 Container(),
               },
               if (_isWebViewZoomedOut) ...{
-                IconButton(
+                PlatformIconButton(
                   icon: Icon(Icons.zoom_in),
                   onPressed: () {
                     locator<NavigationService>()
@@ -618,7 +618,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
         removeOverlay();
         return Future.value(false);
       },
-      child: IconButton(
+      child: PlatformIconButton(
         icon: IconService.buildNumericIcon(length),
         onPressed: () {
           _overlayEntry = _buildThreadsOverlay();

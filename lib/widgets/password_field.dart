@@ -1,3 +1,4 @@
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
 class PasswordField extends StatefulWidget {
@@ -22,20 +23,22 @@ class _PasswordFieldState extends State<PasswordField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return PlatformTextField(
       controller: widget.controller,
       obscureText: obscureText,
       onChanged: widget.onChanged,
-      decoration: InputDecoration(
-        hintText: widget.hintText,
-        labelText: widget.labelText,
-        suffixIcon: IconButton(
-          icon: Icon(obscureText ? Icons.lock_open : Icons.lock),
-          onPressed: () {
-            setState(
-              () => obscureText = !obscureText,
-            );
-          },
+      material: (context, platform) => MaterialTextFieldData(
+        decoration: InputDecoration(
+          hintText: widget.hintText,
+          labelText: widget.labelText,
+          suffixIcon: IconButton(
+            icon: Icon(obscureText ? Icons.lock_open : Icons.lock),
+            onPressed: () {
+              setState(
+                () => obscureText = !obscureText,
+              );
+            },
+          ),
         ),
       ),
     );

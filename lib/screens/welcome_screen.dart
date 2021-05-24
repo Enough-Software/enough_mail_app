@@ -2,6 +2,7 @@ import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
@@ -72,7 +73,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   //final PageController _pageController = PageController(initialPage: 0);
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlatformScaffold(
       body: _buildOnboardingArea(),
     );
   }
@@ -110,10 +111,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   child: Shimmer(
                     duration: const Duration(seconds: 4),
                     interval: const Duration(seconds: 6),
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.email),
-                      label: ButtonText(
-                          AppLocalizations.of(context).welcomeActionSignIn),
+                    child: PlatformElevatedButton(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Icon(Icons.email),
+                          ),
+                          ButtonText(
+                              AppLocalizations.of(context).welcomeActionSignIn),
+                        ],
+                      ),
                       onPressed: () {
                         locator<NavigationService>().push(Routes.accountAdd);
                       },

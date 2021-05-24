@@ -122,7 +122,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               hintText: localizations.homeSearchHint,
               hintStyle: TextStyle(color: Colors.white30),
               suffix: hasSearchInput
-                  ? IconButton(
+                  ? PlatformIconButton(
                       icon: Icon(Icons.clear),
                       onPressed: () {
                         searchEditingController.text = '';
@@ -149,7 +149,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             widget.messageSource.description ?? '');
     final appBarActions = [
       if (widget.messageSource.supportsSearching) ...{
-        IconButton(
+        PlatformIconButton(
           icon: Icon(isInSearchMode ? Icons.arrow_back : Icons.search),
           onPressed: () {
             if (isInSearchMode) {
@@ -497,51 +497,51 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             child: Text('${selectedMessages.length}'),
           ),
           if (isAnyUnseen) ...{
-            IconButton(
+            PlatformIconButton(
               icon: Icon(Icons.circle),
               onPressed: () => handleMultipleChoice(_MultipleChoice.seen),
             ),
           } else ...{
-            IconButton(
+            PlatformIconButton(
               icon: Icon(Feather.circle),
               onPressed: () => handleMultipleChoice(_MultipleChoice.unseen),
             ),
           },
           if (isAnyUnflagged) ...{
-            IconButton(
+            PlatformIconButton(
               icon: Icon(Icons.flag_outlined),
               onPressed: () => handleMultipleChoice(_MultipleChoice.flag),
             ),
           } else ...{
-            IconButton(
+            PlatformIconButton(
               icon: Icon(Icons.flag),
               onPressed: () => handleMultipleChoice(_MultipleChoice.unflag),
             ),
           },
           if (isJunk) ...{
-            IconButton(
+            PlatformIconButton(
               icon: Icon(Icons.check),
               onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
             ),
           } else ...{
-            IconButton(
+            PlatformIconButton(
               icon: Icon(Entypo.bug),
               onPressed: () => handleMultipleChoice(_MultipleChoice.junk),
             ),
           },
           Spacer(),
           if (isTrash) ...{
-            IconButton(
+            PlatformIconButton(
               icon: Icon(Entypo.inbox),
               onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
             ),
           } else ...{
-            IconButton(
+            PlatformIconButton(
               icon: Icon(Icons.delete),
               onPressed: () => handleMultipleChoice(_MultipleChoice.delete),
             ),
           },
-          IconButton(
+          PlatformIconButton(
             icon: Icon(Icons.close),
             onPressed: leaveSelectionMode,
           ),

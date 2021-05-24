@@ -131,7 +131,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                   content: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      TextField(
+                      PlatformTextField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         onChanged: (value) {
@@ -145,10 +145,12 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             });
                           }
                         },
-                        decoration: InputDecoration(
-                          labelText: localizations.addAccountEmailLabel,
-                          hintText: localizations.addAccountEmailHint,
-                          icon: const Icon(Icons.email),
+                        material: (context, platform) => MaterialTextFieldData(
+                          decoration: InputDecoration(
+                            labelText: localizations.addAccountEmailLabel,
+                            hintText: localizations.addAccountEmailHint,
+                            icon: const Icon(Icons.email),
+                          ),
                         ),
                       ),
                     ],
@@ -286,7 +288,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                       } else if (_isAccountVerified) ...{
                         Text(localizations
                             .addAccountVerifyingSuccessInfo(account.email)),
-                        TextField(
+                        PlatformTextField(
                           controller: _userNameController,
                           keyboardType: TextInputType.text,
                           onChanged: (value) {
@@ -298,13 +300,17 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                               });
                             }
                           },
-                          decoration: InputDecoration(
-                            labelText: localizations.addAccountNameOfUserLabel,
-                            hintText: localizations.addAccountNameOfUserHint,
-                            icon: const Icon(Icons.account_circle),
+                          material: (context, platform) =>
+                              MaterialTextFieldData(
+                            decoration: InputDecoration(
+                              labelText:
+                                  localizations.addAccountNameOfUserLabel,
+                              hintText: localizations.addAccountNameOfUserHint,
+                              icon: const Icon(Icons.account_circle),
+                            ),
                           ),
                         ),
-                        TextField(
+                        PlatformTextField(
                           controller: _accountNameController,
                           keyboardType: TextInputType.text,
                           onChanged: (value) {
@@ -316,11 +322,15 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                               });
                             }
                           },
-                          decoration: InputDecoration(
-                            labelText:
-                                localizations.addAccountNameOfAccountLabel,
-                            hintText: localizations.addAccountNameOfAccountHint,
-                            icon: const Icon(Icons.email),
+                          material: (context, platform) =>
+                              MaterialTextFieldData(
+                            decoration: InputDecoration(
+                              labelText:
+                                  localizations.addAccountNameOfAccountLabel,
+                              hintText:
+                                  localizations.addAccountNameOfAccountHint,
+                              icon: const Icon(Icons.email),
+                            ),
                           ),
                         ),
                       } else ...{

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
@@ -24,24 +27,45 @@ class DialogHelper {
       actionTextStyle = theme.textTheme.button.copyWith(color: Colors.white);
     }
 
-    return showDialog<bool>(
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(query),
-        actions: [
-          TextButton(
-            child: ButtonText(localizations.actionCancel),
-            onPressed: () => Navigator.of(context).pop(false),
-          ),
-          TextButton(
-            child: ButtonText(action ?? title, style: actionTextStyle),
-            onPressed: () => Navigator.of(context).pop(true),
-            style: actionButtonStyle,
-          ),
-        ],
-      ),
-      context: context,
-    );
+    if (Platform.isAndroid) {
+      return showDialog<bool>(
+        builder: (context) => AlertDialog(
+          title: Text(title),
+          content: Text(query),
+          actions: [
+            TextButton(
+              child: ButtonText(localizations.actionCancel),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: ButtonText(action ?? title, style: actionTextStyle),
+              onPressed: () => Navigator.of(context).pop(true),
+              style: actionButtonStyle,
+            ),
+          ],
+        ),
+        context: context,
+      );
+    } else {
+      return showCupertinoDialog<bool>(
+        builder: (context) => CupertinoAlertDialog(
+          title: Text(title),
+          content: Text(query),
+          actions: [
+            TextButton(
+              child: Text(localizations.actionCancel),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: Text(action ?? title, style: actionTextStyle),
+              onPressed: () => Navigator.of(context).pop(true),
+              style: actionButtonStyle,
+            ),
+          ],
+        ),
+        context: context,
+      );
+    }
   }
 
   static Future showTextDialog(BuildContext context, String title, String text,
@@ -69,15 +93,25 @@ class DialogHelper {
         ),
       },
     ];
-
-    return showDialog(
-      builder: (context) => AlertDialog(
-        title: title == null ? null : Text(title),
-        content: content,
-        actions: actions,
-      ),
-      context: context,
-    );
+    if (Platform.isAndroid) {
+      return showDialog(
+        builder: (context) => AlertDialog(
+          title: title == null ? null : Text(title),
+          content: content,
+          actions: actions,
+        ),
+        context: context,
+      );
+    } else {
+      return showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: title == null ? null : Text(title),
+          content: content,
+          actions: actions,
+        ),
+      );
+    }
   }
 
   static void showAbout(BuildContext context) async {
