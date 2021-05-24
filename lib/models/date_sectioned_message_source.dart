@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/date_service.dart';
@@ -115,6 +117,22 @@ class DateSectionedMessageSource extends ChangeNotifier {
     }
     final message = messageSource.getMessageAt(messageIndex);
     return SectionElement(null, message);
+  }
+
+  List<Message> getMessagesForSection(MessageDateSection section) {
+    final index = _sections.indexOf(section);
+    if (index == -1) {
+      return [];
+    }
+    final startIndex = section.sourceStartIndex - index;
+    final endIndex = (index < _sections.length - 1)
+        ? _sections[index + 1].sourceStartIndex - index - 1
+        : min(startIndex + 5, messageSource.size);
+    final messages = <Message>[];
+    for (var i = startIndex; i < endIndex; i++) {
+      messages.add(messageSource.getMessageAt(i));
+    }
+    return messages;
   }
 
   List<Message> _getTopMessages(int length) {

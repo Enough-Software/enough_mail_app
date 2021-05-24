@@ -341,24 +341,35 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                             if (element.section != null) {
                               final text = i18nService.formatDateRange(
                                   element.section.range, element.section.date);
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 16.0,
-                                      right: 8.0,
-                                      bottom: 4.0,
-                                      top: 16.0,
+                              return GestureDetector(
+                                onLongPress: () {
+                                  selectedMessages = _sectionedMessageSource
+                                      .getMessagesForSection(element.section);
+                                  selectedMessages
+                                      .forEach((m) => m.isSelected = true);
+                                  setState(() {
+                                    isInSelectionMode = true;
+                                  });
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 16.0,
+                                        right: 8.0,
+                                        bottom: 4.0,
+                                        top: 16.0,
+                                      ),
+                                      child: Text(
+                                        text,
+                                        style:
+                                            TextStyle(color: theme.accentColor),
+                                      ),
                                     ),
-                                    child: Text(
-                                      text,
-                                      style:
-                                          TextStyle(color: theme.accentColor),
-                                    ),
-                                  ),
-                                  Divider()
-                                ],
+                                    Divider()
+                                  ],
+                                ),
                               );
                             }
                             final message = element.message;
