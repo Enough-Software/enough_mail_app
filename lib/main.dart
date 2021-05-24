@@ -133,6 +133,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           },
         ),
         material: (context, platform) => MaterialAppData(
+          scaffoldMessengerKey:
+              locator<ScaffoldMessengerService>().scaffoldMessengerKey,
           theme: _themeService?.lightTheme ?? ThemeService.defaultLightTheme,
           darkTheme: _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
           themeMode: _themeMode,
@@ -145,42 +147,5 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
       );
     }
-    return MaterialApp(
-      scaffoldMessengerKey:
-          locator<ScaffoldMessengerService>().scaffoldMessengerKey,
-      supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      locale: _locale,
-      theme: _themeService?.lightTheme ?? ThemeService.defaultLightTheme,
-      darkTheme: _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
-      themeMode: _themeMode,
-      debugShowCheckedModeBanner: false,
-      title: 'Maily',
-      onGenerateRoute: AppRouter.generateRoute,
-      //initialRoute: Routes.splash,
-      navigatorKey: locator<NavigationService>().navigatorKey,
-      home: Builder(
-        builder: (context) {
-          locator<I18nService>().init(
-              AppLocalizations.of(context), Localizations.localeOf(context));
-          return FutureBuilder<MailService>(
-            future: _appInitialization,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.waiting:
-                case ConnectionState.active:
-                  return SplashScreen();
-                  break;
-                case ConnectionState.done:
-                  // in the meantime the app has navigated away
-                  break;
-              }
-              return Container();
-            },
-          );
-        },
-      ),
-    );
   }
 }
