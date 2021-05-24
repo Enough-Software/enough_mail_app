@@ -576,7 +576,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
   @override
   void dispose() {
     if (_overlayEntry != null) {
-      removeOverlay();
+      _removeOverlay();
     }
     super.dispose();
   }
@@ -603,8 +603,8 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
       final message = Message(mime, mailClient, source, i);
       messages.add(message);
     }
-    source.messages = messages;
-    return messages;
+    source.messages = messages.reversed.toList();
+    return source.messages;
   }
 
   @override
@@ -615,26 +615,30 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
         if (_overlayEntry == null) {
           return Future.value(true);
         }
-        removeOverlay();
+        _removeOverlay();
         return Future.value(false);
       },
       child: PlatformIconButton(
         icon: IconService.buildNumericIcon(length),
         onPressed: () {
-          _overlayEntry = _buildThreadsOverlay();
-          Overlay.of(context).insert(_overlayEntry);
+          if (_overlayEntry != null) {
+            _removeOverlay();
+          } else {
+            _overlayEntry = _buildThreadsOverlay();
+            Overlay.of(context).insert(_overlayEntry);
+          }
         },
       ),
     );
   }
 
-  void removeOverlay() {
+  void _removeOverlay() {
     _overlayEntry.remove();
     _overlayEntry = null;
   }
 
-  void select(Message message) {
-    removeOverlay();
+  void _select(Message message) {
+    _removeOverlay();
     locator<NavigationService>()
         .push(Routes.mailDetails, arguments: message, replace: false);
   }
@@ -651,11 +655,11 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
     return OverlayEntry(
       builder: (context) => GestureDetector(
         onTap: () {
-          removeOverlay();
+          _removeOverlay();
         },
         child: Stack(
-          fit: StackFit.expand,
           children: [
+            Positioned.fill(child: Container(color: Color(0x09000000))),
             Positioned(
               left: offset.dx,
               top: top,
@@ -678,7 +682,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                             .map((message) => PlatformListTile(
                                   title:
                                       MessageOverviewContent(message: message),
-                                  onTap: () => select(message),
+                                  onTap: () => _select(message),
                                   selected:
                                       (message.mimeMessage.uid == currentUid),
                                 ))
