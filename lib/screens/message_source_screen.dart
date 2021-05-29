@@ -1070,7 +1070,7 @@ class _MessageOverviewState extends State<MessageOverview> {
 
   Widget buildMessageOverview() {
     return widget.isInSelectionMode
-        ? CheckboxListTile(
+        ? PlatformCheckboxListTile(
             value: widget.message.isSelected,
             selected: widget.message.isSelected,
             title: MessageOverviewContent(message: widget.message),

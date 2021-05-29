@@ -115,7 +115,7 @@ class _MessageContentState extends State<_MessageContent> {
           localizations.subjectUndefined,
       content: MessageWidget(
         message: widget.message,
-        child: SafeArea(child: buildMailDetails(localizations)),
+        child: buildMailDetails(localizations),
       ),
       appBarActions: [
         //PlatformIconButton(icon: Icon(Icons.reply), onPressed: reply),
