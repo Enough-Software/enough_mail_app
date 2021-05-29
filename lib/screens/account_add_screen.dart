@@ -192,7 +192,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                 child: ButtonText(localizations
                                     .addAccountApplicationPasswordRequiredButton),
                               ),
-                              CheckboxListTile(
+                              PlatformCheckboxListTile(
                                 onChanged: (value) => setState(() =>
                                     _isApplicationSpecificPasswordAcknowledged =
                                         value),

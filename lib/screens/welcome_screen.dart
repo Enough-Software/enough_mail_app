@@ -116,12 +116,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.only(right: 8.0),
                             child: Icon(Icons.email),
                           ),
-                          ButtonText(
-                              AppLocalizations.of(context).welcomeActionSignIn),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: ButtonText(AppLocalizations.of(context)
+                                  .welcomeActionSignIn),
+                            ),
+                          ),
                         ],
                       ),
                       onPressed: () {
