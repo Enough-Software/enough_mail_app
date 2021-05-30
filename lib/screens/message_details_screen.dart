@@ -151,15 +151,17 @@ class _MessageContentState extends State<_MessageContent> {
 
   Widget buildMailDetails(AppLocalizations localizations) {
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: buildHeader(localizations),
-          ),
-          buildContent(localizations),
-        ],
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: buildHeader(localizations),
+            ),
+            buildContent(localizations),
+          ],
+        ),
       ),
     );
   }

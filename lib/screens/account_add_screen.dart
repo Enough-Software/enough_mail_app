@@ -131,7 +131,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                   content: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      PlatformTextField(
+                      DecoratedPlatformTextField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         onChanged: (value) {
@@ -145,13 +145,12 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             });
                           }
                         },
-                        material: (context, platform) => MaterialTextFieldData(
-                          decoration: InputDecoration(
-                            labelText: localizations.addAccountEmailLabel,
-                            hintText: localizations.addAccountEmailHint,
-                            icon: const Icon(Icons.email),
-                          ),
+                        decoration: InputDecoration(
+                          labelText: localizations.addAccountEmailLabel,
+                          hintText: localizations.addAccountEmailHint,
+                          icon: const Icon(Icons.email),
                         ),
+                        autofocus: true,
                       ),
                     ],
                   ),
@@ -184,7 +183,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             if (_providerAppplicationPasswordUrl != null) ...{
                               Text(localizations
                                   .addAccountApplicationPasswordRequiredInfo),
-                              ElevatedButton(
+                              PlatformElevatedButton(
                                 onPressed: () async {
                                   await launcher
                                       .launch(_providerAppplicationPasswordUrl);
@@ -216,18 +215,19 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                     });
                                   }
                                 },
+                                autofocus: true,
                                 labelText:
                                     localizations.addAccountPasswordLabel,
                                 hintText: localizations.addAccountPasswordHint,
                               ),
-                              TextButton(
+                              PlatformTextButton(
                                 onPressed: navigateToManualSettings,
                                 child: ButtonText(localizations
                                     .addAccountResolvedSettingsWrongAction(
                                         _clientConfig?.displayName)),
                               ),
                               if (_extensionForgotPassword != null) ...{
-                                TextButton(
+                                PlatformTextButton(
                                   onPressed: () {
                                     final languageCode = locator<I18nService>()
                                         .locale
@@ -256,7 +256,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             Text(localizations
                                 .addAccountResolvingSetingsFailedInfo(
                                     account.email)),
-                            ElevatedButton(
+                            PlatformElevatedButton(
                               child: ButtonText(
                                   localizations.addAccountEditManuallyAction),
                               onPressed: navigateToManualSettings,
@@ -288,7 +288,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                       } else if (_isAccountVerified) ...{
                         Text(localizations
                             .addAccountVerifyingSuccessInfo(account.email)),
-                        PlatformTextField(
+                        DecoratedPlatformTextField(
                           controller: _userNameController,
                           keyboardType: TextInputType.text,
                           onChanged: (value) {
@@ -300,17 +300,14 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                               });
                             }
                           },
-                          material: (context, platform) =>
-                              MaterialTextFieldData(
-                            decoration: InputDecoration(
-                              labelText:
-                                  localizations.addAccountNameOfUserLabel,
-                              hintText: localizations.addAccountNameOfUserHint,
-                              icon: const Icon(Icons.account_circle),
-                            ),
+                          decoration: InputDecoration(
+                            labelText: localizations.addAccountNameOfUserLabel,
+                            hintText: localizations.addAccountNameOfUserHint,
+                            icon: const Icon(Icons.account_circle),
                           ),
+                          autofocus: true,
                         ),
-                        PlatformTextField(
+                        DecoratedPlatformTextField(
                           controller: _accountNameController,
                           keyboardType: TextInputType.text,
                           onChanged: (value) {
@@ -322,15 +319,11 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                               });
                             }
                           },
-                          material: (context, platform) =>
-                              MaterialTextFieldData(
-                            decoration: InputDecoration(
-                              labelText:
-                                  localizations.addAccountNameOfAccountLabel,
-                              hintText:
-                                  localizations.addAccountNameOfAccountHint,
-                              icon: const Icon(Icons.email),
-                            ),
+                          decoration: InputDecoration(
+                            labelText:
+                                localizations.addAccountNameOfAccountLabel,
+                            hintText: localizations.addAccountNameOfAccountHint,
+                            icon: const Icon(Icons.email),
                           ),
                         ),
                       } else ...{

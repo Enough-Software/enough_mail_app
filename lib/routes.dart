@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/models.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_media/enough_media.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Routes {
@@ -121,6 +124,8 @@ class AppRouter {
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final page = generatePage(settings.name, settings.arguments);
-    return MaterialPageRoute(builder: (_) => page);
+    return Platform.isAndroid
+        ? MaterialPageRoute(builder: (_) => page)
+        : CupertinoPageRoute(builder: (_) => page);
   }
 }
