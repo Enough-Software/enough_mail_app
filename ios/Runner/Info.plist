@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.transistorsoft.fetch</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -22,6 +26,15 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allows you to attach your location to a message</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allows you to attach photos to a message</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -43,22 +56,5 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<string>yes</string>
-	<key>UIBackgroundModes</key>
-	<array>
-	<string>fetch</string>
-	<string>remote-notification</string>
-	<!-- only required when calling BackgroundFetch.scheduleTask: -->
-	<!-- <string>processing</string>  -->
-	</array>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-	<string>com.transistorsoft.fetch</string>
-	</array>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allows you to attach photos to a message</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Allows you to attach your location to a message</string>
-	<!-- <key>NSLocationAlwaysUsageDescription</key>
-	<string>Allows you to attach you location to a message</string> -->
 </dict>
 </plist>
