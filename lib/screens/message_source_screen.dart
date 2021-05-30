@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
@@ -148,7 +149,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         : Base.buildTitle(widget.messageSource.name ?? '',
             widget.messageSource.description ?? '');
     final appBarActions = [
-      if (widget.messageSource.supportsSearching) ...{
+      if (widget.messageSource.supportsSearching && !Platform.isIOS) ...{
         PlatformIconButton(
           icon: Icon(isInSearchMode ? Icons.arrow_back : Icons.search),
           onPressed: () {
@@ -165,15 +166,15 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         ),
       },
       if (!isInSearchMode) ...{
-        PopupMenuButton<_Visualization>(
+        PlatformPopupMenuButton<_Visualization>(
           onSelected: switchVisualization,
           itemBuilder: (context) => [
             _visualization == _Visualization.list
-                ? PopupMenuItem<_Visualization>(
+                ? PlatformPopupMenuItem<_Visualization>(
                     value: _Visualization.stack,
                     child: Text(localizations.homeActionsShowAsStack),
                   )
-                : PopupMenuItem<_Visualization>(
+                : PlatformPopupMenuItem<_Visualization>(
                     value: _Visualization.list,
                     child: Text(localizations.homeActionsShowAsList),
                   ),
@@ -237,7 +238,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         ),
       );
     }
-    return PlatformScaffold(
+    return PlatformPageScaffold(
+      bottomBar:
+          isInSelectionMode ? buildSelectionModeBottomBar(localizations) : null,
+      cupertinoBarBackgroundOpacity: 0.8,
       material: (context, platform) => MaterialScaffoldData(
         drawer: AppDrawer(),
         floatingActionButton: _visualization == _Visualization.stack
@@ -257,9 +261,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                 child: Icon(Icons.add),
                 elevation: 2.0,
               ),
-        bottomNavBar: isInSelectionMode
-            ? buildSelectionModeBottomBar(localizations)
-            : null,
       ),
       // cupertino: (context, platform) => CupertinoPageScaffoldData(),
       appBar: (_visualization == _Visualization.stack)
@@ -319,12 +320,13 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   child: CustomScrollView(
                     physics: BouncingScrollPhysics(),
                     slivers: [
-                      SliverAppBar(
+                      PlatformSliverAppBar(
                         title: appBarTitle,
                         floating: isInSearchMode ? false : true,
                         pinned: isInSearchMode ? true : false,
                         stretch: true,
                         actions: appBarActions,
+                        previousPageTitle: localizations.accountsTitle,
                       ),
                       SliverList(
                         delegate: SliverChildBuilderDelegate(
@@ -524,7 +526,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     final isJunk = widget.messageSource.isJunk;
     final isAnyUnseen = selectedMessages.any((m) => !m.isSeen);
     final isAnyUnflagged = selectedMessages.any((m) => !m.isFlagged);
-    return BottomAppBar(
+    return SafeArea(
+      top: false,
       child: Row(
         children: [
           Padding(
@@ -580,70 +583,70 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             icon: Icon(Icons.close),
             onPressed: leaveSelectionMode,
           ),
-          PopupMenuButton<_MultipleChoice>(
+          PlatformPopupMenuButton<_MultipleChoice>(
             onSelected: handleMultipleChoice,
             itemBuilder: (context) => [
-              PopupMenuItem(
+              PlatformPopupMenuItem(
                 value: _MultipleChoice.forwardAsAttachment,
-                child: ListTile(
+                child: PlatformListTile(
                   leading: Icon(Icons.forward_to_inbox),
                   title: Text(localizations.messageActionForwardAsAttachment),
                 ),
               ),
-              PopupMenuItem(
+              PlatformPopupMenuItem(
                 value: _MultipleChoice.forwardAttachments,
-                child: ListTile(
+                child: PlatformListTile(
                   leading: Icon(Icons.attach_file),
                   title: Text(localizations.messagesActionForwardAttachments),
                 ),
               ),
               if (isTrash) ...{
-                PopupMenuItem(
+                PlatformPopupMenuItem(
                   value: _MultipleChoice.inbox,
-                  child: ListTile(
+                  child: PlatformListTile(
                     leading: Icon(Entypo.inbox),
                     title: Text(localizations.messageActionMoveToInbox),
                   ),
                 ),
               } else ...{
-                PopupMenuItem(
+                PlatformPopupMenuItem(
                   value: _MultipleChoice.delete,
-                  child: ListTile(
+                  child: PlatformListTile(
                     leading: Icon(Icons.delete),
                     title: Text(localizations.messageActionDelete),
                   ),
                 ),
               },
-              PopupMenuDivider(),
+              PlatformPopupDivider(),
               if (isAnyUnseen) ...{
-                PopupMenuItem(
+                PlatformPopupMenuItem(
                   value: _MultipleChoice.seen,
-                  child: ListTile(
+                  child: PlatformListTile(
                     leading: Icon(Icons.circle),
                     title: Text(localizations.messageActionMultipleMarkSeen),
                   ),
                 ),
               } else ...{
-                PopupMenuItem(
+                PlatformPopupMenuItem(
                   value: _MultipleChoice.unseen,
-                  child: ListTile(
+                  child: PlatformListTile(
                     leading: Icon(Feather.circle),
                     title: Text(localizations.messageActionMultipleMarkUnseen),
                   ),
                 ),
               },
               if (isAnyUnflagged) ...{
-                PopupMenuItem(
+                PlatformPopupMenuItem(
                   value: _MultipleChoice.flag,
-                  child: ListTile(
+                  child: PlatformListTile(
                     leading: Icon(Icons.outlined_flag),
                     title: Text(localizations.messageActionMultipleMarkFlagged),
                   ),
                 ),
               } else ...{
-                PopupMenuItem(
+                PlatformPopupMenuItem(
                   value: _MultipleChoice.unflag,
-                  child: ListTile(
+                  child: PlatformListTile(
                     leading: Icon(Icons.flag),
                     title:
                         Text(localizations.messageActionMultipleMarkUnflagged),
@@ -651,43 +654,43 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                 ),
               },
               if (widget.messageSource.supportsMessageFolders) ...{
-                PopupMenuDivider(),
-                PopupMenuItem(
+                PlatformPopupDivider(),
+                PlatformPopupMenuItem(
                   value: _MultipleChoice.move,
-                  child: ListTile(
+                  child: PlatformListTile(
                     leading: Icon(MaterialCommunityIcons.file_move),
                     title: Text(localizations.messageActionMove),
                   ),
                 ),
                 if (isJunk) ...{
-                  PopupMenuItem(
+                  PlatformPopupMenuItem(
                     value: _MultipleChoice.inbox,
-                    child: ListTile(
+                    child: PlatformListTile(
                       leading: Icon(Entypo.check),
                       title: Text(localizations.messageActionMarkAsNotJunk),
                     ),
                   ),
                 } else ...{
-                  PopupMenuItem(
+                  PlatformPopupMenuItem(
                     value: _MultipleChoice.junk,
-                    child: ListTile(
+                    child: PlatformListTile(
                       leading: Icon(Entypo.bug),
                       title: Text(localizations.messageActionMarkAsJunk),
                     ),
                   ),
                 },
                 if (widget.messageSource.isArchive) ...{
-                  PopupMenuItem(
+                  PlatformPopupMenuItem(
                     value: _MultipleChoice.inbox,
-                    child: ListTile(
+                    child: PlatformListTile(
                       leading: Icon(Entypo.inbox),
                       title: Text(localizations.messageActionUnarchive),
                     ),
                   ),
                 } else ...{
-                  PopupMenuItem(
+                  PlatformPopupMenuItem(
                     value: _MultipleChoice.archive,
-                    child: ListTile(
+                    child: PlatformListTile(
                       leading: Icon(Entypo.archive),
                       title: Text(localizations.messageActionArchive),
                     ),

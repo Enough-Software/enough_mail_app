@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:enough_mail_app/routes.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NavigationService {
@@ -17,7 +20,9 @@ class NavigationService {
     if (fade) {
       route = FadeRoute(page: page);
     } else {
-      route = MaterialPageRoute(builder: (context) => page);
+      route = Platform.isAndroid
+          ? MaterialPageRoute(builder: (_) => page)
+          : CupertinoPageRoute(builder: (_) => page);
     }
     if (clear) {
       navigatorKey.currentState.popUntil((route) => false);
