@@ -2,6 +2,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
 import '../locator.dart';
@@ -41,7 +42,7 @@ class MailboxTree extends StatelessWidget {
     if (element.children == null) {
       final isCurrent = (mailbox == current);
       final iconData = locator<IconService>().getForMailbox(mailbox);
-      return ListTile(
+      return PlatformListTile(
         leading: Icon(iconData),
         title: title,
         onTap: isCurrent ? null : () => onSelected(mailbox),

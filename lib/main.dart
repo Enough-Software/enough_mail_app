@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_mail_app/services/app_service.dart';
@@ -77,9 +78,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     await mailService.init(i18nService.localizations);
 
     if (mailService.messageSource != null) {
+      // on ios show the app drawer:
+      if (Platform.isIOS) {
+        locator<NavigationService>().push(Routes.appDrawer, replace: true);
+      }
+
       /// the app has at least one configured account
       locator<NavigationService>().push(Routes.messageSource,
-          arguments: mailService.messageSource, fade: true, replace: true);
+          arguments: mailService.messageSource,
+          fade: true,
+          replace: !Platform.isIOS);
       // check for a tapped notification that started the app:
       final notificationInitResult =
           await locator<NotificationService>().init();

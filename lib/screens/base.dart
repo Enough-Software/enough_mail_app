@@ -42,7 +42,6 @@ class Base {
       appBar: appBar,
       body: content,
       bottomBar: bottom,
-      cupertinoBarBackgroundOpacity: 0.8,
       material: (context, platform) => MaterialScaffoldData(
         drawer: drawer,
         floatingActionButton: floatingActionButton,

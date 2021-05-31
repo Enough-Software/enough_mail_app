@@ -2,6 +2,7 @@ import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/models/models.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -45,7 +46,7 @@ class ExtensionActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final languageCode = locator<I18nService>().locale.languageCode;
 
-    return ListTile(
+    return PlatformListTile(
       leading: actionDescription.icon == null
           ? null
           : Image.network(
