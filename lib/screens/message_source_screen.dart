@@ -22,6 +22,7 @@ import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
+import 'package:enough_mail_app/widgets/status_bar.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 // import 'package:enough_style/enough_style.dart';
@@ -239,24 +240,36 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       );
     }
     return PlatformPageScaffold(
-      bottomBar:
-          isInSelectionMode ? buildSelectionModeBottomBar(localizations) : null,
-      cupertinoBarBackgroundOpacity: 0.8,
+      bottomBar: isInSelectionMode
+          ? buildSelectionModeBottomBar(localizations)
+          : Platform.isIOS
+              ? StatusBar(
+                  rightAction: PlatformIconButton(
+                    icon: Icon(CupertinoIcons.create),
+                    onPressed: () => locator<NavigationService>().push(
+                      Routes.mailCompose,
+                      arguments: ComposeData(
+                        null,
+                        MessageBuilder(),
+                        ComposeAction.newMessage,
+                      ),
+                    ),
+                  ),
+                )
+              : null,
       material: (context, platform) => MaterialScaffoldData(
         drawer: AppDrawer(),
         floatingActionButton: _visualization == _Visualization.stack
             ? null
             : FloatingActionButton(
-                onPressed: () {
-                  // locator<NotificationService>()
-                  //     .sendLocalNotificationForMailMessage(
-                  //         widget.messageSource.getMessageAt(3));
-                  locator<NavigationService>().push(
-                    Routes.mailCompose,
-                    arguments: ComposeData(
-                        null, MessageBuilder(), ComposeAction.newMessage),
-                  );
-                },
+                onPressed: () => locator<NavigationService>().push(
+                  Routes.mailCompose,
+                  arguments: ComposeData(
+                    null,
+                    MessageBuilder(),
+                    ComposeAction.newMessage,
+                  ),
+                ),
                 tooltip: localizations.homeFabTooltip,
                 child: Icon(Icons.add),
                 elevation: 2.0,
@@ -526,180 +539,185 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     final isJunk = widget.messageSource.isJunk;
     final isAnyUnseen = selectedMessages.any((m) => !m.isSeen);
     final isAnyUnflagged = selectedMessages.any((m) => !m.isFlagged);
-    return SafeArea(
-      top: false,
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text('${selectedMessages.length}'),
-          ),
-          if (isAnyUnseen) ...{
-            PlatformIconButton(
-              icon: Icon(Icons.circle),
-              onPressed: () => handleMultipleChoice(_MultipleChoice.seen),
+    return PlatformBottomBar(
+      cupertinoBlurBackground: true,
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text('${selectedMessages.length}'),
             ),
-          } else ...{
-            PlatformIconButton(
-              icon: Icon(Feather.circle),
-              onPressed: () => handleMultipleChoice(_MultipleChoice.unseen),
-            ),
-          },
-          if (isAnyUnflagged) ...{
-            PlatformIconButton(
-              icon: Icon(Icons.flag_outlined),
-              onPressed: () => handleMultipleChoice(_MultipleChoice.flag),
-            ),
-          } else ...{
-            PlatformIconButton(
-              icon: Icon(Icons.flag),
-              onPressed: () => handleMultipleChoice(_MultipleChoice.unflag),
-            ),
-          },
-          if (isJunk) ...{
-            PlatformIconButton(
-              icon: Icon(Icons.check),
-              onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
-            ),
-          } else ...{
-            PlatformIconButton(
-              icon: Icon(Entypo.bug),
-              onPressed: () => handleMultipleChoice(_MultipleChoice.junk),
-            ),
-          },
-          Spacer(),
-          if (isTrash) ...{
-            PlatformIconButton(
-              icon: Icon(Entypo.inbox),
-              onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
-            ),
-          } else ...{
-            PlatformIconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () => handleMultipleChoice(_MultipleChoice.delete),
-            ),
-          },
-          PlatformIconButton(
-            icon: Icon(Icons.close),
-            onPressed: leaveSelectionMode,
-          ),
-          PlatformPopupMenuButton<_MultipleChoice>(
-            onSelected: handleMultipleChoice,
-            itemBuilder: (context) => [
-              PlatformPopupMenuItem(
-                value: _MultipleChoice.forwardAsAttachment,
-                child: PlatformListTile(
-                  leading: Icon(Icons.forward_to_inbox),
-                  title: Text(localizations.messageActionForwardAsAttachment),
-                ),
+            if (isAnyUnseen) ...{
+              PlatformIconButton(
+                icon: Icon(Icons.circle),
+                onPressed: () => handleMultipleChoice(_MultipleChoice.seen),
               ),
-              PlatformPopupMenuItem(
-                value: _MultipleChoice.forwardAttachments,
-                child: PlatformListTile(
-                  leading: Icon(Icons.attach_file),
-                  title: Text(localizations.messagesActionForwardAttachments),
-                ),
+            } else ...{
+              PlatformIconButton(
+                icon: Icon(Feather.circle),
+                onPressed: () => handleMultipleChoice(_MultipleChoice.unseen),
               ),
-              if (isTrash) ...{
+            },
+            if (isAnyUnflagged) ...{
+              PlatformIconButton(
+                icon: Icon(Icons.flag_outlined),
+                onPressed: () => handleMultipleChoice(_MultipleChoice.flag),
+              ),
+            } else ...{
+              PlatformIconButton(
+                icon: Icon(Icons.flag),
+                onPressed: () => handleMultipleChoice(_MultipleChoice.unflag),
+              ),
+            },
+            if (isJunk) ...{
+              PlatformIconButton(
+                icon: Icon(Icons.check),
+                onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
+              ),
+            } else ...{
+              PlatformIconButton(
+                icon: Icon(Entypo.bug),
+                onPressed: () => handleMultipleChoice(_MultipleChoice.junk),
+              ),
+            },
+            Spacer(),
+            if (isTrash) ...{
+              PlatformIconButton(
+                icon: Icon(Entypo.inbox),
+                onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
+              ),
+            } else ...{
+              PlatformIconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () => handleMultipleChoice(_MultipleChoice.delete),
+              ),
+            },
+            PlatformIconButton(
+              icon: Icon(Icons.close),
+              onPressed: leaveSelectionMode,
+            ),
+            PlatformPopupMenuButton<_MultipleChoice>(
+              onSelected: handleMultipleChoice,
+              itemBuilder: (context) => [
                 PlatformPopupMenuItem(
-                  value: _MultipleChoice.inbox,
+                  value: _MultipleChoice.forwardAsAttachment,
                   child: PlatformListTile(
-                    leading: Icon(Entypo.inbox),
-                    title: Text(localizations.messageActionMoveToInbox),
+                    leading: Icon(Icons.forward_to_inbox),
+                    title: Text(localizations.messageActionForwardAsAttachment),
                   ),
                 ),
-              } else ...{
                 PlatformPopupMenuItem(
-                  value: _MultipleChoice.delete,
+                  value: _MultipleChoice.forwardAttachments,
                   child: PlatformListTile(
-                    leading: Icon(Icons.delete),
-                    title: Text(localizations.messageActionDelete),
+                    leading: Icon(Icons.attach_file),
+                    title: Text(localizations.messagesActionForwardAttachments),
                   ),
                 ),
-              },
-              PlatformPopupDivider(),
-              if (isAnyUnseen) ...{
-                PlatformPopupMenuItem(
-                  value: _MultipleChoice.seen,
-                  child: PlatformListTile(
-                    leading: Icon(Icons.circle),
-                    title: Text(localizations.messageActionMultipleMarkSeen),
-                  ),
-                ),
-              } else ...{
-                PlatformPopupMenuItem(
-                  value: _MultipleChoice.unseen,
-                  child: PlatformListTile(
-                    leading: Icon(Feather.circle),
-                    title: Text(localizations.messageActionMultipleMarkUnseen),
-                  ),
-                ),
-              },
-              if (isAnyUnflagged) ...{
-                PlatformPopupMenuItem(
-                  value: _MultipleChoice.flag,
-                  child: PlatformListTile(
-                    leading: Icon(Icons.outlined_flag),
-                    title: Text(localizations.messageActionMultipleMarkFlagged),
-                  ),
-                ),
-              } else ...{
-                PlatformPopupMenuItem(
-                  value: _MultipleChoice.unflag,
-                  child: PlatformListTile(
-                    leading: Icon(Icons.flag),
-                    title:
-                        Text(localizations.messageActionMultipleMarkUnflagged),
-                  ),
-                ),
-              },
-              if (widget.messageSource.supportsMessageFolders) ...{
-                PlatformPopupDivider(),
-                PlatformPopupMenuItem(
-                  value: _MultipleChoice.move,
-                  child: PlatformListTile(
-                    leading: Icon(MaterialCommunityIcons.file_move),
-                    title: Text(localizations.messageActionMove),
-                  ),
-                ),
-                if (isJunk) ...{
-                  PlatformPopupMenuItem(
-                    value: _MultipleChoice.inbox,
-                    child: PlatformListTile(
-                      leading: Icon(Entypo.check),
-                      title: Text(localizations.messageActionMarkAsNotJunk),
-                    ),
-                  ),
-                } else ...{
-                  PlatformPopupMenuItem(
-                    value: _MultipleChoice.junk,
-                    child: PlatformListTile(
-                      leading: Icon(Entypo.bug),
-                      title: Text(localizations.messageActionMarkAsJunk),
-                    ),
-                  ),
-                },
-                if (widget.messageSource.isArchive) ...{
+                if (isTrash) ...{
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.inbox,
                     child: PlatformListTile(
                       leading: Icon(Entypo.inbox),
-                      title: Text(localizations.messageActionUnarchive),
+                      title: Text(localizations.messageActionMoveToInbox),
                     ),
                   ),
                 } else ...{
                   PlatformPopupMenuItem(
-                    value: _MultipleChoice.archive,
+                    value: _MultipleChoice.delete,
                     child: PlatformListTile(
-                      leading: Icon(Entypo.archive),
-                      title: Text(localizations.messageActionArchive),
+                      leading: Icon(Icons.delete),
+                      title: Text(localizations.messageActionDelete),
                     ),
                   ),
                 },
-              },
-            ],
-          ),
-        ],
+                PlatformPopupDivider(),
+                if (isAnyUnseen) ...{
+                  PlatformPopupMenuItem(
+                    value: _MultipleChoice.seen,
+                    child: PlatformListTile(
+                      leading: Icon(Icons.circle),
+                      title: Text(localizations.messageActionMultipleMarkSeen),
+                    ),
+                  ),
+                } else ...{
+                  PlatformPopupMenuItem(
+                    value: _MultipleChoice.unseen,
+                    child: PlatformListTile(
+                      leading: Icon(Feather.circle),
+                      title:
+                          Text(localizations.messageActionMultipleMarkUnseen),
+                    ),
+                  ),
+                },
+                if (isAnyUnflagged) ...{
+                  PlatformPopupMenuItem(
+                    value: _MultipleChoice.flag,
+                    child: PlatformListTile(
+                      leading: Icon(Icons.outlined_flag),
+                      title:
+                          Text(localizations.messageActionMultipleMarkFlagged),
+                    ),
+                  ),
+                } else ...{
+                  PlatformPopupMenuItem(
+                    value: _MultipleChoice.unflag,
+                    child: PlatformListTile(
+                      leading: Icon(Icons.flag),
+                      title: Text(
+                          localizations.messageActionMultipleMarkUnflagged),
+                    ),
+                  ),
+                },
+                if (widget.messageSource.supportsMessageFolders) ...{
+                  PlatformPopupDivider(),
+                  PlatformPopupMenuItem(
+                    value: _MultipleChoice.move,
+                    child: PlatformListTile(
+                      leading: Icon(MaterialCommunityIcons.file_move),
+                      title: Text(localizations.messageActionMove),
+                    ),
+                  ),
+                  if (isJunk) ...{
+                    PlatformPopupMenuItem(
+                      value: _MultipleChoice.inbox,
+                      child: PlatformListTile(
+                        leading: Icon(Entypo.check),
+                        title: Text(localizations.messageActionMarkAsNotJunk),
+                      ),
+                    ),
+                  } else ...{
+                    PlatformPopupMenuItem(
+                      value: _MultipleChoice.junk,
+                      child: PlatformListTile(
+                        leading: Icon(Entypo.bug),
+                        title: Text(localizations.messageActionMarkAsJunk),
+                      ),
+                    ),
+                  },
+                  if (widget.messageSource.isArchive) ...{
+                    PlatformPopupMenuItem(
+                      value: _MultipleChoice.inbox,
+                      child: PlatformListTile(
+                        leading: Icon(Entypo.inbox),
+                        title: Text(localizations.messageActionUnarchive),
+                      ),
+                    ),
+                  } else ...{
+                    PlatformPopupMenuItem(
+                      value: _MultipleChoice.archive,
+                      child: PlatformListTile(
+                        leading: Icon(Entypo.archive),
+                        title: Text(localizations.messageActionArchive),
+                      ),
+                    ),
+                  },
+                },
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

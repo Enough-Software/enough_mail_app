@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/models.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
+import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ class Routes {
   static const String locationPicker = 'locationPicker';
   static const String sourceCode = 'sourceCode';
   static const String webview = 'webview';
+  static const String appDrawer = 'appDrawer';
 }
 
 class AppRouter {
@@ -112,6 +114,9 @@ class AppRouter {
       case Routes.webview:
         final configuration = arguments as WebViewConfiguration;
         page = WebViewScreen(configuration: configuration);
+        break;
+      case Routes.appDrawer:
+        page = AppDrawer();
         break;
       default:
         print('Unknown route: $name');

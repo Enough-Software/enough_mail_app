@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/accounts_changed_event.dart';
@@ -10,6 +11,7 @@ import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -51,7 +53,7 @@ class _AppDrawerState extends State<AppDrawer> {
       accounts = accounts.toList();
       accounts.insert(0, mailService.unifiedAccount);
     }
-    return Drawer(
+    return PlatformDrawer(
       child: SafeArea(
         child: Column(
           children: [
@@ -65,35 +67,36 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             Expanded(
               child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    buildAccountSelection(
-                        mailService, accounts, currentAccount, localizations),
-                    buildFolderTree(currentAccount),
-                    ExtensionActionTile.buildSideMenuForAccount(
-                        context, currentAccount),
-                    Divider(),
-                    ListTile(
-                      leading: Icon(Icons.info),
-                      title: Text(localizations.drawerEntryAbout),
-                      onTap: () {
-                        DialogHelper.showAbout(context);
-                      },
-                    ),
-                  ],
+                child: Material(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildAccountSelection(
+                          mailService, accounts, currentAccount, localizations),
+                      buildFolderTree(currentAccount),
+                      ExtensionActionTile.buildSideMenuForAccount(
+                          context, currentAccount),
+                      Divider(),
+                      PlatformListTile(
+                        leading: Icon(Icons.info),
+                        title: Text(localizations.drawerEntryAbout),
+                        onTap: () {
+                          DialogHelper.showAbout(context);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
             Material(
               elevation: 18,
-              child: ListTile(
+              child: PlatformListTile(
                 leading: Icon(Icons.settings),
                 title: Text(localizations.drawerEntrySettings),
                 onTap: () {
                   final navService = locator<NavigationService>();
-                  navService.pop();
-                  navService.push(Routes.settings);
+                  navService.push(Routes.settings, replace: !Platform.isIOS);
                 },
               ),
             )
@@ -108,7 +111,7 @@ class _AppDrawerState extends State<AppDrawer> {
     final avatarAccount =
         currentAccount.isVirtual ? accounts.first : currentAccount;
     final userName = currentAccount.userName;
-    return ListTile(
+    return PlatformListTile(
       onTap: () {
         final navService = locator<NavigationService>();
         if (currentAccount is UnifiedAccount) {
@@ -134,7 +137,7 @@ class _AppDrawerState extends State<AppDrawer> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
+              children: [
                 Text(
                   currentAccount.name ?? '',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -167,16 +170,20 @@ class _AppDrawerState extends State<AppDrawer> {
             .drawerAccountsSectionTitle(mailService.accounts.length)),
         children: [
           for (final account in accounts) ...{
-            ListTile(
+            PlatformListTile(
               title: Text(account.name),
               selected: account == currentAccount,
               onTap: () async {
                 final navService = locator<NavigationService>();
-                navService.pop();
+                if (!Platform.isIOS) {
+                  navService.pop();
+                }
                 final messageSource = await locator<MailService>()
                     .getMessageSourceFor(account, switchToAccount: true);
                 navService.push(Routes.messageSource,
-                    arguments: messageSource, replace: true, fade: true);
+                    arguments: messageSource,
+                    replace: !Platform.isIOS,
+                    fade: true);
               },
               onLongPress: () {
                 final navService = locator<NavigationService>();
@@ -198,12 +205,14 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Widget buildAddAccountTile(AppLocalizations localizations) {
-    return ListTile(
+    return PlatformListTile(
       leading: Icon(Icons.add),
       title: Text(localizations.drawerEntryAddAccount),
       onTap: () {
         final navService = locator<NavigationService>();
-        navService.pop();
+        if (!Platform.isIOS) {
+          navService.pop();
+        }
         navService.push(Routes.accountAdd);
       },
     );
@@ -219,6 +228,6 @@ class _AppDrawerState extends State<AppDrawer> {
     final messageSource =
         await mailService.getMessageSourceFor(account, mailbox: mailbox);
     locator<NavigationService>().push(Routes.messageSource,
-        arguments: messageSource, replace: true, fade: true);
+        arguments: messageSource, replace: !Platform.isIOS, fade: true);
   }
 }

@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
+import 'package:enough_mail_app/widgets/status_bar.dart';
 import 'package:flutter/material.dart';
 
 class ScaffoldMessengerService {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
+  final GlobalKey<StatusBarState> statusBarKey = GlobalKey<StatusBarState>();
 
   SnackBar buildTextSnackBar(String text, {Function() undo}) {
     return SnackBar(
@@ -23,6 +27,10 @@ class ScaffoldMessengerService {
   }
 
   void showTextSnackBar(String text, {Function() undo}) {
-    showSnackBar(buildTextSnackBar(text, undo: undo));
+    if (Platform.isIOS) {
+      statusBarKey.currentState?.showTextStatus(text, undo: undo);
+    } else {
+      showSnackBar(buildTextSnackBar(text, undo: undo));
+    }
   }
 }
