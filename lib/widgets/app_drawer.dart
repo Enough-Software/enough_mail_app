@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:badges/badges.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
@@ -166,11 +167,16 @@ class _AppDrawerState extends State<AppDrawer> {
       Account currentAccount, AppLocalizations localizations) {
     if (accounts.length > 1) {
       return ExpansionTile(
+        leading: mailService.hasAccountsWithErrors() ? Badge() : null,
         title: Text(localizations
             .drawerAccountsSectionTitle(mailService.accounts.length)),
         children: [
           for (final account in accounts) ...{
             PlatformListTile(
+              leading: mailService.hasError(account)
+                  ? Icon(Icons.error_outline)
+                  : null,
+              tileColor: mailService.hasError(account) ? Colors.red : null,
               title: Text(account.name),
               selected: account == currentAccount,
               onTap: () async {
@@ -178,12 +184,16 @@ class _AppDrawerState extends State<AppDrawer> {
                 if (!Platform.isIOS) {
                   navService.pop();
                 }
-                final messageSource = await locator<MailService>()
-                    .getMessageSourceFor(account, switchToAccount: true);
-                navService.push(Routes.messageSource,
-                    arguments: messageSource,
-                    replace: !Platform.isIOS,
-                    fade: true);
+                if (mailService.hasError(account)) {
+                  navService.push(Routes.accountEdit, arguments: account);
+                } else {
+                  final messageSource = await locator<MailService>()
+                      .getMessageSourceFor(account, switchToAccount: true);
+                  navService.push(Routes.messageSource,
+                      arguments: messageSource,
+                      replace: !Platform.isIOS,
+                      fade: true);
+                }
               },
               onLongPress: () {
                 final navService = locator<NavigationService>();

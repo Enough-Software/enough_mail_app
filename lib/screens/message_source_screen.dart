@@ -20,6 +20,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/string_helper.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
+import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
 import 'package:enough_mail_app/widgets/status_bar.dart';
@@ -280,6 +281,9 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           ? PlatformAppBar(
               title: appBarTitle,
               trailingActions: appBarActions,
+              leading: (locator<MailService>().hasAccountsWithErrors())
+                  ? MenuWithBadge()
+                  : null,
             )
           : null,
       body: FutureBuilder<void>(
@@ -335,6 +339,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     slivers: [
                       PlatformSliverAppBar(
                         title: appBarTitle,
+                        leading:
+                            (locator<MailService>().hasAccountsWithErrors())
+                                ? MenuWithBadge()
+                                : null,
                         floating: isInSearchMode ? false : true,
                         pinned: isInSearchMode ? true : false,
                         stretch: true,
