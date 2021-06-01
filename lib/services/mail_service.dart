@@ -24,6 +24,8 @@ class MailService {
   List<MailAccount> mailAccounts = <MailAccount>[];
   final accounts = <Account>[];
   UnifiedAccount unifiedAccount;
+
+  List<Account> accountsWithErrors;
   bool get hasUnifiedAccount => (unifiedAccount != null);
 
   static const String _keyAccounts = 'accts';
@@ -170,32 +172,43 @@ class MailService {
 
   Future<List<MimeSource>> _getUnifiedMimeSources(
       Mailbox mailbox, UnifiedAccount unifiedAccount) async {
-    final futures = <Future>[];
+    final futures = <Future<MailClient>>[];
     final mimeSources = <MimeSource>[];
     MailboxFlag flag = mailbox?.flags?.first;
     for (final subAccount in unifiedAccount.accounts) {
       futures.add(_getClientAndStopPolling(subAccount));
     }
     final clients = await Future.wait(futures);
-    for (final client in clients) {
-      Mailbox accountMailbox;
-      if (flag != null) {
-        accountMailbox = client.getMailbox(flag);
-        if (accountMailbox == null) {
-          print(
-              'unable to find mailbox with $flag in account ${client.account.name}');
-          continue;
+    for (var i = 0; i < clients.length; i++) {
+      final client = clients[i];
+      if (client != null) {
+        Mailbox accountMailbox;
+        if (flag != null) {
+          accountMailbox = client.getMailbox(flag);
+          if (accountMailbox == null) {
+            print(
+                'unable to find mailbox with $flag in account ${client.account.name}');
+            continue;
+          }
         }
+        mimeSources.add(MailboxMimeSource(client, accountMailbox));
+      } else {
+        accountsWithErrors ??= <Account>[];
+        accountsWithErrors.add(unifiedAccount.accounts[i]);
       }
-      mimeSources.add(MailboxMimeSource(client, accountMailbox));
     }
     return mimeSources;
   }
 
   Future<MailClient> _getClientAndStopPolling(Account account) async {
-    final client = await getClientFor(account);
-    await client.stopPollingIfNeeded();
-    return client;
+    try {
+      final client = await getClientFor(account);
+      await client.stopPollingIfNeeded();
+      return client;
+    } catch (e, s) {
+      print('Unable to get client for ${account.email}: $e $s');
+      return null;
+    }
   }
 
   void _addGravatar(MailAccount account) {
@@ -548,5 +561,15 @@ class MailService {
           .fire(UnifiedMessageSourceChangedEvent(messageSource));
     }
     return saveAccounts();
+  }
+
+  bool hasError(Account account) {
+    final accts = accountsWithErrors;
+    return accts != null && accts.contains(account);
+  }
+
+  bool hasAccountsWithErrors() {
+    final accts = accountsWithErrors;
+    return accts != null && accts.isNotEmpty;
   }
 }

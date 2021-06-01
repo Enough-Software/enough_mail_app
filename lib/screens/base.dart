@@ -1,10 +1,14 @@
+import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
+import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 // import 'package:enough_style/enough_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+import '../locator.dart';
 
 class Base {
   static Widget onBottom(Widget child) => align(child, Alignment.bottomCenter);
@@ -20,21 +24,27 @@ class Base {
     );
   }
 
-  static Widget buildAppChrome(BuildContext context,
-      {@required String title,
-      @required Widget content,
-      FloatingActionButton floatingActionButton,
-      List<Widget> appBarActions,
-      PlatformAppBar appBar,
-      Widget drawer,
-      String subtitle,
-      Widget bottom,
-      bool includeDrawer}) {
-    appBar ??= buildAppBar(context, title,
-        actions: appBarActions,
-        subtitle: subtitle,
-        floatingActionButton: floatingActionButton);
-    if (includeDrawer != false) {
+  static Widget buildAppChrome(
+    BuildContext context, {
+    @required String title,
+    @required Widget content,
+    FloatingActionButton floatingActionButton,
+    List<Widget> appBarActions,
+    PlatformAppBar appBar,
+    Widget drawer,
+    String subtitle,
+    Widget bottom,
+    bool includeDrawer = true,
+  }) {
+    appBar ??= buildAppBar(
+      context,
+      title,
+      actions: appBarActions,
+      subtitle: subtitle,
+      floatingActionButton: floatingActionButton,
+      includeDrawer: includeDrawer,
+    );
+    if (includeDrawer) {
       drawer ??= buildDrawer(context);
     }
 
@@ -50,13 +60,21 @@ class Base {
     );
   }
 
-  static PlatformAppBar buildAppBar(BuildContext context, String title,
-      {List<Widget> actions,
-      String subtitle,
-      FloatingActionButton floatingActionButton}) {
+  static PlatformAppBar buildAppBar(
+    BuildContext context,
+    String title, {
+    List<Widget> actions,
+    String subtitle,
+    FloatingActionButton floatingActionButton,
+    bool includeDrawer = true,
+  }) {
     return PlatformAppBar(
       material: (context, platform) => MaterialAppBarData(
         elevation: 0,
+        leading:
+            (includeDrawer && locator<MailService>().hasAccountsWithErrors())
+                ? MenuWithBadge()
+                : null,
       ),
       cupertino: (context, platform) => CupertinoNavigationBarData(
         trailing: floatingActionButton == null
