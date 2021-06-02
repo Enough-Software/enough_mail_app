@@ -7,6 +7,7 @@ import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'account.dart';
 import 'message.dart';
 
 abstract class MessageSource extends ChangeNotifier
@@ -857,6 +858,71 @@ class ListMessageSource extends MessageSource {
   @override
   void clear() {
     messages.clear();
+  }
+}
+
+class ErrorMessageSource extends MessageSource {
+  final Account account;
+
+  ErrorMessageSource(this.account);
+
+  @override
+  Message _getUncachedMessage(int index) {
+    return null;
+  }
+
+  @override
+  void clear() {}
+
+  @override
+  Future<List<DeleteResult>> deleteAllMessages() {
+    throw UnimplementedError();
+  }
+
+  @override
+  MimeSource getMimeSource(Message message) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> init() {
+    return Future.value(false);
+  }
+
+  @override
+  bool get isArchive => false;
+
+  @override
+  bool get isJunk => false;
+
+  @override
+  bool get isTrash => false;
+
+  @override
+  Future<bool> markAllMessagesSeen(bool seen) {
+    throw UnimplementedError();
+  }
+
+  @override
+  MessageSource search(MailSearch search) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool get shouldBlockImages => false;
+
+  @override
+  int get size => 0;
+
+  @override
+  bool get supportsMessageFolders => false;
+
+  @override
+  bool get supportsSearching => false;
+
+  @override
+  Future<void> waitForDownload() {
+    return Future.value();
   }
 }
 

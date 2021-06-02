@@ -22,6 +22,9 @@ class MailboxTree extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mailboxTreeData = locator<MailService>().getMailboxTreeFor(account);
+    if (mailboxTreeData == null) {
+      return Container();
+    }
     final mailboxTreeElements = mailboxTreeData.root.children;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
