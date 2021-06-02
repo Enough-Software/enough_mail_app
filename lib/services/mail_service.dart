@@ -25,7 +25,7 @@ class MailService {
   final accounts = <Account>[];
   UnifiedAccount unifiedAccount;
 
-  List<Account> accountsWithErrors;
+  List<Account> _accountsWithErrors;
   bool get hasUnifiedAccount => (unifiedAccount != null);
 
   static const String _keyAccounts = 'accts';
@@ -163,10 +163,13 @@ class MailService {
         mailbox?.flags?.first ?? MailboxFlag.inbox,
       );
     } else {
-      final mailClient = await getClientFor(account);
-      await mailClient.stopPollingIfNeeded();
-      //return ThreadedMailboxMessageSource(mailbox, mailClient);
-      return MailboxMessageSource(mailbox, mailClient);
+      final mailClient = await _getClientAndStopPolling(account);
+      if (mailClient != null) {
+        return MailboxMessageSource(mailbox, mailClient);
+      }
+      _accountsWithErrors ??= <Account>[];
+      _accountsWithErrors.add(account);
+      return ErrorMessageSource(account);
     }
   }
 
@@ -193,8 +196,8 @@ class MailService {
         }
         mimeSources.add(MailboxMimeSource(client, accountMailbox));
       } else {
-        accountsWithErrors ??= <Account>[];
-        accountsWithErrors.add(unifiedAccount.accounts[i]);
+        _accountsWithErrors ??= <Account>[];
+        _accountsWithErrors.add(unifiedAccount.accounts[i]);
       }
     }
     return mimeSources;
@@ -315,11 +318,12 @@ class MailService {
     }
     var client = _mailClientsPerAccount[account];
     if (client == null) {
-      client = MailClient(account.account,
-          eventBus: AppEventBus.eventBus,
-          isLogEnabled:
-              foundation.kDebugMode, // enable log only for debug  mode
-          logName: account.account.name);
+      client = MailClient(
+        account.account,
+        eventBus: AppEventBus.eventBus,
+        isLogEnabled: foundation.kDebugMode, // enable log only for debug  mode
+        logName: account.account.name,
+      );
       _mailClientsPerAccount[account] = client;
       await client.connect();
       await loadMailboxesFor(client);
@@ -564,12 +568,12 @@ class MailService {
   }
 
   bool hasError(Account account) {
-    final accts = accountsWithErrors;
+    final accts = _accountsWithErrors;
     return accts != null && accts.contains(account);
   }
 
   bool hasAccountsWithErrors() {
-    final accts = accountsWithErrors;
+    final accts = _accountsWithErrors;
     return accts != null && accts.isNotEmpty;
   }
 }

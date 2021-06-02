@@ -325,6 +325,8 @@
   "fontUnderlinedDouble": "Doppelt unterstrichen",
   "fontStrikethroughSingle": "Durchgestrichen",
   "fontCrosshatch": "Crosshatch",
+  "accountLoadError": "Keine Verbindung mit {name} möglich. Wurde vielleicht das Passwort geändert?",
+  "accountLoadErrorEditAction": "Konto bearbeiten",
   "extensionsTitle": "Erweiterungen",
   "extensionsIntro": "Mit Erweiterungen können E-Mail-Dienstleister, Firmen und Entwickler:innen Maily mit hilfreichen Funktionen ergänzen.",
   "extensionsLearnMoreAction": "Lerne mehr über Erweiterungen",

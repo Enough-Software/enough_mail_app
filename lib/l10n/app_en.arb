@@ -1573,6 +1573,20 @@
   "@fontCrosshatch": {
     "description": "Font name"
   },
+  "accountLoadError": "Unable to connect to your account {name}. Has the password been changed?",
+  "@accountLoadError": {
+    "description": "Message shown when single account could not be loaded.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }  
+  },
+  "accountLoadErrorEditAction": "Edit account",
+  "@accountLoadErrorEditAction": {
+    "description": "Action to edit account"
+  },
   "extensionsTitle": "Extensions",
   "@extensionsTitle": {
     "description": "Title of extension section within the development settings"

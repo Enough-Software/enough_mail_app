@@ -112,6 +112,14 @@ class _AppDrawerState extends State<AppDrawer> {
     final avatarAccount =
         currentAccount.isVirtual ? accounts.first : currentAccount;
     final userName = currentAccount.userName;
+    final accountName = Text(
+      currentAccount.name ?? '',
+      style: TextStyle(fontWeight: FontWeight.bold),
+    );
+    final accountNameWithBadge = locator<MailService>().hasError(currentAccount)
+        ? Badge(child: accountName)
+        : accountName;
+
     return PlatformListTile(
       onTap: () {
         final navService = locator<NavigationService>();
@@ -139,10 +147,7 @@ class _AppDrawerState extends State<AppDrawer> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  currentAccount.name ?? '',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                accountNameWithBadge,
                 if (userName != null) ...{
                   Text(
                     userName,

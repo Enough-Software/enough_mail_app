@@ -117,6 +117,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final localizations = AppLocalizations.of(context);
+    if (widget.messageSource is ErrorMessageSource) {
+      return buildForLoadingError(
+          context, localizations, widget.messageSource as ErrorMessageSource);
+    }
     final appBarTitle = isInSearchMode
         ? TextField(
             controller: searchEditingController,
@@ -1018,6 +1022,39 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             .flagMessage(message.mimeMessage, isFlagged: isFlagged);
         break;
     }
+  }
+
+  Widget buildForLoadingError(BuildContext context,
+      AppLocalizations localizations, ErrorMessageSource errorSource) {
+    final account = errorSource?.account;
+    return Base.buildAppChrome(
+      context,
+      title: localizations.errorTitle,
+      content: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(localizations.accountLoadError(account?.name)),
+          ),
+          PlatformTextButton(
+            child: Text(localizations.accountLoadErrorEditAction),
+            onPressed: () => locator<NavigationService>()
+                .push(Routes.accountEdit, arguments: account),
+          ),
+          // this does not currently work, as no new login is done
+          // PlatformTextButton(
+          //   child: Text(localizations.detailsErrorDownloadRetry),
+          //   onPressed: () async {
+          //     final messageSource = await locator<MailService>()
+          //         .getMessageSourceFor(account, switchToAccount: true);
+          //     locator<NavigationService>().push(Routes.messageSource,
+          //         arguments: messageSource, replace: true, fade: true);
+          //   },
+          // ),
+        ],
+      ),
+    );
   }
 }
 
