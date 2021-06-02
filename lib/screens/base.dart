@@ -71,10 +71,6 @@ class Base {
     return PlatformAppBar(
       material: (context, platform) => MaterialAppBarData(
         elevation: 0,
-        leading:
-            (includeDrawer && locator<MailService>().hasAccountsWithErrors())
-                ? MenuWithBadge()
-                : null,
       ),
       cupertino: (context, platform) => CupertinoNavigationBarData(
         trailing: floatingActionButton == null
@@ -83,10 +79,9 @@ class Base {
                 child: floatingActionButton.child,
                 onPressed: floatingActionButton.onPressed),
       ),
-      // leading: Padding(
-      //   padding: const EdgeInsets.all(16.0),
-      //   child: Icon(Icons.menu),
-      // ),
+      leading: (includeDrawer && locator<MailService>().hasAccountsWithErrors())
+          ? MenuWithBadge()
+          : null,
       title: buildTitle(title, subtitle),
       automaticallyImplyLeading: true,
       trailingActions: actions ?? [],
