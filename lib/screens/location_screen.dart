@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/location_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -71,7 +72,7 @@ class _LocationScreenState extends State<LocationScreen> {
       context,
       title: localizations.attachTypeLocation,
       appBarActions: [
-        IconButton(
+        PlatformIconButton(
           icon: Icon(Icons.check),
           onPressed: onLocationSelected,
         ),
@@ -143,7 +144,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 alignment: Alignment.bottomRight,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: IconButton(
+                  child: PlatformIconButton(
                     icon: Icon(
                       Icons.location_searching,
                       color: Colors.grey,

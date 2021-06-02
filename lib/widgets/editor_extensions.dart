@@ -2,6 +2,7 @@ import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -17,7 +18,7 @@ class EditorArtExtensionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
+    return PlatformIconButton(
       icon: Icon(MaterialCommunityIcons.format_font),
       onPressed: () => showArtExtensionDialog(context, editorApi),
     );
@@ -92,7 +93,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
-            child: TextField(
+            child: DecoratedPlatformTextField(
               controller: _inputController,
               onChanged: (value) => _updateTexts(value),
               decoration: InputDecoration(
@@ -107,7 +108,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
                 captions[unicodeFont] ?? '',
                 style: captionStyle,
               ),
-              TextButton(
+              PlatformTextButton(
                 child: ButtonText(_textsByUnicodeFont[unicodeFont] ??
                     localizations.editorArtWaitingForInputHint),
                 onPressed: () {
