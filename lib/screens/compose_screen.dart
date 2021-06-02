@@ -20,6 +20,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -292,11 +293,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
         localizations.errorTitle,
         localizations.composeSendErrorInfo(message),
         actions: [
-          TextButton(
+          PlatformTextButton(
             child: ButtonText(localizations.actionCancel),
             onPressed: () => Navigator.of(currentContext).pop(),
           ),
-          TextButton(
+          PlatformTextButton(
             child: ButtonText(localizations.composeContinueEditingAction),
             onPressed: () {
               Navigator.of(currentContext).pop();
@@ -369,12 +370,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
       },
       child: MessageWidget(
         message: widget.data.originalMessage,
-        child: Scaffold(
-          drawer: AppDrawer(),
+        child: PlatformScaffold(
+          material: (context, platform) =>
+              MaterialScaffoldData(drawer: AppDrawer()),
           body: CustomScrollView(
             physics: BouncingScrollPhysics(),
             slivers: [
-              SliverAppBar(
+              PlatformSliverAppBar(
                 title: Text(titleText),
                 floating: false,
                 pinned: true,
@@ -384,11 +386,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
                     messageBuilder: widget.data.messageBuilder,
                     update: () => setState(() {}),
                   ),
-                  IconButton(
+                  PlatformIconButton(
                     icon: Icon(Icons.send),
                     onPressed: () => send(localizations),
                   ),
-                  PopupMenuButton<_OverflowMenuChoice>(
+                  PlatformPopupMenuButton<_OverflowMenuChoice>(
                     onSelected: (result) {
                       switch (result) {
                         case _OverflowMenuChoice.showSourceCode:
@@ -403,11 +405,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       }
                     },
                     itemBuilder: (context) => [
-                      PopupMenuItem<_OverflowMenuChoice>(
+                      PlatformPopupMenuItem<_OverflowMenuChoice>(
                         value: _OverflowMenuChoice.saveAsDraft,
                         child: Text(localizations.composeSaveDraftAction),
                       ),
-                      PopupMenuItem<_OverflowMenuChoice>(
+                      PlatformPopupMenuItem<_OverflowMenuChoice>(
                         value: _OverflowMenuChoice.requestReadReceipt,
                         child:
                             Text(localizations.composeRequestReadReceiptAction),
@@ -415,7 +417,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       if (locator<SettingsService>()
                           .settings
                           .enableDeveloperMode) ...{
-                        PopupMenuItem<_OverflowMenuChoice>(
+                        PlatformPopupMenuItem<_OverflowMenuChoice>(
                           value: _OverflowMenuChoice.showSourceCode,
                           child: Text(localizations.viewSourceAction),
                         ),
@@ -425,111 +427,115 @@ class _ComposeScreenState extends State<ComposeScreen> {
                 ], // actions
               ),
               SliverToBoxAdapter(
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(localizations.detailsHeaderFrom,
-                          style: Theme.of(context).textTheme?.caption),
-                      DropdownButton<Sender>(
-                        isExpanded: true,
-                        items: senders
-                            .map(
-                              (s) => DropdownMenuItem<Sender>(
-                                value: s,
-                                child: Text(
-                                  s.isPlaceHolderForPlusAlias
-                                      ? localizations
-                                          .composeCreatePlusAliasAction
-                                      : s.toString(),
-                                  overflow: TextOverflow.fade,
+                child: Material(
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(localizations.detailsHeaderFrom,
+                            style: Theme.of(context).textTheme?.caption),
+                        DropdownButton<Sender>(
+                          isExpanded: true,
+                          items: senders
+                              .map(
+                                (s) => DropdownMenuItem<Sender>(
+                                  value: s,
+                                  child: Text(
+                                    s.isPlaceHolderForPlusAlias
+                                        ? localizations
+                                            .composeCreatePlusAliasAction
+                                        : s.toString(),
+                                    overflow: TextOverflow.fade,
+                                  ),
                                 ),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (s) async {
-                          final builder = widget.data.messageBuilder;
-                          if (s.isPlaceHolderForPlusAlias) {
-                            final index = senders.indexOf(s);
-                            s = locator<MailService>()
-                                .generateRandomPlusAliasSender(s);
-                            setState(() {
-                              senders.insert(index, s);
-                            });
-                          }
-                          builder.from = [s.address];
-                          final lastSignature = signature;
-                          from = s;
-                          final newSignature = signature;
-                          if (newSignature != lastSignature) {
-                            _editorApi.replaceAll(lastSignature, newSignature);
-                          }
-                          if (_isReadReceiptRequested) {
-                            builder.requestReadReceipt(recipient: from.address);
-                          }
-                          setState(() {});
+                              )
+                              .toList(),
+                          onChanged: (s) async {
+                            final builder = widget.data.messageBuilder;
+                            if (s.isPlaceHolderForPlusAlias) {
+                              final index = senders.indexOf(s);
+                              s = locator<MailService>()
+                                  .generateRandomPlusAliasSender(s);
+                              setState(() {
+                                senders.insert(index, s);
+                              });
+                            }
+                            builder.from = [s.address];
+                            final lastSignature = signature;
+                            from = s;
+                            final newSignature = signature;
+                            if (newSignature != lastSignature) {
+                              _editorApi.replaceAll(
+                                  lastSignature, newSignature);
+                            }
+                            if (_isReadReceiptRequested) {
+                              builder.requestReadReceipt(
+                                  recipient: from.address);
+                            }
+                            setState(() {});
 
-                          _checkAccountContactManager(from.account);
-                        },
-                        value: from,
-                        hint: Text(localizations.composeSenderHint),
-                      ),
-                      RecipientInputField(
-                        contactManager: from.account.contactManager,
-                        addresses: _toRecipients,
-                        autofocus: _focus == _Autofocus.to,
-                        labelText: localizations.detailsHeaderTo,
-                        hintText: localizations.composeRecipientHint,
-                        additionalSuffixIcon: TextButton(
-                          child: ButtonText(localizations.detailsHeaderCc),
-                          onPressed: () => setState(
-                            () => _isCcBccVisible = !_isCcBccVisible,
+                            _checkAccountContactManager(from.account);
+                          },
+                          value: from,
+                          hint: Text(localizations.composeSenderHint),
+                        ),
+                        RecipientInputField(
+                          contactManager: from.account.contactManager,
+                          addresses: _toRecipients,
+                          autofocus: _focus == _Autofocus.to,
+                          labelText: localizations.detailsHeaderTo,
+                          hintText: localizations.composeRecipientHint,
+                          additionalSuffixIcon: PlatformTextButton(
+                            child: ButtonText(localizations.detailsHeaderCc),
+                            onPressed: () => setState(
+                              () => _isCcBccVisible = !_isCcBccVisible,
+                            ),
                           ),
                         ),
-                      ),
-                      if (_isCcBccVisible) ...{
-                        RecipientInputField(
-                          addresses: _ccRecipients,
-                          contactManager: from.account.contactManager,
-                          labelText: localizations.detailsHeaderCc,
-                          hintText: localizations.composeRecipientHint,
+                        if (_isCcBccVisible) ...{
+                          RecipientInputField(
+                            addresses: _ccRecipients,
+                            contactManager: from.account.contactManager,
+                            labelText: localizations.detailsHeaderCc,
+                            hintText: localizations.composeRecipientHint,
+                          ),
+                          RecipientInputField(
+                            addresses: _bccRecipients,
+                            contactManager: from.account.contactManager,
+                            labelText: localizations.detailsHeaderBcc,
+                            hintText: localizations.composeRecipientHint,
+                          ),
+                        },
+                        DecoratedPlatformTextField(
+                          controller: _subjectController,
+                          autofocus: _focus == _Autofocus.subject,
+                          decoration: InputDecoration(
+                            labelText: localizations.composeSubjectLabel,
+                            hintText: localizations.composeSubjectHint,
+                          ),
                         ),
-                        RecipientInputField(
-                          addresses: _bccRecipients,
-                          contactManager: from.account.contactManager,
-                          labelText: localizations.detailsHeaderBcc,
-                          hintText: localizations.composeRecipientHint,
-                        ),
-                      },
-                      TextField(
-                        controller: _subjectController,
-                        autofocus: _focus == _Autofocus.subject,
-                        decoration: InputDecoration(
-                          labelText: localizations.composeSubjectLabel,
-                          hintText: localizations.composeSubjectHint,
-                        ),
-                      ),
-                      if (widget.data.messageBuilder.attachments.isNotEmpty ||
-                          (_downloadAttachmentsFuture != null)) ...{
-                        Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: AttachmentComposeBar(
-                              composeData: widget.data,
-                              isDownloading:
-                                  (_downloadAttachmentsFuture != null)),
-                        ),
-                        Divider(
-                          color: Colors.grey,
-                        )
-                      },
-                    ],
+                        if (widget.data.messageBuilder.attachments.isNotEmpty ||
+                            (_downloadAttachmentsFuture != null)) ...{
+                          Padding(
+                            padding: EdgeInsets.only(top: 8.0),
+                            child: AttachmentComposeBar(
+                                composeData: widget.data,
+                                isDownloading:
+                                    (_downloadAttachmentsFuture != null)),
+                          ),
+                          Divider(
+                            color: Colors.grey,
+                          )
+                        },
+                      ],
+                    ),
                   ),
                 ),
               ),
               if (_isReadReceiptRequested) ...{
                 SliverToBoxAdapter(
-                  child: CheckboxListTile(
+                  child: PlatformCheckboxListTile(
                     value: true,
                     title: Text(localizations.composeRequestReadReceiptAction),
                     onChanged: (value) {
@@ -552,7 +558,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       case ConnectionState.none:
                       case ConnectionState.waiting:
                       case ConnectionState.active:
-                        return Center(child: CircularProgressIndicator());
+                        return Center(child: PlatformProgressIndicator());
                         break;
                       case ConnectionState.done:
                         final text = snapshot.data ?? '<p></p>';
@@ -566,7 +572,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         );
                         break;
                     }
-                    return CircularProgressIndicator();
+                    return PlatformProgressIndicator();
                   },
                 ),
               ),
@@ -608,18 +614,22 @@ class _ComposeScreenState extends State<ComposeScreen> {
       }
     } catch (e, s) {
       print('unable to save draft message $e $s');
+      final currentContext = locator<NavigationService>().currentContext;
       DialogHelper.showTextDialog(
-        context,
+        currentContext,
         localizations.errorTitle,
         localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),
         actions: [
-          TextButton(
+          PlatformTextButton(
             child: ButtonText(localizations.actionCancel),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(currentContext).pop(),
           ),
-          TextButton(
+          PlatformTextButton(
             child: ButtonText(localizations.composeContinueEditingAction),
-            onPressed: returnToCompose,
+            onPressed: () {
+              Navigator.of(currentContext).pop();
+              returnToCompose();
+            },
           ),
         ],
       );

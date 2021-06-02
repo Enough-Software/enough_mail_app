@@ -10,6 +10,7 @@ import 'package:enough_mail_app/util/api_keys.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
 import 'package:enough_mail_app/widgets/message_widget.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_media/enough_media.dart';
@@ -91,54 +92,54 @@ class AddAttachmentPopupButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
 
-    return PopupMenuButton<int>(
+    return PlatformPopupMenuButton<int>(
       icon: Icon(Icons.add),
       itemBuilder: (context) => [
-        PopupMenuItem(
+        PlatformPopupMenuItem(
           value: 0,
-          child: ListTile(
+          child: PlatformListTile(
             leading: Icon(Icons.insert_drive_file_outlined),
             title: Text(localizations.attachTypeFile),
           ),
         ),
-        PopupMenuItem(
+        PlatformPopupMenuItem(
           value: 1,
-          child: ListTile(
+          child: PlatformListTile(
             leading: Icon(Icons.photo_outlined),
             title: Text(localizations.attachTypePhoto),
           ),
         ),
-        PopupMenuItem(
+        PlatformPopupMenuItem(
           value: 2,
-          child: ListTile(
+          child: PlatformListTile(
             leading: Icon(Icons.video_collection_outlined),
             title: Text(localizations.attachTypeVideo),
           ),
         ),
-        PopupMenuItem(
+        PlatformPopupMenuItem(
           value: 3,
-          child: ListTile(
+          child: PlatformListTile(
             leading: Icon(Icons.audiotrack_outlined),
             title: Text(localizations.attachTypeAudio),
           ),
         ),
-        PopupMenuItem(
+        PlatformPopupMenuItem(
           value: 4,
-          child: ListTile(
+          child: PlatformListTile(
             leading: Icon(Icons.location_on_outlined),
             title: Text(localizations.attachTypeLocation),
           ),
         ),
-        PopupMenuItem(
+        PlatformPopupMenuItem(
           value: 5,
-          child: ListTile(
+          child: PlatformListTile(
             leading: Icon(Icons.gif),
             title: Text(localizations.attachTypeGif),
           ),
         ),
-        PopupMenuItem(
+        PlatformPopupMenuItem(
           value: 6,
-          child: ListTile(
+          child: PlatformListTile(
             leading: Icon(MaterialCommunityIcons.sticker),
             title: Text(localizations.attachTypeSticker),
           ),

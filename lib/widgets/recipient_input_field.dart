@@ -1,6 +1,7 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/contact.dart';
 import 'package:enough_mail_app/util/validator.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 
@@ -113,7 +114,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
       displayStringForOption: (option) => option.toString(),
       fieldViewBuilder:
           (context, textEditingController, focusNode, onFieldSubmitted) {
-        return TextField(
+        return DecoratedPlatformTextField(
           controller: textEditingController,
           focusNode: focusNode,
           autofocus: widget.autofocus,
@@ -126,7 +127,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
             labelText: widget.addresses.isNotEmpty ? null : widget.labelText,
             hintText: widget.hintText,
             suffixIcon: widget.additionalSuffixIcon == null
-                ? IconButton(
+                ? PlatformIconButton(
                     icon: Icon(Icons.contacts),
                     onPressed: () => _pickContact(textEditingController),
                   )
@@ -134,7 +135,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       widget.additionalSuffixIcon,
-                      IconButton(
+                      PlatformIconButton(
                         icon: Icon(Icons.contacts),
                         onPressed: () => _pickContact(textEditingController),
                       ),
@@ -156,7 +157,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                 itemCount: options.length,
                 itemBuilder: (BuildContext context, int index) {
                   final MailAddress option = options.elementAt(index);
-                  return ActionChip(
+                  return PlatformActionChip(
                     label: Column(
                       children: [
                         if (option.hasPersonalName) ...{
