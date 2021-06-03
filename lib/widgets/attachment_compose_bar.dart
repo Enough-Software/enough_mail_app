@@ -37,11 +37,11 @@ class AttachmentComposeBar extends StatefulWidget {
 }
 
 class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
-  List<AttachmentInfo> attachments;
+  List<AttachmentInfo> _attachments;
 
   @override
   void initState() {
-    attachments = widget.composeData.messageBuilder.attachments;
+    _attachments = widget.composeData.messageBuilder.attachments;
     super.initState();
   }
 
@@ -50,7 +50,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
     // final localizations = AppLocalizations.of(context);
     return Wrap(
       children: [
-        for (final attachment in attachments) ...{
+        for (final attachment in _attachments) ...{
           ComposeAttachment(
             attachment: attachment,
             onRemove: removeAttachment,
@@ -76,7 +76,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
   void removeAttachment(AttachmentInfo attachment) {
     widget.composeData.messageBuilder.removeAttachment(attachment);
     setState(() {
-      attachments.remove(attachment);
+      _attachments.remove(attachment);
     });
   }
 }

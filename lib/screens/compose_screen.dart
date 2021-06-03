@@ -43,8 +43,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
   List<MailAddress> _ccRecipients;
   List<MailAddress> _bccRecipients;
   TextEditingController _subjectController = TextEditingController();
-  Sender from;
-  List<Sender> senders;
+  Sender _from;
+  List<Sender> _senders;
   _Autofocus _focus;
   bool _isCcBccVisible = false;
   TransferEncoding _usedTextEncoding;
@@ -69,24 +69,24 @@ class _ComposeScreenState extends State<ComposeScreen> {
         : (_subjectController.text?.isEmpty ?? true)
             ? _Autofocus.subject
             : _Autofocus.text;
-    senders = locator<MailService>().getSenders();
+    _senders = locator<MailService>().getSenders();
     final currentAccount = locator<MailService>().currentAccount;
     if (mb.from == null) {
       mb.from = [currentAccount.fromAddress];
     }
     final senderEmail = mb.from.first.email.toLowerCase();
-    from = senders.firstWhere(
+    _from = _senders.firstWhere(
         (s) => s.address?.email?.toLowerCase() == senderEmail,
         orElse: () => null);
-    if (from == null) {
-      from = Sender(mb.from.first, currentAccount);
-      senders.insert(0, from);
+    if (_from == null) {
+      _from = Sender(mb.from.first, currentAccount);
+      _senders.insert(0, _from);
     }
-    _checkAccountContactManager(from.account);
+    _checkAccountContactManager(_from.account);
     if (widget.data.resumeHtmlText != null) {
-      loadMailTextFuture = loadMailTextFromComposeData();
+      loadMailTextFuture = _loadMailTextFromComposeData();
     } else {
-      loadMailTextFuture = loadMailTextFromMessage();
+      loadMailTextFuture = _loadMailTextFromMessage();
     }
     final future = widget.data.future;
     if (future != null) {
@@ -107,18 +107,18 @@ class _ComposeScreenState extends State<ComposeScreen> {
     super.dispose();
   }
 
-  Future<String> loadMailTextFromComposeData() {
+  Future<String> _loadMailTextFromComposeData() {
     return Future.value(widget.data.resumeHtmlText);
   }
 
-  String get signature => locator<SettingsService>()
-      .getSignatureHtml(from.account, widget.data.action);
+  String get _signature => locator<SettingsService>()
+      .getSignatureHtml(_from.account, widget.data.action);
 
-  Future<String> loadMailTextFromMessage() async {
+  Future<String> _loadMailTextFromMessage() async {
     // find out signature:
     final mb = widget.data.messageBuilder;
     if (mb.originalMessage == null) {
-      final html = '<p>${mb.text ?? '&nbsp;'}</p>$signature';
+      final html = '<p>${mb.text ?? '&nbsp;'}</p>$_signature';
       _originalMessageHtml = html;
       return html;
     } else {
@@ -130,7 +130,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
         // continue with draft:
         final args = _HtmlGenerationArguments(null, mb.originalMessage,
             blockExternalImages, emptyMessageText, maxImageWidth);
-        final html = await compute(_generateDraftHtmlImpl, args) + signature;
+        final html = await compute(_generateDraftHtmlImpl, args) + _signature;
         _originalMessageHtml = html;
         return html;
       }
@@ -141,7 +141,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
               : MailConventions.defaultReplyHeaderTemplate;
       final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
           blockExternalImages, emptyMessageText, maxImageWidth);
-      final html = await compute(_generateQuoteHtmlImpl, args) + signature;
+      final html = await compute(_generateQuoteHtmlImpl, args) + _signature;
       _originalMessageHtml = html;
       return html;
     }
@@ -165,7 +165,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
     return html;
   }
 
-  Future<void> populateMessageBuilder({bool storeHtmlForResume = false}) async {
+  Future<void> _populateMessageBuilder(
+      {bool storeHtmlForResume = false}) async {
     final mb = widget.data.messageBuilder;
     mb.to = _toRecipients;
     mb.cc = _ccRecipients;
@@ -255,29 +256,29 @@ class _ComposeScreenState extends State<ComposeScreen> {
     }
   }
 
-  Future<MimeMessage> buildMimeMessage(MailClient mailClient) async {
-    await populateMessageBuilder();
+  Future<MimeMessage> _buildMimeMessage(MailClient mailClient) async {
+    await _populateMessageBuilder();
     final mb = widget.data.messageBuilder;
     _usedTextEncoding = TransferEncoding.automatic;
     final mimeMessage = mb.buildMimeMessage();
     return mimeMessage;
   }
 
-  Future<MailClient> getMailClient() {
-    return locator<MailService>().getClientFor(from.account);
+  Future<MailClient> _getMailClient() {
+    return locator<MailService>().getClientFor(_from.account);
   }
 
-  Future<void> send(AppLocalizations localizations) async {
+  Future<void> _send(AppLocalizations localizations) async {
     locator<NavigationService>().pop();
-    final mailClient = await getMailClient();
-    final mimeMessage = await buildMimeMessage(mailClient);
+    final mailClient = await _getMailClient();
+    final mimeMessage = await _buildMimeMessage(mailClient);
     //TODO check first if message can be sent or catch errors
     try {
-      final append = !from.account.addsSentMailAutomatically;
+      final append = !_from.account.addsSentMailAutomatically;
       final use8Bit = (_usedTextEncoding == TransferEncoding.eightBit);
       await mailClient.sendMessage(
         mimeMessage,
-        from: from.account.fromAddress,
+        from: _from.account.fromAddress,
         appendToSent: append,
         use8BitEncoding: use8Bit,
       );
@@ -301,7 +302,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
             child: ButtonText(localizations.composeContinueEditingAction),
             onPressed: () {
               Navigator.of(currentContext).pop();
-              returnToCompose();
+              _returnToCompose();
             },
           ),
         ],
@@ -341,16 +342,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
     }
   }
 
-  List<MailAddress> parse(String text) {
-    if (text?.isEmpty ?? true) {
-      return null;
-    }
-    return text
-        .split(';')
-        .map<MailAddress>((t) => MailAddress(null, t.trim()))
-        .toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
@@ -362,10 +353,10 @@ class _ComposeScreenState extends State<ComposeScreen> {
     return WillPopScope(
       onWillPop: () async {
         // let it pop but show snackbar to return:
-        await populateMessageBuilder(storeHtmlForResume: true);
+        await _populateMessageBuilder(storeHtmlForResume: true);
         locator<ScaffoldMessengerService>().showTextSnackBar(
             localizations.composeLeftByMistake,
-            undo: returnToCompose);
+            undo: _returnToCompose);
         return true;
       },
       child: MessageWidget(
@@ -388,19 +379,19 @@ class _ComposeScreenState extends State<ComposeScreen> {
                   ),
                   PlatformIconButton(
                     icon: Icon(Icons.send),
-                    onPressed: () => send(localizations),
+                    onPressed: () => _send(localizations),
                   ),
                   PlatformPopupMenuButton<_OverflowMenuChoice>(
                     onSelected: (result) {
                       switch (result) {
                         case _OverflowMenuChoice.showSourceCode:
-                          showSourceCode();
+                          _showSourceCode();
                           break;
                         case _OverflowMenuChoice.saveAsDraft:
-                          saveAsDraft();
+                          _saveAsDraft();
                           break;
                         case _OverflowMenuChoice.requestReadReceipt:
-                          requestReadReceipt();
+                          _requestReadReceipt();
                           break;
                       }
                     },
@@ -437,7 +428,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                             style: Theme.of(context).textTheme?.caption),
                         DropdownButton<Sender>(
                           isExpanded: true,
-                          items: senders
+                          items: _senders
                               .map(
                                 (s) => DropdownMenuItem<Sender>(
                                   value: s,
@@ -454,34 +445,34 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           onChanged: (s) async {
                             final builder = widget.data.messageBuilder;
                             if (s.isPlaceHolderForPlusAlias) {
-                              final index = senders.indexOf(s);
+                              final index = _senders.indexOf(s);
                               s = locator<MailService>()
                                   .generateRandomPlusAliasSender(s);
                               setState(() {
-                                senders.insert(index, s);
+                                _senders.insert(index, s);
                               });
                             }
                             builder.from = [s.address];
-                            final lastSignature = signature;
-                            from = s;
-                            final newSignature = signature;
+                            final lastSignature = _signature;
+                            _from = s;
+                            final newSignature = _signature;
                             if (newSignature != lastSignature) {
                               _editorApi.replaceAll(
                                   lastSignature, newSignature);
                             }
                             if (_isReadReceiptRequested) {
                               builder.requestReadReceipt(
-                                  recipient: from.address);
+                                  recipient: _from.address);
                             }
                             setState(() {});
 
-                            _checkAccountContactManager(from.account);
+                            _checkAccountContactManager(_from.account);
                           },
-                          value: from,
+                          value: _from,
                           hint: Text(localizations.composeSenderHint),
                         ),
                         RecipientInputField(
-                          contactManager: from.account.contactManager,
+                          contactManager: _from.account.contactManager,
                           addresses: _toRecipients,
                           autofocus: _focus == _Autofocus.to,
                           labelText: localizations.detailsHeaderTo,
@@ -496,13 +487,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         if (_isCcBccVisible) ...{
                           RecipientInputField(
                             addresses: _ccRecipients,
-                            contactManager: from.account.contactManager,
+                            contactManager: _from.account.contactManager,
                             labelText: localizations.detailsHeaderCc,
                             hintText: localizations.composeRecipientHint,
                           ),
                           RecipientInputField(
                             addresses: _bccRecipients,
-                            contactManager: from.account.contactManager,
+                            contactManager: _from.account.contactManager,
                             labelText: localizations.detailsHeaderBcc,
                             hintText: localizations.composeRecipientHint,
                           ),
@@ -520,9 +511,10 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           Padding(
                             padding: EdgeInsets.only(top: 8.0),
                             child: AttachmentComposeBar(
-                                composeData: widget.data,
-                                isDownloading:
-                                    (_downloadAttachmentsFuture != null)),
+                              composeData: widget.data,
+                              isDownloading:
+                                  (_downloadAttachmentsFuture != null),
+                            ),
                           ),
                           Divider(
                             color: Colors.grey,
@@ -539,7 +531,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                     value: true,
                     title: Text(localizations.composeRequestReadReceiptAction),
                     onChanged: (value) {
-                      removeReadReceiptRequest();
+                      _removeReadReceiptRequest();
                     },
                   ),
                 ),
@@ -583,17 +575,17 @@ class _ComposeScreenState extends State<ComposeScreen> {
     );
   }
 
-  void showSourceCode() async {
-    final mailClient = await locator<MailService>().getClientFor(from.account);
-    final mime = await buildMimeMessage(mailClient);
+  void _showSourceCode() async {
+    final mailClient = await locator<MailService>().getClientFor(_from.account);
+    final mime = await _buildMimeMessage(mailClient);
     locator<NavigationService>().push(Routes.sourceCode, arguments: mime);
   }
 
-  Future<void> saveAsDraft() async {
+  Future<void> _saveAsDraft() async {
     locator<NavigationService>().pop();
     final localizations = locator<I18nService>().localizations;
-    final mailClient = await locator<MailService>().getClientFor(from.account);
-    final mime = await buildMimeMessage(mailClient);
+    final mailClient = await locator<MailService>().getClientFor(_from.account);
+    final mime = await _buildMimeMessage(mailClient);
     try {
       await mailClient.saveDraftMessage(mime);
       locator<ScaffoldMessengerService>()
@@ -628,7 +620,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
             child: ButtonText(localizations.composeContinueEditingAction),
             onPressed: () {
               Navigator.of(currentContext).pop();
-              returnToCompose();
+              _returnToCompose();
             },
           ),
         ],
@@ -636,21 +628,21 @@ class _ComposeScreenState extends State<ComposeScreen> {
     }
   }
 
-  void requestReadReceipt() {
-    widget.data.messageBuilder.requestReadReceipt(recipient: from.address);
+  void _requestReadReceipt() {
+    widget.data.messageBuilder.requestReadReceipt(recipient: _from.address);
     setState(() {
       _isReadReceiptRequested = true;
     });
   }
 
-  void removeReadReceiptRequest() {
+  void _removeReadReceiptRequest() {
     widget.data.messageBuilder.removeReadReceiptRequest();
     setState(() {
       _isReadReceiptRequested = false;
     });
   }
 
-  void returnToCompose() {
+  void _returnToCompose() {
     locator<NavigationService>()
         .push(Routes.mailCompose, arguments: _resumeComposeData);
   }
