@@ -454,6 +454,7 @@ class _MessageActionsState extends State<MessageActions> {
       widget.message.mimeMessage,
       from: from,
       quoteMessage: false,
+      forwardAttachments: false,
     );
     final composeFuture = addAttachments(widget.message, builder);
     navigateToCompose(
