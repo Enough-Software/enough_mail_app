@@ -12,6 +12,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_media/enough_media.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:share/share.dart';
@@ -38,17 +39,17 @@ class InteractiveMediaScreen extends StatelessWidget {
       title: mediaWidget.mediaProvider.name,
       content: mediaWidget,
       appBarActions: [
-        IconButton(
+        PlatformIconButton(
           icon: Icon(Icons.forward),
           onPressed: forward,
         ),
-        IconButton(
+        PlatformIconButton(
           icon: Icon(Icons.share),
           onPressed: share,
         ),
         if (mediaWidget.mediaProvider.isText &&
             locator<SettingsService>().settings.enableDeveloperMode) ...{
-          PopupMenuButton<_OverflowMenuChoice>(
+          PlatformPopupMenuButton<_OverflowMenuChoice>(
             onSelected: (_OverflowMenuChoice result) async {
               switch (result) {
                 case _OverflowMenuChoice.showAsEmail:
@@ -87,7 +88,7 @@ class InteractiveMediaScreen extends StatelessWidget {
               }
             },
             itemBuilder: (BuildContext context) => [
-              PopupMenuItem<_OverflowMenuChoice>(
+              PlatformPopupMenuItem<_OverflowMenuChoice>(
                 value: _OverflowMenuChoice.showAsEmail,
                 child: Text(localizations.developerShowAsEmail),
               ),

@@ -8,6 +8,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
@@ -56,45 +57,48 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
       context,
       title: localizations.signatureSettingsTitle,
       content: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(localizations.signatureSettingsComposeActionsInfo),
-              for (final action in ComposeAction.values) ...{
-                CheckboxListTile(
-                  value: _signatureEnabledFor[action],
-                  onChanged: (value) async {
-                    setState(() {
-                      _signatureEnabledFor[action] = value;
-                    });
-                  },
-                  title: Text(getActionName(action, localizations)),
-                ),
-              },
-              Divider(),
-              SignatureWidget(), //  global signature
-              if (accounts.length > 1) ...{
-                Divider(),
-                if (accountsWithSignature.isNotEmpty) ...{
-                  for (final account in accountsWithSignature) ...{
-                    Text(account.name, style: theme.textTheme.subtitle1),
-                    SignatureWidget(
-                      account: account,
-                    ),
-                    Divider(),
-                  },
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.signatureSettingsComposeActionsInfo),
+                for (final action in ComposeAction.values) ...{
+                  PlatformCheckboxListTile(
+                    value: _signatureEnabledFor[action],
+                    onChanged: (value) async {
+                      setState(() {
+                        _signatureEnabledFor[action] = value;
+                      });
+                    },
+                    title: Text(getActionName(action, localizations)),
+                  ),
                 },
-                Text(localizations.signatureSettingsAccountInfo),
-                TextButton(
-                  onPressed: () {
-                    locator<NavigationService>().push(Routes.settingsAccounts);
+                Divider(),
+                SignatureWidget(), //  global signature
+                if (accounts.length > 1) ...{
+                  Divider(),
+                  if (accountsWithSignature.isNotEmpty) ...{
+                    for (final account in accountsWithSignature) ...{
+                      Text(account.name, style: theme.textTheme.subtitle1),
+                      SignatureWidget(
+                        account: account,
+                      ),
+                      Divider(),
+                    },
                   },
-                  child: ButtonText(localizations.settingsActionAccounts),
-                ),
-              },
-            ],
+                  Text(localizations.signatureSettingsAccountInfo),
+                  PlatformTextButton(
+                    onPressed: () {
+                      locator<NavigationService>()
+                          .push(Routes.settingsAccounts);
+                    },
+                    child: ButtonText(localizations.settingsActionAccounts),
+                  ),
+                },
+              ],
+            ),
           ),
         ),
       ),
@@ -126,7 +130,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
     if (_signature == null) {
-      return ListTile(
+      return PlatformListTile(
         leading: Icon(Icons.add),
         title: Text(
           localizations.signatureSettingsAddForAccount(widget.account.name),
@@ -146,7 +150,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
         ),
         Align(
           alignment: Alignment.topRight,
-          child: IconButton(
+          child: PlatformIconButton(
             icon: Icon(Icons.edit),
             onPressed: _showEditor,
           ),
@@ -173,7 +177,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
         actions: _signature == null
             ? null
             : [
-                TextButton(
+                PlatformTextButton(
                   child: ButtonText(localizations.actionDelete),
                   onPressed: () async {
                     setState(() {
@@ -191,11 +195,11 @@ class _SignatureWidgetState extends State<SignatureWidget> {
                     }
                   },
                 ),
-                TextButton(
+                PlatformTextButton(
                   child: ButtonText(localizations.actionCancel),
                   onPressed: () => Navigator.of(context).pop(false),
                 ),
-                TextButton(
+                PlatformTextButton(
                   child: ButtonText(localizations.actionOk),
                   onPressed: () => Navigator.of(context).pop(true),
                 ),

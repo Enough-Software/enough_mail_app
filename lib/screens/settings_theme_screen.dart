@@ -1,6 +1,7 @@
 import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -46,133 +47,138 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
       context,
       title: localizations.designTitle,
       content: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(localizations.designSectionThemeTitle,
-                  style: theme.textTheme.subtitle1),
-              ListTile(
-                title: Text(localizations.designThemeOptionLight),
-                leading: Radio<ThemeModeSetting>(
-                  value: ThemeModeSetting.light,
-                  groupValue: _themeModeSetting,
-                  onChanged: (ThemeModeSetting value) {
-                    setState(() {
-                      themeModeSetting = value;
-                    });
-                  },
-                ),
-              ),
-              ListTile(
-                title: Text(localizations.designThemeOptionDark),
-                leading: Radio<ThemeModeSetting>(
-                  value: ThemeModeSetting.dark,
-                  groupValue: _themeModeSetting,
-                  onChanged: (ThemeModeSetting value) {
-                    setState(() {
-                      themeModeSetting = value;
-                    });
-                  },
-                ),
-              ),
-              ListTile(
-                title: Text(localizations.designThemeOptionSystem),
-                leading: Radio<ThemeModeSetting>(
-                  value: ThemeModeSetting.system,
-                  groupValue: _themeModeSetting,
-                  onChanged: (ThemeModeSetting value) {
-                    setState(() {
-                      themeModeSetting = value;
-                    });
-                  },
-                ),
-              ),
-              ListTile(
-                title: Text(localizations.designThemeOptionCustom),
-                leading: Radio<ThemeModeSetting>(
-                  value: ThemeModeSetting.custom,
-                  groupValue: _themeModeSetting,
-                  onChanged: (ThemeModeSetting value) {
-                    setState(() {
-                      themeModeSetting = value;
-                    });
-                  },
-                ),
-              ),
-              if (_themeModeSetting == ThemeModeSetting.custom) ...{
-                Text(localizations.designSectionCustomTitle,
-                    style: theme.textTheme.subtitle1),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    TextButton(
-                      child: ButtonText(localizations.designThemeCustomStart(
-                          darkThemeStartTime.format(context))),
-                      onPressed: () async {
-                        final pickedTime = await showTimePicker(
-                          context: context,
-                          initialTime: darkThemeStartTime,
-                          initialEntryMode: TimePickerEntryMode.dial,
-                        );
-                        if (pickedTime != null) {
-                          themeSettings.themeDarkStartTime = pickedTime;
-                          // indirectly set theme again:
-                          themeModeSetting = ThemeModeSetting.custom;
-                          setState(() {});
-                          await locator<SettingsService>().save();
-                        }
-                      },
-                    ),
-                    TextButton(
-                      child: ButtonText(localizations.designThemeCustomEnd(
-                          darkThemeEndTime.format(context))),
-                      onPressed: () async {
-                        final pickedTime = await showTimePicker(
-                          context: context,
-                          initialTime: darkThemeEndTime,
-                          initialEntryMode: TimePickerEntryMode.dial,
-                        );
-                        if (pickedTime != null) {
-                          themeSettings.themeDarkEndTime = pickedTime;
-                          // indirectly set theme again:
-                          themeModeSetting = ThemeModeSetting.custom;
-                          setState(() {});
-                          await locator<SettingsService>().save();
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              },
-              Divider(),
-              Text(localizations.designSectionColorTitle,
-                  style: theme.textTheme.subtitle1),
-              GridView.count(
-                crossAxisCount: 4,
-                primary: false,
-                shrinkWrap: true,
+        child: Material(
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final color in availableColors) ...{
-                    ListTile(
-                        title: CircleAvatar(
-                          backgroundColor: color,
-                          child: (color == primarySwatch)
-                              ? Icon(Icons.check)
-                              : null,
+                  Text(localizations.designSectionThemeTitle,
+                      style: theme.textTheme.subtitle1),
+                  PlatformListTile(
+                    title: Text(localizations.designThemeOptionLight),
+                    leading: Radio<ThemeModeSetting>(
+                      value: ThemeModeSetting.light,
+                      groupValue: _themeModeSetting,
+                      onChanged: (ThemeModeSetting value) {
+                        setState(() {
+                          themeModeSetting = value;
+                        });
+                      },
+                    ),
+                  ),
+                  PlatformListTile(
+                    title: Text(localizations.designThemeOptionDark),
+                    leading: Radio<ThemeModeSetting>(
+                      value: ThemeModeSetting.dark,
+                      groupValue: _themeModeSetting,
+                      onChanged: (ThemeModeSetting value) {
+                        setState(() {
+                          themeModeSetting = value;
+                        });
+                      },
+                    ),
+                  ),
+                  PlatformListTile(
+                    title: Text(localizations.designThemeOptionSystem),
+                    leading: Radio<ThemeModeSetting>(
+                      value: ThemeModeSetting.system,
+                      groupValue: _themeModeSetting,
+                      onChanged: (ThemeModeSetting value) {
+                        setState(() {
+                          themeModeSetting = value;
+                        });
+                      },
+                    ),
+                  ),
+                  PlatformListTile(
+                    title: Text(localizations.designThemeOptionCustom),
+                    leading: Radio<ThemeModeSetting>(
+                      value: ThemeModeSetting.custom,
+                      groupValue: _themeModeSetting,
+                      onChanged: (ThemeModeSetting value) {
+                        setState(() {
+                          themeModeSetting = value;
+                        });
+                      },
+                    ),
+                  ),
+                  if (_themeModeSetting == ThemeModeSetting.custom) ...{
+                    Text(localizations.designSectionCustomTitle,
+                        style: theme.textTheme.subtitle1),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        PlatformTextButton(
+                          child: ButtonText(
+                              localizations.designThemeCustomStart(
+                                  darkThemeStartTime.format(context))),
+                          onPressed: () async {
+                            final pickedTime = await showTimePicker(
+                              context: context,
+                              initialTime: darkThemeStartTime,
+                              initialEntryMode: TimePickerEntryMode.dial,
+                            );
+                            if (pickedTime != null) {
+                              themeSettings.themeDarkStartTime = pickedTime;
+                              // indirectly set theme again:
+                              themeModeSetting = ThemeModeSetting.custom;
+                              setState(() {});
+                              await locator<SettingsService>().save();
+                            }
+                          },
                         ),
-                        onTap: () async {
-                          primarySwatch = color;
-                          setState(() {});
-                          themeSettings.primarySwatch = color;
-                          locator<ThemeService>().checkForChangedTheme();
-                          await locator<SettingsService>().save();
-                        }),
+                        PlatformTextButton(
+                          child: ButtonText(localizations.designThemeCustomEnd(
+                              darkThemeEndTime.format(context))),
+                          onPressed: () async {
+                            final pickedTime = await showTimePicker(
+                              context: context,
+                              initialTime: darkThemeEndTime,
+                              initialEntryMode: TimePickerEntryMode.dial,
+                            );
+                            if (pickedTime != null) {
+                              themeSettings.themeDarkEndTime = pickedTime;
+                              // indirectly set theme again:
+                              themeModeSetting = ThemeModeSetting.custom;
+                              setState(() {});
+                              await locator<SettingsService>().save();
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   },
+                  Divider(),
+                  Text(localizations.designSectionColorTitle,
+                      style: theme.textTheme.subtitle1),
+                  GridView.count(
+                    crossAxisCount: 4,
+                    primary: false,
+                    shrinkWrap: true,
+                    children: [
+                      for (final color in availableColors) ...{
+                        PlatformListTile(
+                            title: CircleAvatar(
+                              backgroundColor: color,
+                              child: (color == primarySwatch)
+                                  ? Icon(Icons.check)
+                                  : null,
+                            ),
+                            onTap: () async {
+                              primarySwatch = color;
+                              setState(() {});
+                              themeSettings.primarySwatch = color;
+                              locator<ThemeService>().checkForChangedTheme();
+                              await locator<SettingsService>().save();
+                            }),
+                      },
+                    ],
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),

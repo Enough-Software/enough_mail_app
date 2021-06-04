@@ -672,7 +672,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                   future: _loadingFuture,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return CircularProgressIndicator();
+                      return PlatformProgressIndicator();
                     }
                     final messages = snapshot.data;
                     return ConstrainedBox(
@@ -726,7 +726,7 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
       return Text(localizations.detailsReadReceiptSentStatus,
           style: Theme.of(context).textTheme.caption);
     } else if (_isSendingReadReceipt) {
-      return CircularProgressIndicator();
+      return PlatformProgressIndicator();
     } else {
       return ElevatedButton(
         child: ButtonText(localizations.detailsSendReadReceiptAction),

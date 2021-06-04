@@ -5,6 +5,7 @@ import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -497,7 +498,7 @@ class _MessageCardState extends State<MessageCard> {
               case ConnectionState.none:
               case ConnectionState.waiting:
               case ConnectionState.active:
-                return Container(child: CircularProgressIndicator());
+                return Container(child: PlatformProgressIndicator());
                 break;
               case ConnectionState.done:
                 if (snapshot.hasError) {

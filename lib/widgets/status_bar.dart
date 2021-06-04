@@ -42,12 +42,12 @@ class StatusBarState extends State<StatusBar> {
       _status = notification;
     });
     await Future.delayed(const Duration(seconds: 4));
-    if (_status == notification) {
+    if (_status == notification && mounted) {
       setState(() {
         _statusOpacity = 0.0;
       });
       await Future.delayed(const Duration(milliseconds: 500));
-      if (_status == notification) {
+      if (_status == notification && mounted) {
         setState(() {
           _status = null;
           _statusAction = null;
