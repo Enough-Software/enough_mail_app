@@ -2,6 +2,7 @@ import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
@@ -54,69 +55,72 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
       context,
       title: localizations.languageSettingTitle,
       content: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(localizations.languageSettingLabel,
-                  style: theme.textTheme.caption),
-              DropdownButton<_Language>(
-                value: selectedLanguage,
-                onChanged: (value) async {
-                  if (value.locale == null) {
-                    setState(() {
-                      selectedLanguage = value;
-                      this.selectedLocalizations = null;
-                      systemSettingApplied = true;
-                    });
-                    locator<SettingsService>().settings.languageTag = null;
-                    await locator<SettingsService>().save();
-                    return;
-                  }
-                  final selectedLocalizations =
-                      await AppLocalizations.delegate.load(value.locale);
-                  final confirmed = await DialogHelper.showTextDialog(
-                      context,
-                      selectedLocalizations.languageSettingConfirmationTitle,
-                      selectedLocalizations.languageSettingConfirmationQuery,
-                      actions: [
-                        TextButton(
-                          child: ButtonText(selectedLocalizations.actionCancel),
-                          onPressed: () => Navigator.of(context).pop(false),
-                        ),
-                        TextButton(
-                          child: ButtonText(selectedLocalizations.actionOk),
-                          onPressed: () => Navigator.of(context).pop(true),
-                        ),
-                      ]);
-                  if (confirmed) {
-                    setState(() {
-                      selectedLanguage = value;
-                      this.selectedLocalizations = selectedLocalizations;
-                      systemSettingApplied = false;
-                    });
-                    locator<SettingsService>().settings.languageTag =
-                        selectedLanguage?.locale?.toLanguageTag();
-                    await locator<SettingsService>().save();
-                  }
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.languageSettingLabel,
+                    style: theme.textTheme.caption),
+                PlatformDropdownButton<_Language>(
+                  value: selectedLanguage,
+                  onChanged: (value) async {
+                    if (value.locale == null) {
+                      setState(() {
+                        selectedLanguage = value;
+                        this.selectedLocalizations = null;
+                        systemSettingApplied = true;
+                      });
+                      locator<SettingsService>().settings.languageTag = null;
+                      await locator<SettingsService>().save();
+                      return;
+                    }
+                    final selectedLocalizations =
+                        await AppLocalizations.delegate.load(value.locale);
+                    final confirmed = await DialogHelper.showTextDialog(
+                        context,
+                        selectedLocalizations.languageSettingConfirmationTitle,
+                        selectedLocalizations.languageSettingConfirmationQuery,
+                        actions: [
+                          PlatformTextButton(
+                            child:
+                                ButtonText(selectedLocalizations.actionCancel),
+                            onPressed: () => Navigator.of(context).pop(false),
+                          ),
+                          PlatformTextButton(
+                            child: ButtonText(selectedLocalizations.actionOk),
+                            onPressed: () => Navigator.of(context).pop(true),
+                          ),
+                        ]);
+                    if (confirmed) {
+                      setState(() {
+                        selectedLanguage = value;
+                        this.selectedLocalizations = selectedLocalizations;
+                        systemSettingApplied = false;
+                      });
+                      locator<SettingsService>().settings.languageTag =
+                          selectedLanguage?.locale?.toLanguageTag();
+                      await locator<SettingsService>().save();
+                    }
+                  },
+                  selectedItemBuilder: (context) => languages
+                      .map((language) => Text(language.displayName))
+                      .toList(),
+                  items: languages
+                      .map((language) => DropdownMenuItem(
+                          value: language, child: Text(language.displayName)))
+                      .toList(),
+                ),
+                if (selectedLocalizations != null) ...{
+                  Text(selectedLocalizations.languageSetInfo,
+                      style: theme.textTheme.subtitle1),
+                } else if (systemSettingApplied) ...{
+                  Text(localizations.languageSystemSetInfo,
+                      style: theme.textTheme.subtitle1),
                 },
-                selectedItemBuilder: (context) => languages
-                    .map((language) => Text(language.displayName))
-                    .toList(),
-                items: languages
-                    .map((language) => DropdownMenuItem(
-                        value: language, child: Text(language.displayName)))
-                    .toList(),
-              ),
-              if (selectedLocalizations != null) ...{
-                Text(selectedLocalizations.languageSetInfo,
-                    style: theme.textTheme.subtitle1),
-              } else if (systemSettingApplied) ...{
-                Text(localizations.languageSystemSetInfo,
-                    style: theme.textTheme.subtitle1),
-              },
-            ],
+              ],
+            ),
           ),
         ),
       ),

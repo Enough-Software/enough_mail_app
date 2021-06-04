@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -19,7 +20,7 @@ class SplashScreen extends StatelessWidget {
     final isNight = timeOfDay.hour >= 22 || timeOfDay.hour <= 6;
     final splashColor = isNight ? Colors.black87 : Color(0xff99cc00);
     final textColor = isNight ? Colors.white : Colors.black87;
-    return Scaffold(
+    return PlatformScaffold(
       body: Container(
         color: splashColor,
         child: Center(

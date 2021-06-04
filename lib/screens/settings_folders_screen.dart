@@ -4,6 +4,7 @@ import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -157,57 +158,59 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
     final localizations = AppLocalizations.of(context);
 
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          TextField(
-            controller: _inboxController,
-            decoration: InputDecoration(
-              labelText: localizations.folderInbox,
-              prefixIcon: Icon(MaterialCommunityIcons.inbox),
+      child: SafeArea(
+        child: Column(
+          children: [
+            DecoratedPlatformTextField(
+              controller: _inboxController,
+              decoration: InputDecoration(
+                labelText: localizations.folderInbox,
+                prefixIcon: Icon(MaterialCommunityIcons.inbox),
+              ),
+              onChanged: (value) => widget.customNames[0] = value,
             ),
-            onChanged: (value) => widget.customNames[0] = value,
-          ),
-          TextField(
-            controller: _draftsController,
-            decoration: InputDecoration(
-              labelText: localizations.folderDrafts,
-              prefixIcon: Icon(MaterialCommunityIcons.email_edit_outline),
+            DecoratedPlatformTextField(
+              controller: _draftsController,
+              decoration: InputDecoration(
+                labelText: localizations.folderDrafts,
+                prefixIcon: Icon(MaterialCommunityIcons.email_edit_outline),
+              ),
+              onChanged: (value) => widget.customNames[1] = value,
             ),
-            onChanged: (value) => widget.customNames[1] = value,
-          ),
-          TextField(
-            controller: _sentController,
-            decoration: InputDecoration(
-              labelText: localizations.folderSent,
-              prefixIcon: Icon(MaterialCommunityIcons.inbox_arrow_up),
+            DecoratedPlatformTextField(
+              controller: _sentController,
+              decoration: InputDecoration(
+                labelText: localizations.folderSent,
+                prefixIcon: Icon(MaterialCommunityIcons.inbox_arrow_up),
+              ),
+              onChanged: (value) => widget.customNames[2] = value,
             ),
-            onChanged: (value) => widget.customNames[2] = value,
-          ),
-          TextField(
-            controller: _trashController,
-            decoration: InputDecoration(
-              labelText: localizations.folderTrash,
-              prefixIcon: Icon(MaterialCommunityIcons.trash_can_outline),
+            DecoratedPlatformTextField(
+              controller: _trashController,
+              decoration: InputDecoration(
+                labelText: localizations.folderTrash,
+                prefixIcon: Icon(MaterialCommunityIcons.trash_can_outline),
+              ),
+              onChanged: (value) => widget.customNames[3] = value,
             ),
-            onChanged: (value) => widget.customNames[3] = value,
-          ),
-          TextField(
-            controller: _archiveController,
-            decoration: InputDecoration(
-              labelText: localizations.folderArchive,
-              prefixIcon: Icon(MaterialCommunityIcons.archive),
+            DecoratedPlatformTextField(
+              controller: _archiveController,
+              decoration: InputDecoration(
+                labelText: localizations.folderArchive,
+                prefixIcon: Icon(MaterialCommunityIcons.archive),
+              ),
+              onChanged: (value) => widget.customNames[4] = value,
             ),
-            onChanged: (value) => widget.customNames[4] = value,
-          ),
-          TextField(
-            controller: _junkController,
-            decoration: InputDecoration(
-              labelText: localizations.folderJunk,
-              prefixIcon: Icon(Entypo.bug),
+            DecoratedPlatformTextField(
+              controller: _junkController,
+              decoration: InputDecoration(
+                labelText: localizations.folderJunk,
+                prefixIcon: Icon(Entypo.bug),
+              ),
+              onChanged: (value) => widget.customNames[5] = value,
             ),
-            onChanged: (value) => widget.customNames[5] = value,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

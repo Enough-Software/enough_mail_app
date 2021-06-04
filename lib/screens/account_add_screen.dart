@@ -169,7 +169,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                           children: [
                             Container(
                                 padding: EdgeInsets.all(8),
-                                child: CircularProgressIndicator()),
+                                child: PlatformProgressIndicator()),
                             Expanded(
                               child: Text(
                                   localizations.addAccountResolvingSetingsLabel(
@@ -277,7 +277,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                           children: [
                             Container(
                                 padding: EdgeInsets.all(8),
-                                child: CircularProgressIndicator()),
+                                child: PlatformProgressIndicator()),
                             Expanded(
                               child: Text(localizations
                                   .addAccountVerifyingSettingsLabel(

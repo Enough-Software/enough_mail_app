@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
@@ -72,7 +73,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               if (info == null) ...{
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(),
+                  child: PlatformProgressIndicator(),
                 ),
               } else ...{
                 Padding(
@@ -88,7 +89,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: IconButton(
+                  child: PlatformIconButton(
                     icon: Icon(Icons.copy),
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: info));
@@ -100,7 +101,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               },
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextButton(
+                child: PlatformTextButton(
                   child: ButtonText(localizations.feedbackActionSuggestFeature),
                   onPressed: () async {
                     await launcher.launch('https://maily.userecho.com/');
@@ -109,7 +110,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextButton(
+                child: PlatformTextButton(
                   child: ButtonText(localizations.feedbackActionReportProblem),
                   onPressed: () async {
                     await launcher.launch('https://maily.userecho.com/');
@@ -118,7 +119,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextButton(
+                child: PlatformTextButton(
                   child: ButtonText(localizations.feedbackActionHelpDeveloping),
                   onPressed: () async {
                     await launcher.launch(

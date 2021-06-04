@@ -57,7 +57,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
           ),
         },
         if (widget.isDownloading) ...{
-          CircularProgressIndicator(),
+          PlatformProgressIndicator(),
         },
         AddAttachmentPopupButton(
           messageBuilder: widget.composeData.messageBuilder,

@@ -8,6 +8,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_media/enough_media.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
 class AttachmentChip extends StatefulWidget {
@@ -49,7 +50,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         minWidth: 0, //wraps child's width
         height: 0, //wraps child's height
-        child: MaterialButton(
+        child: PlatformButton(
           onPressed: _isDownloading ? null : download,
           child: Padding(
             padding: const EdgeInsets.all(4.0),
@@ -134,7 +135,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
               ),
             ),
             if (_isDownloading) ...{
-              Center(child: CircularProgressIndicator()),
+              Center(child: PlatformProgressIndicator()),
             },
           }
         ],
@@ -193,7 +194,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
 
   Widget buildIcon() {
     if (_isDownloading) {
-      return CircularProgressIndicator();
+      return PlatformProgressIndicator();
     }
     final mediaType = widget.info.contentType?.mediaType;
     IconData icon = locator<IconService>().getForMediaType(mediaType);
