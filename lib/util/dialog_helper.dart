@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
@@ -18,16 +19,16 @@ class DialogHelper {
     bool isDangerousAction,
   }) {
     final localizations = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    var actionButtonStyle = theme.textButtonTheme.style;
-    TextStyle actionTextStyle;
-    if (isDangerousAction == true) {
-      actionButtonStyle = TextButton.styleFrom(
-          backgroundColor: Colors.red, onSurface: Colors.white);
-      actionTextStyle = theme.textTheme.button.copyWith(color: Colors.white);
-    }
 
     if (Platform.isAndroid) {
+      final theme = Theme.of(context);
+      var actionButtonStyle = theme.textButtonTheme.style;
+      TextStyle actionTextStyle;
+      if (isDangerousAction == true) {
+        actionButtonStyle = TextButton.styleFrom(
+            backgroundColor: Colors.red, onSurface: Colors.white);
+        actionTextStyle = theme.textTheme.button.copyWith(color: Colors.white);
+      }
       return showDialog<bool>(
         builder: (context) => AlertDialog(
           title: Text(title),
@@ -52,14 +53,14 @@ class DialogHelper {
           title: Text(title),
           content: Text(query),
           actions: [
-            TextButton(
+            CupertinoDialogAction(
               child: Text(localizations.actionCancel),
               onPressed: () => Navigator.of(context).pop(false),
             ),
-            TextButton(
-              child: Text(action ?? title, style: actionTextStyle),
+            CupertinoDialogAction(
+              child: Text(action ?? title),
               onPressed: () => Navigator.of(context).pop(true),
-              style: actionButtonStyle,
+              isDestructiveAction: isDangerousAction,
             ),
           ],
         ),
@@ -80,14 +81,14 @@ class DialogHelper {
     actions ??= [
       if (defaultActions == DialogActions.cancel ||
           defaultActions == DialogActions.okAndCancel) ...{
-        TextButton(
+        PlatformTextButton(
           child: ButtonText(localizations.actionCancel),
           onPressed: () => Navigator.of(context).pop(false),
         ),
       },
       if (defaultActions == DialogActions.ok ||
           defaultActions == DialogActions.okAndCancel) ...{
-        TextButton(
+        PlatformTextButton(
           child: ButtonText(localizations.actionOk),
           onPressed: () => Navigator.of(context).pop(true),
         ),

@@ -5,6 +5,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -46,7 +47,7 @@ class _SettingsDeveloperModeScreenState
                   style: theme.textTheme.subtitle1),
               Text(localizations.developerModeIntroduction,
                   style: theme.textTheme.caption),
-              CheckboxListTile(
+              PlatformCheckboxListTile(
                 value: isDeveloperModeEnabled,
                 onChanged: (value) async {
                   setState(() {
@@ -63,20 +64,20 @@ class _SettingsDeveloperModeScreenState
                   style: theme.textTheme.subtitle1),
               Text(localizations.extensionsIntro,
                   style: theme.textTheme.caption),
-              TextButton(
+              PlatformTextButton(
                 child: ButtonText(localizations.extensionsLearnMoreAction),
                 onPressed: () => launch(
                     'https://github.com/Enough-Software/enough_mail_app/wiki/Extensions'),
               ),
-              ListTile(
+              PlatformListTile(
                 title: Text(localizations.extensionsReloadAction),
                 onTap: _reloadExtensions,
               ),
-              ListTile(
+              PlatformListTile(
                 title: Text(localizations.extensionDeactivateAllAction),
                 onTap: _deactivateAllExtensions,
               ),
-              ListTile(
+              PlatformListTile(
                 title: Text(localizations.extensionsManualAction),
                 onTap: _loadExtensionManually,
               ),
@@ -95,7 +96,7 @@ class _SettingsDeveloperModeScreenState
     final result = await DialogHelper.showWidgetDialog(
       context,
       localizations.extensionsManualAction,
-      TextField(
+      DecoratedPlatformTextField(
         controller: controller,
         decoration: InputDecoration(
           labelText: localizations.extensionsManualUrlLabel,
@@ -103,11 +104,11 @@ class _SettingsDeveloperModeScreenState
         keyboardType: TextInputType.url,
       ),
       actions: [
-        TextButton(
+        PlatformTextButton(
           child: ButtonText(localizations.actionCancel),
           onPressed: () => navService.pop(false),
         ),
-        TextButton(
+        PlatformTextButton(
           child: ButtonText(localizations.actionOk),
           onPressed: () {
             url = controller.text.trim();
@@ -177,7 +178,7 @@ class _SettingsDeveloperModeScreenState
         child: Column(
           children: [
             for (final domain in domains) ...{
-              ListTile(
+              PlatformListTile(
                 title: Text(domain.domain),
                 subtitle: Text(AppExtension.urlFor(domain.domain)),
                 trailing: FutureBuilder<AppExtension>(
@@ -185,7 +186,7 @@ class _SettingsDeveloperModeScreenState
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       domain.account.appExtensions.add(snapshot.data);
-                      return IconButton(
+                      return PlatformIconButton(
                         icon: Icon(Icons.check),
                         onPressed: () =>
                             _showExtensionDetails(domain.domain, snapshot.data),
@@ -194,7 +195,7 @@ class _SettingsDeveloperModeScreenState
                         ConnectionState.done) {
                       return Icon(Icons.cancel_outlined);
                     }
-                    return CircularProgressIndicator();
+                    return PlatformProgressIndicator();
                   },
                 ),
               ),

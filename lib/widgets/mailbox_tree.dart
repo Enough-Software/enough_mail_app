@@ -52,13 +52,15 @@ class MailboxTree extends StatelessWidget {
         selected: isCurrent,
       );
     }
-    return ExpansionTile(
-      title: title,
-      children: [
-        for (final childElement in element.children) ...{
-          buildMailboxElement(childElement, level + 1),
-        },
-      ],
+    return Material(
+      child: ExpansionTile(
+        title: title,
+        children: [
+          for (final childElement in element.children) ...{
+            buildMailboxElement(childElement, level + 1),
+          },
+        ],
+      ),
     );
   }
 }

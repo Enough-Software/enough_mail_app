@@ -84,7 +84,7 @@ class _LocationScreenState extends State<LocationScreen> {
             case ConnectionState.none:
             case ConnectionState.waiting:
             case ConnectionState.active:
-              return Center(child: CircularProgressIndicator());
+              return Center(child: PlatformProgressIndicator());
             case ConnectionState.done:
               if (snapshot.hasData) {
                 defaultLocation =

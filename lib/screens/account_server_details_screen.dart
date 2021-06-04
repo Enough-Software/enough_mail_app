@@ -7,6 +7,7 @@ import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/password_field.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -16,9 +17,12 @@ class AccountServerDetailsScreen extends StatefulWidget {
   final String title;
   final bool includeDrawer;
 
-  AccountServerDetailsScreen(
-      {Key key, @required this.account, this.title, this.includeDrawer})
-      : super(key: key);
+  AccountServerDetailsScreen({
+    Key key,
+    @required this.account,
+    this.title,
+    this.includeDrawer = true,
+  }) : super(key: key);
 
   @override
   _AccountServerDetailsScreenState createState() =>
@@ -187,7 +191,7 @@ class _AccountServerDetailsScreenState
       content: buildContent(localizations, context),
       includeDrawer: widget.includeDrawer,
       appBarActions: [
-        IconButton(
+        PlatformIconButton(
           icon: Icon(Icons.save),
           onPressed: () => testConnection(localizations),
         ),
@@ -197,222 +201,230 @@ class _AccountServerDetailsScreenState
 
   Widget buildContent(AppLocalizations localizations, BuildContext context) {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                labelText: localizations.addAccountEmailLabel,
-                hintText: localizations.addAccountEmailHint,
-              ),
-            ),
-            TextField(
-              controller: userNameController,
-              decoration: InputDecoration(
-                labelText: localizations.accountDetailsUserNameLabel,
-                hintText: localizations.accountDetailsUserNameHint,
-              ),
-            ),
-            PasswordField(
-                controller: passwordController,
-                labelText: localizations.accountDetailsPasswordLabel,
-                hintText: localizations.accountDetailsPasswordHint),
-            ExpansionTile(
-              title: Text(localizations.accountDetailsBaseSectionTitle),
-              initiallyExpanded: true,
+      child: Material(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
               children: [
-                TextField(
-                  controller: incomingHostDomainController,
+                DecoratedPlatformTextField(
+                  controller: emailController,
                   decoration: InputDecoration(
-                    labelText: localizations.accountDetailsIncomingLabel,
-                    hintText: localizations.accountDetailsIncomingHint,
+                    labelText: localizations.addAccountEmailLabel,
+                    hintText: localizations.addAccountEmailHint,
                   ),
                 ),
-                TextField(
-                  controller: outgoingHostDomainController,
+                DecoratedPlatformTextField(
+                  controller: userNameController,
                   decoration: InputDecoration(
-                    labelText: localizations.accountDetailsOutgoingLabel,
-                    hintText: localizations.accountDetailsOutgoingHint,
-                  ),
-                ),
-              ],
-            ),
-            ExpansionTile(
-              title: Text(
-                  localizations.accountDetailsAdvancedIncomingSectionTitle),
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(
-                          localizations.accountDetailsIncomingServerTypeLabel),
-                    ),
-                    DropdownButton<ServerType>(
-                        items: [
-                          DropdownMenuItem(
-                              child: Text(
-                                  localizations.accountDetailsOptionAutomatic)),
-                          DropdownMenuItem(
-                            child: Text('IMAP'),
-                            value: ServerType.imap,
-                          ),
-                          DropdownMenuItem(
-                            child: Text('POP'),
-                            value: ServerType.pop,
-                          ),
-                        ],
-                        value: incomingServerType,
-                        onChanged: (value) =>
-                            setState(() => incomingServerType = value)),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(
-                          localizations.accountDetailsIncomingSecurityLabel),
-                    ),
-                    DropdownButton<SocketType>(
-                        items: [
-                          DropdownMenuItem(
-                              child: Text(
-                                  localizations.accountDetailsOptionAutomatic)),
-                          DropdownMenuItem(
-                            child: Text('SSL'),
-                            value: SocketType.ssl,
-                          ),
-                          DropdownMenuItem(
-                            child: Text('Start TLS'),
-                            value: SocketType.starttls,
-                          ),
-                          DropdownMenuItem(
-                            child: Text(
-                                localizations.accountDetailsSecurityOptionNone),
-                            value: SocketType.plain,
-                          ),
-                        ],
-                        value: incomingSecurity,
-                        onChanged: (value) =>
-                            setState(() => incomingSecurity = value)),
-                  ],
-                ),
-                TextField(
-                  controller: incomingHostPortController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: InputDecoration(
-                    labelText: localizations.accountDetailsIncomingPortLabel,
-                    hintText: localizations.accountDetailsPortHint,
-                  ),
-                ),
-                TextField(
-                  controller: incomingUserNameController,
-                  decoration: InputDecoration(
-                    labelText:
-                        localizations.accountDetailsIncomingUserNameLabel,
-                    hintText:
-                        localizations.accountDetailsAlternativeUserNameHint,
+                    labelText: localizations.accountDetailsUserNameLabel,
+                    hintText: localizations.accountDetailsUserNameHint,
                   ),
                 ),
                 PasswordField(
-                    controller: incomingPasswordController,
-                    labelText:
-                        localizations.accountDetailsIncomingPasswordLabel,
-                    hintText:
-                        localizations.accountDetailsAlternativePasswordHint),
-              ],
-            ),
-            ExpansionTile(
-              title: Text(
-                  localizations.accountDetailsAdvancedOutgoingSectionTitle),
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                    controller: passwordController,
+                    labelText: localizations.accountDetailsPasswordLabel,
+                    hintText: localizations.accountDetailsPasswordHint),
+                ExpansionTile(
+                  title: Text(localizations.accountDetailsBaseSectionTitle),
+                  initiallyExpanded: true,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(
-                          localizations.accountDetailsOutgoingServerTypeLabel),
+                    DecoratedPlatformTextField(
+                      controller: incomingHostDomainController,
+                      decoration: InputDecoration(
+                        labelText: localizations.accountDetailsIncomingLabel,
+                        hintText: localizations.accountDetailsIncomingHint,
+                      ),
                     ),
-                    DropdownButton<ServerType>(
-                        items: [
-                          DropdownMenuItem(
-                              child: Text(
-                                  localizations.accountDetailsOptionAutomatic)),
-                          DropdownMenuItem(
-                            child: Text('SMTP'),
-                            value: ServerType.smtp,
-                          ),
-                        ],
-                        value: outgoingServerType,
-                        onChanged: (value) =>
-                            setState(() => outgoingServerType = value)),
+                    DecoratedPlatformTextField(
+                      controller: outgoingHostDomainController,
+                      decoration: InputDecoration(
+                        labelText: localizations.accountDetailsOutgoingLabel,
+                        hintText: localizations.accountDetailsOutgoingHint,
+                      ),
+                    ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                ExpansionTile(
+                  title: Text(
+                      localizations.accountDetailsAdvancedIncomingSectionTitle),
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(
-                          localizations.accountDetailsOutgoingSecurityLabel),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Text(localizations
+                              .accountDetailsIncomingServerTypeLabel),
+                        ),
+                        PlatformDropdownButton<ServerType>(
+                            items: [
+                              DropdownMenuItem(
+                                  child: Text(localizations
+                                      .accountDetailsOptionAutomatic)),
+                              DropdownMenuItem(
+                                child: Text('IMAP'),
+                                value: ServerType.imap,
+                              ),
+                              DropdownMenuItem(
+                                child: Text('POP'),
+                                value: ServerType.pop,
+                              ),
+                            ],
+                            value: incomingServerType,
+                            onChanged: (value) =>
+                                setState(() => incomingServerType = value)),
+                      ],
                     ),
-                    DropdownButton<SocketType>(
-                        items: [
-                          DropdownMenuItem(
-                              child: Text(
-                                  localizations.accountDetailsOptionAutomatic)),
-                          DropdownMenuItem(
-                            child: Text('SSL'),
-                            value: SocketType.ssl,
-                          ),
-                          DropdownMenuItem(
-                            child: Text('Start TLS'),
-                            value: SocketType.starttls,
-                          ),
-                          DropdownMenuItem(
-                            child: Text(
-                                localizations.accountDetailsSecurityOptionNone),
-                            value: SocketType.plain,
-                          ),
-                        ],
-                        value: outgoingSecurity,
-                        onChanged: (value) =>
-                            setState(() => outgoingSecurity = value)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Text(localizations
+                              .accountDetailsIncomingSecurityLabel),
+                        ),
+                        PlatformDropdownButton<SocketType>(
+                            items: [
+                              DropdownMenuItem(
+                                  child: Text(localizations
+                                      .accountDetailsOptionAutomatic)),
+                              DropdownMenuItem(
+                                child: Text('SSL'),
+                                value: SocketType.ssl,
+                              ),
+                              DropdownMenuItem(
+                                child: Text('Start TLS'),
+                                value: SocketType.starttls,
+                              ),
+                              DropdownMenuItem(
+                                child: Text(localizations
+                                    .accountDetailsSecurityOptionNone),
+                                value: SocketType.plain,
+                              ),
+                            ],
+                            value: incomingSecurity,
+                            onChanged: (value) =>
+                                setState(() => incomingSecurity = value)),
+                      ],
+                    ),
+                    DecoratedPlatformTextField(
+                      controller: incomingHostPortController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: InputDecoration(
+                        labelText:
+                            localizations.accountDetailsIncomingPortLabel,
+                        hintText: localizations.accountDetailsPortHint,
+                      ),
+                    ),
+                    DecoratedPlatformTextField(
+                      controller: incomingUserNameController,
+                      decoration: InputDecoration(
+                        labelText:
+                            localizations.accountDetailsIncomingUserNameLabel,
+                        hintText:
+                            localizations.accountDetailsAlternativeUserNameHint,
+                      ),
+                    ),
+                    PasswordField(
+                        controller: incomingPasswordController,
+                        labelText:
+                            localizations.accountDetailsIncomingPasswordLabel,
+                        hintText: localizations
+                            .accountDetailsAlternativePasswordHint),
                   ],
                 ),
-                TextField(
-                  controller: outgoingHostPortController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: InputDecoration(
-                    labelText: localizations.accountDetailsOutgoingPortLabel,
-                    hintText: localizations.accountDetailsPortHint,
-                  ),
-                ),
-                TextField(
-                  controller: outgoingUserNameController,
-                  decoration: InputDecoration(
-                    labelText:
-                        localizations.accountDetailsOutgoingUserNameLabel,
-                    hintText:
-                        localizations.accountDetailsAlternativeUserNameHint,
-                  ),
-                ),
-                PasswordField(
-                  controller: outgoingPasswordController,
-                  labelText: localizations.accountDetailsOutgoingPasswordLabel,
-                  hintText: localizations.accountDetailsAlternativePasswordHint,
+                ExpansionTile(
+                  title: Text(
+                      localizations.accountDetailsAdvancedOutgoingSectionTitle),
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Text(localizations
+                              .accountDetailsOutgoingServerTypeLabel),
+                        ),
+                        PlatformDropdownButton<ServerType>(
+                            items: [
+                              DropdownMenuItem(
+                                  child: Text(localizations
+                                      .accountDetailsOptionAutomatic)),
+                              DropdownMenuItem(
+                                child: Text('SMTP'),
+                                value: ServerType.smtp,
+                              ),
+                            ],
+                            value: outgoingServerType,
+                            onChanged: (value) =>
+                                setState(() => outgoingServerType = value)),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Text(localizations
+                              .accountDetailsOutgoingSecurityLabel),
+                        ),
+                        PlatformDropdownButton<SocketType>(
+                            items: [
+                              DropdownMenuItem(
+                                  child: Text(localizations
+                                      .accountDetailsOptionAutomatic)),
+                              DropdownMenuItem(
+                                child: Text('SSL'),
+                                value: SocketType.ssl,
+                              ),
+                              DropdownMenuItem(
+                                child: Text('Start TLS'),
+                                value: SocketType.starttls,
+                              ),
+                              DropdownMenuItem(
+                                child: Text(localizations
+                                    .accountDetailsSecurityOptionNone),
+                                value: SocketType.plain,
+                              ),
+                            ],
+                            value: outgoingSecurity,
+                            onChanged: (value) =>
+                                setState(() => outgoingSecurity = value)),
+                      ],
+                    ),
+                    DecoratedPlatformTextField(
+                      controller: outgoingHostPortController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: InputDecoration(
+                        labelText:
+                            localizations.accountDetailsOutgoingPortLabel,
+                        hintText: localizations.accountDetailsPortHint,
+                      ),
+                    ),
+                    DecoratedPlatformTextField(
+                      controller: outgoingUserNameController,
+                      decoration: InputDecoration(
+                        labelText:
+                            localizations.accountDetailsOutgoingUserNameLabel,
+                        hintText:
+                            localizations.accountDetailsAlternativeUserNameHint,
+                      ),
+                    ),
+                    PasswordField(
+                      controller: outgoingPasswordController,
+                      labelText:
+                          localizations.accountDetailsOutgoingPasswordLabel,
+                      hintText:
+                          localizations.accountDetailsAlternativePasswordHint,
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

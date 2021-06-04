@@ -302,7 +302,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
+                      child: PlatformProgressIndicator(),
                     ),
                     Expanded(
                       child: Padding(
