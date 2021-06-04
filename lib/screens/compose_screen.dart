@@ -427,109 +427,105 @@ class _ComposeScreenState extends State<ComposeScreen> {
                 ], // actions
               ),
               SliverToBoxAdapter(
-                child: Material(
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(localizations.detailsHeaderFrom,
-                            style: Theme.of(context).textTheme?.caption),
-                        DropdownButton<Sender>(
-                          isExpanded: true,
-                          items: senders
-                              .map(
-                                (s) => DropdownMenuItem<Sender>(
-                                  value: s,
-                                  child: Text(
-                                    s.isPlaceHolderForPlusAlias
-                                        ? localizations
-                                            .composeCreatePlusAliasAction
-                                        : s.toString(),
-                                    overflow: TextOverflow.fade,
-                                  ),
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(localizations.detailsHeaderFrom,
+                          style: Theme.of(context).textTheme?.caption),
+                      PlatformDropdownButton<Sender>(
+                        isExpanded: true,
+                        items: senders
+                            .map(
+                              (s) => DropdownMenuItem<Sender>(
+                                value: s,
+                                child: Text(
+                                  s.isPlaceHolderForPlusAlias
+                                      ? localizations
+                                          .composeCreatePlusAliasAction
+                                      : s.toString(),
+                                  overflow: TextOverflow.fade,
                                 ),
-                              )
-                              .toList(),
-                          onChanged: (s) async {
-                            final builder = widget.data.messageBuilder;
-                            if (s.isPlaceHolderForPlusAlias) {
-                              final index = senders.indexOf(s);
-                              s = locator<MailService>()
-                                  .generateRandomPlusAliasSender(s);
-                              setState(() {
-                                senders.insert(index, s);
-                              });
-                            }
-                            builder.from = [s.address];
-                            final lastSignature = signature;
-                            from = s;
-                            final newSignature = signature;
-                            if (newSignature != lastSignature) {
-                              _editorApi.replaceAll(
-                                  lastSignature, newSignature);
-                            }
-                            if (_isReadReceiptRequested) {
-                              builder.requestReadReceipt(
-                                  recipient: from.address);
-                            }
-                            setState(() {});
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (s) async {
+                          final builder = widget.data.messageBuilder;
+                          if (s.isPlaceHolderForPlusAlias) {
+                            final index = senders.indexOf(s);
+                            s = locator<MailService>()
+                                .generateRandomPlusAliasSender(s);
+                            setState(() {
+                              senders.insert(index, s);
+                            });
+                          }
+                          builder.from = [s.address];
+                          final lastSignature = signature;
+                          from = s;
+                          final newSignature = signature;
+                          if (newSignature != lastSignature) {
+                            _editorApi.replaceAll(lastSignature, newSignature);
+                          }
+                          if (_isReadReceiptRequested) {
+                            builder.requestReadReceipt(recipient: from.address);
+                          }
+                          setState(() {});
 
-                            _checkAccountContactManager(from.account);
-                          },
-                          value: from,
-                          hint: Text(localizations.composeSenderHint),
+                          _checkAccountContactManager(from.account);
+                        },
+                        value: from,
+                        hint: Text(localizations.composeSenderHint),
+                      ),
+                      RecipientInputField(
+                        contactManager: from.account.contactManager,
+                        addresses: _toRecipients,
+                        autofocus: _focus == _Autofocus.to,
+                        labelText: localizations.detailsHeaderTo,
+                        hintText: localizations.composeRecipientHint,
+                        additionalSuffixIcon: PlatformTextButton(
+                          child: ButtonText(localizations.detailsHeaderCc),
+                          onPressed: () => setState(
+                            () => _isCcBccVisible = !_isCcBccVisible,
+                          ),
+                        ),
+                      ),
+                      if (_isCcBccVisible) ...{
+                        RecipientInputField(
+                          addresses: _ccRecipients,
+                          contactManager: from.account.contactManager,
+                          labelText: localizations.detailsHeaderCc,
+                          hintText: localizations.composeRecipientHint,
                         ),
                         RecipientInputField(
+                          addresses: _bccRecipients,
                           contactManager: from.account.contactManager,
-                          addresses: _toRecipients,
-                          autofocus: _focus == _Autofocus.to,
-                          labelText: localizations.detailsHeaderTo,
+                          labelText: localizations.detailsHeaderBcc,
                           hintText: localizations.composeRecipientHint,
-                          additionalSuffixIcon: PlatformTextButton(
-                            child: ButtonText(localizations.detailsHeaderCc),
-                            onPressed: () => setState(
-                              () => _isCcBccVisible = !_isCcBccVisible,
-                            ),
-                          ),
                         ),
-                        if (_isCcBccVisible) ...{
-                          RecipientInputField(
-                            addresses: _ccRecipients,
-                            contactManager: from.account.contactManager,
-                            labelText: localizations.detailsHeaderCc,
-                            hintText: localizations.composeRecipientHint,
-                          ),
-                          RecipientInputField(
-                            addresses: _bccRecipients,
-                            contactManager: from.account.contactManager,
-                            labelText: localizations.detailsHeaderBcc,
-                            hintText: localizations.composeRecipientHint,
-                          ),
-                        },
-                        DecoratedPlatformTextField(
-                          controller: _subjectController,
-                          autofocus: _focus == _Autofocus.subject,
-                          decoration: InputDecoration(
-                            labelText: localizations.composeSubjectLabel,
-                            hintText: localizations.composeSubjectHint,
-                          ),
+                      },
+                      DecoratedPlatformTextField(
+                        controller: _subjectController,
+                        autofocus: _focus == _Autofocus.subject,
+                        decoration: InputDecoration(
+                          labelText: localizations.composeSubjectLabel,
+                          hintText: localizations.composeSubjectHint,
                         ),
-                        if (widget.data.messageBuilder.attachments.isNotEmpty ||
-                            (_downloadAttachmentsFuture != null)) ...{
-                          Padding(
-                            padding: EdgeInsets.only(top: 8.0),
-                            child: AttachmentComposeBar(
-                                composeData: widget.data,
-                                isDownloading:
-                                    (_downloadAttachmentsFuture != null)),
-                          ),
-                          Divider(
-                            color: Colors.grey,
-                          )
-                        },
-                      ],
-                    ),
+                      ),
+                      if (widget.data.messageBuilder.attachments.isNotEmpty ||
+                          (_downloadAttachmentsFuture != null)) ...{
+                        Padding(
+                          padding: EdgeInsets.only(top: 8.0),
+                          child: AttachmentComposeBar(
+                              composeData: widget.data,
+                              isDownloading:
+                                  (_downloadAttachmentsFuture != null)),
+                        ),
+                        Divider(
+                          color: Colors.grey,
+                        )
+                      },
+                    ],
                   ),
                 ),
               ),

@@ -1,3 +1,4 @@
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
@@ -33,97 +34,97 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context,
       title: localizations.settingsTitle,
       content: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Checkbox(
-                    value: blockExternalImages,
-                    onChanged: (value) async {
-                      setState(() {
-                        blockExternalImages = value;
-                      });
-                      settings.blockExternalImages = value;
-                      await locator<SettingsService>().save();
-                    },
-                  ),
-                  Text(localizations.settingsSecurityBlockExternalImages),
-                ],
-              ),
-              Divider(),
-              ListTile(
-                title: Text(localizations.settingsActionAccounts),
-                onTap: () {
-                  locator<NavigationService>().push(Routes.settingsAccounts);
-                },
-              ),
-              ListTile(
-                title: Text(localizations.swipeSettingTitle),
-                onTap: () {
-                  locator<NavigationService>().push(Routes.settingsSwipe);
-                },
-              ),
-              ListTile(
-                title: Text(localizations.signatureSettingsTitle),
-                onTap: () {
-                  locator<NavigationService>().push(Routes.settingsSignature);
-                },
-              ),
-              ListTile(
-                title: Text(localizations.settingsActionDesign),
-                onTap: () {
-                  locator<NavigationService>().push(Routes.settingsDesign);
-                },
-              ),
-              ListTile(
-                title: Text(localizations.languageSettingTitle),
-                onTap: () {
-                  locator<NavigationService>().push(Routes.settingsLanguage);
-                },
-              ),
-              ListTile(
-                title: Text(localizations.settingsFolders),
-                onTap: () {
-                  locator<NavigationService>().push(Routes.settingsFolders);
-                },
-              ),
-              ListTile(
-                title: Text(localizations.settingsReadReceipts),
-                onTap: () {
-                  locator<NavigationService>()
-                      .push(Routes.settingsReadReceipts);
-                },
-              ),
-              Divider(),
-              ListTile(
-                title: Text(localizations.settingsActionFeedback),
-                onTap: () {
-                  locator<NavigationService>().push(Routes.settingsFeedback);
-                },
-              ),
-              ListTile(
-                onTap: () {
-                  DialogHelper.showAbout(context);
-                },
-                title: Text(localizations.drawerEntryAbout),
-              ),
-              ListTile(
-                onTap: () {
-                  locator<NavigationService>().push(Routes.welcome);
-                },
-                title: Text(localizations.settingsActionWelcome),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(localizations.settingsDevelopment),
-                onTap: () {
-                  locator<NavigationService>().push(Routes.settingsDevelopment);
-                },
-              ),
-            ],
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                PlatformCheckboxListTile(
+                  value: blockExternalImages,
+                  onChanged: (value) async {
+                    setState(() {
+                      blockExternalImages = value;
+                    });
+                    settings.blockExternalImages = value;
+                    await locator<SettingsService>().save();
+                  },
+                  title:
+                      Text(localizations.settingsSecurityBlockExternalImages),
+                ),
+                Divider(),
+                PlatformListTile(
+                  title: Text(localizations.settingsActionAccounts),
+                  onTap: () {
+                    locator<NavigationService>().push(Routes.settingsAccounts);
+                  },
+                ),
+                PlatformListTile(
+                  title: Text(localizations.swipeSettingTitle),
+                  onTap: () {
+                    locator<NavigationService>().push(Routes.settingsSwipe);
+                  },
+                ),
+                PlatformListTile(
+                  title: Text(localizations.signatureSettingsTitle),
+                  onTap: () {
+                    locator<NavigationService>().push(Routes.settingsSignature);
+                  },
+                ),
+                PlatformListTile(
+                  title: Text(localizations.settingsActionDesign),
+                  onTap: () {
+                    locator<NavigationService>().push(Routes.settingsDesign);
+                  },
+                ),
+                PlatformListTile(
+                  title: Text(localizations.languageSettingTitle),
+                  onTap: () {
+                    locator<NavigationService>().push(Routes.settingsLanguage);
+                  },
+                ),
+                PlatformListTile(
+                  title: Text(localizations.settingsFolders),
+                  onTap: () {
+                    locator<NavigationService>().push(Routes.settingsFolders);
+                  },
+                ),
+                PlatformListTile(
+                  title: Text(localizations.settingsReadReceipts),
+                  onTap: () {
+                    locator<NavigationService>()
+                        .push(Routes.settingsReadReceipts);
+                  },
+                ),
+                Divider(),
+                PlatformListTile(
+                  title: Text(localizations.settingsActionFeedback),
+                  onTap: () {
+                    locator<NavigationService>().push(Routes.settingsFeedback);
+                  },
+                ),
+                PlatformListTile(
+                  onTap: () {
+                    DialogHelper.showAbout(context);
+                  },
+                  title: Text(localizations.drawerEntryAbout),
+                ),
+                PlatformListTile(
+                  onTap: () {
+                    locator<NavigationService>().push(Routes.welcome);
+                  },
+                  title: Text(localizations.settingsActionWelcome),
+                ),
+                Divider(),
+                PlatformListTile(
+                  title: Text(localizations.settingsDevelopment),
+                  onTap: () {
+                    locator<NavigationService>()
+                        .push(Routes.settingsDevelopment);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

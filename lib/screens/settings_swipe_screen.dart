@@ -4,6 +4,7 @@ import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
@@ -22,25 +23,27 @@ class SettingsSwipeScreen extends StatelessWidget {
       context,
       title: localizations.swipeSettingTitle,
       content: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(localizations.swipeSettingLeftToRightLabel,
-                  style: theme.textTheme.caption),
-              _SwipeSetting(
-                swipeAction: leftToRightAction,
-                isLeftToRight: true,
-              ),
-              Divider(),
-              Text(localizations.swipeSettingRightToLeftLabel,
-                  style: theme.textTheme.caption),
-              _SwipeSetting(
-                swipeAction: rightToLeftAction,
-                isLeftToRight: false,
-              ),
-            ],
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.swipeSettingLeftToRightLabel,
+                    style: theme.textTheme.caption),
+                _SwipeSetting(
+                  swipeAction: leftToRightAction,
+                  isLeftToRight: true,
+                ),
+                Divider(),
+                Text(localizations.swipeSettingRightToLeftLabel,
+                    style: theme.textTheme.caption),
+                _SwipeSetting(
+                  swipeAction: rightToLeftAction,
+                  isLeftToRight: false,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -75,13 +78,13 @@ class _SwipeSettingState extends State<_SwipeSetting> {
 
     return Row(
       children: [
-        TextButton(
+        PlatformTextButton(
           onPressed: _onPressed,
           child: _SwipeWidget(
             swipeAction: _currentAction,
           ),
         ),
-        TextButton.icon(
+        PlatformTextButtonIcon(
           onPressed: _onPressed,
           icon: Icon(Icons.edit),
           label: ButtonText(localizations.swipeSettingChangeAction),
@@ -115,13 +118,14 @@ class _SwipeSettingState extends State<_SwipeSetting> {
           ? localizations.swipeSettingLeftToRightLabel
           : localizations.swipeSettingRightToLeftLabel,
       SizedBox(
+        height: MediaQuery.of(context).size.height * 0.7,
         width: MediaQuery.of(context).size.width * 0.7,
         child: GridView.count(
           crossAxisCount: 2,
-          shrinkWrap: true,
+          // shrinkWrap: true,
           children: SwipeAction.values
               .map(
-                (action) => TextButton(
+                (action) => PlatformTextButton(
                   child: Stack(
                     children: [
                       _SwipeWidget(
@@ -136,8 +140,10 @@ class _SwipeSettingState extends State<_SwipeSetting> {
                               color: Colors.white,
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(Icons.check,
-                                color: Theme.of(context).accentColor),
+                            child: Icon(
+                              Icons.check,
+                              color: Theme.of(context).accentColor,
+                            ),
                           ),
                         ),
                       },
@@ -180,7 +186,7 @@ class _SwipeWidget extends StatelessWidget {
           width: 128,
           height: 128,
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(8.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -195,8 +201,10 @@ class _SwipeWidget extends StatelessWidget {
                 Text(
                   swipeAction.name(localizations),
                   style: TextStyle(
-                      color: swipeAction.colorForeground,
-                      fontSize: isSmall ? 10.0 : 12.0),
+                    color: swipeAction.colorForeground,
+                    fontSize: isSmall ? 10.0 : 12.0,
+                  ),
+                  // overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

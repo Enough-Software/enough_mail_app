@@ -8,10 +8,11 @@ import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
-import 'package:event_bus/event_bus.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -62,175 +63,182 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: accountNameController,
-              decoration: InputDecoration(
-                labelText: localizations.addAccountNameOfAccountLabel,
-                hintText: localizations.addAccountNameOfAccountHint,
-              ),
-              onChanged: (value) async {
-                widget.account.name = value;
-                await locator<MailService>().saveAccounts();
-              },
-            ),
-            TextField(
-              controller: userNameController,
-              decoration: InputDecoration(
-                labelText: localizations.addAccountNameOfUserLabel,
-                hintText: localizations.addAccountNameOfUserHint,
-              ),
-              onChanged: (value) async {
-                widget.account.userName = value;
-                await locator<MailService>().saveAccounts();
-              },
-            ),
-            if (locator<MailService>().hasUnifiedAccount) ...{
-              CheckboxListTile(
-                value: !widget.account.excludeFromUnified,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DecoratedPlatformTextField(
+                controller: accountNameController,
+                decoration: InputDecoration(
+                  labelText: localizations.addAccountNameOfAccountLabel,
+                  hintText: localizations.addAccountNameOfAccountHint,
+                ),
                 onChanged: (value) async {
-                  widget.account.excludeFromUnified = !value;
-                  setState(() {});
-                  await locator<MailService>()
-                      .excludeAccountFromUnified(widget.account, !value);
+                  widget.account.name = value;
+                  await locator<MailService>().saveAccounts();
                 },
-                title: Text(localizations.editAccountIncludeInUnifiedLabel),
               ),
-            },
-            Divider(),
-            Text(localizations.signatureSettingsTitle,
-                style: theme.textTheme.subtitle1),
-            SignatureWidget(
-              account: widget.account,
-            ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-              child: Text(
-                  localizations.editAccountAliasLabel(widget.account.email)),
-            ),
-            if (widget.account.hasNoAlias) ...{
+              DecoratedPlatformTextField(
+                controller: userNameController,
+                decoration: InputDecoration(
+                  labelText: localizations.addAccountNameOfUserLabel,
+                  hintText: localizations.addAccountNameOfUserHint,
+                ),
+                onChanged: (value) async {
+                  widget.account.userName = value;
+                  await locator<MailService>().saveAccounts();
+                },
+              ),
+              if (locator<MailService>().hasUnifiedAccount) ...{
+                PlatformCheckboxListTile(
+                  value: !widget.account.excludeFromUnified,
+                  onChanged: (value) async {
+                    widget.account.excludeFromUnified = !value;
+                    setState(() {});
+                    await locator<MailService>()
+                        .excludeAccountFromUnified(widget.account, !value);
+                  },
+                  title: Text(localizations.editAccountIncludeInUnifiedLabel),
+                ),
+              },
+              Divider(),
+              Text(localizations.signatureSettingsTitle,
+                  style: theme.textTheme.subtitle1),
+              SignatureWidget(
+                account: widget.account,
+              ),
+              Divider(),
               Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text(localizations.editAccountNoAliasesInfo,
-                    style: TextStyle(fontStyle: FontStyle.italic)),
+                padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                child: Text(
+                    localizations.editAccountAliasLabel(widget.account.email)),
               ),
-            },
-            for (final alias in widget.account.aliases) ...{
-              Dismissible(
-                key: ValueKey(alias),
-                child: ListTile(
-                  title: Text(alias.toString()),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AliasEditDialog(
-                        isNewAlias: false,
-                        alias: alias,
-                        account: widget.account,
-                      ),
-                    );
+              if (widget.account.hasNoAlias) ...{
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(localizations.editAccountNoAliasesInfo,
+                      style: TextStyle(fontStyle: FontStyle.italic)),
+                ),
+              },
+              for (final alias in widget.account.aliases) ...{
+                Dismissible(
+                  key: ValueKey(alias),
+                  child: PlatformListTile(
+                    title: Text(alias.toString()),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AliasEditDialog(
+                          isNewAlias: false,
+                          alias: alias,
+                          account: widget.account,
+                        ),
+                      );
+                    },
+                  ),
+                  background:
+                      Container(color: Colors.red, child: Icon(Icons.delete)),
+                  onDismissed: (direction) async {
+                    await widget.account.removeAlias(alias);
+                    locator<ScaffoldMessengerService>().showTextSnackBar(
+                        localizations.editAccountAliasRemoved(alias.email));
                   },
                 ),
-                background:
-                    Container(color: Colors.red, child: Icon(Icons.delete)),
-                onDismissed: (direction) async {
-                  await widget.account.removeAlias(alias);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                          localizations.editAccountAliasRemoved(alias.email))));
+              },
+              PlatformTextButtonIcon(
+                icon: Icon(Icons.add),
+                label: Text(localizations.editAccountAddAliasAction),
+                onPressed: () {
+                  var email = widget.account.email;
+                  email = email.substring(email.lastIndexOf('@'));
+                  final alias = MailAddress(widget.account.userName, email);
+                  showDialog(
+                    context: context,
+                    builder: (context) => AliasEditDialog(
+                      isNewAlias: true,
+                      alias: alias,
+                      account: widget.account,
+                    ),
+                  );
                 },
               ),
-            },
-            ListTile(
-              leading: Icon(Icons.add),
-              title: Text(localizations.editAccountAddAliasAction),
-              onTap: () {
-                var email = widget.account.email;
-                email = email.substring(email.lastIndexOf('@'));
-                final alias = MailAddress(widget.account.userName, email);
-                showDialog(
-                  context: context,
-                  builder: (context) => AliasEditDialog(
-                      isNewAlias: true, alias: alias, account: widget.account),
-                );
-              },
-            ),
-            // section to test plus alias support
-            CheckboxListTile(
-              value: widget.account.supportsPlusAliases,
-              onChanged: null,
-              title: Text(localizations.editAccountPlusAliasesSupported),
-            ),
-            //if (!widget.account.supportsPlusAliases) ...{
-            ElevatedButton(
-              child: ButtonText(localizations.editAccountCheckPlusAliasAction),
-              onPressed: () async {
-                var result = await showDialog<bool>(
-                  context: context,
-                  builder: (context) =>
-                      PlusAliasTestingDialog(account: widget.account),
-                );
-                if (result != null) {
-                  widget.account.supportsPlusAliases = result;
-                  locator<MailService>()
-                      .markAccountAsTestedForPlusAlias(widget.account);
-                  await locator<MailService>()
-                      .saveAccount(widget.account.account);
-                }
-              },
-            ),
-            Divider(),
-            ElevatedButton.icon(
-                onPressed: () => locator<NavigationService>().push(
-                    Routes.accountServerDetails,
-                    arguments: widget.account),
-                icon: Icon(Icons.edit),
-                label:
-                    ButtonText(localizations.editAccountServerSettingsAction)),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: ElevatedButton.icon(
-                style: TextButton.styleFrom(backgroundColor: Colors.red),
-                icon: Icon(
-                  Icons.delete,
-                  color: Colors.white,
-                ),
-                label: ButtonText(
-                  localizations.editAccountDeleteAccountAction,
-                  style: Theme.of(context)
-                      .textTheme
-                      .button
-                      .copyWith(color: Colors.white),
-                ),
+              // section to test plus alias support
+              PlatformCheckboxListTile(
+                value: widget.account.supportsPlusAliases,
+                onChanged: null,
+                title: Text(localizations.editAccountPlusAliasesSupported),
+              ),
+              //if (!widget.account.supportsPlusAliases) ...{
+              PlatformTextButton(
+                child:
+                    ButtonText(localizations.editAccountCheckPlusAliasAction),
                 onPressed: () async {
-                  final result = await DialogHelper.askForConfirmation(context,
-                      title: localizations
-                          .editAccountDeleteAccountConfirmationTitle,
-                      query: localizations
-                          .editAccountDeleteAccountConfirmationQuery(
-                              accountNameController.text),
-                      action: localizations.actionDelete,
-                      isDangerousAction: true);
-                  if (result == true) {
-                    final mailService = locator<MailService>();
-                    await mailService.removeAccount(widget.account);
-                    AppEventBus.eventBus.fire(AccountsChangedEvent());
-                    if (mailService.accounts.isEmpty) {
-                      locator<NavigationService>()
-                          .push(Routes.welcome, clear: true);
-                    } else {
-                      locator<NavigationService>().pop();
-                    }
+                  var result = await showDialog<bool>(
+                    context: context,
+                    builder: (context) =>
+                        PlusAliasTestingDialog(account: widget.account),
+                  );
+                  if (result != null) {
+                    widget.account.supportsPlusAliases = result;
+                    locator<MailService>()
+                        .markAccountAsTestedForPlusAlias(widget.account);
+                    await locator<MailService>()
+                        .saveAccount(widget.account.account);
                   }
                 },
               ),
-            ),
-            //}
-          ],
+              Divider(),
+              PlatformTextButtonIcon(
+                  onPressed: () => locator<NavigationService>().push(
+                      Routes.accountServerDetails,
+                      arguments: widget.account),
+                  icon: Icon(Icons.edit),
+                  label: ButtonText(
+                      localizations.editAccountServerSettingsAction)),
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: PlatformTextButtonIcon(
+                  backgroundColor: Colors.red,
+                  style: TextButton.styleFrom(backgroundColor: Colors.red),
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                  ),
+                  label: ButtonText(
+                    localizations.editAccountDeleteAccountAction,
+                    style: Theme.of(context)
+                        .textTheme
+                        .button
+                        .copyWith(color: Colors.white),
+                  ),
+                  onPressed: () async {
+                    final result = await DialogHelper.askForConfirmation(
+                        context,
+                        title: localizations
+                            .editAccountDeleteAccountConfirmationTitle,
+                        query: localizations
+                            .editAccountDeleteAccountConfirmationQuery(
+                                accountNameController.text),
+                        action: localizations.actionDelete,
+                        isDangerousAction: true);
+                    if (result == true) {
+                      final mailService = locator<MailService>();
+                      await mailService.removeAccount(widget.account);
+                      AppEventBus.eventBus.fire(AccountsChangedEvent());
+                      if (mailService.accounts.isEmpty) {
+                        locator<NavigationService>()
+                            .push(Routes.welcome, clear: true);
+                      } else {
+                        locator<NavigationService>().pop();
+                      }
+                    }
+                  },
+                ),
+              ),
+              //}
+            ],
+          ),
         ),
       ),
     );
@@ -348,7 +356,7 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
           ),
           Step(
             title: Text(localizations.editAccountTestPlusAliasStepTestingTitle),
-            content: Center(child: CircularProgressIndicator()),
+            content: Center(child: PlatformProgressIndicator()),
             isActive: (step == 1),
           ),
           Step(
@@ -402,18 +410,18 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
-    return AlertDialog(
+    return PlatformAlertDialog(
       title: Text(widget.isNewAlias
           ? localizations.editAccountAddAliasTitle
           : localizations.editAccountEditAliasTitle),
       content:
-          isSaving ? CircularProgressIndicator() : buildContent(localizations),
+          isSaving ? PlatformProgressIndicator() : buildContent(localizations),
       actions: [
-        TextButton(
+        PlatformTextButton(
           child: ButtonText(localizations.actionCancel),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        TextButton(
+        PlatformTextButton(
           child: ButtonText(widget.isNewAlias
               ? localizations.editAccountAliasAddAction
               : localizations.editAccountAliasUpdateAction),
@@ -438,13 +446,13 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        TextField(
+        DecoratedPlatformTextField(
           controller: nameController,
           decoration: InputDecoration(
               labelText: localizations.editAccountEditAliasNameLabel,
               hintText: localizations.addAccountNameOfUserHint),
         ),
-        TextField(
+        DecoratedPlatformTextField(
           controller: emailController,
           decoration: InputDecoration(
               labelText: localizations.editAccountEditAliasEmailLabel,
