@@ -70,7 +70,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
         ),
       },
       for (final address in widget.addresses) ...{
-        Chip(
+        PlatformChip(
           label: Column(
             children: [
               if (address.hasPersonalName) ...{
