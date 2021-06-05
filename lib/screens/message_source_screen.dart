@@ -23,7 +23,7 @@ import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
-import 'package:enough_mail_app/widgets/status_bar.dart';
+import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 // import 'package:enough_style/enough_style.dart';
@@ -76,6 +76,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         _messageLoader = initMessageSource();
       });
     });
+    if (Platform.isIOS) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        locator<ScaffoldMessengerService>()
+            .showCupertinoPermanentStatus(widget.messageSource.description);
+      });
+    }
   }
 
   Future<bool> initMessageSource() {
@@ -152,8 +158,11 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               }
             },
           )
-        : Base.buildTitle(widget.messageSource.name ?? '',
-            widget.messageSource.description ?? '');
+        : Platform.isIOS
+            ? Text(widget.messageSource.name)
+            : Base.buildTitle(widget.messageSource.name ?? '',
+                widget.messageSource.description ?? '');
+
     final appBarActions = [
       if (widget.messageSource.supportsSearching && !Platform.isIOS) ...{
         PlatformIconButton(
@@ -248,7 +257,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       bottomBar: isInSelectionMode
           ? buildSelectionModeBottomBar(localizations)
           : Platform.isIOS
-              ? StatusBar(
+              ? CupertinoStatusBar(
                   rightAction: PlatformIconButton(
                     icon: Icon(CupertinoIcons.create),
                     onPressed: () => locator<NavigationService>().push(
