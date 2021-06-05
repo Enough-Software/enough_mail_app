@@ -34,10 +34,4 @@ class ScaffoldMessengerService {
       _showSnackBar(_buildTextSnackBar(text, undo: undo));
     }
   }
-
-  void showCupertinoPermanentStatus(String text) {
-    if (Platform.isIOS) {
-      statusBarKey.currentState?.showPermanentStatus(text);
-    }
-  }
 }
