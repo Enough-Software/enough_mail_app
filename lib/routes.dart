@@ -41,7 +41,9 @@ class AppRouter {
     Widget page;
     switch (name) {
       case Routes.accountAdd:
-        page = AccountAddScreen();
+        page = AccountAddScreen(
+          launchedFromWelcome: (arguments == true),
+        );
         break;
       case Routes.accountServerDetails:
         page = AccountServerDetailsScreen(account: arguments as Account);
