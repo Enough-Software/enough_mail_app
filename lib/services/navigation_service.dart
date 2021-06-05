@@ -17,12 +17,12 @@ class NavigationService {
       bool clear = false}) {
     final page = AppRouter.generatePage(routeName, arguments);
     Route route;
-    if (fade) {
+    if (fade && !Platform.isIOS) {
       route = FadeRoute(page: page);
     } else {
-      route = Platform.isAndroid
-          ? MaterialPageRoute(builder: (_) => page)
-          : CupertinoPageRoute(builder: (_) => page);
+      route = Platform.isIOS
+          ? CupertinoPageRoute(builder: (_) => page)
+          : MaterialPageRoute(builder: (_) => page);
     }
     if (clear) {
       navigatorKey.currentState.popUntil((route) => false);

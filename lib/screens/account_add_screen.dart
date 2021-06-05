@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/account_add_event.dart';
 import 'package:enough_mail_app/extensions/extensions.dart';
@@ -18,6 +20,10 @@ import 'package:url_launcher/url_launcher.dart' as launcher;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AccountAddScreen extends StatefulWidget {
+  final bool launchedFromWelcome;
+
+  const AccountAddScreen({Key key, this.launchedFromWelcome = false});
+
   @override
   _AccountAddScreenState createState() => _AccountAddScreenState();
 }
@@ -419,8 +425,15 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         final service = locator<MailService>();
         final added = await service.addAccount(account, mailClient);
         if (added) {
-          locator<NavigationService>().push(Routes.messageSource,
-              arguments: service.messageSource, replace: true, fade: true);
+          if (Platform.isIOS && widget.launchedFromWelcome) {
+            locator<NavigationService>().push(Routes.appDrawer, clear: true);
+          }
+          locator<NavigationService>().push(
+            Routes.messageSource,
+            arguments: service.messageSource,
+            replace: !Platform.isIOS,
+            fade: true,
+          );
         }
     }
   }

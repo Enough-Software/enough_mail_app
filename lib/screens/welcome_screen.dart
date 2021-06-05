@@ -129,7 +129,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ],
                       ),
                       onPressed: () {
-                        locator<NavigationService>().push(Routes.accountAdd);
+                        locator<NavigationService>()
+                            .push(Routes.accountAdd, arguments: true);
                       },
                     ),
                   ),
