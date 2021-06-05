@@ -2,15 +2,16 @@ import 'dart:io';
 
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/widgets/status_bar.dart';
+import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
 import 'package:flutter/material.dart';
 
 class ScaffoldMessengerService {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
-  final GlobalKey<StatusBarState> statusBarKey = GlobalKey<StatusBarState>();
+  final GlobalKey<CupertinoStatusBarState> statusBarKey =
+      GlobalKey<CupertinoStatusBarState>();
 
-  SnackBar buildTextSnackBar(String text, {Function() undo}) {
+  SnackBar _buildTextSnackBar(String text, {Function() undo}) {
     return SnackBar(
       content: Text(text),
       action: undo == null
@@ -22,7 +23,7 @@ class ScaffoldMessengerService {
     );
   }
 
-  void showSnackBar(SnackBar snackBar) {
+  void _showSnackBar(SnackBar snackBar) {
     scaffoldMessengerKey.currentState.showSnackBar(snackBar);
   }
 
@@ -30,7 +31,13 @@ class ScaffoldMessengerService {
     if (Platform.isIOS) {
       statusBarKey.currentState?.showTextStatus(text, undo: undo);
     } else {
-      showSnackBar(buildTextSnackBar(text, undo: undo));
+      _showSnackBar(_buildTextSnackBar(text, undo: undo));
+    }
+  }
+
+  void showCupertinoPermanentStatus(String text) {
+    if (Platform.isIOS) {
+      statusBarKey.currentState?.showPermanentStatus(text);
     }
   }
 }
