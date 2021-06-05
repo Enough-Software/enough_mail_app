@@ -431,7 +431,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
           locator<NavigationService>().push(
             Routes.messageSource,
             arguments: service.messageSource,
-            replace: !Platform.isIOS,
+            clear: !Platform.isIOS && widget.launchedFromWelcome,
             fade: true,
           );
         }
