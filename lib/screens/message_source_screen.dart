@@ -76,12 +76,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         _messageLoader = initMessageSource();
       });
     });
-    if (Platform.isIOS) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        locator<ScaffoldMessengerService>()
-            .showCupertinoPermanentStatus(widget.messageSource.description);
-      });
-    }
   }
 
   Future<bool> initMessageSource() {
@@ -258,6 +252,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           ? buildSelectionModeBottomBar(localizations)
           : Platform.isIOS
               ? CupertinoStatusBar(
+                  info: CupertinoStatusBar.createInfo(
+                      widget.messageSource.description),
                   rightAction: PlatformIconButton(
                     icon: Icon(CupertinoIcons.create),
                     onPressed: () => locator<NavigationService>().push(

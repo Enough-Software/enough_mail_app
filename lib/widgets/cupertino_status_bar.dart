@@ -9,21 +9,30 @@ import '../locator.dart';
 ///
 /// Contains compose action and can display snackbar notifications on ios.
 class CupertinoStatusBar extends StatefulWidget {
+  static const _statusTextStyle = const TextStyle(fontSize: 10.0);
   final Widget leftAction;
   final Widget rightAction;
-  CupertinoStatusBar({this.leftAction, this.rightAction})
+  final Widget info;
+  CupertinoStatusBar({this.leftAction, this.info, this.rightAction})
       : super(key: locator<ScaffoldMessengerService>().statusBarKey);
 
   @override
   CupertinoStatusBarState createState() => CupertinoStatusBarState();
+
+  static Widget createInfo(String text) {
+    return (text == null)
+        ? null
+        : Text(
+            text,
+            style: _statusTextStyle,
+          );
+  }
 }
 
 class CupertinoStatusBarState extends State<CupertinoStatusBar> {
-  static const _statusTextStyle = const TextStyle(fontSize: 10.0);
   Widget _status;
   Widget _statusAction;
   double _statusOpacity;
-  Widget _permanentStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +57,7 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
             duration: const Duration(milliseconds: 400),
             child: _status,
           )
-        : _permanentStatus ?? Spacer();
+        : widget.info ?? Container();
     return CupertinoBar(
       blurBackground: true,
       backgroundOpacity: 0.8,
@@ -91,21 +100,10 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
     );
   }
 
-  void showPermanentStatus(String text) {
-    setState(() {
-      _permanentStatus = (text == null)
-          ? null
-          : Text(
-              text,
-              style: _statusTextStyle,
-            );
-    });
-  }
-
   void showTextStatus(String text, {Function() undo}) async {
     final notification = Text(
       text,
-      style: _statusTextStyle,
+      style: CupertinoStatusBar._statusTextStyle,
     );
     if (undo != null) {
       _statusAction = Padding(
@@ -115,7 +113,7 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
           minSize: 20.0,
           child: Text(
             locator<I18nService>().localizations.actionUndo,
-            style: _statusTextStyle,
+            style: CupertinoStatusBar._statusTextStyle,
           ),
           onPressed: () {
             setState(() {
