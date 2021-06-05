@@ -2,7 +2,6 @@ import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';

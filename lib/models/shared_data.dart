@@ -84,7 +84,7 @@ class SharedText extends SharedData {
   @override
   Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi) async {
     await editorApi.insertText(text);
-    Future.value(SharedDataAddResult.added);
+    return Future.value(SharedDataAddResult.added);
   }
 }
 

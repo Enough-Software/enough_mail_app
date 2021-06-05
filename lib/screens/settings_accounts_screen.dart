@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
-import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';

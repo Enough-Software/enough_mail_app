@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -9,7 +7,6 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/api_keys.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
-import 'package:enough_mail_app/widgets/message_widget.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
