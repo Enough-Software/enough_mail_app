@@ -1,5 +1,4 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/mime_source.dart';
 
 import 'message.dart';
 import 'package:collection/collection.dart' show IterableExtension;

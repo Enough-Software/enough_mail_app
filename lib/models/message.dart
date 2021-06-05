@@ -104,10 +104,10 @@ class Message extends ChangeNotifier {
     }
   }
 
-  bool get isMdnSent => mimeMessage.isMdnSent;
+  bool get isMdnSent => mimeMessage.isReadReceiptSent;
   set isMdnSent(bool value) {
-    if (value != mimeMessage.isMdnSent) {
-      mimeMessage.isMdnSent = value;
+    if (value != mimeMessage.isReadReceiptSent) {
+      mimeMessage.isReadReceiptSent = value;
       notifyListeners();
     }
   }

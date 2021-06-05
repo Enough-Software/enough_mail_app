@@ -140,7 +140,7 @@ class AppService {
       return locator<NavigationService>()
           .push(Routes.mailCompose, arguments: composeData, fade: true);
     }
-    // structure is:
+    // structure was:
     // mimetype:[<<uri>>,<<uri>>]:text
     // final uriStartIndex = shared.indexOf(':[<<');
     // final uriEndIndex = shared.indexOf('>>]:');
@@ -180,15 +180,5 @@ class AppService {
     // if (sharedText != null && sharedText != 'null') {
     //   builder.text = sharedText;
     // }
-  }
-
-  MediaType _guessMediaTypeFromFile(File file) {
-    print('guess media type for "${file.path}"...');
-    final extIndex = file.path.lastIndexOf('.');
-    if (extIndex != -1) {
-      final ext = file.path.substring(extIndex + 1);
-      return MediaType.guessFromFileExtension(ext);
-    }
-    return MediaType.fromSubtype(MediaSubtype.applicationOctetStream);
   }
 }

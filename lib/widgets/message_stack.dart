@@ -4,6 +4,7 @@ import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
+import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
@@ -153,7 +154,7 @@ class _MessageStackState extends State<MessageStack> {
           alignment: Alignment.bottomLeft,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: IconButton(
+            child: PlatformIconButton(
               icon: Icon(Icons.arrow_back),
               onPressed:
                   currentMessageIndex == 0 ? null : moveToPreviousMessage,
@@ -211,23 +212,17 @@ class _MessageStackState extends State<MessageStack> {
     }
     if (snack != null) {
       //TODO allow undo when marking as deleted
-      final snackBar = SnackBar(
-        content: Text(snack),
-        action: undo == null
-            ? null
-            : SnackBarAction(
-                label: 'Undo',
-                onPressed: () async {
-                  // bring back message:
-                  setState(() {
-                    currentMessage = message;
-                    currentMessageIndex = message.sourceIndex;
-                  });
-                  await undo();
-                },
-              ),
+      locator<ScaffoldMessengerService>().showTextSnackBar(
+        snack,
+        undo: () async {
+          // bring back message:
+          setState(() {
+            currentMessage = message;
+            currentMessageIndex = message.sourceIndex;
+          });
+          await undo();
+        },
       );
-      Scaffold.of(context).showSnackBar(snackBar);
     }
   }
 }
