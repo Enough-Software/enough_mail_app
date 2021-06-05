@@ -147,36 +147,33 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
       optionsViewBuilder: (context, onSelected, options) {
         return Align(
           alignment: Alignment.topLeft,
-          child: Material(
-            elevation: 4.0,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 200),
-              child: ListView.builder(
-                shrinkWrap: true,
-                padding: const EdgeInsets.all(8.0),
-                itemCount: options.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final MailAddress option = options.elementAt(index);
-                  return PlatformActionChip(
-                    label: Column(
-                      children: [
-                        if (option.hasPersonalName) ...{
-                          Text(option.personalName),
-                        },
-                        Text(option.email, style: theme.textTheme.caption),
-                      ],
-                    ),
-                    onPressed: () {
-                      if (!widget.addresses.contains(option)) {
-                        widget.addresses.add(option);
-                        _controller.text = '';
-                        setState(() {});
-                      }
-                      onSelected(null);
-                    },
-                  );
-                },
-              ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 200),
+            child: ListView.builder(
+              shrinkWrap: true,
+              padding: const EdgeInsets.all(8.0),
+              itemCount: options.length,
+              itemBuilder: (BuildContext context, int index) {
+                final MailAddress option = options.elementAt(index);
+                return PlatformActionChip(
+                  label: Column(
+                    children: [
+                      if (option.hasPersonalName) ...{
+                        Text(option.personalName),
+                      },
+                      Text(option.email, style: theme.textTheme.caption),
+                    ],
+                  ),
+                  onPressed: () {
+                    if (!widget.addresses.contains(option)) {
+                      widget.addresses.add(option);
+                      _controller.text = '';
+                      setState(() {});
+                    }
+                    onSelected(null);
+                  },
+                );
+              },
             ),
           ),
         );

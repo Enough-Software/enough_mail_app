@@ -33,7 +33,7 @@ class _PasswordFieldState extends State<PasswordField> {
       decoration: InputDecoration(
         hintText: widget.hintText,
         labelText: widget.labelText,
-        suffixIcon: IconButton(
+        suffixIcon: PlatformIconButton(
           icon: Icon(obscureText ? Icons.lock_open : Icons.lock),
           onPressed: () {
             setState(

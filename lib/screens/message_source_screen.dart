@@ -207,7 +207,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Wrap(
           children: [
-            TextButton.icon(
+            PlatformTextButtonIcon(
               style: style,
               icon: Icon(Icons.delete),
               label: Text(localizations.homeDeleteAllAction, style: textStyle),
@@ -222,7 +222,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                 }
               },
             ),
-            TextButton.icon(
+            PlatformTextButtonIcon(
               style: style,
               icon: Icon(Feather.circle),
               label:
@@ -231,7 +231,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                 await widget.messageSource.markAllMessagesSeen(true);
               },
             ),
-            TextButton.icon(
+            PlatformTextButtonIcon(
               style: style,
               icon: Icon(Icons.circle),
               label:
@@ -357,13 +357,30 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
                             //print('building message item at $index');
+                            if (Platform.isIOS &&
+                                widget.messageSource.supportsSearching) {
+                              if (index == 0) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                    vertical: 4.0,
+                                  ),
+                                  child: CupertinoSearchTextField(
+                                    controller: searchEditingController,
+                                    placeholder: localizations.homeSearchHint,
+                                    onSubmitted: search,
+                                  ),
+                                );
+                              }
+                              index--;
+                            }
                             if (zeroPosWidget != null) {
                               if (index == 0) {
                                 return zeroPosWidget;
                               }
                               index--;
                             }
-                            var element =
+                            final element =
                                 _sectionedMessageSource.getElementAt(index);
                             if (element.section != null) {
                               final text = i18nService.formatDateRange(
