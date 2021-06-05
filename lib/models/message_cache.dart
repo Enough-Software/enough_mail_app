@@ -48,12 +48,15 @@ class MessageCache {
   }
 
   void insert(Message message) {
+    var insertIndex = 0;
     for (final existing in _messages) {
       if (existing.sourceIndex >= message.sourceIndex) {
         existing.sourceIndex++;
+      } else {
+        insertIndex++;
       }
     }
-    _messages.insert(message.sourceIndex, message);
+    _messages.insert(insertIndex, message);
   }
 
   bool remove(Message toBeRemoved) {
