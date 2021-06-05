@@ -39,6 +39,10 @@ pubspec.lock
 # Web related
 lib/generated_plugin_registrant.dart
 
+# ios related
+ios/Podfile.lock
+ios/build
+
 # Symbolication related
 app.*.symbols
 
