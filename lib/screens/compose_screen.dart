@@ -365,7 +365,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
           material: (context, platform) =>
               MaterialScaffoldData(drawer: AppDrawer()),
           body: CustomScrollView(
-            physics: BouncingScrollPhysics(),
             slivers: [
               PlatformSliverAppBar(
                 title: Text(titleText),

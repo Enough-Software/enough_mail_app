@@ -9,7 +9,6 @@ import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/account_selector.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/mailbox_selector.dart';
-import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -77,7 +76,6 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
               },
               Divider(
                 height: 8.0,
-                thickness: 2.0,
               ),
               FolderManagement(),
             ],
