@@ -769,6 +769,76 @@
   "@folderNamesCustomTitle": {
     "description": "Title of dialog to specify custom folder names."
   },
+  "folderAddAction": "Create folder",
+  "@folderAddAction": {
+    "description": "Action to create a new folder."
+  },
+  "folderAddTitle": "Create folder",
+  "@folderAddTitle": {
+    "description": "Dialog title when creating a new folder."
+  },
+  "folderAddNameLabel": "Name",
+  "@folderAddNameLabel": {
+    "description": "Label for input field for the folder name."
+  },
+  "folderAddNameHint": "Name of the new folder",
+  "@folderAddNameHint": {
+    "description": "Hint for input field for the folder name."
+  },
+  "folderAccountLabel": "Account",
+  "@folderAddAccountLabel": {
+    "description": "Label to select the current account."
+  },
+  "folderMailboxLabel": "Folder",
+  "@folderAddParentFolderLabel": {
+    "description": "Label to select the current folder."
+  },
+  "folderAddResultSuccess": "Folder created 😊",
+  "@folderAddResultSuccess": {
+    "description": "Info for showing the creation success."
+  },
+  "folderAddResultFailure": "Folder could not be created.\n\nThe server responded with {details}",
+  "@folderAddResultFailure": {
+    "description": "Info for showing a folder creation error.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Invalid name"
+      }
+    }  
+  },
+  "folderDeleteAction": "Delete",
+  "@folderDeleteAction": {
+    "description": "Action to delete an existing folder."
+  },
+  "folderDeleteConfirmTitle": "Confirm",
+  "@folderDeleteConfirmTitle": {
+    "description": "Dialog title to confirm deleting a folder."
+  },
+  "folderDeleteConfirmText": "Do you really want to delete the folder {name}?",
+  "@folderDeleteConfirmText": {
+    "description": "Dialog text to confirm deleting a folder.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "My Custom Folder"
+      }
+    }  
+  },
+  "folderDeleteResultSuccess": "Folder deleted.",
+  "@folderDeleteResultSuccess": {
+    "description": "Info for showing the creation success."
+  },
+  "folderDeleteResultFailure": "Folder could not be deleted.\n\nThe server responded with {details}",
+  "@folderDeleteResultFailure": {
+    "description": "Info for showing a folder deletion error.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Invalid name"
+      }
+    }  
+  },
   "settingsDevelopment": "Development settings",
   "@settingsDevelopment": {
     "description": "Settings action to specify the development options."

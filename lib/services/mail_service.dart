@@ -34,6 +34,20 @@ class MailService {
   final _mailboxesPerAccount = <Account, Tree<Mailbox>>{};
   AppLocalizations _localizations;
   AppLocalizations get localizations => _localizations;
+
+  List<Account> get accountsWithoutErrors {
+    final withErrors = _accountsWithErrors;
+    if (withErrors == null) {
+      return accounts;
+    }
+    return accounts.where((account) => !withErrors.contains(account)).toList();
+  }
+
+  List<Account> get accountsWithErrors {
+    final withErrors = _accountsWithErrors;
+    return withErrors ?? [];
+  }
+
   set localizations(AppLocalizations value) {
     if (value != _localizations) {
       _localizations = value;
@@ -420,6 +434,19 @@ class MailService {
 
   Tree<Mailbox> getMailboxTreeFor(Account account) {
     return _mailboxesPerAccount[account];
+  }
+
+  Future<void> createMailbox(
+      Account account, String mailboxName, Mailbox parentMailbox) async {
+    final mailClient = await getClientFor(account);
+    await mailClient.createMailbox(mailboxName, parentMailbox: parentMailbox);
+    await loadMailboxesFor(mailClient);
+  }
+
+  Future<void> deleteMailbox(Account account, Mailbox mailbox) async {
+    final mailClient = await getClientFor(account);
+    await mailClient.deleteMailbox(mailbox);
+    await loadMailboxesFor(mailClient);
   }
 
   Future<void> saveAccount(MailAccount account) {

@@ -1,9 +1,15 @@
+import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/models/models.dart';
 import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
+import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/widgets/account_selector.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_mail_app/widgets/mailbox_selector.dart';
+import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -63,37 +69,17 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
               ),
               if (folderNameSetting == FolderNameSetting.custom) ...{
                 Divider(),
-                TextButton.icon(
+                PlatformTextButtonIcon(
                   icon: Icon(Icons.edit),
                   label: ButtonText(localizations.folderNamesEditAction),
-                  onPressed: () async {
-                    final service = locator<SettingsService>();
-                    var customNames = service.settings.customFolderNames;
-                    if (customNames == null) {
-                      final l = locator<I18nService>().localizations;
-                      customNames = [
-                        l.folderInbox,
-                        l.folderDrafts,
-                        l.folderSent,
-                        l.folderTrash,
-                        l.folderArchive,
-                        l.folderJunk
-                      ];
-                    }
-                    final result = await DialogHelper.showWidgetDialog(
-                        context,
-                        localizations.folderNamesCustomTitle,
-                        CustomFolderNamesEditor(customNames: customNames),
-                        defaultActions: DialogActions.okAndCancel);
-                    if (result == true) {
-                      service.settings.customFolderNames = customNames;
-                      locator<MailService>()
-                          .applyFolderNameSettings(service.settings);
-                      await service.save();
-                    }
-                  },
+                  onPressed: _editFolderNames,
                 ),
               },
+              Divider(
+                height: 8.0,
+                thickness: 2.0,
+              ),
+              FolderManagement(),
             ],
           ),
         ),
@@ -101,7 +87,34 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
     );
   }
 
-  _onFolderNameSettingChanged(FolderNameSetting value) async {
+  void _editFolderNames() async {
+    final localizations = AppLocalizations.of(context);
+    final service = locator<SettingsService>();
+    var customNames = service.settings.customFolderNames;
+    if (customNames == null) {
+      final l = locator<I18nService>().localizations;
+      customNames = [
+        l.folderInbox,
+        l.folderDrafts,
+        l.folderSent,
+        l.folderTrash,
+        l.folderArchive,
+        l.folderJunk
+      ];
+    }
+    final result = await DialogHelper.showWidgetDialog(
+        context,
+        localizations.folderNamesCustomTitle,
+        CustomFolderNamesEditor(customNames: customNames),
+        defaultActions: DialogActions.okAndCancel);
+    if (result == true) {
+      service.settings.customFolderNames = customNames;
+      locator<MailService>().applyFolderNameSettings(service.settings);
+      await service.save();
+    }
+  }
+
+  void _onFolderNameSettingChanged(FolderNameSetting value) async {
     setState(() {
       folderNameSetting = value;
     });
@@ -213,5 +226,186 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
         ),
       ),
     );
+  }
+}
+
+class FolderManagement extends StatefulWidget {
+  FolderManagement({Key key}) : super(key: key);
+
+  @override
+  _FolderManagementState createState() => _FolderManagementState();
+}
+
+class _FolderManagementState extends State<FolderManagement> {
+  Account _account;
+  Mailbox _mailbox;
+  TextEditingController _folderNameController;
+
+  @override
+  void initState() {
+    _account = locator<MailService>().accounts.first;
+    _folderNameController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _folderNameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+    return SingleChildScrollView(
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(localizations.folderAccountLabel),
+            AccountSelector(
+              account: _account,
+              onChanged: (account) {
+                setState(() {
+                  _mailbox = null;
+                  _account = account;
+                });
+              },
+            ),
+            Divider(),
+            Text(localizations.folderMailboxLabel),
+            MailboxSelector(
+              account: _account,
+              mailbox: _mailbox,
+              onChanged: (mailbox) {
+                setState(() {
+                  _mailbox = mailbox;
+                });
+              },
+            ),
+            Divider(),
+            MailboxWidget(
+              mailbox: _mailbox,
+              account: _account,
+              onMailboxAdded: () {
+                setState(() {});
+              },
+              onMailboxDeleted: () {
+                setState(() {
+                  _mailbox = null;
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MailboxWidget extends StatelessWidget {
+  final Account account;
+  final Mailbox mailbox;
+  final void Function() onMailboxAdded;
+  final void Function() onMailboxDeleted;
+
+  const MailboxWidget(
+      {Key key,
+      @required this.mailbox,
+      @required this.account,
+      @required this.onMailboxAdded,
+      @required this.onMailboxDeleted})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        PlatformTextButtonIcon(
+          onPressed: () => _createFolder(context),
+          icon: Icon(Icons.add),
+          label: ButtonText(localizations.folderAddAction),
+        ),
+        if (mailbox != null) ...{
+          PlatformTextButtonIcon(
+            onPressed: () => _deleteFolder(context),
+            backgroundColor: Colors.red,
+            style: TextButton.styleFrom(backgroundColor: Colors.red),
+            icon: Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+            label: ButtonText(
+              localizations.folderDeleteAction,
+              style: Theme.of(context)
+                  .textTheme
+                  .button
+                  .copyWith(color: Colors.white),
+            ),
+          ),
+        },
+      ],
+    );
+  }
+
+  void _createFolder(context) async {
+    final localizations = AppLocalizations.of(context);
+    final folderNameController = TextEditingController();
+    final result = await DialogHelper.showWidgetDialog(
+      context,
+      localizations.folderAddTitle,
+      DecoratedPlatformTextField(
+        controller: folderNameController,
+        decoration: InputDecoration(
+          labelText: localizations.folderAddNameLabel,
+          hintText: localizations.folderAddNameHint,
+        ),
+        textInputAction: TextInputAction.done,
+      ),
+      defaultActions: DialogActions.okAndCancel,
+    );
+    if (result == true) {
+      try {
+        await locator<MailService>().createMailbox(
+          account,
+          folderNameController.text,
+          mailbox,
+        );
+        locator<ScaffoldMessengerService>()
+            .showTextSnackBar(localizations.folderAddResultSuccess);
+        onMailboxAdded();
+      } on MailException catch (e) {
+        await DialogHelper.showTextDialog(
+          context,
+          localizations.errorTitle,
+          localizations.folderAddResultFailure(e.message),
+        );
+      }
+    }
+  }
+
+  void _deleteFolder(BuildContext context) async {
+    final localizations = AppLocalizations.of(context);
+    final confirmed = await DialogHelper.askForConfirmation(
+      context,
+      title: localizations.folderDeleteConfirmTitle,
+      query: localizations.folderDeleteConfirmText(mailbox.path),
+    );
+    if (confirmed == true) {
+      try {
+        await locator<MailService>().deleteMailbox(account, mailbox);
+        locator<ScaffoldMessengerService>()
+            .showTextSnackBar(localizations.folderDeleteResultSuccess);
+        onMailboxDeleted();
+      } on MailException catch (e) {
+        await DialogHelper.showTextDialog(
+          context,
+          localizations.errorTitle,
+          localizations.folderDeleteResultFailure(e.message),
+        );
+      }
+    }
   }
 }
