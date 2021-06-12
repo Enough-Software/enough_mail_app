@@ -108,10 +108,11 @@ class _AccountServerDetailsScreenState
 
     final incomingServerConfig = mailAccount.incoming?.serverConfig ??
         ServerConfig(
-            type: incomingServerType,
-            hostname: incomingHostDomainController.text,
-            port: int.tryParse(incomingHostPortController.text),
-            socketType: incomingSecurity);
+          type: incomingServerType,
+          hostname: incomingHostDomainController.text,
+          port: int.tryParse(incomingHostPortController.text),
+          socketType: incomingSecurity,
+        );
     final incomingUserName = incomingUserNameController.text?.isEmpty ?? true
         ? userName
         : incomingUserNameController.text;
@@ -124,10 +125,11 @@ class _AccountServerDetailsScreenState
             PlainAuthentication(incomingUserName, incomingPassword));
     final outgoingServerConfig = mailAccount.outgoing?.serverConfig ??
         ServerConfig(
-            type: outgoingServerType,
-            hostname: outgoingHostDomainController.text,
-            port: int.tryParse(outgoingHostPortController.text),
-            socketType: outgoingSecurity);
+          type: outgoingServerType,
+          hostname: outgoingHostDomainController.text,
+          port: int.tryParse(outgoingHostPortController.text),
+          socketType: outgoingSecurity,
+        );
     final outgoingUserName = outgoingUserNameController.text?.isEmpty ?? true
         ? userName
         : outgoingUserNameController.text;
@@ -135,9 +137,9 @@ class _AccountServerDetailsScreenState
         ? password
         : outgoingPasswordController.text;
     mailAccount.outgoing = MailServerConfig(
-        serverConfig: outgoingServerConfig,
-        authentication:
-            PlainAuthentication(outgoingUserName, outgoingPassword));
+      serverConfig: outgoingServerConfig,
+      authentication: PlainAuthentication(outgoingUserName, outgoingPassword),
+    );
     //print('account: $mailAccount');
     final completed = await Discover.complete(mailAccount);
     if (!completed) {
@@ -145,9 +147,12 @@ class _AccountServerDetailsScreenState
         context: context,
         builder: (context) => AlertDialog(
           title: Text(localizations.errorTitle),
-          content: Text(localizations.accountDetailsErrorHostProblem(
+          content: Text(
+            localizations.accountDetailsErrorHostProblem(
               incomingHostDomainController.text,
-              outgoingHostDomainController.text)),
+              outgoingHostDomainController.text,
+            ),
+          ),
         ),
       );
       return;
@@ -173,8 +178,10 @@ class _AccountServerDetailsScreenState
         context: context,
         builder: (context) => AlertDialog(
           title: Text(localizations.errorTitle),
-          content: Text(localizations.accountDetailsErrorLoginProblem(
-              incomingUserName, password)),
+          content: Text(
+            localizations.accountDetailsErrorLoginProblem(
+                incomingUserName, password),
+          ),
         ),
       );
     }
