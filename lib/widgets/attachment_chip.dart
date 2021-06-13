@@ -23,6 +23,8 @@ class _AttachmentChipState extends State<AttachmentChip> {
   MimePart _mimePart;
   bool _isDownloading = false;
   MediaProvider _mediaProvider;
+  final width = 72.0;
+  final height = 72.0;
 
   @override
   void initState() {
@@ -37,26 +39,19 @@ class _AttachmentChipState extends State<AttachmentChip> {
 
   @override
   Widget build(BuildContext context) {
-    final width = 72.0;
-    final height = 72.0;
     final mediaType = widget.info.contentType?.mediaType;
-    final fallbackIcon = locator<IconService>().getForMediaType(mediaType);
     final name = widget.info.fileName;
     if (_mediaProvider == null) {
-      return ButtonTheme(
-        padding: EdgeInsets.zero,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        minWidth: 0, //wraps child's width
-        height: 0, //wraps child's height
-        child: PlatformButton(
-          onPressed: _isDownloading ? null : download,
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child:
-                  buildPreviewWidget(true, width, height, fallbackIcon, name),
-            ),
+      final fallbackIcon = locator<IconService>().getForMediaType(mediaType);
+      return PlatformButton(
+        materialFlat: (context, platform) =>
+            MaterialFlatButtonData(padding: EdgeInsets.zero),
+        onPressed: _isDownloading ? null : download,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: _buildPreviewWidget(true, fallbackIcon, name),
           ),
         ),
       );
@@ -70,16 +65,21 @@ class _AttachmentChipState extends State<AttachmentChip> {
             width: width,
             height: height,
             showInteractiveDelegate: showAttachment,
-            fallbackWidget:
-                buildPreviewWidget(false, width, height, fallbackIcon, name),
+            fallbackBuilder: _buildFallbackPreview,
           ),
         ),
       );
     }
   }
 
-  Widget buildPreviewWidget(bool includeDownloadOption, double width,
-      double height, IconData iconData, String name) {
+  Widget _buildFallbackPreview(BuildContext context, MediaProvider provider) {
+    final fallbackIcon = locator<IconService>()
+        .getForMediaType(MediaType.fromText(provider.mediaType));
+    return _buildPreviewWidget(false, fallbackIcon, provider.name);
+  }
+
+  Widget _buildPreviewWidget(
+      bool includeDownloadOption, IconData iconData, String name) {
     return Container(
       width: width,
       height: height,
