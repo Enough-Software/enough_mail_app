@@ -1,4 +1,3 @@
-import 'package:diff_match_patch/diff_match_patch.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/shared_data.dart';
@@ -51,7 +50,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
   Future<String> loadMailTextFuture;
   HtmlEditorApi _editorApi;
   Future _downloadAttachmentsFuture;
-  String _originalMessageHtml;
   ComposeData _resumeComposeData;
   bool _isReadReceiptRequested = false;
 
@@ -119,7 +117,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
     final mb = widget.data.messageBuilder;
     if (mb.originalMessage == null) {
       final html = '<p>${mb.text ?? '&nbsp;'}</p>$_signature';
-      _originalMessageHtml = html;
       return html;
     } else {
       final blockExternalImages = false;
@@ -131,7 +128,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
         final args = _HtmlGenerationArguments(null, mb.originalMessage,
             blockExternalImages, emptyMessageText, maxImageWidth);
         final html = await compute(_generateDraftHtmlImpl, args) + _signature;
-        _originalMessageHtml = html;
         return html;
       }
       final quoteTemplate = widget.data.action == ComposeAction.answer
@@ -142,7 +138,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
       final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
           blockExternalImages, emptyMessageText, maxImageWidth);
       final html = await compute(_generateQuoteHtmlImpl, args) + _signature;
-      _originalMessageHtml = html;
       return html;
     }
   }
@@ -178,58 +173,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
     if (storeHtmlForResume) {
       return;
     } else {
-      // print('got html: $htmlText');
-      var newHtmlText = htmlText;
-      final htmlTagRegex =
-          RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
-      if (_originalMessageHtml != null) {
-        // check for simple case first:
-        var original = _originalMessageHtml;
-        int blockquoteStart = original.indexOf('<blockquote>');
-        if (blockquoteStart != -1) {
-          original = original.substring(blockquoteStart);
-        }
-        final originalStartIndex = htmlText.indexOf(original);
-        if (originalStartIndex != -1) {
-          newHtmlText = htmlText.replaceFirst(original, '', originalStartIndex);
-        } else {
-          //TODO Here the text should be added at the correct positions and not just at the front of the plain text message...
-          // create a diff between the original HTML and the new HTML:
-          final buffer = StringBuffer();
-          DiffMatchPatch dmp = new DiffMatchPatch();
-          List<Diff> diffs = dmp.diff(newHtmlText, _originalMessageHtml);
-          dmp.diffCleanupSemantic(diffs);
-          for (final diff in diffs) {
-            // print('diff: ${diff.operation}: ${diff.text}');
-            if (diff.operation == -1) {
-              // this is new text:
-              buffer.write(diff.text);
-            }
-          }
-          newHtmlText = buffer.toString();
-        }
-        //print('newHtmlText=$newHtmlText');
-      }
+      final plainText = HtmlToPlainTextConverter.convert(htmlText);
 
-      // generate plain text from HTML code:
-      var plainText = newHtmlText.replaceAll(htmlTagRegex, '');
-      if (mb.originalMessage != null) {
-        final originalPlainText = mb.originalMessage.decodeTextPlainPart();
-        if (originalPlainText != null) {
-          if (widget.data.action == ComposeAction.forward) {
-            final forwardHeader = MessageBuilder.fillTemplate(
-                MailConventions.defaultForwardHeaderTemplate,
-                mb.originalMessage);
-            plainText += forwardHeader + originalPlainText;
-          } else if (widget.data.action == ComposeAction.answer) {
-            final replyHeader = MessageBuilder.fillTemplate(
-                MailConventions.defaultForwardHeaderTemplate,
-                mb.originalMessage);
-            plainText += '\r\n' +
-                MessageBuilder.quotePlainText(replyHeader, originalPlainText);
-          }
-        }
-      }
       final textPartBuilder = mb.hasAttachments
           ? mb.getPart(MediaSubtype.multipartAlternative, recursive: false) ??
               mb.addPart(
@@ -272,7 +217,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
     locator<NavigationService>().pop();
     final mailClient = await _getMailClient();
     final mimeMessage = await _buildMimeMessage(mailClient);
-    //TODO check first if message can be sent or catch errors
     try {
       final append = !_from.account.addsSentMailAutomatically;
       final use8Bit = (_usedTextEncoding == TransferEncoding.eightBit);
