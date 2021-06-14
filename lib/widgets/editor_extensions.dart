@@ -1,10 +1,10 @@
+import 'package:community_material_icon/community_material_icon.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:enough_ascii_art/enough_ascii_art.dart';
 
@@ -19,7 +19,7 @@ class EditorArtExtensionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlatformIconButton(
-      icon: Icon(MaterialCommunityIcons.format_font),
+      icon: Icon(CommunityMaterialIcons.format_font),
       onPressed: () => showArtExtensionDialog(context, editorApi),
     );
   }

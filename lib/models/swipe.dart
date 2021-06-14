@@ -1,6 +1,8 @@
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../locator.dart';
 
 enum SwipeAction {
   markRead,
@@ -77,17 +79,18 @@ extension SwipeExtension on SwipeAction {
   }
 
   IconData get icon {
+    final iconService = locator<IconService>();
     switch (this) {
       case SwipeAction.markRead:
-        return Icons.circle;
+        return iconService.messageIsNotSeen;
       case SwipeAction.archive:
-        return Icons.archive;
+        return iconService.messageActionArchive;
       case SwipeAction.markJunk:
-        return Entypo.bug;
+        return iconService.messageActionMoveToJunk;
       case SwipeAction.delete:
-        return Icons.delete;
+        return iconService.messageActionDelete;
       case SwipeAction.flag:
-        return Icons.flag;
+        return iconService.messageIsNotFlagged;
     }
     return Icons.device_unknown;
   }

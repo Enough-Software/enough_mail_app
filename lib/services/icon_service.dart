@@ -1,8 +1,38 @@
+import 'package:community_material_icon/community_material_icon.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 
 class IconService {
+  IconData getMessageIsSeen(bool isSeen) =>
+      isSeen ? messageIsSeen : messageIsNotSeen;
+  IconData get messageIsSeen => Icons.circle_outlined;
+  IconData get messageIsNotSeen => Icons.circle;
+  IconData getMessageIsFlagged(bool isFlagged) =>
+      isFlagged ? messageIsFlagged : messageIsNotFlagged;
+  IconData get messageIsFlagged => Icons.flag;
+  IconData get messageIsNotFlagged => Icons.flag_outlined;
+
+  IconData get messageActionReply => Icons.reply;
+  IconData get messageActionReplyAll => Icons.reply_all;
+  IconData get messageActionForward => Icons.forward;
+  IconData get messageActionForwardAsAttachment => Icons.forward_to_inbox;
+  IconData get messageActionForwardAttachments => Icons.attach_file;
+  IconData get messageActionMoveToInbox => Icons.move_to_inbox;
+  IconData get messageActionDelete => CommunityMaterialIcons.trash_can_outline;
+  IconData get messageActionMove => CommunityMaterialIcons.file_move_outline;
+  IconData get messageActionMoveToJunk => CommunityMaterialIcons.bug_outline;
+  IconData get messageActionMoveFromJunkToInbox => Icons.check;
+  IconData get messageActionArchive => CommunityMaterialIcons.archive_outline;
+  IconData get messageActionRedirect => Icons.compare_arrows;
+
+  IconData get folderGeneric => CommunityMaterialIcons.folder_outline;
+  IconData get folderInbox => CommunityMaterialIcons.inbox;
+  IconData get folderDrafts => CommunityMaterialIcons.email_edit_outline;
+  IconData get folderTrash => CommunityMaterialIcons.trash_can_outline;
+  IconData get folderSent => CommunityMaterialIcons.inbox_arrow_up;
+  IconData get folderArchive => CommunityMaterialIcons.archive_outline;
+  IconData get folderJunk => CommunityMaterialIcons.bug_outline;
+
   IconData getForMediaType(MediaType mediaType) {
     if (mediaType == null) {
       return Icons.attachment;
@@ -43,19 +73,19 @@ class IconService {
   }
 
   IconData getForMailbox(Mailbox mailbox) {
-    var iconData = MaterialCommunityIcons.folder_outline;
+    var iconData = folderGeneric;
     if (mailbox.isInbox) {
-      iconData = MaterialCommunityIcons.inbox;
+      iconData = folderInbox;
     } else if (mailbox.isDrafts) {
-      iconData = MaterialCommunityIcons.email_edit_outline;
+      iconData = folderDrafts;
     } else if (mailbox.isTrash) {
-      iconData = MaterialCommunityIcons.trash_can_outline;
+      iconData = folderTrash;
     } else if (mailbox.isSent) {
-      iconData = MaterialCommunityIcons.inbox_arrow_up;
+      iconData = folderSent;
     } else if (mailbox.isArchive) {
-      iconData = MaterialCommunityIcons.archive;
+      iconData = folderArchive;
     } else if (mailbox.isJunk) {
-      iconData = Entypo.bug;
+      iconData = folderJunk;
     }
     return iconData;
   }
