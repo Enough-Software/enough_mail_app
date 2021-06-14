@@ -4,16 +4,17 @@ import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
+import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 import 'button_text.dart';
@@ -64,6 +65,7 @@ class _MessageActionsState extends State<MessageActions> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
     final attachments = widget.message.attachments;
+    final iconService = locator<IconService>();
     return PlatformBottomBar(
       cupertinoBackgroundOpacity: 0.8,
       child: SafeArea(
@@ -72,66 +74,70 @@ class _MessageActionsState extends State<MessageActions> {
           children: [
             if (!widget.message.isEmbedded) ...{
               PlatformIconButton(
-                icon: Icon(widget.message.isSeen
-                    ? Feather.circle // Icons.check_circle_outline
-                    : Icons.circle), //Icons.check_circle),
+                icon: Icon(iconService.getMessageIsSeen(widget.message.isSeen)),
                 onPressed: toggleSeen,
               ),
               PlatformIconButton(
-                icon: Icon(widget.message.isFlagged
-                    ? Icons.flag
-                    : Icons.outlined_flag),
+                icon: Icon(
+                    iconService.getMessageIsFlagged(widget.message.isFlagged)),
                 onPressed: toggleFlagged,
               ),
             },
             Spacer(),
-            PlatformIconButton(icon: Icon(Icons.reply), onPressed: reply),
             PlatformIconButton(
-                icon: Icon(Icons.reply_all), onPressed: replyAll),
-            PlatformIconButton(icon: Icon(Icons.forward), onPressed: forward),
+                icon: Icon(iconService.messageActionReply), onPressed: reply),
+            PlatformIconButton(
+                icon: Icon(iconService.messageActionReplyAll),
+                onPressed: replyAll),
+            PlatformIconButton(
+                icon: Icon(iconService.messageActionForward),
+                onPressed: forward),
             if (widget.message.source.isTrash) ...{
               PlatformIconButton(
-                  icon: Icon(Entypo.inbox), onPressed: moveToInbox),
+                  icon: Icon(iconService.messageActionMoveToInbox),
+                  onPressed: moveToInbox),
             } else if (!widget.message.isEmbedded) ...{
-              PlatformIconButton(icon: Icon(Icons.delete), onPressed: delete),
+              PlatformIconButton(
+                  icon: Icon(iconService.messageActionDelete),
+                  onPressed: delete),
             },
             PlatformPopupMenuButton<_OverflowMenuChoice>(
               onSelected: onOverflowChoiceSelected,
               itemBuilder: (context) => [
                 PlatformPopupMenuItem(
                   value: _OverflowMenuChoice.reply,
-                  child: PlatformListTile(
-                    leading: Icon(Icons.reply),
-                    title: Text(localizations.messageActionReply),
+                  child: IconText(
+                    icon: Icon(iconService.messageActionReply),
+                    label: Text(localizations.messageActionReply),
                   ),
                 ),
                 PlatformPopupMenuItem(
                   value: _OverflowMenuChoice.replyAll,
-                  child: PlatformListTile(
-                    leading: Icon(Icons.reply_all),
-                    title: Text(localizations.messageActionReplyAll),
+                  child: IconText(
+                    icon: Icon(iconService.messageActionReplyAll),
+                    label: Text(localizations.messageActionReplyAll),
                   ),
                 ),
                 PlatformPopupMenuItem(
                   value: _OverflowMenuChoice.forward,
-                  child: PlatformListTile(
-                    leading: Icon(Icons.forward),
-                    title: Text(localizations.messageActionForward),
+                  child: IconText(
+                    icon: Icon(iconService.messageActionForward),
+                    label: Text(localizations.messageActionForward),
                   ),
                 ),
                 PlatformPopupMenuItem(
                   value: _OverflowMenuChoice.forwardAsAttachment,
-                  child: PlatformListTile(
-                    leading: Icon(Icons.forward_to_inbox),
-                    title: Text(localizations.messageActionForwardAsAttachment),
+                  child: IconText(
+                    icon: Icon(iconService.messageActionForwardAsAttachment),
+                    label: Text(localizations.messageActionForwardAsAttachment),
                   ),
                 ),
                 if (attachments.isNotEmpty) ...{
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.forwardAttachments,
-                    child: PlatformListTile(
-                      leading: Icon(Icons.attach_file),
-                      title: Text(localizations
+                    child: IconText(
+                      icon: Icon(iconService.messageActionForwardAttachments),
+                      label: Text(localizations
                           .messageActionForwardAttachments(attachments.length)),
                     ),
                   ),
@@ -139,17 +145,17 @@ class _MessageActionsState extends State<MessageActions> {
                 if (widget.message.source.isTrash) ...{
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.inbox,
-                    child: PlatformListTile(
-                      leading: Icon(Entypo.inbox),
-                      title: Text(localizations.messageActionMoveToInbox),
+                    child: IconText(
+                      icon: Icon(iconService.messageActionMoveToInbox),
+                      label: Text(localizations.messageActionMoveToInbox),
                     ),
                   ),
                 } else if (!widget.message.isEmbedded) ...{
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.delete,
-                    child: PlatformListTile(
-                      leading: Icon(Icons.delete),
-                      title: Text(localizations.messageActionDelete),
+                    child: IconText(
+                      icon: Icon(iconService.messageActionDelete),
+                      label: Text(localizations.messageActionDelete),
                     ),
                   ),
                 },
@@ -157,11 +163,10 @@ class _MessageActionsState extends State<MessageActions> {
                   PlatformPopupDivider(),
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.seen,
-                    child: PlatformListTile(
-                      leading: Icon(widget.message.isSeen
-                          ? Feather.circle
-                          : Icons.circle),
-                      title: Text(
+                    child: IconText(
+                      icon: Icon(
+                          iconService.getMessageIsSeen(widget.message.isSeen)),
+                      label: Text(
                         widget.message.isSeen
                             ? localizations.messageStatusSeen
                             : localizations.messageStatusUnseen,
@@ -170,11 +175,10 @@ class _MessageActionsState extends State<MessageActions> {
                   ),
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.flag,
-                    child: PlatformListTile(
-                      leading: Icon(widget.message.isFlagged
-                          ? Icons.flag
-                          : Icons.outlined_flag),
-                      title: Text(
+                    child: IconText(
+                      icon: Icon(iconService
+                          .getMessageIsFlagged(widget.message.isFlagged)),
+                      label: Text(
                         widget.message.isFlagged
                             ? localizations.messageStatusFlagged
                             : localizations.messageStatusUnflagged,
@@ -185,18 +189,18 @@ class _MessageActionsState extends State<MessageActions> {
                     PlatformPopupDivider(),
                     PlatformPopupMenuItem(
                       value: _OverflowMenuChoice.move,
-                      child: PlatformListTile(
-                        leading: Icon(MaterialCommunityIcons.file_move),
-                        title: Text(localizations.messageActionMove),
+                      child: IconText(
+                        icon: Icon(iconService.messageActionMove),
+                        label: Text(localizations.messageActionMove),
                       ),
                     ),
                     PlatformPopupMenuItem(
                       value: _OverflowMenuChoice.junk,
-                      child: PlatformListTile(
-                        leading: Icon(widget.message.source.isJunk
-                            ? Entypo.check
-                            : Entypo.bug),
-                        title: Text(
+                      child: IconText(
+                        icon: Icon(widget.message.source.isJunk
+                            ? iconService.messageActionMoveFromJunkToInbox
+                            : iconService.messageActionMoveToJunk),
+                        label: Text(
                           widget.message.source.isJunk
                               ? localizations.messageActionMarkAsNotJunk
                               : localizations.messageActionMarkAsJunk,
@@ -205,11 +209,11 @@ class _MessageActionsState extends State<MessageActions> {
                     ),
                     PlatformPopupMenuItem(
                       value: _OverflowMenuChoice.archive,
-                      child: PlatformListTile(
-                        leading: Icon(widget.message.source.isArchive
-                            ? Entypo.inbox
-                            : Entypo.archive),
-                        title: Text(
+                      child: IconText(
+                        icon: Icon(widget.message.source.isArchive
+                            ? iconService.messageActionMoveToInbox
+                            : iconService.messageActionArchive),
+                        label: Text(
                           widget.message.source.isArchive
                               ? localizations.messageActionUnarchive
                               : localizations.messageActionArchive,
@@ -219,9 +223,9 @@ class _MessageActionsState extends State<MessageActions> {
                   },
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.redirect,
-                    child: PlatformListTile(
-                      leading: Icon(Icons.compare_arrows),
-                      title: Text(
+                    child: IconText(
+                      icon: Icon(iconService.messageActionRedirect),
+                      label: Text(
                         localizations.messageActionRedirect,
                       ),
                     ),

@@ -1,3 +1,4 @@
+import 'package:community_material_icon/community_material_icon.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -12,7 +13,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:giphy_picker/giphy_picker.dart';
 import '../locator.dart';
 
@@ -137,7 +137,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
         PlatformPopupMenuItem(
           value: 6,
           child: PlatformListTile(
-            leading: Icon(MaterialCommunityIcons.sticker),
+            leading: Icon(CommunityMaterialIcons.sticker),
             title: Text(localizations.attachTypeSticker),
           ),
         ),

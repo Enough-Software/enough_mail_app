@@ -1,6 +1,7 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/models.dart';
 import 'package:enough_mail_app/models/settings.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
@@ -12,7 +13,6 @@ import 'package:enough_mail_app/widgets/mailbox_selector.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import '../locator.dart';
 import 'base.dart';
 
@@ -167,7 +167,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
-
+    final iconService = locator<IconService>();
     return SingleChildScrollView(
       child: SafeArea(
         child: Column(
@@ -176,7 +176,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
               controller: _inboxController,
               decoration: InputDecoration(
                 labelText: localizations.folderInbox,
-                prefixIcon: Icon(MaterialCommunityIcons.inbox),
+                prefixIcon: Icon(iconService.folderInbox),
               ),
               onChanged: (value) => widget.customNames[0] = value,
             ),
@@ -184,7 +184,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
               controller: _draftsController,
               decoration: InputDecoration(
                 labelText: localizations.folderDrafts,
-                prefixIcon: Icon(MaterialCommunityIcons.email_edit_outline),
+                prefixIcon: Icon(iconService.folderDrafts),
               ),
               onChanged: (value) => widget.customNames[1] = value,
             ),
@@ -192,7 +192,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
               controller: _sentController,
               decoration: InputDecoration(
                 labelText: localizations.folderSent,
-                prefixIcon: Icon(MaterialCommunityIcons.inbox_arrow_up),
+                prefixIcon: Icon(iconService.folderSent),
               ),
               onChanged: (value) => widget.customNames[2] = value,
             ),
@@ -200,7 +200,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
               controller: _trashController,
               decoration: InputDecoration(
                 labelText: localizations.folderTrash,
-                prefixIcon: Icon(MaterialCommunityIcons.trash_can_outline),
+                prefixIcon: Icon(iconService.folderTrash),
               ),
               onChanged: (value) => widget.customNames[3] = value,
             ),
@@ -208,7 +208,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
               controller: _archiveController,
               decoration: InputDecoration(
                 labelText: localizations.folderArchive,
-                prefixIcon: Icon(MaterialCommunityIcons.archive),
+                prefixIcon: Icon(iconService.folderArchive),
               ),
               onChanged: (value) => widget.customNames[4] = value,
             ),
@@ -216,7 +216,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
               controller: _junkController,
               decoration: InputDecoration(
                 labelText: localizations.folderJunk,
-                prefixIcon: Icon(Entypo.bug),
+                prefixIcon: Icon(iconService.folderJunk),
               ),
               onChanged: (value) => widget.customNames[5] = value,
             ),
