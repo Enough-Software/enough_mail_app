@@ -4,13 +4,13 @@ import 'message.dart';
 enum ComposeAction { answer, forward, newMessage }
 
 class ComposeData {
-  Message get originalMessage =>
-      (originalMessages?.isNotEmpty ?? false) ? originalMessages.first : null;
-  final List<Message> originalMessages;
+  Message? get originalMessage =>
+      (originalMessages?.isNotEmpty ?? false) ? originalMessages!.first : null;
+  final List<Message?>? originalMessages;
   final MessageBuilder messageBuilder;
   final ComposeAction action;
-  final String resumeHtmlText;
-  final Future future;
+  final String? resumeHtmlText;
+  final Future? future;
 
   ComposeData(this.originalMessages, this.messageBuilder, this.action,
       {this.resumeHtmlText, this.future});

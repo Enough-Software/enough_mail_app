@@ -13,7 +13,7 @@ class SettingsReadReceiptsScreen extends StatefulWidget {
 }
 
 class _SettingsFoldersScreenState extends State<SettingsReadReceiptsScreen> {
-  ReadReceiptDisplaySetting _readReceiptDisplaySetting;
+  ReadReceiptDisplaySetting? _readReceiptDisplaySetting;
 
   @override
   void initState() {
@@ -25,7 +25,7 @@ class _SettingsFoldersScreenState extends State<SettingsReadReceiptsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
       title: localizations.settingsReadReceipts,
@@ -62,7 +62,7 @@ class _SettingsFoldersScreenState extends State<SettingsReadReceiptsScreen> {
     );
   }
 
-  _onReadReceiptDisplaySettingChanged(ReadReceiptDisplaySetting value) async {
+  _onReadReceiptDisplaySettingChanged(ReadReceiptDisplaySetting? value) async {
     setState(() {
       _readReceiptDisplaySetting = value;
     });

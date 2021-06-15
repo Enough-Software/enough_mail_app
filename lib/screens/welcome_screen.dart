@@ -25,7 +25,7 @@ class WelcomeScreen extends StatefulWidget {
     fontWeight: FontWeight.w600,
     color: Colors.black,
   );
-  WelcomeScreen({Key key}) : super(key: key);
+  WelcomeScreen({Key? key}) : super(key: key);
 
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
@@ -33,15 +33,15 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   int page = 0;
-  LiquidController liquidController;
-  UpdateType updateType;
+  LiquidController? liquidController;
+  UpdateType? updateType;
 
   @override
   void initState() {
     liquidController = LiquidController();
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final localizations = AppLocalizations.of(context);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      final localizations = AppLocalizations.of(context)!;
       DialogHelper.showTextDialog(context, localizations.welcomeBetaTitle,
           localizations.welcomeBetaText);
     });
@@ -122,7 +122,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(right: 8.0),
-                              child: ButtonText(AppLocalizations.of(context)
+                              child: ButtonText(AppLocalizations.of(context)!
                                   .welcomeActionSignIn),
                             ),
                           ),
@@ -162,7 +162,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
               child: Text(
-                AppLocalizations.of(context).welcomePanel1,
+                AppLocalizations.of(context)!.welcomePanel1,
                 style: WelcomeScreen.textStyleLight,
                 textAlign: TextAlign.center,
               ),
@@ -188,7 +188,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
               child: Text(
-                AppLocalizations.of(context).welcomePanel2,
+                AppLocalizations.of(context)!.welcomePanel2,
                 style: WelcomeScreen.textStyleLight,
                 textAlign: TextAlign.center,
               ),
@@ -214,7 +214,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
               child: Text(
-                AppLocalizations.of(context).welcomePanel3,
+                AppLocalizations.of(context)!.welcomePanel3,
                 style: WelcomeScreen.textStyleLight,
                 textAlign: TextAlign.center,
               ),
@@ -240,7 +240,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
               child: Text(
-                AppLocalizations.of(context).welcomePanel4,
+                AppLocalizations.of(context)!.welcomePanel4,
                 style: WelcomeScreen.textStyleDark,
                 textAlign: TextAlign.center,
               ),

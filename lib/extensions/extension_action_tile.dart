@@ -11,7 +11,7 @@ import '../routes.dart';
 
 class ExtensionActionTile extends StatelessWidget {
   final AppExtensionActionDescription actionDescription;
-  const ExtensionActionTile({Key key, @required this.actionDescription})
+  const ExtensionActionTile({Key? key, required this.actionDescription})
       : super(key: key);
 
   static Widget buildSideMenuForAccount(
@@ -44,20 +44,20 @@ class ExtensionActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final languageCode = locator<I18nService>().locale.languageCode;
+    final languageCode = locator<I18nService>().locale!.languageCode;
 
     return PlatformListTile(
       leading: actionDescription.icon == null
           ? null
           : Image.network(
-              actionDescription.icon,
+              actionDescription.icon!,
               height: 24,
               width: 24,
             ),
-      title: Text(actionDescription.getLabel(languageCode)),
+      title: Text(actionDescription.getLabel(languageCode)!),
       onTap: () {
-        final url = actionDescription.action.url;
-        switch (actionDescription.action.mechanism) {
+        final url = actionDescription.action!.url;
+        switch (actionDescription.action!.mechanism) {
           case AppExtensionActionMechanism.inapp:
             final navService = locator<NavigationService>();
             navService.pop();

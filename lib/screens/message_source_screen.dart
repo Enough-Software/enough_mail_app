@@ -40,7 +40,7 @@ enum _Visualization { stack, list }
 class MessageSourceScreen extends StatefulWidget {
   final MessageSource messageSource;
 
-  MessageSourceScreen(this.messageSource);
+  const MessageSourceScreen({Key? key, required this.messageSource});
 
   @override
   _MessageSourceScreenState createState() => _MessageSourceScreenState();
@@ -48,15 +48,15 @@ class MessageSourceScreen extends StatefulWidget {
 
 class _MessageSourceScreenState extends State<MessageSourceScreen>
     with TickerProviderStateMixin {
-  Future<void> _messageLoader;
+  Future<void>? _messageLoader;
   _Visualization _visualization = _Visualization.list;
-  DateSectionedMessageSource _sectionedMessageSource;
+  late DateSectionedMessageSource _sectionedMessageSource;
   bool isInSelectionMode = false;
   List<Message> selectedMessages = [];
   bool isInSearchMode = false;
   bool hasSearchInput = false;
-  TextEditingController searchEditingController;
-  StreamSubscription eventsSubscription;
+  TextEditingController? searchEditingController;
+  late StreamSubscription eventsSubscription;
 
   @override
   void initState() {
@@ -87,7 +87,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 
   @override
   void dispose() {
-    searchEditingController.dispose();
+    searchEditingController!.dispose();
     _sectionedMessageSource.removeListener(_update);
     _sectionedMessageSource.dispose();
     eventsSubscription.cancel();
@@ -117,10 +117,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context);
-    if (widget.messageSource is ErrorMessageSource) {
-      return buildForLoadingError(
-          context, localizations, widget.messageSource as ErrorMessageSource);
+    final localizations = AppLocalizations.of(context)!;
+    final source = widget.messageSource;
+    if (source is ErrorMessageSource) {
+      return buildForLoadingError(context, localizations, source);
     }
     final appBarTitle = isInSearchMode
         ? TextField(
@@ -133,7 +133,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   ? PlatformIconButton(
                       icon: Icon(Icons.clear),
                       onPressed: () {
-                        searchEditingController.text = '';
+                        searchEditingController!.text = '';
                         setState(() {
                           hasSearchInput = false;
                         });
@@ -154,7 +154,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             },
           )
         : Platform.isIOS
-            ? Text(widget.messageSource.name)
+            ? Text(widget.messageSource.name!)
             : Base.buildTitle(widget.messageSource.name ?? '',
                 widget.messageSource.description ?? '');
 
@@ -192,8 +192,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         ),
       },
     ];
-    final i18nService = locator<I18nService>();
-    Widget zeroPosWidget;
+    final I18nService? i18nService = locator<I18nService>();
+    Widget? zeroPosWidget;
     if (_sectionedMessageSource.isInitialized &&
         widget.messageSource.size == 0) {
       final emptyMessage = widget.messageSource.isSearch
@@ -217,7 +217,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               icon: Icon(iconService.messageActionDelete),
               label: Text(localizations.homeDeleteAllAction, style: textStyle),
               onPressed: () async {
-                bool confirmed = await DialogHelper.askForConfirmation(context,
+                bool? confirmed = await DialogHelper.askForConfirmation(context,
                     title: localizations.homeDeleteAllTitle,
                     query: localizations.homeDeleteAllQuestion,
                     action: localizations.homeDeleteAllAction,
@@ -316,13 +316,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                         padding: const EdgeInsets.all(8.0),
                         child: Text(localizations.homeLoading(
                             widget.messageSource.name ??
-                                widget.messageSource.description)),
+                                widget.messageSource.description!)),
                       ),
                     ),
                   ],
                 ),
               );
-              break;
             case ConnectionState.done:
               if (_visualization == _Visualization.stack) {
                 return WillPopScope(
@@ -389,13 +388,14 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                             }
                             final element =
                                 _sectionedMessageSource.getElementAt(index);
-                            if (element.section != null) {
-                              final text = i18nService.formatDateRange(
-                                  element.section.range, element.section.date);
+                            final section = element.section;
+                            if (section != null) {
+                              final text = i18nService!
+                                  .formatDateRange(section.range, section.date);
                               return GestureDetector(
                                 onLongPress: () {
                                   selectedMessages = _sectionedMessageSource
-                                      .getMessagesForSection(element.section);
+                                      .getMessagesForSection(section);
                                   selectedMessages
                                       .forEach((m) => m.isSelected = true);
                                   setState(() {
@@ -407,8 +407,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                     : () {
                                         final sectionMessages =
                                             _sectionedMessageSource
-                                                .getMessagesForSection(
-                                                    element.section);
+                                                .getMessagesForSection(section);
                                         final doSelect =
                                             !sectionMessages.first.isSelected;
                                         for (final msg in sectionMessages) {
@@ -447,7 +446,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 ),
                               );
                             }
-                            final message = element.message;
+                            final message = element.message!;
                             final settings =
                                 locator<SettingsService>().settings;
                             final swipeLeftToRightAction =
@@ -513,7 +512,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 ),
                               ),
                               child: MessageOverview(
-                                element.message,
+                                element.message!,
                                 isInSelectionMode,
                                 onMessageTap,
                                 onMessageLongPress,
@@ -564,7 +563,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                 ),
               );
           }
-          return Container();
         },
       ),
     );
@@ -575,7 +573,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     final isJunk = widget.messageSource.isJunk;
     final isAnyUnseen = selectedMessages.any((m) => !m.isSeen);
     final isAnyUnflagged = selectedMessages.any((m) => !m.isFlagged);
-    final iconService = locator<IconService>();
+    final IconService? iconService = locator<IconService>();
     return PlatformBottomBar(
       cupertinoBlurBackground: true,
       child: SafeArea(
@@ -588,12 +586,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             ),
             if (isAnyUnseen) ...{
               PlatformIconButton(
-                icon: Icon(iconService.messageIsNotSeen),
+                icon: Icon(iconService!.messageIsNotSeen),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.seen),
               ),
             } else ...{
               PlatformIconButton(
-                icon: Icon(iconService.messageIsSeen),
+                icon: Icon(iconService!.messageIsSeen),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.unseen),
               ),
             },
@@ -761,7 +759,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   void handleMultipleChoice(_MultipleChoice choice) async {
-    final localizations = locator<I18nService>().localizations;
+    final localizations = locator<I18nService>().localizations!;
     if (selectedMessages.isEmpty) {
       locator<ScaffoldMessengerService>()
           .showTextSnackBar(localizations.multipleSelectionNeededInfo);
@@ -842,7 +840,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   void forwardAttachmentsLike(
-      Future Function(Message, MessageBuilder) loader) async {
+      Future? Function(Message, MessageBuilder) loader) async {
     final builder = MessageBuilder();
     final fromAddresses = <MailAddress>[];
     final subjects = <String>[];
@@ -854,10 +852,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       if (!fromAddresses.contains(from)) {
         fromAddresses.add(from);
       }
-      var mime = message.mimeMessage;
+      var mime = message.mimeMessage!;
       final subject = mime.decodeSubject();
       if (subject?.isNotEmpty ?? false) {
-        subjects.add(subject.replaceAll('\r\n ', '').replaceAll('\n', ''));
+        subjects.add(subject!.replaceAll('\r\n ', '').replaceAll('\n', ''));
       }
       final composeFuture = loader(message, builder);
       if (composeFuture != null) {
@@ -880,8 +878,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         .push(Routes.mailCompose, arguments: composeData, fade: true);
   }
 
-  Future addMessageAttachment(Message message, MessageBuilder builder) {
-    final mime = message.mimeMessage;
+  Future? addMessageAttachment(Message message, MessageBuilder builder) {
+    final mime = message.mimeMessage!;
     if (mime.mimeData == null) {
       return message.mailClient.fetchMessageContents(mime).then((value) {
         message.updateMime(value);
@@ -893,10 +891,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     return null;
   }
 
-  Future addAttachments(Message message, MessageBuilder builder) {
+  Future? addAttachments(Message message, MessageBuilder builder) {
     final mailClient = message.mailClient;
-    var mime = message.mimeMessage;
-    Future composeFuture;
+    var mime = message.mimeMessage!;
+    Future? composeFuture;
     if (mime.mimeData == null) {
       composeFuture = mailClient.fetchMessageContents(mime).then((value) {
         message.updateMime(value);
@@ -925,8 +923,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   void move() {
-    final localizations = locator<I18nService>().localizations;
-    var account = locator<MailService>().currentAccount;
+    final localizations = locator<I18nService>().localizations!;
+    var account = locator<MailService>().currentAccount!;
     if (account.isVirtual) {
       // check how many mailclient are involved in the current selection to either show the mailboxes of the unified account
       // or of the real account
@@ -939,7 +937,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       if (mailClients.length == 1) {
         // ok, all messages belong to one account:
         account =
-            locator<MailService>().getAccountFor(mailClients.first.account);
+            locator<MailService>().getAccountFor(mailClients.first.account)!;
       }
     }
     final mailbox = account.isVirtual
@@ -964,8 +962,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       isInSelectionMode = false;
     });
     locator<NavigationService>().pop(); // alert
-    final localizations = locator<I18nService>().localizations;
-    final account = locator<MailService>().currentAccount;
+    final localizations = locator<I18nService>().localizations!;
+    final account = locator<MailService>().currentAccount!;
     if (account.isVirtual) {
       await widget.messageSource.moveMessagesToFlag(selectedMessages,
           mailbox.flags.first, localizations.moveSuccess(mailbox.name));
@@ -991,11 +989,11 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       }
       setState(() {});
     } else {
-      if (message.mimeMessage.hasFlag(MessageFlags.draft)) {
+      if (message.mimeMessage!.hasFlag(MessageFlags.draft)) {
         // continue to edit message:
         // first download message:
         final mime =
-            await message.mailClient.fetchMessageContents(message.mimeMessage);
+            await message.mailClient.fetchMessageContents(message.mimeMessage!);
         //message.updateMime(mime);
         final builder = MessageBuilder.prepareFromDraft(mime);
         final data = ComposeData([message], builder, ComposeAction.newMessage);
@@ -1030,7 +1028,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         final isSeen = !message.isSeen;
         message.isSeen = isSeen;
         await message.mailClient
-            .flagMessage(message.mimeMessage, isSeen: isSeen);
+            .flagMessage(message.mimeMessage!, isSeen: isSeen);
         break;
       case SwipeAction.archive:
         await _sectionedMessageSource.messageSource.archive(message);
@@ -1045,14 +1043,14 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         final isFlagged = !message.isFlagged;
         message.isFlagged = isFlagged;
         await message.mailClient
-            .flagMessage(message.mimeMessage, isFlagged: isFlagged);
+            .flagMessage(message.mimeMessage!, isFlagged: isFlagged);
         break;
     }
   }
 
   Widget buildForLoadingError(BuildContext context,
       AppLocalizations localizations, ErrorMessageSource errorSource) {
-    final account = errorSource?.account;
+    final account = errorSource.account;
     return Base.buildAppChrome(
       context,
       title: localizations.errorTitle,
@@ -1061,7 +1059,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(localizations.accountLoadError(account?.name)),
+            child: Text(localizations.accountLoadError(account.name)),
           ),
           PlatformTextButton(
             child: Text(localizations.accountLoadErrorEditAction),
@@ -1103,7 +1101,7 @@ class MessageOverview extends StatefulWidget {
   final bool isInSelectionMode;
   final void Function(Message message) onTap;
   final void Function(Message message) onLongPress;
-  final AnimationController animationController;
+  final AnimationController? animationController;
 
   MessageOverview(
       this.message, this.isInSelectionMode, this.onTap, this.onLongPress,
@@ -1152,7 +1150,7 @@ class _MessageOverviewState extends State<MessageOverview> {
     return (widget.animationController != null)
         ? SizeTransition(
             sizeFactor: CurvedAnimation(
-              parent: widget.animationController,
+              parent: widget.animationController!,
               curve: Curves.easeOut,
             ),
             child: buildMessageOverview(),

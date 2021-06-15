@@ -33,7 +33,7 @@ class IconService {
   IconData get folderArchive => CommunityMaterialIcons.archive_outline;
   IconData get folderJunk => CommunityMaterialIcons.bug_outline;
 
-  IconData getForMediaType(MediaType mediaType) {
+  IconData getForMediaType(MediaType? mediaType) {
     if (mediaType == null) {
       return Icons.attachment;
     }
@@ -90,7 +90,7 @@ class IconService {
     return iconData;
   }
 
-  static Widget buildNumericIcon(int value, {double size}) {
+  static Widget buildNumericIcon(int value, {double? size}) {
     switch (value) {
       case 1:
         return Icon(

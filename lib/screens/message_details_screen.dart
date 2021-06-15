@@ -31,7 +31,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MessageDetailsScreen extends StatefulWidget {
   final Message message;
-  const MessageDetailsScreen({Key key, @required this.message})
+  const MessageDetailsScreen({Key? key, required this.message})
       : super(key: key);
 
   @override
@@ -41,26 +41,26 @@ class MessageDetailsScreen extends StatefulWidget {
 enum _OverflowMenuChoice { showContents, showSourceCode }
 
 class _DetailsScreenState extends State<MessageDetailsScreen> {
-  PageController _pageController;
-  MessageSource source;
-  Message current;
+  PageController? _pageController;
+  late MessageSource source;
+  Message? current;
 
   @override
   void initState() {
     _pageController = PageController(initialPage: widget.message.sourceIndex);
     current = widget.message;
-    source = current.source;
+    source = current!.source;
     super.initState();
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _pageController!.dispose();
     super.dispose();
   }
 
-  Message getMessage(int index) {
-    if (current.sourceIndex == index) {
+  Message? getMessage(int index) {
+    if (current!.sourceIndex == index) {
       return current;
     }
     current = source.getMessageAt(index);
@@ -72,34 +72,34 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
     return PageView.builder(
       controller: _pageController,
       itemCount: source.size,
-      itemBuilder: (context, index) => _MessageContent(getMessage(index)),
+      itemBuilder: (context, index) => _MessageContent(getMessage(index)!),
     );
   }
 }
 
 class _MessageContent extends StatefulWidget {
   final Message message;
-  const _MessageContent(this.message, {Key key}) : super(key: key);
+  const _MessageContent(this.message, {Key? key}) : super(key: key);
 
   @override
   _MessageContentState createState() => _MessageContentState();
 }
 
 class _MessageContentState extends State<_MessageContent> {
-  bool _blockExternalImages;
-  bool _messageDownloadError;
+  late bool _blockExternalImages;
+  late bool _messageDownloadError;
   bool _messageRequiresRefresh = false;
   bool _isWebViewZoomedOut = false;
-  Object errorObject;
-  StackTrace errorStackTrace;
+  Object? errorObject;
+  StackTrace? errorStackTrace;
 
   @override
   void initState() {
     final mime = widget.message.mimeMessage;
-    if (mime.isDownloaded) {
+    if (mime != null && mime.isDownloaded) {
       _blockExternalImages = shouldImagesBeBlocked(mime);
     } else {
-      _messageRequiresRefresh = widget.message.mimeMessage.envelope == null;
+      _messageRequiresRefresh = mime?.envelope == null;
       _blockExternalImages = false;
     }
     _messageDownloadError = false;
@@ -108,10 +108,10 @@ class _MessageContentState extends State<_MessageContent> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
-      title: widget.message.mimeMessage.decodeSubject() ??
+      title: widget.message.mimeMessage!.decodeSubject() ??
           localizations.subjectUndefined,
       content: MessageWidget(
         message: widget.message,
@@ -167,7 +167,7 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   Widget buildHeader(AppLocalizations localizations) {
-    final mime = widget.message.mimeMessage;
+    final mime = widget.message.mimeMessage!;
     final attachments = widget.message.attachments;
     final date = locator<I18nService>().formatDate(mime.decodeDate());
     final subject = mime.decodeSubject();
@@ -287,7 +287,7 @@ class _MessageContentState extends State<_MessageContent> {
     );
   }
 
-  Widget buildMailAddresses(List<MailAddress> addresses) {
+  Widget buildMailAddresses(List<MailAddress>? addresses) {
     if (addresses?.isEmpty ?? true) {
       return Container();
     }
@@ -296,7 +296,7 @@ class _MessageContentState extends State<_MessageContent> {
       spacing: 2,
       runSpacing: 0,
       children: [
-        for (var address in addresses) ...{
+        for (var address in addresses!) ...{
           MailAddressChip(mailAddress: address)
         }
       ],
@@ -341,8 +341,9 @@ class _MessageContentState extends State<_MessageContent> {
               label: ButtonText('Copy to clipboard'),
               onPressed: () {
                 final text = errorObject?.toString() ??
-                    '<unknown error>' + '\n\n' + errorStackTrace?.toString() ??
-                    '<no stacktrace>';
+                    '<unknown error>' +
+                        '\n\n' +
+                        (errorStackTrace?.toString() ?? '<no stacktrace>');
                 final data = ClipboardData(text: text);
                 Clipboard.setData(data);
               },
@@ -353,7 +354,7 @@ class _MessageContentState extends State<_MessageContent> {
     }
 
     return MimeMessageDownloader(
-      mimeMessage: widget.message.mimeMessage,
+      mimeMessage: widget.message.mimeMessage!,
       mailClient: widget.message.mailClient,
       markAsSeen: true,
       onDownloaded: onMimeMessageDownloaded,
@@ -405,7 +406,7 @@ class _MessageContentState extends State<_MessageContent> {
         .cancelNotificationForMailMessage(widget.message);
   }
 
-  void onMimeMessageError(Object e, StackTrace s) {
+  void onMimeMessageError(Object? e, StackTrace? s) {
     if (mounted) {
       setState(() {
         errorObject = e;
@@ -434,9 +435,9 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   void resubscribe() async {
-    final localizations = AppLocalizations.of(context);
-    final mime = widget.message.mimeMessage;
-    final listName = mime.decodeListName();
+    final localizations = AppLocalizations.of(context)!;
+    final mime = widget.message.mimeMessage!;
+    final listName = mime.decodeListName()!;
     final confirmation = await DialogHelper.askForConfirmation(context,
         title: localizations.detailsNewsletterResubscribeDialogTitle,
         action: localizations.detailsNewsletterResubscribeDialogAction,
@@ -469,9 +470,9 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   void unsubscribe() async {
-    final localizations = AppLocalizations.of(context);
-    final mime = widget.message.mimeMessage;
-    final listName = mime.decodeListName();
+    final localizations = AppLocalizations.of(context)!;
+    final mime = widget.message.mimeMessage!;
+    final listName = mime.decodeListName()!;
     final confirmation = await DialogHelper.askForConfirmation(
       context,
       title: localizations.detailsNewsletterUnsubscribeDialogTitle,
@@ -521,7 +522,7 @@ class _MessageContentState extends State<_MessageContent> {
     navigateToMessage(widget.message.previous);
   }
 
-  void navigateToMessage(Message message) {
+  void navigateToMessage(Message? message) {
     if (message != null) {
       locator<NavigationService>()
           .push(Routes.mailDetails, arguments: message, replace: true);
@@ -530,18 +531,18 @@ class _MessageContentState extends State<_MessageContent> {
 }
 
 class MessageContentsScreen extends StatelessWidget {
-  final Message message;
-  const MessageContentsScreen({Key key, @required this.message})
+  final Message? message;
+  const MessageContentsScreen({Key? key, required this.message})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Base.buildAppChrome(
       context,
-      title: message.mimeMessage.decodeSubject() ??
-          AppLocalizations.of(context).subjectUndefined,
+      title: message!.mimeMessage!.decodeSubject() ??
+          AppLocalizations.of(context)!.subjectUndefined,
       content: MimeMessageViewer(
-        mimeMessage: message.mimeMessage,
+        mimeMessage: message!.mimeMessage!,
         adjustHeight: false,
         mailtoDelegate: handleMailto,
         showMediaDelegate: navigateToMedia,
@@ -565,15 +566,15 @@ class MessageContentsScreen extends StatelessWidget {
 
 class ThreadSequenceButton extends StatefulWidget {
   final Message message;
-  ThreadSequenceButton({Key key, @required this.message}) : super(key: key);
+  ThreadSequenceButton({Key? key, required this.message}) : super(key: key);
 
   @override
   _ThreadSequenceButtonState createState() => _ThreadSequenceButtonState();
 }
 
 class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
-  OverlayEntry _overlayEntry;
-  Future<List<Message>> _loadingFuture;
+  OverlayEntry? _overlayEntry;
+  late Future<List<Message>> _loadingFuture;
 
   @override
   void dispose() {
@@ -592,11 +593,11 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
   Future<List<Message>> loadMessages() async {
     final existingSource = widget.message.source;
     if (existingSource is ListMessageSource) {
-      return existingSource.messages;
+      return existingSource.messages!;
     }
     final mailClient = widget.message.mailClient;
     final mimeMessages = await mailClient.fetchMessageSequence(
-        widget.message.mimeMessage.threadSequence,
+        widget.message.mimeMessage!.threadSequence!,
         fetchPreference: FetchPreference.envelope);
     final source = ListMessageSource(widget.message.source);
     final messages = <Message>[];
@@ -606,12 +607,12 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
       messages.add(message);
     }
     source.messages = messages.reversed.toList();
-    return source.messages;
+    return source.messages!;
   }
 
   @override
   Widget build(BuildContext context) {
-    final length = widget.message.mimeMessage.threadSequence?.length ?? 0;
+    final length = widget.message.mimeMessage!.threadSequence?.length ?? 0;
     return WillPopScope(
       onWillPop: () {
         if (_overlayEntry == null) {
@@ -627,7 +628,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
             _removeOverlay();
           } else {
             _overlayEntry = _buildThreadsOverlay();
-            Overlay.of(context).insert(_overlayEntry);
+            Overlay.of(context)!.insert(_overlayEntry!);
           }
         },
       ),
@@ -635,7 +636,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
   }
 
   void _removeOverlay() {
-    _overlayEntry.remove();
+    _overlayEntry!.remove();
     _overlayEntry = null;
   }
 
@@ -646,11 +647,11 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
   }
 
   OverlayEntry _buildThreadsOverlay() {
-    RenderBox renderBox = context.findRenderObject();
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
     final offset = renderBox.localToGlobal(Offset.zero);
     final renderSize = renderBox.size;
     final size = MediaQuery.of(context).size;
-    final currentUid = widget.message.mimeMessage.uid;
+    final currentUid = widget.message.mimeMessage!.uid;
     final top = offset.dy + renderSize.height + 5.0;
     final height = size.height - top - 16;
 
@@ -668,13 +669,13 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
               width: size.width - offset.dx - 16,
               child: Material(
                 elevation: 4.0,
-                child: FutureBuilder<List<Message>>(
+                child: FutureBuilder<List<Message>?>(
                   future: _loadingFuture,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return PlatformProgressIndicator();
                     }
-                    final messages = snapshot.data;
+                    final messages = snapshot.data!;
                     return ConstrainedBox(
                       constraints: BoxConstraints(maxHeight: height),
                       child: ListView(
@@ -686,7 +687,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                                       MessageOverviewContent(message: message),
                                   onTap: () => _select(message),
                                   selected:
-                                      (message.mimeMessage.uid == currentUid),
+                                      (message.mimeMessage!.uid == currentUid),
                                 ))
                             .toList(),
                       ),
@@ -703,7 +704,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
 }
 
 class ReadReceiptButton extends StatefulWidget {
-  ReadReceiptButton({Key key}) : super(key: key);
+  ReadReceiptButton({Key? key}) : super(key: key);
 
   @override
   _ReadReceiptButtonState createState() => _ReadReceiptButtonState();
@@ -719,17 +720,17 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
 
   @override
   Widget build(BuildContext context) {
-    final message = Message.of(context);
-    final mime = message.mimeMessage;
+    final message = Message.of(context)!;
+    final mime = message.mimeMessage!;
     final localizations = AppLocalizations.of(context);
     if (mime.isReadReceiptSent) {
-      return Text(localizations.detailsReadReceiptSentStatus,
+      return Text(localizations!.detailsReadReceiptSentStatus,
           style: Theme.of(context).textTheme.caption);
     } else if (_isSendingReadReceipt) {
       return PlatformProgressIndicator();
     } else {
       return ElevatedButton(
-        child: ButtonText(localizations.detailsSendReadReceiptAction),
+        child: ButtonText(localizations!.detailsSendReadReceiptAction),
         onPressed: () async {
           setState(() {
             _isSendingReadReceipt = true;

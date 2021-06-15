@@ -13,7 +13,7 @@ import 'dart:ui' as ui;
 import '../locator.dart';
 
 class LocationScreen extends StatefulWidget {
-  LocationScreen({Key key}) : super(key: key);
+  LocationScreen({Key? key}) : super(key: key);
 
   @override
   _LocationScreenState createState() => _LocationScreenState();
@@ -23,9 +23,9 @@ class _LocationScreenState extends State<LocationScreen> {
   final repaintBoundaryKey = GlobalKey();
 
   LatLng defaultLocation = LatLng(53.07516, 8.80777);
-  MapController controller;
-  Future<LocationData> findLocation;
-  Offset _dragStart;
+  late MapController controller;
+  Future<LocationData?>? findLocation;
+  late Offset _dragStart;
   double _scaleStart = 1.0;
 
   void _gotoDefault() {
@@ -66,7 +66,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
 
     return Base.buildAppChrome(
       context,
@@ -77,7 +77,7 @@ class _LocationScreenState extends State<LocationScreen> {
           onPressed: onLocationSelected,
         ),
       ],
-      content: FutureBuilder<LocationData>(
+      content: FutureBuilder<LocationData?>(
         future: findLocation,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
@@ -88,7 +88,7 @@ class _LocationScreenState extends State<LocationScreen> {
             case ConnectionState.done:
               if (snapshot.hasData) {
                 defaultLocation =
-                    LatLng(snapshot.data.latitude, snapshot.data.longitude);
+                    LatLng(snapshot.data!.latitude!, snapshot.data!.longitude!);
                 controller.center = defaultLocation;
                 return buildMap();
               }
@@ -100,11 +100,11 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   void onLocationSelected() async {
-    RenderRepaintBoundary boundary =
-        repaintBoundaryKey.currentContext.findRenderObject();
+    RenderRepaintBoundary boundary = repaintBoundaryKey.currentContext!
+        .findRenderObject() as RenderRepaintBoundary;
     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    var pngBytes = byteData.buffer.asUint8List();
+    var pngBytes = byteData?.buffer.asUint8List();
     locator<NavigationService>().pop(pngBytes);
   }
 

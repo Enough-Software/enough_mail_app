@@ -18,13 +18,13 @@ abstract class MimeSource {
   final MailClient mailClient;
   int get size;
   final _subscribers = <MimeSourceSubscriber>[];
-  StreamSubscription<MailLoadEvent> _mailLoadEventSubscription;
-  StreamSubscription<MailVanishedEvent> _mailVanishedEventSubscription;
-  StreamSubscription<MailUpdateEvent> _mailUpdatedEventSubscription;
-  Future _downloadFuture;
-  Future get downloadFuture => _downloadFuture;
+  late StreamSubscription<MailLoadEvent> _mailLoadEventSubscription;
+  late StreamSubscription<MailVanishedEvent> _mailVanishedEventSubscription;
+  late StreamSubscription<MailUpdateEvent> _mailUpdatedEventSubscription;
+  Future? _downloadFuture;
+  Future? get downloadFuture => _downloadFuture;
 
-  String get name;
+  String? get name;
 
   bool get suppportsDeleteAll;
 
@@ -44,7 +44,7 @@ abstract class MimeSource {
 
   bool get supportsSearching;
 
-  MimeSource(this.mailClient, {MimeSourceSubscriber subscriber}) {
+  MimeSource(this.mailClient, {MimeSourceSubscriber? subscriber}) {
     if (subscriber != null) {
       _subscribers.add(subscriber);
     }
@@ -53,7 +53,7 @@ abstract class MimeSource {
 
   Future<bool> init();
 
-  void remove(MimeMessage mimeMessage);
+  void remove(MimeMessage? mimeMessage);
 
   void dispose() {
     _deregisterEvents();
@@ -67,7 +67,7 @@ abstract class MimeSource {
     _subscribers.remove(subscriber);
   }
 
-  MimeMessage getMessageAt(int index);
+  MimeMessage? getMessageAt(int index);
 
   void addMessage(MimeMessage message);
 
@@ -120,7 +120,7 @@ abstract class MimeSource {
     }
   }
 
-  void removeVanishedMessages(MessageSequence sequence);
+  void removeVanishedMessages(MessageSequence? sequence);
 
   void _onMessageVanished(MailVanishedEvent e) {
     if (!e.isEarlier && e.mailClient == mailClient) {
@@ -175,8 +175,8 @@ abstract class MimeSource {
 }
 
 class MailboxMimeSource extends MimeSource {
-  Mailbox mailbox;
-  int messagesExistAtInit;
+  Mailbox? mailbox;
+  int? messagesExistAtInit;
   final _requestedPages = <int>[];
   final _cache = MimeCache();
   final int pageSize;
@@ -185,11 +185,11 @@ class MailboxMimeSource extends MimeSource {
   int get size => mailbox?.messagesExists ?? 0;
 
   @override
-  String get name => mailbox?.name;
+  String? get name => mailbox?.name;
 
   @override
   bool get suppportsDeleteAll =>
-      (mailbox != null) && (mailbox.isTrash || mailbox.isJunk);
+      (mailbox != null) && (mailbox!.isTrash || mailbox!.isJunk);
 
   @override
   bool get isJunk => mailbox?.isJunk ?? false;
@@ -204,7 +204,7 @@ class MailboxMimeSource extends MimeSource {
   bool get supportsSearching => true;
 
   MailboxMimeSource(MailClient mailClient, this.mailbox,
-      {this.pageSize = 40, MimeSourceSubscriber subscriber})
+      {this.pageSize = 40, MimeSourceSubscriber? subscriber})
       : super(mailClient, subscriber: subscriber);
 
   @override
@@ -213,16 +213,16 @@ class MailboxMimeSource extends MimeSource {
       if (mailbox == null) {
         mailbox = await mailClient.selectInbox();
       } else {
-        mailbox = await mailClient.selectMailbox(mailbox);
+        mailbox = await mailClient.selectMailbox(mailbox!);
       }
-      messagesExistAtInit = mailbox.messagesExists;
-      if (messagesExistAtInit > 0) {
+      messagesExistAtInit = mailbox!.messagesExists;
+      if (messagesExistAtInit! > 0) {
         // pre-cache first page:
         if (mailClient.supportsThreading &&
-            !(mailbox.isTrash ||
-                mailbox.isSent ||
-                mailbox.isDrafts ||
-                mailbox.isJunk)) {
+            !(mailbox!.isTrash ||
+                mailbox!.isSent ||
+                mailbox!.isDrafts ||
+                mailbox!.isJunk)) {
           final since = DateTime.now().subtract(const Duration(days: 90));
           await mailClient.fetchThreadData(
               since: since, setThreadSequences: true);
@@ -242,9 +242,9 @@ class MailboxMimeSource extends MimeSource {
   }
 
   @override
-  void removeVanishedMessages(MessageSequence sequence) {
-    final ids = sequence.toList();
-    MimeMessage message;
+  void removeVanishedMessages(MessageSequence? sequence) {
+    final ids = sequence!.toList();
+    MimeMessage? message;
     for (var id in ids) {
       if (sequence.isUidSequence == true) {
         message = _cache.getForUid(id);
@@ -262,14 +262,14 @@ class MailboxMimeSource extends MimeSource {
 
   @override
   Future<List<DeleteResult>> deleteAllMessages() async {
-    final deleteResult = await mailClient.deleteAllMessages(mailbox);
-    mailbox.messagesExists = 0;
+    final deleteResult = await mailClient.deleteAllMessages(mailbox!);
+    mailbox!.messagesExists = 0;
     return [deleteResult];
   }
 
   @override
-  void remove(MimeMessage mimeMessage) {
-    mailbox.messagesExists--;
+  void remove(MimeMessage? mimeMessage) {
+    mailbox!.messagesExists--;
     _cache.remove(mimeMessage);
   }
 
@@ -279,7 +279,7 @@ class MailboxMimeSource extends MimeSource {
   }
 
   @override
-  MimeMessage getMessageAt(int index) {
+  MimeMessage? getMessageAt(int index) {
     //print('getMessageAt($index)');
     if (index >= size) {
       throw StateError('Invalid index $index for MimeSource with size $size');
@@ -363,15 +363,15 @@ class MailboxMimeSource extends MimeSource {
   void clear() {
     _cache.clear();
     _requestedPages.clear();
-    mailbox.messagesExists = 0;
+    mailbox!.messagesExists = 0;
     //mailbox = Mailbox()..messagesExists = 0;
   }
 }
 
 class SearchMimeSource extends MimeSource {
   final MailSearch mailSearch;
-  final Mailbox mailbox;
-  MailSearchResult searchResult;
+  final Mailbox? mailbox;
+  late MailSearchResult searchResult;
   @override
   int get size => searchResult.length;
 
@@ -401,13 +401,13 @@ class SearchMimeSource extends MimeSource {
   }
 
   @override
-  bool get isArchive => mailbox.isArchive;
+  bool get isArchive => mailbox!.isArchive;
 
   @override
-  bool get isJunk => mailbox.isJunk;
+  bool get isJunk => mailbox!.isJunk;
 
   @override
-  bool get isTrash => mailbox.isTrash;
+  bool get isTrash => mailbox!.isTrash;
 
   @override
   String get name => mailSearch.query;
@@ -427,7 +427,7 @@ class SearchMimeSource extends MimeSource {
   bool get suppportsDeleteAll => true;
 
   @override
-  MimeMessage getMessageAt(int index) {
+  MimeMessage? getMessageAt(int index) {
     if (searchResult.isAvailable(index)) {
       return searchResult[index];
     }
@@ -460,13 +460,13 @@ class SearchMimeSource extends MimeSource {
   }
 
   @override
-  void remove(MimeMessage mimeMessage) {
-    searchResult.removeMessage(mimeMessage);
+  void remove(MimeMessage? mimeMessage) {
+    searchResult.removeMessage(mimeMessage!);
   }
 
   @override
-  void removeVanishedMessages(MessageSequence sequence) {
-    final messages = searchResult.removeMessageSequence(sequence);
+  void removeVanishedMessages(MessageSequence? sequence) {
+    final messages = searchResult.removeMessageSequence(sequence!);
     for (final message in messages) {
       _notifyVanished(message);
     }
@@ -479,7 +479,7 @@ class SearchMimeSource extends MimeSource {
   Future<bool> markAllMessagesSeen(bool seen) async {
     final sequence = searchResult.pagedSequence.sequence;
 
-    if (sequence == null || sequence.isEmpty) {
+    if (sequence.isEmpty) {
       return Future.value(true);
     }
     try {

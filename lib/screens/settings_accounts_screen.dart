@@ -13,7 +13,7 @@ import '../locator.dart';
 import '../routes.dart';
 
 class SettingsAccountsScreen extends StatefulWidget {
-  SettingsAccountsScreen({Key key}) : super(key: key);
+  SettingsAccountsScreen({Key? key}) : super(key: key);
 
   @override
   _SettingsAccountsScreenState createState() => _SettingsAccountsScreenState();
@@ -21,7 +21,7 @@ class SettingsAccountsScreen extends StatefulWidget {
 
 class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
   bool reorderAccounts = false;
-  StreamSubscription eventsSubscription;
+  late StreamSubscription eventsSubscription;
 
   @override
   void initState() {
@@ -40,7 +40,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
 
     return Base.buildAppChrome(
       context,

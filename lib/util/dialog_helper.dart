@@ -11,23 +11,23 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 enum DialogActions { ok, cancel, okAndCancel }
 
 class DialogHelper {
-  static Future<bool> askForConfirmation(
+  static Future<bool?> askForConfirmation(
     BuildContext context, {
-    @required String title,
-    @required String query,
-    String action,
-    bool isDangerousAction,
+    required String title,
+    required String query,
+    String? action,
+    bool? isDangerousAction,
   }) {
     final localizations = AppLocalizations.of(context);
 
     if (Platform.isAndroid) {
       final theme = Theme.of(context);
       var actionButtonStyle = theme.textButtonTheme.style;
-      TextStyle actionTextStyle;
+      TextStyle? actionTextStyle;
       if (isDangerousAction == true) {
         actionButtonStyle = TextButton.styleFrom(
             backgroundColor: Colors.red, onSurface: Colors.white);
-        actionTextStyle = theme.textTheme.button.copyWith(color: Colors.white);
+        actionTextStyle = theme.textTheme.button!.copyWith(color: Colors.white);
       }
       return showDialog<bool>(
         builder: (context) => AlertDialog(
@@ -35,7 +35,7 @@ class DialogHelper {
           content: Text(query),
           actions: [
             TextButton(
-              child: ButtonText(localizations.actionCancel),
+              child: ButtonText(localizations!.actionCancel),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             TextButton(
@@ -54,13 +54,13 @@ class DialogHelper {
           content: Text(query),
           actions: [
             CupertinoDialogAction(
-              child: Text(localizations.actionCancel),
+              child: Text(localizations!.actionCancel),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             CupertinoDialogAction(
               child: Text(action ?? title),
               onPressed: () => Navigator.of(context).pop(true),
-              isDestructiveAction: isDangerousAction,
+              isDestructiveAction: isDangerousAction!,
             ),
           ],
         ),
@@ -70,26 +70,26 @@ class DialogHelper {
   }
 
   static Future showTextDialog(BuildContext context, String title, String text,
-      {List<Widget> actions}) {
+      {List<Widget>? actions}) {
     return showWidgetDialog(context, title, Text(text), actions: actions);
   }
 
   static Future showWidgetDialog(
-      BuildContext context, String title, Widget content,
-      {List<Widget> actions, DialogActions defaultActions = DialogActions.ok}) {
+      BuildContext context, String? title, Widget content,
+      {List<Widget>? actions, DialogActions defaultActions = DialogActions.ok}) {
     final localizations = AppLocalizations.of(context);
     actions ??= [
       if (defaultActions == DialogActions.cancel ||
           defaultActions == DialogActions.okAndCancel) ...{
         PlatformTextButton(
-          child: ButtonText(localizations.actionCancel),
+          child: ButtonText(localizations!.actionCancel),
           onPressed: () => Navigator.of(context).pop(false),
         ),
       },
       if (defaultActions == DialogActions.ok ||
           defaultActions == DialogActions.okAndCancel) ...{
         PlatformTextButton(
-          child: ButtonText(localizations.actionOk),
+          child: ButtonText(localizations!.actionOk),
           onPressed: () => Navigator.of(context).pop(true),
         ),
       },
@@ -109,14 +109,14 @@ class DialogHelper {
         builder: (context) => CupertinoAlertDialog(
           title: title == null ? null : Text(title),
           content: content,
-          actions: actions,
+          actions: actions!,
         ),
       );
     }
   }
 
   static void showAbout(BuildContext context) async {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final packageInfo = await PackageInfo.fromPlatform();
     var version = 'v${packageInfo.version}+${packageInfo.buildNumber}';
     showAboutDialog(

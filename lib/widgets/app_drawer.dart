@@ -19,18 +19,18 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../routes.dart';
 
 class AppDrawer extends StatefulWidget {
-  AppDrawer({Key key}) : super(key: key);
+  AppDrawer({Key? key}) : super(key: key);
 
   @override
   _AppDrawerState createState() => _AppDrawerState();
 }
 
 class _AppDrawerState extends State<AppDrawer> {
-  StreamSubscription eventSubscription;
+  late StreamSubscription _eventSubscription;
 
   @override
   void initState() {
-    eventSubscription =
+    _eventSubscription =
         AppEventBus.eventBus.on<AccountsChangedEvent>().listen((event) {
       setState(() {});
     });
@@ -39,7 +39,7 @@ class _AppDrawerState extends State<AppDrawer> {
 
   @override
   void dispose() {
-    eventSubscription.cancel();
+    _eventSubscription.cancel();
     super.dispose();
   }
 
@@ -47,12 +47,12 @@ class _AppDrawerState extends State<AppDrawer> {
   Widget build(BuildContext context) {
     final mailService = locator<MailService>();
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context);
-    final currentAccount = mailService.currentAccount;
+    final localizations = AppLocalizations.of(context)!;
+    final currentAccount = mailService.currentAccount!;
     var accounts = mailService.accounts;
     if (mailService.hasUnifiedAccount) {
       accounts = accounts.toList();
-      accounts.insert(0, mailService.unifiedAccount);
+      accounts.insert(0, mailService.unifiedAccount!);
     }
     return PlatformDrawer(
       child: SafeArea(
@@ -108,12 +108,12 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Widget buildAccountHeader(
-      Account currentAccount, List<Account> accounts, ThemeData theme) {
+      Account currentAccount, List<Account?> accounts, ThemeData theme) {
     final avatarAccount =
-        currentAccount.isVirtual ? accounts.first : currentAccount;
+        currentAccount.isVirtual ? accounts.first! : currentAccount;
     final userName = currentAccount.userName;
     final accountName = Text(
-      currentAccount.name ?? '',
+      currentAccount.name,
       style: TextStyle(fontWeight: FontWeight.bold),
     );
     final accountNameWithBadge = locator<MailService>().hasError(currentAccount)
@@ -122,12 +122,12 @@ class _AppDrawerState extends State<AppDrawer> {
 
     return PlatformListTile(
       onTap: () {
-        final navService = locator<NavigationService>();
+        final NavigationService? navService = locator<NavigationService>();
         if (currentAccount is UnifiedAccount) {
-          navService.push(Routes.settingsAccounts, fade: true);
+          navService!.push(Routes.settingsAccounts, fade: true);
         } else {
-          navService.push(Routes.accountEdit,
-              arguments: currentAccount, fade: true);
+          navService!
+              .push(Routes.accountEdit, arguments: currentAccount, fade: true);
         }
       },
       title: Row(
@@ -135,7 +135,7 @@ class _AppDrawerState extends State<AppDrawer> {
           CircleAvatar(
             backgroundColor: theme.secondaryHeaderColor,
             backgroundImage: NetworkImage(
-              avatarAccount.imageUrlGravator,
+              avatarAccount.imageUrlGravator!,
             ),
             radius: 30,
           ),
@@ -157,7 +157,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 Text(
                   currentAccount is UnifiedAccount
                       ? currentAccount.accounts.map((a) => a.name).join(', ')
-                      : currentAccount.email ?? '',
+                      : currentAccount.email,
                   style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
                 ),
               ],
@@ -185,28 +185,30 @@ class _AppDrawerState extends State<AppDrawer> {
               title: Text(account.name),
               selected: account == currentAccount,
               onTap: () async {
-                final navService = locator<NavigationService>();
+                final NavigationService? navService =
+                    locator<NavigationService>();
                 if (!Platform.isIOS) {
-                  navService.pop();
+                  navService!.pop();
                 }
                 if (mailService.hasError(account)) {
-                  navService.push(Routes.accountEdit, arguments: account);
+                  navService!.push(Routes.accountEdit, arguments: account);
                 } else {
                   final messageSource = await locator<MailService>()
                       .getMessageSourceFor(account, switchToAccount: true);
-                  navService.push(Routes.messageSource,
+                  navService!.push(Routes.messageSource,
                       arguments: messageSource,
                       replace: !Platform.isIOS,
                       fade: true);
                 }
               },
               onLongPress: () {
-                final navService = locator<NavigationService>();
+                final NavigationService? navService =
+                    locator<NavigationService>();
                 if (account is UnifiedAccount) {
-                  navService.push(Routes.settingsAccounts, fade: true);
+                  navService!.push(Routes.settingsAccounts, fade: true);
                 } else {
-                  navService.push(Routes.accountEdit,
-                      arguments: account, fade: true);
+                  navService!
+                      .push(Routes.accountEdit, arguments: account, fade: true);
                 }
               },
             ),
@@ -239,7 +241,7 @@ class _AppDrawerState extends State<AppDrawer> {
 
   void navigateToMailbox(Mailbox mailbox) async {
     final mailService = locator<MailService>();
-    final account = mailService.currentAccount;
+    final account = mailService.currentAccount!;
     final messageSource =
         await mailService.getMessageSourceFor(account, mailbox: mailbox);
     locator<NavigationService>().push(Routes.messageSource,

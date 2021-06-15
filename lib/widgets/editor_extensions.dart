@@ -12,9 +12,8 @@ import '../locator.dart';
 
 class EditorArtExtensionButton extends StatelessWidget {
   final HtmlEditorApi editorApi;
-  EditorArtExtensionButton({Key key, @required this.editorApi})
-      : assert(editorApi != null),
-        super(key: key);
+  EditorArtExtensionButton({Key? key, required this.editorApi})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +37,8 @@ class EditorArtExtensionButton extends StatelessWidget {
 
 class EditorArtExtensionWidget extends StatefulWidget {
   final HtmlEditorApi editorApi;
-  EditorArtExtensionWidget({Key key, @required this.editorApi})
-      : assert(editorApi != null),
-        super(key: key);
+  EditorArtExtensionWidget({Key? key, required this.editorApi})
+      : super(key: key);
 
   @override
   _EditorArtExtensionWidgetState createState() =>
@@ -56,13 +54,13 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
     super.initState();
     widget.editorApi.getSelectedText().then((value) {
       _updateTexts(value);
-      _inputController.text = value;
+      _inputController.text = value!;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final captions = {
       UnicodeFont.serifBold: localizations.fontSerifBold,
       UnicodeFont.serifItalic: localizations.fontSerifItalic,
@@ -128,11 +126,11 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
     );
   }
 
-  void _updateTexts(final String input) {
+  void _updateTexts(final String? input) {
     for (final unicodeFont in UnicodeFont.values) {
       if (unicodeFont != UnicodeFont.normal) {
         _textsByUnicodeFont[unicodeFont] =
-            UnicodeFontConverter.encode(input, unicodeFont);
+            UnicodeFontConverter.encode(input!, unicodeFont);
       }
     }
     setState(() {});

@@ -3,7 +3,7 @@ import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:flutter/material.dart';
 
 class ThemeService with ChangeNotifier {
-  ThemeSettings _themeSettings;
+  late ThemeSettings _themeSettings;
   static final ThemeData defaultLightTheme =
       ThemeData(primarySwatch: Colors.green);
   static final ThemeData defaultDarkTheme =

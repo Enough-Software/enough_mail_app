@@ -26,9 +26,9 @@ enum _OverflowMenuChoice {
 }
 
 class InteractiveMediaScreen extends StatelessWidget {
-  final InteractiveMediaWidget mediaWidget;
+  final InteractiveMediaWidget? mediaWidget;
 
-  const InteractiveMediaScreen({Key key, this.mediaWidget}) : super(key: key);
+  const InteractiveMediaScreen({Key? key, this.mediaWidget}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class InteractiveMediaScreen extends StatelessWidget {
 
     return Base.buildAppChrome(
       context,
-      title: mediaWidget.mediaProvider.name,
+      title: mediaWidget!.mediaProvider.name,
       content: mediaWidget,
       appBarActions: [
         PlatformIconButton(
@@ -47,16 +47,16 @@ class InteractiveMediaScreen extends StatelessWidget {
           icon: Icon(Icons.share),
           onPressed: share,
         ),
-        if (mediaWidget.mediaProvider.isText &&
+        if (mediaWidget!.mediaProvider.isText &&
             locator<SettingsService>().settings.enableDeveloperMode) ...{
           PlatformPopupMenuButton<_OverflowMenuChoice>(
             onSelected: (_OverflowMenuChoice result) async {
               switch (result) {
                 case _OverflowMenuChoice.showAsEmail:
-                  final provider = mediaWidget.mediaProvider;
+                  final provider = mediaWidget!.mediaProvider;
                   var showErrorMessage = true;
                   try {
-                    MimeMessage mime;
+                    MimeMessage? mime;
                     if (provider is TextMediaProvider) {
                       mime = MimeMessage.parseFromText(provider.text);
                     } else if (provider is MemoryMediaProvider) {
@@ -65,7 +65,7 @@ class InteractiveMediaScreen extends StatelessWidget {
                     if (mime != null) {
                       final mailService = locator<MailService>();
                       final client = await mailService
-                          .getClientFor(mailService.currentAccount);
+                          .getClientFor(mailService.currentAccount!);
                       final source =
                           SingleMessageSource(mailService.messageSource);
                       final message = Message(mime, client, source, 0);
@@ -81,7 +81,7 @@ class InteractiveMediaScreen extends StatelessWidget {
                   if (showErrorMessage) {
                     DialogHelper.showTextDialog(
                         context,
-                        localizations.errorTitle,
+                        localizations!.errorTitle,
                         localizations.developerShowAsEmailFailed);
                   }
                   break;
@@ -90,7 +90,7 @@ class InteractiveMediaScreen extends StatelessWidget {
             itemBuilder: (BuildContext context) => [
               PlatformPopupMenuItem<_OverflowMenuChoice>(
                 value: _OverflowMenuChoice.showAsEmail,
-                child: Text(localizations.developerShowAsEmail),
+                child: Text(localizations!.developerShowAsEmail),
               ),
             ],
           ),
@@ -100,7 +100,7 @@ class InteractiveMediaScreen extends StatelessWidget {
   }
 
   void forward() {
-    final provider = mediaWidget.mediaProvider;
+    final provider = mediaWidget!.mediaProvider;
     final messageBuilder = MessageBuilder()..subject = provider.name;
 
     if (provider is TextMediaProvider) {
@@ -119,7 +119,7 @@ class InteractiveMediaScreen extends StatelessWidget {
   }
 
   void share() async {
-    final provider = mediaWidget.mediaProvider;
+    final provider = mediaWidget!.mediaProvider;
     if (provider is TextMediaProvider) {
       await shareText(provider);
     } else if (provider is MemoryMediaProvider) {
@@ -134,8 +134,7 @@ class InteractiveMediaScreen extends StatelessWidget {
 
   Future shareFile(MemoryMediaProvider provider) async {
     final tempDir = await pathprovider.getTemporaryDirectory();
-    final originalFileName =
-        provider.name ?? 'unknown_${DateTime.now().millisecondsSinceEpoch}';
+    final originalFileName = provider.name;
     final lastDotIndex = originalFileName.lastIndexOf('.');
     final ext =
         lastDotIndex != -1 ? originalFileName.substring(lastDotIndex) : '';
@@ -145,7 +144,7 @@ class InteractiveMediaScreen extends StatelessWidget {
     await file.writeAsBytes(provider.data);
 
     final paths = [path];
-    final mimeTypes = provider.mediaType != null ? [provider.mediaType] : null;
+    final mimeTypes = [provider.mediaType];
     await Share.shareFiles(paths,
         mimeTypes: mimeTypes,
         subject: originalFileName,

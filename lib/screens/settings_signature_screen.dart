@@ -22,7 +22,7 @@ class SettingsSignatureScreen extends StatefulWidget {
 }
 
 class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
-  final _signatureEnabledFor = <ComposeAction, bool>{};
+  final _signatureEnabledFor = <ComposeAction, bool?>{};
 
   @override
   void initState() {
@@ -42,13 +42,12 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
       case ComposeAction.newMessage:
         return localizations.composeTitleNew;
     }
-    return '';
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final accounts = locator<MailService>().accounts;
     final accountsWithSignature =
         accounts.where((account) => (account.signatureHtml != null));
@@ -106,33 +105,33 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
 }
 
 class SignatureWidget extends StatefulWidget {
-  final Account account;
-  SignatureWidget({Key key, this.account}) : super(key: key);
+  final Account? account;
+  SignatureWidget({Key? key, this.account}) : super(key: key);
 
   @override
   _SignatureWidgetState createState() => _SignatureWidgetState();
 }
 
 class _SignatureWidgetState extends State<SignatureWidget> {
-  String _signature;
+  String? _signature;
 
   @override
   void initState() {
     super.initState();
 
-    _signature = widget.account != null
-        ? widget.account.signatureHtml
+    _signature = (widget.account != null)
+        ? widget.account!.signatureHtml
         : locator<SettingsService>().getSignatureHtmlGlobal();
   }
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     if (_signature == null) {
       return PlatformListTile(
         leading: Icon(Icons.add),
         title: Text(
-          localizations.signatureSettingsAddForAccount(widget.account.name),
+          localizations.signatureSettingsAddForAccount(widget.account!.name),
         ),
         onTap: _showEditor,
       );
@@ -140,7 +139,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
     return Stack(
       children: [
         HtmlWidget(
-          _signature,
+          _signature!,
           onTapUrl: (url) async {
             if (await launcher.canLaunch(url)) {
               await launcher.launch(url);
@@ -159,8 +158,8 @@ class _SignatureWidgetState extends State<SignatureWidget> {
   }
 
   void _showEditor() async {
-    final localizations = AppLocalizations.of(context);
-    HtmlEditorApi editorApi;
+    final localizations = AppLocalizations.of(context)!;
+    HtmlEditorApi? editorApi;
     final result = await DialogHelper.showWidgetDialog(
         context,
         localizations.signatureSettingsTitle,
@@ -184,7 +183,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
                     });
                     Navigator.of(context).pop(false);
                     if (widget.account != null) {
-                      widget.account.signatureHtml = null;
+                      widget.account!.signatureHtml = null;
                       await locator<MailService>().saveAccounts();
                     } else {
                       final service = locator<SettingsService>();
@@ -204,7 +203,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
                 ),
               ]);
     if (result == true && editorApi != null) {
-      final newSignature = await editorApi.getText();
+      final newSignature = await editorApi!.getText();
       setState(() {
         _signature = newSignature;
       });
@@ -213,7 +212,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
         service.settings.signatureHtml = newSignature;
         await service.save();
       } else {
-        widget.account.signatureHtml = newSignature;
+        widget.account!.signatureHtml = newSignature;
         locator<MailService>().saveAccounts();
       }
     }

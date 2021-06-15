@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_mail_app/services/app_service.dart';
@@ -23,27 +24,28 @@ void main() {
 }
 
 class MyApp extends StatefulWidget {
-  MyApp({Key key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  Future<void> _appInitialization;
+  late Future<MailService> _appInitialization;
   ThemeMode _themeMode = ThemeMode.system;
-  ThemeService _themeService;
-  Locale _locale;
+  ThemeService? _themeService;
+  Locale? _locale;
 
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
+    _appInitialization = initApp();
     super.initState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
@@ -54,17 +56,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future<MailService> initApp() async {
     final settings = await locator<SettingsService>().init();
-    _themeService = locator<ThemeService>();
-    _themeService.addListener(() => setState(() {
-          _themeMode = _themeService.themeMode;
+    final themeService = locator<ThemeService>();
+    _themeService = themeService;
+    themeService.addListener(() => setState(() {
+          _themeMode = themeService.themeMode;
         }));
-    _themeService.init(settings);
+    themeService.init(settings);
     final i18nService = locator<I18nService>();
     final languageTag = settings.languageTag;
     if (languageTag != null) {
-      final settingsLocale = AppLocalizations.supportedLocales.firstWhere(
-          (l) => l.toLanguageTag() == languageTag,
-          orElse: () => null);
+      final settingsLocale = AppLocalizations.supportedLocales
+          .firstWhereOrNull((l) => l.toLanguageTag() == languageTag);
       if (settingsLocale != null) {
         final settingsLocalizations =
             await AppLocalizations.delegate.load(settingsLocale);
@@ -120,8 +122,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         home: Builder(
           builder: (context) {
             locator<I18nService>().init(
-                AppLocalizations.of(context), Localizations.localeOf(context));
-            _appInitialization ??= initApp();
+                AppLocalizations.of(context)!, Localizations.localeOf(context));
             return FutureBuilder<MailService>(
               future: _appInitialization,
               builder: (context, snapshot) {
@@ -130,7 +131,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                   case ConnectionState.waiting:
                   case ConnectionState.active:
                     return SplashScreen();
-                    break;
                   case ConnectionState.done:
                     // in the meantime the app has navigated away
                     break;
@@ -148,11 +148,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           themeMode: _themeMode,
         ),
         cupertino: (context, platform) => CupertinoAppData(
-          theme: (_themeService?.lightTheme ?? ThemeService.defaultLightTheme)
-              .cupertinoOverrideTheme,
-          // darkTheme: _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
-          // themeMode: _themeMode,
-        ),
+            // theme: (_themeService?.lightTheme ?? ThemeService.defaultLightTheme)
+            //     .cupertinoOverrideTheme,
+            // darkTheme: _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
+            // themeMode: _themeMode,
+            ),
       );
     }
   }

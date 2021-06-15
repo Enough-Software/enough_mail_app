@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MenuWithBadge extends StatelessWidget {
-  final Widget badgeContent;
-  const MenuWithBadge({Key key, this.badgeContent}) : super(key: key);
+  final Widget? badgeContent;
+  const MenuWithBadge({Key? key, this.badgeContent}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class MenuWithBadge extends StatelessWidget {
 
   Widget _buildIndicator(BuildContext context) {
     if (Platform.isIOS) {
-      final localizations = AppLocalizations.of(context);
+      final localizations = AppLocalizations.of(context)!;
       return Text('\u2329 ${localizations.accountsTitle}');
     } else {
       return Icon(Icons.menu);

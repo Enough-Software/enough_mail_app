@@ -10,6 +10,6 @@ class Sender {
 
   @override
   String toString() {
-    return address?.toString();
+    return address.toString();
   }
 }

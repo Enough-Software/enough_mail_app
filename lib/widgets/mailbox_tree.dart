@@ -10,13 +10,10 @@ import '../locator.dart';
 class MailboxTree extends StatelessWidget {
   final Account account;
   final void Function(Mailbox mailbox) onSelected;
-  final Mailbox current;
+  final Mailbox? current;
 
   const MailboxTree(
-      {Key key,
-      @required this.account,
-      @required this.onSelected,
-      this.current})
+      {Key? key, required this.account, required this.onSelected, this.current})
       : super(key: key);
 
   @override
@@ -25,7 +22,7 @@ class MailboxTree extends StatelessWidget {
     if (mailboxTreeData == null) {
       return Container();
     }
-    final mailboxTreeElements = mailboxTreeData.root.children;
+    final mailboxTreeElements = mailboxTreeData.root!.children!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -36,8 +33,8 @@ class MailboxTree extends StatelessWidget {
     );
   }
 
-  Widget buildMailboxElement(TreeElement<Mailbox> element, final int level) {
-    final mailbox = element.value;
+  Widget buildMailboxElement(TreeElement<Mailbox?> element, final int level) {
+    final mailbox = element.value!;
     final title = Padding(
       padding: EdgeInsets.only(left: level * 8.0),
       child: Text(mailbox.name),
@@ -56,7 +53,7 @@ class MailboxTree extends StatelessWidget {
       child: ExpansionTile(
         title: title,
         children: [
-          for (final childElement in element.children) ...{
+          for (final childElement in element.children!) ...{
             buildMailboxElement(childElement, level + 1),
           },
         ],

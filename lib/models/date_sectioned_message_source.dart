@@ -20,7 +20,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
     return sourceSize + _numberOfSections;
   }
 
-  List<MessageDateSection> _sections;
+  late List<MessageDateSection> _sections;
   bool isInitialized = false;
 
   DateSectionedMessageSource(this.messageSource) {
@@ -83,7 +83,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
 
   List<MessageDateSection> getDateSections(List<Message> messages) {
     final sections = <MessageDateSection>[];
-    DateSectionRange lastRange;
+    DateSectionRange? lastRange;
     int foundSections = 0;
     for (var i = 0; i < messages.length; i++) {
       final message = messages[i];
@@ -162,8 +162,8 @@ class DateSectionedMessageSource extends ChangeNotifier {
 }
 
 class SectionElement {
-  final MessageDateSection section;
-  final Message message;
+  final MessageDateSection? section;
+  final Message? message;
 
   SectionElement(this.section, this.message);
 }

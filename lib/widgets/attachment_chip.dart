@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 
 class AttachmentChip extends StatefulWidget {
   final ContentInfo info;
-  final Message message;
-  AttachmentChip({Key key, @required this.info, @required this.message})
+  final Message? message;
+  AttachmentChip({Key? key, required this.info, required this.message})
       : super(key: key);
 
   @override
@@ -20,19 +20,19 @@ class AttachmentChip extends StatefulWidget {
 }
 
 class _AttachmentChipState extends State<AttachmentChip> {
-  MimePart _mimePart;
+  MimePart? _mimePart;
   bool _isDownloading = false;
-  MediaProvider _mediaProvider;
-  final width = 72.0;
-  final height = 72.0;
+  MediaProvider? _mediaProvider;
+  final _width = 72.0;
+  final _height = 72.0;
 
   @override
   void initState() {
-    final mimeMessage = widget.message.mimeMessage;
+    final mimeMessage = widget.message!.mimeMessage!;
     _mimePart = mimeMessage.getPart(widget.info.fetchId);
     if (_mimePart != null) {
       _mediaProvider =
-          MimeMediaProviderFactory.fromMime(mimeMessage, _mimePart);
+          MimeMediaProviderFactory.fromMime(mimeMessage, _mimePart!);
     }
     super.initState();
   }
@@ -61,9 +61,9 @@ class _AttachmentChipState extends State<AttachmentChip> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: PreviewMediaWidget(
-            mediaProvider: _mediaProvider,
-            width: width,
-            height: height,
+            mediaProvider: _mediaProvider!,
+            width: _width,
+            height: _height,
             showInteractiveDelegate: showAttachment,
             fallbackBuilder: _buildFallbackPreview,
           ),
@@ -79,23 +79,23 @@ class _AttachmentChipState extends State<AttachmentChip> {
   }
 
   Widget _buildPreviewWidget(
-      bool includeDownloadOption, IconData iconData, String name) {
+      bool includeDownloadOption, IconData iconData, String? name) {
     return Container(
-      width: width,
-      height: height,
+      width: _width,
+      height: _height,
       //color: Colors.yellow,
       child: Stack(
         children: [
           Icon(
             iconData,
-            size: width,
+            size: _width,
             color: Colors.grey[700],
           ),
           if (name != null) ...{
             Align(
               alignment: Alignment.bottomLeft,
               child: Container(
-                width: width,
+                width: _width,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
@@ -118,7 +118,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
             Align(
               alignment: Alignment.topLeft,
               child: Container(
-                width: width,
+                width: _width,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
@@ -159,11 +159,11 @@ class _AttachmentChipState extends State<AttachmentChip> {
       _isDownloading = true;
     });
     try {
-      _mimePart = await widget.message.mailClient
-          .fetchMessagePart(widget.message.mimeMessage, widget.info.fetchId);
+      _mimePart = await widget.message!.mailClient
+          .fetchMessagePart(widget.message!.mimeMessage!, widget.info.fetchId);
       _mediaProvider = MimeMediaProviderFactory.fromMime(
-          widget.message.mimeMessage, _mimePart);
-      final media = InteractiveMediaWidget(mediaProvider: _mediaProvider);
+          widget.message!.mimeMessage!, _mimePart!);
+      final media = InteractiveMediaWidget(mediaProvider: _mediaProvider!);
       showAttachment(media);
     } on MailException catch (e) {
       print(
@@ -178,10 +178,10 @@ class _AttachmentChipState extends State<AttachmentChip> {
   }
 
   Future showAttachment(InteractiveMediaWidget media) {
-    if (_mimePart.mediaType.sub == MediaSubtype.messageRfc822) {
-      final mime = _mimePart.decodeContentMessage();
+    if (_mimePart!.mediaType.sub == MediaSubtype.messageRfc822) {
+      final mime = _mimePart!.decodeContentMessage();
       if (mime != null) {
-        final message = Message.embedded(mime, widget.message);
+        final message = Message.embedded(mime, widget.message!);
         return locator<NavigationService>()
             .push(Routes.mailDetails, arguments: message);
       }

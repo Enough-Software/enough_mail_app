@@ -6,23 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 
 class RecipientInputField extends StatefulWidget {
-  final String labelText;
-  final String hintText;
-  final TextEditingController controller;
-  final Widget additionalSuffixIcon;
+  final String? labelText;
+  final String? hintText;
+  final TextEditingController? controller;
+  final Widget? additionalSuffixIcon;
   final bool autofocus;
   final List<MailAddress> addresses;
-  final ContactManager contactManager;
+  final ContactManager? contactManager;
 
   RecipientInputField({
-    Key key,
+    Key? key,
     this.labelText,
     this.hintText,
     this.controller,
     this.additionalSuffixIcon,
     this.autofocus = false,
-    @required this.addresses,
-    @required this.contactManager,
+    required this.addresses,
+    required this.contactManager,
   }) : super(key: key);
 
   @override
@@ -31,7 +31,7 @@ class RecipientInputField extends StatefulWidget {
 
 class _RecipientInputFieldState extends State<RecipientInputField> {
   final _focusNode = FocusNode();
-  TextEditingController _controller;
+  late TextEditingController _controller;
 
   @override
   void initState() {
@@ -62,7 +62,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
         Padding(
           padding: EdgeInsets.only(top: 8.0, right: 8.0),
           child: Text(
-            widget.labelText,
+            widget.labelText!,
             style: TextStyle(
                 color:
                     _focusNode.hasFocus ? theme.accentColor : theme.hintColor),
@@ -74,7 +74,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
           label: Column(
             children: [
               if (address.hasPersonalName) ...{
-                Text(address.personalName),
+                Text(address.personalName!),
               },
               Text(address.email, style: theme.textTheme.caption),
             ],
@@ -109,7 +109,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
         if (widget.contactManager == null) {
           return [];
         }
-        return widget.contactManager.find(search);
+        return widget.contactManager!.find(search);
       },
       displayStringForOption: (option) => option.toString(),
       fieldViewBuilder:
@@ -134,7 +134,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      widget.additionalSuffixIcon,
+                      widget.additionalSuffixIcon!,
                       PlatformIconButton(
                         icon: Icon(Icons.contacts),
                         onPressed: () => _pickContact(textEditingController),
@@ -160,18 +160,25 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                     label: Column(
                       children: [
                         if (option.hasPersonalName) ...{
-                          Text(option.personalName),
+                          Text(option.personalName!),
                         },
                         Text(option.email, style: theme.textTheme.caption),
                       ],
                     ),
                     onPressed: () {
+                      final currentTextInput = _controller.text;
+                      onSelected(option);
                       if (!widget.addresses.contains(option)) {
                         widget.addresses.add(option);
-                        _controller.text = '';
                         setState(() {});
+                        _controller.text = '';
+                      } else {
+                        _controller.value = TextEditingValue(
+                          selection: TextSelection.collapsed(
+                              offset: currentTextInput.length),
+                          text: currentTextInput,
+                        );
                       }
-                      onSelected(null);
                     },
                   );
                 },
@@ -196,18 +203,16 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
     try {
       final contact =
           await FlutterContactPicker.pickEmailContact(askForPermission: true);
-      if (contact != null) {
-        widget.addresses
-            .add(MailAddress(contact.fullName, contact.email.email));
-        setState(() {});
-        // if (controller.text.isNotEmpty) {
-        //   controller.text += '; ' + contact.email.email;
-        // } else {
-        //   controller.text = contact.email.email;
-        // }
-        // controller.selection =
-        //     TextSelection.collapsed(offset: controller.text.length);
-      }
+      widget.addresses
+          .add(MailAddress(contact.fullName, contact.email!.email!));
+      setState(() {});
+      // if (controller.text.isNotEmpty) {
+      //   controller.text += '; ' + contact.email.email;
+      // } else {
+      //   controller.text = contact.email.email;
+      // }
+      // controller.selection =
+      //     TextSelection.collapsed(offset: controller.text.length);
     } catch (e, s) {
       print('Unable to pick contact $e $s');
     }

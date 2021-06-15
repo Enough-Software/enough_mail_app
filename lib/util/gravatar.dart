@@ -22,11 +22,11 @@ enum GravatarRating {
 class Gravatar {
   static String imageUrl(
     String email, {
-    int size,
-    GravatarImage defaultImage,
+    int? size,
+    GravatarImage? defaultImage,
     bool forceDefault = false,
     bool fileExtension = false,
-    GravatarRating rating,
+    GravatarRating? rating,
   }) {
     var hashDigest = _generateHash(email);
     final query = <String, String>{};
@@ -78,7 +78,6 @@ class Gravatar {
       case GravatarImage.blank:
         return 'blank';
     }
-    return '404';
   }
 
   static String _ratingString(GravatarRating value) {
@@ -92,6 +91,5 @@ class Gravatar {
       case GravatarRating.x:
         return 'x';
     }
-    return 'g';
   }
 }

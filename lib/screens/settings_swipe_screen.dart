@@ -17,7 +17,7 @@ class SettingsSwipeScreen extends StatelessWidget {
     final rightToLeftAction = settings.swipeRightToLeftAction;
 
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
       title: localizations.swipeSettingTitle,
@@ -55,7 +55,7 @@ class _SwipeSetting extends StatefulWidget {
   final SwipeAction swipeAction;
 
   const _SwipeSetting(
-      {Key key, @required this.swipeAction, @required this.isLeftToRight})
+      {Key? key, required this.swipeAction, required this.isLeftToRight})
       : super(key: key);
 
   @override
@@ -63,7 +63,7 @@ class _SwipeSetting extends StatefulWidget {
 }
 
 class _SwipeSettingState extends State<_SwipeSetting> {
-  SwipeAction _currentAction;
+  late SwipeAction _currentAction;
 
   @override
   void initState() {
@@ -73,7 +73,7 @@ class _SwipeSettingState extends State<_SwipeSetting> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
 
     return Row(
       children: [
@@ -108,14 +108,14 @@ class _SwipeSettingState extends State<_SwipeSetting> {
     }
   }
 
-  Future<SwipeAction> selectSwipe(SwipeAction current) async {
+  Future<SwipeAction?> selectSwipe(SwipeAction current) async {
     final localizations = AppLocalizations.of(context);
 
     final action = await DialogHelper.showWidgetDialog(
       context,
       widget.isLeftToRight
-          ? localizations.swipeSettingLeftToRightLabel
-          : localizations.swipeSettingRightToLeftLabel,
+          ? localizations!.swipeSettingLeftToRightLabel
+          : localizations!.swipeSettingRightToLeftLabel,
       SizedBox(
         height: MediaQuery.of(context).size.height * 0.7,
         width: MediaQuery.of(context).size.width * 0.7,
@@ -169,12 +169,12 @@ class _SwipeWidget extends StatelessWidget {
   final SwipeAction swipeAction;
   final bool isSmall;
   const _SwipeWidget(
-      {Key key, @required this.swipeAction, this.isSmall = false})
+      {Key? key, required this.swipeAction, this.isSmall = false})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.all(4.0),

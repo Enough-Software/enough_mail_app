@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
@@ -18,15 +19,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AccountEditScreen extends StatefulWidget {
   final Account account;
-  const AccountEditScreen({Key key, @required this.account}) : super(key: key);
+  const AccountEditScreen({Key? key, required this.account}) : super(key: key);
 
   @override
   _AccountEditScreenState createState() => _AccountEditScreenState();
 }
 
 class _AccountEditScreenState extends State<AccountEditScreen> {
-  TextEditingController accountNameController;
-  TextEditingController userNameController;
+  TextEditingController? accountNameController;
+  TextEditingController? userNameController;
 
   void _update() {
     setState(() {});
@@ -48,7 +49,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
       title: localizations.editAccountTitle(widget.account.name),
@@ -93,7 +94,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 PlatformCheckboxListTile(
                   value: !widget.account.excludeFromUnified,
                   onChanged: (value) async {
-                    widget.account.excludeFromUnified = !value;
+                    widget.account.excludeFromUnified = !value!;
                     setState(() {});
                     await locator<MailService>()
                         .excludeAccountFromUnified(widget.account, !value);
@@ -209,7 +210,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                     localizations.editAccountDeleteAccountAction,
                     style: Theme.of(context)
                         .textTheme
-                        .button
+                        .button!
                         .copyWith(color: Colors.white),
                   ),
                   onPressed: () async {
@@ -219,7 +220,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                             .editAccountDeleteAccountConfirmationTitle,
                         query: localizations
                             .editAccountDeleteAccountConfirmationQuery(
-                                accountNameController.text),
+                                accountNameController!.text),
                         action: localizations.actionDelete,
                         isDangerousAction: true);
                     if (result == true) {
@@ -247,22 +248,22 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
 
 class PlusAliasTestingDialog extends StatefulWidget {
   final Account account;
-  PlusAliasTestingDialog({Key key, this.account}) : super(key: key);
+  PlusAliasTestingDialog({Key? key, required this.account}) : super(key: key);
 
   @override
   _PlusAliasTestingDialogState createState() => _PlusAliasTestingDialogState();
 }
 
 class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
-  bool isContinueAvailable = true;
-  int step = 0;
+  bool _isContinueAvailable = true;
+  int _step = 0;
   static const int _maxStep = 1;
-  String generatedAliasAdddress;
-  MimeMessage testMessage;
+  String? _generatedAliasAdddress;
+  // MimeMessage? _testMessage;
 
   @override
   void initState() {
-    generatedAliasAdddress =
+    _generatedAliasAdddress =
         locator<MailService>().generateRandomPlusAlias(widget.account);
     super.initState();
   }
@@ -270,24 +271,25 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
   bool filter(MailEvent event) {
     if (event is MailLoadEvent) {
       final msg = event.message;
-      if (msg.to?.length == 1 && msg.to.first.email == generatedAliasAdddress) {
+      if (msg.to?.length == 1 &&
+          msg.to!.first.email == _generatedAliasAdddress) {
         // this is the test message, plus aliases are supported
         widget.account.supportsPlusAliases = true;
         setState(() {
-          isContinueAvailable = true;
-          step++;
+          _isContinueAvailable = true;
+          _step++;
         });
         deleteMessage(msg);
         return true;
       } else if ((msg.getHeaderValue('auto-submitted') != null) &&
           (msg.isTextPlainMessage()) &&
-          (msg.decodeContentText()?.contains(generatedAliasAdddress) ??
+          (msg.decodeContentText()?.contains(_generatedAliasAdddress!) ??
               false)) {
         // this is an automatic reply telling that the address is not available
 
         setState(() {
-          isContinueAvailable = true;
-          step++;
+          _isContinueAvailable = true;
+          _step++;
         });
         deleteMessage(msg);
         return true;
@@ -310,32 +312,32 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return AlertDialog(
       title: Text(
           localizations.editAccountTestPlusAliasTitle(widget.account.name)),
       content: Stepper(
-        onStepCancel: step == 3 ? null : () => Navigator.of(context).pop(),
-        onStepContinue: !isContinueAvailable
+        onStepCancel: _step == 3 ? null : () => Navigator.of(context).pop(),
+        onStepContinue: !_isContinueAvailable
             ? null
             : () async {
-                if (step < _maxStep) {
-                  step++;
+                if (_step < _maxStep) {
+                  _step++;
                 } else {
                   Navigator.of(context).pop(widget.account.supportsPlusAliases);
                 }
-                switch (step) {
+                switch (_step) {
                   case 1:
                     setState(() {
-                      isContinueAvailable = false;
+                      _isContinueAvailable = false;
                     });
                     // send the email and wait for a response:
                     final msg = MessageBuilder.buildSimpleTextMessage(
                         widget.account.fromAddress,
-                        [MailAddress(null, generatedAliasAdddress)],
+                        [MailAddress(null, _generatedAliasAdddress!)],
                         'This is an automated message testing support for + aliases. Please ignore.',
                         subject: 'Testing + Alias');
-                    testMessage = msg;
+                    // _testMessage = msg;
                     var mailClient = await locator<MailService>()
                         .getClientFor(widget.account);
                     mailClient.addEventFilter(filter);
@@ -349,15 +351,15 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
                 localizations.editAccountTestPlusAliasStepIntroductionTitle),
             content: Text(
               localizations.editAccountTestPlusAliasStepIntroductionText(
-                  widget.account.name, generatedAliasAdddress),
+                  widget.account.name, _generatedAliasAdddress!),
               style: TextStyle(fontSize: 12),
             ),
-            isActive: (step == 0),
+            isActive: (_step == 0),
           ),
           Step(
             title: Text(localizations.editAccountTestPlusAliasStepTestingTitle),
             content: Center(child: PlatformProgressIndicator()),
-            isActive: (step == 1),
+            isActive: (_step == 1),
           ),
           Step(
             title: Text(localizations.editAccountTestPlusAliasStepResultTitle),
@@ -367,11 +369,11 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
                 : Text(
                     localizations.editAccountTestPlusAliasStepResultNoSuccess(
                         widget.account.name)),
-            isActive: (step == 3),
+            isActive: (_step == 3),
             state: StepState.complete,
           ),
         ],
-        currentStep: step,
+        currentStep: _step,
       ),
     );
   }
@@ -381,41 +383,41 @@ class AliasEditDialog extends StatefulWidget {
   final MailAddress alias;
   final Account account;
   final bool isNewAlias;
-  AliasEditDialog(
-      {Key key,
-      @required this.isNewAlias,
-      @required this.alias,
-      @required this.account})
-      : super(key: key);
+  AliasEditDialog({
+    Key? key,
+    required this.isNewAlias,
+    required this.alias,
+    required this.account,
+  }) : super(key: key);
 
   @override
   _AliasEditDialogState createState() => _AliasEditDialogState();
 }
 
 class _AliasEditDialogState extends State<AliasEditDialog> {
-  TextEditingController nameController;
-  TextEditingController emailController;
-  bool isEmailValid = false;
-  String errorMessage;
-  bool isSaving = false;
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late bool _isEmailValid;
+  String? _errorMessage;
+  bool _isSaving = false;
 
   @override
   void initState() {
-    nameController = TextEditingController(text: widget.alias.personalName);
-    emailController = TextEditingController(text: widget.alias.email);
-    isEmailValid = !widget.isNewAlias;
+    _nameController = TextEditingController(text: widget.alias.personalName);
+    _emailController = TextEditingController(text: widget.alias.email);
+    _isEmailValid = !widget.isNewAlias;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return PlatformAlertDialog(
       title: Text(widget.isNewAlias
           ? localizations.editAccountAddAliasTitle
           : localizations.editAccountEditAliasTitle),
       content:
-          isSaving ? PlatformProgressIndicator() : buildContent(localizations),
+          _isSaving ? PlatformProgressIndicator() : buildContent(localizations),
       actions: [
         PlatformTextButton(
           child: ButtonText(localizations.actionCancel),
@@ -425,13 +427,13 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
           child: ButtonText(widget.isNewAlias
               ? localizations.editAccountAliasAddAction
               : localizations.editAccountAliasUpdateAction),
-          onPressed: isEmailValid
+          onPressed: _isEmailValid
               ? () async {
                   setState(() {
-                    isSaving = true;
+                    _isSaving = true;
                   });
-                  widget.alias.email = emailController.text;
-                  widget.alias.personalName = nameController.text;
+                  widget.alias.email = _emailController.text;
+                  widget.alias.personalName = _nameController.text;
                   await widget.account.addAlias(widget.alias);
                   Navigator.of(context).pop();
                 }
@@ -447,13 +449,13 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
       mainAxisSize: MainAxisSize.min,
       children: [
         DecoratedPlatformTextField(
-          controller: nameController,
+          controller: _nameController,
           decoration: InputDecoration(
               labelText: localizations.editAccountEditAliasNameLabel,
               hintText: localizations.addAccountNameOfUserHint),
         ),
         DecoratedPlatformTextField(
-          controller: emailController,
+          controller: _emailController,
           decoration: InputDecoration(
               labelText: localizations.editAccountEditAliasEmailLabel,
               hintText: localizations.editAccountEditAliasEmailHint),
@@ -461,32 +463,31 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
             bool isValid = Validator.validateEmail(value);
             final emailValue = value.toLowerCase();
             if (isValid) {
-              final existingAlias = widget.account.aliases.firstWhere(
-                  (e) => e.email.toLowerCase() == emailValue,
-                  orElse: () => null);
+              final existingAlias = widget.account.aliases
+                  .firstWhereOrNull((e) => e.email.toLowerCase() == emailValue);
               if (existingAlias != null && existingAlias != widget.alias) {
                 setState(() {
-                  errorMessage =
+                  _errorMessage =
                       localizations.editAccountEditAliasDuplicateError(value);
                 });
-              } else if (errorMessage != null) {
+              } else if (_errorMessage != null) {
                 setState(() {
-                  errorMessage = null;
+                  _errorMessage = null;
                 });
               }
             }
-            if (isValid != isEmailValid) {
+            if (isValid != _isEmailValid) {
               setState(() {
-                isEmailValid = isValid;
+                _isEmailValid = isValid;
               });
             }
           },
         ),
-        if (errorMessage != null) ...{
+        if (_errorMessage != null) ...{
           Padding(
             padding: const EdgeInsets.all(8),
             child: Text(
-              errorMessage,
+              _errorMessage!,
               style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic),
             ),
           ),

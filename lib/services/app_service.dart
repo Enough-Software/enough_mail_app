@@ -19,7 +19,7 @@ class AppService {
   static const _platform = const MethodChannel('app.channel.shared.data');
   AppLifecycleState appLifecycleState = AppLifecycleState.resumed;
   bool get isInBackground => (appLifecycleState != AppLifecycleState.resumed);
-  Future Function(List<SharedData> sharedData) onSharedData;
+  Future Function(List<SharedData> sharedData)? onSharedData;
 
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     print('AppLifecycleState = $state');
@@ -55,21 +55,21 @@ class AppService {
   Future<List<SharedData>> collectSharedData(
       Map<dynamic, dynamic> shared) async {
     final sharedData = <SharedData>[];
-    final String mimeTypeText = shared['mimeType'];
+    final String? mimeTypeText = shared['mimeType'];
     final mediaType = (mimeTypeText == null || mimeTypeText.contains('*'))
         ? null
         : MediaType.fromText(mimeTypeText);
-    final int length = shared['length'];
-    final String text = shared['text'];
+    final int? length = shared['length'];
+    final String? text = shared['text'];
     print('share text: "$text"');
     if (length != null && length > 0) {
       for (var i = 0; i < length; i++) {
-        final String filename = shared['name.$i'];
-        final Uint8List data = shared['data.$i'];
-        final String typeName = shared['type.$i'];
+        final String? filename = shared['name.$i'];
+        final Uint8List? data = shared['data.$i'];
+        final String? typeName = shared['type.$i'];
         final localMediaType = (typeName != 'null')
-            ? MediaType.fromText(typeName)
-            : mediaType ?? MediaType.guessFromFileName(filename);
+            ? MediaType.fromText(typeName!)
+            : mediaType ?? MediaType.guessFromFileName(filename!);
         sharedData.add(SharedBinary(data, filename, localMediaType));
         print(
             'share: loaded ${localMediaType.text}  "$filename" with ${data?.length} bytes');
@@ -123,13 +123,13 @@ class AppService {
       return;
     }
     if (onSharedData != null) {
-      return onSharedData(sharedData);
+      return onSharedData!(sharedData);
     } else {
       MessageBuilder builder;
       final firstData = sharedData.first;
       if (firstData is SharedMailto) {
         builder = MessageBuilder.prepareMailtoBasedMessage(firstData.mailto,
-            locator<MailService>().currentAccount.fromAddress);
+            locator<MailService>().currentAccount!.fromAddress);
       } else {
         builder = MessageBuilder();
         for (final data in sharedData) {

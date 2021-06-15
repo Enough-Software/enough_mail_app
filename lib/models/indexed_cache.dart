@@ -1,17 +1,18 @@
+import 'package:collection/collection.dart' show IterableExtension;
+
 class IndexedCache<T> {
   static const int defaultMaxSize = 1000;
-  final List<_CacheElement<T>> _elements = <_CacheElement<T>>[];
+  final List<_CacheElement<T?>> _elements = <_CacheElement<T>>[];
   final int maxSize;
   int _currentAddIndex = 0;
 
   IndexedCache({this.maxSize = defaultMaxSize});
 
-  _CacheElement _cacheElementAt(int index) {
-    return _elements.firstWhere((element) => element.index == index,
-        orElse: () => null);
+  _CacheElement? _cacheElementAt(int index) {
+    return _elements.firstWhereOrNull((element) => element.index == index);
   }
 
-  T elementAt(int index) {
+  T? elementAt(int index) {
     final cacheElement = _cacheElementAt(index);
     return cacheElement?.element;
   }
@@ -35,23 +36,23 @@ class IndexedCache<T> {
     }
   }
 
-  int remove(T element) {
+  int? remove(T element) {
     final cacheElement =
-        _elements.firstWhere((ce) => ce.element == element, orElse: () => null);
+        _elements.firstWhereOrNull((ce) => ce.element == element);
     if (_remove(cacheElement)) {
-      return cacheElement.index;
+      return cacheElement!.index;
     } else {
       return null;
     }
   }
 
-  T removeAt(int index) {
+  T? removeAt(int index) {
     final element = _cacheElementAt(index);
     _remove(element);
     return element?.element;
   }
 
-  bool _remove(_CacheElement toBeRemoved) {
+  bool _remove(_CacheElement? toBeRemoved) {
     if (toBeRemoved == null) {
       return false;
     }

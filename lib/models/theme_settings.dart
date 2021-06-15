@@ -14,7 +14,7 @@ class ThemeSettings extends SerializableObject {
 
   ThemeModeSetting get themeModeSetting =>
       attributes['themeModeSetting'] ?? ThemeModeSetting.system;
-  set themeModeSetting(ThemeModeSetting value) =>
+  set themeModeSetting(ThemeModeSetting? value) =>
       attributes['themeModeSetting'] = value;
 
   TimeOfDay get themeDarkStartTime =>
@@ -27,11 +27,11 @@ class ThemeSettings extends SerializableObject {
       attributes['themeDarkEndTime'] = value;
 
   MaterialColor get primarySwatch {
-    int index = attributes['primarySwatchIndex'];
+    int? index = attributes['primarySwatchIndex'];
     if (index == null || index < 0) {
       return Colors.green;
     }
-    return availableColors[index];
+    return availableColors[index] as MaterialColor;
   }
 
   set primarySwatch(MaterialColor value) {
@@ -80,7 +80,6 @@ class ThemeSettings extends SerializableObject {
           return ThemeMode.light;
         }
     }
-    return ThemeMode.light;
   }
 
   static dynamic _convertTimeOfDay(dynamic value) {

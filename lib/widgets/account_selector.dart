@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import '../locator.dart';
 
 class AccountSelector extends StatelessWidget {
-  final Account account;
+  final Account? account;
   final bool excludeAccountsWithErrors;
-  final void Function(Account account) onChanged;
+  final void Function(Account? account) onChanged;
   const AccountSelector({
-    Key key,
-    @required this.onChanged,
-    @required this.account,
+    Key? key,
+    required this.onChanged,
+    required this.account,
     this.excludeAccountsWithErrors = true,
   }) : super(key: key);
 

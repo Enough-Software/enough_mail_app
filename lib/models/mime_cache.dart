@@ -7,7 +7,7 @@ class MimeCache {
 
   MimeCache({this.maxCacheSize = 100});
 
-  MimeMessage operator [](int index) =>
+  MimeMessage? operator [](int index) =>
       _messages.firstWhereOrNull((m) => m.sourceIndex == index)?.mime;
 
   void add(MimeMessage mime, int sourceIndex) {
@@ -35,16 +35,16 @@ class MimeCache {
   //   return null;
   // }
 
-  bool remove(MimeMessage mime) {
+  bool remove(MimeMessage? mime) {
     final mimeWithSourceIndex =
         _messages.firstWhereOrNull((m) => m.mime == mime);
     if (mimeWithSourceIndex != null) {
       bool removed = _messages.remove(mimeWithSourceIndex);
-      final sequenceId = mime.sequenceId;
+      final sequenceId = mime!.sequenceId;
       if (sequenceId != null) {
         for (final msg in _messages) {
-          if (msg.mime.sequenceId >= sequenceId) {
-            msg.mime.sequenceId--;
+          if (msg.mime.sequenceId! >= sequenceId) {
+            msg.mime.sequenceId = msg.mime.sequenceId! - 1;
           } else {
             msg.sourceIndex--;
           }
@@ -68,11 +68,11 @@ class MimeCache {
     add(message, 0);
   }
 
-  MimeMessage getForUid(final int uid) {
+  MimeMessage? getForUid(final int uid) {
     return _messages.firstWhereOrNull((msg) => msg.mime.uid == uid)?.mime;
   }
 
-  MimeMessage getForSequenceId(final int sequenceId) {
+  MimeMessage? getForSequenceId(final int sequenceId) {
     return _messages
         .firstWhereOrNull((msg) => msg.mime.sequenceId == sequenceId)
         ?.mime;

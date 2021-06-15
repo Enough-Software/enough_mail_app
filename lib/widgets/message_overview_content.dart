@@ -9,28 +9,28 @@ import '../locator.dart';
 
 class MessageOverviewContent extends StatelessWidget {
   final Message message;
-  const MessageOverviewContent({Key key, @required this.message})
+  const MessageOverviewContent({Key? key, required this.message})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final msg = message;
-    final mime = msg.mimeMessage;
+    final mime = msg.mimeMessage!;
     final localizations = AppLocalizations.of(context);
     final threadLength =
-        mime.threadSequence != null ? mime.threadSequence.toList().length : 0;
-    final subject = mime.decodeSubject() ?? localizations.subjectUndefined;
-    MailAddress from;
+        mime.threadSequence != null ? mime.threadSequence!.toList().length : 0;
+    final subject = mime.decodeSubject() ?? localizations!.subjectUndefined;
+    MailAddress? from;
     if (mime.from?.isNotEmpty ?? false) {
-      from = mime.from.first;
+      from = mime.from!.first;
     } else {
       from = mime.sender;
     }
     final sender = (from?.personalName?.isNotEmpty ?? false)
-        ? from.personalName
+        ? from!.personalName!
         : from?.email != null
-            ? from.email
-            : localizations.emailSenderUnknown;
+            ? from!.email
+            : localizations!.emailSenderUnknown;
     final hasAttachments = msg.hasAttachment;
     final date = locator<I18nService>().formatDate(mime.decodeDate());
     return Container(

@@ -30,16 +30,16 @@ class Settings extends SerializableObject {
   }
 
   bool get blockExternalImages => attributes['blockExternalImages'] ?? false;
-  set blockExternalImages(bool value) =>
+  set blockExternalImages(bool? value) =>
       attributes['blockExternalImages'] = value;
 
-  String get preferredComposeMailAddress =>
+  String? get preferredComposeMailAddress =>
       attributes['preferredComposeMailAddress'];
-  set preferredComposeMailAddress(String value) =>
+  set preferredComposeMailAddress(String? value) =>
       attributes['preferredComposeMailAddress'] = value;
 
-  String get languageTag => attributes['languageTag'];
-  set languageTag(String value) => attributes['languageTag'] = value;
+  String? get languageTag => attributes['languageTag'];
+  set languageTag(String? value) => attributes['languageTag'] = value;
 
   ThemeSettings get themeSettings {
     var themeSettings = attributes['themeSettings'];
@@ -64,22 +64,22 @@ class Settings extends SerializableObject {
 
   FolderNameSetting get folderNameSetting =>
       attributes['folderNameSetting'] ?? FolderNameSetting.localized;
-  set folderNameSetting(FolderNameSetting value) =>
+  set folderNameSetting(FolderNameSetting? value) =>
       attributes['folderNameSetting'] = value;
 
-  List<String> get customFolderNames => attributes['customFolderNames'];
-  set customFolderNames(List<String> value) =>
+  List<String>? get customFolderNames => attributes['customFolderNames'];
+  set customFolderNames(List<String>? value) =>
       attributes['customFolderNames'] = value;
 
   bool get enableDeveloperMode => attributes['enableDeveloperMode'] ?? false;
-  set enableDeveloperMode(bool value) =>
+  set enableDeveloperMode(bool? value) =>
       attributes['enableDeveloperMode'] = value;
 
-  String get signatureHtml => attributes['signatureHtml'];
-  set signatureHtml(String value) => attributes['signatureHtml'] = value;
+  String? get signatureHtml => attributes['signatureHtml'];
+  set signatureHtml(String? value) => attributes['signatureHtml'] = value;
 
-  String get signaturePlain => attributes['signaturePlain'];
-  set signaturePlain(String value) => attributes['signaturePlain'] = value;
+  String? get signaturePlain => attributes['signaturePlain'];
+  set signaturePlain(String? value) => attributes['signaturePlain'] = value;
 
   List<ComposeAction> get signatureActions =>
       attributes['signatureActions'] ?? [ComposeAction.newMessage];
@@ -89,6 +89,6 @@ class Settings extends SerializableObject {
   ReadReceiptDisplaySetting get readReceiptDisplaySetting =>
       attributes['readReceiptDisplaySetting'] ??
       ReadReceiptDisplaySetting.always;
-  set readReceiptDisplaySetting(ReadReceiptDisplaySetting value) =>
+  set readReceiptDisplaySetting(ReadReceiptDisplaySetting? value) =>
       attributes['readReceiptDisplaySetting'] = value;
 }

@@ -38,8 +38,8 @@ class HttpHelper {
 
 class HttpResult {
   final int statusCode;
-  String _text;
-  String get text {
+  String? _text;
+  String? get text {
     var t = _text;
     if (t == null) {
       final d = data;
@@ -51,6 +51,6 @@ class HttpResult {
     return t;
   }
 
-  final Uint8List data;
+  final Uint8List? data;
   HttpResult(this.statusCode, [this.data]);
 }

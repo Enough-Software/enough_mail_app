@@ -22,7 +22,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class AccountAddScreen extends StatefulWidget {
   final bool launchedFromWelcome;
 
-  const AccountAddScreen({Key key, this.launchedFromWelcome = false});
+  const AccountAddScreen({Key? key, this.launchedFromWelcome = false});
 
   @override
   _AccountAddScreenState createState() => _AccountAddScreenState();
@@ -30,27 +30,27 @@ class AccountAddScreen extends StatefulWidget {
 
 class _AccountAddScreenState extends State<AccountAddScreen> {
   MailAccount account = MailAccount();
-  int _availableSteps;
+  late int _availableSteps;
   int _currentStep = 0;
   int _progressedSteps = 0;
   bool _isContinueAvailable = false;
-  String _providerAppplicationPasswordUrl;
-  bool _isApplicationSpecificPasswordAcknowledged = false;
+  String? _providerAppplicationPasswordUrl;
+  bool? _isApplicationSpecificPasswordAcknowledged = false;
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _accountNameController = TextEditingController();
   TextEditingController _userNameController = TextEditingController();
 
-  ClientConfig _clientConfig;
+  ClientConfig? _clientConfig;
   bool _isClientConfigResolving = false;
   bool _isManualSettings = false;
   bool _isAccountVerifying = false;
 
   bool _isAccountVerified = false;
-  List<AppExtension> _extensions;
-  MailClient mailClient;
+  List<AppExtension>? _extensions;
+  MailClient? mailClient;
 
-  AppExtensionActionDescription _extensionForgotPassword;
+  AppExtensionActionDescription? _extensionForgotPassword;
 
   Future<void> navigateToManualSettings() async {
     if (_clientConfig == null) {
@@ -65,15 +65,15 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     } else {
       account.incoming = MailServerConfig(
         authentication: PlainAuthentication(
-            _clientConfig.preferredIncomingServer.getUserName(account.email),
+            _clientConfig!.preferredIncomingServer!.getUserName(account.email!),
             ''),
-        serverConfig: _clientConfig.preferredIncomingServer,
+        serverConfig: _clientConfig!.preferredIncomingServer,
       );
       account.outgoing = MailServerConfig(
         authentication: PlainAuthentication(
-            _clientConfig.preferredOutgoingServer.getUserName(account.email),
+            _clientConfig!.preferredOutgoingServer!.getUserName(account.email!),
             ''),
-        serverConfig: _clientConfig.preferredOutgoingServer,
+        serverConfig: _clientConfig!.preferredOutgoingServer,
       );
     }
     final result = await locator<NavigationService>()
@@ -91,8 +91,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   @override
   void initState() {
     _availableSteps = 3;
-    if (locator<MailService>().accounts?.isNotEmpty ?? false) {
-      _userNameController.text = locator<MailService>().accounts.first.userName;
+    if (locator<MailService>().accounts.isNotEmpty) {
+      _userNameController.text =
+          locator<MailService>().accounts.first.userName!;
     }
     super.initState();
   }
@@ -100,7 +101,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   @override
   Widget build(BuildContext context) {
     // print('build: current step=$_currentStep');
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
       title: localizations.addAccountTitle,
@@ -179,7 +180,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             Expanded(
                               child: Text(
                                   localizations.addAccountResolvingSetingsLabel(
-                                      account.email)),
+                                      account.email!)),
                             ),
                           ],
                         ),
@@ -191,8 +192,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                   .addAccountApplicationPasswordRequiredInfo),
                               PlatformElevatedButton(
                                 onPressed: () async {
-                                  await launcher
-                                      .launch(_providerAppplicationPasswordUrl);
+                                  await launcher.launch(
+                                      _providerAppplicationPasswordUrl!);
                                 },
                                 child: ButtonText(localizations
                                     .addAccountApplicationPasswordRequiredButton),
@@ -208,7 +209,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                               ),
                             },
                             if (_providerAppplicationPasswordUrl == null ||
-                                _isApplicationSpecificPasswordAcknowledged) ...{
+                                _isApplicationSpecificPasswordAcknowledged!) ...{
                               PasswordField(
                                 controller: _passwordController,
                                 onChanged: (value) {
@@ -230,25 +231,26 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                 onPressed: navigateToManualSettings,
                                 child: ButtonText(localizations
                                     .addAccountResolvedSettingsWrongAction(
-                                        _clientConfig?.displayName)),
+                                        _clientConfig?.displayName ??
+                                            '<unknown>')),
                               ),
                               if (_extensionForgotPassword != null) ...{
                                 PlatformTextButton(
                                   onPressed: () {
                                     final languageCode = locator<I18nService>()
-                                        .locale
+                                        .locale!
                                         .languageCode;
                                     var url =
-                                        _extensionForgotPassword.action.url;
+                                        _extensionForgotPassword!.action!.url;
                                     url = url
                                       ..replaceAll(
-                                          '{user.email}', account.email)
+                                          '{user.email}', account.email!)
                                       ..replaceAll('{language}', languageCode);
                                     launcher.launch(url);
                                   },
-                                  child: ButtonText(_extensionForgotPassword
+                                  child: ButtonText(_extensionForgotPassword!
                                       .getLabel(locator<I18nService>()
-                                          .locale
+                                          .locale!
                                           .languageCode)),
                                 ),
                               },
@@ -261,7 +263,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                           children: [
                             Text(localizations
                                 .addAccountResolvingSetingsFailedInfo(
-                                    account.email)),
+                                    account.email!)),
                             PlatformElevatedButton(
                               child: ButtonText(
                                   localizations.addAccountEditManuallyAction),
@@ -287,13 +289,13 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             Expanded(
                               child: Text(localizations
                                   .addAccountVerifyingSettingsLabel(
-                                      account.email)),
+                                      account.email!)),
                             ),
                           ],
                         ),
                       } else if (_isAccountVerified) ...{
                         Text(localizations
-                            .addAccountVerifyingSuccessInfo(account.email)),
+                            .addAccountVerifyingSuccessInfo(account.email!)),
                         DecoratedPlatformTextField(
                           controller: _userNameController,
                           keyboardType: TextInputType.text,
@@ -334,7 +336,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                         ),
                       } else ...{
                         Text(localizations
-                            .addAccountVerifyingFailedInfo(account.email)),
+                            .addAccountVerifyingFailedInfo(account.email!)),
                       }
                     ],
                   ),
@@ -359,7 +361,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         }
         print('discover settings for ${account.email}');
         final clientConfig =
-            await Discover.discover(account.email, isLogEnabled: true);
+            await Discover.discover(account.email!, isLogEnabled: true);
         print('done discovering settings: ${clientConfig?.displayName}');
         final incomingHostname =
             clientConfig?.preferredIncomingServer?.hostname;
@@ -375,7 +377,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
           _isApplicationSpecificPasswordAcknowledged = false;
         }
         var domainName =
-            account.email.substring(account.email.lastIndexOf('@') + 1);
+            account.email!.substring(account.email!.lastIndexOf('@') + 1);
         _accountNameController.text = domainName;
         if (clientConfig != null) {
           final mailAccount = MailAccount.fromDiscoveredSettings(
@@ -403,7 +405,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
             _emailController.text,
             _emailController.text,
             _passwordController.text,
-            _clientConfig);
+            _clientConfig!);
         mailClient = await locator<MailService>().connect(mailAccount);
 
         final isVerified = mailClient?.isConnected ?? false;
@@ -423,7 +425,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         account.name = _accountNameController.text;
         account.userName = _userNameController.text;
         final service = locator<MailService>();
-        final added = await service.addAccount(account, mailClient);
+        final added = await service.addAccount(account, mailClient!);
         if (added) {
           if (Platform.isIOS && widget.launchedFromWelcome) {
             locator<NavigationService>().push(Routes.appDrawer, clear: true);

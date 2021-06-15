@@ -22,12 +22,12 @@ abstract class SharedData {
   SharedData(this.mediaType);
 
   Future<SharedDataAddResult> addToMessageBuilder(MessageBuilder builder);
-  Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi);
+  Future<SharedDataAddResult> addToEditor(HtmlEditorApi? editorApi);
 }
 
 class SharedFile extends SharedData {
   final File file;
-  SharedFile(this.file, MediaType mediaType)
+  SharedFile(this.file, MediaType? mediaType)
       : super(mediaType ?? MediaType.guessFromFileName(file.path));
 
   @override
@@ -38,9 +38,10 @@ class SharedFile extends SharedData {
   }
 
   @override
-  Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi) async {
+  Future<SharedDataAddResult> addToEditor(HtmlEditorApi? editorApi) async {
     if (mediaType.isImage) {
-      await editorApi.insertImageFile(file, mediaType.sub.mediaType.toString());
+      await editorApi!
+          .insertImageFile(file, mediaType.sub.mediaType.toString());
       return SharedDataAddResult.added;
     }
     return SharedDataAddResult.notAdded;
@@ -48,22 +49,23 @@ class SharedFile extends SharedData {
 }
 
 class SharedBinary extends SharedData {
-  final Uint8List data;
-  final String filename;
+  final Uint8List? data;
+  final String? filename;
   SharedBinary(this.data, this.filename, MediaType mediaType)
       : super(mediaType);
 
   @override
   Future<SharedDataAddResult> addToMessageBuilder(
       MessageBuilder builder) async {
-    builder.addBinary(data, mediaType, filename: filename);
+    builder.addBinary(data!, mediaType, filename: filename);
     return SharedDataAddResult.added;
   }
 
   @override
-  Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi) async {
+  Future<SharedDataAddResult> addToEditor(HtmlEditorApi? editorApi) async {
     if (mediaType.isImage) {
-      await editorApi.insertImageData(data, mediaType.sub.mediaType.toString());
+      await editorApi!
+          .insertImageData(data!, mediaType.sub.mediaType.toString());
       return SharedDataAddResult.added;
     }
     return SharedDataAddResult.notAdded;
@@ -72,7 +74,7 @@ class SharedBinary extends SharedData {
 
 class SharedText extends SharedData {
   final String text;
-  SharedText(this.text, MediaType mediaType)
+  SharedText(this.text, MediaType? mediaType)
       : super(mediaType ?? MediaType.textPlain);
 
   @override
@@ -82,8 +84,8 @@ class SharedText extends SharedData {
   }
 
   @override
-  Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi) async {
-    await editorApi.insertText(text);
+  Future<SharedDataAddResult> addToEditor(HtmlEditorApi? editorApi) async {
+    await editorApi!.insertText(text);
     return Future.value(SharedDataAddResult.added);
   }
 }
@@ -94,7 +96,7 @@ class SharedMailto extends SharedData {
       : super(MediaType.fromSubtype(MediaSubtype.textHtml));
 
   @override
-  Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi) {
+  Future<SharedDataAddResult> addToEditor(HtmlEditorApi? editorApi) {
     // TODO: implement addToEditor
     throw UnimplementedError();
   }
