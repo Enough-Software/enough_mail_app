@@ -22,7 +22,7 @@ class _InheritedMessageContainer extends InheritedWidget {
 class MessageWidget extends StatefulWidget {
   // You must pass through a child.
   final Widget child;
-  final Message message;
+  final Message? message;
 
   MessageWidget({
     Key? key,
@@ -44,10 +44,10 @@ class MessageWidget extends StatefulWidget {
 }
 
 class MessageWidgetState extends State<MessageWidget> {
-  Message get message => widget.message;
+  Message? get message => widget.message;
 
-  void updateMime({MimeMessage? mime}) {
-    message.updateMime(mime);
+  void updateMime({required MimeMessage mime}) {
+    message?.updateMime(mime);
   }
 
   @override

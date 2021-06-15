@@ -139,7 +139,7 @@ class Message extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateMime(MimeMessage? mime) {
+  void updateMime(MimeMessage mime) {
     this.mimeMessage = mime;
     _attachments = null;
     notifyListeners();

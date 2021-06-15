@@ -18,8 +18,10 @@ class WebViewScreen extends StatelessWidget {
     return Base.buildAppChrome(
       context,
       title: configuration!.title,
-      content: InAppWebView(
-        initialUrlRequest: URLRequest(url: configuration!.uri),
+      content: SafeArea(
+        child: InAppWebView(
+          initialUrlRequest: URLRequest(url: configuration!.uri),
+        ),
       ),
     );
   }
