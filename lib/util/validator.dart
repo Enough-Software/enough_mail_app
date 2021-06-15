@@ -1,6 +1,6 @@
 class Validator {
   static bool validateEmail(String value) {
-    if (value == null || value.length < 'a@b.cd'.length) {
+    if (value.length < 'a@b.cd'.length) {
       return false;
     }
     final atIndex = value.lastIndexOf('@');

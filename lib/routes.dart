@@ -37,7 +37,7 @@ class Routes {
 }
 
 class AppRouter {
-  static Widget generatePage(String name, Object arguments) {
+  static Widget generatePage(String? name, Object? arguments) {
     Widget page;
     switch (name) {
       case Routes.accountAdd:
@@ -82,23 +82,20 @@ class AppRouter {
         page = SettingsSignatureScreen();
         break;
       case Routes.messageSource:
-        page = MessageSourceScreen(arguments as MessageSource);
+        page = MessageSourceScreen(messageSource: arguments as MessageSource);
         break;
       case Routes.mailDetails:
-        final message = arguments as Message;
-        page = MessageDetailsScreen(message: message);
+        page = MessageDetailsScreen(message: arguments as Message);
         break;
       case Routes.mailContents:
-        final message = arguments as Message;
-        page = MessageContentsScreen(message: message);
+        page = MessageContentsScreen(message: arguments as Message);
         break;
       case Routes.mailCompose:
-        final composeData = arguments as ComposeData;
-        page = ComposeScreen(data: composeData);
+        page = ComposeScreen(data: arguments as ComposeData);
         break;
       case Routes.interactiveMedia:
-        final mediaViewer = arguments as InteractiveMediaWidget;
-        page = InteractiveMediaScreen(mediaWidget: mediaViewer);
+        page = InteractiveMediaScreen(
+            mediaWidget: arguments as InteractiveMediaWidget);
         break;
       case Routes.locationPicker:
         page = LocationScreen();
@@ -110,12 +107,10 @@ class AppRouter {
         page = WelcomeScreen();
         break;
       case Routes.sourceCode:
-        final mime = arguments as MimeMessage;
-        page = SourceCodeScreen(mimeMessage: mime);
+        page = SourceCodeScreen(mimeMessage: arguments as MimeMessage);
         break;
       case Routes.webview:
-        final configuration = arguments as WebViewConfiguration;
-        page = WebViewScreen(configuration: configuration);
+        page = WebViewScreen(configuration: arguments as WebViewConfiguration);
         break;
       case Routes.appDrawer:
         page = AppDrawer();

@@ -14,12 +14,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AccountServerDetailsScreen extends StatefulWidget {
   final Account account;
-  final String title;
+  final String? title;
   final bool includeDrawer;
 
   AccountServerDetailsScreen({
-    Key key,
-    @required this.account,
+    Key? key,
+    required this.account,
     this.title,
     this.includeDrawer = true,
   }) : super(key: key);
@@ -31,111 +31,111 @@ class AccountServerDetailsScreen extends StatefulWidget {
 
 class _AccountServerDetailsScreenState
     extends State<AccountServerDetailsScreen> {
-  TextEditingController emailController;
-  TextEditingController userNameController;
-  TextEditingController passwordController;
-  TextEditingController incomingHostDomainController;
-  TextEditingController outgoingHostDomainController;
-  TextEditingController incomingHostPortController;
-  TextEditingController incomingUserNameController;
-  TextEditingController incomingPasswordController;
-  SocketType incomingSecurity;
-  ServerType incomingServerType;
-  TextEditingController outgoingHostPortController;
-  TextEditingController outgoingUserNameController;
-  TextEditingController outgoingPasswordController;
-  SocketType outgoingSecurity;
-  ServerType outgoingServerType;
+  late TextEditingController _emailController;
+  late TextEditingController _userNameController;
+  late TextEditingController _passwordController;
+  late TextEditingController _incomingHostDomainController;
+  late TextEditingController _incomingHostPortController;
+  late TextEditingController _incomingUserNameController;
+  late TextEditingController _incomingPasswordController;
+  late SocketType _incomingSecurity;
+  late ServerType _incomingServerType;
+  late TextEditingController _outgoingHostDomainController;
+  late TextEditingController _outgoingHostPortController;
+  late TextEditingController _outgoingUserNameController;
+  late TextEditingController _outgoingPasswordController;
+  late SocketType _outgoingSecurity;
+  late ServerType _outgoingServerType;
 
   @override
   void initState() {
-    final mailAccount = widget.account?.account;
-    final incoming = mailAccount?.incoming;
-    final incomingAuth = incoming?.authentication as PlainAuthentication;
-    final outgoing = mailAccount?.outgoing;
-    final outgoingAuth = outgoing?.authentication as PlainAuthentication;
-    emailController = TextEditingController(text: mailAccount?.email);
-    userNameController = TextEditingController(text: incomingAuth?.userName);
-    passwordController = TextEditingController(text: incomingAuth?.password);
-    incomingHostDomainController =
+    final mailAccount = widget.account.account;
+    final incoming = mailAccount.incoming;
+    final incomingAuth = incoming?.authentication as PlainAuthentication?;
+    final outgoing = mailAccount.outgoing;
+    final outgoingAuth = outgoing?.authentication as PlainAuthentication?;
+    _emailController = TextEditingController(text: mailAccount.email);
+    _userNameController = TextEditingController(text: incomingAuth?.userName);
+    _passwordController = TextEditingController(text: incomingAuth?.password);
+    _incomingHostDomainController =
         TextEditingController(text: incoming?.serverConfig?.hostname);
-    incomingHostPortController =
+    _incomingHostPortController =
         TextEditingController(text: incoming?.serverConfig?.port?.toString());
-    incomingUserNameController =
+    _incomingUserNameController =
         TextEditingController(text: incomingAuth?.userName);
-    incomingPasswordController =
+    _incomingPasswordController =
         TextEditingController(text: incomingAuth?.password);
-    incomingSecurity = incoming?.serverConfig?.socketType;
-    incomingServerType = incoming?.serverConfig?.type;
-    outgoingHostDomainController =
+    _incomingSecurity = incoming?.serverConfig?.socketType ?? SocketType.ssl;
+    _incomingServerType = incoming?.serverConfig?.type ?? ServerType.imap;
+    _outgoingHostDomainController =
         TextEditingController(text: outgoing?.serverConfig?.hostname);
-    outgoingHostPortController =
+    _outgoingHostPortController =
         TextEditingController(text: outgoing?.serverConfig?.port?.toString());
-    outgoingUserNameController =
+    _outgoingUserNameController =
         TextEditingController(text: outgoingAuth?.userName);
-    outgoingPasswordController =
+    _outgoingPasswordController =
         TextEditingController(text: outgoingAuth?.password);
-    outgoingSecurity = outgoing?.serverConfig?.socketType;
-    outgoingServerType = outgoing?.serverConfig?.type;
+    _outgoingSecurity = outgoing?.serverConfig?.socketType ?? SocketType.ssl;
+    _outgoingServerType = outgoing?.serverConfig?.type ?? ServerType.smtp;
 
     super.initState();
   }
 
   @override
   void dispose() {
-    emailController.dispose();
-    userNameController.dispose();
-    passwordController.dispose();
-    incomingHostDomainController.dispose();
-    incomingHostPortController.dispose();
-    incomingUserNameController.dispose();
-    incomingPasswordController.dispose();
-    outgoingHostDomainController.dispose();
-    outgoingHostPortController.dispose();
-    outgoingUserNameController.dispose();
-    outgoingPasswordController.dispose();
+    _emailController.dispose();
+    _userNameController.dispose();
+    _passwordController.dispose();
+    _incomingHostDomainController.dispose();
+    _incomingHostPortController.dispose();
+    _incomingUserNameController.dispose();
+    _incomingPasswordController.dispose();
+    _outgoingHostDomainController.dispose();
+    _outgoingHostPortController.dispose();
+    _outgoingUserNameController.dispose();
+    _outgoingPasswordController.dispose();
     super.dispose();
   }
 
   Future<void> testConnection(AppLocalizations localizations) async {
     final mailAccount = widget.account.account;
-    mailAccount.email = emailController.text;
-    final userName = userNameController.text?.isEmpty ?? true
+    mailAccount.email = _emailController.text;
+    final userName = (_userNameController.text.isEmpty)
         ? mailAccount.email
-        : userNameController.text;
+        : _userNameController.text;
     mailAccount.userName = userName;
-    final password = passwordController.text;
+    final password = _passwordController.text;
 
     final incomingServerConfig = mailAccount.incoming?.serverConfig ??
         ServerConfig(
-          type: incomingServerType,
-          hostname: incomingHostDomainController.text,
-          port: int.tryParse(incomingHostPortController.text),
-          socketType: incomingSecurity,
+          type: _incomingServerType,
+          hostname: _incomingHostDomainController.text,
+          port: int.tryParse(_incomingHostPortController.text),
+          socketType: _incomingSecurity,
         );
-    final incomingUserName = incomingUserNameController.text?.isEmpty ?? true
+    final incomingUserName = (_incomingUserNameController.text.isEmpty)
         ? userName
-        : incomingUserNameController.text;
-    final incomingPassword = incomingPasswordController.text?.isEmpty ?? true
+        : _incomingUserNameController.text;
+    final incomingPassword = (_incomingPasswordController.text.isEmpty)
         ? password
-        : incomingPasswordController.text;
+        : _incomingPasswordController.text;
     mailAccount.incoming = MailServerConfig(
         serverConfig: incomingServerConfig,
         authentication:
             PlainAuthentication(incomingUserName, incomingPassword));
     final outgoingServerConfig = mailAccount.outgoing?.serverConfig ??
         ServerConfig(
-          type: outgoingServerType,
-          hostname: outgoingHostDomainController.text,
-          port: int.tryParse(outgoingHostPortController.text),
-          socketType: outgoingSecurity,
+          type: _outgoingServerType,
+          hostname: _outgoingHostDomainController.text,
+          port: int.tryParse(_outgoingHostPortController.text),
+          socketType: _outgoingSecurity,
         );
-    final outgoingUserName = outgoingUserNameController.text?.isEmpty ?? true
+    final outgoingUserName = (_outgoingUserNameController.text.isEmpty)
         ? userName
-        : outgoingUserNameController.text;
-    final outgoingPassword = outgoingPasswordController.text?.isEmpty ?? true
+        : _outgoingUserNameController.text;
+    final outgoingPassword = (_outgoingPasswordController.text.isEmpty)
         ? password
-        : outgoingPasswordController.text;
+        : _outgoingPasswordController.text;
     mailAccount.outgoing = MailServerConfig(
       serverConfig: outgoingServerConfig,
       authentication: PlainAuthentication(outgoingUserName, outgoingPassword),
@@ -149,28 +149,30 @@ class _AccountServerDetailsScreenState
           title: Text(localizations.errorTitle),
           content: Text(
             localizations.accountDetailsErrorHostProblem(
-              incomingHostDomainController.text,
-              outgoingHostDomainController.text,
+              _incomingHostDomainController.text,
+              _outgoingHostDomainController.text,
             ),
           ),
         ),
       );
       return;
     } else {
+      final incoming = mailAccount.incoming!;
+      final outgoing = mailAccount.outgoing!;
       setState(() {
-        incomingHostPortController.text =
-            mailAccount.incoming.serverConfig.port.toString();
-        incomingServerType = mailAccount.incoming.serverConfig.type;
-        incomingSecurity = mailAccount.incoming.serverConfig.socketType;
-        outgoingHostPortController.text =
-            mailAccount.outgoing.serverConfig.port.toString();
-        outgoingServerType = mailAccount.outgoing.serverConfig.type;
-        outgoingSecurity = mailAccount.outgoing.serverConfig.socketType;
+        _incomingHostPortController.text =
+            incoming.serverConfig?.port?.toString() ?? '';
+        _incomingServerType = incoming.serverConfig?.type ?? ServerType.imap;
+        _incomingSecurity = incoming.serverConfig?.socketType ?? SocketType.ssl;
+        _outgoingHostPortController.text =
+            outgoing.serverConfig?.port?.toString() ?? '';
+        _outgoingServerType = outgoing.serverConfig?.type ?? ServerType.smtp;
+        _outgoingSecurity = outgoing.serverConfig?.socketType ?? SocketType.ssl;
       });
     }
     // now try to sign in:
     final mailClient = await locator<MailService>().connect(mailAccount);
-    if (mailClient?.isConnected ?? false) {
+    if (mailClient != null && mailClient.isConnected) {
       locator<NavigationService>().pop(
           AccountResolvedEvent(context, widget.account.account, mailClient));
     } else {
@@ -180,7 +182,7 @@ class _AccountServerDetailsScreenState
           title: Text(localizations.errorTitle),
           content: Text(
             localizations.accountDetailsErrorLoginProblem(
-                incomingUserName, password),
+                incomingUserName!, password),
           ),
         ),
       );
@@ -189,12 +191,10 @@ class _AccountServerDetailsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
-      title: widget.title ??
-          widget.account.name ??
-          localizations.accountDetailsFallbackTitle,
+      title: widget.title ?? widget.account.name,
       content: buildContent(localizations, context),
       includeDrawer: widget.includeDrawer,
       appBarActions: [
@@ -215,21 +215,21 @@ class _AccountServerDetailsScreenState
             child: Column(
               children: [
                 DecoratedPlatformTextField(
-                  controller: emailController,
+                  controller: _emailController,
                   decoration: InputDecoration(
                     labelText: localizations.addAccountEmailLabel,
                     hintText: localizations.addAccountEmailHint,
                   ),
                 ),
                 DecoratedPlatformTextField(
-                  controller: userNameController,
+                  controller: _userNameController,
                   decoration: InputDecoration(
                     labelText: localizations.accountDetailsUserNameLabel,
                     hintText: localizations.accountDetailsUserNameHint,
                   ),
                 ),
                 PasswordField(
-                    controller: passwordController,
+                    controller: _passwordController,
                     labelText: localizations.accountDetailsPasswordLabel,
                     hintText: localizations.accountDetailsPasswordHint),
                 ExpansionTile(
@@ -237,14 +237,14 @@ class _AccountServerDetailsScreenState
                   initiallyExpanded: true,
                   children: [
                     DecoratedPlatformTextField(
-                      controller: incomingHostDomainController,
+                      controller: _incomingHostDomainController,
                       decoration: InputDecoration(
                         labelText: localizations.accountDetailsIncomingLabel,
                         hintText: localizations.accountDetailsIncomingHint,
                       ),
                     ),
                     DecoratedPlatformTextField(
-                      controller: outgoingHostDomainController,
+                      controller: _outgoingHostDomainController,
                       decoration: InputDecoration(
                         labelText: localizations.accountDetailsOutgoingLabel,
                         hintText: localizations.accountDetailsOutgoingHint,
@@ -278,9 +278,9 @@ class _AccountServerDetailsScreenState
                                 value: ServerType.pop,
                               ),
                             ],
-                            value: incomingServerType,
+                            value: _incomingServerType,
                             onChanged: (value) =>
-                                setState(() => incomingServerType = value)),
+                                setState(() => _incomingServerType = value!)),
                       ],
                     ),
                     Row(
@@ -310,13 +310,13 @@ class _AccountServerDetailsScreenState
                                 value: SocketType.plain,
                               ),
                             ],
-                            value: incomingSecurity,
+                            value: _incomingSecurity,
                             onChanged: (value) =>
-                                setState(() => incomingSecurity = value)),
+                                setState(() => _incomingSecurity = value!)),
                       ],
                     ),
                     DecoratedPlatformTextField(
-                      controller: incomingHostPortController,
+                      controller: _incomingHostPortController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
@@ -326,7 +326,7 @@ class _AccountServerDetailsScreenState
                       ),
                     ),
                     DecoratedPlatformTextField(
-                      controller: incomingUserNameController,
+                      controller: _incomingUserNameController,
                       decoration: InputDecoration(
                         labelText:
                             localizations.accountDetailsIncomingUserNameLabel,
@@ -335,7 +335,7 @@ class _AccountServerDetailsScreenState
                       ),
                     ),
                     PasswordField(
-                        controller: incomingPasswordController,
+                        controller: _incomingPasswordController,
                         labelText:
                             localizations.accountDetailsIncomingPasswordLabel,
                         hintText: localizations
@@ -364,9 +364,9 @@ class _AccountServerDetailsScreenState
                                 value: ServerType.smtp,
                               ),
                             ],
-                            value: outgoingServerType,
+                            value: _outgoingServerType,
                             onChanged: (value) =>
-                                setState(() => outgoingServerType = value)),
+                                setState(() => _outgoingServerType = value!)),
                       ],
                     ),
                     Row(
@@ -396,13 +396,13 @@ class _AccountServerDetailsScreenState
                                 value: SocketType.plain,
                               ),
                             ],
-                            value: outgoingSecurity,
+                            value: _outgoingSecurity,
                             onChanged: (value) =>
-                                setState(() => outgoingSecurity = value)),
+                                setState(() => _outgoingSecurity = value!)),
                       ],
                     ),
                     DecoratedPlatformTextField(
-                      controller: outgoingHostPortController,
+                      controller: _outgoingHostPortController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
@@ -412,7 +412,7 @@ class _AccountServerDetailsScreenState
                       ),
                     ),
                     DecoratedPlatformTextField(
-                      controller: outgoingUserNameController,
+                      controller: _outgoingUserNameController,
                       decoration: InputDecoration(
                         labelText:
                             localizations.accountDetailsOutgoingUserNameLabel,
@@ -421,7 +421,7 @@ class _AccountServerDetailsScreenState
                       ),
                     ),
                     PasswordField(
-                      controller: outgoingPasswordController,
+                      controller: _outgoingPasswordController,
                       labelText:
                           localizations.accountDetailsOutgoingPasswordLabel,
                       hintText:

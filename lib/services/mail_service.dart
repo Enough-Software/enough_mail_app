@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/account_change_event.dart';
 import 'package:enough_mail_app/events/accounts_changed_event.dart';
@@ -19,21 +20,22 @@ import '../locator.dart';
 
 class MailService {
   //MailClient current;
-  MessageSource messageSource;
-  Account currentAccount;
+  MessageSource? messageSource;
+  Account? currentAccount;
   List<MailAccount> mailAccounts = <MailAccount>[];
   final accounts = <Account>[];
-  UnifiedAccount unifiedAccount;
+  UnifiedAccount? unifiedAccount;
 
-  List<Account> _accountsWithErrors;
+  List<Account>? _accountsWithErrors;
   bool get hasUnifiedAccount => (unifiedAccount != null);
 
   static const String _keyAccounts = 'accts';
-  FlutterSecureStorage _storage;
-  final _mailClientsPerAccount = <Account, MailClient>{};
-  final _mailboxesPerAccount = <Account, Tree<Mailbox>>{};
-  AppLocalizations _localizations;
-  AppLocalizations get localizations => _localizations;
+  FlutterSecureStorage? _storage;
+  final _mailClientsPerAccount = <Account?, MailClient?>{};
+  final Map<Account, Tree<Mailbox?>> _mailboxesPerAccount =
+      <Account, Tree<Mailbox?>>{};
+  AppLocalizations? _localizations;
+  AppLocalizations? get localizations => _localizations;
 
   List<Account> get accountsWithoutErrors {
     final withErrors = _accountsWithErrors;
@@ -48,18 +50,18 @@ class MailService {
     return withErrors ?? [];
   }
 
-  set localizations(AppLocalizations value) {
+  set localizations(AppLocalizations? value) {
     if (value != _localizations) {
       _localizations = value;
       if (unifiedAccount != null) {
-        unifiedAccount.name = value.unifiedAccountName;
-        final mailboxes = _mailboxesPerAccount[unifiedAccount]
-            .root
-            .children
+        unifiedAccount!.name = value!.unifiedAccountName;
+        final mailboxes = _mailboxesPerAccount[unifiedAccount]!
+            .root!
+            .children!
             .map((c) => c.value);
         for (final mailbox in mailboxes) {
-          String name;
-          if (mailbox.isInbox) {
+          String? name;
+          if (mailbox!.isInbox) {
             name = value.unifiedFolderInbox;
           } else if (mailbox.isDrafts) {
             name = value.unifiedFolderDrafts;
@@ -80,7 +82,7 @@ class MailService {
     }
   }
 
-  Future<void> init(AppLocalizations localizations) async {
+  Future<void> init(AppLocalizations? localizations) async {
     _localizations = localizations;
     await _loadAccounts();
     messageSource = await _initMessageSource();
@@ -96,7 +98,7 @@ class MailService {
 
   Future<List<MailAccount>> loadMailAccounts() async {
     _storage ??= FlutterSecureStorage();
-    var json = await _storage.read(key: _keyAccounts);
+    var json = await _storage!.read(key: _keyAccounts);
     if (json != null) {
       final accounts = <MailAccount>[];
       Serializer().deserializeList(json, accounts,
@@ -111,70 +113,64 @@ class MailService {
     if (currentSource != null && currentSource.supportsSearching) {
       return currentSource.search(search);
     }
-    final account = currentAccount != null
-        ? currentAccount
-        : (unifiedAccount != null)
-            ? unifiedAccount
-            : mailAccounts.first;
-    currentAccount = account;
-    messageSource = await _createMessageSource(null, account);
-    return messageSource.search(search);
+    final Account account = currentAccount ?? unifiedAccount ?? accounts.first;
+    final source = await _createMessageSource(null, account);
+    messageSource = source;
+    return source.search(search);
   }
 
-  _createUnifiedAccount() {
+  void _createUnifiedAccount() {
     final mailAccountsForUnified = accounts
         .where((account) => (!account.isVirtual &&
             !account.account.hasAttribute(Account.attributeExcludeFromUnified)))
         .toList();
     if (mailAccountsForUnified.length > 1) {
       unifiedAccount = UnifiedAccount(
-          mailAccountsForUnified, _localizations.unifiedAccountName);
+          mailAccountsForUnified, _localizations!.unifiedAccountName);
       final mailboxes = [
         Mailbox()
-          ..name = _localizations.unifiedFolderInbox
+          ..name = _localizations!.unifiedFolderInbox
           ..flags = [MailboxFlag.inbox],
         Mailbox()
-          ..name = _localizations.unifiedFolderDrafts
+          ..name = _localizations!.unifiedFolderDrafts
           ..flags = [MailboxFlag.drafts],
         Mailbox()
-          ..name = _localizations.unifiedFolderSent
+          ..name = _localizations!.unifiedFolderSent
           ..flags = [MailboxFlag.sent],
         Mailbox()
-          ..name = _localizations.unifiedFolderTrash
+          ..name = _localizations!.unifiedFolderTrash
           ..flags = [MailboxFlag.trash],
         Mailbox()
-          ..name = _localizations.unifiedFolderArchive
+          ..name = _localizations!.unifiedFolderArchive
           ..flags = [MailboxFlag.archive],
         Mailbox()
-          ..name = _localizations.unifiedFolderJunk
+          ..name = _localizations!.unifiedFolderJunk
           ..flags = [MailboxFlag.junk],
       ];
-      final tree = Tree<Mailbox>(Mailbox())
+      final tree = Tree<Mailbox?>(Mailbox())
         ..populateFromList(mailboxes, (child) => null);
-      _mailboxesPerAccount[unifiedAccount] = tree;
+      _mailboxesPerAccount[unifiedAccount!] = tree;
     }
   }
 
-  Future<MessageSource> _initMessageSource() {
-    if (unifiedAccount != null) {
-      currentAccount = unifiedAccount;
-    } else if (accounts.isNotEmpty) {
-      currentAccount = accounts.first;
-    }
-    if (currentAccount != null) {
-      return _createMessageSource(null, currentAccount);
+  Future<MessageSource>? _initMessageSource() {
+    final account =
+        unifiedAccount ?? ((accounts.isNotEmpty) ? accounts.first : null);
+    if (account != null) {
+      currentAccount = account;
+      return _createMessageSource(null, account);
     }
     return null;
   }
 
   Future<MessageSource> _createMessageSource(
-      Mailbox mailbox, Account account) async {
+      Mailbox? mailbox, Account account) async {
     if (account is UnifiedAccount) {
       final mimeSources = await _getUnifiedMimeSources(mailbox, account);
       return MultipleMessageSource(
         mimeSources,
-        mailbox == null ? _localizations.unifiedFolderInbox : mailbox.name,
-        mailbox?.flags?.first ?? MailboxFlag.inbox,
+        mailbox == null ? _localizations!.unifiedFolderInbox : mailbox.name,
+        mailbox?.flags.first ?? MailboxFlag.inbox,
       );
     } else {
       final mailClient = await _getClientAndStopPolling(account);
@@ -182,16 +178,16 @@ class MailService {
         return MailboxMessageSource(mailbox, mailClient);
       }
       _accountsWithErrors ??= <Account>[];
-      _accountsWithErrors.add(account);
+      _accountsWithErrors!.add(account);
       return ErrorMessageSource(account);
     }
   }
 
   Future<List<MimeSource>> _getUnifiedMimeSources(
-      Mailbox mailbox, UnifiedAccount unifiedAccount) async {
-    final futures = <Future<MailClient>>[];
+      Mailbox? mailbox, UnifiedAccount unifiedAccount) async {
+    final futures = <Future<MailClient?>>[];
     final mimeSources = <MimeSource>[];
-    MailboxFlag flag = mailbox?.flags?.first;
+    MailboxFlag? flag = mailbox?.flags.first;
     for (final subAccount in unifiedAccount.accounts) {
       futures.add(_getClientAndStopPolling(subAccount));
     }
@@ -199,7 +195,7 @@ class MailService {
     for (var i = 0; i < clients.length; i++) {
       final client = clients[i];
       if (client != null) {
-        Mailbox accountMailbox;
+        Mailbox? accountMailbox;
         if (flag != null) {
           accountMailbox = client.getMailbox(flag);
           if (accountMailbox == null) {
@@ -211,13 +207,13 @@ class MailService {
         mimeSources.add(MailboxMimeSource(client, accountMailbox));
       } else {
         _accountsWithErrors ??= <Account>[];
-        _accountsWithErrors.add(unifiedAccount.accounts[i]);
+        _accountsWithErrors!.add(unifiedAccount.accounts[i]);
       }
     }
     return mimeSources;
   }
 
-  Future<MailClient> _getClientAndStopPolling(Account account) async {
+  Future<MailClient?> _getClientAndStopPolling(Account account) async {
     try {
       final client = await getClientFor(account);
       await client.stopPollingIfNeeded();
@@ -230,7 +226,7 @@ class MailService {
 
   void _addGravatar(MailAccount account) {
     final url = Gravatar.imageUrl(
-      account.email,
+      account.email!,
       size: 400,
       defaultImage: GravatarImage.retro,
     );
@@ -241,58 +237,52 @@ class MailService {
       MailAccount mailAccount, MailClient mailClient) async {
     //TODO check if other account with the same name already exists
     //TODO how to save extension data?
-    final existing = mailAccounts.firstWhere(
-        (account) => account.email == mailAccount.email,
-        orElse: () => null);
+    final existing = mailAccounts
+        .firstWhereOrNull((account) => account.email == mailAccount.email);
     if (existing != null) {
       mailAccounts.remove(existing);
       accounts.removeWhere((account) => account.email == mailAccount.email);
     }
-    currentAccount = Account(mailAccount);
-    accounts.add(currentAccount);
+    final newAccount = Account(mailAccount);
+
+    currentAccount = newAccount;
+    accounts.add(newAccount);
     await loadMailboxesFor(mailClient);
     _mailClientsPerAccount[currentAccount] = mailClient;
     await _checkForAddingSentMessages(mailAccount);
     _addGravatar(mailAccount);
     mailAccounts.add(mailAccount);
     if (!mailAccount.hasAttribute(Account.attributeExcludeFromUnified)) {
-      if (unifiedAccount != null) {
-        unifiedAccount.accounts.add(currentAccount);
+      final unified = unifiedAccount;
+      if (unified != null) {
+        unified.accounts.add(newAccount);
       } else {
         _createUnifiedAccount();
       }
     }
-    final source = await getMessageSourceFor(currentAccount);
+    final source = await getMessageSourceFor(newAccount);
     messageSource = source;
     AppEventBus.eventBus.fire(AccountChangeEvent(mailClient, mailAccount));
     await saveAccounts();
     return true;
   }
 
-  List<Sender> getSenders({bool includePlaceholdersForPlusAliases = false}) {
+  List<Sender> getSenders() {
     final senders = <Sender>[];
     for (final account in accounts) {
       if (account.isVirtual) {
         continue;
       }
       senders.add(Sender(account.fromAddress, account));
-      if (account.aliases != null) {
-        for (final alias in account.aliases) {
-          senders.add(Sender(alias, account));
-        }
-      }
-      if (includePlaceholdersForPlusAliases) {
-        if (account.supportsPlusAliases ||
-            !hasAccountBeenTestedForPlusAlias(account)) {
-          senders.add(Sender(null, account, isPlaceHolderForPlusAlias: true));
-        }
+      for (final alias in account.aliases) {
+        senders.add(Sender(alias, account));
       }
     }
     return senders;
   }
 
   MessageBuilder mailto(Uri mailto, MimeMessage originatingMessage) {
-    final senders = getSenders(includePlaceholdersForPlusAliases: false);
+    final senders = getSenders();
     final searchFor = senders.map((s) => s.address).toList();
     final searchIn = originatingMessage.recipientAddresses
         .map((email) => MailAddress('', email))
@@ -301,9 +291,8 @@ class MailService {
     if (fromAddress == null) {
       final settings = locator<SettingsService>().settings;
       if (settings.preferredComposeMailAddress != null) {
-        fromAddress = searchFor.firstWhere(
-            (address) => address.email == settings.preferredComposeMailAddress,
-            orElse: () => null);
+        fromAddress = searchFor.firstWhereOrNull(
+            (address) => address.email == settings.preferredComposeMailAddress);
       }
       fromAddress ??= searchFor.first;
     }
@@ -323,12 +312,12 @@ class MailService {
     final json = Serializer().serializeList(mailAccounts);
     // print(json);
     _storage ??= FlutterSecureStorage();
-    return _storage.write(key: _keyAccounts, value: json);
+    return _storage!.write(key: _keyAccounts, value: json);
   }
 
   Future<MailClient> getClientFor(Account account) async {
     if (account is UnifiedAccount) {
-      account = (account as UnifiedAccount).accounts.first;
+      account = account.accounts.first;
     }
     var client = _mailClientsPerAccount[account];
     if (client == null) {
@@ -345,34 +334,32 @@ class MailService {
     return client;
   }
 
-  Future<MailClient> getClientForAccountWithEmail(String accountEmail) {
-    final account = getAccountForEmail(accountEmail);
+  Future<MailClient> getClientForAccountWithEmail(String? accountEmail) {
+    final account = getAccountForEmail(accountEmail)!;
     return getClientFor(account);
   }
 
   Future<MessageSource> getMessageSourceFor(Account account,
-      {Mailbox mailbox, bool switchToAccount}) async {
+      {Mailbox? mailbox, bool switchToAccount = false}) async {
     var source = await _createMessageSource(mailbox, account);
-    if (switchToAccount == true) {
+    if (switchToAccount) {
       messageSource = source;
       currentAccount = account;
     }
     return source;
   }
 
-  Account getAccountFor(MailAccount mailAccount) {
-    return accounts.firstWhere((a) => a.account == mailAccount,
-        orElse: () => null);
+  Account? getAccountFor(MailAccount mailAccount) {
+    return accounts.firstWhereOrNull((a) => a.account == mailAccount);
   }
 
-  Account getAccountForEmail(String accountEmail) {
-    return accounts.firstWhere((a) => a.email == accountEmail,
-        orElse: () => null);
+  Account? getAccountForEmail(String? accountEmail) {
+    return accounts.firstWhereOrNull((a) => a.email == accountEmail);
   }
 
   void applyFolderNameSettings(Settings settings) {
     for (final client in _mailClientsPerAccount.values) {
-      _setMaiboxNames(settings, client);
+      _setMaiboxNames(settings, client!);
     }
   }
 
@@ -382,13 +369,13 @@ class MailService {
       return;
     }
     if (folderNameSetting == FolderNameSetting.server) {
-      for (final mailbox in client.mailboxes) {
+      for (final mailbox in client.mailboxes!) {
         mailbox.setNameFromPath();
       }
     } else {
       var names = settings.customFolderNames;
       if (names == null || folderNameSetting == FolderNameSetting.localized) {
-        final l = localizations;
+        final l = localizations!;
         names = [
           l.folderInbox,
           l.folderDrafts,
@@ -398,19 +385,22 @@ class MailService {
           l.folderJunk
         ];
       }
-      for (final mailbox in client.mailboxes) {
-        if (mailbox == null || mailbox.isInbox) {
-          mailbox.name = names[0];
-        } else if (mailbox.isDrafts) {
-          mailbox.name = names[1];
-        } else if (mailbox.isSent) {
-          mailbox.name = names[2];
-        } else if (mailbox.isTrash) {
-          mailbox.name = names[3];
-        } else if (mailbox.isArchive) {
-          mailbox.name = names[4];
-        } else if (mailbox.isJunk) {
-          mailbox.name = names[5];
+      final boxes = client.mailboxes;
+      if (boxes != null) {
+        for (final mailbox in boxes) {
+          if (mailbox.isInbox) {
+            mailbox.name = names[0];
+          } else if (mailbox.isDrafts) {
+            mailbox.name = names[1];
+          } else if (mailbox.isSent) {
+            mailbox.name = names[2];
+          } else if (mailbox.isTrash) {
+            mailbox.name = names[3];
+          } else if (mailbox.isArchive) {
+            mailbox.name = names[4];
+          } else if (mailbox.isJunk) {
+            mailbox.name = names[5];
+          }
         }
       }
     }
@@ -432,12 +422,12 @@ class MailService {
     _mailboxesPerAccount[account] = mailboxTree;
   }
 
-  Tree<Mailbox> getMailboxTreeFor(Account account) {
+  Tree<Mailbox?>? getMailboxTreeFor(Account account) {
     return _mailboxesPerAccount[account];
   }
 
   Future<void> createMailbox(
-      Account account, String mailboxName, Mailbox parentMailbox) async {
+      Account account, String mailboxName, Mailbox? parentMailbox) async {
     final mailClient = await getClientFor(account);
     await mailClient.createMailbox(mailboxName, parentMailbox: parentMailbox);
     await loadMailboxesFor(mailClient);
@@ -449,7 +439,7 @@ class MailService {
     await loadMailboxesFor(mailClient);
   }
 
-  Future<void> saveAccount(MailAccount account) {
+  Future<void> saveAccount(MailAccount? account) {
     // print('saving account ${account.name}');
     return saveAccounts();
   }
@@ -459,7 +449,7 @@ class MailService {
   }
 
   bool hasAccountBeenTestedForPlusAlias(Account account) {
-    return account?.account?.attributes[Account.attributePlusAliasTested] ??
+    return account.account.attributes[Account.attributePlusAliasTested] ??
         false;
   }
 
@@ -483,8 +473,8 @@ class MailService {
   Future<void> removeAccount(Account account) async {
     accounts.remove(account);
     mailAccounts.remove(account.account);
-    _mailboxesPerAccount[account] = null;
-    _mailClientsPerAccount[account] = null;
+    _mailboxesPerAccount.remove(account);
+    _mailClientsPerAccount.remove(account);
     // TODO handle the case when an account is removed that is used in the current mail source
     // if (current?.account == account) {
     //   await current.disconnect();
@@ -497,7 +487,7 @@ class MailService {
     await saveAccounts();
   }
 
-  String getEmailDomain(String email) {
+  String? getEmailDomain(String email) {
     final startIndex = email.lastIndexOf('@');
     if (startIndex == -1) {
       return null;
@@ -505,22 +495,22 @@ class MailService {
     return email.substring(startIndex + 1);
   }
 
-  Future<MailClient> connect(MailAccount mailAccount) async {
+  Future<MailClient?> connect(MailAccount mailAccount) async {
     var mailClient = MailClient(mailAccount,
         isLogEnabled: true, eventBus: AppEventBus.eventBus);
     try {
       await mailClient.connect();
     } on MailException {
-      var preferredUserName =
-          mailAccount.incoming.serverConfig.getUserName(mailAccount.userName);
+      var preferredUserName = mailAccount.incoming!.serverConfig!
+          .getUserName(mailAccount.userName!);
       if (preferredUserName == null || preferredUserName == mailAccount.email) {
-        final atIndex = mailAccount.email.lastIndexOf('@');
-        preferredUserName = mailAccount.email.substring(0, atIndex);
-        final incomingAuth = mailAccount.incoming.authentication;
+        final atIndex = mailAccount.email!.lastIndexOf('@');
+        preferredUserName = mailAccount.email!.substring(0, atIndex);
+        final incomingAuth = mailAccount.incoming!.authentication;
         if (incomingAuth is UserNameBasedAuthentication) {
           incomingAuth.userName = preferredUserName;
         }
-        final outgoingAuth = mailAccount.outgoing.authentication;
+        final outgoingAuth = mailAccount.outgoing!.authentication;
         if (outgoingAuth is UserNameBasedAuthentication) {
           outgoingAuth.userName = preferredUserName;
         }
@@ -542,7 +532,7 @@ class MailService {
     mailAccount.attributes[Account.attributeSentMailAddedAutomatically] = [
       'outlook.office365.com',
       'imap.gmail.com'
-    ].contains(mailAccount.incoming.serverConfig.hostname);
+    ].contains(mailAccount.incoming!.serverConfig!.hostname);
     //TODO later test sending of messages
   }
 
@@ -551,7 +541,7 @@ class MailService {
     final existingMailClients = _mailClientsPerAccount.values;
     for (final mailAccount in mailAccounts) {
       var client = existingMailClients.firstWhere(
-          (client) => client.account == mailAccount,
+          (client) => client!.account == mailAccount,
           orElse: () => null);
       client ??= MailClient(mailAccount);
       mailClients.add(client);
@@ -563,7 +553,7 @@ class MailService {
   Future resume() {
     final futures = <Future>[];
     for (final client in _mailClientsPerAccount.values) {
-      if (client.isPolling()) {
+      if (client!.isPolling()) {
         futures.add(client.resume());
       }
     }
@@ -577,24 +567,24 @@ class MailService {
     account.excludeFromUnified = exclude;
     if (exclude) {
       if (unifiedAccount != null) {
-        unifiedAccount.removeAccount(account);
+        unifiedAccount!.removeAccount(account);
       }
     } else {
       if (unifiedAccount == null) {
         _createUnifiedAccount();
       } else {
-        unifiedAccount.addAccount(account);
+        unifiedAccount!.addAccount(account);
       }
     }
-    if (currentAccount == unifiedAccount) {
-      messageSource = await _createMessageSource(null, unifiedAccount);
+    if (currentAccount == unifiedAccount && unifiedAccount != null) {
+      messageSource = await _createMessageSource(null, unifiedAccount!);
       AppEventBus.eventBus
-          .fire(UnifiedMessageSourceChangedEvent(messageSource));
+          .fire(UnifiedMessageSourceChangedEvent(messageSource!));
     }
     return saveAccounts();
   }
 
-  bool hasError(Account account) {
+  bool hasError(Account? account) {
     final accts = _accountsWithErrors;
     return accts != null && accts.contains(account);
   }

@@ -17,7 +17,7 @@ class NotificationService {
   static const String _messagePayloadStart = 'msg:';
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  int _lastNotificationId;
+  int? _lastNotificationId;
 
   Future<NotificationServiceInitResult> init(
       {bool checkForLaunchDetails = true}) async {
@@ -38,7 +38,7 @@ class NotificationService {
       if (launchDetails?.payload != null) {
         // print(
         //     'got notification launched details: $launchDetails with payload ${launchDetails?.payload}');
-        await _selectNotification(launchDetails.payload);
+        await _selectNotification(launchDetails!.payload);
         return NotificationServiceInitResult.appLaunchedByNotification;
       }
     }
@@ -47,7 +47,7 @@ class NotificationService {
   }
 
   Future _onDidReceiveLocalNotification(
-      int id, String title, String body, String payload) async {
+      int id, String? title, String? body, String? payload) async {
     print('iOS onDidReceiveLocalNotification $id $title $body $payload');
   }
 
@@ -84,9 +84,9 @@ class NotificationService {
     return payload;
   }
 
-  Future _selectNotification(String payloadText) async {
+  Future _selectNotification(String? payloadText) async {
     print('select notification: $payloadText');
-    if (payloadText.startsWith(_messagePayloadStart)) {
+    if (payloadText!.startsWith(_messagePayloadStart)) {
       try {
         final payload = _deserialize(payloadText);
 
@@ -118,7 +118,7 @@ class NotificationService {
 
   Future sendLocalNotificationForMailMessage(maily.Message message) {
     return sendLocalNotificationForMail(
-        message.mimeMessage, message.mailClient);
+        message.mimeMessage!, message.mailClient);
   }
 
   Future sendLocalNotificationForMail(
@@ -129,31 +129,31 @@ class NotificationService {
     }
     _lastNotificationId = notificationId;
     var from = mimeMessage.from?.isNotEmpty ?? false
-        ? mimeMessage.from.first.personalName
+        ? mimeMessage.from!.first.personalName
         : mimeMessage.sender?.personalName;
     if (from == null || from.isEmpty) {
       from = mimeMessage.from?.isNotEmpty ?? false
-          ? mimeMessage.from.first.email
+          ? mimeMessage.from!.first.email
           : mimeMessage.sender?.email;
     }
     final subject = mimeMessage.decodeSubject();
     final payload = MailNotificationPayload.fromMail(mimeMessage, mailClient);
     final payloadText = _messagePayloadStart + Serializer().serialize(payload);
-    return sendLocalNotification(notificationId, from, subject,
+    return sendLocalNotification(notificationId, from!, subject,
         payloadText: payloadText, when: mimeMessage.decodeDate());
   }
 
   int getNotificationIdForMail(MimeMessage mimeMessage, MailClient mailClient) {
-    return getNotificationIdForUid(mimeMessage.uid, mailClient.account.email);
+    return getNotificationIdForUid(mimeMessage.uid!, mailClient.account.email);
   }
 
-  int getNotificationIdForUid(int uid, String email) {
+  int getNotificationIdForUid(int uid, String? email) {
     return email.hashCode + uid;
   }
 
-  Future sendLocalNotification(int id, String title, String text,
-      {String payloadText, DateTime when, bool channelShowBadge = true}) async {
-    AndroidNotificationDetails androidPlatformChannelSpecifics;
+  Future sendLocalNotification(int id, String title, String? text,
+      {String? payloadText, DateTime? when, bool channelShowBadge = true}) async {
+    AndroidNotificationDetails? androidPlatformChannelSpecifics;
     if (Platform.isAndroid) {
       androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'maily',
@@ -175,7 +175,7 @@ class NotificationService {
   }
 
   void cancelNotificationForMailMessage(maily.Message message) {
-    cancelNotificationForMail(message.mimeMessage, message.mailClient);
+    cancelNotificationForMail(message.mimeMessage!, message.mailClient);
   }
 
   void cancelNotificationForMail(
@@ -193,16 +193,16 @@ class NotificationService {
 }
 
 class MailNotificationPayload extends SerializableObject {
-  int get uid => attributes['uid'];
-  set uid(int value) => attributes['uid'] = value;
-  int get id => attributes['id'];
-  set id(int value) => attributes['id'] = value;
-  String get accountEmail => attributes['account-email'];
-  set accountEmail(String value) => attributes['account-email'] = value;
-  String get subject => attributes['subject'];
-  set subject(String value) => attributes['subject'] = value;
-  int get size => attributes['size'];
-  set size(int value) => attributes['size'] = value;
+  int? get uid => attributes['uid'];
+  set uid(int? value) => attributes['uid'] = value;
+  int? get id => attributes['id'];
+  set id(int? value) => attributes['id'] = value;
+  String? get accountEmail => attributes['account-email'];
+  set accountEmail(String? value) => attributes['account-email'] = value;
+  String? get subject => attributes['subject'];
+  set subject(String? value) => attributes['subject'] = value;
+  int? get size => attributes['size'];
+  set size(int? value) => attributes['size'] = value;
 
   MailNotificationPayload();
 

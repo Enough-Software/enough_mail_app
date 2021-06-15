@@ -6,9 +6,9 @@ class IconText extends StatelessWidget {
   final EdgeInsets padding;
   final EdgeInsets horizontalPadding;
   const IconText({
-    Key key,
-    @required this.icon,
-    @required this.label,
+    Key? key,
+    required this.icon,
+    required this.label,
     this.padding = const EdgeInsets.all(8.0),
     this.horizontalPadding = const EdgeInsets.only(left: 8.0),
   }) : super(key: key);

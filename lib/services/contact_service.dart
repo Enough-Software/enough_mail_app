@@ -48,7 +48,7 @@ class ContactService {
   }
 
   void _addAddresses(
-      List<MailAddress> addresses, Map<String, MailAddress> addressesByEmail) {
+      List<MailAddress>? addresses, Map<String, MailAddress> addressesByEmail) {
     if (addresses == null) {
       return;
     }

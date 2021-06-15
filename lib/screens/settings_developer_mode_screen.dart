@@ -21,7 +21,7 @@ class SettingsDeveloperModeScreen extends StatefulWidget {
 
 class _SettingsDeveloperModeScreenState
     extends State<SettingsDeveloperModeScreen> {
-  bool isDeveloperModeEnabled = false;
+  bool? isDeveloperModeEnabled = false;
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ class _SettingsDeveloperModeScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
       title: localizations.settingsDevelopment,
@@ -89,10 +89,10 @@ class _SettingsDeveloperModeScreenState
   }
 
   void _loadExtensionManually() async {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final controller = TextEditingController();
-    String url;
-    final navService = locator<NavigationService>();
+    String? url;
+    final NavigationService? navService = locator<NavigationService>();
     final result = await DialogHelper.showWidgetDialog(
       context,
       localizations.extensionsManualAction,
@@ -106,33 +106,33 @@ class _SettingsDeveloperModeScreenState
       actions: [
         PlatformTextButton(
           child: ButtonText(localizations.actionCancel),
-          onPressed: () => navService.pop(false),
+          onPressed: () => navService!.pop(false),
         ),
         PlatformTextButton(
           child: ButtonText(localizations.actionOk),
           onPressed: () {
             url = controller.text.trim();
-            navService.pop(true);
+            navService!.pop(true);
           },
         ),
       ],
     );
     // controller.dispose();
     if (result == true) {
-      if (url.length > 4) {
-        if (url.indexOf(':') == -1) {
+      if (url!.length > 4) {
+        if (url!.indexOf(':') == -1) {
           url = 'https://$url';
         }
-        if (!url.endsWith('json')) {
-          if (url.endsWith('/')) {
+        if (!url!.endsWith('json')) {
+          if (url!.endsWith('/')) {
             url = '$url.maily.json';
           } else {
             url = '$url/.maily.json';
           }
         }
-        final appExtension = await AppExtension.loadFromUrl(url);
+        final appExtension = await AppExtension.loadFromUrl(url!);
         if (appExtension != null) {
-          var account = locator<MailService>().currentAccount;
+          var account = locator<MailService>().currentAccount!;
           if (account.isVirtual) {
             account = locator<MailService>().accounts.first;
           }
@@ -142,7 +142,7 @@ class _SettingsDeveloperModeScreenState
           await DialogHelper.showTextDialog(
             context,
             localizations.errorTitle,
-            localizations.extensionsManualLoardingError(url),
+            localizations.extensionsManualLoardingError(url!),
           );
         }
       } else {
@@ -160,16 +160,16 @@ class _SettingsDeveloperModeScreenState
   }
 
   void _reloadExtensions() async {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final accounts = locator<MailService>().accounts;
     final domains = <_AccountDomain>[];
     for (final account in accounts) {
       account.appExtensions = [];
       _addEmail(account, account.email, domains);
       _addHostname(
-          account, account.account.incoming.serverConfig.hostname, domains);
+          account, account.account.incoming!.serverConfig!.hostname!, domains);
       _addHostname(
-          account, account.account.outgoing.serverConfig.hostname, domains);
+          account, account.account.outgoing!.serverConfig!.hostname!, domains);
     }
     DialogHelper.showWidgetDialog(
       context,
@@ -181,15 +181,15 @@ class _SettingsDeveloperModeScreenState
               PlatformListTile(
                 title: Text(domain.domain),
                 subtitle: Text(AppExtension.urlFor(domain.domain)),
-                trailing: FutureBuilder<AppExtension>(
+                trailing: FutureBuilder<AppExtension?>(
                   future: domain.future,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      domain.account.appExtensions.add(snapshot.data);
+                      domain.account!.appExtensions!.add(snapshot.data);
                       return PlatformIconButton(
                         icon: Icon(Icons.check),
-                        onPressed: () =>
-                            _showExtensionDetails(domain.domain, snapshot.data),
+                        onPressed: () => _showExtensionDetails(
+                            domain.domain, snapshot.data!),
                       );
                     } else if (snapshot.connectionState ==
                         ConnectionState.done) {
@@ -206,12 +206,12 @@ class _SettingsDeveloperModeScreenState
     );
   }
 
-  void _addEmail(Account account, String email, List<_AccountDomain> domains) {
+  void _addEmail(Account? account, String email, List<_AccountDomain> domains) {
     _addDomain(account, email.substring(email.indexOf('@') + 1), domains);
   }
 
   void _addHostname(
-      Account account, String hostname, List<_AccountDomain> domains) {
+      Account? account, String hostname, List<_AccountDomain> domains) {
     final domainIndex = hostname.indexOf('.');
     if (domainIndex != -1) {
       _addDomain(account, hostname.substring(domainIndex + 1), domains);
@@ -219,14 +219,14 @@ class _SettingsDeveloperModeScreenState
   }
 
   void _addDomain(
-      Account account, String domain, List<_AccountDomain> domains) {
+      Account? account, String domain, List<_AccountDomain> domains) {
     if (!domains.any((k) => k.domain == domain)) {
       domains
           .add(_AccountDomain(account, domain, AppExtension.loadFrom(domain)));
     }
   }
 
-  void _showExtensionDetails(String domainOrUrl, AppExtension data) {
+  void _showExtensionDetails(String? domainOrUrl, AppExtension data) {
     DialogHelper.showWidgetDialog(
       context,
       '$domainOrUrl Extension',
@@ -237,15 +237,15 @@ class _SettingsDeveloperModeScreenState
           if (data.accountSideMenu != null) ...{
             Divider(),
             Text('Account side menus:'),
-            for (final entry in data.accountSideMenu) ...{
-              Text('"${entry.getLabel('en')}": ${entry.action.url}'),
+            for (final entry in data.accountSideMenu!) ...{
+              Text('"${entry.getLabel('en')}": ${entry.action!.url}'),
             },
           },
           if (data.forgotPasswordAction != null) ...{
             Divider(),
             Text('Forgot password:'),
             Text(
-                '"${data.forgotPasswordAction.getLabel('en')}": ${data.forgotPasswordAction.action.url}'),
+                '"${data.forgotPasswordAction!.getLabel('en')}": ${data.forgotPasswordAction!.action!.url}'),
           },
           if (data.signatureHtml != null) ...{
             Divider(),
@@ -259,9 +259,9 @@ class _SettingsDeveloperModeScreenState
 }
 
 class _AccountDomain {
-  final Account account;
+  final Account? account;
   final String domain;
-  final Future<AppExtension> future;
+  final Future<AppExtension?> future;
 
   _AccountDomain(this.account, this.domain, this.future);
 }

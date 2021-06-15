@@ -56,23 +56,23 @@ class I18nService {
     'zw': DateTime.sunday, // Zimbabwe
   };
   int firstDayOfWeek = DateTime.monday;
-  Locale _locale;
-  Locale get locale => _locale;
+  Locale? _locale;
+  Locale? get locale => _locale;
 
-  AppLocalizations _localizations;
-  AppLocalizations get localizations => _localizations;
+  AppLocalizations? _localizations;
+  AppLocalizations? get localizations => _localizations;
 
-  intl.DateFormat _dateFormatToday;
-  intl.DateFormat _dateFormatLastWeek;
-  intl.DateFormat _dateFormat;
-  intl.DateFormat _dateFormatDayInLastWeek;
-  intl.DateFormat _dateFormatDayBeforeLastWeek;
-  intl.DateFormat _dateFormatMonth;
+  late intl.DateFormat _dateFormatToday;
+  late intl.DateFormat _dateFormatLastWeek;
+  late intl.DateFormat _dateFormat;
+  late intl.DateFormat _dateFormatDayInLastWeek;
+  late intl.DateFormat _dateFormatDayBeforeLastWeek;
+  intl.DateFormat? _dateFormatMonth;
 
   void init(AppLocalizations localizations, Locale locale) {
     _localizations = localizations;
     _locale = locale;
-    final countryCode = locale?.countryCode?.toLowerCase();
+    final countryCode = locale.countryCode?.toLowerCase();
     if (countryCode == null) {
       firstDayOfWeek = DateTime.monday;
     } else {
@@ -88,9 +88,9 @@ class I18nService {
     _dateFormatMonth = intl.DateFormat.MMMM(localeText);
   }
 
-  String formatDate(DateTime dateTime) {
+  String formatDate(DateTime? dateTime) {
     if (dateTime == null) {
-      return _localizations.dateUndefined;
+      return _localizations!.dateUndefined;
     }
     //TODO use DateService
     final messageDate = dateTime;
@@ -121,11 +121,11 @@ class I18nService {
         seconds: nw.second,
         milliseconds: nw.millisecond));
     if (messageDate.isAfter(today)) {
-      return localizations.dateDayToday;
+      return localizations!.dateDayToday;
     } else if (messageDate.isAfter(today.subtract(Duration(days: 1)))) {
-      return localizations.dateDayYesterday;
+      return localizations!.dateDayYesterday;
     } else if (messageDate.isAfter(today.subtract(Duration(days: 7)))) {
-      return localizations
+      return localizations!
           .dateDayLastWeekday(_dateFormatDayInLastWeek.format(messageDate));
     } else {
       return _dateFormatDayBeforeLastWeek.format(messageDate);
@@ -135,31 +135,27 @@ class I18nService {
   String formatDateRange(DateSectionRange range, DateTime dateTime) {
     switch (range) {
       case DateSectionRange.future:
-        return _localizations.dateRangeFuture;
+        return _localizations!.dateRangeFuture;
       case DateSectionRange.tomorrow:
-        return _localizations.dateRangeTomorrow;
+        return _localizations!.dateRangeTomorrow;
       case DateSectionRange.today:
-        return _localizations.dateRangeToday;
+        return _localizations!.dateRangeToday;
       case DateSectionRange.yesterday:
-        return _localizations.dateRangeYesterday;
+        return _localizations!.dateRangeYesterday;
       case DateSectionRange.thisWeek:
-        return _localizations.dateRangeCurrentWeek;
+        return _localizations!.dateRangeCurrentWeek;
       case DateSectionRange.lastWeek:
-        return _localizations.dateRangeLastWeek;
+        return _localizations!.dateRangeLastWeek;
       case DateSectionRange.thisMonth:
-        return _localizations.dateRangeCurrentMonth;
+        return _localizations!.dateRangeCurrentMonth;
       case DateSectionRange.monthOfThisYear:
-        return _localizations.dateRangeCurrentYear;
+        return _localizations!.dateRangeCurrentYear;
       case DateSectionRange.monthAndYear:
-        return _localizations.dateRangeLongAgo;
+        return _localizations!.dateRangeLongAgo;
     }
-    return '<uncategorized>';
   }
 
   String formatTimeOfDay(TimeOfDay timeOfDay, BuildContext context) {
-    if (timeOfDay == null) {
-      return _localizations.dateUndefined;
-    }
     return timeOfDay.format(context);
   }
 }

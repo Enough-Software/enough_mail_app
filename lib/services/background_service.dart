@@ -54,7 +54,7 @@ class BackgroundService {
 
   Future saveStateOnPause() async {
     final mailClients = locator<MailService>().getMailClients();
-    final futures = <Future<int>>[];
+    final List<Future<int?>> futures = <Future<int>>[];
     for (final client in mailClients) {
       futures.add(getNextUidFor(client));
     }
@@ -70,13 +70,13 @@ class BackgroundService {
       if (mailClient.selectedMailbox == null) {
         await mailClient.connect();
         await mailClient.selectInbox();
-      } else if (!mailClient.selectedMailbox.isInbox) {
+      } else if (!mailClient.selectedMailbox!.isInbox) {
         // do not interfere with other operations
         mailClient = MailClient(mailClient.account);
         await mailClient.connect();
         await mailClient.selectInbox();
       }
-      return mailClient.selectedMailbox.uidNext;
+      return mailClient.selectedMailbox!.uidNext ?? 0;
     } catch (e, s) {
       print(
           'Error while getting Inbox.nextUids for ${mailClient.account.email}: $e $s');
@@ -101,7 +101,7 @@ class BackgroundService {
     final activeMailNotifications =
         await notificationService.getActiveMailNotifications();
     // print('background: got activeMailNotifications=$activeMailNotifications');
-    final futures = <Future<int>>[];
+    final List<Future<int?>> futures = <Future<int>>[];
     for (var index = 0;
         index < math.min(prevUids.length, accounts.length);
         index++) {
@@ -124,7 +124,7 @@ class BackgroundService {
     }
   }
 
-  static Future<int> loadNewMessage(
+  static Future<int?> loadNewMessage(
       MailAccount account,
       int previousUidNext,
       NotificationService notificationService,
@@ -139,7 +139,8 @@ class BackgroundService {
       // check outdated notifications that should be removed because the message is deleted or read elsewhere:
       if (activeNotifications.isNotEmpty) {
         final uids = activeNotifications.map((n) => n.uid).toList();
-        final sequence = MessageSequence.fromIds(uids, isUid: true);
+        final sequence =
+            MessageSequence.fromIds(uids as List<int>, isUid: true);
         final mimeMessages = await mailClient.fetchMessageSequence(sequence,
             fetchPreference: FetchPreference.envelope);
         for (final mimeMessage in mimeMessages) {
@@ -175,7 +176,7 @@ class BackgroundService {
 }
 
 class _SharedPrefsHelper {
-  static String renderIntList(final List<int> ids) {
+  static String renderIntList(final List<int?> ids) {
     final buffer = StringBuffer();
     bool addComma = false;
     for (final id in ids) {

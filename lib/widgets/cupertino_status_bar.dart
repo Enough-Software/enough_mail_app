@@ -10,16 +10,16 @@ import '../locator.dart';
 /// Contains compose action and can display snackbar notifications on ios.
 class CupertinoStatusBar extends StatefulWidget {
   static const _statusTextStyle = const TextStyle(fontSize: 10.0);
-  final Widget leftAction;
-  final Widget rightAction;
-  final Widget info;
+  final Widget? leftAction;
+  final Widget? rightAction;
+  final Widget? info;
   CupertinoStatusBar({this.leftAction, this.info, this.rightAction})
       : super(key: locator<ScaffoldMessengerService>().statusBarKey);
 
   @override
   CupertinoStatusBarState createState() => CupertinoStatusBarState();
 
-  static Widget createInfo(String text) {
+  static Widget? createInfo(String? text) {
     return (text == null)
         ? null
         : Text(
@@ -30,9 +30,9 @@ class CupertinoStatusBar extends StatefulWidget {
 }
 
 class CupertinoStatusBarState extends State<CupertinoStatusBar> {
-  Widget _status;
-  Widget _statusAction;
-  double _statusOpacity;
+  Widget? _status;
+  Widget? _statusAction;
+  late double _statusOpacity;
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +100,7 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
     );
   }
 
-  void showTextStatus(String text, {Function() undo}) async {
+  void showTextStatus(String text, {Function()? undo}) async {
     final notification = Text(
       text,
       style: CupertinoStatusBar._statusTextStyle,
@@ -112,7 +112,7 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
           padding: EdgeInsets.all(8.0),
           minSize: 20.0,
           child: Text(
-            locator<I18nService>().localizations.actionUndo,
+            locator<I18nService>().localizations!.actionUndo,
             style: CupertinoStatusBar._statusTextStyle,
           ),
           onPressed: () {

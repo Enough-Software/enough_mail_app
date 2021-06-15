@@ -12,23 +12,15 @@ import 'package:flutter/services.dart';
 
 import '../locator.dart';
 
-class MailAddressChip extends StatefulWidget {
+class MailAddressChip extends StatelessWidget {
   final MailAddress mailAddress;
-  MailAddressChip({Key key, @required this.mailAddress}) : super(key: key);
+  const MailAddressChip({Key? key, required this.mailAddress})
+      : super(key: key);
 
-  @override
-  _MailAddressChipState createState() => _MailAddressChipState();
-}
-
-enum _AddressAction { none, copy, compose, search }
-
-class _MailAddressChipState extends State<MailAddressChip> {
-  // bool isShowingPersonalName = true;
-
-  String getText() {
-    return (widget.mailAddress.personalName?.isNotEmpty ?? false)
-        ? widget.mailAddress.personalName
-        : widget.mailAddress.email;
+  String? getText() {
+    return (mailAddress.personalName?.isNotEmpty ?? false)
+        ? mailAddress.personalName
+        : mailAddress.email;
   }
 
   @override
@@ -36,17 +28,16 @@ class _MailAddressChipState extends State<MailAddressChip> {
     final localizations = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return PlatformPopupMenuButton<_AddressAction>(
-      child: PlatformChip(label: Text(getText())),
-      title: widget.mailAddress.hasPersonalName
-          ? Text(widget.mailAddress.personalName)
-          : null,
-      message: Text(widget.mailAddress.email, style: theme.textTheme.caption),
+      child: PlatformChip(label: Text(getText()!)),
+      title:
+          mailAddress.hasPersonalName ? Text(mailAddress.personalName!) : null,
+      message: Text(mailAddress.email, style: theme.textTheme.caption),
       itemBuilder: (context) => [
         PlatformPopupMenuItem(
           value: _AddressAction.copy,
           child: PlatformListTile(
             leading: Icon(Icons.copy),
-            title: Text(localizations.actionAddressCopy),
+            title: Text(localizations!.actionAddressCopy),
           ),
         ),
         PlatformPopupMenuItem(
@@ -69,12 +60,12 @@ class _MailAddressChipState extends State<MailAddressChip> {
           case _AddressAction.none:
             break;
           case _AddressAction.copy:
-            Clipboard.setData(ClipboardData(text: widget.mailAddress.email));
+            Clipboard.setData(ClipboardData(text: mailAddress.email));
             locator<ScaffoldMessengerService>()
-                .showTextSnackBar(localizations.feedbackResultInfoCopied);
+                .showTextSnackBar(localizations!.feedbackResultInfoCopied);
             break;
           case _AddressAction.compose:
-            final messageBuilder = MessageBuilder()..to = [widget.mailAddress];
+            final messageBuilder = MessageBuilder()..to = [mailAddress];
             final composeData =
                 ComposeData(null, messageBuilder, ComposeAction.newMessage);
             locator<NavigationService>()
@@ -82,7 +73,7 @@ class _MailAddressChipState extends State<MailAddressChip> {
             break;
           case _AddressAction.search:
             final search =
-                MailSearch(widget.mailAddress.email, SearchQueryType.fromOrTo);
+                MailSearch(mailAddress.email, SearchQueryType.fromOrTo);
             final source = await locator<MailService>().search(search);
             locator<NavigationService>()
                 .push(Routes.messageSource, arguments: source);
@@ -92,3 +83,5 @@ class _MailAddressChipState extends State<MailAddressChip> {
     );
   }
 }
+
+enum _AddressAction { none, copy, compose, search }

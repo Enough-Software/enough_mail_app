@@ -13,62 +13,63 @@ import 'dart:math' as math;
 enum DragAction { noted, later, delete, reply }
 
 class MessageStack extends StatefulWidget {
-  final MessageSource messageSource;
-  MessageStack({Key key, @required this.messageSource}) : super(key: key);
+  final MessageSource? messageSource;
+  MessageStack({Key? key, required this.messageSource}) : super(key: key);
 
   @override
   _MessageStackState createState() => _MessageStackState();
 }
 
 class _MessageStackState extends State<MessageStack> {
-  static final random = Random();
-  int currentMessageIndex = 0;
-  Message currentMessage;
-  double currentAngle;
-  List<Message> nextMessages = [];
-  List<double> nextAngles = [];
+  static final _random = Random();
+  int _currentMessageIndex = 0;
+  Message? _currentMessage;
+  double? _currentAngle;
+  List<Message?> _nextMessages = [];
+  List<double> _nextAngles = [];
 
   double createAngle() {
-    return (random.nextInt(200) - 100.0) / 4000;
+    return (_random.nextInt(200) - 100.0) / 4000;
   }
 
   @override
   void initState() {
-    currentMessage = widget.messageSource.getMessageAt(0);
-    currentAngle = createAngle();
-    for (var i = 1; i < math.min(3, widget.messageSource.size); i++) {
-      nextMessages.add(widget.messageSource.getMessageAt(i));
-      nextAngles.add(createAngle());
+    _currentMessage = widget.messageSource!.getMessageAt(0);
+    _currentAngle = createAngle();
+    for (var i = 1; i < math.min(3, widget.messageSource!.size); i++) {
+      _nextMessages.add(widget.messageSource!.getMessageAt(i));
+      _nextAngles.add(createAngle());
     }
     super.initState();
   }
 
   void moveToNextMessage() {
     setState(() {
-      currentMessageIndex++;
-      if (nextMessages.isEmpty) {
-        currentMessage = null;
+      _currentMessageIndex++;
+      if (_nextMessages.isEmpty) {
+        _currentMessage = null;
       } else {
-        currentMessage = nextMessages.first;
-        currentAngle = nextAngles.first;
-        nextMessages.removeAt(0);
-        nextAngles.removeAt(0);
-        if (widget.messageSource.size > currentMessageIndex + 3) {
-          nextMessages
-              .add(widget.messageSource.getMessageAt(currentMessageIndex + 3));
-          nextAngles.add(createAngle());
+        _currentMessage = _nextMessages.first;
+        _currentAngle = _nextAngles.first;
+        _nextMessages.removeAt(0);
+        _nextAngles.removeAt(0);
+        if (widget.messageSource!.size > _currentMessageIndex + 3) {
+          _nextMessages.add(
+              widget.messageSource!.getMessageAt(_currentMessageIndex + 3));
+          _nextAngles.add(createAngle());
         }
       }
     });
   }
 
   void moveToPreviousMessage() {
-    if (currentMessage != null && currentMessageIndex > 0) {
+    if (_currentMessage != null && _currentMessageIndex > 0) {
       setState(() {
-        nextMessages.insert(0, currentMessage);
-        nextAngles.insert(0, createAngle());
-        currentMessageIndex--;
-        currentMessage = widget.messageSource.getMessageAt(currentMessageIndex);
+        _nextMessages.insert(0, _currentMessage);
+        _nextAngles.insert(0, createAngle());
+        _currentMessageIndex--;
+        _currentMessage =
+            widget.messageSource!.getMessageAt(_currentMessageIndex);
       });
     }
   }
@@ -76,7 +77,7 @@ class _MessageStackState extends State<MessageStack> {
   @override
   Widget build(BuildContext context) {
     final quickReplies = ['OK', 'Thank you!', '👍', '😊'];
-    final dateTime = currentMessage.mimeMessage.decodeDate();
+    final dateTime = _currentMessage!.mimeMessage!.decodeDate();
     final dayName =
         dateTime == null ? '' : locator<I18nService>().formatDay(dateTime);
     return Stack(
@@ -84,12 +85,12 @@ class _MessageStackState extends State<MessageStack> {
       fit: StackFit.expand,
       children: [
         // center: stack of messages
-        for (var i = nextMessages.length; --i >= 0;) ...{
+        for (var i = _nextMessages.length; --i >= 0;) ...{
           Padding(
             padding: EdgeInsets.all(30),
             child: MessageCard(
-              message: nextMessages[i],
-              angle: nextAngles[i],
+              message: _nextMessages[i],
+              angle: _nextAngles[i],
             ),
           ),
         },
@@ -157,17 +158,17 @@ class _MessageStackState extends State<MessageStack> {
             child: PlatformIconButton(
               icon: Icon(Icons.arrow_back),
               onPressed:
-                  currentMessageIndex == 0 ? null : moveToPreviousMessage,
+                  _currentMessageIndex == 0 ? null : moveToPreviousMessage,
             ),
           ),
         ),
         // center: first / current message
-        if (currentMessage != null) ...{
+        if (_currentMessage != null) ...{
           Padding(
             padding: EdgeInsets.all(30),
             child: MessageDraggable(
-              message: currentMessage,
-              angle: currentAngle,
+              message: _currentMessage,
+              angle: _currentAngle,
             ),
           ),
         } else ...{
@@ -181,16 +182,16 @@ class _MessageStackState extends State<MessageStack> {
   }
 
   Future<void> acceptDragOperation(Message message, DragAction action,
-      {Object data}) async {
+      {Object? data}) async {
     moveToNextMessage();
     //print('drag operation: $action');
-    String snack;
-    Future<void> Function() undo;
+    String? snack;
+    late Future<void> Function() undo;
     switch (action) {
       case DragAction.noted:
         if (!message.isSeen) {
           await message.mailClient
-              .flagMessage(message.mimeMessage, isSeen: true);
+              .flagMessage(message.mimeMessage!, isSeen: true);
           snack = 'mark as read';
         }
         break;
@@ -200,9 +201,9 @@ class _MessageStackState extends State<MessageStack> {
       case DragAction.delete:
         //TODO remove from message source
         await message.mailClient
-            .flagMessage(message.mimeMessage, isDeleted: true);
+            .flagMessage(message.mimeMessage!, isDeleted: true);
         snack = 'deleted';
-        undo = () => message.mailClient.flagMessage(message.mimeMessage,
+        undo = () => message.mailClient.flagMessage(message.mimeMessage!,
             isDeleted: false); //TODO add re-integration into message source
         break;
       case DragAction.reply:
@@ -217,8 +218,8 @@ class _MessageStackState extends State<MessageStack> {
         undo: () async {
           // bring back message:
           setState(() {
-            currentMessage = message;
-            currentMessageIndex = message.sourceIndex;
+            _currentMessage = message;
+            _currentMessageIndex = message.sourceIndex;
           });
           await undo();
         },
@@ -229,14 +230,14 @@ class _MessageStackState extends State<MessageStack> {
 
 class MessageDragTarget extends StatefulWidget {
   final DragAction action;
-  final Object data;
-  final Function(Message message, DragAction action, {Object data}) onComplete;
-  final double width;
-  final double height;
+  final Object? data;
+  final Function(Message message, DragAction action, {Object? data}) onComplete;
+  final double? width;
+  final double? height;
   MessageDragTarget(
-      {Key key,
-      @required this.action,
-      @required this.onComplete,
+      {Key? key,
+      required this.action,
+      required this.onComplete,
       this.data,
       this.width,
       this.height})
@@ -247,14 +248,14 @@ class MessageDragTarget extends StatefulWidget {
 }
 
 class _MessageDragTargetState extends State<MessageDragTarget> {
-  double width;
-  double height;
-  Color color;
-  String text;
+  double? width;
+  double? height;
+  Color? color;
+  late String text;
 
-  double _originalWidth;
-  double _originalHeight;
-  Color _originalColor;
+  double? _originalWidth;
+  double? _originalHeight;
+  Color? _originalColor;
 
   @override
   void initState() {
@@ -287,8 +288,8 @@ class _MessageDragTargetState extends State<MessageDragTarget> {
   void startAccepting() {
     if (width == _originalWidth) {
       setState(() {
-        width = _originalWidth * 1.2;
-        height = _originalHeight * 1.2;
+        width = _originalWidth! * 1.2;
+        height = _originalHeight! * 1.2;
         color = Color.lerp(_originalColor, Colors.black, 0.3);
       });
     }
@@ -311,7 +312,7 @@ class _MessageDragTargetState extends State<MessageDragTarget> {
           child: AnimatedContainer(
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.circular(width / 5),
+              borderRadius: BorderRadius.circular(width! / 5),
             ),
             width: width,
             height: height,
@@ -336,10 +337,11 @@ class _MessageDragTargetState extends State<MessageDragTarget> {
 }
 
 class MessageDraggable extends StatefulWidget {
-  final Message message;
-  final double angle;
+  final Message? message;
+  final double? angle;
 
-  const MessageDraggable({Key key, this.message, this.angle}) : super(key: key);
+  const MessageDraggable({Key? key, this.message, this.angle})
+      : super(key: key);
 
   @override
   _MessageDraggableState createState() => _MessageDraggableState();
@@ -347,8 +349,8 @@ class MessageDraggable extends StatefulWidget {
 
 class _MessageDraggableState extends State<MessageDraggable>
     with TickerProviderStateMixin {
-  AnimationController animationController;
-  Animation scaleAnimation;
+  late AnimationController animationController;
+  late Animation scaleAnimation;
 
   @override
   void initState() {
@@ -375,9 +377,9 @@ class _MessageDraggableState extends State<MessageDraggable>
           feedback: ConstrainedBox(
               constraints: constraints,
               child: ScaleTransition(
-                scale: scaleAnimation,
+                scale: scaleAnimation as Animation<double>,
                 child: FadeTransition(
-                  opacity: scaleAnimation,
+                  opacity: scaleAnimation as Animation<double>,
                   child:
                       MessageCard(message: widget.message, angle: widget.angle),
                 ),
@@ -397,9 +399,9 @@ class _MessageDraggableState extends State<MessageDraggable>
 }
 
 class MessageCard extends StatefulWidget {
-  final Message message;
-  final double angle;
-  const MessageCard({Key key, @required this.message, this.angle})
+  final Message? message;
+  final double? angle;
+  const MessageCard({Key? key, required this.message, this.angle})
       : super(key: key);
 
   @override
@@ -409,13 +411,13 @@ class MessageCard extends StatefulWidget {
 class _MessageCardState extends State<MessageCard> {
   @override
   void initState() {
-    widget.message.addListener(_update);
+    widget.message!.addListener(_update);
     super.initState();
   }
 
   @override
   void dispose() {
-    widget.message.removeListener(_update);
+    widget.message!.removeListener(_update);
     super.dispose();
   }
 
@@ -426,13 +428,13 @@ class _MessageCardState extends State<MessageCard> {
   @override
   Widget build(BuildContext context) {
     return Transform.rotate(
-      angle: widget.angle,
+      angle: widget.angle!,
       child: Card(
         elevation: 18,
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: widget.message.mimeMessage.isEmpty
+            child: widget.message!.mimeMessage!.isEmpty
                 ? Text('...')
                 : buildMessageContents(),
           ),
@@ -442,17 +444,17 @@ class _MessageCardState extends State<MessageCard> {
   }
 
   Widget buildMessageContents() {
-    final mime = widget.message.mimeMessage;
+    final mime = widget.message!.mimeMessage!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(mime.decodeSubject()),
+        Text(mime.decodeSubject()!),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text('From '),
-            for (final address in mime.from) ...{
+            for (final address in mime.from!) ...{
               MailAddressChip(mailAddress: address),
             },
           ],
@@ -461,7 +463,7 @@ class _MessageCardState extends State<MessageCard> {
           Wrap(
             children: [
               Text('To '),
-              for (final address in mime.to) ...{
+              for (final address in mime.to!) ...{
                 MailAddressChip(mailAddress: address),
               },
             ],
@@ -471,7 +473,7 @@ class _MessageCardState extends State<MessageCard> {
           Wrap(
             children: [
               Text('CC '),
-              for (final address in mime.cc) ...{
+              for (final address in mime.cc!) ...{
                 MailAddressChip(mailAddress: address),
               },
             ],
@@ -485,9 +487,9 @@ class _MessageCardState extends State<MessageCard> {
   Widget buildContent() {
     //TODO do not download or display the content
     // when the widget is not exposed, unless the content is there already
-    if (!widget.message.mimeMessage.isDownloaded) {
+    if (!widget.message!.mimeMessage!.isDownloaded) {
       return FutureBuilder(
-          future: downloadMessageContents(widget.message),
+          future: downloadMessageContents(widget.message!),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
@@ -510,7 +512,7 @@ class _MessageCardState extends State<MessageCard> {
   Future<Message> downloadMessageContents(Message message) async {
     try {
       final mime =
-          await message.mailClient.fetchMessageContents(message.mimeMessage);
+          await message.mailClient.fetchMessageContents(message.mimeMessage!);
       message.updateMime(mime);
       if (mime.isNewsletter || mime.hasAttachments()) {
         setState(() {});
@@ -547,12 +549,12 @@ class _MessageCardState extends State<MessageCard> {
     //     onLinkTap: (url) => urlLauncher.launch(url),
     //   );
     // }
-    var text = widget.message.mimeMessage.decodeTextPlainPart();
+    var text = widget.message?.mimeMessage?.decodeTextPlainPart();
     if (text != null) {
       return SelectableText(text);
     }
     //TODO add other content, attachments, etc
     return Text(
-        'Unsupported content: ${widget.message.mimeMessage.mediaType?.text}');
+        'Unsupported content: ${widget.message?.mimeMessage?.mediaType.text}');
   }
 }

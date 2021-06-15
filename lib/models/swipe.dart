@@ -17,17 +17,16 @@ extension SwipeExtension on SwipeAction {
   Color get colorBackground {
     switch (this) {
       case SwipeAction.markRead:
-        return Colors.blue[200];
+        return Colors.blue[200]!;
       case SwipeAction.archive:
-        return Colors.amber[200];
+        return Colors.amber[200]!;
       case SwipeAction.markJunk:
-        return Colors.red[200];
+        return Colors.red[200]!;
       case SwipeAction.delete:
-        return Colors.red[600];
+        return Colors.red[600]!;
       case SwipeAction.flag:
-        return Colors.lime[600];
+        return Colors.lime[600]!;
     }
-    return Colors.grey[400];
   }
 
   Color get colorForeground {
@@ -43,23 +42,21 @@ extension SwipeExtension on SwipeAction {
       case SwipeAction.flag:
         return Colors.black;
     }
-    return Colors.black;
   }
 
   Color get colorIcon {
     switch (this) {
       case SwipeAction.markRead:
-        return Colors.blue[900];
+        return Colors.blue[900]!;
       case SwipeAction.archive:
-        return Colors.amber[900];
+        return Colors.amber[900]!;
       case SwipeAction.markJunk:
-        return Colors.red[900];
+        return Colors.red[900]!;
       case SwipeAction.delete:
         return Colors.white;
       case SwipeAction.flag:
-        return Colors.lime[900];
+        return Colors.lime[900]!;
     }
-    return Colors.grey[900];
   }
 
   Brightness get brightness {
@@ -75,7 +72,6 @@ extension SwipeExtension on SwipeAction {
       case SwipeAction.flag:
         return Brightness.light;
     }
-    return Brightness.light;
   }
 
   IconData get icon {
@@ -92,7 +88,6 @@ extension SwipeExtension on SwipeAction {
       case SwipeAction.flag:
         return iconService.messageIsNotFlagged;
     }
-    return Icons.device_unknown;
   }
 
   String name(AppLocalizations localizations) {
@@ -108,7 +103,6 @@ extension SwipeExtension on SwipeAction {
       case SwipeAction.flag:
         return localizations.swipeActionFlag;
     }
-    return 'unknown';
   }
 
   double get dismissThreshold {
@@ -124,7 +118,6 @@ extension SwipeExtension on SwipeAction {
       case SwipeAction.flag:
         return 0.3;
     }
-    return 0.6;
   }
 
   bool get isMessageMoving {
@@ -140,6 +133,5 @@ extension SwipeExtension on SwipeAction {
       case SwipeAction.flag:
         return false;
     }
-    return true;
   }
 }

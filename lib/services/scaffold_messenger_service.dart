@@ -11,23 +11,23 @@ class ScaffoldMessengerService {
   final GlobalKey<CupertinoStatusBarState> statusBarKey =
       GlobalKey<CupertinoStatusBarState>();
 
-  SnackBar _buildTextSnackBar(String text, {Function() undo}) {
+  SnackBar _buildTextSnackBar(String text, {Function()? undo}) {
     return SnackBar(
       content: Text(text),
       action: undo == null
           ? null
           : SnackBarAction(
-              label: locator<I18nService>().localizations.actionUndo,
+              label: locator<I18nService>().localizations!.actionUndo,
               onPressed: undo,
             ),
     );
   }
 
   void _showSnackBar(SnackBar snackBar) {
-    scaffoldMessengerKey.currentState.showSnackBar(snackBar);
+    scaffoldMessengerKey.currentState!.showSnackBar(snackBar);
   }
 
-  void showTextSnackBar(String text, {Function() undo}) {
+  void showTextSnackBar(String text, {Function()? undo}) {
     if (Platform.isIOS) {
       statusBarKey.currentState?.showTextStatus(text, undo: undo);
     } else {

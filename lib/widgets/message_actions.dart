@@ -22,7 +22,7 @@ import 'mailbox_tree.dart';
 
 class MessageActions extends StatefulWidget {
   final Message message;
-  MessageActions({Key key, @required this.message}) : super(key: key);
+  MessageActions({Key? key, required this.message}) : super(key: key);
 
   @override
   _MessageActionsState createState() => _MessageActionsState();
@@ -75,40 +75,40 @@ class _MessageActionsState extends State<MessageActions> {
             if (!widget.message.isEmbedded) ...{
               PlatformIconButton(
                 icon: Icon(iconService.getMessageIsSeen(widget.message.isSeen)),
-                onPressed: toggleSeen,
+                onPressed: _toggleSeen,
               ),
               PlatformIconButton(
                 icon: Icon(
                     iconService.getMessageIsFlagged(widget.message.isFlagged)),
-                onPressed: toggleFlagged,
+                onPressed: _toggleFlagged,
               ),
             },
             Spacer(),
             PlatformIconButton(
-                icon: Icon(iconService.messageActionReply), onPressed: reply),
+                icon: Icon(iconService.messageActionReply), onPressed: _reply),
             PlatformIconButton(
                 icon: Icon(iconService.messageActionReplyAll),
-                onPressed: replyAll),
+                onPressed: _replyAll),
             PlatformIconButton(
                 icon: Icon(iconService.messageActionForward),
-                onPressed: forward),
+                onPressed: _forward),
             if (widget.message.source.isTrash) ...{
               PlatformIconButton(
                   icon: Icon(iconService.messageActionMoveToInbox),
-                  onPressed: moveToInbox),
+                  onPressed: _moveToInbox),
             } else if (!widget.message.isEmbedded) ...{
               PlatformIconButton(
                   icon: Icon(iconService.messageActionDelete),
-                  onPressed: delete),
+                  onPressed: _delete),
             },
             PlatformPopupMenuButton<_OverflowMenuChoice>(
-              onSelected: onOverflowChoiceSelected,
+              onSelected: _onOverflowChoiceSelected,
               itemBuilder: (context) => [
                 PlatformPopupMenuItem(
                   value: _OverflowMenuChoice.reply,
                   child: IconText(
                     icon: Icon(iconService.messageActionReply),
-                    label: Text(localizations.messageActionReply),
+                    label: Text(localizations!.messageActionReply),
                   ),
                 ),
                 PlatformPopupMenuItem(
@@ -239,90 +239,90 @@ class _MessageActionsState extends State<MessageActions> {
     );
   }
 
-  void onOverflowChoiceSelected(_OverflowMenuChoice result) {
+  void _onOverflowChoiceSelected(_OverflowMenuChoice result) {
     switch (result) {
       case _OverflowMenuChoice.reply:
-        reply();
+        _reply();
         break;
       case _OverflowMenuChoice.replyAll:
-        replyAll();
+        _replyAll();
         break;
       case _OverflowMenuChoice.forward:
-        forward();
+        _forward();
         break;
       case _OverflowMenuChoice.forwardAsAttachment:
-        forwardAsAttachment();
+        _forwardAsAttachment();
         break;
       case _OverflowMenuChoice.forwardAttachments:
-        forwardAttachments();
+        _forwardAttachments();
         break;
       case _OverflowMenuChoice.delete:
-        delete();
+        _delete();
         break;
       case _OverflowMenuChoice.inbox:
-        moveToInbox();
+        _moveToInbox();
         break;
       case _OverflowMenuChoice.seen:
-        toggleSeen();
+        _toggleSeen();
         break;
       case _OverflowMenuChoice.flag:
-        toggleFlagged();
+        _toggleFlagged();
         break;
       case _OverflowMenuChoice.move:
-        move();
+        _move();
         break;
       case _OverflowMenuChoice.junk:
-        moveJunk();
+        _moveJunk();
         break;
       case _OverflowMenuChoice.archive:
-        moveArchive();
+        _moveArchive();
         break;
       case _OverflowMenuChoice.redirect:
-        redirectMessage();
+        _redirectMessage();
         break;
     }
   }
 
-  void next() {
-    navigateToMessage(widget.message.next);
+  void _next() {
+    _navigateToMessage(widget.message.next);
   }
 
-  void previous() {
-    navigateToMessage(widget.message.previous);
+  void _previous() {
+    _navigateToMessage(widget.message.previous);
   }
 
-  void navigateToMessage(Message message) {
+  void _navigateToMessage(Message? message) {
     if (message != null) {
       locator<NavigationService>()
           .push(Routes.mailDetails, arguments: message, replace: true);
     }
   }
 
-  void replyAll() {
-    reply(all: true);
+  void _replyAll() {
+    _reply(all: true);
   }
 
-  void reply({all = false}) {
+  void _reply({all = false}) {
     final account = widget.message.mailClient.account;
 
     final builder = MessageBuilder.prepareReplyToMessage(
-        widget.message.mimeMessage, account.fromAddress,
+        widget.message.mimeMessage!, account.fromAddress,
         aliases: account.aliases,
         quoteOriginalText: false,
-        handlePlusAliases: account.supportsPlusAliases ?? false,
+        handlePlusAliases: account.supportsPlusAliases,
         replyAll: all);
-    navigateToCompose(widget.message, builder, ComposeAction.answer);
+    _navigateToCompose(widget.message, builder, ComposeAction.answer);
   }
 
-  void redirectMessage() async {
+  void _redirectMessage() async {
     final mailClient = widget.message.mailClient;
-    final account = locator<MailService>().getAccountFor(mailClient.account);
+    final account = locator<MailService>().getAccountFor(mailClient.account)!;
     if (account.contactManager == null) {
       await locator<ContactService>().getForAccount(account);
     }
 
     final List<MailAddress> recipients = [];
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final size = MediaQuery.of(context).size;
     final textEditingController = TextEditingController();
     final redirect = await DialogHelper.showWidgetDialog(
@@ -369,7 +369,7 @@ class _MessageActionsState extends State<MessageActions> {
         await DialogHelper.showTextDialog(context, localizations.errorTitle,
             localizations.redirectEmailInputRequired);
       } else {
-        final mime = widget.message.mimeMessage;
+        final mime = widget.message.mimeMessage!;
         if (mime.mimeData == null) {
           // download complete message first
           await mailClient.fetchMessageContents(mime);
@@ -379,31 +379,31 @@ class _MessageActionsState extends State<MessageActions> {
               recipients: recipients, appendToSent: false);
           locator<ScaffoldMessengerService>()
               .showTextSnackBar(localizations.resultRedirectedSuccess);
-        } catch (e, s) {
+        } on MailException catch (e, s) {
           print('message could not get redirected: $e $s');
           await DialogHelper.showTextDialog(context, localizations.errorTitle,
-              localizations.resultRedirectedFailure(e.message));
+              localizations.resultRedirectedFailure(e.message ?? '<unknown>'));
         }
       }
     }
   }
 
-  void delete() async {
+  void _delete() async {
     locator<NavigationService>().pop();
     await widget.message.source.deleteMessage(widget.message);
     locator<NotificationService>()
         .cancelNotificationForMailMessage(widget.message);
   }
 
-  void move() {
-    final localizations = locator<I18nService>().localizations;
+  void _move() {
+    final localizations = locator<I18nService>().localizations!;
     DialogHelper.showWidgetDialog(
       context,
       localizations.moveTitle,
       SingleChildScrollView(
         child: MailboxTree(
           account: widget.message.account,
-          onSelected: moveTo,
+          onSelected: _moveTo,
           current: widget.message.mailClient.selectedMailbox,
         ),
       ),
@@ -411,17 +411,17 @@ class _MessageActionsState extends State<MessageActions> {
     );
   }
 
-  void moveTo(Mailbox mailbox) async {
+  void _moveTo(Mailbox mailbox) async {
     locator<NavigationService>().pop(); // alert
     locator<NavigationService>().pop(); // detail view
-    final localizations = locator<I18nService>().localizations;
+    final localizations = locator<I18nService>().localizations!;
     final message = widget.message;
     final source = message.source;
     await source.moveMessage(
         message, mailbox, localizations.moveSuccess(mailbox.name));
   }
 
-  void moveJunk() async {
+  void _moveJunk() async {
     final source = widget.message.source;
     if (source.isJunk) {
       await source.markAsNotJunk(widget.message);
@@ -433,14 +433,14 @@ class _MessageActionsState extends State<MessageActions> {
     locator<NavigationService>().pop();
   }
 
-  void moveToInbox() async {
+  void _moveToInbox() async {
     final source = widget.message.source;
     source.moveMessageToFlag(widget.message, MailboxFlag.inbox,
-        locator<I18nService>().localizations.resultMovedToInbox);
+        locator<I18nService>().localizations!.resultMovedToInbox);
     locator<NavigationService>().pop();
   }
 
-  void moveArchive() async {
+  void _moveArchive() async {
     final source = widget.message.source;
     if (source.isArchive) {
       await source.moveToInbox(widget.message);
@@ -452,29 +452,30 @@ class _MessageActionsState extends State<MessageActions> {
     locator<NavigationService>().pop();
   }
 
-  void forward() {
+  void _forward() {
     final from = widget.message.mailClient.account.fromAddress;
     final builder = MessageBuilder.prepareForwardMessage(
-      widget.message.mimeMessage,
+      widget.message.mimeMessage!,
       from: from,
       quoteMessage: false,
       forwardAttachments: false,
     );
-    final composeFuture = addAttachments(widget.message, builder);
-    navigateToCompose(
+    final composeFuture = _addAttachments(widget.message, builder);
+    _navigateToCompose(
         widget.message, builder, ComposeAction.forward, composeFuture);
   }
 
-  void forwardAsAttachment() async {
+  void _forwardAsAttachment() async {
     final message = widget.message;
     final mailClient = message.mailClient;
     final from = mailClient.account.fromAddress;
-    var mime = message.mimeMessage;
+    var mime = message.mimeMessage!;
     final builder = MessageBuilder();
     builder.from = [from];
 
-    builder.subject = MessageBuilder.createForwardSubject(mime.decodeSubject());
-    Future composeFuture;
+    builder.subject =
+        MessageBuilder.createForwardSubject(mime.decodeSubject()!);
+    Future? composeFuture;
     if (mime.mimeData == null) {
       composeFuture = mailClient.fetchMessageContents(mime).then((value) {
         message.updateMime(value);
@@ -483,27 +484,28 @@ class _MessageActionsState extends State<MessageActions> {
     } else {
       builder.addMessagePart(mime);
     }
-    navigateToCompose(
+    _navigateToCompose(
         widget.message, builder, ComposeAction.forward, composeFuture);
   }
 
-  void forwardAttachments() async {
+  void _forwardAttachments() async {
     final message = widget.message;
     final mailClient = message.mailClient;
     final from = mailClient.account.fromAddress;
-    var mime = message.mimeMessage;
+    var mime = message.mimeMessage!;
     final builder = MessageBuilder();
     builder.from = [from];
-    builder.subject = MessageBuilder.createForwardSubject(mime.decodeSubject());
-    final composeFuture = addAttachments(message, builder);
-    navigateToCompose(message, builder, ComposeAction.forward, composeFuture);
+    builder.subject =
+        MessageBuilder.createForwardSubject(mime.decodeSubject()!);
+    final composeFuture = _addAttachments(message, builder);
+    _navigateToCompose(message, builder, ComposeAction.forward, composeFuture);
   }
 
-  Future addAttachments(Message message, MessageBuilder builder) {
+  Future? _addAttachments(Message message, MessageBuilder builder) {
     final attachments = message.attachments;
     final mailClient = message.mailClient;
-    var mime = message.mimeMessage;
-    Future composeFuture;
+    var mime = message.mimeMessage!;
+    Future? composeFuture;
     if (mime.mimeData == null && attachments.length > 1) {
       composeFuture = mailClient.fetchMessageContents(mime).then((value) {
         message.updateMime(value);
@@ -531,21 +533,21 @@ class _MessageActionsState extends State<MessageActions> {
     return composeFuture;
   }
 
-  void toggleFlagged() async {
+  void _toggleFlagged() async {
     final msg = widget.message;
     final flagged = !msg.isFlagged;
     await msg.source.markAsFlagged(msg, flagged);
   }
 
-  void toggleSeen() async {
+  void _toggleSeen() async {
     final msg = widget.message;
     final seen = !msg.isSeen;
     await msg.source.markAsSeen(msg, seen);
   }
 
-  void navigateToCompose(
-      Message message, MessageBuilder builder, ComposeAction action,
-      [Future composeFuture]) {
+  void _navigateToCompose(
+      Message? message, MessageBuilder builder, ComposeAction action,
+      [Future? composeFuture]) {
     final data = ComposeData([message], builder, action, future: composeFuture);
     locator<NavigationService>()
         .push(Routes.mailCompose, arguments: data, replace: true);

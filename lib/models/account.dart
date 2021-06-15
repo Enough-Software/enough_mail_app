@@ -21,7 +21,7 @@ class Account extends ChangeNotifier {
 
   bool get isVirtual => false;
 
-  String get name => account?.name;
+  String get name => account.name!;
 
   bool get excludeFromUnified =>
       account.hasAttribute(attributeExcludeFromUnified);
@@ -41,14 +41,14 @@ class Account extends ChangeNotifier {
     account.attributes[key] = value;
   }
 
-  String get signatureHtml {
+  String? get signatureHtml {
     var signature = account.attributes[attributeSignatureHtml];
     if (signature == null) {
       final extensions = account.appExtensions;
       if (extensions != null) {
-        final languageCode = locator<I18nService>().locale.languageCode;
+        final languageCode = locator<I18nService>().locale!.languageCode;
         for (final extension in extensions) {
-          final signature = extension.getSignatureHtml(languageCode);
+          final signature = extension!.getSignatureHtml(languageCode);
           if (signature != null) {
             return signature;
           }
@@ -58,7 +58,7 @@ class Account extends ChangeNotifier {
     return signature;
   }
 
-  set signatureHtml(String value) {
+  set signatureHtml(String? value) {
     if (value == null) {
       account.attributes.remove(attributeSignatureHtml);
     } else {
@@ -66,8 +66,8 @@ class Account extends ChangeNotifier {
     }
   }
 
-  String get signaturePlain => account.attributes[attributeSignaturePlain];
-  set signaturePlain(String value) {
+  String? get signaturePlain => account.attributes[attributeSignaturePlain];
+  set signaturePlain(String? value) {
     if (value == null) {
       account.attributes.remove(attributeSignaturePlain);
     } else {
@@ -75,43 +75,43 @@ class Account extends ChangeNotifier {
     }
   }
 
-  set name(String value) {
+  set name(String? value) {
     account.name = value;
     notifyListeners();
   }
 
-  String get userName => account?.userName;
-  set userName(String value) {
+  String? get userName => account.userName;
+  set userName(String? value) {
     account.userName = value;
     notifyListeners();
   }
 
-  String get email => account?.email;
+  String get email => account.email!;
   set email(String value) {
     account.email = value;
     notifyListeners();
   }
 
-  MailAddress get fromAddress => account?.fromAddress;
+  MailAddress get fromAddress => account.fromAddress;
 
-  get supportsPlusAliases => account?.supportsPlusAliases;
+  bool get supportsPlusAliases => account.supportsPlusAliases;
   set supportsPlusAliases(bool value) {
     account.supportsPlusAliases = value;
     notifyListeners();
   }
 
-  ContactManager contactManager;
+  ContactManager? contactManager;
 
   Future<void> addAlias(MailAddress alias) {
     account.aliases ??= <MailAddress>[];
-    account.aliases.add(alias);
+    account.aliases!.add(alias);
     notifyListeners();
     return locator<MailService>().saveAccount(account);
   }
 
   Future<void> removeAlias(MailAddress alias) {
     account.aliases ??= <MailAddress>[];
-    account.aliases.remove(alias);
+    account.aliases!.remove(alias);
     notifyListeners();
     return locator<MailService>().saveAccount(account);
   }
@@ -120,26 +120,29 @@ class Account extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<MailAddress> get aliases => account?.aliases ?? <MailAddress>[];
+  List<MailAddress> get aliases => account.aliases ?? <MailAddress>[];
 
-  bool get hasAlias => account?.aliases?.isNotEmpty ?? false;
+  bool get hasAlias => account.aliases?.isNotEmpty ?? false;
   bool get hasNoAlias => !hasAlias;
 
-  String get imageUrlGravator => account?.attributes[attributeGravatarImageUrl];
+  String? get imageUrlGravator => account.attributes[attributeGravatarImageUrl];
 
   bool get addsSentMailAutomatically =>
-      account?.attributes[attributeSentMailAddedAutomatically] ?? false;
+      account.attributes[attributeSentMailAddedAutomatically] ?? false;
 
-  String _key;
+  String? _key;
   String get key {
-    if (_key == null) {
-      _key = email.toLowerCase();
+    var k = _key;
+    if (k == null) {
+      k = email.toLowerCase();
+      _key = k;
     }
-    return _key;
+    return k;
   }
 
-  List<AppExtension> get appExtensions => account.appExtensions;
-  set appExtensions(List<AppExtension> value) => account.appExtensions = value;
+  List<AppExtension?>? get appExtensions => account.appExtensions;
+  set appExtensions(List<AppExtension?>? value) =>
+      account.appExtensions = value;
 
   @override
   operator ==(Object o) => o is Account && o.key == key;
@@ -154,7 +157,9 @@ class UnifiedAccount extends Account {
 
   UnifiedAccount(this.accounts, String name)
       : _name = name,
-        super(null);
+        super(MailAccount()
+          ..name = 'unified'
+          ..email = 'info@enough.de');
 
   @override
   bool get isVirtual => true;

@@ -9,7 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 /// Search input screen, currently used only for Cupertino
 class SearchScreen extends StatefulWidget {
   final MessageSource messageSource;
-  SearchScreen({Key key, @required this.messageSource}) : super(key: key);
+  SearchScreen({Key? key, required this.messageSource}) : super(key: key);
 
   @override
   _SearchScreenState createState() => _SearchScreenState();
@@ -32,7 +32,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(

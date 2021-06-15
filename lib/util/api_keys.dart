@@ -12,12 +12,10 @@ class ApiKeys {
     _isInitialized = true;
     try {
       final text = await rootBundle.loadString('assets/keys.txt');
-      if (text != null) {
-        final lines = text.split('\n');
-        for (final line in lines) {
-          if (line.startsWith('giphy:')) {
-            _giphy = line.substring('giphy:'.length).trim();
-          }
+      final lines = text.split('\n');
+      for (final line in lines) {
+        if (line.startsWith('giphy:')) {
+          _giphy = line.substring('giphy:'.length).trim();
         }
       }
     } catch (e) {
@@ -26,6 +24,6 @@ class ApiKeys {
     }
   }
 
-  static String _giphy;
-  static String get giphy => _giphy;
+  static String? _giphy;
+  static String? get giphy => _giphy;
 }

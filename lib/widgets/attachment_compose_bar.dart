@@ -18,15 +18,15 @@ import '../locator.dart';
 
 class AttachmentMediaProviderFactory {
   static MediaProvider fromAttachmentInfo(AttachmentInfo info) {
-    return MemoryMediaProvider(info.name, info.mediaType.text, info.data);
+    return MemoryMediaProvider(info.name!, info.mediaType.text, info.data!);
   }
 }
 
 class AttachmentComposeBar extends StatefulWidget {
-  final ComposeData composeData;
+  final ComposeData? composeData;
   final bool isDownloading;
   AttachmentComposeBar(
-      {Key key, @required this.composeData, this.isDownloading = false})
+      {Key? key, required this.composeData, this.isDownloading = false})
       : super(key: key);
 
   @override
@@ -34,11 +34,11 @@ class AttachmentComposeBar extends StatefulWidget {
 }
 
 class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
-  List<AttachmentInfo> _attachments;
+  late List<AttachmentInfo> _attachments;
 
   @override
   void initState() {
-    _attachments = widget.composeData.messageBuilder.attachments;
+    _attachments = widget.composeData!.messageBuilder.attachments;
     super.initState();
   }
 
@@ -57,7 +57,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
           PlatformProgressIndicator(),
         },
         AddAttachmentPopupButton(
-          messageBuilder: widget.composeData.messageBuilder,
+          messageBuilder: widget.composeData!.messageBuilder,
           update: () => setState(() {}),
         ),
         // ActionChip(
@@ -71,7 +71,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
   }
 
   void removeAttachment(AttachmentInfo attachment) {
-    widget.composeData.messageBuilder.removeAttachment(attachment);
+    widget.composeData!.messageBuilder.removeAttachment(attachment);
     setState(() {
       _attachments.remove(attachment);
     });
@@ -82,7 +82,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
   final MessageBuilder messageBuilder;
   final Function() update;
   const AddAttachmentPopupButton(
-      {Key key, @required this.messageBuilder, @required this.update})
+      {Key? key, required this.messageBuilder, required this.update})
       : super(key: key);
 
   @override
@@ -96,7 +96,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
           value: 0,
           child: PlatformListTile(
             leading: Icon(Icons.insert_drive_file_outlined),
-            title: Text(localizations.attachTypeFile),
+            title: Text(localizations!.attachTypeFile),
           ),
         ),
         PlatformPopupMenuItem(
@@ -188,50 +188,50 @@ class AddAttachmentPopupButton extends StatelessWidget {
       return false;
     }
     for (final file in result.files) {
-      final lastDotIndex = file.path.lastIndexOf('.');
+      final lastDotIndex = file.path!.lastIndexOf('.');
       MediaType mediaType;
-      if (lastDotIndex == -1 || lastDotIndex == file.path.length - 1) {
+      if (lastDotIndex == -1 || lastDotIndex == file.path!.length - 1) {
         mediaType = MediaType.fromSubtype(MediaSubtype.applicationOctetStream);
       } else {
-        final ext = file.path.substring(lastDotIndex + 1);
+        final ext = file.path!.substring(lastDotIndex + 1);
         mediaType = MediaType.guessFromFileExtension(ext);
       }
-      messageBuilder.addBinary(file.bytes, mediaType, filename: file.name);
+      messageBuilder.addBinary(file.bytes!, mediaType, filename: file.name);
     }
     return true;
   }
 
   Future<bool> addAttachmentGif(
-      BuildContext context, AppLocalizations localizations,
+      BuildContext context, AppLocalizations? localizations,
       {bool searchSticker = false}) async {
     if (!ApiKeys.isInitialized) {
       await ApiKeys.init();
     }
     if (ApiKeys.giphy == null) {
-      DialogHelper.showTextDialog(context, localizations.errorTitle,
+      DialogHelper.showTextDialog(context, localizations!.errorTitle,
           'No GIPHY API key found. Please check set up instructions.');
       return false;
     }
 
     final gif = await GiphyPicker.pickGif(
         context: context,
-        apiKey: ApiKeys.giphy,
+        apiKey: ApiKeys.giphy!,
         searchText: searchSticker
-            ? localizations.attachTypeStickerSearch
-            : localizations.attachTypeGifSearch,
-        lang: locator<I18nService>().locale.languageCode,
+            ? localizations!.attachTypeStickerSearch
+            : localizations!.attachTypeGifSearch,
+        lang: locator<I18nService>().locale!.languageCode,
         sticker: searchSticker,
         showPreviewPage: false);
     if (gif == null) {
       return false;
     }
-    final result = await HttpHelper.httpGet(gif.images.original.url);
+    final result = await HttpHelper.httpGet(gif.images.original!.url!);
     if (result.data == null) {
       return false;
     }
     messageBuilder.addBinary(
-        result.data, MediaType.fromSubtype(MediaSubtype.imageGif),
-        filename: gif.title + '.gif');
+        result.data!, MediaType.fromSubtype(MediaSubtype.imageGif),
+        filename: gif.title! + '.gif');
 
     return true;
   }
@@ -242,12 +242,12 @@ class ComposeAttachment extends StatelessWidget {
   final void Function(AttachmentInfo attachment) onRemove;
 
   const ComposeAttachment(
-      {Key key, @required this.attachment, @required this.onRemove})
+      {Key? key, required this.attachment, required this.onRemove})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ClipRRect(
@@ -259,8 +259,8 @@ class ComposeAttachment extends StatelessWidget {
           height: 60,
           showInteractiveDelegate: (interactiveMedia) {
             if (attachment.mediaType.sub == MediaSubtype.messageRfc822) {
-              final mime = MimeMessage.parseFromData(attachment.data);
-              final message = Message.embedded(mime, Message.of(context));
+              final mime = MimeMessage.parseFromData(attachment.data!);
+              final message = Message.embedded(mime, Message.of(context)!);
               return locator<NavigationService>()
                   .push(Routes.mailDetails, arguments: message);
             }
@@ -271,7 +271,7 @@ class ComposeAttachment extends StatelessWidget {
           contextMenuEntries: [
             PopupMenuItem<String>(
               child: Text(
-                  localizations.composeRemoveAttachmentAction(attachment.name)),
+                  localizations.composeRemoveAttachmentAction(attachment.name!)),
               value: 'remove',
             ),
           ],

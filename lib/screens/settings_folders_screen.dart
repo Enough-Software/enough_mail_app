@@ -24,7 +24,7 @@ class SettingsFoldersScreen extends StatefulWidget {
 }
 
 class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
-  FolderNameSetting folderNameSetting;
+  FolderNameSetting? folderNameSetting;
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
       title: localizations.settingsFolders,
@@ -86,11 +86,11 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
   }
 
   void _editFolderNames() async {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final service = locator<SettingsService>();
     var customNames = service.settings.customFolderNames;
     if (customNames == null) {
-      final l = locator<I18nService>().localizations;
+      final l = locator<I18nService>().localizations!;
       customNames = [
         l.folderInbox,
         l.folderDrafts,
@@ -112,7 +112,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
     }
   }
 
-  void _onFolderNameSettingChanged(FolderNameSetting value) async {
+  void _onFolderNameSettingChanged(FolderNameSetting? value) async {
     setState(() {
       folderNameSetting = value;
     });
@@ -125,7 +125,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
 
 class CustomFolderNamesEditor extends StatefulWidget {
   final List<String> customNames;
-  CustomFolderNamesEditor({Key key, @required this.customNames})
+  CustomFolderNamesEditor({Key? key, required this.customNames})
       : super(key: key);
 
   @override
@@ -134,12 +134,12 @@ class CustomFolderNamesEditor extends StatefulWidget {
 }
 
 class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
-  TextEditingController _inboxController;
-  TextEditingController _draftsController;
-  TextEditingController _sentController;
-  TextEditingController _trashController;
-  TextEditingController _archiveController;
-  TextEditingController _junkController;
+  TextEditingController? _inboxController;
+  TextEditingController? _draftsController;
+  TextEditingController? _sentController;
+  TextEditingController? _trashController;
+  TextEditingController? _archiveController;
+  TextEditingController? _junkController;
 
   @override
   void initState() {
@@ -155,18 +155,18 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
 
   @override
   void dispose() {
-    _inboxController.dispose();
-    _draftsController.dispose();
-    _sentController.dispose();
-    _trashController.dispose();
-    _archiveController.dispose();
-    _junkController.dispose();
+    _inboxController!.dispose();
+    _draftsController!.dispose();
+    _sentController!.dispose();
+    _trashController!.dispose();
+    _archiveController!.dispose();
+    _junkController!.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final iconService = locator<IconService>();
     return SingleChildScrollView(
       child: SafeArea(
@@ -228,16 +228,16 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
 }
 
 class FolderManagement extends StatefulWidget {
-  FolderManagement({Key key}) : super(key: key);
+  FolderManagement({Key? key}) : super(key: key);
 
   @override
   _FolderManagementState createState() => _FolderManagementState();
 }
 
 class _FolderManagementState extends State<FolderManagement> {
-  Account _account;
-  Mailbox _mailbox;
-  TextEditingController _folderNameController;
+  late Account _account;
+  Mailbox? _mailbox;
+  late TextEditingController _folderNameController;
 
   @override
   void initState() {
@@ -254,7 +254,7 @@ class _FolderManagementState extends State<FolderManagement> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       child: SafeArea(
         child: Column(
@@ -266,7 +266,7 @@ class _FolderManagementState extends State<FolderManagement> {
               onChanged: (account) {
                 setState(() {
                   _mailbox = null;
-                  _account = account;
+                  _account = account!;
                 });
               },
             ),
@@ -303,21 +303,21 @@ class _FolderManagementState extends State<FolderManagement> {
 
 class MailboxWidget extends StatelessWidget {
   final Account account;
-  final Mailbox mailbox;
+  final Mailbox? mailbox;
   final void Function() onMailboxAdded;
   final void Function() onMailboxDeleted;
 
   const MailboxWidget(
-      {Key key,
-      @required this.mailbox,
-      @required this.account,
-      @required this.onMailboxAdded,
-      @required this.onMailboxDeleted})
+      {Key? key,
+      required this.mailbox,
+      required this.account,
+      required this.onMailboxAdded,
+      required this.onMailboxDeleted})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -339,7 +339,7 @@ class MailboxWidget extends StatelessWidget {
               localizations.folderDeleteAction,
               style: Theme.of(context)
                   .textTheme
-                  .button
+                  .button!
                   .copyWith(color: Colors.white),
             ),
           ),
@@ -349,7 +349,7 @@ class MailboxWidget extends StatelessWidget {
   }
 
   void _createFolder(context) async {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final folderNameController = TextEditingController();
     final result = await DialogHelper.showWidgetDialog(
       context,
@@ -378,22 +378,22 @@ class MailboxWidget extends StatelessWidget {
         await DialogHelper.showTextDialog(
           context,
           localizations.errorTitle,
-          localizations.folderAddResultFailure(e.message),
+          localizations.folderAddResultFailure(e.message!),
         );
       }
     }
   }
 
   void _deleteFolder(BuildContext context) async {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final confirmed = await DialogHelper.askForConfirmation(
       context,
       title: localizations.folderDeleteConfirmTitle,
-      query: localizations.folderDeleteConfirmText(mailbox.path),
+      query: localizations.folderDeleteConfirmText(mailbox!.path),
     );
     if (confirmed == true) {
       try {
-        await locator<MailService>().deleteMailbox(account, mailbox);
+        await locator<MailService>().deleteMailbox(account, mailbox!);
         locator<ScaffoldMessengerService>()
             .showTextSnackBar(localizations.folderDeleteResultSuccess);
         onMailboxDeleted();
@@ -401,7 +401,7 @@ class MailboxWidget extends StatelessWidget {
         await DialogHelper.showTextDialog(
           context,
           localizations.errorTitle,
-          localizations.folderDeleteResultFailure(e.message),
+          localizations.folderDeleteResultFailure(e.message!),
         );
       }
     }

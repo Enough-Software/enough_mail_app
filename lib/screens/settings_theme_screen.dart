@@ -16,17 +16,17 @@ class SettingsThemeScreen extends StatefulWidget {
 }
 
 class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
-  ThemeSettings themeSettings;
+  late ThemeSettings themeSettings;
 
-  ThemeModeSetting _themeModeSetting;
-  set themeModeSetting(ThemeModeSetting value) {
+  ThemeModeSetting? _themeModeSetting;
+  set themeModeSetting(ThemeModeSetting? value) {
     _themeModeSetting = value;
     themeSettings.themeModeSetting = value;
     locator<ThemeService>().checkForChangedTheme();
     locator<SettingsService>().save();
   }
 
-  MaterialColor primarySwatch;
+  MaterialColor? primarySwatch;
 
   @override
   void initState() {
@@ -38,7 +38,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final darkThemeStartTime = themeSettings.themeDarkStartTime;
     final darkThemeEndTime = themeSettings.themeDarkEndTime;
     final availableColors = themeSettings.availableColors;
@@ -61,7 +61,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                     leading: Radio<ThemeModeSetting>(
                       value: ThemeModeSetting.light,
                       groupValue: _themeModeSetting,
-                      onChanged: (ThemeModeSetting value) {
+                      onChanged: (ThemeModeSetting? value) {
                         setState(() {
                           themeModeSetting = value;
                         });
@@ -73,7 +73,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                     leading: Radio<ThemeModeSetting>(
                       value: ThemeModeSetting.dark,
                       groupValue: _themeModeSetting,
-                      onChanged: (ThemeModeSetting value) {
+                      onChanged: (ThemeModeSetting? value) {
                         setState(() {
                           themeModeSetting = value;
                         });
@@ -85,7 +85,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                     leading: Radio<ThemeModeSetting>(
                       value: ThemeModeSetting.system,
                       groupValue: _themeModeSetting,
-                      onChanged: (ThemeModeSetting value) {
+                      onChanged: (ThemeModeSetting? value) {
                         setState(() {
                           themeModeSetting = value;
                         });
@@ -97,7 +97,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                     leading: Radio<ThemeModeSetting>(
                       value: ThemeModeSetting.custom,
                       groupValue: _themeModeSetting,
-                      onChanged: (ThemeModeSetting value) {
+                      onChanged: (ThemeModeSetting? value) {
                         setState(() {
                           themeModeSetting = value;
                         });
@@ -167,9 +167,10 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                                   : null,
                             ),
                             onTap: () async {
-                              primarySwatch = color;
+                              primarySwatch = color as MaterialColor?;
                               setState(() {});
-                              themeSettings.primarySwatch = color;
+                              themeSettings.primarySwatch =
+                                  color as MaterialColor;
                               locator<ThemeService>().checkForChangedTheme();
                               await locator<SettingsService>().save();
                             }),

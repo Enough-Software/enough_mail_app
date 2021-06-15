@@ -2,16 +2,16 @@ import 'dart:math';
 
 class StringHelper {
   StringHelper._();
-  static String largestCommonSequence(List<String> texts) {
+  static String? largestCommonSequence(List<String> texts) {
     if (texts.isEmpty) {
       return null;
     }
-    var text = texts.first;
+    String? text = texts.first;
     if (texts.length == 1) {
       return text;
     }
     for (var i = 1; i < texts.length; i++) {
-      text = largestCommonSequenceOf(text, texts[i]);
+      text = largestCommonSequenceOf(text!, texts[i]);
       if (text == null) {
         return null;
       }
@@ -19,7 +19,7 @@ class StringHelper {
     return text;
   }
 
-  static String largestCommonSequenceOf(String first, String second) {
+  static String? largestCommonSequenceOf(String first, String second) {
     // print('lcs of "$first" and "$second"');
     // problem: the longest sequence between first and second is not necessarily the longest sequence between all
     String shorter, longer;

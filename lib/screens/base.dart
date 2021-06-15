@@ -26,14 +26,14 @@ class Base {
 
   static Widget buildAppChrome(
     BuildContext context, {
-    @required String title,
-    @required Widget content,
-    FloatingActionButton floatingActionButton,
-    List<Widget> appBarActions,
-    PlatformAppBar appBar,
-    Widget drawer,
-    String subtitle,
-    Widget bottom,
+    required String? title,
+    required Widget? content,
+    FloatingActionButton? floatingActionButton,
+    List<Widget>? appBarActions,
+    PlatformAppBar? appBar,
+    Widget? drawer,
+    String? subtitle,
+    Widget? bottom,
     bool includeDrawer = true,
   }) {
     appBar ??= buildAppBar(
@@ -62,10 +62,10 @@ class Base {
 
   static PlatformAppBar buildAppBar(
     BuildContext context,
-    String title, {
-    List<Widget> actions,
-    String subtitle,
-    FloatingActionButton floatingActionButton,
+    String? title, {
+    List<Widget>? actions,
+    String? subtitle,
+    FloatingActionButton? floatingActionButton,
     bool includeDrawer = true,
   }) {
     return PlatformAppBar(
@@ -76,7 +76,7 @@ class Base {
         trailing: floatingActionButton == null
             ? null
             : CupertinoButton(
-                child: floatingActionButton.child,
+                child: floatingActionButton.child!,
                 onPressed: floatingActionButton.onPressed),
       ),
       leading: (includeDrawer && locator<MailService>().hasAccountsWithErrors())
@@ -88,10 +88,10 @@ class Base {
     );
   }
 
-  static Widget buildTitle(String title, String subtitle) {
+  static Widget buildTitle(String? title, String? subtitle) {
     if (subtitle == null) {
       return Text(
-        title,
+        title!,
         overflow: TextOverflow.fade,
       );
     } else {
@@ -99,7 +99,7 @@ class Base {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
+            title!,
             overflow: TextOverflow.fade,
           ),
           Padding(
@@ -123,14 +123,14 @@ class Base {
 class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
   final double maxHeight;
   final double minHeight;
-  final double elevation;
+  final double? elevation;
   final Widget child;
-  final Widget background;
+  final Widget? background;
 
   SliverSingleChildHeaderDelegate(
-      {@required this.maxHeight,
-      @required this.minHeight,
-      @required this.child,
+      {required this.maxHeight,
+      required this.minHeight,
+      required this.child,
       this.elevation,
       this.background});
 
@@ -148,7 +148,7 @@ class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
               left: 0.0,
               right: 0.0,
               top: 0,
-              child: background,
+              child: background!,
             ),
             child
           ],
@@ -172,9 +172,9 @@ class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class CustomApBarSliverDelegate extends SliverPersistentHeaderDelegate {
-  final Widget child;
-  final Widget title;
-  final Widget background;
+  final Widget? child;
+  final Widget? title;
+  final Widget? background;
   final double minHeight;
   final double maxHeight;
 
@@ -201,7 +201,7 @@ class CustomApBarSliverDelegate extends SliverPersistentHeaderDelegate {
             left: 0.0,
             right: 0.0,
             top: 0,
-            child: background,
+            child: background!,
           ),
           Positioned(
             bottom: 0.0,

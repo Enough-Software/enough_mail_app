@@ -17,19 +17,19 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  Settings settings;
-  bool blockExternalImages;
+  Settings? settings;
+  bool? blockExternalImages;
 
   @override
   void initState() {
     settings = locator<SettingsService>().settings;
-    blockExternalImages = settings.blockExternalImages;
+    blockExternalImages = settings!.blockExternalImages;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
       title: localizations.settingsTitle,
@@ -46,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     setState(() {
                       blockExternalImages = value;
                     });
-                    settings.blockExternalImages = value;
+                    settings!.blockExternalImages = value;
                     await locator<SettingsService>().save();
                   },
                   title:

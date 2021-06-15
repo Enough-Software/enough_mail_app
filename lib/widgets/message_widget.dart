@@ -7,9 +7,9 @@ class _InheritedMessageContainer extends InheritedWidget {
 
   // You must pass through a child and your state.
   _InheritedMessageContainer({
-    Key key,
-    @required this.data,
-    @required Widget child,
+    Key? key,
+    required this.data,
+    required Widget child,
   }) : super(key: key, child: child);
 
   // This is a built in method which you can use to check if
@@ -25,14 +25,15 @@ class MessageWidget extends StatefulWidget {
   final Message message;
 
   MessageWidget({
-    @required this.child,
-    this.message,
-  });
+    Key? key,
+    required this.child,
+    required this.message,
+  }) : super(key: key);
 
   // This is the secret sauce. Write your own 'of' method that will behave
   // Exactly like MediaQuery.of and Theme.of
   // It basically says 'get the data from the widget of this type.
-  static MessageWidgetState of(BuildContext context) {
+  static MessageWidgetState? of(BuildContext context) {
     return context
         .dependOnInheritedWidgetOfExactType<_InheritedMessageContainer>()
         ?.data;
@@ -45,7 +46,7 @@ class MessageWidget extends StatefulWidget {
 class MessageWidgetState extends State<MessageWidget> {
   Message get message => widget.message;
 
-  void updateMime({MimeMessage mime}) {
+  void updateMime({MimeMessage? mime}) {
     message.updateMime(mime);
   }
 

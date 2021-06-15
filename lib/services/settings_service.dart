@@ -10,14 +10,14 @@ import 'i18n_service.dart';
 class SettingsService {
   static const String _keySettings = 'settings';
   final Serializer _serializer = Serializer();
-  FlutterSecureStorage _storage;
+  FlutterSecureStorage? _storage;
 
-  Settings _settings;
+  late Settings _settings;
   Settings get settings => _settings;
 
   Future<Settings> init() async {
     _storage ??= FlutterSecureStorage();
-    final json = await _storage.read(key: _keySettings);
+    final json = await _storage!.read(key: _keySettings);
     _settings = Settings();
     if (json != null) {
       _serializer.deserialize(json, _settings);
@@ -28,15 +28,15 @@ class SettingsService {
   Future<void> save() async {
     final json = _serializer.serialize(_settings);
     _storage ??= FlutterSecureStorage();
-    await _storage.write(key: _keySettings, value: json);
+    await _storage!.write(key: _keySettings, value: json);
   }
 
   /// Retrieves the HTML signature for the specified [account] and [composeAction]
-  String getSignatureHtml(Account account, ComposeAction composeAction) {
+  String getSignatureHtml(Account? account, ComposeAction composeAction) {
     if (!settings.signatureActions.contains(composeAction)) {
       return '';
     }
-    return account.signatureHtml ?? getSignatureHtmlGlobal();
+    return account!.signatureHtml ?? getSignatureHtmlGlobal();
   }
 
   /// Retrieves the global signature
@@ -58,5 +58,5 @@ class SettingsService {
   }
 
   String get _fallbackSignature =>
-      locator<I18nService>().localizations.signature;
+      locator<I18nService>().localizations!.signature;
 }

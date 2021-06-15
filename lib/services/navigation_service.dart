@@ -8,10 +8,10 @@ class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey =
       new GlobalKey<NavigatorState>();
 
-  BuildContext get currentContext => navigatorKey.currentContext;
+  BuildContext? get currentContext => navigatorKey.currentContext;
 
   Future<dynamic> push(String routeName,
-      {Object arguments,
+      {Object? arguments,
       bool replace = false,
       bool fade = false,
       bool clear = false}) {
@@ -25,14 +25,14 @@ class NavigationService {
           : MaterialPageRoute(builder: (_) => page);
     }
     if (clear) {
-      navigatorKey.currentState.popUntil((route) => false);
+      navigatorKey.currentState!.popUntil((route) => false);
     }
     if (replace) {
       // history.replace(routeName, route);
-      return navigatorKey.currentState.pushReplacement(route);
+      return navigatorKey.currentState!.pushReplacement(route);
     } else {
       // history.push(routeName, route);
-      return navigatorKey.currentState.push(route);
+      return navigatorKey.currentState!.push(route);
     }
   }
 
@@ -54,18 +54,18 @@ class NavigationService {
 
   void popUntil(String routeName) {
     // history.popUntil(routeName);
-    navigatorKey.currentState.popUntil(ModalRoute.withName(routeName));
+    navigatorKey.currentState!.popUntil(ModalRoute.withName(routeName));
   }
 
-  void pop([Object result]) {
+  void pop([Object? result]) {
     // history.pop();
-    navigatorKey.currentState.pop(result);
+    navigatorKey.currentState!.pop(result);
   }
 }
 
 class FadeRoute extends PageRouteBuilder {
   final Widget page;
-  FadeRoute({@required this.page})
+  FadeRoute({required this.page})
       : super(
           pageBuilder: (
             BuildContext context,

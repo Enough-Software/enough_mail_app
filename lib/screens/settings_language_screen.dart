@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
@@ -16,9 +17,9 @@ class SettingsLanguageScreen extends StatefulWidget {
 }
 
 class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
-  _Language selectedLanguage;
-  List<_Language> languages;
-  AppLocalizations selectedLocalizations;
+  _Language? selectedLanguage;
+  late List<_Language> languages;
+  AppLocalizations? selectedLocalizations;
   bool systemSettingApplied = false;
 
   @override
@@ -33,13 +34,12 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
             (locale) => _Language(locale, displayNames[locale.toLanguageTag()]))
         .toList();
     final systemLanguage = _Language(
-        null, locator<I18nService>().localizations.designThemeOptionSystem);
+        null, locator<I18nService>().localizations!.designThemeOptionSystem);
     languages = [systemLanguage, ...available];
     final languageTag = locator<SettingsService>().settings.languageTag;
     if (languageTag != null) {
-      selectedLanguage = available.firstWhere(
-          (l) => l.locale.toLanguageTag() == languageTag,
-          orElse: () => null);
+      selectedLanguage = available
+          .firstWhereOrNull((l) => l.locale!.toLanguageTag() == languageTag);
     } else {
       selectedLanguage = systemLanguage;
     }
@@ -50,7 +50,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
       title: localizations.languageSettingTitle,
@@ -66,7 +66,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                 PlatformDropdownButton<_Language>(
                   value: selectedLanguage,
                   onChanged: (value) async {
-                    if (value.locale == null) {
+                    if (value!.locale == null) {
                       setState(() {
                         selectedLanguage = value;
                         this.selectedLocalizations = null;
@@ -77,7 +77,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                       return;
                     }
                     final selectedLocalizations =
-                        await AppLocalizations.delegate.load(value.locale);
+                        await AppLocalizations.delegate.load(value.locale!);
                     final confirmed = await DialogHelper.showTextDialog(
                         context,
                         selectedLocalizations.languageSettingConfirmationTitle,
@@ -105,15 +105,15 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                     }
                   },
                   selectedItemBuilder: (context) => languages
-                      .map((language) => Text(language.displayName))
+                      .map((language) => Text(language.displayName!))
                       .toList(),
                   items: languages
                       .map((language) => DropdownMenuItem(
-                          value: language, child: Text(language.displayName)))
+                          value: language, child: Text(language.displayName!)))
                       .toList(),
                 ),
                 if (selectedLocalizations != null) ...{
-                  Text(selectedLocalizations.languageSetInfo,
+                  Text(selectedLocalizations!.languageSetInfo,
                       style: theme.textTheme.subtitle1),
                 } else if (systemSettingApplied) ...{
                   Text(localizations.languageSystemSetInfo,
@@ -129,7 +129,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
 }
 
 class _Language {
-  final Locale locale;
-  final String displayName;
+  final Locale? locale;
+  final String? displayName;
   _Language(this.locale, this.displayName);
 }

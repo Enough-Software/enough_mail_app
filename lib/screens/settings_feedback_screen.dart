@@ -21,7 +21,7 @@ class SettingsFeedbackScreen extends StatefulWidget {
 }
 
 class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
-  String info;
+  String? info;
 
   @override
   void initState() {
@@ -54,7 +54,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
 
     return Base.buildAppChrome(
       context,
@@ -85,7 +85,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(info),
+                  child: Text(info!),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),

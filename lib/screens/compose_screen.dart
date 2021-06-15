@@ -23,12 +23,13 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import '../locator.dart';
 import '../routes.dart';
 
 class ComposeScreen extends StatefulWidget {
   final ComposeData data;
-  ComposeScreen({@required this.data, key}) : super(key: key);
+  ComposeScreen({Key? key, required this.data}) : super(key: key);
 
   @override
   _ComposeScreenState createState() => _ComposeScreenState();
@@ -38,19 +39,19 @@ enum _OverflowMenuChoice { showSourceCode, saveAsDraft, requestReadReceipt }
 enum _Autofocus { to, subject, text }
 
 class _ComposeScreenState extends State<ComposeScreen> {
-  List<MailAddress> _toRecipients;
-  List<MailAddress> _ccRecipients;
-  List<MailAddress> _bccRecipients;
+  late List<MailAddress> _toRecipients;
+  late List<MailAddress> _ccRecipients;
+  late List<MailAddress> _bccRecipients;
   TextEditingController _subjectController = TextEditingController();
-  Sender _from;
-  List<Sender> _senders;
-  _Autofocus _focus;
+  late Sender _from;
+  late List<Sender> _senders;
+  _Autofocus? _focus;
   bool _isCcBccVisible = false;
-  TransferEncoding _usedTextEncoding;
-  Future<String> loadMailTextFuture;
-  HtmlEditorApi _editorApi;
-  Future _downloadAttachmentsFuture;
-  ComposeData _resumeComposeData;
+  TransferEncoding? _usedTextEncoding;
+  Future<String>? loadMailTextFuture;
+  HtmlEditorApi? _editorApi;
+  Future? _downloadAttachmentsFuture;
+  ComposeData? _resumeComposeData;
   bool _isReadReceiptRequested = false;
 
   @override
@@ -61,25 +62,25 @@ class _ComposeScreenState extends State<ComposeScreen> {
     _ccRecipients = mb.cc ?? [];
     _bccRecipients = mb.bcc ?? [];
     _isCcBccVisible = _ccRecipients.isNotEmpty || _bccRecipients.isNotEmpty;
-    _subjectController.text = mb.subject;
+    _subjectController.text = mb.subject ?? '';
     _focus = (_toRecipients.isEmpty && _ccRecipients.isEmpty)
         ? _Autofocus.to
-        : (_subjectController.text?.isEmpty ?? true)
+        : (_subjectController.text.isEmpty)
             ? _Autofocus.subject
             : _Autofocus.text;
     _senders = locator<MailService>().getSenders();
-    final currentAccount = locator<MailService>().currentAccount;
+    final currentAccount = locator<MailService>().currentAccount!;
     if (mb.from == null) {
       mb.from = [currentAccount.fromAddress];
     }
-    final senderEmail = mb.from.first.email.toLowerCase();
-    _from = _senders.firstWhere(
-        (s) => s.address?.email?.toLowerCase() == senderEmail,
-        orElse: () => null);
-    if (_from == null) {
-      _from = Sender(mb.from.first, currentAccount);
-      _senders.insert(0, _from);
+    final senderEmail = mb.from?.first.email.toLowerCase();
+    var from = _senders
+        .firstWhereOrNull((s) => s.address.email.toLowerCase() == senderEmail);
+    if (from == null) {
+      from = Sender(mb.from!.first, currentAccount);
+      _senders.insert(0, from);
     }
+    _from = from;
     _checkAccountContactManager(_from.account);
     if (widget.data.resumeHtmlText != null) {
       loadMailTextFuture = _loadMailTextFromComposeData();
@@ -121,7 +122,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     } else {
       final blockExternalImages = false;
       final emptyMessageText =
-          locator<I18nService>().localizations.composeEmptyMessage;
+          locator<I18nService>().localizations!.composeEmptyMessage;
       final maxImageWidth = 300;
       if (widget.data.action == ComposeAction.newMessage) {
         // continue with draft:
@@ -143,7 +144,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
   }
 
   static String _generateQuoteHtmlImpl(_HtmlGenerationArguments args) {
-    final html = args.mimeMessage.quoteToHtml(
+    final html = args.mimeMessage!.quoteToHtml(
       quoteHeaderTemplate: args.quoteTemplate,
       blockExternalImages: args.blockExternalImages,
       emptyMessageText: args.emptyMessageText,
@@ -153,7 +154,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
   }
 
   static String _generateDraftHtmlImpl(_HtmlGenerationArguments args) {
-    final html = args.mimeMessage.transformToHtml(
+    final html = args.mimeMessage!.transformToHtml(
         emptyMessageText: args.emptyMessageText,
         maxImageWidth: args.maxImageWidth,
         blockExternalImages: args.blockExternalImages);
@@ -168,7 +169,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     mb.bcc = _bccRecipients;
     mb.subject = _subjectController.text;
 
-    final htmlText = await _editorApi.getText();
+    final htmlText = await _editorApi!.getText();
     _resumeComposeData = widget.data.resume(htmlText);
     if (storeHtmlForResume) {
       return;
@@ -191,7 +192,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
         textPartBuilder.addTextPlain(plainText);
       }
       final fullHtmlMessageText =
-          await _editorApi.getFullHtml(content: htmlText);
+          await _editorApi!.getFullHtml(content: htmlText);
       final htmlTextBuilder = textPartBuilder.getTextHtmlPart();
       if (htmlTextBuilder != null) {
         htmlTextBuilder.text = fullHtmlMessageText;
@@ -231,8 +232,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
     } catch (e, s) {
       print('Unable to send or append mail: $e $s');
       // this state's context is now invalid because this widget is not mounted anymore
-      final currentContext = locator<NavigationService>().currentContext;
-      final message = (e is MailException) ? e.message : e.toString();
+      final currentContext = locator<NavigationService>().currentContext!;
+      final message = (e is MailException) ? e.message! : e.toString();
       DialogHelper.showTextDialog(
         currentContext,
         localizations.errorTitle,
@@ -256,29 +257,29 @@ class _ComposeScreenState extends State<ComposeScreen> {
     final action = widget.data.action;
     final storeFlags = action != ComposeAction.newMessage;
     if (storeFlags) {
-      for (final originalMessage in widget.data.originalMessages) {
+      for (final originalMessage in widget.data.originalMessages!) {
         if (action == ComposeAction.answer) {
-          originalMessage.isAnswered = true;
+          originalMessage!.isAnswered = true;
         } else {
-          originalMessage.isForwarded = true;
+          originalMessage!.isForwarded = true;
         }
         try {
           await mailClient.store(
-              MessageSequence.fromMessage(originalMessage.mimeMessage),
-              originalMessage.mimeMessage.flags,
+              MessageSequence.fromMessage(originalMessage.mimeMessage!),
+              originalMessage.mimeMessage!.flags!,
               action: StoreAction.replace);
         } catch (e, s) {
           print('Unable to update message flags: $e $s'); // otherwise ignore
         }
       }
     } else if ((widget.data.originalMessage != null) &&
-        widget.data.originalMessage.mimeMessage.hasFlag(MessageFlags.draft)) {
+        widget.data.originalMessage!.mimeMessage!.hasFlag(MessageFlags.draft)) {
       // delete draft message:
       try {
-        final originalMessage = widget.data.originalMessage;
+        final originalMessage = widget.data.originalMessage!;
         final source = originalMessage.source;
         source.remove(originalMessage);
-        await mailClient.flagMessage(originalMessage.mimeMessage,
+        await mailClient.flagMessage(originalMessage.mimeMessage!,
             isDeleted: true);
       } catch (e, s) {
         print('Unable to update message flags: $e $s'); // otherwise ignore
@@ -288,7 +289,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final titleText = widget.data.action == ComposeAction.answer
         ? localizations.composeTitleReply
         : widget.data.action == ComposeAction.forward
@@ -367,7 +368,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(localizations.detailsHeaderFrom,
-                          style: Theme.of(context).textTheme?.caption),
+                          style: Theme.of(context).textTheme.caption),
                       PlatformDropdownButton<Sender>(
                         isExpanded: true,
                         items: _senders
@@ -375,10 +376,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                               (s) => DropdownMenuItem<Sender>(
                                 value: s,
                                 child: Text(
-                                  s.isPlaceHolderForPlusAlias
-                                      ? localizations
-                                          .composeCreatePlusAliasAction
-                                      : s.toString(),
+                                  s.toString(),
                                   overflow: TextOverflow.fade,
                                 ),
                               ),
@@ -386,20 +384,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
                             .toList(),
                         onChanged: (s) async {
                           final builder = widget.data.messageBuilder;
-                          if (s.isPlaceHolderForPlusAlias) {
-                            final index = _senders.indexOf(s);
-                            s = locator<MailService>()
-                                .generateRandomPlusAliasSender(s);
-                            setState(() {
-                              _senders.insert(index, s);
-                            });
-                          }
-                          builder.from = [s.address];
+
+                          builder.from = [s!.address];
                           final lastSignature = _signature;
                           _from = s;
                           final newSignature = _signature;
                           if (newSignature != lastSignature) {
-                            _editorApi.replaceAll(lastSignature, newSignature);
+                            _editorApi!.replaceAll(lastSignature, newSignature);
                           }
                           if (_isReadReceiptRequested) {
                             builder.requestReadReceipt(
@@ -478,7 +469,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
               if (_editorApi != null) ...{
                 SliverHeaderHtmlEditorControls(
                   editorApi: _editorApi,
-                  suffix: EditorArtExtensionButton(editorApi: _editorApi),
+                  suffix: EditorArtExtensionButton(editorApi: _editorApi!),
                 ),
               },
               SliverToBoxAdapter(
@@ -490,7 +481,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       case ConnectionState.waiting:
                       case ConnectionState.active:
                         return Center(child: PlatformProgressIndicator());
-                        break;
                       case ConnectionState.done:
                         final text = snapshot.data ?? '<p></p>';
                         return HtmlEditor(
@@ -501,9 +491,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           },
                           initialContent: text,
                         );
-                        break;
                     }
-                    return PlatformProgressIndicator();
                   },
                 ),
               ),
@@ -522,7 +510,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   Future<void> _saveAsDraft() async {
     locator<NavigationService>().pop();
-    final localizations = locator<I18nService>().localizations;
+    final localizations = locator<I18nService>().localizations!;
     final mailClient = await locator<MailService>().getClientFor(_from.account);
     final mime = await _buildMimeMessage(mailClient);
     try {
@@ -545,7 +533,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
       }
     } catch (e, s) {
       print('unable to save draft message $e $s');
-      final currentContext = locator<NavigationService>().currentContext;
+      final currentContext = locator<NavigationService>().currentContext!;
       DialogHelper.showTextDialog(
         currentContext,
         localizations.errorTitle,
@@ -609,8 +597,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
 }
 
 class _HtmlGenerationArguments {
-  final String quoteTemplate;
-  final MimeMessage mimeMessage;
+  final String? quoteTemplate;
+  final MimeMessage? mimeMessage;
   final bool blockExternalImages;
   final String emptyMessageText;
   final int maxImageWidth;
