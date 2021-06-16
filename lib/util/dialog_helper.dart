@@ -16,9 +16,9 @@ class DialogHelper {
     required String title,
     required String query,
     String? action,
-    bool? isDangerousAction,
+    bool isDangerousAction = false,
   }) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
 
     if (Platform.isAndroid) {
       final theme = Theme.of(context);
@@ -35,7 +35,7 @@ class DialogHelper {
           content: Text(query),
           actions: [
             TextButton(
-              child: ButtonText(localizations!.actionCancel),
+              child: ButtonText(localizations.actionCancel),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             TextButton(
@@ -54,13 +54,13 @@ class DialogHelper {
           content: Text(query),
           actions: [
             CupertinoDialogAction(
-              child: Text(localizations!.actionCancel),
+              child: Text(localizations.actionCancel),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             CupertinoDialogAction(
               child: Text(action ?? title),
               onPressed: () => Navigator.of(context).pop(true),
-              isDestructiveAction: isDangerousAction!,
+              isDestructiveAction: isDangerousAction,
             ),
           ],
         ),
@@ -76,7 +76,8 @@ class DialogHelper {
 
   static Future showWidgetDialog(
       BuildContext context, String? title, Widget content,
-      {List<Widget>? actions, DialogActions defaultActions = DialogActions.ok}) {
+      {List<Widget>? actions,
+      DialogActions defaultActions = DialogActions.ok}) {
     final localizations = AppLocalizations.of(context);
     actions ??= [
       if (defaultActions == DialogActions.cancel ||
