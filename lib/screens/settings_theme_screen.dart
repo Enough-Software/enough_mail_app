@@ -56,53 +56,45 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                 children: [
                   Text(localizations.designSectionThemeTitle,
                       style: theme.textTheme.subtitle1),
-                  PlatformListTile(
+                  PlatformRadioListTile<ThemeModeSetting>(
                     title: Text(localizations.designThemeOptionLight),
-                    leading: Radio<ThemeModeSetting>(
-                      value: ThemeModeSetting.light,
-                      groupValue: _themeModeSetting,
-                      onChanged: (ThemeModeSetting? value) {
-                        setState(() {
-                          themeModeSetting = value;
-                        });
-                      },
-                    ),
+                    value: ThemeModeSetting.light,
+                    groupValue: _themeModeSetting,
+                    onChanged: (ThemeModeSetting? value) {
+                      setState(() {
+                        themeModeSetting = value;
+                      });
+                    },
                   ),
-                  PlatformListTile(
+                  PlatformRadioListTile<ThemeModeSetting>(
                     title: Text(localizations.designThemeOptionDark),
-                    leading: Radio<ThemeModeSetting>(
-                      value: ThemeModeSetting.dark,
-                      groupValue: _themeModeSetting,
-                      onChanged: (ThemeModeSetting? value) {
-                        setState(() {
-                          themeModeSetting = value;
-                        });
-                      },
-                    ),
+                    value: ThemeModeSetting.dark,
+                    groupValue: _themeModeSetting,
+                    onChanged: (ThemeModeSetting? value) {
+                      setState(() {
+                        themeModeSetting = value;
+                      });
+                    },
                   ),
-                  PlatformListTile(
+                  PlatformRadioListTile<ThemeModeSetting>(
                     title: Text(localizations.designThemeOptionSystem),
-                    leading: Radio<ThemeModeSetting>(
-                      value: ThemeModeSetting.system,
-                      groupValue: _themeModeSetting,
-                      onChanged: (ThemeModeSetting? value) {
-                        setState(() {
-                          themeModeSetting = value;
-                        });
-                      },
-                    ),
+                    value: ThemeModeSetting.system,
+                    groupValue: _themeModeSetting,
+                    onChanged: (ThemeModeSetting? value) {
+                      setState(() {
+                        themeModeSetting = value;
+                      });
+                    },
                   ),
-                  PlatformListTile(
+                  PlatformRadioListTile<ThemeModeSetting>(
                     title: Text(localizations.designThemeOptionCustom),
-                    leading: Radio<ThemeModeSetting>(
-                      value: ThemeModeSetting.custom,
-                      groupValue: _themeModeSetting,
-                      onChanged: (ThemeModeSetting? value) {
-                        setState(() {
-                          themeModeSetting = value;
-                        });
-                      },
-                    ),
+                    value: ThemeModeSetting.custom,
+                    groupValue: _themeModeSetting,
+                    onChanged: (ThemeModeSetting? value) {
+                      setState(() {
+                        themeModeSetting = value;
+                      });
+                    },
                   ),
                   if (_themeModeSetting == ThemeModeSetting.custom) ...{
                     Text(localizations.designSectionCustomTitle,
