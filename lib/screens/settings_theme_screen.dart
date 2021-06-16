@@ -107,7 +107,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                               localizations.designThemeCustomStart(
                                   darkThemeStartTime.format(context))),
                           onPressed: () async {
-                            final pickedTime = await showTimePicker(
+                            final pickedTime = await showPlatformTimePicker(
                               context: context,
                               initialTime: darkThemeStartTime,
                               initialEntryMode: TimePickerEntryMode.dial,
@@ -125,7 +125,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                           child: ButtonText(localizations.designThemeCustomEnd(
                               darkThemeEndTime.format(context))),
                           onPressed: () async {
-                            final pickedTime = await showTimePicker(
+                            final pickedTime = await showPlatformTimePicker(
                               context: context,
                               initialTime: darkThemeEndTime,
                               initialEntryMode: TimePickerEntryMode.dial,
