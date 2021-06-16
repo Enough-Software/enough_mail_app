@@ -41,44 +41,46 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
       context,
       title: localizations.settingsFolders,
       content: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(localizations.folderNamesIntroduction,
-                  style: theme.textTheme.caption),
-              PlatformRadioListTile<FolderNameSetting>(
-                value: FolderNameSetting.localized,
-                groupValue: folderNameSetting,
-                onChanged: _onFolderNameSettingChanged,
-                title: Text(localizations.folderNamesSettingLocalized),
-              ),
-              PlatformRadioListTile<FolderNameSetting>(
-                value: FolderNameSetting.server,
-                groupValue: folderNameSetting,
-                onChanged: _onFolderNameSettingChanged,
-                title: Text(localizations.folderNamesSettingServer),
-              ),
-              PlatformRadioListTile<FolderNameSetting>(
-                value: FolderNameSetting.custom,
-                groupValue: folderNameSetting,
-                onChanged: _onFolderNameSettingChanged,
-                title: Text(localizations.folderNamesSettingCustom),
-              ),
-              if (folderNameSetting == FolderNameSetting.custom) ...{
-                Divider(),
-                PlatformTextButtonIcon(
-                  icon: Icon(Icons.edit),
-                  label: ButtonText(localizations.folderNamesEditAction),
-                  onPressed: _editFolderNames,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.folderNamesIntroduction,
+                    style: theme.textTheme.caption),
+                PlatformRadioListTile<FolderNameSetting>(
+                  value: FolderNameSetting.localized,
+                  groupValue: folderNameSetting,
+                  onChanged: _onFolderNameSettingChanged,
+                  title: Text(localizations.folderNamesSettingLocalized),
                 ),
-              },
-              Divider(
-                height: 8.0,
-              ),
-              FolderManagement(),
-            ],
+                PlatformRadioListTile<FolderNameSetting>(
+                  value: FolderNameSetting.server,
+                  groupValue: folderNameSetting,
+                  onChanged: _onFolderNameSettingChanged,
+                  title: Text(localizations.folderNamesSettingServer),
+                ),
+                PlatformRadioListTile<FolderNameSetting>(
+                  value: FolderNameSetting.custom,
+                  groupValue: folderNameSetting,
+                  onChanged: _onFolderNameSettingChanged,
+                  title: Text(localizations.folderNamesSettingCustom),
+                ),
+                if (folderNameSetting == FolderNameSetting.custom) ...{
+                  Divider(),
+                  PlatformTextButtonIcon(
+                    icon: Icon(Icons.edit),
+                    label: ButtonText(localizations.folderNamesEditAction),
+                    onPressed: _editFolderNames,
+                  ),
+                },
+                Divider(
+                  height: 8.0,
+                ),
+                FolderManagement(),
+              ],
+            ),
           ),
         ),
       ),

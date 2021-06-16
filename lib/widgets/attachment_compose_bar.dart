@@ -8,6 +8,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/api_keys.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
+import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -94,51 +95,51 @@ class AddAttachmentPopupButton extends StatelessWidget {
       itemBuilder: (context) => [
         PlatformPopupMenuItem(
           value: 0,
-          child: PlatformListTile(
-            leading: Icon(Icons.insert_drive_file_outlined),
-            title: Text(localizations!.attachTypeFile),
+          child: IconText(
+            icon: Icon(Icons.insert_drive_file_outlined),
+            label: Text(localizations!.attachTypeFile),
           ),
         ),
         PlatformPopupMenuItem(
           value: 1,
-          child: PlatformListTile(
-            leading: Icon(Icons.photo_outlined),
-            title: Text(localizations.attachTypePhoto),
+          child: IconText(
+            icon: Icon(Icons.photo_outlined),
+            label: Text(localizations.attachTypePhoto),
           ),
         ),
         PlatformPopupMenuItem(
           value: 2,
-          child: PlatformListTile(
-            leading: Icon(Icons.video_collection_outlined),
-            title: Text(localizations.attachTypeVideo),
+          child: IconText(
+            icon: Icon(Icons.video_collection_outlined),
+            label: Text(localizations.attachTypeVideo),
           ),
         ),
         PlatformPopupMenuItem(
           value: 3,
-          child: PlatformListTile(
-            leading: Icon(Icons.audiotrack_outlined),
-            title: Text(localizations.attachTypeAudio),
+          child: IconText(
+            icon: Icon(Icons.audiotrack_outlined),
+            label: Text(localizations.attachTypeAudio),
           ),
         ),
         PlatformPopupMenuItem(
           value: 4,
-          child: PlatformListTile(
-            leading: Icon(Icons.location_on_outlined),
-            title: Text(localizations.attachTypeLocation),
+          child: IconText(
+            icon: Icon(Icons.location_on_outlined),
+            label: Text(localizations.attachTypeLocation),
           ),
         ),
         PlatformPopupMenuItem(
           value: 5,
-          child: PlatformListTile(
-            leading: Icon(Icons.gif),
-            title: Text(localizations.attachTypeGif),
+          child: IconText(
+            icon: Icon(Icons.gif),
+            label: Text(localizations.attachTypeGif),
           ),
         ),
         PlatformPopupMenuItem(
           value: 6,
-          child: PlatformListTile(
-            leading: Icon(CommunityMaterialIcons.sticker),
-            title: Text(localizations.attachTypeSticker),
+          child: IconText(
+            icon: Icon(CommunityMaterialIcons.sticker),
+            label: Text(localizations.attachTypeSticker),
           ),
         ),
       ],
@@ -270,8 +271,8 @@ class ComposeAttachment extends StatelessWidget {
           },
           contextMenuEntries: [
             PopupMenuItem<String>(
-              child: Text(
-                  localizations.composeRemoveAttachmentAction(attachment.name!)),
+              child: Text(localizations
+                  .composeRemoveAttachmentAction(attachment.name!)),
               value: 'remove',
             ),
           ],
