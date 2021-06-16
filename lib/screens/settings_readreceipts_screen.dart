@@ -1,5 +1,6 @@
 import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
@@ -37,19 +38,19 @@ class _SettingsFoldersScreenState extends State<SettingsReadReceiptsScreen> {
             children: [
               Text(localizations.readReceiptsSettingsIntroduction,
                   style: theme.textTheme.caption),
-              RadioListTile<ReadReceiptDisplaySetting>(
+              PlatformRadioListTile<ReadReceiptDisplaySetting>(
                 value: ReadReceiptDisplaySetting.always,
                 groupValue: _readReceiptDisplaySetting,
                 onChanged: _onReadReceiptDisplaySettingChanged,
                 title: Text(localizations.readReceiptOptionAlways),
               ),
-              RadioListTile<ReadReceiptDisplaySetting>(
+              PlatformRadioListTile<ReadReceiptDisplaySetting>(
                 value: ReadReceiptDisplaySetting.never,
                 groupValue: _readReceiptDisplaySetting,
                 onChanged: _onReadReceiptDisplaySettingChanged,
                 title: Text(localizations.readReceiptOptionNever),
               ),
-              // RadioListTile<ReadReceiptDisplaySetting>(
+              // PlatformRadioListTile<ReadReceiptDisplaySetting>(
               //   value: ReadReceiptDisplaySetting.forContacts,
               //   groupValue: _readReceiptDisplaySetting,
               //   onChanged: _onReadReceiptDisplaySettingChanged,

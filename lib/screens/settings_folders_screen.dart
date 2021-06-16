@@ -48,19 +48,19 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
             children: [
               Text(localizations.folderNamesIntroduction,
                   style: theme.textTheme.caption),
-              RadioListTile<FolderNameSetting>(
+              PlatformRadioListTile<FolderNameSetting>(
                 value: FolderNameSetting.localized,
                 groupValue: folderNameSetting,
                 onChanged: _onFolderNameSettingChanged,
                 title: Text(localizations.folderNamesSettingLocalized),
               ),
-              RadioListTile<FolderNameSetting>(
+              PlatformRadioListTile<FolderNameSetting>(
                 value: FolderNameSetting.server,
                 groupValue: folderNameSetting,
                 onChanged: _onFolderNameSettingChanged,
                 title: Text(localizations.folderNamesSettingServer),
               ),
-              RadioListTile<FolderNameSetting>(
+              PlatformRadioListTile<FolderNameSetting>(
                 value: FolderNameSetting.custom,
                 groupValue: folderNameSetting,
                 onChanged: _onFolderNameSettingChanged,
