@@ -26,10 +26,10 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
   @override
   void initState() {
     super.initState();
-    loadAppInformation();
+    _loadAppInformation();
   }
 
-  Future<void> loadAppInformation() async {
+  Future<void> _loadAppInformation() async {
     final packageInfo = await PackageInfo.fromPlatform();
     var textualInfo =
         'Maily v${packageInfo.version}+${packageInfo.buildNumber}\n'
@@ -60,74 +60,79 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
       context,
       title: localizations.feedbackTitle,
       content: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(localizations.feedbackIntro,
-                    style: theme.textTheme.subtitle1),
-              ),
-              if (info == null) ...{
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: PlatformProgressIndicator(),
+                  child: Text(localizations.feedbackIntro,
+                      style: theme.textTheme.subtitle1),
                 ),
-              } else ...{
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    localizations.feedbackProvideInfoRequest,
-                    style: theme.textTheme.caption,
+                if (info == null) ...{
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: PlatformProgressIndicator(),
                   ),
-                ),
+                } else ...{
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      localizations.feedbackProvideInfoRequest,
+                      style: theme.textTheme.caption,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(info!),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: PlatformIconButton(
+                      icon: Icon(Icons.copy),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: info));
+                        locator<ScaffoldMessengerService>().showTextSnackBar(
+                            localizations.feedbackResultInfoCopied);
+                      },
+                    ),
+                  ),
+                },
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(info!),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: PlatformIconButton(
-                    icon: Icon(Icons.copy),
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: info));
-                      locator<ScaffoldMessengerService>().showTextSnackBar(
-                          localizations.feedbackResultInfoCopied);
+                  child: PlatformTextButton(
+                    child:
+                        ButtonText(localizations.feedbackActionSuggestFeature),
+                    onPressed: () async {
+                      await launcher.launch('https://maily.userecho.com/');
                     },
                   ),
                 ),
-              },
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: PlatformTextButton(
-                  child: ButtonText(localizations.feedbackActionSuggestFeature),
-                  onPressed: () async {
-                    await launcher.launch('https://maily.userecho.com/');
-                  },
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: PlatformTextButton(
+                    child:
+                        ButtonText(localizations.feedbackActionReportProblem),
+                    onPressed: () async {
+                      await launcher.launch('https://maily.userecho.com/');
+                    },
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: PlatformTextButton(
-                  child: ButtonText(localizations.feedbackActionReportProblem),
-                  onPressed: () async {
-                    await launcher.launch('https://maily.userecho.com/');
-                  },
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: PlatformTextButton(
+                    child:
+                        ButtonText(localizations.feedbackActionHelpDeveloping),
+                    onPressed: () async {
+                      await launcher.launch(
+                          'https://github.com/Enough-Software/enough_mail_app');
+                    },
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: PlatformTextButton(
-                  child: ButtonText(localizations.feedbackActionHelpDeveloping),
-                  onPressed: () async {
-                    await launcher.launch(
-                        'https://github.com/Enough-Software/enough_mail_app');
-                  },
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

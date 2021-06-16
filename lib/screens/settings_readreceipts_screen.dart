@@ -33,30 +33,32 @@ class _SettingsFoldersScreenState extends State<SettingsReadReceiptsScreen> {
       content: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(localizations.readReceiptsSettingsIntroduction,
-                  style: theme.textTheme.caption),
-              PlatformRadioListTile<ReadReceiptDisplaySetting>(
-                value: ReadReceiptDisplaySetting.always,
-                groupValue: _readReceiptDisplaySetting,
-                onChanged: _onReadReceiptDisplaySettingChanged,
-                title: Text(localizations.readReceiptOptionAlways),
-              ),
-              PlatformRadioListTile<ReadReceiptDisplaySetting>(
-                value: ReadReceiptDisplaySetting.never,
-                groupValue: _readReceiptDisplaySetting,
-                onChanged: _onReadReceiptDisplaySettingChanged,
-                title: Text(localizations.readReceiptOptionNever),
-              ),
-              // PlatformRadioListTile<ReadReceiptDisplaySetting>(
-              //   value: ReadReceiptDisplaySetting.forContacts,
-              //   groupValue: _readReceiptDisplaySetting,
-              //   onChanged: _onReadReceiptDisplaySettingChanged,
-              //   title: Text(localizations.readReceiptOptionForContacts),
-              // ),
-            ],
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.readReceiptsSettingsIntroduction,
+                    style: theme.textTheme.caption),
+                PlatformRadioListTile<ReadReceiptDisplaySetting>(
+                  value: ReadReceiptDisplaySetting.always,
+                  groupValue: _readReceiptDisplaySetting,
+                  onChanged: _onReadReceiptDisplaySettingChanged,
+                  title: Text(localizations.readReceiptOptionAlways),
+                ),
+                PlatformRadioListTile<ReadReceiptDisplaySetting>(
+                  value: ReadReceiptDisplaySetting.never,
+                  groupValue: _readReceiptDisplaySetting,
+                  onChanged: _onReadReceiptDisplaySettingChanged,
+                  title: Text(localizations.readReceiptOptionNever),
+                ),
+                // PlatformRadioListTile<ReadReceiptDisplaySetting>(
+                //   value: ReadReceiptDisplaySetting.forContacts,
+                //   groupValue: _readReceiptDisplaySetting,
+                //   onChanged: _onReadReceiptDisplaySettingChanged,
+                //   title: Text(localizations.readReceiptOptionForContacts),
+                // ),
+              ],
+            ),
           ),
         ),
       ),

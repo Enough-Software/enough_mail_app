@@ -38,50 +38,52 @@ class _SettingsDeveloperModeScreenState
       context,
       title: localizations.settingsDevelopment,
       content: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(localizations.developerModeTitle,
-                  style: theme.textTheme.subtitle1),
-              Text(localizations.developerModeIntroduction,
-                  style: theme.textTheme.caption),
-              PlatformCheckboxListTile(
-                value: isDeveloperModeEnabled,
-                onChanged: (value) async {
-                  setState(() {
-                    isDeveloperModeEnabled = value;
-                  });
-                  final service = locator<SettingsService>();
-                  service.settings.enableDeveloperMode = value;
-                  await service.save();
-                },
-                title: Text(localizations.developerModeEnable),
-              ),
-              Divider(),
-              Text(localizations.extensionsTitle,
-                  style: theme.textTheme.subtitle1),
-              Text(localizations.extensionsIntro,
-                  style: theme.textTheme.caption),
-              PlatformTextButton(
-                child: ButtonText(localizations.extensionsLearnMoreAction),
-                onPressed: () => launch(
-                    'https://github.com/Enough-Software/enough_mail_app/wiki/Extensions'),
-              ),
-              PlatformListTile(
-                title: Text(localizations.extensionsReloadAction),
-                onTap: _reloadExtensions,
-              ),
-              PlatformListTile(
-                title: Text(localizations.extensionDeactivateAllAction),
-                onTap: _deactivateAllExtensions,
-              ),
-              PlatformListTile(
-                title: Text(localizations.extensionsManualAction),
-                onTap: _loadExtensionManually,
-              ),
-            ],
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.developerModeTitle,
+                    style: theme.textTheme.subtitle1),
+                Text(localizations.developerModeIntroduction,
+                    style: theme.textTheme.caption),
+                PlatformCheckboxListTile(
+                  value: isDeveloperModeEnabled,
+                  onChanged: (value) async {
+                    setState(() {
+                      isDeveloperModeEnabled = value;
+                    });
+                    final service = locator<SettingsService>();
+                    service.settings.enableDeveloperMode = value;
+                    await service.save();
+                  },
+                  title: Text(localizations.developerModeEnable),
+                ),
+                Divider(),
+                Text(localizations.extensionsTitle,
+                    style: theme.textTheme.subtitle1),
+                Text(localizations.extensionsIntro,
+                    style: theme.textTheme.caption),
+                PlatformTextButton(
+                  child: ButtonText(localizations.extensionsLearnMoreAction),
+                  onPressed: () => launch(
+                      'https://github.com/Enough-Software/enough_mail_app/wiki/Extensions'),
+                ),
+                PlatformListTile(
+                  title: Text(localizations.extensionsReloadAction),
+                  onTap: _reloadExtensions,
+                ),
+                PlatformListTile(
+                  title: Text(localizations.extensionDeactivateAllAction),
+                  onTap: _deactivateAllExtensions,
+                ),
+                PlatformListTile(
+                  title: Text(localizations.extensionsManualAction),
+                  onTap: _loadExtensionManually,
+                ),
+              ],
+            ),
           ),
         ),
       ),
