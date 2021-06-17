@@ -21,11 +21,13 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/string_helper.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
+import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
 import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
+import 'package:enough_mail_app/widgets/search_text_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 // import 'package:enough_style/enough_style.dart';
@@ -51,21 +53,21 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   Future<void>? _messageLoader;
   _Visualization _visualization = _Visualization.list;
   late DateSectionedMessageSource _sectionedMessageSource;
-  bool isInSelectionMode = false;
-  List<Message> selectedMessages = [];
-  bool isInSearchMode = false;
-  bool hasSearchInput = false;
-  TextEditingController? searchEditingController;
-  late StreamSubscription eventsSubscription;
+  bool _isInSelectionMode = false;
+  List<Message> _selectedMessages = [];
+  bool _isInSearchMode = false;
+  bool _hasSearchInput = false;
+  late TextEditingController _searchEditingController;
+  late StreamSubscription _eventsSubscription;
 
   @override
   void initState() {
     super.initState();
-    searchEditingController = TextEditingController();
+    _searchEditingController = TextEditingController();
     _sectionedMessageSource = DateSectionedMessageSource(widget.messageSource);
     _sectionedMessageSource.addListener(_update);
     _messageLoader = initMessageSource();
-    eventsSubscription = AppEventBus.eventBus
+    _eventsSubscription = AppEventBus.eventBus
         .on<UnifiedMessageSourceChangedEvent>()
         .listen((event) {
       setState(() {
@@ -87,10 +89,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 
   @override
   void dispose() {
-    searchEditingController!.dispose();
+    _searchEditingController.dispose();
     _sectionedMessageSource.removeListener(_update);
     _sectionedMessageSource.dispose();
-    eventsSubscription.cancel();
+    _eventsSubscription.cancel();
     super.dispose();
   }
 
@@ -101,7 +103,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   void search(String query) {
     if (query.isEmpty) {
       setState(() {
-        isInSearchMode = false;
+        _isInSearchMode = false;
       });
       return;
     }
@@ -110,32 +112,33 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     locator<NavigationService>()
         .push(Routes.messageSource, arguments: searchSource);
     setState(() {
-      isInSearchMode = false;
+      _isInSearchMode = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    print('parent name: ${widget.messageSource.parentName}');
     final theme = Theme.of(context);
     final localizations = AppLocalizations.of(context)!;
     final source = widget.messageSource;
     if (source is ErrorMessageSource) {
       return buildForLoadingError(context, localizations, source);
     }
-    final appBarTitle = isInSearchMode
+    final appBarTitle = _isInSearchMode
         ? TextField(
-            controller: searchEditingController,
+            controller: _searchEditingController,
             textInputAction: TextInputAction.search,
             decoration: InputDecoration(
               hintText: localizations.homeSearchHint,
               hintStyle: TextStyle(color: Colors.white30),
-              suffix: hasSearchInput
-                  ? PlatformIconButton(
+              suffix: _hasSearchInput
+                  ? IconButton(
                       icon: Icon(Icons.clear),
                       onPressed: () {
-                        searchEditingController!.text = '';
+                        _searchEditingController.text = '';
                         setState(() {
-                          hasSearchInput = false;
+                          _hasSearchInput = false;
                         });
                       },
                     )
@@ -143,39 +146,39 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             ),
             autofocus: true,
             autocorrect: false,
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white), //TODO remove hardcoded color
             onSubmitted: search,
             onChanged: (text) {
-              if (text.isNotEmpty != hasSearchInput) {
+              if (text.isNotEmpty != _hasSearchInput) {
                 setState(() {
-                  hasSearchInput = text.isNotEmpty;
+                  _hasSearchInput = text.isNotEmpty;
                 });
               }
             },
           )
-        : Platform.isIOS
-            ? Text(widget.messageSource.name!)
+        : (Platform.isIOS || Platform.isMacOS)
+            ? Text(widget.messageSource.name ?? '')
             : Base.buildTitle(widget.messageSource.name ?? '',
                 widget.messageSource.description ?? '');
 
     final appBarActions = [
       if (widget.messageSource.supportsSearching && !Platform.isIOS) ...{
         PlatformIconButton(
-          icon: Icon(isInSearchMode ? Icons.arrow_back : Icons.search),
+          icon: Icon(_isInSearchMode ? Icons.arrow_back : Icons.search),
           onPressed: () {
-            if (isInSearchMode) {
+            if (_isInSearchMode) {
               setState(() {
-                isInSearchMode = false;
+                _isInSearchMode = false;
               });
             } else {
               setState(() {
-                isInSearchMode = true;
+                _isInSearchMode = true;
               });
             }
           },
         ),
       },
-      if (!isInSearchMode) ...{
+      if (!_isInSearchMode) ...{
         PlatformPopupMenuButton<_Visualization>(
           onSelected: switchVisualization,
           itemBuilder: (context) => [
@@ -250,7 +253,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       );
     }
     return PlatformPageScaffold(
-      bottomBar: isInSelectionMode
+      bottomBar: _isInSelectionMode
           ? buildSelectionModeBottomBar(localizations)
           : Platform.isIOS
               ? CupertinoStatusBar(
@@ -297,273 +300,282 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   : null,
             )
           : null,
-      body: FutureBuilder<void>(
-        future: _messageLoader,
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-            case ConnectionState.waiting:
-            case ConnectionState.active:
-              return Center(
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PlatformProgressIndicator(),
-                    ),
-                    Expanded(
-                      child: Padding(
+      body: MessageSourceWidget(
+        messageSource: widget.messageSource,
+        child: FutureBuilder<void>(
+          future: _messageLoader,
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return Center(
+                  child: Row(
+                    children: [
+                      Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(localizations.homeLoading(
-                            widget.messageSource.name ??
-                                widget.messageSource.description!)),
+                        child: PlatformProgressIndicator(),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            case ConnectionState.done:
-              if (_visualization == _Visualization.stack) {
-                return WillPopScope(
-                  onWillPop: () {
-                    switchVisualization(_Visualization.list);
-                    return Future.value(false);
-                  },
-                  child: MessageStack(messageSource: widget.messageSource),
-                );
-              }
-              return WillPopScope(
-                onWillPop: () {
-                  if (isInSelectionMode) {
-                    leaveSelectionMode();
-                    return Future.value(false);
-                  }
-                  return Future.value(true);
-                },
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    await _sectionedMessageSource.refresh();
-                  },
-                  child: CustomScrollView(
-                    physics: BouncingScrollPhysics(),
-                    slivers: [
-                      PlatformSliverAppBar(
-                        title: appBarTitle,
-                        leading:
-                            (locator<MailService>().hasAccountsWithErrors())
-                                ? MenuWithBadge()
-                                : null,
-                        floating: isInSearchMode ? false : true,
-                        pinned: isInSearchMode ? true : false,
-                        stretch: true,
-                        actions: appBarActions,
-                        previousPageTitle: localizations.accountsTitle,
-                      ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            //print('building message item at $index');
-                            if (Platform.isIOS &&
-                                widget.messageSource.supportsSearching) {
-                              if (index == 0) {
-                                return Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                    vertical: 4.0,
-                                  ),
-                                  child: CupertinoSearchTextField(
-                                    controller: searchEditingController,
-                                    placeholder: localizations.homeSearchHint,
-                                    onSubmitted: search,
-                                  ),
-                                );
-                              }
-                              index--;
-                            }
-                            if (zeroPosWidget != null) {
-                              if (index == 0) {
-                                return zeroPosWidget;
-                              }
-                              index--;
-                            }
-                            final element =
-                                _sectionedMessageSource.getElementAt(index);
-                            final section = element.section;
-                            if (section != null) {
-                              final text = i18nService!
-                                  .formatDateRange(section.range, section.date);
-                              return GestureDetector(
-                                onLongPress: () {
-                                  selectedMessages = _sectionedMessageSource
-                                      .getMessagesForSection(section);
-                                  selectedMessages
-                                      .forEach((m) => m.isSelected = true);
-                                  setState(() {
-                                    isInSelectionMode = true;
-                                  });
-                                },
-                                onTap: !isInSelectionMode
-                                    ? null
-                                    : () {
-                                        final sectionMessages =
-                                            _sectionedMessageSource
-                                                .getMessagesForSection(section);
-                                        final doSelect =
-                                            !sectionMessages.first.isSelected;
-                                        for (final msg in sectionMessages) {
-                                          if (doSelect) {
-                                            if (!msg.isSelected) {
-                                              msg.isSelected = true;
-                                              selectedMessages.add(msg);
-                                            }
-                                          } else {
-                                            if (msg.isSelected) {
-                                              msg.isSelected = false;
-                                              selectedMessages.remove(msg);
-                                            }
-                                          }
-                                        }
-                                        setState(() {});
-                                      },
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 16.0,
-                                        right: 8.0,
-                                        bottom: 4.0,
-                                        top: 16.0,
-                                      ),
-                                      child: Text(
-                                        text,
-                                        style:
-                                            TextStyle(color: theme.accentColor),
-                                      ),
-                                    ),
-                                    Divider()
-                                  ],
-                                ),
-                              );
-                            }
-                            final message = element.message!;
-                            final settings =
-                                locator<SettingsService>().settings;
-                            final swipeLeftToRightAction =
-                                settings.swipeLeftToRightAction;
-                            final swipeRightToLeftAction =
-                                settings.swipeRightToLeftAction;
-                            // print(
-                            //     '$index subject=${message.mimeMessage?.decodeSubject()}');
-                            return Dismissible(
-                              key: ValueKey(message),
-                              dismissThresholds: {
-                                DismissDirection.startToEnd:
-                                    swipeLeftToRightAction.dismissThreshold,
-                                DismissDirection.endToStart:
-                                    swipeRightToLeftAction.dismissThreshold,
-                              },
-                              background: Container(
-                                color: swipeLeftToRightAction.colorBackground,
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                alignment: AlignmentDirectional.centerStart,
-                                child: Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
-                                      child: Text(
-                                        swipeLeftToRightAction
-                                            .name(localizations),
-                                        style: TextStyle(
-                                            color: swipeLeftToRightAction
-                                                .colorForeground),
-                                      ),
-                                    ),
-                                    Icon(swipeLeftToRightAction.icon,
-                                        color:
-                                            swipeLeftToRightAction.colorIcon),
-                                  ],
-                                ),
-                              ),
-                              secondaryBackground: Container(
-                                color: swipeRightToLeftAction.colorBackground,
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                alignment: AlignmentDirectional.centerEnd,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Icon(
-                                      swipeRightToLeftAction.icon,
-                                      color: swipeRightToLeftAction.colorIcon,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
-                                      child: Text(
-                                        swipeRightToLeftAction
-                                            .name(localizations),
-                                        style: TextStyle(
-                                            color: swipeRightToLeftAction
-                                                .colorForeground),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              child: MessageOverview(
-                                element.message!,
-                                isInSelectionMode,
-                                onMessageTap,
-                                onMessageLongPress,
-                              ),
-                              onDismissed: (direction) {
-                                final action =
-                                    (direction == DismissDirection.startToEnd)
-                                        ? swipeLeftToRightAction
-                                        : swipeRightToLeftAction;
-                                if (action.isMessageMoving) {
-                                  fireSwipeAction(action, message);
-                                }
-                              },
-                              confirmDismiss: (direction) {
-                                if (direction == DismissDirection.startToEnd) {
-                                  if (swipeLeftToRightAction.isMessageMoving) {
-                                    return Future.value(true);
-                                  } else {
-                                    fireSwipeAction(
-                                        swipeLeftToRightAction, message);
-                                    return Future.value(false);
-                                  }
-                                } else {
-                                  if (swipeRightToLeftAction.isMessageMoving) {
-                                    return Future.value(true);
-                                  } else {
-                                    fireSwipeAction(
-                                        swipeRightToLeftAction, message);
-                                    return Future.value(false);
-                                  }
-                                }
-                              },
-                            );
-                          },
-                          childCount: _sectionedMessageSource.size +
-                              ((zeroPosWidget != null) ? 1 : 0),
-                          semanticIndexCallback:
-                              (Widget widget, int localIndex) {
-                            if (widget is MessageOverview) {
-                              return widget.message.sourceIndex;
-                            }
-                            return null;
-                          },
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(localizations.homeLoading(
+                              widget.messageSource.name ??
+                                  widget.messageSource.description!)),
                         ),
                       ),
                     ],
                   ),
-                ),
-              );
-          }
-        },
+                );
+              case ConnectionState.done:
+                if (_visualization == _Visualization.stack) {
+                  return WillPopScope(
+                    onWillPop: () {
+                      switchVisualization(_Visualization.list);
+                      return Future.value(false);
+                    },
+                    child: MessageStack(messageSource: widget.messageSource),
+                  );
+                }
+                return WillPopScope(
+                  onWillPop: () {
+                    if (_isInSelectionMode) {
+                      leaveSelectionMode();
+                      return Future.value(false);
+                    }
+                    return Future.value(true);
+                  },
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      await _sectionedMessageSource.refresh();
+                    },
+                    child: CustomScrollView(
+                      physics: BouncingScrollPhysics(),
+                      slivers: [
+                        PlatformSliverAppBar(
+                          title: appBarTitle,
+                          leading:
+                              (locator<MailService>().hasAccountsWithErrors())
+                                  ? MenuWithBadge()
+                                  : null,
+                          floating: _isInSearchMode ? false : true,
+                          pinned: _isInSearchMode ? true : false,
+                          stretch: true,
+                          actions: appBarActions,
+                          previousPageTitle: widget.messageSource.parentName ??
+                              localizations.accountsTitle,
+                        ),
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              //print('building message item at $index');
+                              if (Platform.isIOS &&
+                                  widget.messageSource.supportsSearching) {
+                                if (index == 0) {
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                      vertical: 4.0,
+                                    ),
+                                    child: SearchTextField(
+                                      messageSource: widget.messageSource,
+                                    ),
+                                  );
+                                }
+                                index--;
+                              }
+                              if (zeroPosWidget != null) {
+                                if (index == 0) {
+                                  return zeroPosWidget;
+                                }
+                                index--;
+                              }
+                              final element =
+                                  _sectionedMessageSource.getElementAt(index);
+                              final section = element.section;
+                              if (section != null) {
+                                final text = i18nService!.formatDateRange(
+                                    section.range, section.date);
+                                return GestureDetector(
+                                  onLongPress: () {
+                                    _selectedMessages = _sectionedMessageSource
+                                        .getMessagesForSection(section);
+                                    _selectedMessages
+                                        .forEach((m) => m.isSelected = true);
+                                    setState(() {
+                                      _isInSelectionMode = true;
+                                    });
+                                  },
+                                  onTap: !_isInSelectionMode
+                                      ? null
+                                      : () {
+                                          final sectionMessages =
+                                              _sectionedMessageSource
+                                                  .getMessagesForSection(
+                                                      section);
+                                          final doSelect =
+                                              !sectionMessages.first.isSelected;
+                                          for (final msg in sectionMessages) {
+                                            if (doSelect) {
+                                              if (!msg.isSelected) {
+                                                msg.isSelected = true;
+                                                _selectedMessages.add(msg);
+                                              }
+                                            } else {
+                                              if (msg.isSelected) {
+                                                msg.isSelected = false;
+                                                _selectedMessages.remove(msg);
+                                              }
+                                            }
+                                          }
+                                          setState(() {});
+                                        },
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 16.0,
+                                          right: 8.0,
+                                          bottom: 4.0,
+                                          top: 16.0,
+                                        ),
+                                        child: Text(
+                                          text,
+                                          style: TextStyle(
+                                              color: theme.accentColor),
+                                        ),
+                                      ),
+                                      Divider()
+                                    ],
+                                  ),
+                                );
+                              }
+                              final message = element.message!;
+                              final settings =
+                                  locator<SettingsService>().settings;
+                              final swipeLeftToRightAction =
+                                  settings.swipeLeftToRightAction;
+                              final swipeRightToLeftAction =
+                                  settings.swipeRightToLeftAction;
+                              // print(
+                              //     '$index subject=${message.mimeMessage?.decodeSubject()}');
+                              return Dismissible(
+                                key: ValueKey(message),
+                                dismissThresholds: {
+                                  DismissDirection.startToEnd:
+                                      swipeLeftToRightAction.dismissThreshold,
+                                  DismissDirection.endToStart:
+                                      swipeRightToLeftAction.dismissThreshold,
+                                },
+                                background: Container(
+                                  color: swipeLeftToRightAction.colorBackground,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0),
+                                        child: Text(
+                                          swipeLeftToRightAction
+                                              .name(localizations),
+                                          style: TextStyle(
+                                              color: swipeLeftToRightAction
+                                                  .colorForeground),
+                                        ),
+                                      ),
+                                      Icon(swipeLeftToRightAction.icon,
+                                          color:
+                                              swipeLeftToRightAction.colorIcon),
+                                    ],
+                                  ),
+                                ),
+                                secondaryBackground: Container(
+                                  color: swipeRightToLeftAction.colorBackground,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  alignment: AlignmentDirectional.centerEnd,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Icon(
+                                        swipeRightToLeftAction.icon,
+                                        color: swipeRightToLeftAction.colorIcon,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0),
+                                        child: Text(
+                                          swipeRightToLeftAction
+                                              .name(localizations),
+                                          style: TextStyle(
+                                              color: swipeRightToLeftAction
+                                                  .colorForeground),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                child: MessageOverview(
+                                  element.message!,
+                                  _isInSelectionMode,
+                                  onMessageTap,
+                                  onMessageLongPress,
+                                ),
+                                onDismissed: (direction) {
+                                  final action =
+                                      (direction == DismissDirection.startToEnd)
+                                          ? swipeLeftToRightAction
+                                          : swipeRightToLeftAction;
+                                  if (action.isMessageMoving) {
+                                    fireSwipeAction(action, message);
+                                  }
+                                },
+                                confirmDismiss: (direction) {
+                                  if (direction ==
+                                      DismissDirection.startToEnd) {
+                                    if (swipeLeftToRightAction
+                                        .isMessageMoving) {
+                                      return Future.value(true);
+                                    } else {
+                                      fireSwipeAction(
+                                          swipeLeftToRightAction, message);
+                                      return Future.value(false);
+                                    }
+                                  } else {
+                                    if (swipeRightToLeftAction
+                                        .isMessageMoving) {
+                                      return Future.value(true);
+                                    } else {
+                                      fireSwipeAction(
+                                          swipeRightToLeftAction, message);
+                                      return Future.value(false);
+                                    }
+                                  }
+                                },
+                              );
+                            },
+                            childCount: _sectionedMessageSource.size +
+                                ((zeroPosWidget != null) ? 1 : 0),
+                            semanticIndexCallback:
+                                (Widget widget, int localIndex) {
+                              if (widget is MessageOverview) {
+                                return widget.message.sourceIndex;
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+            }
+          },
+        ),
       ),
     );
   }
@@ -571,8 +583,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   Widget buildSelectionModeBottomBar(AppLocalizations localizations) {
     final isTrash = widget.messageSource.isTrash;
     final isJunk = widget.messageSource.isJunk;
-    final isAnyUnseen = selectedMessages.any((m) => !m.isSeen);
-    final isAnyUnflagged = selectedMessages.any((m) => !m.isFlagged);
+    final isAnyUnseen = _selectedMessages.any((m) => !m.isSeen);
+    final isAnyUnflagged = _selectedMessages.any((m) => !m.isFlagged);
     final IconService? iconService = locator<IconService>();
     return PlatformBottomBar(
       cupertinoBlurBackground: true,
@@ -582,7 +594,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text('${selectedMessages.length}'),
+              child: Text('${_selectedMessages.length}'),
             ),
             if (isAnyUnseen) ...{
               PlatformIconButton(
@@ -760,7 +772,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 
   void handleMultipleChoice(_MultipleChoice choice) async {
     final localizations = locator<I18nService>().localizations!;
-    if (selectedMessages.isEmpty) {
+    if (_selectedMessages.isEmpty) {
       locator<ScaffoldMessengerService>()
           .showTextSnackBar(localizations.multipleSelectionNeededInfo);
       return;
@@ -775,36 +787,36 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         break;
       case _MultipleChoice.delete:
         final notification =
-            localizations.multipleMovedToTrash(selectedMessages.length);
+            localizations.multipleMovedToTrash(_selectedMessages.length);
         await widget.messageSource
-            .deleteMessages(selectedMessages, notification);
+            .deleteMessages(_selectedMessages, notification);
         break;
       case _MultipleChoice.inbox:
         final notification =
-            localizations.multipleMovedToInbox(selectedMessages.length);
+            localizations.multipleMovedToInbox(_selectedMessages.length);
         await widget.messageSource.moveMessagesToFlag(
-            selectedMessages, MailboxFlag.inbox, notification);
+            _selectedMessages, MailboxFlag.inbox, notification);
         break;
       case _MultipleChoice.seen:
         endSelectionMode = false;
-        await widget.messageSource.markMessagesAsSeen(selectedMessages, true);
+        await widget.messageSource.markMessagesAsSeen(_selectedMessages, true);
         setState(() {});
         break;
       case _MultipleChoice.unseen:
         endSelectionMode = false;
-        await widget.messageSource.markMessagesAsSeen(selectedMessages, false);
+        await widget.messageSource.markMessagesAsSeen(_selectedMessages, false);
         setState(() {});
         break;
       case _MultipleChoice.flag:
         endSelectionMode = false;
         await widget.messageSource
-            .markMessagesAsFlagged(selectedMessages, true);
+            .markMessagesAsFlagged(_selectedMessages, true);
         setState(() {});
         break;
       case _MultipleChoice.unflag:
         endSelectionMode = false;
         await widget.messageSource
-            .markMessagesAsFlagged(selectedMessages, false);
+            .markMessagesAsFlagged(_selectedMessages, false);
         setState(() {});
         break;
       case _MultipleChoice.move:
@@ -813,20 +825,20 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         break;
       case _MultipleChoice.junk:
         final notification =
-            localizations.multipleMovedToJunk(selectedMessages.length);
+            localizations.multipleMovedToJunk(_selectedMessages.length);
         await widget.messageSource.moveMessagesToFlag(
-            selectedMessages, MailboxFlag.junk, notification);
+            _selectedMessages, MailboxFlag.junk, notification);
         break;
       case _MultipleChoice.archive:
         final notification =
-            localizations.multipleMovedToArchive(selectedMessages.length);
+            localizations.multipleMovedToArchive(_selectedMessages.length);
         await widget.messageSource.moveMessagesToFlag(
-            selectedMessages, MailboxFlag.archive, notification);
+            _selectedMessages, MailboxFlag.archive, notification);
         break;
     }
     if (endSelectionMode) {
       setState(() {
-        isInSelectionMode = false;
+        _isInSelectionMode = false;
       });
     }
   }
@@ -845,7 +857,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     final fromAddresses = <MailAddress>[];
     final subjects = <String>[];
     final futures = <Future>[];
-    for (final message in selectedMessages) {
+    for (final message in _selectedMessages) {
       message.isSelected = false;
       final mailClient = message.mailClient;
       final from = mailClient.account.fromAddress;
@@ -872,7 +884,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     }
     final composeFuture = futures.isEmpty ? null : Future.wait(futures);
     final composeData = ComposeData(
-        selectedMessages, builder, ComposeAction.forward,
+        _selectedMessages, builder, ComposeAction.forward,
         future: composeFuture);
     locator<NavigationService>()
         .push(Routes.mailCompose, arguments: composeData, fade: true);
@@ -929,7 +941,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       // check how many mailclient are involved in the current selection to either show the mailboxes of the unified account
       // or of the real account
       final mailClients = <MailClient>[];
-      for (final message in selectedMessages) {
+      for (final message in _selectedMessages) {
         if (!mailClients.contains(message.mailClient)) {
           mailClients.add(message.mailClient);
         }
@@ -942,10 +954,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     }
     final mailbox = account.isVirtual
         ? null // //TODO set current mailbox, e.g.  current: widget.messageSource.currentMailbox,
-        : selectedMessages.first.mailClient.selectedMailbox;
+        : _selectedMessages.first.mailClient.selectedMailbox;
     DialogHelper.showWidgetDialog(
       context,
-      localizations.multipleMoveTitle(selectedMessages.length),
+      localizations.multipleMoveTitle(_selectedMessages.length),
       SingleChildScrollView(
         child: MailboxTree(
           account: account,
@@ -959,17 +971,17 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 
   void moveTo(Mailbox mailbox) async {
     setState(() {
-      isInSelectionMode = false;
+      _isInSelectionMode = false;
     });
     locator<NavigationService>().pop(); // alert
     final localizations = locator<I18nService>().localizations!;
     final account = locator<MailService>().currentAccount!;
     if (account.isVirtual) {
-      await widget.messageSource.moveMessagesToFlag(selectedMessages,
+      await widget.messageSource.moveMessagesToFlag(_selectedMessages,
           mailbox.flags.first, localizations.moveSuccess(mailbox.name));
     } else {
       await widget.messageSource.moveMessages(
-          selectedMessages, mailbox, localizations.moveSuccess(mailbox.name));
+          _selectedMessages, mailbox, localizations.moveSuccess(mailbox.name));
     }
   }
 
@@ -980,12 +992,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   void onMessageTap(Message message) async {
-    if (isInSelectionMode) {
+    if (_isInSelectionMode) {
       message.toggleSelected();
       if (message.isSelected) {
-        selectedMessages.add(message);
+        _selectedMessages.add(message);
       } else {
-        selectedMessages.remove(message);
+        _selectedMessages.remove(message);
       }
       setState(() {});
     } else {
@@ -1008,17 +1020,17 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 
   void onMessageLongPress(Message message) {
     message.isSelected = true;
-    selectedMessages = [message];
+    _selectedMessages = [message];
     setState(() {
-      isInSelectionMode = true;
+      _isInSelectionMode = true;
     });
   }
 
   void leaveSelectionMode() {
-    selectedMessages.forEach((m) => m.isSelected = false);
-    selectedMessages = [];
+    _selectedMessages.forEach((m) => m.isSelected = false);
+    _selectedMessages = [];
     setState(() {
-      isInSelectionMode = false;
+      _isInSelectionMode = false;
     });
   }
 

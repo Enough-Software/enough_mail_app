@@ -1,7 +1,7 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/widgets/message_widget.dart';
+import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' as urlLauncher;

@@ -21,7 +21,7 @@ import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_mail_app/widgets/message_actions.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
-import 'package:enough_mail_app/widgets/message_widget.dart';
+import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';

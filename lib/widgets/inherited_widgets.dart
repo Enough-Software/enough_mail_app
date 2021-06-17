@@ -1,5 +1,6 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/message.dart';
+import 'package:enough_mail_app/models/message_source.dart';
 import 'package:flutter/cupertino.dart';
 
 class _InheritedMessageContainer extends InheritedWidget {
@@ -53,6 +54,60 @@ class MessageWidgetState extends State<MessageWidget> {
   @override
   Widget build(BuildContext context) {
     return new _InheritedMessageContainer(
+      data: this,
+      child: widget.child,
+    );
+  }
+}
+
+class _InheritedMessageSourceContainer extends InheritedWidget {
+  final MessageSourceWidgetState data;
+
+  // You must pass through a child and your state.
+  _InheritedMessageSourceContainer({
+    Key? key,
+    required this.data,
+    required Widget child,
+  }) : super(key: key, child: child);
+
+  // This is a built in method which you can use to check if
+  // any state has changed. If not, no reason to rebuild all the widgets
+  // that rely on your state.
+  @override
+  bool updateShouldNotify(_InheritedMessageSourceContainer old) =>
+      (old.data != data);
+}
+
+class MessageSourceWidget extends StatefulWidget {
+  // You must pass through a child.
+  final Widget child;
+  final MessageSource? messageSource;
+
+  MessageSourceWidget({
+    Key? key,
+    required this.child,
+    required this.messageSource,
+  }) : super(key: key);
+
+  // This is the secret sauce. Write your own 'of' method that will behave
+  // Exactly like MediaQuery.of and Theme.of
+  // It basically says 'get the data from the widget of this type.
+  static MessageSourceWidgetState? of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<_InheritedMessageSourceContainer>()
+        ?.data;
+  }
+
+  @override
+  MessageSourceWidgetState createState() => MessageSourceWidgetState();
+}
+
+class MessageSourceWidgetState extends State<MessageSourceWidget> {
+  MessageSource? get messageSource => widget.messageSource;
+
+  @override
+  Widget build(BuildContext context) {
+    return new _InheritedMessageSourceContainer(
       data: this,
       child: widget.child,
     );

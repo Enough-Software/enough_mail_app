@@ -5,6 +5,7 @@ import 'package:enough_mail_app/models/mime_source.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:collection/collection.dart' show IterableExtension;
@@ -13,6 +14,14 @@ import 'message.dart';
 
 abstract class MessageSource extends ChangeNotifier
     implements MimeSourceSubscriber {
+  MessageSource({MessageSource? parent, this.isSearch = false})
+      : _parentMessageSource = parent;
+
+  String? get parentName => _parentMessageSource?.name;
+
+  static MessageSource? of(BuildContext context) =>
+      MessageSourceWidget.of(context)?.messageSource;
+
   int get size;
   bool get isEmpty => (size == 0);
   final cache = MessageCache();
@@ -41,9 +50,6 @@ abstract class MessageSource extends ChangeNotifier
 
   final MessageSource? _parentMessageSource;
   final bool isSearch;
-
-  MessageSource({MessageSource? parent, this.isSearch = false})
-      : _parentMessageSource = parent;
 
   bool get shouldBlockImages;
   bool get isJunk;
@@ -391,9 +397,9 @@ abstract class MessageSource extends ChangeNotifier
 
 class MailboxMessageSource extends MessageSource {
   @override
-  int get size => _mimeSource!.size;
+  int get size => _mimeSource.size;
 
-  MimeSource? _mimeSource;
+  late MimeSource _mimeSource;
 
   MailboxMessageSource(Mailbox? mailbox, MailClient mailClient) {
     _mimeSource = MailboxMimeSource(mailClient, mailbox, subscriber: this);
@@ -407,34 +413,34 @@ class MailboxMessageSource extends MessageSource {
       : super(parent: parent, isSearch: isSearch) {
     _description = description;
     _name = name;
-    _mimeSource!.addSubscriber(this);
+    _mimeSource.addSubscriber(this);
   }
 
   @override
   void dispose() {
-    _mimeSource!.removeSubscriber(this);
-    _mimeSource!.dispose();
+    _mimeSource.removeSubscriber(this);
+    _mimeSource.dispose();
     super.dispose();
   }
 
   @override
   Message _getUncachedMessage(int index) {
     //print('get uncached $index');
-    final mime = _mimeSource!.getMessageAt(index);
-    return Message(mime, _mimeSource!.mailClient, this, index);
+    final mime = _mimeSource.getMessageAt(index);
+    return Message(mime, _mimeSource.mailClient, this, index);
   }
 
   @override
   Future<bool> init() async {
-    final result = await _mimeSource!.init();
-    name ??= _mimeSource!.name;
-    supportsDeleteAll = _mimeSource!.suppportsDeleteAll;
+    final result = await _mimeSource.init();
+    name ??= _mimeSource.name;
+    supportsDeleteAll = _mimeSource.suppportsDeleteAll;
     return result;
   }
 
   @override
   Future<void> waitForDownload() {
-    final future = _mimeSource!.downloadFuture;
+    final future = _mimeSource.downloadFuture;
     if (future != null) {
       return future;
     }
@@ -445,7 +451,7 @@ class MailboxMessageSource extends MessageSource {
   Future<List<DeleteResult>> deleteAllMessages() async {
     final removedMessages = cache.allMessages.toList();
     cache.clear();
-    final futureResults = _mimeSource!.deleteAllMessages();
+    final futureResults = _mimeSource.deleteAllMessages();
     clear();
     notifyListeners();
     final results = await futureResults;
@@ -464,31 +470,31 @@ class MailboxMessageSource extends MessageSource {
   @override
   Future<bool> markAllMessagesSeen(bool seen) async {
     cache.markAllMessageSeen(seen);
-    final marked = await _mimeSource!.markAllMessagesSeen(seen);
+    final marked = await _mimeSource.markAllMessagesSeen(seen);
     return marked;
   }
 
   @override
-  bool get shouldBlockImages => _mimeSource!.shouldBlockImages;
+  bool get shouldBlockImages => _mimeSource.shouldBlockImages;
 
   @override
-  bool get isJunk => _mimeSource!.isJunk;
+  bool get isJunk => _mimeSource.isJunk;
 
   @override
-  bool get isArchive => _mimeSource!.isArchive;
+  bool get isArchive => _mimeSource.isArchive;
 
   @override
-  bool get isTrash => _mimeSource!.isTrash;
+  bool get isTrash => _mimeSource.isTrash;
 
   @override
-  bool get supportsMessageFolders => _mimeSource!.supportsMessageFolders;
+  bool get supportsMessageFolders => _mimeSource.supportsMessageFolders;
 
   @override
-  bool get supportsSearching => _mimeSource!.supportsSearching;
+  bool get supportsSearching => _mimeSource.supportsSearching;
 
   @override
   MessageSource search(MailSearch search) {
-    final searchSource = _mimeSource!.search(search);
+    final searchSource = _mimeSource.search(search);
     final localizations = locator<I18nService>().localizations!;
     return MailboxMessageSource.fromMimeSource(
         searchSource,
@@ -504,7 +510,7 @@ class MailboxMessageSource extends MessageSource {
   }
 
   void clear() {
-    _mimeSource!.clear();
+    _mimeSource.clear();
   }
 }
 
@@ -674,8 +680,12 @@ class MultipleMessageSource extends MessageSource {
     }
     final localizations = locator<I18nService>().localizations!;
     final searchMessageSource = MultipleMessageSource(
-        searchMimeSources, localizations.searchQueryTitle(search.query), _flag,
-        parent: this, isSearch: true);
+      searchMimeSources,
+      localizations.searchQueryTitle(search.query),
+      _flag,
+      parent: this,
+      isSearch: true,
+    );
     searchMessageSource._description =
         localizations.searchQueryDescription(name!);
     searchMessageSource._supportsDeleteAll = true;
