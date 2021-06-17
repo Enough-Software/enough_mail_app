@@ -118,7 +118,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 
   @override
   Widget build(BuildContext context) {
-    print('parent name: ${widget.messageSource.parentName}');
+    // print('parent name: ${widget.messageSource.parentName}');
     final theme = Theme.of(context);
     final localizations = AppLocalizations.of(context)!;
     final source = widget.messageSource;
