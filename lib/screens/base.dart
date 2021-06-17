@@ -36,14 +36,16 @@ class Base {
     Widget? bottom,
     bool includeDrawer = true,
   }) {
-    appBar ??= buildAppBar(
-      context,
-      title,
-      actions: appBarActions,
-      subtitle: subtitle,
-      floatingActionButton: floatingActionButton,
-      includeDrawer: includeDrawer,
-    );
+    appBar ??= (title == null && subtitle == null && appBarActions == null)
+        ? null
+        : buildAppBar(
+            context,
+            title,
+            actions: appBarActions,
+            subtitle: subtitle,
+            floatingActionButton: floatingActionButton,
+            includeDrawer: includeDrawer,
+          );
     if (includeDrawer) {
       drawer ??= buildDrawer(context);
     }
@@ -77,7 +79,8 @@ class Base {
             ? null
             : CupertinoButton(
                 child: floatingActionButton.child!,
-                onPressed: floatingActionButton.onPressed),
+                onPressed: floatingActionButton.onPressed,
+              ),
       ),
       leading: (includeDrawer && locator<MailService>().hasAccountsWithErrors())
           ? MenuWithBadge()
@@ -88,10 +91,13 @@ class Base {
     );
   }
 
-  static Widget buildTitle(String? title, String? subtitle) {
+  static Widget? buildTitle(String? title, String? subtitle) {
     if (subtitle == null) {
+      if (title == null) {
+        return null;
+      }
       return Text(
-        title!,
+        title,
         overflow: TextOverflow.fade,
       );
     } else {

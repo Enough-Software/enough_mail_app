@@ -8,7 +8,7 @@ import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/editor_extensions.dart';
-import 'package:enough_mail_app/widgets/message_widget.dart';
+import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:enough_mail/enough_mail.dart';
