@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 class ScaffoldMessengerService {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
-  final GlobalKey<CupertinoStatusBarState> statusBarKey =
-      GlobalKey<CupertinoStatusBarState>();
+
+  CupertinoStatusBarState? statusBarState;
 
   SnackBar _buildTextSnackBar(String text, {Function()? undo}) {
     return SnackBar(
@@ -24,12 +24,17 @@ class ScaffoldMessengerService {
   }
 
   void _showSnackBar(SnackBar snackBar) {
-    scaffoldMessengerKey.currentState!.showSnackBar(snackBar);
+    scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
   }
 
   void showTextSnackBar(String text, {Function()? undo}) {
-    if (Platform.isIOS) {
-      statusBarKey.currentState?.showTextStatus(text, undo: undo);
+    if (Platform.isIOS || Platform.isMacOS) {
+      final state = statusBarState;
+      if (state != null) {
+        state.showTextStatus(text, undo: undo);
+      } else {
+        _showSnackBar(_buildTextSnackBar(text, undo: undo));
+      }
     } else {
       _showSnackBar(_buildTextSnackBar(text, undo: undo));
     }
