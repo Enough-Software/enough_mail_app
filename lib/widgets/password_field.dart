@@ -7,6 +7,8 @@ class PasswordField extends StatefulWidget {
   final String? hintText;
   final Function(String)? onChanged;
   final bool autofocus;
+  final bool cupertinoShowLabel;
+
   PasswordField({
     Key? key,
     required this.controller,
@@ -14,6 +16,7 @@ class PasswordField extends StatefulWidget {
     this.hintText,
     this.onChanged,
     this.autofocus = false,
+    this.cupertinoShowLabel = true,
   }) : super(key: key);
 
   @override
@@ -30,6 +33,7 @@ class _PasswordFieldState extends State<PasswordField> {
       obscureText: _obscureText,
       onChanged: widget.onChanged,
       autofocus: widget.autofocus,
+      cupertinoShowLabel: widget.cupertinoShowLabel,
       decoration: InputDecoration(
         hintText: widget.hintText,
         labelText: widget.labelText,

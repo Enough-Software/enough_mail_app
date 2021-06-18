@@ -141,6 +141,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                       DecoratedPlatformTextField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
+                        cupertinoShowLabel: false,
                         onChanged: (value) {
                           final isValid = Validator.validateEmail(value);
                           if (isValid) {
@@ -212,6 +213,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                 _isApplicationSpecificPasswordAcknowledged!) ...{
                               PasswordField(
                                 controller: _passwordController,
+                                cupertinoShowLabel: false,
                                 onChanged: (value) {
                                   bool isValid = value.isNotEmpty &&
                                       (_clientConfig != null ||
@@ -229,10 +231,12 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                               ),
                               PlatformTextButton(
                                 onPressed: navigateToManualSettings,
-                                child: ButtonText(localizations
-                                    .addAccountResolvedSettingsWrongAction(
-                                        _clientConfig?.displayName ??
-                                            '<unknown>')),
+                                child: ButtonText(
+                                  localizations
+                                      .addAccountResolvedSettingsWrongAction(
+                                          _clientConfig?.displayName ??
+                                              '<unknown>'),
+                                ),
                               ),
                               if (_extensionForgotPassword != null) ...{
                                 PlatformTextButton(
@@ -244,7 +248,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                         _extensionForgotPassword!.action!.url;
                                     url = url
                                       ..replaceAll(
-                                          '{user.email}', account.email!)
+                                          '{user.email}', account.email ?? '')
                                       ..replaceAll('{language}', languageCode);
                                     launcher.launch(url);
                                   },
@@ -263,7 +267,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                           children: [
                             Text(localizations
                                 .addAccountResolvingSetingsFailedInfo(
-                                    account.email!)),
+                                    account.email ?? '')),
                             PlatformElevatedButton(
                               child: ButtonText(
                                   localizations.addAccountEditManuallyAction),
@@ -335,8 +339,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                           ),
                         ),
                       } else ...{
-                        Text(localizations
-                            .addAccountVerifyingFailedInfo(account.email!)),
+                        Text(localizations.addAccountVerifyingFailedInfo(
+                            account.email ?? '')),
                       }
                     ],
                   ),

@@ -11,15 +11,16 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 
 import '../locator.dart';
+import 'icon_text.dart';
 
 class MailAddressChip extends StatelessWidget {
   final MailAddress mailAddress;
   const MailAddressChip({Key? key, required this.mailAddress})
       : super(key: key);
 
-  String? getText() {
+  String getText() {
     return (mailAddress.personalName?.isNotEmpty ?? false)
-        ? mailAddress.personalName
+        ? mailAddress.personalName!
         : mailAddress.email;
   }
 
@@ -28,30 +29,31 @@ class MailAddressChip extends StatelessWidget {
     final localizations = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return PlatformPopupMenuButton<_AddressAction>(
-      child: PlatformChip(label: Text(getText()!)),
+      cupertinoButtonPadding: EdgeInsets.zero,
+      child: PlatformChip(label: Text(getText())),
       title:
           mailAddress.hasPersonalName ? Text(mailAddress.personalName!) : null,
       message: Text(mailAddress.email, style: theme.textTheme.caption),
       itemBuilder: (context) => [
         PlatformPopupMenuItem(
           value: _AddressAction.copy,
-          child: PlatformListTile(
-            leading: Icon(Icons.copy),
-            title: Text(localizations!.actionAddressCopy),
+          child: IconText(
+            icon: Icon(Icons.copy),
+            label: Text(localizations!.actionAddressCopy),
           ),
         ),
         PlatformPopupMenuItem(
           value: _AddressAction.compose,
-          child: PlatformListTile(
-            leading: Icon(Icons.add),
-            title: Text(localizations.actionAddressCompose),
+          child: IconText(
+            icon: Icon(Icons.add),
+            label: Text(localizations.actionAddressCompose),
           ),
         ),
         PlatformPopupMenuItem(
           value: _AddressAction.search,
-          child: PlatformListTile(
-            leading: Icon(Icons.search),
-            title: Text(localizations.actionAddressSearch),
+          child: IconText(
+            icon: Icon(Icons.search),
+            label: Text(localizations.actionAddressSearch),
           ),
         ),
       ],

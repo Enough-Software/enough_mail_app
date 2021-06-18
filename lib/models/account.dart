@@ -47,8 +47,8 @@ class Account extends ChangeNotifier {
       final extensions = account.appExtensions;
       if (extensions != null) {
         final languageCode = locator<I18nService>().locale!.languageCode;
-        for (final extension in extensions) {
-          final signature = extension!.getSignatureHtml(languageCode);
+        for (final ext in extensions) {
+          final signature = ext.getSignatureHtml(languageCode);
           if (signature != null) {
             return signature;
           }
