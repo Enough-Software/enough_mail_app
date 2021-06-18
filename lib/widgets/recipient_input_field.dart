@@ -64,8 +64,8 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
           child: Text(
             widget.labelText!,
             style: TextStyle(
-                color:
-                    _focusNode.hasFocus ? theme.accentColor : theme.hintColor),
+              color: _focusNode.hasFocus ? theme.accentColor : theme.hintColor,
+            ),
           ),
         ),
       },
@@ -106,10 +106,16 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
           final email = textEditingValue.text.substring(0, search.length - 1);
           checkEmail(email);
         }
-        if (widget.contactManager == null) {
+        final contactManager = widget.contactManager;
+        if (contactManager == null) {
           return [];
         }
-        return widget.contactManager!.find(search);
+        final matches = contactManager.find(search).toList();
+        // do not suggest recipients that are already added:
+        for (final existing in widget.addresses) {
+          matches.remove(existing);
+        }
+        return matches;
       },
       displayStringForOption: (option) => option.toString(),
       fieldViewBuilder:

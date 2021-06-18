@@ -293,8 +293,8 @@ class _MessageContentState extends State<_MessageContent> {
     }
     return Wrap(
       //TODO make expansible
-      spacing: 2,
-      runSpacing: 0,
+      spacing: 1.0,
+      runSpacing: 1.0,
       children: [
         for (var address in addresses!) ...{
           MailAddressChip(mailAddress: address)

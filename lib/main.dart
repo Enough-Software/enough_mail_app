@@ -12,6 +12,7 @@ import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'locator.dart';
@@ -146,6 +147,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       materialDarkTheme:
           _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
       materialThemeMode: _themeMode,
+      cupertinoTheme: CupertinoThemeData(
+        brightness: Brightness.light,
+      ),
     );
   }
 }

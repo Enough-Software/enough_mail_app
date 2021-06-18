@@ -1,6 +1,7 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
 import 'package:enough_serialization/enough_serialization.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 
 extension MailAccountExtension on MailAccount {
   void addExtensionSerializationConfiguration() {
@@ -8,13 +9,12 @@ extension MailAccountExtension on MailAccount {
     objectCreators['extensions.value'] = (map) => AppExtension();
   }
 
-  List<AppExtension?>? get appExtensions => attributes['extensions'];
+  List<AppExtension>? get appExtensions => attributes['extensions'];
   set appExtensions(List<AppExtension?>? value) =>
       attributes['extensions'] = value;
 
   AppExtensionActionDescription? get appExtensionForgotPassword => appExtensions
-      ?.firstWhere((ext) => ext!.forgotPasswordAction != null,
-          orElse: () => null)
+      ?.firstWhereOrNull((ext) => ext.forgotPasswordAction != null)
       ?.forgotPasswordAction;
 
   List<AppExtensionActionDescription> get appExtensionsAccountSideMenu {
@@ -22,7 +22,7 @@ extension MailAccountExtension on MailAccount {
     final extensions = appExtensions;
     if (extensions != null) {
       for (final ext in extensions) {
-        if (ext!.accountSideMenu != null) {
+        if (ext.accountSideMenu != null) {
           entries.addAll(ext.accountSideMenu!);
         }
       }

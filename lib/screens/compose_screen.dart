@@ -437,6 +437,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           labelText: localizations.composeSubjectLabel,
                           hintText: localizations.composeSubjectHint,
                         ),
+                        cupertinoShowLabel: false,
                       ),
                       if (widget.data.messageBuilder.attachments.isNotEmpty ||
                           (_downloadAttachmentsFuture != null)) ...{
