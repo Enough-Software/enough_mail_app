@@ -13,7 +13,7 @@ import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'locator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 // AppStyles appStyles = AppStyles.instance;
@@ -109,51 +109,43 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if (true) {
-      return PlatformApp(
-        supportedLocales: AppLocalizations.supportedLocales,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        locale: _locale,
-        debugShowCheckedModeBanner: false,
-        title: 'Maily',
-        onGenerateRoute: AppRouter.generateRoute,
-        // initialRoute: Routes.splash,
-        navigatorKey: locator<NavigationService>().navigatorKey,
-        home: Builder(
-          builder: (context) {
-            locator<I18nService>().init(
-                AppLocalizations.of(context)!, Localizations.localeOf(context));
-            return FutureBuilder<MailService>(
-              future: _appInitialization,
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                  case ConnectionState.active:
-                    return SplashScreen();
-                  case ConnectionState.done:
-                    // in the meantime the app has navigated away
-                    break;
-                }
-                return Container();
-              },
-            );
-          },
-        ),
-        material: (context, platform) => MaterialAppData(
-          scaffoldMessengerKey:
-              locator<ScaffoldMessengerService>().scaffoldMessengerKey,
-          theme: _themeService?.lightTheme ?? ThemeService.defaultLightTheme,
-          darkTheme: _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
-          themeMode: _themeMode,
-        ),
-        cupertino: (context, platform) => CupertinoAppData(
-            // theme: (_themeService?.lightTheme ?? ThemeService.defaultLightTheme)
-            //     .cupertinoOverrideTheme,
-            // darkTheme: _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
-            // themeMode: _themeMode,
-            ),
-      );
-    }
+    return PlatformSnackApp(
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      locale: _locale,
+      debugShowCheckedModeBanner: false,
+      title: 'Maily',
+      onGenerateRoute: AppRouter.generateRoute,
+      // initialRoute: Routes.splash,
+      navigatorKey: locator<NavigationService>().navigatorKey,
+      home: Builder(
+        builder: (context) {
+          locator<I18nService>().init(
+              AppLocalizations.of(context)!, Localizations.localeOf(context));
+          return FutureBuilder<MailService>(
+            future: _appInitialization,
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                case ConnectionState.waiting:
+                case ConnectionState.active:
+                  return SplashScreen();
+                case ConnectionState.done:
+                  // in the meantime the app has navigated away
+                  break;
+              }
+              return Container();
+            },
+          );
+        },
+      ),
+      scaffoldMessengerKey:
+          locator<ScaffoldMessengerService>().scaffoldMessengerKey,
+      materialTheme:
+          _themeService?.lightTheme ?? ThemeService.defaultLightTheme,
+      materialDarkTheme:
+          _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
+      materialThemeMode: _themeMode,
+    );
   }
 }

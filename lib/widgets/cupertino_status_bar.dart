@@ -13,8 +13,7 @@ class CupertinoStatusBar extends StatefulWidget {
   final Widget? leftAction;
   final Widget? rightAction;
   final Widget? info;
-  CupertinoStatusBar({this.leftAction, this.info, this.rightAction})
-      : super(key: locator<ScaffoldMessengerService>().statusBarKey);
+  CupertinoStatusBar({this.leftAction, this.info, this.rightAction});
 
   @override
   CupertinoStatusBarState createState() => CupertinoStatusBarState();
@@ -33,6 +32,18 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
   Widget? _status;
   Widget? _statusAction;
   late double _statusOpacity;
+
+  @override
+  void initState() {
+    super.initState();
+    locator<ScaffoldMessengerService>().statusBarState = this;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    locator<ScaffoldMessengerService>().statusBarState = null;
+  }
 
   @override
   Widget build(BuildContext context) {
