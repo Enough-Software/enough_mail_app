@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/models/settings.dart';
@@ -71,12 +73,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     locator<NavigationService>().push(Routes.settingsSignature);
                   },
                 ),
-                PlatformListTile(
-                  title: Text(localizations.settingsActionDesign),
-                  onTap: () {
-                    locator<NavigationService>().push(Routes.settingsDesign);
-                  },
-                ),
+                if (!(Platform.isIOS || Platform.isMacOS)) ...{
+                  PlatformListTile(
+                    title: Text(localizations.settingsActionDesign),
+                    onTap: () {
+                      locator<NavigationService>().push(Routes.settingsDesign);
+                    },
+                  ),
+                },
                 PlatformListTile(
                   title: Text(localizations.languageSettingTitle),
                   onTap: () {
