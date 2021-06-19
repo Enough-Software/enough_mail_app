@@ -9,7 +9,23 @@ class ScaffoldMessengerService {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
-  CupertinoStatusBarState? statusBarState;
+  final _statusBarStates = <CupertinoStatusBarState>[];
+  CupertinoStatusBarState? _statusBarState;
+  set statusBarState(CupertinoStatusBarState state) {
+    final current = _statusBarState;
+    if (current != null) {
+      _statusBarStates.add(current);
+    }
+    _statusBarState = state;
+  }
+
+  void popStatusBarState() {
+    if (_statusBarStates.isNotEmpty) {
+      _statusBarState = _statusBarStates.removeLast();
+    } else {
+      _statusBarState = null;
+    }
+  }
 
   SnackBar _buildTextSnackBar(String text, {Function()? undo}) {
     return SnackBar(
@@ -29,7 +45,7 @@ class ScaffoldMessengerService {
 
   void showTextSnackBar(String text, {Function()? undo}) {
     if (Platform.isIOS || Platform.isMacOS) {
-      final state = statusBarState;
+      final state = _statusBarState;
       if (state != null) {
         state.showTextStatus(text, undo: undo);
       } else {

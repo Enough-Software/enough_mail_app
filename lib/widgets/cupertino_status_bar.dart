@@ -42,7 +42,7 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
   @override
   void dispose() {
     super.dispose();
-    locator<ScaffoldMessengerService>().statusBarState = null;
+    locator<ScaffoldMessengerService>().popStatusBarState();
   }
 
   @override
