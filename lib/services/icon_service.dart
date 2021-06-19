@@ -1,29 +1,69 @@
+import 'dart:io';
+
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/models/models.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class IconService {
+  static final _isCupertino = Platform.isIOS || Platform.isMacOS;
+
+  IconData get share => _isCupertino ? CupertinoIcons.share : Icons.share;
+  IconData get location =>
+      _isCupertino ? CupertinoIcons.location : Icons.location_on_outlined;
+  IconData get email => _isCupertino ? CupertinoIcons.mail : Icons.email;
+  IconData get settings =>
+      _isCupertino ? CupertinoIcons.settings : Icons.settings;
+  IconData get about => _isCupertino ? CupertinoIcons.info : Icons.info_outline;
+
+  IconData get mediaFile =>
+      _isCupertino ? CupertinoIcons.doc : Icons.insert_drive_file_outlined;
+  IconData get mediaPhoto =>
+      _isCupertino ? CupertinoIcons.photo : Icons.photo_outlined;
+  IconData get mediaAudio =>
+      _isCupertino ? CupertinoIcons.music_note : Icons.audiotrack_outlined;
+  IconData get mediaVideo =>
+      _isCupertino ? CupertinoIcons.videocam : Icons.video_collection_outlined;
+  IconData get mediaGif => Icons.gif;
+  IconData get mediaSticker => CommunityMaterialIcons.sticker;
+
   IconData getMessageIsSeen(bool isSeen) =>
       isSeen ? messageIsSeen : messageIsNotSeen;
-  IconData get messageIsSeen => Icons.circle_outlined;
-  IconData get messageIsNotSeen => Icons.circle;
+  IconData get messageIsSeen =>
+      _isCupertino ? CupertinoIcons.circle : Icons.circle_outlined;
+  IconData get messageIsNotSeen =>
+      _isCupertino ? CupertinoIcons.circle_fill : Icons.circle;
   IconData getMessageIsFlagged(bool isFlagged) =>
       isFlagged ? messageIsFlagged : messageIsNotFlagged;
-  IconData get messageIsFlagged => Icons.flag;
-  IconData get messageIsNotFlagged => Icons.flag_outlined;
+  IconData get messageIsFlagged =>
+      _isCupertino ? CupertinoIcons.flag_fill : Icons.flag;
+  IconData get messageIsNotFlagged =>
+      _isCupertino ? CupertinoIcons.flag : Icons.flag_outlined;
 
-  IconData get messageActionReply => Icons.reply;
-  IconData get messageActionReplyAll => Icons.reply_all;
-  IconData get messageActionForward => Icons.forward;
+  IconData get messageActionReply =>
+      _isCupertino ? CupertinoIcons.reply : Icons.reply;
+  IconData get messageActionReplyAll =>
+      _isCupertino ? CupertinoIcons.reply_all : Icons.reply_all;
+  IconData get messageActionForward =>
+      _isCupertino ? CupertinoIcons.arrowshape_turn_up_right : Icons.forward;
   IconData get messageActionForwardAsAttachment => Icons.forward_to_inbox;
   IconData get messageActionForwardAttachments => Icons.attach_file;
   IconData get messageActionMoveToInbox => Icons.move_to_inbox;
-  IconData get messageActionDelete => CommunityMaterialIcons.trash_can_outline;
-  IconData get messageActionMove => CommunityMaterialIcons.file_move_outline;
+  IconData get messageActionDelete => _isCupertino
+      ? CupertinoIcons.delete
+      : CommunityMaterialIcons.trash_can_outline;
+  IconData get messageActionMove => _isCupertino
+      ? CupertinoIcons.folder
+      : CommunityMaterialIcons.file_move_outline;
   IconData get messageActionMoveToJunk => CommunityMaterialIcons.bug_outline;
-  IconData get messageActionMoveFromJunkToInbox => Icons.check;
-  IconData get messageActionArchive => CommunityMaterialIcons.archive_outline;
-  IconData get messageActionRedirect => Icons.compare_arrows;
+  IconData get messageActionMoveFromJunkToInbox =>
+      _isCupertino ? CupertinoIcons.checkmark : Icons.check;
+  IconData get messageActionArchive => _isCupertino
+      ? CupertinoIcons.archivebox
+      : CommunityMaterialIcons.archive_outline;
+  IconData get messageActionRedirect =>
+      _isCupertino ? CupertinoIcons.arrow_branch : Icons.compare_arrows;
 
   IconData get folderGeneric => CommunityMaterialIcons.folder_outline;
   IconData get folderInbox => CommunityMaterialIcons.inbox;

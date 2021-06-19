@@ -4,6 +4,7 @@ import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/api_keys.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
@@ -88,57 +89,57 @@ class AddAttachmentPopupButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-
+    final localizations = AppLocalizations.of(context)!;
+    final iconService = locator<IconService>();
     return PlatformPopupMenuButton<int>(
       icon: Icon(Icons.add),
       itemBuilder: (context) => [
         PlatformPopupMenuItem(
           value: 0,
           child: IconText(
-            icon: Icon(Icons.insert_drive_file_outlined),
-            label: Text(localizations!.attachTypeFile),
+            icon: Icon(iconService.mediaFile),
+            label: Text(localizations.attachTypeFile),
           ),
         ),
         PlatformPopupMenuItem(
           value: 1,
           child: IconText(
-            icon: Icon(Icons.photo_outlined),
+            icon: Icon(iconService.mediaPhoto),
             label: Text(localizations.attachTypePhoto),
           ),
         ),
         PlatformPopupMenuItem(
           value: 2,
           child: IconText(
-            icon: Icon(Icons.video_collection_outlined),
+            icon: Icon(iconService.mediaVideo),
             label: Text(localizations.attachTypeVideo),
           ),
         ),
         PlatformPopupMenuItem(
           value: 3,
           child: IconText(
-            icon: Icon(Icons.audiotrack_outlined),
+            icon: Icon(iconService.mediaAudio),
             label: Text(localizations.attachTypeAudio),
           ),
         ),
         PlatformPopupMenuItem(
           value: 4,
           child: IconText(
-            icon: Icon(Icons.location_on_outlined),
+            icon: Icon(iconService.location),
             label: Text(localizations.attachTypeLocation),
           ),
         ),
         PlatformPopupMenuItem(
           value: 5,
           child: IconText(
-            icon: Icon(Icons.gif),
+            icon: Icon(iconService.mediaGif),
             label: Text(localizations.attachTypeGif),
           ),
         ),
         PlatformPopupMenuItem(
           value: 6,
           child: IconText(
-            icon: Icon(CommunityMaterialIcons.sticker),
+            icon: Icon(iconService.mediaSticker),
             label: Text(localizations.attachTypeSticker),
           ),
         ),
