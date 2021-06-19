@@ -1,4 +1,5 @@
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
@@ -79,7 +80,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Widget _buildOnboardingArea() {
-    final pages = buildPages();
+    final localizations = AppLocalizations.of(context)!;
+    final pages = buildPages(localizations);
     return Stack(
       children: [
         LiquidSwipe(
@@ -111,23 +113,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   child: Shimmer(
                     duration: const Duration(seconds: 4),
                     interval: const Duration(seconds: 6),
-                    child: PlatformElevatedButton(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Icon(Icons.email),
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: ButtonText(AppLocalizations.of(context)!
-                                  .welcomeActionSignIn),
-                            ),
-                          ),
-                        ],
-                      ),
+                    child: PlatformFilledButtonIcon(
+                      icon: Icon(locator<IconService>().email),
+                      label: ButtonText(localizations.welcomeActionSignIn),
                       onPressed: () {
                         locator<NavigationService>()
                             .push(Routes.accountAdd, arguments: true);
@@ -143,7 +131,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
-  List<Widget> buildPages() {
+  List<Widget> buildPages(AppLocalizations localizations) {
     return [
       Container(
         color: Colors.green[700],
@@ -162,7 +150,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
               child: Text(
-                AppLocalizations.of(context)!.welcomePanel1,
+                localizations.welcomePanel1,
                 style: WelcomeScreen.textStyleLight,
                 textAlign: TextAlign.center,
               ),
@@ -188,7 +176,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
               child: Text(
-                AppLocalizations.of(context)!.welcomePanel2,
+                localizations.welcomePanel2,
                 style: WelcomeScreen.textStyleLight,
                 textAlign: TextAlign.center,
               ),
@@ -214,7 +202,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
               child: Text(
-                AppLocalizations.of(context)!.welcomePanel3,
+                localizations.welcomePanel3,
                 style: WelcomeScreen.textStyleLight,
                 textAlign: TextAlign.center,
               ),
@@ -240,7 +228,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 8.0, 24.0, 8.0),
               child: Text(
-                AppLocalizations.of(context)!.welcomePanel4,
+                localizations.welcomePanel4,
                 style: WelcomeScreen.textStyleDark,
                 textAlign: TextAlign.center,
               ),

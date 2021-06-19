@@ -73,33 +73,39 @@ class _MessageActionsState extends State<MessageActions> {
         child: Row(
           children: [
             if (!widget.message.isEmbedded) ...{
-              PlatformIconButton(
+              DensePlatformIconButton(
                 icon: Icon(iconService.getMessageIsSeen(widget.message.isSeen)),
                 onPressed: _toggleSeen,
               ),
-              PlatformIconButton(
+              DensePlatformIconButton(
                 icon: Icon(
                     iconService.getMessageIsFlagged(widget.message.isFlagged)),
                 onPressed: _toggleFlagged,
               ),
             },
             Spacer(),
-            PlatformIconButton(
-                icon: Icon(iconService.messageActionReply), onPressed: _reply),
-            PlatformIconButton(
-                icon: Icon(iconService.messageActionReplyAll),
-                onPressed: _replyAll),
-            PlatformIconButton(
-                icon: Icon(iconService.messageActionForward),
-                onPressed: _forward),
+            DensePlatformIconButton(
+              icon: Icon(iconService.messageActionReply),
+              onPressed: _reply,
+            ),
+            DensePlatformIconButton(
+              icon: Icon(iconService.messageActionReplyAll),
+              onPressed: _replyAll,
+            ),
+            DensePlatformIconButton(
+              icon: Icon(iconService.messageActionForward),
+              onPressed: _forward,
+            ),
             if (widget.message.source.isTrash) ...{
-              PlatformIconButton(
-                  icon: Icon(iconService.messageActionMoveToInbox),
-                  onPressed: _moveToInbox),
+              DensePlatformIconButton(
+                icon: Icon(iconService.messageActionMoveToInbox),
+                onPressed: _moveToInbox,
+              ),
             } else if (!widget.message.isEmbedded) ...{
-              PlatformIconButton(
-                  icon: Icon(iconService.messageActionDelete),
-                  onPressed: _delete),
+              DensePlatformIconButton(
+                icon: Icon(iconService.messageActionDelete),
+                onPressed: _delete,
+              ),
             },
             PlatformPopupMenuButton<_OverflowMenuChoice>(
               onSelected: _onOverflowChoiceSelected,

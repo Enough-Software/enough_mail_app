@@ -8,6 +8,7 @@ import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/extensions/extension_action_tile.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
@@ -48,6 +49,7 @@ class _AppDrawerState extends State<AppDrawer> {
     final mailService = locator<MailService>();
     final theme = Theme.of(context);
     final localizations = AppLocalizations.of(context)!;
+    final iconService = locator<IconService>();
     final currentAccount = mailService.currentAccount!;
     var accounts = mailService.accounts;
     if (mailService.hasUnifiedAccount) {
@@ -79,7 +81,7 @@ class _AppDrawerState extends State<AppDrawer> {
                           context, currentAccount),
                       Divider(),
                       PlatformListTile(
-                        leading: Icon(Icons.info),
+                        leading: Icon(iconService.about),
                         title: Text(localizations.drawerEntryAbout),
                         onTap: () {
                           DialogHelper.showAbout(context);
@@ -93,7 +95,7 @@ class _AppDrawerState extends State<AppDrawer> {
             Material(
               elevation: 18,
               child: PlatformListTile(
-                leading: Icon(Icons.settings),
+                leading: Icon(iconService.settings),
                 title: Text(localizations.drawerEntrySettings),
                 onTap: () {
                   final navService = locator<NavigationService>();

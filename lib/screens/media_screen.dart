@@ -7,6 +7,7 @@ import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
@@ -33,18 +34,18 @@ class InteractiveMediaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
-
+    final iconService = locator<IconService>();
     return Base.buildAppChrome(
       context,
       title: mediaWidget!.mediaProvider.name,
       content: mediaWidget,
       appBarActions: [
-        PlatformIconButton(
-          icon: Icon(Icons.forward),
+        DensePlatformIconButton(
+          icon: Icon(iconService.messageActionForward),
           onPressed: forward,
         ),
-        PlatformIconButton(
-          icon: Icon(Icons.share),
+        DensePlatformIconButton(
+          icon: Icon(iconService.share),
           onPressed: share,
         ),
         if (mediaWidget!.mediaProvider.isText &&
