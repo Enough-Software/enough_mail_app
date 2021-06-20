@@ -208,6 +208,8 @@
   "addAccountVerifyingSettingsLabel": "Überprüfe {email}...",
   "addAccountVerifyingSuccessInfo": "Erfolgreich mit {email} angemeldet.",
   "addAccountVerifyingFailedInfo": "Leider konnte ich dich nicht anmelden. Überprüfe deine Email {email} und dein Passwort.",
+  "accountAddImapAccessSetuptMightBeRequired": "Vielleicht musst Du bei deinem Anbieter den Zugang für Email Apps aktivieren.",
+  "addAccoutSetupImapAccessButtonLabel": "Email Zugang aktivieren",
   "addAccountNameOfUserLabel": "Dein Name",
   "addAccountNameOfUserHint": "Name, den Empfänger:innen sehen",
   "addAccountNameOfAccountLabel": "Konto Name",

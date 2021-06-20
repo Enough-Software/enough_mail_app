@@ -1015,6 +1015,14 @@
       }
     }  
   },
+  "accountAddImapAccessSetuptMightBeRequired": "Your provider might require you to setup access for email apps manually.",
+  "@accountAddImapAccessSetuptMightBeRequired": {
+    "description": "Info shown when login fails for a provider that is know to require manual activation of IMAP access."
+  },
+  "addAccoutSetupImapAccessButtonLabel": "Setup email access",
+  "@addAccoutSetupImapAccessButtonLabel": {
+    "description": "Label of button to launch website with instructions."
+  },
   "addAccountNameOfUserLabel": "Your name",
   "@addAccountNameOfUserLabel": {
     "description": "Label for user name input field."
