@@ -2,9 +2,11 @@
 Mail app for iOS, Android and hopefully more platforms in the future. Developed in [Flutter](https://flutter.dev).
 
 ## Test Maily
-You can test an early access version of Maily today on [Google Play](https://play.google.com/store/apps/details?id=de.enough.enough_mail_app).
+You can test an early access version of Maily today:
+* on Android at [Google Play](https://play.google.com/store/apps/details?id=de.enough.enough_mail_app).
+* on iOS with [TestFlight](https://testflight.apple.com/join/6TFIg0uJ).
 
-## Screenshots 
+## Screenshots Android
 [<img src="screenshots/welcome.png" width="320"/>](screenshots/welcome.png)
 [<img src="screenshots/compose_honey.png" width="320"/>](screenshots/compose_honey.png)
 [<img src="screenshots/contact_interactions.png" width="320"/>](screenshots/contact_interactions.png)
