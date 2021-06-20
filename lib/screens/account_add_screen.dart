@@ -391,7 +391,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                 'https://support.microsoft.com/account-billing/using-app-passwords-with-apps-that-don-t-support-two-step-verification-5896ed9b-4263-e681-128a-a6f2979a7944',
             'imap.yahoo.com': 'https://help.yahoo.com/kb/SLN15241.html',
             'imap.gmail.com':
-                'https://support.google.com/accounts/answer/185833'
+                'https://support.google.com/accounts/answer/185833',
+            'imap.aol.com':
+                'https://help.aol.com/articles/Create-and-manage-app-password',
           }[incomingHostname];
           _isApplicationSpecificPasswordAcknowledged = false;
         }
