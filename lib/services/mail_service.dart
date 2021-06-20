@@ -501,9 +501,10 @@ class MailService {
     try {
       await mailClient.connect();
     } on MailException {
-      var preferredUserName = mailAccount.incoming!.serverConfig!
-          .getUserName(mailAccount.userName!);
-      if (preferredUserName == null || preferredUserName == mailAccount.email) {
+      final email = mailAccount.email!;
+      var preferredUserName =
+          mailAccount.incoming?.serverConfig?.getUserName(email);
+      if (preferredUserName == null || preferredUserName == email) {
         final atIndex = mailAccount.email!.lastIndexOf('@');
         preferredUserName = mailAccount.email!.substring(0, atIndex);
         final incomingAuth = mailAccount.incoming!.authentication;
