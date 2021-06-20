@@ -52,6 +52,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
 
   AppExtensionActionDescription? _extensionForgotPassword;
 
+  String? _providerManualImapAccessSetupUrl;
+
   Future<void> navigateToManualSettings() async {
     if (_clientConfig == null) {
       account.incoming = MailServerConfig(
@@ -341,6 +343,19 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                       } else ...{
                         Text(localizations.addAccountVerifyingFailedInfo(
                             account.email ?? '')),
+                        if (_providerManualImapAccessSetupUrl != null) ...{
+                          Padding(
+                            padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
+                            child: Text(localizations
+                                .accountAddImapAccessSetuptMightBeRequired),
+                          ),
+                          PlatformTextButton(
+                            child: ButtonText(localizations
+                                .addAccoutSetupImapAccessButtonLabel),
+                            onPressed: () => launcher
+                                .launch(_providerManualImapAccessSetupUrl!),
+                          ),
+                        },
                       }
                     ],
                   ),
@@ -416,6 +431,12 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         if (isVerified) {
           mailAccount.appExtensions = _extensions;
           account = mailAccount;
+        } else {
+          FocusManager.instance.primaryFocus?.unfocus();
+          // check if the provider might require manual setup of IMAP access:
+          _providerManualImapAccessSetupUrl = {
+            'imap.gmx.net': 'https://hilfe.gmx.net/pop-imap/einschalten.html',
+          }[mailAccount.incoming?.serverConfig?.hostname];
         }
         setState(() {
           _isAccountVerifying = false;
