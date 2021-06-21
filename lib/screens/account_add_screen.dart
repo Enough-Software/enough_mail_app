@@ -378,9 +378,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
             _isClientConfigResolving = true;
           });
         }
-        print('discover settings for ${account.email}');
-        final clientConfig =
-            await Discover.discover(account.email!, isLogEnabled: true);
+        final email = account.email!;
+        print('discover settings for $email');
+        final clientConfig = await Discover.discover(email, isLogEnabled: true);
         print('done discovering settings: ${clientConfig?.displayName}');
         final incomingHostname =
             clientConfig?.preferredIncomingServer?.hostname;
@@ -394,11 +394,14 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                 'https://support.google.com/accounts/answer/185833',
             'imap.aol.com':
                 'https://help.aol.com/articles/Create-and-manage-app-password',
+            'imap.mail.me.com': 'https://support.apple.com/en-us/HT204397',
           }[incomingHostname];
+          if (_providerAppplicationPasswordUrl != null) {
+            FocusManager.instance.primaryFocus?.unfocus();
+          }
           _isApplicationSpecificPasswordAcknowledged = false;
         }
-        var domainName =
-            account.email!.substring(account.email!.lastIndexOf('@') + 1);
+        var domainName = email.substring(email.lastIndexOf('@') + 1);
         _accountNameController.text = domainName;
         if (clientConfig != null) {
           final mailAccount = MailAccount.fromDiscoveredSettings(
@@ -406,8 +409,15 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
               _emailController.text,
               _passwordController.text,
               clientConfig);
-          _extensions = await AppExtension.loadFor(mailAccount);
-          _extensionForgotPassword = mailAccount.appExtensionForgotPassword;
+          AppExtension.loadFor(mailAccount).then((value) {
+            _extensions = value;
+            final forgotPwUrl = mailAccount.appExtensionForgotPassword;
+            if (forgotPwUrl != null) {
+              setState(() {
+                _extensionForgotPassword = forgotPwUrl;
+              });
+            }
+          });
         }
 
         setState(() {
