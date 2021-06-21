@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/models/models.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
@@ -60,7 +62,10 @@ class ExtensionActionTile extends StatelessWidget {
         switch (actionDescription.action!.mechanism) {
           case AppExtensionActionMechanism.inapp:
             final navService = locator<NavigationService>();
-            navService.pop();
+            if (!(Platform.isIOS || Platform.isMacOS)) {
+              // close app drawer:
+              navService.pop();
+            }
             navService.push(
               Routes.webview,
               arguments: WebViewConfiguration(
