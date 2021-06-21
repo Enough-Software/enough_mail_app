@@ -539,13 +539,15 @@ class MessageContentsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Base.buildAppChrome(
       context,
-      title: message!.mimeMessage!.decodeSubject() ??
+      title: message?.mimeMessage?.decodeSubject() ??
           AppLocalizations.of(context)!.subjectUndefined,
-      content: MimeMessageViewer(
-        mimeMessage: message!.mimeMessage!,
-        adjustHeight: false,
-        mailtoDelegate: handleMailto,
-        showMediaDelegate: navigateToMedia,
+      content: SafeArea(
+        child: MimeMessageViewer(
+          mimeMessage: message!.mimeMessage!,
+          adjustHeight: false,
+          mailtoDelegate: handleMailto,
+          showMediaDelegate: navigateToMedia,
+        ),
       ),
     );
   }
@@ -722,7 +724,7 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
   Widget build(BuildContext context) {
     final message = Message.of(context)!;
     final mime = message.mimeMessage!;
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     if (mime.isReadReceiptSent) {
       return Text(localizations!.detailsReadReceiptSentStatus,
           style: Theme.of(context).textTheme.caption);
@@ -730,7 +732,7 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
       return PlatformProgressIndicator();
     } else {
       return ElevatedButton(
-        child: ButtonText(localizations!.detailsSendReadReceiptAction),
+        child: ButtonText(localizations.detailsSendReadReceiptAction),
         onPressed: () async {
           setState(() {
             _isSendingReadReceipt = true;
