@@ -31,14 +31,12 @@ class MainActivity: FlutterActivity() {
     }
 
     private fun checkForShareIntent(shareIntent: Intent) {
-        if (shareIntent != null) {
-            val action = shareIntent.action
-            val type = shareIntent.type
+        val action = shareIntent.action
+        val type = shareIntent.type
 
-            //println("checkForShareIntent: $shareIntent")
-            if (action == Intent.ACTION_SEND || action == Intent.ACTION_SEND_MULTIPLE || action == Intent.ACTION_SENDTO || action == Intent.ACTION_VIEW) {
-                extractShareData(shareIntent, action, type)
-            } 
+        //println("checkForShareIntent: $shareIntent")
+        if (action == Intent.ACTION_SEND || action == Intent.ACTION_SEND_MULTIPLE || action == Intent.ACTION_SENDTO || action == Intent.ACTION_VIEW) {
+            extractShareData(shareIntent, action, type)
         }
     }
 
@@ -88,8 +86,23 @@ class MainActivity: FlutterActivity() {
                 result["data.0"] = loadUriData(uri)
                 result["name.0"] = getFileName(uri)
                 result["type.0"] = getMimeType(uri)
+            } else {
+                val dataString = shareIntent.dataString;
+                if (dataString != null) {
+                    result["text"] = dataString
+                } else if (shareIntent.hasExtra("android.intent.extra.TEXT")){
+                    val text = shareIntent.getStringExtra("android.intent.extra.TEXT")
+                    if (text != null) {
+                        result["text"] = text
+                    }
+                    val  subject = shareIntent.getStringExtra("android.intent.extra.SUBJECT")
+                    if (subject != null) {
+                        result["subject"] = subject
+                    }
+                }
             }
         }
+        //println("sharedData: $result")
         sharedDataMap = result;
     }
 
@@ -98,19 +111,19 @@ class MainActivity: FlutterActivity() {
     }
 
     private fun getFileName(uri: Uri): String {
-        return contentResolver.query(uri, null, null, null, null)?.use { cursor -> 
+        val filename = contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
             cursor.moveToFirst()
             cursor.getString(nameIndex)
-        } ?: File(uri.path).name 
-        // int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        // cursor.moveToFirst();
-        // nameView.setText(cursor.getString(nameIndex));
-        // val path = uri.path;
-        // if (path != null) {
-        //     return File(path).name;
-        // }
-        // return "null";
+        }
+        if (filename != null) {
+            return filename;
+        }
+        val path = uri.path;
+        if (path != null) {
+            return File(path).name
+        }
+        return "null"
     }
 
     private fun loadUriData(uri: Uri): ByteArray {

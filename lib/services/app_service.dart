@@ -52,7 +52,7 @@ class AppService {
     }
   }
 
-  Future<List<SharedData>> collectSharedData(
+  Future<List<SharedData>> _collectSharedData(
       Map<dynamic, dynamic> shared) async {
     final sharedData = <SharedData>[];
     final String? mimeTypeText = shared['mimeType'];
@@ -74,56 +74,25 @@ class AppService {
         print(
             'share: loaded ${localMediaType.text}  "$filename" with ${data?.length} bytes');
       }
+    } else if (text != null) {
+      if (text.startsWith('mailto:')) {
+        final mailto = Uri.parse(text);
+        sharedData.add(SharedMailto(mailto));
+      } else {
+        sharedData.add(SharedText(text, mediaType, subject: shared['subject']));
+      }
     }
     return sharedData;
-    // // structure is:
-    // // mimetype:[<<uri>>,<<uri>>]:text
-    // final uriStartIndex = shared.indexOf(':[<<');
-    // final uriEndIndex = shared.indexOf('>>]:');
-    // if (uriStartIndex == -1 || uriEndIndex <= uriStartIndex) {
-    //   print('invalid share: "$shared"');
-    //   return data;
-    // }
-    // final urls = shared
-    //     .substring(uriStartIndex + ':[<<'.length, uriEndIndex)
-    //     .split('>>, <<');
-    // print(urls);
-    // if (urls.first.startsWith('mailto:')) {
-    //   data.add(SharedMailto(Uri.parse(urls.first)));
-    //   // builder = MessageBuilder.prepareMailtoBasedMessage(Uri.parse(urls.first),
-    //   //     locator<MailService>().currentAccount.fromAddress);
-    // } else {
-    //   final mediaTypeText = shared.substring(0, uriStartIndex);
-    //   final mediaType = (mediaTypeText != 'null' &&
-    //           mediaTypeText != null &&
-    //           !mediaTypeText.contains('*'))
-    //       ? MediaType.fromText(mediaTypeText)
-    //       : null;
-    //   for (final url in urls) {
-    //     if (url != 'null') {
-    //       final filePath = await FlutterAbsolutePath.getAbsolutePath(url);
-    //       final file = File(filePath);
-    //       data.add(SharedFile(file, mediaType));
-    //     }
-    //   }
-    // }
-    // final sharedText = uriEndIndex < (shared.length - '>>]:'.length)
-    //     ? shared.substring(uriEndIndex + '>>]:'.length)
-    //     : null;
-    // if (sharedText != null && sharedText != 'null') {
-    //   data.add(SharedText(sharedText, MediaType.textPlain));
-    // }
-
-    // return data;
   }
 
   Future composeWithSharedData(Map<dynamic, dynamic> shared) async {
-    final sharedData = await collectSharedData(shared);
+    final sharedData = await _collectSharedData(shared);
     if (sharedData.isEmpty) {
       return;
     }
-    if (onSharedData != null) {
-      return onSharedData!(sharedData);
+    final callback = onSharedData;
+    if (callback != null) {
+      return callback(sharedData);
     } else {
       MessageBuilder builder;
       final firstData = sharedData.first;
@@ -140,45 +109,5 @@ class AppService {
       return locator<NavigationService>()
           .push(Routes.mailCompose, arguments: composeData, fade: true);
     }
-    // structure was:
-    // mimetype:[<<uri>>,<<uri>>]:text
-    // final uriStartIndex = shared.indexOf(':[<<');
-    // final uriEndIndex = shared.indexOf('>>]:');
-    // if (uriStartIndex == -1 || uriEndIndex <= uriStartIndex) {
-    //   print('invalid share: "$shared"');
-    //   return Future.value();
-    // }
-    // final urls = shared
-    //     .substring(uriStartIndex + ':[<<'.length, uriEndIndex)
-    //     .split('>>, <<');
-    // print(urls);
-    // MessageBuilder builder;
-    // if (urls.first.startsWith('mailto:')) {
-    //   builder = MessageBuilder.prepareMailtoBasedMessage(Uri.parse(urls.first),
-    //       locator<MailService>().currentAccount.fromAddress);
-    // } else {
-    //   final mediaTypeText = shared.substring(0, uriStartIndex);
-    //   final mediaType = (mediaTypeText != 'null' &&
-    //           mediaTypeText != null &&
-    //           !mediaTypeText.contains('*'))
-    //       ? MediaType.fromText(mediaTypeText)
-    //       : null;
-    //   builder = MessageBuilder();
-    //   for (final url in urls) {
-    //     if (url != 'null') {
-    //       final filePath = await FlutterAbsolutePath.getAbsolutePath(url);
-    //       final file = File(filePath);
-    //       //final file = File.fromUri(Uri.parse(url));
-    //       MediaType fileMediaType = mediaType ?? _guessMediaTypeFromFile(file);
-    //       await builder.addFile(file, fileMediaType);
-    //     }
-    //   }
-    // }
-    // var sharedText = uriEndIndex < (shared.length - '>>]:'.length)
-    //     ? shared.substring(uriEndIndex + '>>]:'.length)
-    //     : null;
-    // if (sharedText != null && sharedText != 'null') {
-    //   builder.text = sharedText;
-    // }
   }
 }
