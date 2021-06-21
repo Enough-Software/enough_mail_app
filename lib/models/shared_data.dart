@@ -22,7 +22,7 @@ abstract class SharedData {
   SharedData(this.mediaType);
 
   Future<SharedDataAddResult> addToMessageBuilder(MessageBuilder builder);
-  Future<SharedDataAddResult> addToEditor(HtmlEditorApi? editorApi);
+  Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi);
 }
 
 class SharedFile extends SharedData {
@@ -62,10 +62,10 @@ class SharedBinary extends SharedData {
   }
 
   @override
-  Future<SharedDataAddResult> addToEditor(HtmlEditorApi? editorApi) async {
+  Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi) async {
     if (mediaType.isImage) {
-      await editorApi!
-          .insertImageData(data!, mediaType.sub.mediaType.toString());
+      await editorApi.insertImageData(
+          data!, mediaType.sub.mediaType.toString());
       return SharedDataAddResult.added;
     }
     return SharedDataAddResult.notAdded;
@@ -74,18 +74,22 @@ class SharedBinary extends SharedData {
 
 class SharedText extends SharedData {
   final String text;
-  SharedText(this.text, MediaType? mediaType)
+  final String? subject;
+  SharedText(this.text, MediaType? mediaType, {this.subject})
       : super(mediaType ?? MediaType.textPlain);
 
   @override
   Future<SharedDataAddResult> addToMessageBuilder(MessageBuilder builder) {
     builder.text = text;
+    if (subject != null) {
+      builder.subject = subject;
+    }
     return Future.value(SharedDataAddResult.added);
   }
 
   @override
-  Future<SharedDataAddResult> addToEditor(HtmlEditorApi? editorApi) async {
-    await editorApi!.insertText(text);
+  Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi) async {
+    await editorApi.insertText(text);
     return Future.value(SharedDataAddResult.added);
   }
 }
@@ -96,7 +100,7 @@ class SharedMailto extends SharedData {
       : super(MediaType.fromSubtype(MediaSubtype.textHtml));
 
   @override
-  Future<SharedDataAddResult> addToEditor(HtmlEditorApi? editorApi) {
+  Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi) {
     // TODO: implement addToEditor
     throw UnimplementedError();
   }

@@ -588,9 +588,12 @@ class _ComposeScreenState extends State<ComposeScreen> {
     if (firstData is SharedMailto) {
       //TODO add the recipients, set the subject, set the text?
     } else {
-      for (final data in sharedData) {
-        data.addToMessageBuilder(widget.data.messageBuilder);
-        data.addToEditor(_editorApi);
+      final api = _editorApi;
+      if (api != null) {
+        for (final data in sharedData) {
+          data.addToMessageBuilder(widget.data.messageBuilder);
+          data.addToEditor(api);
+        }
       }
     }
     return Future.value();
