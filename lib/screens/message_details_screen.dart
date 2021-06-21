@@ -726,7 +726,7 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
     final mime = message.mimeMessage!;
     final localizations = AppLocalizations.of(context)!;
     if (mime.isReadReceiptSent) {
-      return Text(localizations!.detailsReadReceiptSentStatus,
+      return Text(localizations.detailsReadReceiptSentStatus,
           style: Theme.of(context).textTheme.caption);
     } else if (_isSendingReadReceipt) {
       return PlatformProgressIndicator();
