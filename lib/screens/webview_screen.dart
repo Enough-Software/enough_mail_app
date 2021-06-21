@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WebViewScreen extends StatelessWidget {
-  final WebViewConfiguration? configuration;
+  final WebViewConfiguration configuration;
 
   const WebViewScreen({Key? key, required this.configuration})
       : super(key: key);
@@ -17,10 +17,10 @@ class WebViewScreen extends StatelessWidget {
 
     return Base.buildAppChrome(
       context,
-      title: configuration!.title,
+      title: configuration.title ?? configuration.uri.host,
       content: SafeArea(
         child: InAppWebView(
-          initialUrlRequest: URLRequest(url: configuration!.uri),
+          initialUrlRequest: URLRequest(url: configuration.uri),
         ),
       ),
     );
