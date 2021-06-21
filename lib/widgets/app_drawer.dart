@@ -99,7 +99,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 title: Text(localizations.drawerEntrySettings),
                 onTap: () {
                   final navService = locator<NavigationService>();
-                  navService.push(Routes.settings, replace: !Platform.isIOS);
+                  navService.push(Routes.settings);
                 },
               ),
             )
