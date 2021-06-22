@@ -12,6 +12,7 @@ import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
+import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -119,27 +120,48 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       onGenerateRoute: AppRouter.generateRoute,
       // initialRoute: Routes.splash,
       navigatorKey: locator<NavigationService>().navigatorKey,
-      home: Builder(
-        builder: (context) {
-          locator<I18nService>().init(
-              AppLocalizations.of(context)!, Localizations.localeOf(context));
-          return FutureBuilder<MailService>(
-            future: _appInitialization,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.waiting:
-                case ConnectionState.active:
-                  return SplashScreen();
-                case ConnectionState.done:
-                  // in the meantime the app has navigated away
-                  break;
-              }
-              return Container();
-            },
-          );
-        },
-      ),
+      builder: (context, child) {
+        locator<I18nService>().init(
+            AppLocalizations.of(context)!, Localizations.localeOf(context));
+        child ??= FutureBuilder<MailService>(
+          future: _appInitialization,
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return SplashScreen();
+              case ConnectionState.done:
+                // in the meantime the app has navigated away
+                break;
+            }
+            return Container();
+          },
+        );
+        final account = locator<MailService>().currentAccount;
+        return AccountWidget(child: child, account: account);
+      },
+      // home: Builder(
+      //   builder: (context) {
+      //     locator<I18nService>().init(
+      //         AppLocalizations.of(context)!, Localizations.localeOf(context));
+      //     return FutureBuilder<MailService>(
+      //       future: _appInitialization,
+      //       builder: (context, snapshot) {
+      //         switch (snapshot.connectionState) {
+      //           case ConnectionState.none:
+      //           case ConnectionState.waiting:
+      //           case ConnectionState.active:
+      //             return SplashScreen();
+      //           case ConnectionState.done:
+      //             // in the meantime the app has navigated away
+      //             break;
+      //         }
+      //         return Container();
+      //       },
+      //     );
+      //   },
+      // ),
       scaffoldMessengerKey:
           locator<ScaffoldMessengerService>().scaffoldMessengerKey,
       materialTheme:

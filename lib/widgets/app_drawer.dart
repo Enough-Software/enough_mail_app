@@ -12,6 +12,7 @@ import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +111,10 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Widget buildAccountHeader(
-      Account currentAccount, List<Account?> accounts, ThemeData theme) {
+    Account currentAccount,
+    List<Account?> accounts,
+    ThemeData theme,
+  ) {
     final avatarAccount =
         currentAccount.isVirtual ? accounts.first! : currentAccount;
     final userName = currentAccount.userName;
@@ -124,12 +128,12 @@ class _AppDrawerState extends State<AppDrawer> {
 
     return PlatformListTile(
       onTap: () {
-        final NavigationService? navService = locator<NavigationService>();
+        final NavigationService navService = locator<NavigationService>();
         if (currentAccount is UnifiedAccount) {
-          navService!.push(Routes.settingsAccounts, fade: true);
+          navService.push(Routes.settingsAccounts, fade: true);
         } else {
-          navService!
-              .push(Routes.accountEdit, arguments: currentAccount, fade: true);
+          navService.push(Routes.accountEdit,
+              arguments: currentAccount, fade: true);
         }
       },
       title: Row(
@@ -187,17 +191,22 @@ class _AppDrawerState extends State<AppDrawer> {
               title: Text(account.name),
               selected: account == currentAccount,
               onTap: () async {
-                final NavigationService? navService =
+                final NavigationService navService =
                     locator<NavigationService>();
                 if (!Platform.isIOS) {
-                  navService!.pop();
+                  // close drawer
+                  navService.pop();
                 }
                 if (mailService.hasError(account)) {
-                  navService!.push(Routes.accountEdit, arguments: account);
+                  navService.push(Routes.accountEdit, arguments: account);
                 } else {
+                  final accountWidgetState = AccountWidget.of(context);
+                  if (accountWidgetState != null) {
+                    accountWidgetState.account = account;
+                  }
                   final messageSource = await locator<MailService>()
                       .getMessageSourceFor(account, switchToAccount: true);
-                  navService!.push(Routes.messageSource,
+                  navService.push(Routes.messageSource,
                       arguments: messageSource,
                       replace: !Platform.isIOS,
                       fade: true);
