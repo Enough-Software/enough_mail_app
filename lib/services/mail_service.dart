@@ -21,7 +21,8 @@ import '../locator.dart';
 class MailService {
   //MailClient current;
   MessageSource? messageSource;
-  Account? currentAccount;
+  Account? _currentAccount;
+  Account? get currentAccount => _currentAccount;
   List<MailAccount> mailAccounts = <MailAccount>[];
   final accounts = <Account>[];
   UnifiedAccount? unifiedAccount;
@@ -157,7 +158,7 @@ class MailService {
     final account =
         unifiedAccount ?? ((accounts.isNotEmpty) ? accounts.first : null);
     if (account != null) {
-      currentAccount = account;
+      _currentAccount = account;
       return _createMessageSource(null, account);
     }
     return null;
@@ -245,7 +246,7 @@ class MailService {
     }
     final newAccount = Account(mailAccount);
 
-    currentAccount = newAccount;
+    _currentAccount = newAccount;
     accounts.add(newAccount);
     await loadMailboxesFor(mailClient);
     _mailClientsPerAccount[currentAccount] = mailClient;
@@ -344,7 +345,7 @@ class MailService {
     var source = await _createMessageSource(mailbox, account);
     if (switchToAccount) {
       messageSource = source;
-      currentAccount = account;
+      _currentAccount = account;
     }
     return source;
   }

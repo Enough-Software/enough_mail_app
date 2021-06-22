@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:flutter/cupertino.dart';
@@ -53,7 +54,7 @@ class MessageWidgetState extends State<MessageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return new _InheritedMessageContainer(
+    return _InheritedMessageContainer(
       data: this,
       child: widget.child,
     );
@@ -107,7 +108,70 @@ class MessageSourceWidgetState extends State<MessageSourceWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return new _InheritedMessageSourceContainer(
+    return _InheritedMessageSourceContainer(
+      data: this,
+      child: widget.child,
+    );
+  }
+}
+
+class _InheritedAccountContainer extends InheritedWidget {
+  final AccountWidgetState data;
+
+  // You must pass through a child and your state.
+  _InheritedAccountContainer({
+    Key? key,
+    required this.data,
+    required Widget child,
+  }) : super(key: key, child: child);
+
+  // This is a built in method which you can use to check if
+  // any state has changed. If not, no reason to rebuild all the widgets
+  // that rely on your state.
+  @override
+  bool updateShouldNotify(_InheritedAccountContainer old) => (old.data != data);
+}
+
+class AccountWidget extends StatefulWidget {
+  // You must pass through a child.
+  final Widget child;
+  final Account? account;
+
+  AccountWidget({
+    Key? key,
+    required this.child,
+    required this.account,
+  }) : super(key: key);
+
+  static AccountWidgetState? of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<_InheritedAccountContainer>()
+        ?.data;
+  }
+
+  @override
+  AccountWidgetState createState() => AccountWidgetState();
+}
+
+class AccountWidgetState extends State<AccountWidget> {
+  Account? _account;
+
+  @override
+  void initState() {
+    super.initState();
+    _account = widget.account;
+  }
+
+  Account? get account => _account;
+  set account(Account? value) {
+    setState(() {
+      _account = value;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _InheritedAccountContainer(
       data: this,
       child: widget.child,
     );
