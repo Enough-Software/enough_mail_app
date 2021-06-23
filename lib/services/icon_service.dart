@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -27,6 +26,8 @@ class IconService {
       _isCupertino ? CupertinoIcons.videocam : Icons.video_collection_outlined;
   IconData get mediaGif => Icons.gif;
   IconData get mediaSticker => CommunityMaterialIcons.sticker;
+
+  IconData? get add => _isCupertino ? CupertinoIcons.add : Icons.add;
 
   IconData getMessageIsSeen(bool isSeen) =>
       isSeen ? messageIsSeen : messageIsNotSeen;
