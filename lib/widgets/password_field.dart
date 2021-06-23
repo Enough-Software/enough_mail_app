@@ -1,4 +1,5 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PasswordField extends StatefulWidget {
@@ -44,6 +45,14 @@ class _PasswordFieldState extends State<PasswordField> {
               () => _obscureText = !_obscureText,
             );
           },
+          cupertino: (context, platform) => CupertinoIconButtonData(
+            padding: const EdgeInsets.fromLTRB(0, 0, 5, 2),
+            icon: Icon(
+              _obscureText ? Icons.lock_open : Icons.lock,
+              color: CupertinoColors.secondaryLabel,
+              size: 20.0,
+            ),
+          ),
         ),
       ),
     );
