@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/events/app_event_bus.dart';
-import 'package:enough_mail_app/events/unified_messagesource_changed_event.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/date_sectioned_message_source.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -58,7 +56,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   bool _isInSearchMode = false;
   bool _hasSearchInput = false;
   late TextEditingController _searchEditingController;
-  late StreamSubscription _eventsSubscription;
 
   @override
   void initState() {
@@ -67,18 +64,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     _sectionedMessageSource = DateSectionedMessageSource(widget.messageSource);
     _sectionedMessageSource.addListener(_update);
     _messageLoader = initMessageSource();
-    _eventsSubscription = AppEventBus.eventBus
-        .on<UnifiedMessageSourceChangedEvent>()
-        .listen((event) {
-      setState(() {
-        _sectionedMessageSource.removeListener(_update);
-        _sectionedMessageSource.dispose();
-        _sectionedMessageSource =
-            DateSectionedMessageSource(event.messageSource);
-        _sectionedMessageSource.addListener(_update);
-        _messageLoader = initMessageSource();
-      });
-    });
   }
 
   Future<bool> initMessageSource() {
@@ -92,7 +77,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     _searchEditingController.dispose();
     _sectionedMessageSource.removeListener(_update);
     _sectionedMessageSource.dispose();
-    _eventsSubscription.cancel();
     super.dispose();
   }
 
@@ -100,7 +84,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     setState(() {});
   }
 
-  void search(String query) {
+  void _search(String query) {
     if (query.isEmpty) {
       setState(() {
         _isInSearchMode = false;
@@ -125,6 +109,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     if (source is ErrorMessageSource) {
       return buildForLoadingError(context, localizations, source);
     }
+    if (source == locator<MailService>().messageSource) {
+      // listen to changes:
+      MailServiceWidget.of(context);
+    }
     final appBarTitle = _isInSearchMode
         ? TextField(
             controller: _searchEditingController,
@@ -147,7 +135,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             autofocus: true,
             autocorrect: false,
             style: TextStyle(color: Colors.white), //TODO remove hardcoded color
-            onSubmitted: search,
+            onSubmitted: _search,
             onChanged: (text) {
               if (text.isNotEmpty != _hasSearchInput) {
                 setState(() {
@@ -260,7 +248,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   info: CupertinoStatusBar.createInfo(
                       widget.messageSource.description),
                   rightAction: PlatformIconButton(
-                    icon: Icon(CupertinoIcons.create),
+                    //TODO use CupertinoIcons.create once it's not buggy anymore
+                    icon: Icon(CupertinoIcons.pen),
                     onPressed: () => locator<NavigationService>().push(
                       Routes.mailCompose,
                       arguments: ComposeData(
@@ -319,9 +308,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(localizations.homeLoading(
-                              widget.messageSource.name ??
-                                  widget.messageSource.description!)),
+                          child: Text(
+                            localizations.homeLoading(
+                                widget.messageSource.name ??
+                                    widget.messageSource.description ??
+                                    ''),
+                          ),
                         ),
                       ),
                     ],

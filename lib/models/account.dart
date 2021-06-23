@@ -21,7 +21,11 @@ class Account extends ChangeNotifier {
 
   bool get isVirtual => false;
 
-  String get name => account.name!;
+  String get name => account.name ?? '';
+  set name(String value) {
+    account.name = value;
+    notifyListeners();
+  }
 
   bool get excludeFromUnified =>
       account.hasAttribute(attributeExcludeFromUnified);
@@ -73,11 +77,6 @@ class Account extends ChangeNotifier {
     } else {
       account.attributes[attributeSignaturePlain] = value;
     }
-  }
-
-  set name(String? value) {
-    account.name = value;
-    notifyListeners();
   }
 
   String? get userName => account.userName;
@@ -180,4 +179,9 @@ class UnifiedAccount extends Account {
   void addAccount(Account account) {
     accounts.add(account);
   }
+}
+
+class ConnectedAccount extends Account {
+  final MailClient mailClient;
+  ConnectedAccount(MailAccount account, this.mailClient) : super(account);
 }

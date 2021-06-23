@@ -1,18 +1,19 @@
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/events/account_change_event.dart';
-import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
-import 'package:enough_mail_app/events/unified_messagesource_changed_event.dart';
 import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/models/mime_source.dart';
 import 'package:enough_mail_app/models/sender.dart';
 import 'package:enough_mail_app/models/settings.dart';
+import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/gravatar.dart';
+import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_serialization/enough_serialization.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart' as foundation;
@@ -234,15 +235,18 @@ class MailService {
     account.attributes[Account.attributeGravatarImageUrl] = url;
   }
 
-  Future<bool> addAccount(
-      MailAccount mailAccount, MailClient mailClient) async {
+  Future<bool> addAccount(MailAccount mailAccount, MailClient mailClient,
+      BuildContext context) async {
     //TODO check if other account with the same name already exists
     //TODO how to save extension data?
     final existing = mailAccounts
         .firstWhereOrNull((account) => account.email == mailAccount.email);
     if (existing != null) {
-      mailAccounts.remove(existing);
-      accounts.removeWhere((account) => account.email == mailAccount.email);
+      final account = accounts
+          .firstWhereOrNull((account) => account.email == mailAccount.email);
+      if (account != null) {
+        removeAccount(account, context);
+      }
     }
     final newAccount = Account(mailAccount);
 
@@ -263,7 +267,12 @@ class MailService {
     }
     final source = await getMessageSourceFor(newAccount);
     messageSource = source;
-    AppEventBus.eventBus.fire(AccountChangeEvent(mailClient, mailAccount));
+    final state = MailServiceWidget.of(context);
+    if (state != null) {
+      state.account = newAccount;
+      state.accounts = accounts;
+      state.messageSource = source;
+    }
     await saveAccounts();
     return true;
   }
@@ -309,7 +318,6 @@ class MailService {
   }
 
   Future<void> saveAccounts() {
-    AppEventBus.eventBus.fire(AccountsChangedEvent());
     final json = Serializer().serializeList(mailAccounts);
     // print(json);
     _storage ??= FlutterSecureStorage();
@@ -471,20 +479,43 @@ class MailService {
     return Sender(MailAddress(null, email), sender.account);
   }
 
-  Future<void> removeAccount(Account account) async {
+  Future<void> removeAccount(Account account, BuildContext context) async {
     accounts.remove(account);
     mailAccounts.remove(account.account);
     _mailboxesPerAccount.remove(account);
     _mailClientsPerAccount.remove(account);
-    // TODO handle the case when an account is removed that is used in the current mail source
-    // if (current?.account == account) {
-    //   await current.disconnect();
-    //   if (accounts.isNotEmpty) {
-    //     current = await getClientFor(accounts.first);
-    //   } else {
-    //     current = null;
-    //   }
-    // }
+    final withErrors = _accountsWithErrors;
+    if (withErrors != null) {
+      withErrors.remove(account);
+    }
+    final client = await getClientFor(account);
+    await client.disconnect();
+    if (!account.excludeFromUnified) {
+      // updates the unified account
+      excludeAccountFromUnified(account, true, context);
+    }
+    final state = MailServiceWidget.of(context);
+    if (state != null) {
+      state.accounts = accounts;
+    }
+    if (account == currentAccount) {
+      final nextAccount = hasUnifiedAccount
+          ? unifiedAccount
+          : accounts.isNotEmpty
+              ? accounts.first
+              : null;
+      _currentAccount = nextAccount;
+      if (nextAccount != null) {
+        messageSource = await _createMessageSource(null, nextAccount);
+      } else {
+        messageSource = null;
+        locator<NavigationService>().push(Routes.welcome, clear: true);
+      }
+      if (state != null) {
+        state.messageSource = messageSource;
+        state.account = _currentAccount;
+      }
+    }
     await saveAccounts();
   }
 
@@ -565,23 +596,27 @@ class MailService {
     return Future.wait(futures);
   }
 
-  Future excludeAccountFromUnified(Account account, bool exclude) async {
+  Future excludeAccountFromUnified(
+      Account account, bool exclude, BuildContext context) async {
     account.excludeFromUnified = exclude;
+    final unified = unifiedAccount;
     if (exclude) {
-      if (unifiedAccount != null) {
-        unifiedAccount!.removeAccount(account);
+      if (unified != null) {
+        unified.removeAccount(account);
       }
     } else {
-      if (unifiedAccount == null) {
+      if (unified == null) {
         _createUnifiedAccount();
       } else {
-        unifiedAccount!.addAccount(account);
+        unified.addAccount(account);
       }
     }
-    if (currentAccount == unifiedAccount && unifiedAccount != null) {
-      messageSource = await _createMessageSource(null, unifiedAccount!);
-      AppEventBus.eventBus
-          .fire(UnifiedMessageSourceChangedEvent(messageSource!));
+    if (currentAccount == unified && unified != null) {
+      messageSource = await _createMessageSource(null, unified);
+      final state = MailServiceWidget.of(context);
+      if (state != null) {
+        state.messageSource = messageSource;
+      }
     }
     return saveAccounts();
   }

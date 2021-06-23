@@ -1,6 +1,5 @@
 import 'package:enough_mail/discover/client_config.dart';
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/events/account_add_event.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/screens/base.dart';
@@ -174,7 +173,8 @@ class _AccountServerDetailsScreenState
     final mailClient = await locator<MailService>().connect(mailAccount);
     if (mailClient != null && mailClient.isConnected) {
       locator<NavigationService>().pop(
-          AccountResolvedEvent(context, widget.account.account, mailClient));
+        ConnectedAccount(widget.account.account, mailClient),
+      );
     } else {
       await showDialog(
         context: context,

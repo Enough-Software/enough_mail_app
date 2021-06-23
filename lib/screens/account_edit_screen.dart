@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/events/accounts_changed_event.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
@@ -26,8 +26,8 @@ class AccountEditScreen extends StatefulWidget {
 }
 
 class _AccountEditScreenState extends State<AccountEditScreen> {
-  TextEditingController? accountNameController;
-  TextEditingController? userNameController;
+  late TextEditingController _accountNameController;
+  late TextEditingController _userNameController;
 
   void _update() {
     setState(() {});
@@ -36,14 +36,16 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
   @override
   void initState() {
     widget.account.addListener(_update);
-    accountNameController = TextEditingController(text: widget.account.name);
-    userNameController = TextEditingController(text: widget.account.userName);
+    _accountNameController = TextEditingController(text: widget.account.name);
+    _userNameController = TextEditingController(text: widget.account.userName);
     super.initState();
   }
 
   @override
   void dispose() {
     widget.account.removeListener(_update);
+    _accountNameController.dispose();
+    _userNameController.dispose();
     super.dispose();
   }
 
@@ -54,13 +56,14 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
       context,
       title: localizations.editAccountTitle(widget.account.name),
       subtitle: widget.account.email,
-      content: buildEditContent(localizations, context),
+      content: _buildEditContent(localizations, context),
     );
   }
 
-  Widget buildEditContent(
+  Widget _buildEditContent(
       AppLocalizations localizations, BuildContext context) {
     final theme = Theme.of(context);
+    final iconService = locator<IconService>();
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -69,7 +72,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DecoratedPlatformTextField(
-                controller: accountNameController,
+                controller: _accountNameController,
                 decoration: InputDecoration(
                   labelText: localizations.addAccountNameOfAccountLabel,
                   hintText: localizations.addAccountNameOfAccountHint,
@@ -80,7 +83,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 },
               ),
               DecoratedPlatformTextField(
-                controller: userNameController,
+                controller: _userNameController,
                 decoration: InputDecoration(
                   labelText: localizations.addAccountNameOfUserLabel,
                   hintText: localizations.addAccountNameOfUserHint,
@@ -94,10 +97,11 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 PlatformCheckboxListTile(
                   value: !widget.account.excludeFromUnified,
                   onChanged: (value) async {
-                    widget.account.excludeFromUnified = !value!;
+                    final exclude = (value == false);
+                    widget.account.excludeFromUnified = exclude;
                     setState(() {});
-                    await locator<MailService>()
-                        .excludeAccountFromUnified(widget.account, !value);
+                    await locator<MailService>().excludeAccountFromUnified(
+                        widget.account, exclude, context);
                   },
                   title: Text(localizations.editAccountIncludeInUnifiedLabel),
                 ),
@@ -137,8 +141,9 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                       );
                     },
                   ),
-                  background:
-                      Container(color: Colors.red, child: Icon(Icons.delete)),
+                  background: Container(
+                      color: Colors.red,
+                      child: Icon(iconService.messageActionDelete)),
                   onDismissed: (direction) async {
                     await widget.account.removeAlias(alias);
                     locator<ScaffoldMessengerService>().showTextSnackBar(
@@ -147,7 +152,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 ),
               },
               PlatformTextButtonIcon(
-                icon: Icon(Icons.add),
+                icon: Icon(iconService.add),
                 label: Text(localizations.editAccountAddAliasAction),
                 onPressed: () {
                   var email = widget.account.email;
@@ -190,12 +195,13 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
               ),
               Divider(),
               PlatformTextButtonIcon(
-                  onPressed: () => locator<NavigationService>().push(
-                      Routes.accountServerDetails,
-                      arguments: widget.account),
-                  icon: Icon(Icons.edit),
-                  label: ButtonText(
-                      localizations.editAccountServerSettingsAction)),
+                onPressed: () => locator<NavigationService>().push(
+                    Routes.accountServerDetails,
+                    arguments: widget.account),
+                icon: Icon(Icons.edit),
+                label:
+                    ButtonText(localizations.editAccountServerSettingsAction),
+              ),
               Divider(),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
@@ -220,13 +226,12 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                             .editAccountDeleteAccountConfirmationTitle,
                         query: localizations
                             .editAccountDeleteAccountConfirmationQuery(
-                                accountNameController!.text),
+                                _accountNameController.text),
                         action: localizations.actionDelete,
                         isDangerousAction: true);
                     if (result == true) {
                       final mailService = locator<MailService>();
-                      await mailService.removeAccount(widget.account);
-                      AppEventBus.eventBus.fire(AccountsChangedEvent());
+                      await mailService.removeAccount(widget.account, context);
                       if (mailService.accounts.isEmpty) {
                         locator<NavigationService>()
                             .push(Routes.welcome, clear: true);

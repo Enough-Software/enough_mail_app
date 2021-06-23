@@ -115,51 +115,56 @@ class MessageSourceWidgetState extends State<MessageSourceWidget> {
   }
 }
 
-class _InheritedAccountContainer extends InheritedWidget {
-  final AccountWidgetState data;
+class _InheritedMailServiceContainer extends InheritedWidget {
+  final MailServiceWidgetState data;
 
   // You must pass through a child and your state.
-  _InheritedAccountContainer({
+  _InheritedMailServiceContainer({
     Key? key,
     required this.data,
     required Widget child,
   }) : super(key: key, child: child);
 
-  // This is a built in method which you can use to check if
-  // any state has changed. If not, no reason to rebuild all the widgets
-  // that rely on your state.
   @override
-  bool updateShouldNotify(_InheritedAccountContainer old) => (old.data != data);
+  bool updateShouldNotify(_InheritedMailServiceContainer old) => true;
+  //(old.data._account != data._account);
 }
 
-class AccountWidget extends StatefulWidget {
-  // You must pass through a child.
+class MailServiceWidget extends StatefulWidget {
   final Widget child;
   final Account? account;
+  final List<Account>? accounts;
+  final MessageSource? messageSource;
 
-  AccountWidget({
+  MailServiceWidget({
     Key? key,
     required this.child,
     required this.account,
+    required this.accounts,
+    required this.messageSource,
   }) : super(key: key);
 
-  static AccountWidgetState? of(BuildContext context) {
+  static MailServiceWidgetState? of(BuildContext context) {
     return context
-        .dependOnInheritedWidgetOfExactType<_InheritedAccountContainer>()
+        .dependOnInheritedWidgetOfExactType<_InheritedMailServiceContainer>()
         ?.data;
   }
 
   @override
-  AccountWidgetState createState() => AccountWidgetState();
+  MailServiceWidgetState createState() => MailServiceWidgetState();
 }
 
-class AccountWidgetState extends State<AccountWidget> {
+class MailServiceWidgetState extends State<MailServiceWidget> {
   Account? _account;
+  List<Account>? _accounts;
+  MessageSource? _messageSource;
 
   @override
   void initState() {
     super.initState();
     _account = widget.account;
+    _accounts = widget.accounts;
+    _messageSource = widget.messageSource;
   }
 
   Account? get account => _account;
@@ -169,9 +174,23 @@ class AccountWidgetState extends State<AccountWidget> {
     });
   }
 
+  List<Account>? get accounts => _accounts;
+  set accounts(List<Account>? value) {
+    setState(() {
+      _accounts = value;
+    });
+  }
+
+  MessageSource? get messageSource => _messageSource;
+  set messageSource(MessageSource? value) {
+    setState(() {
+      _messageSource = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return _InheritedAccountContainer(
+    return _InheritedMailServiceContainer(
       data: this,
       child: widget.child,
     );

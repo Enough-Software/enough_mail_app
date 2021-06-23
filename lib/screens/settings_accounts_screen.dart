@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:enough_mail_app/events/accounts_changed_event.dart';
-import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -20,23 +19,7 @@ class SettingsAccountsScreen extends StatefulWidget {
 }
 
 class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
-  bool reorderAccounts = false;
-  late StreamSubscription eventsSubscription;
-
-  @override
-  void initState() {
-    eventsSubscription =
-        AppEventBus.eventBus.on<AccountsChangedEvent>().listen((event) {
-      setState(() {});
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    eventsSubscription.cancel();
-    super.dispose();
-  }
+  bool _reorderAccounts = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,14 +28,15 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
     return Base.buildAppChrome(
       context,
       title: localizations.accountsTitle,
-      content: reorderAccounts
-          ? buildReorderableListView()
-          : buildAccountSettings(localizations),
+      content: _reorderAccounts
+          ? _buildReorderableListView(context)
+          : _buildAccountSettings(context, localizations),
     );
   }
 
-  Widget buildAccountSettings(AppLocalizations localizations) {
-    final accounts = locator<MailService>().accounts.toList();
+  Widget _buildAccountSettings(
+      BuildContext context, AppLocalizations localizations) {
+    final accounts = MailServiceWidget.of(context)?.accounts ?? [];
     return SingleChildScrollView(
       child: SafeArea(
         child: Column(
@@ -77,7 +61,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
                 child: PlatformElevatedButton(
                   onPressed: () {
                     setState(() {
-                      reorderAccounts = true;
+                      _reorderAccounts = true;
                     });
                   },
                   child: ButtonText(localizations.accountsActionReorder),
@@ -90,12 +74,12 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
     );
   }
 
-  Widget buildReorderableListView() {
-    final accounts = locator<MailService>().accounts.toList();
+  Widget _buildReorderableListView(BuildContext context) {
+    final accounts = MailServiceWidget.of(context)?.accounts?.toList() ?? [];
     return WillPopScope(
       onWillPop: () {
         setState(() {
-          reorderAccounts = false;
+          _reorderAccounts = false;
         });
         return Future.value(false);
       },

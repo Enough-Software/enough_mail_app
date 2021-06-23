@@ -17,8 +17,8 @@ class ExtensionActionTile extends StatelessWidget {
       : super(key: key);
 
   static Widget buildSideMenuForAccount(
-      BuildContext context, Account currentAccount) {
-    if (currentAccount.isVirtual) {
+      BuildContext context, Account? currentAccount) {
+    if (currentAccount == null || currentAccount.isVirtual) {
       return Container();
     }
     final actions = currentAccount.account.appExtensionsAccountSideMenu;
