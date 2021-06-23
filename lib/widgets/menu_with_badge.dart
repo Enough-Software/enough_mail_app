@@ -14,9 +14,8 @@ class MenuWithBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformIconButton(
+    return DensePlatformIconButton(
       icon: Badge(
-        // padding: EdgeInsets.zero,
         badgeContent: badgeContent,
         child: _buildIndicator(context),
       ),
