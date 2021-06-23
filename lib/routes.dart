@@ -10,31 +10,31 @@ import 'package:flutter/material.dart';
 
 class Routes {
   static const String home = '/';
-  static const String accountAdd = 'accountAdd';
-  static const String accountEdit = 'accountEdit';
-  static const String accountServerDetails = 'accountServerDetails';
-  static const String settings = 'settings';
-  static const String settingsAccounts = 'settingsAccounts';
-  static const String settingsDesign = 'settingsDesign';
-  static const String settingsFeedback = 'settingsFeedback';
-  static const String settingsLanguage = 'settingsLanguage';
-  static const String settingsFolders = 'settingsFolders';
-  static const String settingsReadReceipts = 'settingsReadReceipts';
-  static const String settingsDevelopment = 'settingsDeveloperMode';
-  static const String settingsSwipe = 'settingsSwipe';
-  static const String settingsSignature = 'settingsSignature';
-  static const String messageSource = 'messageSource';
-  static const String mailDetails = 'mailDetails';
-  static const String mailContents = 'mailContents';
-  static const String mailCompose = 'mailCompose';
-  static const String welcome = 'welcome';
-  static const String splash = 'splash';
-  static const String interactiveMedia = 'interactiveMedia';
-  static const String locationPicker = 'locationPicker';
-  static const String sourceCode = 'sourceCode';
-  static const String webview = 'webview';
-  static const String appDrawer = 'appDrawer';
-  static const String search = 'search';
+  static const String accountAdd = '/accountAdd';
+  static const String accountEdit = '/accountEdit';
+  static const String accountServerDetails = '/accountServerDetails';
+  static const String settings = '/settings';
+  static const String settingsAccounts = '/settings/accounts';
+  static const String settingsDesign = '/settings/design';
+  static const String settingsFeedback = '/settings/feedback';
+  static const String settingsLanguage = '/settings/language';
+  static const String settingsFolders = '/settings/folders';
+  static const String settingsReadReceipts = '/settings/readReceipts';
+  static const String settingsDevelopment = '/settings/developerMode';
+  static const String settingsSwipe = '/settings/swipe';
+  static const String settingsSignature = '/settingsSignature';
+  static const String messageSource = '/messageSource';
+  static const String mailDetails = '/mailDetails';
+  static const String mailContents = '/mailContents';
+  static const String mailCompose = '/mailCompose';
+  static const String welcome = '/welcome';
+  static const String splash = '/';
+  static const String interactiveMedia = '/interactiveMedia';
+  static const String locationPicker = '/locationPicker';
+  static const String sourceCode = '/sourceCode';
+  static const String webview = '/webview';
+  static const String appDrawer = '/appDrawer';
+  static const String search = '/search';
 }
 
 class AppRouter {

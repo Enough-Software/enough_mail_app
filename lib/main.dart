@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance!.addObserver(this);
-    _appInitialization = initApp();
+    _appInitialization = _initApp();
     super.initState();
   }
 
@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     locator<AppService>().didChangeAppLifecycleState(state);
   }
 
-  Future<MailService> initApp() async {
+  Future<MailService> _initApp() async {
     final settings = await locator<SettingsService>().init();
     final themeService = locator<ThemeService>();
     _themeService = themeService;
@@ -82,6 +82,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     await mailService.init(i18nService.localizations);
 
     if (mailService.messageSource != null) {
+      final state = MailServiceWidget.of(context);
+      if (state != null) {
+        state.account = mailService.currentAccount;
+        state.accounts = mailService.accounts;
+      }
       // on ios show the app drawer:
       if (Platform.isIOS) {
         locator<NavigationService>().push(Routes.appDrawer, replace: true);
@@ -118,8 +123,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       debugShowCheckedModeBanner: false,
       title: 'Maily',
       onGenerateRoute: AppRouter.generateRoute,
-      // initialRoute: Routes.splash,
+      initialRoute: Routes.splash,
       navigatorKey: locator<NavigationService>().navigatorKey,
+      scaffoldMessengerKey:
+          locator<ScaffoldMessengerService>().scaffoldMessengerKey,
       builder: (context, child) {
         locator<I18nService>().init(
             AppLocalizations.of(context)!, Localizations.localeOf(context));
@@ -138,8 +145,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             return Container();
           },
         );
-        final account = locator<MailService>().currentAccount;
-        return AccountWidget(child: child, account: account);
+        final mailService = locator<MailService>();
+        return MailServiceWidget(
+          child: child,
+          account: mailService.currentAccount,
+          accounts: mailService.accounts,
+          messageSource: mailService.messageSource,
+        );
       },
       // home: Builder(
       //   builder: (context) {
@@ -162,8 +174,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       //     );
       //   },
       // ),
-      scaffoldMessengerKey:
-          locator<ScaffoldMessengerService>().scaffoldMessengerKey,
       materialTheme:
           _themeService?.lightTheme ?? ThemeService.defaultLightTheme,
       materialDarkTheme:

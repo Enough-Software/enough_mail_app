@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/events/account_add_event.dart';
 import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
@@ -80,7 +79,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     }
     final result = await locator<NavigationService>()
         .push(Routes.accountServerDetails, arguments: Account(account));
-    if (result is AccountResolvedEvent) {
+    if (result is ConnectedAccount) {
       setState(() {
         account = result.account;
         mailClient = result.mailClient;
@@ -462,7 +461,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         account.name = _accountNameController.text;
         account.userName = _userNameController.text;
         final service = locator<MailService>();
-        final added = await service.addAccount(account, mailClient!);
+        final added = await service.addAccount(account, mailClient!, context);
         if (added) {
           if (Platform.isIOS && widget.launchedFromWelcome) {
             locator<NavigationService>().push(Routes.appDrawer, clear: true);
@@ -471,6 +470,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
             Routes.messageSource,
             arguments: service.messageSource,
             clear: !Platform.isIOS && widget.launchedFromWelcome,
+            replace: !widget.launchedFromWelcome,
             fade: true,
           );
         }
