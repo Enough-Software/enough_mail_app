@@ -269,7 +269,7 @@ class MailboxMimeSource extends MimeSource {
 
   @override
   void remove(MimeMessage? mimeMessage) {
-    mailbox!.messagesExists--;
+    mailbox?.messagesExists--;
     _cache.remove(mimeMessage);
   }
 
