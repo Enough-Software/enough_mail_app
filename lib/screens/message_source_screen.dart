@@ -56,6 +56,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   bool _isInSearchMode = false;
   bool _hasSearchInput = false;
   late TextEditingController _searchEditingController;
+  bool _updateMessageSource = false;
 
   @override
   void initState() {
@@ -92,7 +93,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       return;
     }
     final search = MailSearch(query, SearchQueryType.allTextHeaders);
-    final searchSource = widget.messageSource.search(search);
+    final searchSource = _sectionedMessageSource.messageSource.search(search);
     locator<NavigationService>()
         .push(Routes.messageSource, arguments: searchSource);
     setState(() {
@@ -105,13 +106,26 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     // print('parent name: ${widget.messageSource.parentName}');
     final theme = Theme.of(context);
     final localizations = AppLocalizations.of(context)!;
-    final source = widget.messageSource;
+    final source = _sectionedMessageSource.messageSource;
     if (source is ErrorMessageSource) {
       return buildForLoadingError(context, localizations, source);
     }
     if (source == locator<MailService>().messageSource) {
       // listen to changes:
+      _updateMessageSource = true;
       MailServiceWidget.of(context);
+    } else if (_updateMessageSource) {
+      _updateMessageSource = false;
+      final state = MailServiceWidget.of(context);
+      if (state != null) {
+        final source = state.messageSource;
+        if (source != null) {
+          _sectionedMessageSource.removeListener(_update);
+          _sectionedMessageSource = DateSectionedMessageSource(source);
+          _sectionedMessageSource.addListener(_update);
+          _messageLoader = initMessageSource();
+        }
+      }
     }
     final appBarTitle = _isInSearchMode
         ? TextField(
@@ -145,12 +159,11 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             },
           )
         : (Platform.isIOS || Platform.isMacOS)
-            ? Text(widget.messageSource.name ?? '')
-            : Base.buildTitle(widget.messageSource.name ?? '',
-                widget.messageSource.description ?? '');
+            ? Text(source.name ?? '')
+            : Base.buildTitle(source.name ?? '', source.description ?? '');
 
     final appBarActions = [
-      if (widget.messageSource.supportsSearching && !Platform.isIOS) ...{
+      if (source.supportsSearching && !Platform.isIOS) ...{
         PlatformIconButton(
           icon: Icon(_isInSearchMode ? Icons.arrow_back : Icons.search),
           onPressed: () {
@@ -183,18 +196,17 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         ),
       },
     ];
-    final I18nService? i18nService = locator<I18nService>();
+    final i18nService = locator<I18nService>();
     Widget? zeroPosWidget;
-    if (_sectionedMessageSource.isInitialized &&
-        widget.messageSource.size == 0) {
-      final emptyMessage = widget.messageSource.isSearch
+    if (_sectionedMessageSource.isInitialized && source.size == 0) {
+      final emptyMessage = source.isSearch
           ? localizations.homeEmptySearchMessage
           : localizations.homeEmptyFolderMessage;
       zeroPosWidget = Padding(
         padding: EdgeInsets.symmetric(vertical: 32, horizontal: 32),
         child: Text(emptyMessage),
       );
-    } else if (widget.messageSource.supportsDeleteAll) {
+    } else if (source.supportsDeleteAll) {
       final iconService = locator<IconService>();
       final style = TextButton.styleFrom(primary: Colors.grey[600]);
       final textStyle =
@@ -214,7 +226,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     action: localizations.homeDeleteAllAction,
                     isDangerousAction: true);
                 if (confirmed == true) {
-                  await widget.messageSource.deleteAllMessages();
+                  await source.deleteAllMessages();
                 }
               },
             ),
@@ -224,7 +236,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               label:
                   Text(localizations.homeMarkAllSeenAction, style: textStyle),
               onPressed: () async {
-                await widget.messageSource.markAllMessagesSeen(true);
+                await source.markAllMessagesSeen(true);
               },
             ),
             PlatformTextButtonIcon(
@@ -233,7 +245,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               label:
                   Text(localizations.homeMarkAllUnseenAction, style: textStyle),
               onPressed: () async {
-                await widget.messageSource.markAllMessagesSeen(false);
+                await source.markAllMessagesSeen(false);
               },
             ),
           ],
@@ -245,8 +257,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           ? buildSelectionModeBottomBar(localizations)
           : Platform.isIOS
               ? CupertinoStatusBar(
-                  info: CupertinoStatusBar.createInfo(
-                      widget.messageSource.description),
+                  info: CupertinoStatusBar.createInfo(source.description),
                   rightAction: PlatformIconButton(
                     //TODO use CupertinoIcons.create once it's not buggy anymore
                     icon: Icon(CupertinoIcons.pen),
@@ -290,7 +301,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             )
           : null,
       body: MessageSourceWidget(
-        messageSource: widget.messageSource,
+        messageSource: source,
         child: FutureBuilder<void>(
           future: _messageLoader,
           builder: (context, snapshot) {
@@ -310,9 +321,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             localizations.homeLoading(
-                                widget.messageSource.name ??
-                                    widget.messageSource.description ??
-                                    ''),
+                                source.name ?? source.description ?? ''),
                           ),
                         ),
                       ),
@@ -326,7 +335,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       switchVisualization(_Visualization.list);
                       return Future.value(false);
                     },
-                    child: MessageStack(messageSource: widget.messageSource),
+                    child: MessageStack(messageSource: source),
                   );
                 }
                 return WillPopScope(
@@ -354,15 +363,14 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           pinned: _isInSearchMode ? true : false,
                           stretch: true,
                           actions: appBarActions,
-                          previousPageTitle: widget.messageSource.parentName ??
-                              localizations.accountsTitle,
+                          previousPageTitle:
+                              source.parentName ?? localizations.accountsTitle,
                         ),
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
                               //print('building message item at $index');
-                              if (Platform.isIOS &&
-                                  widget.messageSource.supportsSearching) {
+                              if (Platform.isIOS && source.supportsSearching) {
                                 if (index == 0) {
                                   return Padding(
                                     padding: EdgeInsets.symmetric(
@@ -370,7 +378,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                       vertical: 4.0,
                                     ),
                                     child: SearchTextField(
-                                      messageSource: widget.messageSource,
+                                      messageSource: source,
                                     ),
                                   );
                                 }
@@ -386,7 +394,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                   _sectionedMessageSource.getElementAt(index);
                               final section = element.section;
                               if (section != null) {
-                                final text = i18nService!.formatDateRange(
+                                final text = i18nService.formatDateRange(
                                     section.range, section.date);
                                 return GestureDetector(
                                   onLongPress: () {
@@ -573,11 +581,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   Widget buildSelectionModeBottomBar(AppLocalizations localizations) {
-    final isTrash = widget.messageSource.isTrash;
-    final isJunk = widget.messageSource.isJunk;
+    final source = _sectionedMessageSource.messageSource;
+    final isTrash = source.isTrash;
+    final isJunk = source.isJunk;
     final isAnyUnseen = _selectedMessages.any((m) => !m.isSeen);
     final isAnyUnflagged = _selectedMessages.any((m) => !m.isFlagged);
-    final IconService? iconService = locator<IconService>();
+    final iconService = locator<IconService>();
     return PlatformBottomBar(
       cupertinoBlurBackground: true,
       child: SafeArea(
@@ -590,12 +599,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             ),
             if (isAnyUnseen) ...{
               PlatformIconButton(
-                icon: Icon(iconService!.messageIsNotSeen),
+                icon: Icon(iconService.messageIsNotSeen),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.seen),
               ),
             } else ...{
               PlatformIconButton(
-                icon: Icon(iconService!.messageIsSeen),
+                icon: Icon(iconService.messageIsSeen),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.unseen),
               ),
             },
@@ -709,7 +718,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     ),
                   ),
                 },
-                if (widget.messageSource.supportsMessageFolders) ...{
+                if (source.supportsMessageFolders) ...{
                   PlatformPopupDivider(),
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.move,
@@ -736,7 +745,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       ),
                     ),
                   },
-                  if (widget.messageSource.isArchive) ...{
+                  if (source.isArchive) ...{
                     PlatformPopupMenuItem(
                       value: _MultipleChoice.inbox,
                       child: IconText(
@@ -763,6 +772,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   void handleMultipleChoice(_MultipleChoice choice) async {
+    final source = _sectionedMessageSource.messageSource;
     final localizations = locator<I18nService>().localizations!;
     if (_selectedMessages.isEmpty) {
       locator<ScaffoldMessengerService>()
@@ -780,35 +790,32 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       case _MultipleChoice.delete:
         final notification =
             localizations.multipleMovedToTrash(_selectedMessages.length);
-        await widget.messageSource
-            .deleteMessages(_selectedMessages, notification);
+        await source.deleteMessages(_selectedMessages, notification);
         break;
       case _MultipleChoice.inbox:
         final notification =
             localizations.multipleMovedToInbox(_selectedMessages.length);
-        await widget.messageSource.moveMessagesToFlag(
+        await source.moveMessagesToFlag(
             _selectedMessages, MailboxFlag.inbox, notification);
         break;
       case _MultipleChoice.seen:
         endSelectionMode = false;
-        await widget.messageSource.markMessagesAsSeen(_selectedMessages, true);
+        await source.markMessagesAsSeen(_selectedMessages, true);
         setState(() {});
         break;
       case _MultipleChoice.unseen:
         endSelectionMode = false;
-        await widget.messageSource.markMessagesAsSeen(_selectedMessages, false);
+        await source.markMessagesAsSeen(_selectedMessages, false);
         setState(() {});
         break;
       case _MultipleChoice.flag:
         endSelectionMode = false;
-        await widget.messageSource
-            .markMessagesAsFlagged(_selectedMessages, true);
+        await source.markMessagesAsFlagged(_selectedMessages, true);
         setState(() {});
         break;
       case _MultipleChoice.unflag:
         endSelectionMode = false;
-        await widget.messageSource
-            .markMessagesAsFlagged(_selectedMessages, false);
+        await source.markMessagesAsFlagged(_selectedMessages, false);
         setState(() {});
         break;
       case _MultipleChoice.move:
@@ -818,13 +825,13 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       case _MultipleChoice.junk:
         final notification =
             localizations.multipleMovedToJunk(_selectedMessages.length);
-        await widget.messageSource.moveMessagesToFlag(
+        await source.moveMessagesToFlag(
             _selectedMessages, MailboxFlag.junk, notification);
         break;
       case _MultipleChoice.archive:
         final notification =
             localizations.multipleMovedToArchive(_selectedMessages.length);
-        await widget.messageSource.moveMessagesToFlag(
+        await source.moveMessagesToFlag(
             _selectedMessages, MailboxFlag.archive, notification);
         break;
     }
@@ -966,13 +973,14 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       _isInSelectionMode = false;
     });
     locator<NavigationService>().pop(); // alert
+    final source = _sectionedMessageSource.messageSource;
     final localizations = locator<I18nService>().localizations!;
     final account = locator<MailService>().currentAccount!;
     if (account.isVirtual) {
-      await widget.messageSource.moveMessagesToFlag(_selectedMessages,
-          mailbox.flags.first, localizations.moveSuccess(mailbox.name));
+      await source.moveMessagesToFlag(_selectedMessages, mailbox.flags.first,
+          localizations.moveSuccess(mailbox.name));
     } else {
-      await widget.messageSource.moveMessages(
+      await source.moveMessages(
           _selectedMessages, mailbox, localizations.moveSuccess(mailbox.name));
     }
   }
