@@ -3,7 +3,6 @@ import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +96,6 @@ class _SettingsDeveloperModeScreenState
     final NavigationService? navService = locator<NavigationService>();
     final result = await DialogHelper.showWidgetDialog(
       context,
-      localizations.extensionsManualAction,
       DecoratedPlatformTextField(
         controller: controller,
         decoration: InputDecoration(
@@ -105,6 +103,7 @@ class _SettingsDeveloperModeScreenState
         ),
         keyboardType: TextInputType.url,
       ),
+      title: localizations.extensionsManualAction,
       actions: [
         PlatformTextButton(
           child: ButtonText(localizations.actionCancel),
@@ -175,7 +174,6 @@ class _SettingsDeveloperModeScreenState
     }
     DialogHelper.showWidgetDialog(
       context,
-      localizations.extensionsTitle,
       SingleChildScrollView(
         child: Column(
           children: [
@@ -205,6 +203,7 @@ class _SettingsDeveloperModeScreenState
           ],
         ),
       ),
+      title: localizations.extensionsTitle,
     );
   }
 
@@ -231,7 +230,6 @@ class _SettingsDeveloperModeScreenState
   void _showExtensionDetails(String? domainOrUrl, AppExtension data) {
     DialogHelper.showWidgetDialog(
       context,
-      '$domainOrUrl Extension',
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -256,6 +254,7 @@ class _SettingsDeveloperModeScreenState
           },
         ],
       ),
+      title: '$domainOrUrl Extension',
     );
   }
 }

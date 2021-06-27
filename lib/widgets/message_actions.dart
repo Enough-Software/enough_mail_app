@@ -9,7 +9,6 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
-import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
@@ -333,7 +332,6 @@ class _MessageActionsState extends State<MessageActions> {
     final textEditingController = TextEditingController();
     final redirect = await DialogHelper.showWidgetDialog(
       context,
-      localizations.redirectTitle,
       SingleChildScrollView(
         child: SizedBox(
           width: size.width - 32,
@@ -354,6 +352,7 @@ class _MessageActionsState extends State<MessageActions> {
           ),
         ),
       ),
+      title: localizations.redirectTitle,
       actions: [
         TextButton(
           child: ButtonText(localizations.actionCancel),
@@ -405,7 +404,6 @@ class _MessageActionsState extends State<MessageActions> {
     final localizations = locator<I18nService>().localizations!;
     DialogHelper.showWidgetDialog(
       context,
-      localizations.moveTitle,
       SingleChildScrollView(
         child: MailboxTree(
           account: widget.message.account,
@@ -413,6 +411,7 @@ class _MessageActionsState extends State<MessageActions> {
           current: widget.message.mailClient.selectedMailbox,
         ),
       ),
+      title: localizations.moveTitle,
       defaultActions: DialogActions.cancel,
     );
   }

@@ -1,6 +1,5 @@
 import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -113,9 +112,6 @@ class _SwipeSettingState extends State<_SwipeSetting> {
 
     final action = await DialogHelper.showWidgetDialog(
       context,
-      widget.isLeftToRight
-          ? localizations!.swipeSettingLeftToRightLabel
-          : localizations!.swipeSettingRightToLeftLabel,
       SizedBox(
         height: MediaQuery.of(context).size.height * 0.7,
         width: MediaQuery.of(context).size.width * 0.7,
@@ -156,6 +152,9 @@ class _SwipeSettingState extends State<_SwipeSetting> {
               .toList(),
         ),
       ),
+      title: widget.isLeftToRight
+          ? localizations!.swipeSettingLeftToRightLabel
+          : localizations!.swipeSettingRightToLeftLabel,
       defaultActions: DialogActions.cancel,
     );
     if (action == false) {
