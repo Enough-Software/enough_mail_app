@@ -1,7 +1,6 @@
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +27,6 @@ class EditorArtExtensionButton extends StatelessWidget {
     //final localizations = AppLocalizations.of(context);
     DialogHelper.showWidgetDialog(
       context,
-      null,
       EditorArtExtensionWidget(editorApi: editorApi),
       defaultActions: DialogActions.cancel,
     );

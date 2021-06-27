@@ -13,7 +13,6 @@ import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/string_helper.dart';
@@ -956,7 +955,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         : _selectedMessages.first.mailClient.selectedMailbox;
     DialogHelper.showWidgetDialog(
       context,
-      localizations.multipleMoveTitle(_selectedMessages.length),
       SingleChildScrollView(
         child: MailboxTree(
           account: account,
@@ -964,6 +962,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           current: mailbox,
         ),
       ),
+      title: localizations.multipleMoveTitle(_selectedMessages.length),
       defaultActions: DialogActions.cancel,
     );
   }

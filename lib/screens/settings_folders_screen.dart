@@ -4,7 +4,6 @@ import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
-import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/account_selector.dart';
@@ -103,9 +102,8 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
       ];
     }
     final result = await DialogHelper.showWidgetDialog(
-        context,
-        localizations.folderNamesCustomTitle,
-        CustomFolderNamesEditor(customNames: customNames),
+        context, CustomFolderNamesEditor(customNames: customNames),
+        title: localizations.folderNamesCustomTitle,
         defaultActions: DialogActions.okAndCancel);
     if (result == true) {
       service.settings.customFolderNames = customNames;
@@ -355,7 +353,6 @@ class MailboxWidget extends StatelessWidget {
     final folderNameController = TextEditingController();
     final result = await DialogHelper.showWidgetDialog(
       context,
-      localizations.folderAddTitle,
       DecoratedPlatformTextField(
         controller: folderNameController,
         decoration: InputDecoration(
@@ -364,6 +361,7 @@ class MailboxWidget extends StatelessWidget {
         ),
         textInputAction: TextInputAction.done,
       ),
+      title: localizations.folderAddTitle,
       defaultActions: DialogActions.okAndCancel,
     );
     if (result == true) {

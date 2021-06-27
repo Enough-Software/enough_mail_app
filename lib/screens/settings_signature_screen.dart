@@ -5,7 +5,6 @@ import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/util/dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
@@ -162,7 +161,6 @@ class _SignatureWidgetState extends State<SignatureWidget> {
     HtmlEditorApi? editorApi;
     final result = await DialogHelper.showWidgetDialog(
         context,
-        localizations.signatureSettingsTitle,
         SingleChildScrollView(
           child: PackagedHtmlEditor(
             initialContent: _signature ??
@@ -171,6 +169,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
             onCreated: (api) => editorApi = api,
           ),
         ),
+        title: localizations.signatureSettingsTitle,
         defaultActions: DialogActions.okAndCancel,
         actions: _signature == null
             ? null

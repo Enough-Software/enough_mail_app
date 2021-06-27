@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/models/settings.dart';
-import 'package:enough_mail_app/util/dialog_helper.dart';
+import 'package:enough_mail_app/util/about_helper.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -109,7 +109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 PlatformListTile(
                   onTap: () {
-                    DialogHelper.showAbout(context);
+                    AboutHelper.showAbout(context);
                   },
                   title: Text(localizations.drawerEntryAbout),
                 ),
