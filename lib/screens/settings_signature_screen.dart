@@ -7,12 +7,14 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 import 'base.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class SettingsSignatureScreen extends StatefulWidget {
   @override
@@ -117,9 +119,9 @@ class _SignatureWidgetState extends State<SignatureWidget> {
   @override
   void initState() {
     super.initState();
-
-    _signature = (widget.account != null)
-        ? widget.account!.signatureHtml
+    final account = widget.account;
+    _signature = (account != null)
+        ? account.signatureHtml
         : locator<SettingsService>().getSignatureHtmlGlobal();
   }
 
@@ -130,7 +132,8 @@ class _SignatureWidgetState extends State<SignatureWidget> {
       return PlatformListTile(
         leading: Icon(Icons.add),
         title: Text(
-          localizations.signatureSettingsAddForAccount(widget.account!.name),
+          localizations
+              .signatureSettingsAddForAccount(widget.account?.name ?? ''),
         ),
         onTap: _showEditor,
       );
@@ -159,48 +162,82 @@ class _SignatureWidgetState extends State<SignatureWidget> {
   void _showEditor() async {
     final localizations = AppLocalizations.of(context)!;
     HtmlEditorApi? editorApi;
-    final result = await DialogHelper.showWidgetDialog(
-        context,
-        SingleChildScrollView(
-          child: PackagedHtmlEditor(
-            initialContent: _signature ??
-                locator<SettingsService>().getSignatureHtmlGlobal(),
-            excludeDocumentLevelControls: true,
-            onCreated: (api) => editorApi = api,
+    final bottomSheetContent = SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 32.0),
+        child: Base.buildAppChrome(
+          context,
+          title: widget.account?.name ?? localizations.signatureSettingsTitle,
+          includeDrawer: false,
+          content: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  if (_signature != null) ...{
+                    PlatformTextButton(
+                      child: ButtonText(localizations.actionDelete),
+                      onPressed: () async {
+                        setState(() {
+                          _signature = null;
+                        });
+                        Navigator.of(context).pop(false);
+                        if (widget.account != null) {
+                          widget.account!.signatureHtml = null;
+                          await locator<MailService>().saveAccounts();
+                        } else {
+                          final service = locator<SettingsService>();
+                          service.settings.signatureHtml = null;
+                          _signature = service.getSignatureHtmlGlobal();
+                          await service.save();
+                        }
+                      },
+                    ),
+                  },
+                  PlatformTextButton(
+                    child: ButtonText(localizations.actionCancel),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                  PlatformTextButton(
+                    child: ButtonText(localizations.actionOk),
+                    onPressed: () => Navigator.of(context).pop(true),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: PackagedHtmlEditor(
+                    initialContent: _signature ??
+                        locator<SettingsService>().getSignatureHtmlGlobal(),
+                    excludeDocumentLevelControls: true,
+                    onCreated: (api) => editorApi = api,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        title: localizations.signatureSettingsTitle,
-        defaultActions: DialogActions.okAndCancel,
-        actions: _signature == null
-            ? null
-            : [
-                PlatformTextButton(
-                  child: ButtonText(localizations.actionDelete),
-                  onPressed: () async {
-                    setState(() {
-                      _signature = null;
-                    });
-                    Navigator.of(context).pop(false);
-                    if (widget.account != null) {
-                      widget.account!.signatureHtml = null;
-                      await locator<MailService>().saveAccounts();
-                    } else {
-                      final service = locator<SettingsService>();
-                      service.settings.signatureHtml = null;
-                      _signature = service.getSignatureHtmlGlobal();
-                      await service.save();
-                    }
-                  },
-                ),
-                PlatformTextButton(
-                  child: ButtonText(localizations.actionCancel),
-                  onPressed: () => Navigator.of(context).pop(false),
-                ),
-                PlatformTextButton(
-                  child: ButtonText(localizations.actionOk),
-                  onPressed: () => Navigator.of(context).pop(true),
-                ),
-              ]);
+      ),
+    );
+    bool? result;
+    if (CommonPlatformIcons.isCupertino) {
+      result = await showCupertinoModalBottomSheet(
+        context: context,
+        builder: (context) => bottomSheetContent,
+        elevation: 8.0,
+        isDismissible: true,
+      );
+    } else {
+      result = await showMaterialModalBottomSheet(
+        context: context,
+        elevation: 8.0,
+        backgroundColor: Colors.transparent,
+        builder: (context) => bottomSheetContent,
+      );
+    }
+
     if (result == true && editorApi != null) {
       final newSignature = await editorApi!.getText();
       setState(() {
