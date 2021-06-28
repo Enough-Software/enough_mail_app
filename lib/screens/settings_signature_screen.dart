@@ -2,6 +2,7 @@ import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
@@ -161,6 +162,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
 
   void _showEditor() async {
     final localizations = AppLocalizations.of(context)!;
+    final iconService = locator<IconService>();
     HtmlEditorApi? editorApi;
     final bottomSheetContent = SafeArea(
       bottom: false,
@@ -170,53 +172,41 @@ class _SignatureWidgetState extends State<SignatureWidget> {
           context,
           title: widget.account?.name ?? localizations.signatureSettingsTitle,
           includeDrawer: false,
-          content: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  if (_signature != null) ...{
-                    PlatformTextButton(
-                      child: ButtonText(localizations.actionDelete),
-                      onPressed: () async {
-                        setState(() {
-                          _signature = null;
-                        });
-                        Navigator.of(context).pop(false);
-                        if (widget.account != null) {
-                          widget.account!.signatureHtml = null;
-                          await locator<MailService>().saveAccounts();
-                        } else {
-                          final service = locator<SettingsService>();
-                          service.settings.signatureHtml = null;
-                          _signature = service.getSignatureHtmlGlobal();
-                          await service.save();
-                        }
-                      },
-                    ),
-                  },
-                  PlatformTextButton(
-                    child: ButtonText(localizations.actionCancel),
-                    onPressed: () => Navigator.of(context).pop(false),
-                  ),
-                  PlatformTextButton(
-                    child: ButtonText(localizations.actionOk),
-                    onPressed: () => Navigator.of(context).pop(true),
-                  ),
-                ],
+          appBarActions: [
+            if (_signature != null) ...{
+              DensePlatformIconButton(
+                icon: Icon(iconService.messageActionDelete),
+                onPressed: () async {
+                  setState(() {
+                    _signature = null;
+                  });
+                  Navigator.of(context).pop(false);
+                  if (widget.account != null) {
+                    widget.account!.signatureHtml = null;
+                    await locator<MailService>().saveAccounts();
+                  } else {
+                    final service = locator<SettingsService>();
+                    service.settings.signatureHtml = null;
+                    _signature = service.getSignatureHtmlGlobal();
+                    await service.save();
+                  }
+                },
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: PackagedHtmlEditor(
-                    initialContent: _signature ??
-                        locator<SettingsService>().getSignatureHtmlGlobal(),
-                    excludeDocumentLevelControls: true,
-                    onCreated: (api) => editorApi = api,
-                  ),
-                ),
+            },
+            DensePlatformIconButton(
+              icon: Icon(CommonPlatformIcons.ok),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+          content: SingleChildScrollView(
+            child: SafeArea(
+              child: PackagedHtmlEditor(
+                initialContent: _signature ??
+                    locator<SettingsService>().getSignatureHtmlGlobal(),
+                excludeDocumentLevelControls: true,
+                onCreated: (api) => editorApi = api,
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -227,14 +217,16 @@ class _SignatureWidgetState extends State<SignatureWidget> {
         context: context,
         builder: (context) => bottomSheetContent,
         elevation: 8.0,
+        expand: true,
         isDismissible: true,
       );
     } else {
       result = await showMaterialModalBottomSheet(
         context: context,
-        elevation: 8.0,
-        backgroundColor: Colors.transparent,
         builder: (context) => bottomSheetContent,
+        elevation: 8.0,
+        expand: true,
+        backgroundColor: Colors.transparent,
       );
     }
 
