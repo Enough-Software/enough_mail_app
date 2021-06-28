@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey =
@@ -10,17 +12,22 @@ class NavigationService {
 
   BuildContext? get currentContext => navigatorKey.currentContext;
 
-  Future<dynamic> push(String routeName,
-      {Object? arguments,
-      bool replace = false,
-      bool fade = false,
-      bool clear = false}) {
+  Future<dynamic> push(
+    String routeName, {
+    Object? arguments,
+    bool replace = false,
+    bool fade = false,
+    bool clear = false,
+    bool containsModals = false,
+  }) {
     final page = AppRouter.generatePage(routeName, arguments);
     Route route;
-    if (fade && !Platform.isIOS) {
+    if (containsModals) {
+      route = MaterialWithModalsPageRoute(builder: (_) => page);
+    } else if (fade && !CommonPlatformIcons.isCupertino) {
       route = FadeRoute(page: page);
     } else {
-      route = Platform.isIOS
+      route = CommonPlatformIcons.isCupertino
           ? CupertinoPageRoute(builder: (_) => page)
           : MaterialPageRoute(builder: (_) => page);
     }

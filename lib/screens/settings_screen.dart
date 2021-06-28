@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/util/about_helper.dart';
@@ -70,10 +71,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 PlatformListTile(
                   title: Text(localizations.signatureSettingsTitle),
                   onTap: () {
-                    locator<NavigationService>().push(Routes.settingsSignature);
+                    locator<NavigationService>()
+                        .push(Routes.settingsSignature, containsModals: true);
                   },
                 ),
-                if (!(Platform.isIOS || Platform.isMacOS)) ...{
+                if (!CommonPlatformIcons.isCupertino) ...{
                   PlatformListTile(
                     title: Text(localizations.settingsActionDesign),
                     onTap: () {
