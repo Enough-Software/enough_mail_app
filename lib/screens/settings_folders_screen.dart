@@ -179,6 +179,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
                 prefixIcon: Icon(iconService.folderInbox),
               ),
               onChanged: (value) => widget.customNames[0] = value,
+              cupertinoAlignLabelOnTop: true,
             ),
             DecoratedPlatformTextField(
               controller: _draftsController,
@@ -187,6 +188,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
                 prefixIcon: Icon(iconService.folderDrafts),
               ),
               onChanged: (value) => widget.customNames[1] = value,
+              cupertinoAlignLabelOnTop: true,
             ),
             DecoratedPlatformTextField(
               controller: _sentController,
@@ -195,6 +197,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
                 prefixIcon: Icon(iconService.folderSent),
               ),
               onChanged: (value) => widget.customNames[2] = value,
+              cupertinoAlignLabelOnTop: true,
             ),
             DecoratedPlatformTextField(
               controller: _trashController,
@@ -203,6 +206,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
                 prefixIcon: Icon(iconService.folderTrash),
               ),
               onChanged: (value) => widget.customNames[3] = value,
+              cupertinoAlignLabelOnTop: true,
             ),
             DecoratedPlatformTextField(
               controller: _archiveController,
@@ -211,6 +215,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
                 prefixIcon: Icon(iconService.folderArchive),
               ),
               onChanged: (value) => widget.customNames[4] = value,
+              cupertinoAlignLabelOnTop: true,
             ),
             DecoratedPlatformTextField(
               controller: _junkController,
@@ -219,6 +224,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
                 prefixIcon: Icon(iconService.folderJunk),
               ),
               onChanged: (value) => widget.customNames[5] = value,
+              cupertinoAlignLabelOnTop: true,
             ),
           ],
         ),
