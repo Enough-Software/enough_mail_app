@@ -11,6 +11,7 @@ import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +80,7 @@ class InteractiveMediaScreen extends StatelessWidget {
                     print('Unable to convert text into mime: $e $s');
                   }
                   if (showErrorMessage) {
-                    DialogHelper.showTextDialog(
+                    LocalizedDialogHelper.showTextDialog(
                         context,
                         localizations!.errorTitle,
                         localizations.developerShowAsEmailFailed);

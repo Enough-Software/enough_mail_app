@@ -3,6 +3,7 @@ import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
@@ -94,7 +95,7 @@ class _SettingsDeveloperModeScreenState
     final controller = TextEditingController();
     String? url;
     final NavigationService? navService = locator<NavigationService>();
-    final result = await DialogHelper.showWidgetDialog(
+    final result = await LocalizedDialogHelper.showWidgetDialog(
       context,
       DecoratedPlatformTextField(
         controller: controller,
@@ -140,14 +141,14 @@ class _SettingsDeveloperModeScreenState
           account.appExtensions = [appExtension];
           _showExtensionDetails(url, appExtension);
         } else {
-          await DialogHelper.showTextDialog(
+          await LocalizedDialogHelper.showTextDialog(
             context,
             localizations.errorTitle,
             localizations.extensionsManualLoardingError(url!),
           );
         }
       } else {
-        await DialogHelper.showTextDialog(
+        await LocalizedDialogHelper.showTextDialog(
             context, localizations.errorTitle, 'Invalid URL "$url"');
       }
     }
@@ -172,7 +173,7 @@ class _SettingsDeveloperModeScreenState
       _addHostname(
           account, account.account.outgoing!.serverConfig!.hostname!, domains);
     }
-    DialogHelper.showWidgetDialog(
+    LocalizedDialogHelper.showWidgetDialog(
       context,
       SingleChildScrollView(
         child: Column(
@@ -228,7 +229,7 @@ class _SettingsDeveloperModeScreenState
   }
 
   void _showExtensionDetails(String? domainOrUrl, AppExtension data) {
-    DialogHelper.showWidgetDialog(
+    LocalizedDialogHelper.showWidgetDialog(
       context,
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,

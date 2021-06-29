@@ -9,6 +9,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
@@ -330,7 +331,7 @@ class _MessageActionsState extends State<MessageActions> {
     final localizations = AppLocalizations.of(context)!;
     final size = MediaQuery.of(context).size;
     final textEditingController = TextEditingController();
-    final redirect = await DialogHelper.showWidgetDialog(
+    final redirect = await LocalizedDialogHelper.showWidgetDialog(
       context,
       SingleChildScrollView(
         child: SizedBox(
@@ -371,8 +372,8 @@ class _MessageActionsState extends State<MessageActions> {
     );
     if (redirect == true) {
       if (recipients.isEmpty) {
-        await DialogHelper.showTextDialog(context, localizations.errorTitle,
-            localizations.redirectEmailInputRequired);
+        await LocalizedDialogHelper.showTextDialog(context,
+            localizations.errorTitle, localizations.redirectEmailInputRequired);
       } else {
         final mime = widget.message.mimeMessage!;
         if (mime.mimeData == null) {
@@ -386,7 +387,9 @@ class _MessageActionsState extends State<MessageActions> {
               .showTextSnackBar(localizations.resultRedirectedSuccess);
         } on MailException catch (e, s) {
           print('message could not get redirected: $e $s');
-          await DialogHelper.showTextDialog(context, localizations.errorTitle,
+          await LocalizedDialogHelper.showTextDialog(
+              context,
+              localizations.errorTitle,
               localizations.resultRedirectedFailure(e.message ?? '<unknown>'));
         }
       }
@@ -402,7 +405,7 @@ class _MessageActionsState extends State<MessageActions> {
 
   void _move() {
     final localizations = locator<I18nService>().localizations!;
-    DialogHelper.showWidgetDialog(
+    LocalizedDialogHelper.showWidgetDialog(
       context,
       SingleChildScrollView(
         child: MailboxTree(

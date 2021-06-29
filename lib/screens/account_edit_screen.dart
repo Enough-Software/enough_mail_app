@@ -9,6 +9,7 @@ import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -218,15 +219,15 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                         .copyWith(color: Colors.white),
                   ),
                   onPressed: () async {
-                    final result = await DialogHelper.askForConfirmation(
-                        context,
-                        title: localizations
-                            .editAccountDeleteAccountConfirmationTitle,
-                        query: localizations
-                            .editAccountDeleteAccountConfirmationQuery(
-                                _accountNameController.text),
-                        action: localizations.actionDelete,
-                        isDangerousAction: true);
+                    final result =
+                        await LocalizedDialogHelper.askForConfirmation(context,
+                            title: localizations
+                                .editAccountDeleteAccountConfirmationTitle,
+                            query: localizations
+                                .editAccountDeleteAccountConfirmationQuery(
+                                    _accountNameController.text),
+                            action: localizations.actionDelete,
+                            isDangerousAction: true);
                     if (result == true) {
                       final mailService = locator<MailService>();
                       await mailService.removeAccount(widget.account, context);

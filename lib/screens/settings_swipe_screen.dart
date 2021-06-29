@@ -1,6 +1,7 @@
 import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +111,7 @@ class _SwipeSettingState extends State<_SwipeSetting> {
   Future<SwipeAction?> selectSwipe(SwipeAction current) async {
     final localizations = AppLocalizations.of(context);
 
-    final action = await DialogHelper.showWidgetDialog(
+    final action = await LocalizedDialogHelper.showWidgetDialog(
       context,
       SizedBox(
         height: MediaQuery.of(context).size.height * 0.7,
