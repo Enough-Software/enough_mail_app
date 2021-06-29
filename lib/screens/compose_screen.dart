@@ -6,6 +6,7 @@ import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/editor_extensions.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
@@ -233,7 +234,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
       // this state's context is now invalid because this widget is not mounted anymore
       final currentContext = locator<NavigationService>().currentContext!;
       final message = (e is MailException) ? e.message! : e.toString();
-      DialogHelper.showTextDialog(
+      LocalizedDialogHelper.showTextDialog(
         currentContext,
         localizations.errorTitle,
         localizations.composeSendErrorInfo(message),
@@ -534,7 +535,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     } catch (e, s) {
       print('unable to save draft message $e $s');
       final currentContext = locator<NavigationService>().currentContext!;
-      DialogHelper.showTextDialog(
+      LocalizedDialogHelper.showTextDialog(
         currentContext,
         localizations.errorTitle,
         localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),

@@ -6,6 +6,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/account_selector.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/mailbox_selector.dart';
@@ -101,7 +102,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
         l.folderJunk
       ];
     }
-    final result = await DialogHelper.showWidgetDialog(
+    final result = await LocalizedDialogHelper.showWidgetDialog(
         context, CustomFolderNamesEditor(customNames: customNames),
         title: localizations.folderNamesCustomTitle,
         defaultActions: DialogActions.okAndCancel);
@@ -357,7 +358,7 @@ class MailboxWidget extends StatelessWidget {
   void _createFolder(context) async {
     final localizations = AppLocalizations.of(context)!;
     final folderNameController = TextEditingController();
-    final result = await DialogHelper.showWidgetDialog(
+    final result = await LocalizedDialogHelper.showWidgetDialog(
       context,
       DecoratedPlatformTextField(
         controller: folderNameController,
@@ -381,7 +382,7 @@ class MailboxWidget extends StatelessWidget {
             .showTextSnackBar(localizations.folderAddResultSuccess);
         onMailboxAdded();
       } on MailException catch (e) {
-        await DialogHelper.showTextDialog(
+        await LocalizedDialogHelper.showTextDialog(
           context,
           localizations.errorTitle,
           localizations.folderAddResultFailure(e.message!),
@@ -392,7 +393,7 @@ class MailboxWidget extends StatelessWidget {
 
   void _deleteFolder(BuildContext context) async {
     final localizations = AppLocalizations.of(context)!;
-    final confirmed = await DialogHelper.askForConfirmation(
+    final confirmed = await LocalizedDialogHelper.askForConfirmation(
       context,
       title: localizations.folderDeleteConfirmTitle,
       query: localizations.folderDeleteConfirmText(mailbox!.path),
@@ -404,7 +405,7 @@ class MailboxWidget extends StatelessWidget {
             .showTextSnackBar(localizations.folderDeleteResultSuccess);
         onMailboxDeleted();
       } on MailException catch (e) {
-        await DialogHelper.showTextDialog(
+        await LocalizedDialogHelper.showTextDialog(
           context,
           localizations.errorTitle,
           localizations.folderDeleteResultFailure(e.message!),

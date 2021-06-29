@@ -6,7 +6,7 @@ import 'package:enough_mail_app/extensions/extension_action_tile.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/util/about_helper.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
@@ -61,7 +61,7 @@ class AppDrawer extends StatelessWidget {
                         leading: Icon(iconService.about),
                         title: Text(localizations.drawerEntryAbout),
                         onTap: () {
-                          AboutHelper.showAbout(context);
+                          LocalizedDialogHelper.showAbout(context);
                         },
                       ),
                     ],

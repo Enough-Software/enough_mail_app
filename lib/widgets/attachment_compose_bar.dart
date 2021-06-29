@@ -7,6 +7,7 @@ import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/api_keys.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:file_picker/file_picker.dart';
@@ -208,7 +209,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
       await ApiKeys.init();
     }
     if (ApiKeys.giphy == null) {
-      DialogHelper.showTextDialog(context, localizations!.errorTitle,
+      LocalizedDialogHelper.showTextDialog(context, localizations!.errorTitle,
           'No GIPHY API key found. Please check set up instructions.');
       return false;
     }

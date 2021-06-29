@@ -15,6 +15,7 @@ import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/util/string_helper.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
@@ -219,11 +220,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               icon: Icon(iconService.messageActionDelete),
               label: Text(localizations.homeDeleteAllAction, style: textStyle),
               onPressed: () async {
-                bool? confirmed = await DialogHelper.askForConfirmation(context,
-                    title: localizations.homeDeleteAllTitle,
-                    query: localizations.homeDeleteAllQuestion,
-                    action: localizations.homeDeleteAllAction,
-                    isDangerousAction: true);
+                bool? confirmed =
+                    await LocalizedDialogHelper.askForConfirmation(context,
+                        title: localizations.homeDeleteAllTitle,
+                        query: localizations.homeDeleteAllQuestion,
+                        action: localizations.homeDeleteAllAction,
+                        isDangerousAction: true);
                 if (confirmed == true) {
                   await source.deleteAllMessages();
                 }
@@ -953,7 +955,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     final mailbox = account.isVirtual
         ? null // //TODO set current mailbox, e.g.  current: widget.messageSource.currentMailbox,
         : _selectedMessages.first.mailClient.selectedMailbox;
-    DialogHelper.showWidgetDialog(
+    LocalizedDialogHelper.showWidgetDialog(
       context,
       SingleChildScrollView(
         child: MailboxTree(

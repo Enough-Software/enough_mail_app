@@ -15,6 +15,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/attachment_chip.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
@@ -437,7 +438,7 @@ class _MessageContentState extends State<_MessageContent> {
     final localizations = AppLocalizations.of(context)!;
     final mime = widget.message.mimeMessage!;
     final listName = mime.decodeListName()!;
-    final confirmation = await DialogHelper.askForConfirmation(context,
+    final confirmation = await LocalizedDialogHelper.askForConfirmation(context,
         title: localizations.detailsNewsletterResubscribeDialogTitle,
         action: localizations.detailsNewsletterResubscribeDialogAction,
         query:
@@ -455,7 +456,7 @@ class _MessageContentState extends State<_MessageContent> {
             [Message.keywordFlagUnsubscribed],
             action: StoreAction.remove);
       }
-      await DialogHelper.showTextDialog(
+      await LocalizedDialogHelper.showTextDialog(
           context,
           subscribed
               ? localizations.detailsNewsletterResubscribeSuccessTitle
@@ -472,7 +473,7 @@ class _MessageContentState extends State<_MessageContent> {
     final localizations = AppLocalizations.of(context)!;
     final mime = widget.message.mimeMessage!;
     final listName = mime.decodeListName()!;
-    final confirmation = await DialogHelper.askForConfirmation(
+    final confirmation = await LocalizedDialogHelper.askForConfirmation(
       context,
       title: localizations.detailsNewsletterUnsubscribeDialogTitle,
       action: localizations.detailsNewsletterUnsubscribeDialogAction,
@@ -500,7 +501,7 @@ class _MessageContentState extends State<_MessageContent> {
           print('error during unsubscribe flag store operation: $e $s');
         }
       }
-      await DialogHelper.showTextDialog(
+      await LocalizedDialogHelper.showTextDialog(
           context,
           unsubscribed
               ? localizations.detailsNewsletterUnsubscribeSuccessTitle

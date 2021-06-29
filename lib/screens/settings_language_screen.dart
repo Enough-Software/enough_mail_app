@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
@@ -77,11 +78,14 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                     }
                     final selectedLocalizations =
                         await AppLocalizations.delegate.load(value.locale!);
-                    final confirmed = await DialogHelper.showTextDialog(
-                        context,
-                        selectedLocalizations.languageSettingConfirmationTitle,
-                        selectedLocalizations.languageSettingConfirmationQuery,
-                        actions: [
+                    final confirmed =
+                        await LocalizedDialogHelper.showTextDialog(
+                            context,
+                            selectedLocalizations
+                                .languageSettingConfirmationTitle,
+                            selectedLocalizations
+                                .languageSettingConfirmationQuery,
+                            actions: [
                           PlatformTextButton(
                             child:
                                 ButtonText(selectedLocalizations.actionCancel),
