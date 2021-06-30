@@ -246,7 +246,7 @@ class _MessageContentState extends State<_MessageContent> {
                 Container(),
               },
               if (_blockExternalImages) ...{
-                ElevatedButton(
+                PlatformElevatedButton(
                   child: ButtonText(localizations.detailsActionShowImages),
                   onPressed: () => setState(() {
                     _blockExternalImages = false;
@@ -256,24 +256,9 @@ class _MessageContentState extends State<_MessageContent> {
                 Container(),
               },
               if (mime.isNewsletter) ...{
-                if (widget.message.isNewsletterUnsubscribed) ...{
-                  widget.message.isNewsLetterSubscribable
-                      ? ElevatedButton(
-                          child: ButtonText(
-                              localizations.detailsNewsletterActionResubscribe),
-                          onPressed: resubscribe,
-                        )
-                      : Text(
-                          localizations.detailsNewsletterStatusUnsubscribed,
-                          style: TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                } else ...{
-                  ElevatedButton(
-                    child: ButtonText(
-                        localizations.detailsNewsletterActionUnsubscribe),
-                    onPressed: unsubscribe,
-                  ),
-                },
+                UnsubscribeButton(
+                  message: widget.message,
+                ),
               } else ...{
                 Container(),
               },
@@ -434,86 +419,6 @@ class _MessageContentState extends State<_MessageContent> {
         .push(Routes.sourceCode, arguments: widget.message.mimeMessage);
   }
 
-  void resubscribe() async {
-    final localizations = AppLocalizations.of(context)!;
-    final mime = widget.message.mimeMessage!;
-    final listName = mime.decodeListName()!;
-    final confirmation = await LocalizedDialogHelper.askForConfirmation(context,
-        title: localizations.detailsNewsletterResubscribeDialogTitle,
-        action: localizations.detailsNewsletterResubscribeDialogAction,
-        query:
-            localizations.detailsNewsletterResubscribeDialogQuestion(listName));
-    if (confirmation == true) {
-      // TODO show busy indicator
-      final mailClient = widget.message.mailClient;
-      final subscribed = await mime.subscribe(mailClient);
-      if (subscribed) {
-        setState(() {
-          widget.message.isNewsletterUnsubscribed = false;
-        });
-        //TODO store flag only when server/mailbox supports abritrary flags?
-        await mailClient.store(MessageSequence.fromMessage(mime),
-            [Message.keywordFlagUnsubscribed],
-            action: StoreAction.remove);
-      }
-      await LocalizedDialogHelper.showTextDialog(
-          context,
-          subscribed
-              ? localizations.detailsNewsletterResubscribeSuccessTitle
-              : localizations.detailsNewsletterResubscribeFailureTitle,
-          subscribed
-              ? localizations
-                  .detailsNewsletterResubscribeSuccessMessage(listName)
-              : localizations
-                  .detailsNewsletterResubscribeFailureMessage(listName));
-    }
-  }
-
-  void unsubscribe() async {
-    final localizations = AppLocalizations.of(context)!;
-    final mime = widget.message.mimeMessage!;
-    final listName = mime.decodeListName()!;
-    final confirmation = await LocalizedDialogHelper.askForConfirmation(
-      context,
-      title: localizations.detailsNewsletterUnsubscribeDialogTitle,
-      action: localizations.detailsNewsletterUnsubscribeDialogAction,
-      query: localizations.detailsNewsletterUnsubscribeDialogQuestion(listName),
-    );
-    if (confirmation == true) {
-      // TODO show busy indicator
-      final mailClient = widget.message.mailClient;
-      var unsubscribed = false;
-      try {
-        unsubscribed = await mime.unsubscribe(mailClient);
-      } catch (e, s) {
-        print('error during unsubscribe: $e $s');
-      }
-      if (unsubscribed) {
-        setState(() {
-          widget.message.isNewsletterUnsubscribed = true;
-        });
-        //TODO store flag only when server/mailbox supports abritrary flags?
-        try {
-          await mailClient.store(MessageSequence.fromMessage(mime),
-              [Message.keywordFlagUnsubscribed],
-              action: StoreAction.add);
-        } catch (e, s) {
-          print('error during unsubscribe flag store operation: $e $s');
-        }
-      }
-      await LocalizedDialogHelper.showTextDialog(
-          context,
-          unsubscribed
-              ? localizations.detailsNewsletterUnsubscribeSuccessTitle
-              : localizations.detailsNewsletterUnsubscribeFailureTitle,
-          unsubscribed
-              ? localizations
-                  .detailsNewsletterUnsubscribeSuccessMessage(listName)
-              : localizations
-                  .detailsNewsletterUnsubscribeFailureMessage(listName));
-    }
-  }
-
   void next() {
     navigateToMessage(widget.message.next);
   }
@@ -589,10 +494,10 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
   @override
   void initState() {
     super.initState();
-    _loadingFuture = loadMessages();
+    _loadingFuture = _loadMessages();
   }
 
-  Future<List<Message>> loadMessages() async {
+  Future<List<Message>> _loadMessages() async {
     final existingSource = widget.message.source;
     if (existingSource is ListMessageSource) {
       return existingSource.messages!;
@@ -751,6 +656,133 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
           });
         },
       );
+    }
+  }
+}
+
+class UnsubscribeButton extends StatefulWidget {
+  final Message message;
+  UnsubscribeButton({Key? key, required this.message}) : super(key: key);
+
+  @override
+  _UnsubscribeButtonState createState() => _UnsubscribeButtonState();
+}
+
+class _UnsubscribeButtonState extends State<UnsubscribeButton> {
+  bool _isActive = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isActive) {
+      return PlatformProgressIndicator();
+    }
+    final localizations = AppLocalizations.of(context)!;
+    if (widget.message.isNewsletterUnsubscribed) {
+      return widget.message.isNewsLetterSubscribable
+          ? PlatformElevatedButton(
+              child:
+                  ButtonText(localizations.detailsNewsletterActionResubscribe),
+              onPressed: _resubscribe,
+            )
+          : Text(
+              localizations.detailsNewsletterStatusUnsubscribed,
+              style: TextStyle(fontStyle: FontStyle.italic),
+            );
+    } else {
+      return PlatformElevatedButton(
+        child: ButtonText(localizations.detailsNewsletterActionUnsubscribe),
+        onPressed: _unsubscribe,
+      );
+    }
+  }
+
+  void _resubscribe() async {
+    final localizations = AppLocalizations.of(context)!;
+    final mime = widget.message.mimeMessage!;
+    final listName = mime.decodeListName()!;
+    final confirmation = await LocalizedDialogHelper.askForConfirmation(context,
+        title: localizations.detailsNewsletterResubscribeDialogTitle,
+        action: localizations.detailsNewsletterResubscribeDialogAction,
+        query:
+            localizations.detailsNewsletterResubscribeDialogQuestion(listName));
+    if (confirmation == true) {
+      setState(() {
+        _isActive = true;
+      });
+      final mailClient = widget.message.mailClient;
+      final subscribed = await mime.subscribe(mailClient);
+      setState(() {
+        _isActive = false;
+      });
+      if (subscribed) {
+        setState(() {
+          widget.message.isNewsletterUnsubscribed = false;
+        });
+        //TODO store flag only when server/mailbox supports abritrary flags?
+        await mailClient.store(MessageSequence.fromMessage(mime),
+            [Message.keywordFlagUnsubscribed],
+            action: StoreAction.remove);
+      }
+      await LocalizedDialogHelper.showTextDialog(
+          context,
+          subscribed
+              ? localizations.detailsNewsletterResubscribeSuccessTitle
+              : localizations.detailsNewsletterResubscribeFailureTitle,
+          subscribed
+              ? localizations
+                  .detailsNewsletterResubscribeSuccessMessage(listName)
+              : localizations
+                  .detailsNewsletterResubscribeFailureMessage(listName));
+    }
+  }
+
+  void _unsubscribe() async {
+    final localizations = AppLocalizations.of(context)!;
+    final mime = widget.message.mimeMessage!;
+    final listName = mime.decodeListName()!;
+    final confirmation = await LocalizedDialogHelper.askForConfirmation(
+      context,
+      title: localizations.detailsNewsletterUnsubscribeDialogTitle,
+      action: localizations.detailsNewsletterUnsubscribeDialogAction,
+      query: localizations.detailsNewsletterUnsubscribeDialogQuestion(listName),
+    );
+    if (confirmation == true) {
+      setState(() {
+        _isActive = true;
+      });
+      final mailClient = widget.message.mailClient;
+      var unsubscribed = false;
+      try {
+        unsubscribed = await mime.unsubscribe(mailClient);
+      } catch (e, s) {
+        print('error during unsubscribe: $e $s');
+      }
+      setState(() {
+        _isActive = false;
+      });
+      if (unsubscribed) {
+        setState(() {
+          widget.message.isNewsletterUnsubscribed = true;
+        });
+        //TODO store flag only when server/mailbox supports abritrary flags?
+        try {
+          await mailClient.store(MessageSequence.fromMessage(mime),
+              [Message.keywordFlagUnsubscribed],
+              action: StoreAction.add);
+        } catch (e, s) {
+          print('error during unsubscribe flag store operation: $e $s');
+        }
+      }
+      await LocalizedDialogHelper.showTextDialog(
+          context,
+          unsubscribed
+              ? localizations.detailsNewsletterUnsubscribeSuccessTitle
+              : localizations.detailsNewsletterUnsubscribeFailureTitle,
+          unsubscribed
+              ? localizations
+                  .detailsNewsletterUnsubscribeSuccessMessage(listName)
+              : localizations
+                  .detailsNewsletterUnsubscribeFailureMessage(listName));
     }
   }
 }
