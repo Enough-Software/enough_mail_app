@@ -129,49 +129,55 @@ class BackgroundService {
       int previousUidNext,
       NotificationService notificationService,
       List<MailNotificationPayload> activeNotifications) async {
-    final mailClient =
-        MailClient(account, isLogEnabled: true, logName: account.name);
-    await mailClient.connect();
-    final inbox = await mailClient.selectInbox();
-    if (inbox.uidNext == previousUidNext) {
-      // print(
-      //     'no change for ${account.name}, activeNotifications=$activeNotifications');
-      // check outdated notifications that should be removed because the message is deleted or read elsewhere:
-      if (activeNotifications.isNotEmpty) {
-        final uids = activeNotifications.map((n) => n.uid).toList();
-        final sequence =
-            MessageSequence.fromIds(uids as List<int>, isUid: true);
+    try {
+      final mailClient =
+          MailClient(account, isLogEnabled: true, logName: account.name);
+      await mailClient.connect();
+      final inbox = await mailClient.selectInbox();
+      if (inbox.uidNext == previousUidNext) {
+        // print(
+        //     'no change for ${account.name}, activeNotifications=$activeNotifications');
+        // check outdated notifications that should be removed because the message is deleted or read elsewhere:
+        if (activeNotifications.isNotEmpty) {
+          final uids = activeNotifications.map((n) => n.uid).toList();
+          final sequence =
+              MessageSequence.fromIds(uids as List<int>, isUid: true);
+          final mimeMessages = await mailClient.fetchMessageSequence(sequence,
+              fetchPreference: FetchPreference.envelope);
+          for (final mimeMessage in mimeMessages) {
+            if (mimeMessage.isSeen) {
+              notificationService.cancelNotificationForMail(
+                  mimeMessage, mailClient);
+            }
+            uids.remove(mimeMessage.uid);
+          }
+          // remove notifications for messages that have been deleted:
+          for (final uid in uids) {
+            notificationService.cancelNotificationForUid(uid, mailClient);
+          }
+        }
+      } else {
+        print(
+            'new uidNext=${inbox.uidNext}, previous=$previousUidNext for ${account.name}');
+        final sequence = MessageSequence.fromRangeToLast(previousUidNext,
+            isUidSequence: true);
         final mimeMessages = await mailClient.fetchMessageSequence(sequence,
             fetchPreference: FetchPreference.envelope);
         for (final mimeMessage in mimeMessages) {
-          if (mimeMessage.isSeen) {
-            notificationService.cancelNotificationForMail(
+          if (!mimeMessage.isSeen) {
+            notificationService.sendLocalNotificationForMail(
                 mimeMessage, mailClient);
           }
-          uids.remove(mimeMessage.uid);
-        }
-        // remove notifications for messages that have been deleted:
-        for (final uid in uids) {
-          notificationService.cancelNotificationForUid(uid, mailClient);
         }
       }
-    } else {
-      print(
-          'new uidNext=${inbox.uidNext}, previous=$previousUidNext for ${account.name}');
-      final sequence =
-          MessageSequence.fromRangeToLast(previousUidNext, isUidSequence: true);
-      final mimeMessages = await mailClient.fetchMessageSequence(sequence,
-          fetchPreference: FetchPreference.envelope);
-      for (final mimeMessage in mimeMessages) {
-        if (!mimeMessage.isSeen) {
-          notificationService.sendLocalNotificationForMail(
-              mimeMessage, mailClient);
-        }
-      }
-    }
 
-    await mailClient.disconnect();
-    return inbox.uidNext;
+      await mailClient.disconnect();
+      return inbox.uidNext;
+    } catch (e, s) {
+      print(
+          'Unable to process background operation for ${account.name}: $e $s');
+      return previousUidNext;
+    }
   }
 }
 
