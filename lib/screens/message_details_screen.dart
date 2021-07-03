@@ -18,6 +18,7 @@ import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/attachment_chip.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_mail_app/widgets/expansion_wrap.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_mail_app/widgets/message_actions.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
@@ -187,14 +188,14 @@ class _MessageContentState extends State<_MessageContent> {
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                   child: Text(localizations.detailsHeaderFrom),
                 ),
-                buildMailAddresses(mime.from)
+                _buildMailAddresses(mime.from)
               ]),
               TableRow(children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                   child: Text(localizations.detailsHeaderTo),
                 ),
-                buildMailAddresses(mime.to)
+                _buildMailAddresses(mime.to)
               ]),
               if (mime.cc?.isNotEmpty ?? false) ...{
                 TableRow(children: [
@@ -202,7 +203,7 @@ class _MessageContentState extends State<_MessageContent> {
                     padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                     child: Text(localizations.detailsHeaderCc),
                   ),
-                  buildMailAddresses(mime.cc)
+                  _buildMailAddresses(mime.cc)
                 ]),
               },
               TableRow(children: [
@@ -217,7 +218,7 @@ class _MessageContentState extends State<_MessageContent> {
           subject ?? localizations.subjectUndefined,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        buildAttachments(attachments),
+        _buildAttachments(attachments),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Divider(height: 2),
@@ -272,23 +273,14 @@ class _MessageContentState extends State<_MessageContent> {
     );
   }
 
-  Widget buildMailAddresses(List<MailAddress>? addresses) {
+  Widget _buildMailAddresses(List<MailAddress>? addresses) {
     if (addresses?.isEmpty ?? true) {
       return Container();
     }
-    return Wrap(
-      //TODO make expansible
-      spacing: 1.0,
-      runSpacing: 1.0,
-      children: [
-        for (var address in addresses!) ...{
-          MailAddressChip(mailAddress: address)
-        }
-      ],
-    );
+    return MailAddressList(mailAddresses: addresses!);
   }
 
-  Widget buildAttachments(List<ContentInfo> attachments) {
+  Widget _buildAttachments(List<ContentInfo> attachments) {
     return Wrap(
       children: [
         for (var attachment in attachments) ...{
@@ -784,5 +776,49 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
               : localizations
                   .detailsNewsletterUnsubscribeFailureMessage(listName));
     }
+  }
+}
+
+class MailAddressList extends StatefulWidget {
+  const MailAddressList({Key? key, required this.mailAddresses})
+      : super(key: key);
+  final List<MailAddress> mailAddresses;
+
+  @override
+  _MailAddressListState createState() => _MailAddressListState();
+}
+
+class _MailAddressListState extends State<MailAddressList> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return ExpansionWrap(
+      spacing: 4.0,
+      runSpacing: 0.0,
+      children: [
+        for (var address in widget.mailAddresses) ...{
+          MailAddressChip(mailAddress: address)
+        }
+      ],
+      expandIndicator: DensePlatformIconButton(
+        icon: Icon(Icons.keyboard_arrow_down),
+        onPressed: () {
+          setState(() {
+            _isExpanded = true;
+          });
+        },
+      ),
+      compressIndicator: DensePlatformIconButton(
+        icon: Icon(Icons.keyboard_arrow_up),
+        onPressed: () {
+          setState(() {
+            _isExpanded = false;
+          });
+        },
+      ),
+      isExpanded: _isExpanded,
+      maxRuns: 2,
+    );
   }
 }
