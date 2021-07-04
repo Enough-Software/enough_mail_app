@@ -11,6 +11,18 @@
   "@actionOk": {
     "description": "Generic OK action"
   },
+  "actionDone": "Done",
+  "@actionDone": {
+    "description": "Generic done action"
+  },
+  "actionNext": "Next",
+  "@actionNext": {
+    "description": "Generic next action"
+  },
+  "actionSkip": "Skip",
+  "@actionSkip": {
+    "description": "Generic skip action"
+  },
   "actionUndo": "Undo",
   "@actionUndo": {
     "description": "Generic undo action"
@@ -51,20 +63,36 @@
   "@welcomeBetaText": {
     "description": "Text for beta information dialog shown on welcome page"
   },
-  "welcomePanel1": "Welcome to Maily!",
-  "@welcomePanel1": {
+  "welcomePanel1Title": "Maily",
+  "@welcomePanel1Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel1Text": "Welcome to Maily, your friendly and fast email helper!",
+  "@welcomePanel1Text": {
     "description": "Welcome message shown on first panel"
   },
-  "welcomePanel2": "Manage unlimited email accounts.",
-  "@welcomePanel2": {
+  "welcomePanel2Title": "Accounts",
+  "@welcomePanel2Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel2Text": "Manage unlimited email accounts. Read and search for mails in all your accounts at once.",
+  "@welcomePanel2Text": {
     "description": "Welcome message shown on second panel"
   },
-  "welcomePanel3": "Swipe your mails to delete them or to mark them read. Long-press a message to manage several messages at once.",
-  "@welcomePanel3": {
+  "welcomePanel3Title": "Swipe & Long-Press",
+  "@welcomePanel3Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel3Text": "Swipe your mails to delete them or to mark them read. Long-press a message to select and manage several messages.",
+  "@welcomePanel3Text": {
     "description": "Welcome message shown on third panel"
   },
-  "welcomePanel4": "Unsubscribe newsletters with just one tap.",
-  "@welcomePanel4": {
+  "welcomePanel4Title": "Keep your Inbox clean",
+  "@welcomePanel4Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel4Text": "Unsubscribe newsletters with just one tap.",
+  "@welcomePanel4Text": {
     "description": "Welcome message shown on fourth panel"
   },
   "welcomeActionSignIn": "Sign in to your mail account",
