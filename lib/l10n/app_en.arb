@@ -548,6 +548,10 @@
   "@detailsReadReceiptSubject": {
     "description": "Message subject for read receipts."
   },
+  "attachmentActionOpen": "Open",
+  "@attachmentActionOpen": {
+    "description": "Open action for attachments without interactive viewer."
+  },
   "messageActionReply": "Reply",
   "@messageActionReply": {
     "description": "Action for single message."

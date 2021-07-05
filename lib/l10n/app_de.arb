@@ -114,6 +114,7 @@
   "detailsSendReadReceiptAction": "Lesebestätigung senden",
   "detailsReadReceiptSentStatus": "Lesebestätigung gesendet ✔",
   "detailsReadReceiptSubject": "Lesebestätigung",
+  "attachmentActionOpen": "Öffnen",
   "messageActionReply": "Antworten",
   "messageActionReplyAll": "Allen antworten",
   "messageActionForward": "Weiterleiten",

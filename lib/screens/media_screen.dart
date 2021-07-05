@@ -120,27 +120,34 @@ class InteractiveMediaScreen extends StatelessWidget {
         .push(Routes.mailCompose, arguments: composeData);
   }
 
-  void _share() async {
+  void _share() {
     final provider = mediaWidget.mediaProvider;
+    share(provider);
+  }
+
+  static Future share(MediaProvider provider) {
     if (provider is TextMediaProvider) {
-      await shareText(provider);
+      return _shareText(provider);
     } else if (provider is MemoryMediaProvider) {
-      shareFile(provider);
+      return _shareFile(provider);
+    } else {
+      print('Unable to share provider $provider');
+      return Future.value();
     }
   }
 
-  Future shareText(TextMediaProvider provider) async {
+  static Future _shareText(TextMediaProvider provider) async {
     await Share.share(provider.text,
         subject: provider.description ?? provider.name);
   }
 
-  Future shareFile(MemoryMediaProvider provider) async {
+  static Future _shareFile(MemoryMediaProvider provider) async {
     final tempDir = await pathprovider.getTemporaryDirectory();
     final originalFileName = provider.name;
     final lastDotIndex = originalFileName.lastIndexOf('.');
     final ext =
         lastDotIndex != -1 ? originalFileName.substring(lastDotIndex) : '';
-    final safeFileName = filterNonAscii(originalFileName);
+    final safeFileName = _filterNonAscii(originalFileName);
     final path = '${tempDir.path}/$safeFileName$ext';
     final file = File(path);
     await file.writeAsBytes(provider.data);
@@ -153,7 +160,7 @@ class InteractiveMediaScreen extends StatelessWidget {
         text: provider.description);
   }
 
-  static String filterNonAscii(String input) {
+  static String _filterNonAscii(String input) {
     final buffer = StringBuffer();
     for (final rune in input.runes) {
       if ((rune >= 48 && rune <= 57) || // 0-9

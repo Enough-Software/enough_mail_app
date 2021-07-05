@@ -2,16 +2,21 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/routes.dart';
+import 'package:enough_mail_app/screens/media_screen.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'button_text.dart';
 
 class AttachmentChip extends StatefulWidget {
   final ContentInfo info;
-  final Message? message;
+  final Message message;
   AttachmentChip({Key? key, required this.info, required this.message})
       : super(key: key);
 
@@ -28,7 +33,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
 
   @override
   void initState() {
-    final mimeMessage = widget.message!.mimeMessage!;
+    final mimeMessage = widget.message.mimeMessage!;
     _mimePart = mimeMessage.getPart(widget.info.fetchId);
     if (_mimePart != null) {
       _mediaProvider =
@@ -46,7 +51,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
       return PlatformButton(
         materialFlat: (context, platform) =>
             MaterialFlatButtonData(padding: EdgeInsets.zero),
-        onPressed: _isDownloading ? null : download,
+        onPressed: _isDownloading ? null : _download,
         child: Padding(
           padding: const EdgeInsets.all(4.0),
           child: ClipRRect(
@@ -64,8 +69,9 @@ class _AttachmentChipState extends State<AttachmentChip> {
             mediaProvider: _mediaProvider!,
             width: _width,
             height: _height,
-            showInteractiveDelegate: showAttachment,
+            showInteractiveDelegate: _showAttachment,
             fallbackBuilder: _buildFallbackPreview,
+            interactiveFallbackBuilder: _buildInteractiveFallback,
           ),
         ),
       );
@@ -151,7 +157,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
     // );
   }
 
-  Future download() async {
+  Future _download() async {
     if (_isDownloading) {
       return;
     }
@@ -159,12 +165,15 @@ class _AttachmentChipState extends State<AttachmentChip> {
       _isDownloading = true;
     });
     try {
-      _mimePart = await widget.message!.mailClient
-          .fetchMessagePart(widget.message!.mimeMessage!, widget.info.fetchId);
+      _mimePart = await widget.message.mailClient
+          .fetchMessagePart(widget.message.mimeMessage!, widget.info.fetchId);
       _mediaProvider = MimeMediaProviderFactory.fromMime(
-          widget.message!.mimeMessage!, _mimePart!);
-      final media = InteractiveMediaWidget(mediaProvider: _mediaProvider!);
-      showAttachment(media);
+          widget.message.mimeMessage!, _mimePart!);
+      final media = InteractiveMediaWidget(
+        mediaProvider: _mediaProvider!,
+        fallbackBuilder: _buildInteractiveFallback,
+      );
+      _showAttachment(media);
     } on MailException catch (e) {
       print(
           'Unable to download attachment with fetch id ${widget.info.fetchId}: $e');
@@ -177,11 +186,11 @@ class _AttachmentChipState extends State<AttachmentChip> {
     }
   }
 
-  Future showAttachment(InteractiveMediaWidget media) {
+  Future _showAttachment(InteractiveMediaWidget media) {
     if (_mimePart!.mediaType.sub == MediaSubtype.messageRfc822) {
       final mime = _mimePart!.decodeContentMessage();
       if (mime != null) {
-        final message = Message.embedded(mime, widget.message!);
+        final message = Message.embedded(mime, widget.message);
         return locator<NavigationService>()
             .push(Routes.mailDetails, arguments: message);
       }
@@ -190,13 +199,40 @@ class _AttachmentChipState extends State<AttachmentChip> {
         .push(Routes.interactiveMedia, arguments: media);
   }
 
-  Widget buildIcon() {
-    if (_isDownloading) {
-      return PlatformProgressIndicator();
-    }
-    final mediaType = widget.info.contentType?.mediaType;
-    IconData icon = locator<IconService>().getForMediaType(mediaType);
-    final color = (_mimePart != null) ? Colors.black : Colors.grey[700];
-    return Icon(icon, color: color);
+  Widget _buildInteractiveFallback(
+      BuildContext context, MediaProvider mediaProvider) {
+    final sizeText = locator<I18nService>().formatMemory(mediaProvider.size);
+    final localizations = AppLocalizations.of(context)!;
+    final iconData = locator<IconService>()
+        .getForMediaType(MediaType.fromText(mediaProvider.mediaType));
+
+    return Material(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(iconData),
+            ),
+            Text(
+              mediaProvider.name,
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            if (sizeText != null) ...{
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(sizeText),
+              ),
+            },
+            PlatformTextButton(
+              child: ButtonText(localizations.attachmentActionOpen),
+              onPressed: () => InteractiveMediaScreen.share(mediaProvider),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
