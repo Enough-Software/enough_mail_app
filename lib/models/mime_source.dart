@@ -275,7 +275,7 @@ class MailboxMimeSource extends MimeSource {
 
   @override
   MimeSource search(MailSearch search) {
-    return SearchMimeSource(mailClient, search, mailbox);
+    return SearchMimeSource(mailClient, search, mailbox!);
   }
 
   @override
@@ -370,7 +370,7 @@ class MailboxMimeSource extends MimeSource {
 
 class SearchMimeSource extends MimeSource {
   final MailSearch mailSearch;
-  final Mailbox? mailbox;
+  final Mailbox mailbox;
   late MailSearchResult searchResult;
   @override
   int get size => searchResult.length;
@@ -380,7 +380,12 @@ class SearchMimeSource extends MimeSource {
 
   @override
   Future<bool> init() async {
-    searchResult = await mailClient.searchMessages(mailSearch);
+    try {
+      searchResult = await mailClient.searchMessages(mailSearch);
+    } catch (e, s) {
+      searchResult = MailSearchResult.empty(mailSearch);
+      print('Unable to search: $e $s');
+    }
     return true;
   }
 
@@ -401,13 +406,13 @@ class SearchMimeSource extends MimeSource {
   }
 
   @override
-  bool get isArchive => mailbox!.isArchive;
+  bool get isArchive => mailbox.isArchive;
 
   @override
-  bool get isJunk => mailbox!.isJunk;
+  bool get isJunk => mailbox.isJunk;
 
   @override
-  bool get isTrash => mailbox!.isTrash;
+  bool get isTrash => mailbox.isTrash;
 
   @override
   String get name => mailSearch.query;
@@ -424,7 +429,7 @@ class SearchMimeSource extends MimeSource {
   bool get supportsSearching => false;
 
   @override
-  bool get suppportsDeleteAll => true;
+  bool get suppportsDeleteAll => searchResult.isNotEmpty;
 
   @override
   MimeMessage? getMessageAt(int index) {
