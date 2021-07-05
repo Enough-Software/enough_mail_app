@@ -27,34 +27,35 @@ enum _OverflowMenuChoice {
 }
 
 class InteractiveMediaScreen extends StatelessWidget {
-  final InteractiveMediaWidget? mediaWidget;
+  final InteractiveMediaWidget mediaWidget;
 
-  const InteractiveMediaScreen({Key? key, this.mediaWidget}) : super(key: key);
+  const InteractiveMediaScreen({Key? key, required this.mediaWidget})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final iconService = locator<IconService>();
     return Base.buildAppChrome(
       context,
-      title: mediaWidget!.mediaProvider.name,
+      title: mediaWidget.mediaProvider.name,
       content: mediaWidget,
       appBarActions: [
         DensePlatformIconButton(
           icon: Icon(iconService.messageActionForward),
-          onPressed: forward,
+          onPressed: _forward,
         ),
         DensePlatformIconButton(
           icon: Icon(iconService.share),
-          onPressed: share,
+          onPressed: _share,
         ),
-        if (mediaWidget!.mediaProvider.isText &&
+        if (mediaWidget.mediaProvider.isText &&
             locator<SettingsService>().settings.enableDeveloperMode) ...{
           PlatformPopupMenuButton<_OverflowMenuChoice>(
             onSelected: (_OverflowMenuChoice result) async {
               switch (result) {
                 case _OverflowMenuChoice.showAsEmail:
-                  final provider = mediaWidget!.mediaProvider;
+                  final provider = mediaWidget.mediaProvider;
                   var showErrorMessage = true;
                   try {
                     MimeMessage? mime;
@@ -82,7 +83,7 @@ class InteractiveMediaScreen extends StatelessWidget {
                   if (showErrorMessage) {
                     LocalizedDialogHelper.showTextDialog(
                         context,
-                        localizations!.errorTitle,
+                        localizations.errorTitle,
                         localizations.developerShowAsEmailFailed);
                   }
                   break;
@@ -91,7 +92,7 @@ class InteractiveMediaScreen extends StatelessWidget {
             itemBuilder: (BuildContext context) => [
               PlatformPopupMenuItem<_OverflowMenuChoice>(
                 value: _OverflowMenuChoice.showAsEmail,
-                child: Text(localizations!.developerShowAsEmail),
+                child: Text(localizations.developerShowAsEmail),
               ),
             ],
           ),
@@ -100,8 +101,8 @@ class InteractiveMediaScreen extends StatelessWidget {
     );
   }
 
-  void forward() {
-    final provider = mediaWidget!.mediaProvider;
+  void _forward() {
+    final provider = mediaWidget.mediaProvider;
     final messageBuilder = MessageBuilder()..subject = provider.name;
 
     if (provider is TextMediaProvider) {
@@ -119,8 +120,8 @@ class InteractiveMediaScreen extends StatelessWidget {
         .push(Routes.mailCompose, arguments: composeData);
   }
 
-  void share() async {
-    final provider = mediaWidget!.mediaProvider;
+  void _share() async {
+    final provider = mediaWidget.mediaProvider;
     if (provider is TextMediaProvider) {
       await shareText(provider);
     } else if (provider is MemoryMediaProvider) {
