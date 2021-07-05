@@ -1013,6 +1013,11 @@
   "@addAccountVerificationStep": {
     "description": "Section header of verification/log in step."
   },
+  "addAccountSetupAccountStep": "Account Setup",
+  "@addAccountSetupAccountStep": {
+    "description": "Section header of account setup step."
+  },
+
   "addAccountVerifyingSettingsLabel": "Verifying {email}...",
   "@addAccountVerifyingSettingsLabel": {
     "description": "Info shown while the account settings for the given email are verified.",
