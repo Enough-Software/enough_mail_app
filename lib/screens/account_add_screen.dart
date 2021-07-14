@@ -319,6 +319,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             icon: const Icon(Icons.account_circle),
                           ),
                           autofocus: true,
+                          cupertinoAlignLabelOnTop: true,
                         ),
                         DecoratedPlatformTextField(
                           controller: _accountNameController,
@@ -338,6 +339,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             hintText: localizations.addAccountNameOfAccountHint,
                             icon: const Icon(Icons.email),
                           ),
+                          cupertinoAlignLabelOnTop: true,
                         ),
                       } else ...{
                         Text(localizations.addAccountVerifyingFailedInfo(
