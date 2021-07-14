@@ -209,8 +209,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     } else if (source.supportsDeleteAll) {
       final iconService = locator<IconService>();
       final style = TextButton.styleFrom(primary: Colors.grey[600]);
-      final textStyle =
-          Theme.of(context).textTheme.button; //.copyWith(color: Colors.white);
+      final textStyle = Theme.of(context).textTheme.button;
       zeroPosWidget = Padding(
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Wrap(
@@ -256,7 +255,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     return PlatformPageScaffold(
       bottomBar: _isInSelectionMode
           ? buildSelectionModeBottomBar(localizations)
-          : Platform.isIOS
+          : CommonPlatformIcons.isCupertino
               ? CupertinoStatusBar(
                   info: CupertinoStatusBar.createInfo(source.description),
                   rightAction: PlatformIconButton(
@@ -371,7 +370,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
                               //print('building message item at $index');
-                              if (Platform.isIOS && source.supportsSearching) {
+                              if (CommonPlatformIcons.isCupertino &&
+                                  source.supportsSearching) {
                                 if (index == 0) {
                                   return Padding(
                                     padding: EdgeInsets.symmetric(

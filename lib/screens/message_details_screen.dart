@@ -43,14 +43,14 @@ enum _OverflowMenuChoice { showContents, showSourceCode }
 
 class _DetailsScreenState extends State<MessageDetailsScreen> {
   PageController? _pageController;
-  late MessageSource source;
-  Message? current;
+  late MessageSource _source;
+  Message? _current;
 
   @override
   void initState() {
     _pageController = PageController(initialPage: widget.message.sourceIndex);
-    current = widget.message;
-    source = current!.source;
+    _current = widget.message;
+    _source = _current!.source;
     super.initState();
   }
 
@@ -60,20 +60,20 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
     super.dispose();
   }
 
-  Message? getMessage(int index) {
-    if (current!.sourceIndex == index) {
-      return current;
+  Message? _getMessage(int index) {
+    if (_current!.sourceIndex == index) {
+      return _current;
     }
-    current = source.getMessageAt(index);
-    return current;
+    _current = _source.getMessageAt(index);
+    return _current;
   }
 
   @override
   Widget build(BuildContext context) {
     return PageView.builder(
       controller: _pageController,
-      itemCount: source.size,
-      itemBuilder: (context, index) => _MessageContent(getMessage(index)!),
+      itemCount: _source.size,
+      itemBuilder: (context, index) => _MessageContent(_getMessage(index)!),
     );
   }
 }
@@ -98,7 +98,7 @@ class _MessageContentState extends State<_MessageContent> {
   void initState() {
     final mime = widget.message.mimeMessage;
     if (mime != null && mime.isDownloaded) {
-      _blockExternalImages = shouldImagesBeBlocked(mime);
+      _blockExternalImages = _shouldImagesBeBlocked(mime);
     } else {
       _messageRequiresRefresh = mime?.envelope == null;
       _blockExternalImages = false;
@@ -116,7 +116,7 @@ class _MessageContentState extends State<_MessageContent> {
           localizations.subjectUndefined,
       content: MessageWidget(
         message: widget.message,
-        child: buildMailDetails(localizations),
+        child: _buildMailDetails(localizations),
       ),
       appBarActions: [
         //PlatformIconButton(icon: Icon(Icons.reply), onPressed: reply),
@@ -128,7 +128,7 @@ class _MessageContentState extends State<_MessageContent> {
                     .push(Routes.mailContents, arguments: widget.message);
                 break;
               case _OverflowMenuChoice.showSourceCode:
-                showSourceCode();
+                _showSourceCode();
                 break;
             }
           },
@@ -150,7 +150,7 @@ class _MessageContentState extends State<_MessageContent> {
     );
   }
 
-  Widget buildMailDetails(AppLocalizations localizations) {
+  Widget _buildMailDetails(AppLocalizations localizations) {
     return SingleChildScrollView(
       child: SafeArea(
         child: Column(
@@ -158,16 +158,16 @@ class _MessageContentState extends State<_MessageContent> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: buildHeader(localizations),
+              child: _buildHeader(localizations),
             ),
-            buildContent(localizations),
+            _buildContent(localizations),
           ],
         ),
       ),
     );
   }
 
-  Widget buildHeader(AppLocalizations localizations) {
+  Widget _buildHeader(AppLocalizations localizations) {
     final mime = widget.message.mimeMessage!;
     final attachments = widget.message.attachments;
     final date = locator<I18nService>().formatDate(mime.decodeDate());
@@ -290,7 +290,7 @@ class _MessageContentState extends State<_MessageContent> {
     );
   }
 
-  Widget buildContent(AppLocalizations localizations) {
+  Widget _buildContent(AppLocalizations localizations) {
     if (_messageDownloadError) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,12 +334,12 @@ class _MessageContentState extends State<_MessageContent> {
       mimeMessage: widget.message.mimeMessage!,
       mailClient: widget.message.mailClient,
       markAsSeen: true,
-      onDownloaded: onMimeMessageDownloaded,
-      onError: onMimeMessageError,
+      onDownloaded: _onMimeMessageDownloaded,
+      onError: _onMimeMessageError,
       blockExternalImages: _blockExternalImages,
-      mailtoDelegate: handleMailto,
+      mailtoDelegate: _handleMailto,
       maxImageWidth: 320,
-      showMediaDelegate: navigateToMedia,
+      showMediaDelegate: _navigateToMedia,
       includedInlineTypes: [MediaToptype.image],
       onZoomed: (controller, factor) {
         if (factor < 0.9) {
@@ -351,7 +351,7 @@ class _MessageContentState extends State<_MessageContent> {
     );
   }
 
-  bool shouldImagesBeBlocked(MimeMessage mimeMessage) {
+  bool _shouldImagesBeBlocked(MimeMessage mimeMessage) {
     var blockExternalImages =
         locator<SettingsService>().settings.blockExternalImages ||
             widget.message.source.shouldBlockImages;
@@ -366,9 +366,9 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   // Update view after message has been downloaded successfully
-  void onMimeMessageDownloaded(MimeMessage mimeMessage) {
+  void _onMimeMessageDownloaded(MimeMessage mimeMessage) {
     widget.message.updateMime(mimeMessage);
-    final blockExternalImages = shouldImagesBeBlocked(mimeMessage);
+    final blockExternalImages = _shouldImagesBeBlocked(mimeMessage);
     if (mounted &&
         (_messageRequiresRefresh ||
             mimeMessage.isSeen ||
@@ -383,7 +383,7 @@ class _MessageContentState extends State<_MessageContent> {
         .cancelNotificationForMailMessage(widget.message);
   }
 
-  void onMimeMessageError(Object? e, StackTrace? s) {
+  void _onMimeMessageError(Object? e, StackTrace? s) {
     if (mounted) {
       setState(() {
         errorObject = e;
@@ -393,7 +393,7 @@ class _MessageContentState extends State<_MessageContent> {
     }
   }
 
-  Future handleMailto(Uri mailto, MimeMessage mimeMessage) {
+  Future _handleMailto(Uri mailto, MimeMessage mimeMessage) {
     final messageBuilder = locator<MailService>().mailto(mailto, mimeMessage);
     final composeData =
         ComposeData([widget.message], messageBuilder, ComposeAction.newMessage);
@@ -401,34 +401,34 @@ class _MessageContentState extends State<_MessageContent> {
         .push(Routes.mailCompose, arguments: composeData);
   }
 
-  Future navigateToMedia(InteractiveMediaWidget mediaWidget) async {
+  Future _navigateToMedia(InteractiveMediaWidget mediaWidget) async {
     return locator<NavigationService>()
         .push(Routes.interactiveMedia, arguments: mediaWidget);
   }
 
-  void showSourceCode() {
+  void _showSourceCode() {
     locator<NavigationService>()
         .push(Routes.sourceCode, arguments: widget.message.mimeMessage);
   }
 
-  void next() {
-    navigateToMessage(widget.message.next);
-  }
+  // void _next() {
+  //   _navigateToMessage(widget.message.next);
+  // }
 
-  void previous() {
-    navigateToMessage(widget.message.previous);
-  }
+  // void _previous() {
+  //   _navigateToMessage(widget.message.previous);
+  // }
 
-  void navigateToMessage(Message? message) {
-    if (message != null) {
-      locator<NavigationService>()
-          .push(Routes.mailDetails, arguments: message, replace: true);
-    }
-  }
+  // void _navigateToMessage(Message? message) {
+  //   if (message != null) {
+  //     locator<NavigationService>()
+  //         .push(Routes.mailDetails, arguments: message, replace: true);
+  //   }
+  // }
 }
 
 class MessageContentsScreen extends StatelessWidget {
-  final Message? message;
+  final Message message;
   const MessageContentsScreen({Key? key, required this.message})
       : super(key: key);
 
@@ -436,20 +436,20 @@ class MessageContentsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Base.buildAppChrome(
       context,
-      title: message?.mimeMessage?.decodeSubject() ??
+      title: message.mimeMessage?.decodeSubject() ??
           AppLocalizations.of(context)!.subjectUndefined,
       content: SafeArea(
         child: MimeMessageViewer(
-          mimeMessage: message!.mimeMessage!,
+          mimeMessage: message.mimeMessage!,
           adjustHeight: false,
-          mailtoDelegate: handleMailto,
-          showMediaDelegate: navigateToMedia,
+          mailtoDelegate: _handleMailto,
+          showMediaDelegate: _navigateToMedia,
         ),
       ),
     );
   }
 
-  Future handleMailto(Uri mailto, MimeMessage mimeMessage) {
+  Future _handleMailto(Uri mailto, MimeMessage mimeMessage) {
     final messageBuilder = locator<MailService>().mailto(mailto, mimeMessage);
     final composeData =
         ComposeData([message], messageBuilder, ComposeAction.newMessage);
@@ -457,7 +457,7 @@ class MessageContentsScreen extends StatelessWidget {
         .push(Routes.mailCompose, arguments: composeData);
   }
 
-  Future navigateToMedia(InteractiveMediaWidget mediaWidget) {
+  Future _navigateToMedia(InteractiveMediaWidget mediaWidget) {
     return locator<NavigationService>()
         .push(Routes.interactiveMedia, arguments: mediaWidget);
   }

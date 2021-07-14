@@ -27,10 +27,12 @@ class Message extends ChangeNotifier {
       infos = mimeMessage!.findContentInfo();
       final inlineAttachments = mimeMessage!
           .findContentInfo(disposition: ContentDisposition.inline)
-          .where((info) => !(info.isText ||
-              info.isImage ||
-              info.mediaType?.sub ==
-                  MediaSubtype.messageDispositionNotification));
+          .where((info) =>
+              info.fetchId.isNotEmpty &&
+              !(info.isText ||
+                  info.isImage ||
+                  info.mediaType?.sub ==
+                      MediaSubtype.messageDispositionNotification));
       infos.addAll(inlineAttachments);
       _attachments = infos;
     }

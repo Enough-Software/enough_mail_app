@@ -2,6 +2,7 @@ import 'package:enough_mail_app/services/date_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 class I18nService {
   /// Day of week for countries (in two letter code) for which the week does not start on Monday
@@ -157,5 +158,20 @@ class I18nService {
 
   String formatTimeOfDay(TimeOfDay timeOfDay, BuildContext context) {
     return timeOfDay.format(context);
+  }
+
+  String? formatMemory(int? size) {
+    if (size == null) {
+      return null;
+    }
+    double sizeD = size + 0.0;
+    final units = ['gb', 'mb', 'kb', 'bytes'];
+    var unitIndex = units.length - 1;
+    while ((sizeD / 1024) > 1.0 && unitIndex > 0) {
+      sizeD = sizeD / 1024;
+      unitIndex--;
+    }
+    final sizeFormat = NumberFormat('###.0#');
+    return '${sizeFormat.format(sizeD)} ${units[unitIndex]}';
   }
 }
