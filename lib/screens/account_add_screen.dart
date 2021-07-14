@@ -281,7 +281,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                   ),
                 ),
                 Step(
-                  title: Text(localizations.addAccountVerificationStep),
+                  title: Text(_isAccountVerified
+                      ? localizations.addAccountSetupAccountStep
+                      : localizations.addAccountVerificationStep),
                   content: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [

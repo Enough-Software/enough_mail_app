@@ -124,7 +124,7 @@ class BackgroundService {
     }
   }
 
-  static Future<int?> loadNewMessage(
+  static Future<int> loadNewMessage(
       MailAccount account,
       int previousUidNext,
       NotificationService notificationService,
@@ -172,7 +172,7 @@ class BackgroundService {
       }
 
       await mailClient.disconnect();
-      return inbox.uidNext;
+      return inbox.uidNext ?? previousUidNext;
     } catch (e, s) {
       print(
           'Unable to process background operation for ${account.name}: $e $s');

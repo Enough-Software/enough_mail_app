@@ -27,34 +27,35 @@ enum _OverflowMenuChoice {
 }
 
 class InteractiveMediaScreen extends StatelessWidget {
-  final InteractiveMediaWidget? mediaWidget;
+  final InteractiveMediaWidget mediaWidget;
 
-  const InteractiveMediaScreen({Key? key, this.mediaWidget}) : super(key: key);
+  const InteractiveMediaScreen({Key? key, required this.mediaWidget})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final iconService = locator<IconService>();
     return Base.buildAppChrome(
       context,
-      title: mediaWidget!.mediaProvider.name,
+      title: mediaWidget.mediaProvider.name,
       content: mediaWidget,
       appBarActions: [
         DensePlatformIconButton(
           icon: Icon(iconService.messageActionForward),
-          onPressed: forward,
+          onPressed: _forward,
         ),
         DensePlatformIconButton(
           icon: Icon(iconService.share),
-          onPressed: share,
+          onPressed: _share,
         ),
-        if (mediaWidget!.mediaProvider.isText &&
+        if (mediaWidget.mediaProvider.isText &&
             locator<SettingsService>().settings.enableDeveloperMode) ...{
           PlatformPopupMenuButton<_OverflowMenuChoice>(
             onSelected: (_OverflowMenuChoice result) async {
               switch (result) {
                 case _OverflowMenuChoice.showAsEmail:
-                  final provider = mediaWidget!.mediaProvider;
+                  final provider = mediaWidget.mediaProvider;
                   var showErrorMessage = true;
                   try {
                     MimeMessage? mime;
@@ -82,7 +83,7 @@ class InteractiveMediaScreen extends StatelessWidget {
                   if (showErrorMessage) {
                     LocalizedDialogHelper.showTextDialog(
                         context,
-                        localizations!.errorTitle,
+                        localizations.errorTitle,
                         localizations.developerShowAsEmailFailed);
                   }
                   break;
@@ -91,7 +92,7 @@ class InteractiveMediaScreen extends StatelessWidget {
             itemBuilder: (BuildContext context) => [
               PlatformPopupMenuItem<_OverflowMenuChoice>(
                 value: _OverflowMenuChoice.showAsEmail,
-                child: Text(localizations!.developerShowAsEmail),
+                child: Text(localizations.developerShowAsEmail),
               ),
             ],
           ),
@@ -100,8 +101,8 @@ class InteractiveMediaScreen extends StatelessWidget {
     );
   }
 
-  void forward() {
-    final provider = mediaWidget!.mediaProvider;
+  void _forward() {
+    final provider = mediaWidget.mediaProvider;
     final messageBuilder = MessageBuilder()..subject = provider.name;
 
     if (provider is TextMediaProvider) {
@@ -119,27 +120,34 @@ class InteractiveMediaScreen extends StatelessWidget {
         .push(Routes.mailCompose, arguments: composeData);
   }
 
-  void share() async {
-    final provider = mediaWidget!.mediaProvider;
+  void _share() {
+    final provider = mediaWidget.mediaProvider;
+    share(provider);
+  }
+
+  static Future share(MediaProvider provider) {
     if (provider is TextMediaProvider) {
-      await shareText(provider);
+      return _shareText(provider);
     } else if (provider is MemoryMediaProvider) {
-      shareFile(provider);
+      return _shareFile(provider);
+    } else {
+      print('Unable to share provider $provider');
+      return Future.value();
     }
   }
 
-  Future shareText(TextMediaProvider provider) async {
+  static Future _shareText(TextMediaProvider provider) async {
     await Share.share(provider.text,
         subject: provider.description ?? provider.name);
   }
 
-  Future shareFile(MemoryMediaProvider provider) async {
+  static Future _shareFile(MemoryMediaProvider provider) async {
     final tempDir = await pathprovider.getTemporaryDirectory();
     final originalFileName = provider.name;
     final lastDotIndex = originalFileName.lastIndexOf('.');
     final ext =
         lastDotIndex != -1 ? originalFileName.substring(lastDotIndex) : '';
-    final safeFileName = filterNonAscii(originalFileName);
+    final safeFileName = _filterNonAscii(originalFileName);
     final path = '${tempDir.path}/$safeFileName$ext';
     final file = File(path);
     await file.writeAsBytes(provider.data);
@@ -152,7 +160,7 @@ class InteractiveMediaScreen extends StatelessWidget {
         text: provider.description);
   }
 
-  static String filterNonAscii(String input) {
+  static String _filterNonAscii(String input) {
     final buffer = StringBuffer();
     for (final rune in input.runes) {
       if ((rune >= 48 && rune <= 57) || // 0-9
