@@ -33,7 +33,7 @@ class MailService {
 
   static const String _keyAccounts = 'accts';
   FlutterSecureStorage? _storage;
-  final _mailClientsPerAccount = <Account?, MailClient?>{};
+  final _mailClientsPerAccount = <Account, MailClient>{};
   final Map<Account, Tree<Mailbox?>> _mailboxesPerAccount =
       <Account, Tree<Mailbox?>>{};
   AppLocalizations? _localizations;
@@ -253,7 +253,7 @@ class MailService {
     _currentAccount = newAccount;
     accounts.add(newAccount);
     await loadMailboxesFor(mailClient);
-    _mailClientsPerAccount[currentAccount] = mailClient;
+    _mailClientsPerAccount[newAccount] = mailClient;
     await _checkForAddingSentMessages(mailAccount);
     _addGravatar(mailAccount);
     mailAccounts.add(mailAccount);
@@ -368,7 +368,7 @@ class MailService {
 
   void applyFolderNameSettings(Settings settings) {
     for (final client in _mailClientsPerAccount.values) {
-      _setMaiboxNames(settings, client!);
+      _setMaiboxNames(settings, client);
     }
   }
 
@@ -603,9 +603,8 @@ class MailService {
     final mailClients = <MailClient>[];
     final existingMailClients = _mailClientsPerAccount.values;
     for (final mailAccount in mailAccounts) {
-      var client = existingMailClients.firstWhere(
-          (client) => client!.account == mailAccount,
-          orElse: () => null);
+      var client = existingMailClients
+          .firstWhereOrNull((client) => client.account == mailAccount);
       client ??= MailClient(mailAccount);
       mailClients.add(client);
     }
@@ -616,7 +615,7 @@ class MailService {
   Future resume() {
     final futures = <Future>[];
     for (final client in _mailClientsPerAccount.values) {
-      if (client!.isPolling()) {
+      if (client.isPolling()) {
         futures.add(client.resume());
       }
     }
