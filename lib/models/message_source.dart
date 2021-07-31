@@ -152,7 +152,7 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> deleteMessage(Message message) {
     return deleteMessages(
-        [message], locator<I18nService>().localizations!.resultDeleted);
+        [message], locator<I18nService>().localizations.resultDeleted);
   }
 
   Future<void> deleteMessages(
@@ -204,12 +204,12 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> markAsJunk(Message message) {
     return moveMessageToFlag(message, MailboxFlag.junk,
-        locator<I18nService>().localizations!.resultMovedToJunk);
+        locator<I18nService>().localizations.resultMovedToJunk);
   }
 
   Future<void> markAsNotJunk(Message message) {
     return moveMessageToFlag(message, MailboxFlag.inbox,
-        locator<I18nService>().localizations!.resultMovedToInbox);
+        locator<I18nService>().localizations.resultMovedToInbox);
   }
 
   Future<void> moveMessageToFlag(
@@ -315,12 +315,12 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> moveToInbox(Message message) async {
     return moveMessageToFlag(message, MailboxFlag.inbox,
-        locator<I18nService>().localizations!.resultMovedToInbox);
+        locator<I18nService>().localizations.resultMovedToInbox);
   }
 
   Future<void> archive(Message message) {
     return moveMessageToFlag(message, MailboxFlag.archive,
-        locator<I18nService>().localizations!.resultArchived);
+        locator<I18nService>().localizations.resultArchived);
   }
 
   Future<void> markAsSeen(Message msg, bool seen) {
@@ -495,7 +495,7 @@ class MailboxMessageSource extends MessageSource {
   @override
   MessageSource search(MailSearch search) {
     final searchSource = _mimeSource.search(search);
-    final localizations = locator<I18nService>().localizations!;
+    final localizations = locator<I18nService>().localizations;
     return MailboxMessageSource.fromMimeSource(
         searchSource,
         localizations.searchQueryDescription(name!),
@@ -678,7 +678,7 @@ class MultipleMessageSource extends MessageSource {
       final searchMimeSource = mimeSource.search(search);
       searchMimeSources.add(searchMimeSource);
     }
-    final localizations = locator<I18nService>().localizations!;
+    final localizations = locator<I18nService>().localizations;
     final searchMessageSource = MultipleMessageSource(
       searchMimeSources,
       localizations.searchQueryTitle(search.query),

@@ -19,6 +19,7 @@ import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/attachment_chip.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/expansion_wrap.dart';
+import 'package:enough_mail_app/widgets/ical_interactive_media.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_mail_app/widgets/message_actions.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
@@ -347,6 +348,21 @@ class _MessageContentState extends State<_MessageContent> {
             _isWebViewZoomedOut = true;
           });
         }
+      },
+      builder: (context, mimeMessage) {
+        final textCalendarPart =
+            mimeMessage.getAlternativePart(MediaSubtype.textCalendar);
+        if (textCalendarPart != null) {
+          // || mediaType.sub == MediaSubtype.applicationIcs)
+          final calendarText = textCalendarPart.decodeContentText();
+          if (calendarText != null) {
+            final mediaProvider =
+                TextMediaProvider('invite.ics', 'text/calendar', calendarText);
+            return IcalInteractiveMedia(
+                mediaProvider: mediaProvider, message: widget.message);
+          }
+        }
+        return null;
       },
     );
   }

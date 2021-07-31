@@ -404,7 +404,7 @@ class _MessageActionsState extends State<MessageActions> {
   }
 
   void _move() {
-    final localizations = locator<I18nService>().localizations!;
+    final localizations = locator<I18nService>().localizations;
     LocalizedDialogHelper.showWidgetDialog(
       context,
       SingleChildScrollView(
@@ -422,7 +422,7 @@ class _MessageActionsState extends State<MessageActions> {
   void _moveTo(Mailbox mailbox) async {
     locator<NavigationService>().pop(); // alert
     locator<NavigationService>().pop(); // detail view
-    final localizations = locator<I18nService>().localizations!;
+    final localizations = locator<I18nService>().localizations;
     final message = widget.message;
     final source = message.source;
     await source.moveMessage(
@@ -444,7 +444,7 @@ class _MessageActionsState extends State<MessageActions> {
   void _moveToInbox() async {
     final source = widget.message.source;
     source.moveMessageToFlag(widget.message, MailboxFlag.inbox,
-        locator<I18nService>().localizations!.resultMovedToInbox);
+        locator<I18nService>().localizations.resultMovedToInbox);
     locator<NavigationService>().pop();
   }
 

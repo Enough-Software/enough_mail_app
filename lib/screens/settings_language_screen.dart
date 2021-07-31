@@ -24,7 +24,6 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
 
   @override
   void initState() {
-    //TODO display names should be localized in the arb files
     final displayNames = {
       'de': 'deutsch',
       'en': 'English',
@@ -34,7 +33,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
             (locale) => _Language(locale, displayNames[locale.toLanguageTag()]))
         .toList();
     final systemLanguage = _Language(
-        null, locator<I18nService>().localizations!.designThemeOptionSystem);
+        null, locator<I18nService>().localizations.designThemeOptionSystem);
     languages = [systemLanguage, ...available];
     final languageTag = locator<SettingsService>().settings.languageTag;
     if (languageTag != null) {

@@ -122,7 +122,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     } else {
       final blockExternalImages = false;
       final emptyMessageText =
-          locator<I18nService>().localizations!.composeEmptyMessage;
+          locator<I18nService>().localizations.composeEmptyMessage;
       final maxImageWidth = 300;
       if (widget.data.action == ComposeAction.newMessage) {
         // continue with draft:
@@ -511,7 +511,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   Future<void> _saveAsDraft() async {
     locator<NavigationService>().pop();
-    final localizations = locator<I18nService>().localizations!;
+    final localizations = locator<I18nService>().localizations;
     final mailClient = await locator<MailService>().getClientFor(_from.account);
     final mime = await _buildMimeMessage(mailClient);
     try {

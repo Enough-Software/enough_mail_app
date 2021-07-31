@@ -6,6 +6,7 @@ import 'package:enough_mail_app/screens/media_screen.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/widgets/ical_interactive_media.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -71,6 +72,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
             height: _height,
             showInteractiveDelegate: _showAttachment,
             fallbackBuilder: _buildFallbackPreview,
+            interactiveBuilder: _buildInteractiveMedia,
             interactiveFallbackBuilder: _buildInteractiveFallback,
           ),
         ),
@@ -171,6 +173,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
           widget.message.mimeMessage!, _mimePart!);
       final media = InteractiveMediaWidget(
         mediaProvider: _mediaProvider!,
+        builder: _buildInteractiveMedia,
         fallbackBuilder: _buildInteractiveFallback,
       );
       _showAttachment(media);
@@ -234,5 +237,17 @@ class _AttachmentChipState extends State<AttachmentChip> {
         ),
       ),
     );
+  }
+
+  Widget? _buildInteractiveMedia(
+      BuildContext context, MediaProvider mediaProvider) {
+    if (mediaProvider.mediaType == 'text/calendar' ||
+        mediaProvider.mediaType == 'application/ics') {
+      return IcalInteractiveMedia(
+        mediaProvider: mediaProvider,
+        message: widget.message,
+      );
+    }
+    return null;
   }
 }

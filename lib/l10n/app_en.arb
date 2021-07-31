@@ -31,6 +31,14 @@
   "@actionDelete": {
     "description": "Generic delete action"
   },
+  "actionAccept": "Accept",
+  "@actionAccept": {
+    "description": "Generic accept action"
+  },
+  "actionDecline": "Decline",
+  "@actionDecline": {
+    "description": "Generic decline action"
+  },
   "actionAddressCopy": "Copy",
   "@actionAddressCopy": {
     "description": "Copy action for email addresses"
@@ -1740,5 +1748,177 @@
         "example": "htttps://domain.com/.maily.json"
       }
     }  
+  },
+  "icalendarAcceptTentatively": "Tentatively",
+  "@icalendarAcceptTentatively": {
+    "description": "Action to accept an icalendar invitation tentatively"
+  },
+  "icalendarActionChangeParticipantStatus": "Change",
+  "@icalendarActionChangeParticipantStatus": {
+    "description": "Action to change an icalendar invitation participant status"
+  },
+  "icalendarLabelSummary": "Title",
+  "@icalendarLabelSummary": {
+    "description": "Label of the summary info of an icalendar object"
+  },
+  "icalendarNoSummaryInfo": "(no title)",
+  "@icalendarNoSummaryInfo": {
+    "description": "Info shown when the icalendar object has no summary (no title)"
+  },
+  "icalendarLabelDescription": "Description",
+  "@icalendarLabelDescription": {
+    "description": "Label of the description info of an icalendar object"
+  },
+  "icalendarLabelStart": "Start",
+  "@icalendarLabelStart": {
+    "description": "Label of the start datetime info of an icalendar object"
+  },
+  "icalendarLabelEnd": "End",
+  "@icalendarLabelEnd": {
+    "description": "Label of the end datetime info of an icalendar object"
+  },
+  "icalendarLabelDuration": "Duration",
+  "@icalendarLabelDuration": {
+    "description": "Label of the duration info of an icalendar object"
+  },
+  "icalendarLabelLocation": "Location",
+  "@icalendarLabelLocation": {
+    "description": "Label of the location info of an icalendar object"
+  },
+  "icalendarLabelRecurrenceRule": "Repeats",
+  "@icalendarLabelRecurrenceRule": {
+    "description": "Label of the reccurence info of an icalendar object"
+  },
+  "icalendarLabelParticipants": "Participants",
+  "@icalendarLabelParticipants": {
+    "description": "Label of the participiants info of an icalendar object"
+  },
+  "icalendarParticipantStatusNeedsAction": "You are asked to answer this invitation.",
+  "@icalendarParticipantStatusNeedsAction": {
+    "description":  "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusAccepted": "You have accepted this invitation.",
+  "@icalendarParticipantStatusAccepted": {
+    "description":  "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusDeclined": "You have declined this invitation.",
+  "@icalendarParticipantStatusDeclined": {
+    "description":  "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusAcceptedTentatively": "You have tentatively accepted this invitation.",
+  "@icalendarParticipantStatusAcceptedTentatively": {
+    "description":  "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusDelegated": "You have delegated this invitation.",
+  "@icalendarParticipantStatusDelegated": {
+    "description":  "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusInProcess": "The task is in progress.",
+  "@icalendarParticipantStatusInProcess": {
+    "description":  "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusPartial": "The task is partially done.",
+  "@icalendarParticipantStatusPartial": {
+    "description":  "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusCompleted": "The task is done.",
+  "@icalendarParticipantStatusCompleted": {
+    "description":  "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusOther": "Your status is unknown.",
+  "@icalendarParticipantStatusOther": {
+    "description":  "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusChangeTitle": "Your Status",
+  "@icalendarParticipantStatusChangeTitle": {
+    "description":  "Title for dialog to change participant status"
+  },
+  "icalendarParticipantStatusChangeText": "Do you want to accept this invitation?",
+  "@icalendarParticipantStatusChangeText": {
+    "description":  "Text of dialog to change participant status"
+  },
+  "icalendarParticipantStatusSentSuccess": "Reply sent 😊",
+  "@icalendarParticipantStatusSentSuccess": {
+    "description":  "Success message for a status change reply"
+  },
+  "icalendarParticipantStatusSentFailure": "Unable to send reply.\nThe server responded with the following details:\n{details}",
+  "@icalendarParticipantStatusSentFailure": {
+    "description":  "Failure message for a status change reply",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "No internet connection"
+      }
+    }
+  },
+  "durationYears": "{number,plural, =1{1 year} other{{number} years}}",
+  "@durationYears": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "durationMonths": "{number,plural, =1{1 month} other{{number} months}}",
+  "@durationMonths": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "durationWeeks": "{number,plural, =1{1 week} other{{number} weeks}}",
+  "@durationWeeks": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "durationDays": "{number,plural, =1{1 day} other{{number} days}}",
+  "@durationDays": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "durationHours": "{number,plural, =1{1 hour} other{{number} hours}}",
+  "@durationHours": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "durationMinutes": "{number,plural, =1{1 minute} other{{number} minutes}}",
+  "@durationMinutes": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }  
+  },
+  "durationEmpty": "No duration",
+  "@durationEmpty": {
+    "description": "Text shown when the duration is 0"
   }
 }

@@ -58,5 +58,5 @@ class SettingsService {
   }
 
   String get _fallbackSignature =>
-      locator<I18nService>().localizations!.signature;
+      locator<I18nService>().localizations.signature;
 }

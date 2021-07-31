@@ -1,3 +1,4 @@
+import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:enough_mail_app/services/date_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
@@ -60,15 +61,17 @@ class I18nService {
   Locale? _locale;
   Locale? get locale => _locale;
 
-  AppLocalizations? _localizations;
-  AppLocalizations? get localizations => _localizations;
+  late AppLocalizations _localizations;
+  AppLocalizations get localizations => _localizations;
 
   late intl.DateFormat _dateFormatToday;
   late intl.DateFormat _dateFormatLastWeek;
   late intl.DateFormat _dateFormat;
   late intl.DateFormat _dateFormatDayInLastWeek;
   late intl.DateFormat _dateFormatDayBeforeLastWeek;
-  intl.DateFormat? _dateFormatMonth;
+  // late intl.DateFormat _dateFormatMonth;
+  // late intl.DateFormat _dateFormatWeekday;
+  // late intl.DateFormat _dateFormatNoTime;
 
   void init(AppLocalizations localizations, Locale locale) {
     _localizations = localizations;
@@ -86,15 +89,19 @@ class I18nService {
     _dateFormat = intl.DateFormat.yMd(localeText).add_jm();
     _dateFormatDayInLastWeek = intl.DateFormat.E(localeText);
     _dateFormatDayBeforeLastWeek = intl.DateFormat.yMd(localeText);
-    _dateFormatMonth = intl.DateFormat.MMMM(localeText);
+    // _dateFormatWeekday = intl.DateFormat.EEEE(localeText);
+    // _dateFormatMonth = intl.DateFormat.MMMM(localeText);
+    // _dateFormatNoTime = intl.DateFormat.yMEd(localeText);
   }
 
-  String formatDate(DateTime? dateTime) {
+  String formatDate(DateTime? dateTime,
+      {bool alwaysUseAbsoluteFormat = false}) {
     if (dateTime == null) {
-      return _localizations!.dateUndefined;
+      return _localizations.dateUndefined;
     }
-    //TODO use DateService
-    final messageDate = dateTime;
+    if (alwaysUseAbsoluteFormat) {
+      return _dateFormat.format(dateTime);
+    }
     final nw = DateTime.now();
     final today = nw.subtract(Duration(
         hours: nw.hour,
@@ -103,12 +110,12 @@ class I18nService {
         milliseconds: nw.millisecond));
     final lastWeek = today.subtract(Duration(days: 7));
     String date;
-    if (messageDate.isAfter(today)) {
-      date = _dateFormatToday.format(messageDate);
-    } else if (messageDate.isAfter(lastWeek)) {
-      date = _dateFormatLastWeek.format(messageDate);
+    if (dateTime.isAfter(today)) {
+      date = _dateFormatToday.format(dateTime);
+    } else if (dateTime.isAfter(lastWeek)) {
+      date = _dateFormatLastWeek.format(dateTime);
     } else {
-      date = _dateFormat.format(messageDate);
+      date = _dateFormat.format(dateTime);
     }
     return date;
   }
@@ -122,11 +129,11 @@ class I18nService {
         seconds: nw.second,
         milliseconds: nw.millisecond));
     if (messageDate.isAfter(today)) {
-      return localizations!.dateDayToday;
+      return localizations.dateDayToday;
     } else if (messageDate.isAfter(today.subtract(Duration(days: 1)))) {
-      return localizations!.dateDayYesterday;
+      return localizations.dateDayYesterday;
     } else if (messageDate.isAfter(today.subtract(Duration(days: 7)))) {
-      return localizations!
+      return localizations
           .dateDayLastWeekday(_dateFormatDayInLastWeek.format(messageDate));
     } else {
       return _dateFormatDayBeforeLastWeek.format(messageDate);
@@ -136,23 +143,23 @@ class I18nService {
   String formatDateRange(DateSectionRange range, DateTime dateTime) {
     switch (range) {
       case DateSectionRange.future:
-        return _localizations!.dateRangeFuture;
+        return _localizations.dateRangeFuture;
       case DateSectionRange.tomorrow:
-        return _localizations!.dateRangeTomorrow;
+        return _localizations.dateRangeTomorrow;
       case DateSectionRange.today:
-        return _localizations!.dateRangeToday;
+        return _localizations.dateRangeToday;
       case DateSectionRange.yesterday:
-        return _localizations!.dateRangeYesterday;
+        return _localizations.dateRangeYesterday;
       case DateSectionRange.thisWeek:
-        return _localizations!.dateRangeCurrentWeek;
+        return _localizations.dateRangeCurrentWeek;
       case DateSectionRange.lastWeek:
-        return _localizations!.dateRangeLastWeek;
+        return _localizations.dateRangeLastWeek;
       case DateSectionRange.thisMonth:
-        return _localizations!.dateRangeCurrentMonth;
+        return _localizations.dateRangeCurrentMonth;
       case DateSectionRange.monthOfThisYear:
-        return _localizations!.dateRangeCurrentYear;
+        return _localizations.dateRangeCurrentYear;
       case DateSectionRange.monthAndYear:
-        return _localizations!.dateRangeLongAgo;
+        return _localizations.dateRangeLongAgo;
     }
   }
 
@@ -173,5 +180,40 @@ class I18nService {
     }
     final sizeFormat = NumberFormat('###.0#');
     return '${sizeFormat.format(sizeD)} ${units[unitIndex]}';
+  }
+
+  String formatIsoDuration(IsoDuration duration) {
+    final localizations = _localizations;
+    final buffer = StringBuffer();
+    if (duration.isNegativeDuration) {
+      buffer.write('-');
+    }
+    if (duration.years > 0) {
+      buffer.write(localizations.durationYears(duration.years));
+    }
+    if (duration.months > 0) {
+      if (buffer.isNotEmpty) buffer.write(', ');
+      buffer.write(localizations.durationMonths(duration.months));
+    }
+    if (duration.weeks > 0) {
+      if (buffer.isNotEmpty) buffer.write(', ');
+      buffer.write(localizations.durationWeeks(duration.weeks));
+    }
+    if (duration.days > 0) {
+      if (buffer.isNotEmpty) buffer.write(', ');
+      buffer.write(localizations.durationDays(duration.days));
+    }
+    if (duration.hours > 0) {
+      if (buffer.isNotEmpty) buffer.write(', ');
+      buffer.write(localizations.durationHours(duration.hours));
+    }
+    if (duration.minutes > 0) {
+      if (buffer.isNotEmpty) buffer.write(', ');
+      buffer.write(localizations.durationHours(duration.minutes));
+    }
+    if (buffer.isEmpty) {
+      buffer.write(localizations.durationEmpty);
+    }
+    return buffer.toString();
   }
 }
