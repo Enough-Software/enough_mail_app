@@ -774,7 +774,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 
   void handleMultipleChoice(_MultipleChoice choice) async {
     final source = _sectionedMessageSource.messageSource;
-    final localizations = locator<I18nService>().localizations!;
+    final localizations = locator<I18nService>().localizations;
     if (_selectedMessages.isEmpty) {
       locator<ScaffoldMessengerService>()
           .showTextSnackBar(localizations.multipleSelectionNeededInfo);
@@ -935,7 +935,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   void move() {
-    final localizations = locator<I18nService>().localizations!;
+    final localizations = locator<I18nService>().localizations;
     var account = locator<MailService>().currentAccount!;
     if (account.isVirtual) {
       // check how many mailclient are involved in the current selection to either show the mailboxes of the unified account
@@ -975,7 +975,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     });
     locator<NavigationService>().pop(); // alert
     final source = _sectionedMessageSource.messageSource;
-    final localizations = locator<I18nService>().localizations!;
+    final localizations = locator<I18nService>().localizations;
     final account = locator<MailService>().currentAccount!;
     if (account.isVirtual) {
       await source.moveMessagesToFlag(_selectedMessages, mailbox.flags.first,

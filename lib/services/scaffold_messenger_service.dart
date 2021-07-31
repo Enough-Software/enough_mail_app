@@ -33,7 +33,7 @@ class ScaffoldMessengerService {
       action: undo == null
           ? null
           : SnackBarAction(
-              label: locator<I18nService>().localizations!.actionUndo,
+              label: locator<I18nService>().localizations.actionUndo,
               onPressed: undo,
             ),
     );

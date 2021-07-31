@@ -15,7 +15,8 @@ import 'icon_text.dart';
 
 class MailAddressChip extends StatelessWidget {
   final MailAddress mailAddress;
-  const MailAddressChip({Key? key, required this.mailAddress})
+  final Widget? icon;
+  const MailAddressChip({Key? key, required this.mailAddress, this.icon})
       : super(key: key);
 
   String getText() {
@@ -30,6 +31,7 @@ class MailAddressChip extends StatelessWidget {
     final theme = Theme.of(context);
     return PlatformPopupMenuButton<_AddressAction>(
       cupertinoButtonPadding: EdgeInsets.zero,
+      icon: icon,
       child: PlatformChip(label: Text(getText())),
       title:
           mailAddress.hasPersonalName ? Text(mailAddress.personalName!) : null,

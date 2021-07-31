@@ -92,7 +92,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
     final service = locator<SettingsService>();
     var customNames = service.settings.customFolderNames;
     if (customNames == null) {
-      final l = locator<I18nService>().localizations!;
+      final l = locator<I18nService>().localizations;
       customNames = [
         l.folderInbox,
         l.folderDrafts,

@@ -123,7 +123,7 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
           padding: EdgeInsets.all(8.0),
           minSize: 20.0,
           child: Text(
-            locator<I18nService>().localizations!.actionUndo,
+            locator<I18nService>().localizations.actionUndo,
             style: CupertinoStatusBar._statusTextStyle,
           ),
           onPressed: () {

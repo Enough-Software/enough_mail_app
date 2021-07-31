@@ -615,9 +615,7 @@ class MailService {
   Future resume() {
     final futures = <Future>[];
     for (final client in _mailClientsPerAccount.values) {
-      if (client.isPolling()) {
-        futures.add(client.resume());
-      }
+      futures.add(client.resume());
     }
     if (futures.isEmpty) {
       return Future.value();
