@@ -1851,6 +1851,10 @@
       }
     }
   },
+  "icalendarExportAction": "Export",
+  "@icalendarExportAction": {
+    "description":  "Action to export the invite to the native calendar"
+  },
   "durationYears": "{number,plural, =1{1 year} other{{number} years}}",
   "@durationYears": {
     "description": "Duration. Message formatted using the plural JSON scheme.",

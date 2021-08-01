@@ -44,7 +44,11 @@ dependencies:
   enough_mail_icalendar: #^0.2.0
     git:
       url: https://github.com/Enough-Software/enough_mail_icalendar.git
-      # path: ../enough_mail_icalendar
+    # path: ../enough_mail_icalendar
+  enough_icalendar_export: #^0.2.0
+    git:
+      url: https://github.com/Enough-Software/enough_icalendar_export.git
+    # path: ../enough_icalendar_export
   enough_serialization: ^1.4.0
     # git:
     #   url: https://github.com/Enough-Software/enough_serialization.git
