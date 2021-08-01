@@ -385,6 +385,7 @@
   "icalendarParticipantStatusChangeText": "Möchtest Du an diese Einladung annehmen?",
   "icalendarParticipantStatusSentSuccess": "Antwort gesendet 😊",
   "icalendarParticipantStatusSentFailure": "Antwort kann nicht gesendet werrden.\nDer Server hat mit den folgenden Details geantwortet:\n{details}",  
+  "icalendarExportAction": "Exportieren",
   "durationYears": "{number,plural, =1{1 Jahr} other{{number} Jahre}}",
   "durationMonths": "{number,plural, =1{1 Monat} other{{number} Monate}}",
   "durationWeeks": "{number,plural, =1{1 Woche} other{{number} Wochen}}",

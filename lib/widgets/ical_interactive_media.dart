@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:enough_icalendar/enough_icalendar.dart';
+import 'package:enough_icalendar_export/enough_icalendar_export.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
@@ -277,9 +278,12 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                 ],
               ),
             },
+            PlatformElevatedButton(
+              child: PlatformText('export'),
+              onPressed: () => _calendar?.exportToNativeCalendar(),
+            )
           ],
         ),
-        // TODO add a save to calendar button
       ),
     );
   }
