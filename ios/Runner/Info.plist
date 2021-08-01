@@ -30,6 +30,8 @@
 	<string>Allows you to attach your location to a message</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allows you to attach photos to a message</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Allows you to add appointment invitations</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
