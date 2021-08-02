@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail/message_builder.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/shared_data.dart';
 import 'package:enough_mail_app/services/theme_service.dart';

@@ -1,4 +1,3 @@
-import 'package:enough_mail/discover/client_config.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
