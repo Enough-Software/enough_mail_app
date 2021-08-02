@@ -1,4 +1,4 @@
-import 'package:enough_mail/mime_message.dart';
+import 'package:enough_mail/mime.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
