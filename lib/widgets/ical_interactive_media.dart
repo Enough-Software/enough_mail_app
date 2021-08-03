@@ -279,7 +279,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
               ),
             },
             PlatformElevatedButton(
-              child: PlatformText('export'),
+              child: PlatformText(localizations.icalendarExportAction),
               onPressed: () => _calendar?.exportToNativeCalendar(),
             )
           ],
@@ -300,8 +300,8 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
         originatingMessage: widget.message.mimeMessage,
         productId: 'Maily',
       );
-      locator<ScaffoldMessengerService>().showTextSnackBar(
-          localizations.icalendarParticipantStatusSentSuccess);
+      locator<ScaffoldMessengerService>()
+          .showTextSnackBar(status.localization(localizations));
     } catch (e, s) {
       print('Unable to send status update: $e $s');
       LocalizedDialogHelper.showTextDialog(context, localizations.errorTitle,
