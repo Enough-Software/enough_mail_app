@@ -74,6 +74,8 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
     final i18nService = locator<I18nService>();
     final userEmail = widget.message.account.email.toLowerCase();
     final recurrenceRule = event.recurrenceRule;
+    var end = event.end;
+    var start = event.start;
     return Material(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -143,7 +145,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                     )
                   ]),
                 },
-                if (event.start != null) ...{
+                if (start != null) ...{
                   TableRow(children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -151,12 +153,12 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(i18nService.formatDate(event.start!,
+                      child: Text(i18nService.formatDate(start.toLocal(),
                           alwaysUseAbsoluteFormat: true)),
                     )
                   ]),
                 },
-                if (event.end != null) ...{
+                if (end != null) ...{
                   TableRow(children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -164,7 +166,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(i18nService.formatDate(event.end!,
+                      child: Text(i18nService.formatDate(end.toLocal(),
                           alwaysUseAbsoluteFormat: true)),
                     )
                   ]),
