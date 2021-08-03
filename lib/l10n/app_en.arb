@@ -1837,10 +1837,6 @@
   "@icalendarParticipantStatusChangeText": {
     "description":  "Text of dialog to change participant status"
   },
-  "icalendarParticipantStatusSentSuccess": "Reply sent 😊",
-  "@icalendarParticipantStatusSentSuccess": {
-    "description":  "Success message for a status change reply"
-  },
   "icalendarParticipantStatusSentFailure": "Unable to send reply.\nThe server responded with the following details:\n{details}",
   "@icalendarParticipantStatusSentFailure": {
     "description":  "Failure message for a status change reply",

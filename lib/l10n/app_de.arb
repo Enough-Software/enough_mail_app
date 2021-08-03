@@ -383,7 +383,6 @@
   "icalendarParticipantStatusOther": "Der Status ist unbekannt.",
   "icalendarParticipantStatusChangeTitle": "Dein Status",
   "icalendarParticipantStatusChangeText": "Möchtest Du an diese Einladung annehmen?",
-  "icalendarParticipantStatusSentSuccess": "Antwort gesendet 😊",
   "icalendarParticipantStatusSentFailure": "Antwort kann nicht gesendet werrden.\nDer Server hat mit den folgenden Details geantwortet:\n{details}",  
   "icalendarExportAction": "Exportieren",
   "durationYears": "{number,plural, =1{1 Jahr} other{{number} Jahre}}",
