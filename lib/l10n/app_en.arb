@@ -1516,11 +1516,15 @@
   "@attachTypeSticker": {
     "description": "Attachmment type to add"
   },
-  "attachTypeStickerSearch": "serch GIPHY",
+  "attachTypeStickerSearch": "search GIPHY",
   "@attachTypeStickerSearch": {
     "description": "Text for searching in GIPHY service for sticker"
   },
-  "languageSettingTitle": "Language",
+  "attachTypeAppointment": "Appointment",
+  "@attachTypeAppointment": {
+    "description": "Attachmment type to add"
+  },
+ "languageSettingTitle": "Language",
   "@languageSettingTitle": {
     "description": "Title of language setting screen"
   },
@@ -1850,6 +1854,219 @@
   "icalendarExportAction": "Export",
   "@icalendarExportAction": {
     "description":  "Action to export the invite to the native calendar"
+  },
+  "icalendarReplyStatusNeedsAction": "{attendee} has not answered this invitation.",
+  "@icalendarReplyStatusNeedsAction": {
+    "description":  "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusAccepted": "{attendee} has accepted the appointment.",
+  "@icalendarReplyStatusAccepted": {
+    "description":  "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusDeclined": "{attendee} has declined this invitation.",
+  "@icalendarReplyStatusDeclined": {
+    "description":  "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusAcceptedTentatively": "{attendee} has tentatively accepted this invitation.",
+  "@icalendarReplyStatusAcceptedTentatively": {
+    "description":  "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusDelegated": "{attendee} has delegated this invitation.",
+  "@icalendarReplyStatusDelegated": {
+    "description":  "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusInProcess": "{attendee} has started this task.",
+  "@icalendarReplyStatusInProcess": {
+    "description":  "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusPartial": "{attendee} has partically done this task.",
+  "@icalendarReplyStatusPartial": {
+    "description":  "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusCompleted": "{attendee} has finished this task.",
+  "@icalendarReplyStatusCompleted": {
+    "description":  "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusOther": "{attendee} has answered with an unknown status.",
+  "@icalendarReplyStatusOther": {
+    "description":  "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyWithoutParticipants": "This calendar reply contains no participants.",
+  "@icalendarReplyWithoutParticipants": {
+    "description":  "Calendar reply without any participant"
+  },
+  "icalendarReplyWithoutStatus": "{attendee} replied without an participations status.",
+  "@icalendarReplyWithoutStatus": {
+    "description":  "Calendar reply without any participant status",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "composeAppointmentTitle": "Create Appointment",
+  "@composeAppointmentTitle": {
+    "description":  "Title for adding a new appointment screen"
+  },
+  "composeAppointmentLabelDay": "day",
+  "@composeAppointmentLabelDay": {
+    "description":  "Label for select day button"
+  },
+  "composeAppointmentLabelTime": "time",
+  "@composeAppointmentLabelTime": {
+    "description":  "Label for select time button"
+  },
+  "composeAppointmentLabelAllDayEvent": "All day",
+  "@composeAppointmentLabelAllDayEvent": {
+    "description":  "Label for is all day toggle"
+  },
+  "composeAppointmentLabelRepeat": "Repeat",
+  "@composeAppointmentLabelRepeat": {
+    "description":  "Label for repeat drop-down"
+  },
+  "composeAppointmentLabelRepeatOptionNever": "Never",
+  "@composeAppointmentLabelRepeatOptionNever": {
+    "description":  "Option for repeat drop-down"
+  },
+  "composeAppointmentLabelRepeatOptionDaily": "Daily",
+  "@composeAppointmentLabelRepeatOptionDaily": {
+    "description":  "Option for repeat drop-down"
+  },
+  "composeAppointmentLabelRepeatOptionWeekly": "Weekly",
+  "@composeAppointmentLabelRepeatOptionWeekly": {
+    "description":  "Option for repeat drop-down"
+  },
+  "composeAppointmentLabelRepeatOptionMonthly": "Monthly",
+  "@composeAppointmentLabelRepeatOptionMonthly": {
+    "description":  "Option for repeat drop-down"
+  },
+  "composeAppointmentLabelRepeatOptionYearly": "Annually",
+  "@composeAppointmentLabelRepeatOptionYearly": {
+    "description":  "Option for repeat drop-down"
+  },
+  "composeAppointmentRecurrenceFrequencyLabel": "Frequence",
+  "@composeAppointmentRecurrenceFrequencyLabel": {
+    "description":  "Label for frequency drop-down"
+  },
+  "composeAppointmentRecurrenceIntervalLabel": "Interval",
+  "@composeAppointmentRecurrenceIntervalLabel": {
+    "description":  "Label for interval drop-down"
+  },
+  "composeAppointmentRecurrenceDaysLabel": "On days",
+  "@composeAppointmentRecurrenceDaysLabel": {
+    "description":  "Label for days selection area in a weekly or monthly recurrence"
+  },
+  "composeAppointmentRecurrenceUntilLabel": "Until",
+  "@composeAppointmentRecurrenceUntilLabel": {
+    "description":  "Label for choosing end date of recurrence"
+  },
+  "composeAppointmentRecurrenceUntilOptionUnlimited": "Unlimited",
+  "@composeAppointmentRecurrenceUntilOptionUnlimited": {
+    "description":  "Option for no end date of recurrence"
+  },
+  "composeAppointmentRecurrenceUntilOptionRecommended": "Recommended ({duration})",
+  "@composeAppointmentRecurrenceUntilOptionRecommended": {
+    "description":  "Option for standard end date of recurrence with the given duration",
+    "placeholders": {
+      "duration": {
+        "type": "String",
+        "example": "3 months"
+      }
+    }
+  },
+  "composeAppointmentRecurrenceUntilOptionSpecificDate": "Until chosen date",
+  "@composeAppointmentRecurrenceUntilOptionSpecificDate": {
+    "description":  "Option for specific end date of recurrence"
+  },
+  "composeAppointmentRecurrenceMonthlyOnDayOfMonth": "On the {day}. day of the month",
+  "@composeAppointmentRecurrenceMonthlyOnDayOfMonth": {
+    "description":  "Option for repeating an event always on that day of the month",
+    "placeholders": {
+      "day": {
+        "type": "int",
+        "example": "3",
+        "format": "compactLong"
+      }
+    }
+  },
+  "composeAppointmentRecurrenceMonthlyOnWeekDay": "Weekday in month",
+  "@composeAppointmentRecurrenceMonthlyOnWeekDay": {
+    "description":  "Monthly repeat on weekday of a chosen week"
+  },
+  "composeAppointmentRecurrenceFirst": "First",
+  "@composeAppointmentRecurrenceFirst": {
+    "description":  "Monthly day option"
+  },
+  "composeAppointmentRecurrenceSecond": "Second",
+  "@composeAppointmentRecurrenceSecond": {
+    "description":  "Monthly day option"
+  },
+  "composeAppointmentRecurrenceThird": "Third",
+  "@composeAppointmentRecurrenceThird": {
+    "description":  "Monthly day option"
+  },
+  "composeAppointmentRecurrenceLast": "Last",
+  "@composeAppointmentRecurrenceLast": {
+    "description":  "Monthly day option"
+  },
+  "composeAppointmentRecurrenceSecondLast": "Second-last",
+  "@composeAppointmentRecurrenceSecondLast": {
+    "description":  "Monthly day option"
   },
   "durationYears": "{number,plural, =1{1 year} other{{number} years}}",
   "@durationYears": {

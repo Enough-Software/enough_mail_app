@@ -32,7 +32,7 @@ class MessageOverviewContent extends StatelessWidget {
             ? from!.email
             : localizations!.emailSenderUnknown;
     final hasAttachments = msg.hasAttachment;
-    final date = locator<I18nService>().formatDate(mime.decodeDate());
+    final date = locator<I18nService>().formatDateTime(mime.decodeDate());
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
       color: msg.isFlagged ? Colors.amber[50] : null,

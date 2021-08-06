@@ -15,6 +15,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 
 class IcalInteractiveMedia extends StatefulWidget {
   final MediaProvider mediaProvider;
@@ -66,11 +67,15 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
     final event = _calendar?.event;
     if (event == null) {
       if (_isPermanentError) {
-        return Text(localizations.errorTitle);
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(localizations.errorTitle),
+        );
       }
-      return PlatformProgressIndicator();
+      return Center(child: PlatformProgressIndicator());
     }
-    final attendees = event.attendees;
+    final isReply = _calendar?.method == Method.reply;
+    final attendees = isReply ? <AttendeeProperty>[] : event.attendees;
     final i18nService = locator<I18nService>();
     final userEmail = widget.message.account.email.toLowerCase();
     final recurrenceRule = event.recurrenceRule;
@@ -81,7 +86,12 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            if (_canReply && _participantStatus == null) ...{
+            if (isReply) ...{
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _buildReply(context, localizations, event),
+              ),
+            } else if (_canReply && _participantStatus == null) ...{
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -153,8 +163,10 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(i18nService.formatDate(start.toLocal(),
-                          alwaysUseAbsoluteFormat: true)),
+                      child: Text(
+                        i18nService.formatDateTime(start.toLocal(),
+                            alwaysUseAbsoluteFormat: true, useLongFormat: true),
+                      ),
                     )
                   ]),
                 },
@@ -166,9 +178,11 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(i18nService.formatDate(end.toLocal(),
-                          alwaysUseAbsoluteFormat: true)),
-                    )
+                      child: Text(
+                        i18nService.formatDateTime(end.toLocal(),
+                            alwaysUseAbsoluteFormat: true, useLongFormat: true),
+                      ),
+                    ),
                   ]),
                 } else if (event.duration != null) ...{
                   TableRow(children: [
@@ -280,10 +294,12 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                 ],
               ),
             },
-            PlatformElevatedButton(
-              child: PlatformText(localizations.icalendarExportAction),
-              onPressed: () => _calendar?.exportToNativeCalendar(),
-            )
+            if (!isReply) ...{
+              PlatformElevatedButton(
+                child: PlatformText(localizations.icalendarExportAction),
+                onPressed: () => _calendar?.exportToNativeCalendar(),
+              ),
+            },
           ],
         ),
       ),
@@ -340,6 +356,34 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
     if (status != null && status != _participantStatus) {
       _changeParticipantStatus(status, localizations);
     }
+  }
+
+  Widget _buildReply(
+      BuildContext context, AppLocalizations localizations, VEvent event) {
+    // This is a reply from one of the participants:
+    var attendees = event.attendees;
+    if (attendees.isEmpty) {
+      return Text(localizations.icalendarReplyWithoutParticipants);
+    }
+    final fromEmail = widget.message.mimeMessage?.fromEmail;
+    if (attendees.length > 1) {
+      final attendee = attendees.firstWhereOrNull((a) => a.email == fromEmail);
+      if (attendee != null) {
+        attendees = [attendee];
+      }
+    }
+    // This should be the most common situation:
+    final attendee = attendees.first;
+    final status = attendee.participantStatus;
+    if (status == null) {
+      return Text(localizations
+          .icalendarReplyWithoutStatus(attendee.mailAddress.toString()));
+    }
+    return Text(
+      status.participantReplyText(
+          localizations, attendee.mailAddress.toString()),
+      style: TextStyle(fontStyle: FontStyle.italic),
+    );
   }
 }
 
@@ -421,6 +465,29 @@ extension ExtensionParticipantStatusTextStyle on ParticipantStatus {
         return localizations.icalendarParticipantStatusCompleted;
       case ParticipantStatus.other:
         return localizations.icalendarParticipantStatusOther;
+    }
+  }
+
+  String participantReplyText(AppLocalizations localizations, String attendee) {
+    switch (this) {
+      case ParticipantStatus.needsAction:
+        return localizations.icalendarReplyStatusNeedsAction(attendee);
+      case ParticipantStatus.accepted:
+        return localizations.icalendarReplyStatusAccepted(attendee);
+      case ParticipantStatus.declined:
+        return localizations.icalendarReplyStatusDeclined(attendee);
+      case ParticipantStatus.tentative:
+        return localizations.icalendarReplyStatusAcceptedTentatively(attendee);
+      case ParticipantStatus.delegated:
+        return localizations.icalendarReplyStatusDelegated(attendee);
+      case ParticipantStatus.inProcess:
+        return localizations.icalendarReplyStatusInProcess(attendee);
+      case ParticipantStatus.partial:
+        return localizations.icalendarReplyStatusPartial(attendee);
+      case ParticipantStatus.completed:
+        return localizations.icalendarReplyStatusCompleted(attendee);
+      case ParticipantStatus.other:
+        return localizations.icalendarReplyStatusOther(attendee);
     }
   }
 }

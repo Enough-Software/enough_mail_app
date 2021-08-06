@@ -1,7 +1,9 @@
 import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:enough_mail_app/services/date_service.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbols.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:intl/date_symbol_data_local.dart' as dateIntl;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
@@ -64,13 +66,16 @@ class I18nService {
   late AppLocalizations _localizations;
   AppLocalizations get localizations => _localizations;
 
-  late intl.DateFormat _dateFormatToday;
-  late intl.DateFormat _dateFormatLastWeek;
-  late intl.DateFormat _dateFormat;
+  late intl.DateFormat _dateTimeFormatToday;
+  late intl.DateFormat _dateTimeFormatLastWeek;
+  late intl.DateFormat _dateTimeFormat;
+  late intl.DateFormat _dateTimeFormatLong;
   late intl.DateFormat _dateFormatDayInLastWeek;
   late intl.DateFormat _dateFormatDayBeforeLastWeek;
+  late intl.DateFormat _dateFormatLong;
+  late intl.DateFormat _dateFormatShort;
   // late intl.DateFormat _dateFormatMonth;
-  // late intl.DateFormat _dateFormatWeekday;
+  late intl.DateFormat _dateFormatWeekday;
   // late intl.DateFormat _dateFormatNoTime;
 
   void init(AppLocalizations localizations, Locale locale) {
@@ -84,23 +89,31 @@ class I18nService {
           firstDayOfWeekPerCountryCode[countryCode] ?? DateTime.monday;
     }
     final localeText = locale.toString();
-    _dateFormatToday = intl.DateFormat.jm(localeText);
-    _dateFormatLastWeek = intl.DateFormat.E(localeText).add_jm();
-    _dateFormat = intl.DateFormat.yMd(localeText).add_jm();
-    _dateFormatDayInLastWeek = intl.DateFormat.E(localeText);
-    _dateFormatDayBeforeLastWeek = intl.DateFormat.yMd(localeText);
-    // _dateFormatWeekday = intl.DateFormat.EEEE(localeText);
-    // _dateFormatMonth = intl.DateFormat.MMMM(localeText);
-    // _dateFormatNoTime = intl.DateFormat.yMEd(localeText);
+    dateIntl.initializeDateFormatting(localeText).then((value) {
+      _dateTimeFormatToday = intl.DateFormat.jm(localeText);
+      _dateTimeFormatLastWeek = intl.DateFormat.E(localeText).add_jm();
+      _dateTimeFormat = intl.DateFormat.yMd(localeText).add_jm();
+      _dateTimeFormatLong = intl.DateFormat.yMMMMEEEEd(localeText).add_jm();
+      _dateFormatDayInLastWeek = intl.DateFormat.E(localeText);
+      _dateFormatDayBeforeLastWeek = intl.DateFormat.yMd(localeText);
+      _dateFormatLong = intl.DateFormat.yMMMMEEEEd(localeText);
+      _dateFormatShort = intl.DateFormat.yMd(localeText);
+      _dateFormatWeekday = intl.DateFormat.EEEE(localeText);
+      // _dateFormatMonth = intl.DateFormat.MMMM(localeText);
+      // _dateFormatNoTime = intl.DateFormat.yMEd(localeText);
+    });
   }
 
-  String formatDate(DateTime? dateTime,
-      {bool alwaysUseAbsoluteFormat = false}) {
+  String formatDateTime(DateTime? dateTime,
+      {bool alwaysUseAbsoluteFormat = false, useLongFormat = false}) {
     if (dateTime == null) {
       return _localizations.dateUndefined;
     }
     if (alwaysUseAbsoluteFormat) {
-      return _dateFormat.format(dateTime);
+      if (useLongFormat) {
+        return _dateTimeFormatLong.format(dateTime);
+      }
+      return _dateTimeFormat.format(dateTime);
     }
     final nw = DateTime.now();
     final today = nw.subtract(Duration(
@@ -111,13 +124,29 @@ class I18nService {
     final lastWeek = today.subtract(Duration(days: 7));
     String date;
     if (dateTime.isAfter(today)) {
-      date = _dateFormatToday.format(dateTime);
+      date = _dateTimeFormatToday.format(dateTime);
     } else if (dateTime.isAfter(lastWeek)) {
-      date = _dateFormatLastWeek.format(dateTime);
+      date = _dateTimeFormatLastWeek.format(dateTime);
     } else {
-      date = _dateFormat.format(dateTime);
+      if (useLongFormat) {
+        date = _dateTimeFormatLong.format(dateTime);
+      } else {
+        date = _dateTimeFormat.format(dateTime);
+      }
     }
     return date;
+  }
+
+  String formatDate(DateTime? dateTime, {bool useLongFormat = false}) {
+    if (dateTime == null) {
+      return _localizations.dateUndefined;
+    }
+
+    if (useLongFormat) {
+      return _dateFormatLong.format(dateTime);
+    } else {
+      return _dateFormatShort.format(dateTime);
+    }
   }
 
   String formatDay(DateTime dateTime) {
@@ -138,6 +167,26 @@ class I18nService {
     } else {
       return _dateFormatDayBeforeLastWeek.format(messageDate);
     }
+  }
+
+  String formatWeekDay(DateTime dateTime) {
+    return _dateFormatWeekday.format(dateTime);
+  }
+
+  List<WeekDay> formatWeekDays({int? startOfWeekDay, bool abbreviate = false}) {
+    startOfWeekDay ??= firstDayOfWeek;
+    final dateSymbols =
+        (dateIntl.dateTimeSymbolMap()[_locale.toString()] as DateSymbols);
+    final weekdays = abbreviate
+        ? dateSymbols.STANDALONESHORTWEEKDAYS
+        : dateSymbols.STANDALONEWEEKDAYS;
+    final result = <WeekDay>[];
+    for (int i = 0; i < 7; i++) {
+      final day = (startOfWeekDay + i) % 7;
+      final name = weekdays[day];
+      result.add(WeekDay(day, name));
+    }
+    return result;
   }
 
   String formatDateRange(DateSectionRange range, DateTime dateTime) {
@@ -216,4 +265,11 @@ class I18nService {
     }
     return buffer.toString();
   }
+}
+
+class WeekDay {
+  final int day;
+  final String name;
+
+  const WeekDay(this.day, this.name);
 }

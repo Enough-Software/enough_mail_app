@@ -171,7 +171,7 @@ class _MessageContentState extends State<_MessageContent> {
   Widget _buildHeader(AppLocalizations localizations) {
     final mime = widget.message.mimeMessage!;
     final attachments = widget.message.attachments;
-    final date = locator<I18nService>().formatDate(mime.decodeDate());
+    final date = locator<I18nService>().formatDateTime(mime.decodeDate());
     final subject = mime.decodeSubject();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
