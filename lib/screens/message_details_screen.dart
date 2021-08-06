@@ -591,6 +591,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                       return PlatformProgressIndicator();
                     }
                     final messages = snapshot.data!;
+                    final isSentFolder = widget.message.source.isSent;
                     return ConstrainedBox(
                       constraints: BoxConstraints(maxHeight: height),
                       child: ListView(
@@ -598,8 +599,10 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                         shrinkWrap: true,
                         children: messages
                             .map((message) => PlatformListTile(
-                                  title:
-                                      MessageOverviewContent(message: message),
+                                  title: MessageOverviewContent(
+                                    message: message,
+                                    isSentMessage: isSentFolder,
+                                  ),
                                   onTap: () => _select(message),
                                   selected:
                                       (message.mimeMessage!.uid == currentUid),

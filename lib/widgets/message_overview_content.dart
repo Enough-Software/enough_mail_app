@@ -9,28 +9,21 @@ import '../locator.dart';
 
 class MessageOverviewContent extends StatelessWidget {
   final Message message;
-  const MessageOverviewContent({Key? key, required this.message})
+  final bool isSentMessage;
+
+  const MessageOverviewContent(
+      {Key? key, required this.message, required this.isSentMessage})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final msg = message;
     final mime = msg.mimeMessage!;
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final threadLength =
         mime.threadSequence != null ? mime.threadSequence!.toList().length : 0;
-    final subject = mime.decodeSubject() ?? localizations!.subjectUndefined;
-    MailAddress? from;
-    if (mime.from?.isNotEmpty ?? false) {
-      from = mime.from!.first;
-    } else {
-      from = mime.sender;
-    }
-    final sender = (from?.personalName?.isNotEmpty ?? false)
-        ? from!.personalName!
-        : from?.email != null
-            ? from!.email
-            : localizations!.emailSenderUnknown;
+    final subject = mime.decodeSubject() ?? localizations.subjectUndefined;
+    final senderOrRecipients = _getSenderOrRecipients(mime, localizations);
     final hasAttachments = msg.hasAttachment;
     final date = locator<I18nService>().formatDateTime(mime.decodeDate());
     return Container(
@@ -47,7 +40,7 @@ class MessageOverviewContent extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: Text(
-                    sender,
+                    senderOrRecipients,
                     overflow: TextOverflow.fade,
                     softWrap: false,
                     style: TextStyle(
@@ -97,5 +90,25 @@ class MessageOverviewContent extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _getSenderOrRecipients(
+      MimeMessage mime, AppLocalizations localizations) {
+    if (isSentMessage) {
+      return mime.recipients
+          .map((r) => r.hasPersonalName ? r.personalName : r.email)
+          .join(', ');
+    }
+    MailAddress? from;
+    if (mime.from?.isNotEmpty ?? false) {
+      from = mime.from!.first;
+    } else {
+      from = mime.sender;
+    }
+    return (from?.personalName?.isNotEmpty ?? false)
+        ? from!.personalName!
+        : from?.email != null
+            ? from!.email
+            : localizations.emailSenderUnknown;
   }
 }

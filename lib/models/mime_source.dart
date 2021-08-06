@@ -37,7 +37,7 @@ abstract class MimeSource {
 
   bool get isJunk;
   bool get isTrash;
-
+  bool get isSent;
   bool get isArchive;
 
   Future<List<DeleteResult>> deleteAllMessages();
@@ -196,6 +196,9 @@ class MailboxMimeSource extends MimeSource {
 
   @override
   bool get isTrash => mailbox?.isTrash ?? false;
+
+  @override
+  bool get isSent => mailbox?.isSent ?? false;
 
   @override
   bool get isArchive => mailbox?.isArchive ?? false;
@@ -413,6 +416,9 @@ class SearchMimeSource extends MimeSource {
 
   @override
   bool get isTrash => mailbox.isTrash;
+
+  @override
+  bool get isSent => mailbox.isSent;
 
   @override
   String get name => mailSearch.query;
