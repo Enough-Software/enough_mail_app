@@ -182,8 +182,11 @@ class I18nService {
         : dateSymbols.STANDALONEWEEKDAYS;
     final result = <WeekDay>[];
     for (int i = 0; i < 7; i++) {
-      final day = (startOfWeekDay + i) % 7;
-      final name = weekdays[day];
+      final day = ((startOfWeekDay + i) <= 7)
+          ? (startOfWeekDay + i)
+          : ((startOfWeekDay + i) - 7);
+      final nameIndex = day == DateTime.sunday ? 0 : day;
+      final name = weekdays[nameIndex];
       result.add(WeekDay(day, name));
     }
     return result;

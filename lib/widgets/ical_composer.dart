@@ -608,7 +608,9 @@ class _WeekDaySelectorState extends State<WeekDaySelector> {
     if (byWeekDays != null) {
       int firstDayOfWeek = i18nService.firstDayOfWeek;
       for (int i = 0; i < 7; i++) {
-        final day = (firstDayOfWeek + i) % 7;
+        final day = ((firstDayOfWeek + i) <= 7)
+            ? (firstDayOfWeek + i)
+            : ((firstDayOfWeek + i) - 7);
         bool isSelected = byWeekDays.any((dayRule) => dayRule.weekday == day);
         _selectedDays[i] = isSelected;
       }
