@@ -6,6 +6,7 @@ import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:enough_mail_app/util/modal_bottom_sheet_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,7 +16,6 @@ import '../locator.dart';
 import 'base.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class SettingsSignatureScreen extends StatefulWidget {
   @override
@@ -164,73 +164,45 @@ class _SignatureWidgetState extends State<SignatureWidget> {
     final localizations = AppLocalizations.of(context)!;
     final iconService = locator<IconService>();
     HtmlEditorApi? editorApi;
-    final bottomSheetContent = SafeArea(
-      bottom: false,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 32.0),
-        child: Base.buildAppChrome(
-          context,
-          title: widget.account?.name ?? localizations.signatureSettingsTitle,
-          includeDrawer: false,
-          appBarActions: [
-            if (_signature != null) ...{
-              DensePlatformIconButton(
-                icon: Icon(iconService.messageActionDelete),
-                onPressed: () async {
-                  setState(() {
-                    _signature = null;
-                  });
-                  Navigator.of(context).pop(false);
-                  if (widget.account != null) {
-                    widget.account!.signatureHtml = null;
-                    await locator<MailService>().saveAccounts();
-                  } else {
-                    final service = locator<SettingsService>();
-                    service.settings.signatureHtml = null;
-                    _signature = service.getSignatureHtmlGlobal();
-                    await service.save();
-                  }
-                },
-              ),
-            },
-            DensePlatformIconButton(
-              icon: Icon(CommonPlatformIcons.ok),
-              onPressed: () => Navigator.of(context).pop(true),
-            ),
-          ],
-          content: SingleChildScrollView(
-            child: SafeArea(
-              child: PackagedHtmlEditor(
-                initialContent: _signature ??
-                    locator<SettingsService>().getSignatureHtmlGlobal(),
-                excludeDocumentLevelControls: true,
-                onCreated: (api) => editorApi = api,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-    bool? result;
-    if (CommonPlatformIcons.isCupertino) {
-      result = await showCupertinoModalBottomSheet(
-        context: context,
-        builder: (context) => bottomSheetContent,
-        elevation: 8.0,
-        expand: true,
-        isDismissible: true,
-      );
-    } else {
-      result = await showMaterialModalBottomSheet(
-        context: context,
-        builder: (context) => bottomSheetContent,
-        elevation: 8.0,
-        expand: true,
-        backgroundColor: Colors.transparent,
-      );
-    }
 
-    if (result == true && editorApi != null) {
+    final result = await ModelBottomSheetHelper.showModalBottomSheet(
+      context,
+      widget.account?.name ?? localizations.signatureSettingsTitle,
+      PackagedHtmlEditor(
+        initialContent:
+            _signature ?? locator<SettingsService>().getSignatureHtmlGlobal(),
+        excludeDocumentLevelControls: true,
+        onCreated: (api) => editorApi = api,
+      ),
+      appBarActions: [
+        if (_signature != null) ...{
+          DensePlatformIconButton(
+            icon: Icon(iconService.messageActionDelete),
+            onPressed: () async {
+              setState(() {
+                _signature = null;
+              });
+              Navigator.of(context).pop(false);
+              if (widget.account != null) {
+                widget.account!.signatureHtml = null;
+                await locator<MailService>().saveAccounts();
+              } else {
+                final service = locator<SettingsService>();
+                service.settings.signatureHtml = null;
+                _signature = service.getSignatureHtmlGlobal();
+                await service.save();
+              }
+            },
+          ),
+        },
+        DensePlatformIconButton(
+          icon: Icon(CommonPlatformIcons.ok),
+          onPressed: () => Navigator.of(context).pop(true),
+        ),
+      ],
+    );
+
+    if (result && editorApi != null) {
       final newSignature = await editorApi!.getText();
       setState(() {
         _signature = newSignature;

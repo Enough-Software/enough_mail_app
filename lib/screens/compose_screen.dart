@@ -204,6 +204,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   Future<MimeMessage> _buildMimeMessage(MailClient mailClient) async {
     await _populateMessageBuilder();
+    widget.data.finalize();
     final mb = widget.data.messageBuilder;
     _usedTextEncoding = TransferEncoding.automatic;
     final mimeMessage = mb.buildMimeMessage();
@@ -318,7 +319,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                 stretch: true,
                 actions: [
                   AddAttachmentPopupButton(
-                    messageBuilder: widget.data.messageBuilder,
+                    composeData: widget.data,
                     update: () => setState(() {}),
                   ),
                   PlatformIconButton(

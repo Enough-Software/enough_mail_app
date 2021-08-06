@@ -26,6 +26,8 @@ class IconService {
       _isCupertino ? CupertinoIcons.videocam : Icons.video_collection_outlined;
   IconData get mediaGif => Icons.gif;
   IconData get mediaSticker => CommunityMaterialIcons.sticker;
+  IconData get appointment =>
+      _isCupertino ? CupertinoIcons.calendar : Icons.calendar_today;
 
   IconData? get add => _isCupertino ? CupertinoIcons.add : Icons.add;
 

@@ -16,6 +16,18 @@ class ThemeService with ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
   MaterialColor _primarySwatch = Colors.green;
 
+  Brightness brightness(BuildContext context) {
+    final mode = _themeSettings.getCurrentThemeMode();
+    switch (mode) {
+      case ThemeMode.system:
+        return MediaQuery.platformBrightnessOf(context);
+      case ThemeMode.light:
+        return Brightness.light;
+      case ThemeMode.dark:
+        return Brightness.dark;
+    }
+  }
+
   void init(Settings settings) {
     _themeSettings = settings.themeSettings;
     checkForChangedTheme();

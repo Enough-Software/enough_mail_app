@@ -1,3 +1,4 @@
+import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -5,9 +6,11 @@ import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:enough_mail_app/util/api_keys.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
+import 'package:enough_mail_app/widgets/ical_composer.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:file_picker/file_picker.dart';
@@ -24,7 +27,7 @@ class AttachmentMediaProviderFactory {
 }
 
 class AttachmentComposeBar extends StatefulWidget {
-  final ComposeData? composeData;
+  final ComposeData composeData;
   final bool isDownloading;
   AttachmentComposeBar(
       {Key? key, required this.composeData, this.isDownloading = false})
@@ -39,7 +42,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
 
   @override
   void initState() {
-    _attachments = widget.composeData!.messageBuilder.attachments;
+    _attachments = widget.composeData.messageBuilder.attachments;
     super.initState();
   }
 
@@ -58,7 +61,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
           PlatformProgressIndicator(),
         },
         AddAttachmentPopupButton(
-          messageBuilder: widget.composeData!.messageBuilder,
+          composeData: widget.composeData,
           update: () => setState(() {}),
         ),
         // ActionChip(
@@ -72,7 +75,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
   }
 
   void removeAttachment(AttachmentInfo attachment) {
-    widget.composeData!.messageBuilder.removeAttachment(attachment);
+    widget.composeData.messageBuilder.removeAttachment(attachment);
     setState(() {
       _attachments.remove(attachment);
     });
@@ -80,16 +83,18 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
 }
 
 class AddAttachmentPopupButton extends StatelessWidget {
-  final MessageBuilder messageBuilder;
+  final ComposeData composeData;
   final Function() update;
   const AddAttachmentPopupButton(
-      {Key? key, required this.messageBuilder, required this.update})
+      {Key? key, required this.composeData, required this.update})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final iconService = locator<IconService>();
+    final themeService = locator<ThemeService>();
+    final brightness = themeService.brightness(context);
     return PlatformPopupMenuButton<int>(
       icon: Icon(Icons.add),
       itemBuilder: (context) => [
@@ -98,6 +103,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
           child: IconText(
             icon: Icon(iconService.mediaFile),
             label: Text(localizations.attachTypeFile),
+            brightness: brightness,
           ),
         ),
         PlatformPopupMenuItem(
@@ -105,6 +111,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
           child: IconText(
             icon: Icon(iconService.mediaPhoto),
             label: Text(localizations.attachTypePhoto),
+            brightness: brightness,
           ),
         ),
         PlatformPopupMenuItem(
@@ -112,6 +119,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
           child: IconText(
             icon: Icon(iconService.mediaVideo),
             label: Text(localizations.attachTypeVideo),
+            brightness: brightness,
           ),
         ),
         PlatformPopupMenuItem(
@@ -119,6 +127,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
           child: IconText(
             icon: Icon(iconService.mediaAudio),
             label: Text(localizations.attachTypeAudio),
+            brightness: brightness,
           ),
         ),
         PlatformPopupMenuItem(
@@ -126,6 +135,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
           child: IconText(
             icon: Icon(iconService.location),
             label: Text(localizations.attachTypeLocation),
+            brightness: brightness,
           ),
         ),
         PlatformPopupMenuItem(
@@ -133,6 +143,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
           child: IconText(
             icon: Icon(iconService.mediaGif),
             label: Text(localizations.attachTypeGif),
+            brightness: brightness,
           ),
         ),
         PlatformPopupMenuItem(
@@ -140,6 +151,15 @@ class AddAttachmentPopupButton extends StatelessWidget {
           child: IconText(
             icon: Icon(iconService.mediaSticker),
             label: Text(localizations.attachTypeSticker),
+            brightness: brightness,
+          ),
+        ),
+        PlatformPopupMenuItem(
+          value: 7,
+          child: IconText(
+            icon: Icon(iconService.appointment),
+            label: Text(localizations.attachTypeAppointment),
+            brightness: brightness,
           ),
         ),
       ],
@@ -162,7 +182,8 @@ class AddAttachmentPopupButton extends StatelessWidget {
             final result =
                 await locator<NavigationService>().push(Routes.locationPicker);
             if (result != null) {
-              messageBuilder.addBinary(result, MediaSubtype.imagePng.mediaType,
+              composeData.messageBuilder.addBinary(
+                  result, MediaSubtype.imagePng.mediaType,
                   filename: "location.jpg");
               changed = true;
             }
@@ -173,6 +194,9 @@ class AddAttachmentPopupButton extends StatelessWidget {
           case 6: // gif sticker file
             changed = await addAttachmentGif(context, localizations,
                 searchSticker: true);
+            break;
+          case 7: // appointment
+            changed = await addAttachmentAppointment(context, localizations);
             break;
         }
         if (changed) {
@@ -197,19 +221,20 @@ class AddAttachmentPopupButton extends StatelessWidget {
         final ext = file.path!.substring(lastDotIndex + 1);
         mediaType = MediaType.guessFromFileExtension(ext);
       }
-      messageBuilder.addBinary(file.bytes!, mediaType, filename: file.name);
+      composeData.messageBuilder
+          .addBinary(file.bytes!, mediaType, filename: file.name);
     }
     return true;
   }
 
   Future<bool> addAttachmentGif(
-      BuildContext context, AppLocalizations? localizations,
+      BuildContext context, AppLocalizations localizations,
       {bool searchSticker = false}) async {
     if (!ApiKeys.isInitialized) {
       await ApiKeys.init();
     }
     if (ApiKeys.giphy == null) {
-      LocalizedDialogHelper.showTextDialog(context, localizations!.errorTitle,
+      LocalizedDialogHelper.showTextDialog(context, localizations.errorTitle,
           'No GIPHY API key found. Please check set up instructions.');
       return false;
     }
@@ -218,8 +243,8 @@ class AddAttachmentPopupButton extends StatelessWidget {
         context: context,
         apiKey: ApiKeys.giphy!,
         searchText: searchSticker
-            ? localizations!.attachTypeStickerSearch
-            : localizations!.attachTypeGifSearch,
+            ? localizations.attachTypeStickerSearch
+            : localizations.attachTypeGifSearch,
         lang: locator<I18nService>().locale!.languageCode,
         sticker: searchSticker,
         showPreviewPage: false);
@@ -230,11 +255,71 @@ class AddAttachmentPopupButton extends StatelessWidget {
     if (result.data == null) {
       return false;
     }
-    messageBuilder.addBinary(
+    composeData.messageBuilder.addBinary(
         result.data!, MediaType.fromSubtype(MediaSubtype.imageGif),
         filename: gif.title! + '.gif');
 
     return true;
+  }
+
+  Future<bool> addAttachmentAppointment(
+      BuildContext context, AppLocalizations localizations) async {
+    final appointment = await IcalComposer.createOrEditAppointment(context);
+    if (appointment != null) {
+      // idea: add some sort of finalizer that updates the appointment at the end
+      // to set the organizer and the attendees
+      final text = appointment.toString();
+      final attachmentBuilder = composeData.messageBuilder.addText(
+        text,
+        mediaType: MediaType.fromText('application/ics'),
+        disposition: ContentDispositionHeader.from(
+          ContentDisposition.attachment,
+          filename: 'invite.ics',
+        ),
+      );
+      attachmentBuilder.contentType!.setParameter('method', 'REQUEST');
+      final finalizer = _AppointmentFinalizer(appointment, attachmentBuilder);
+      composeData.addFinalizer(finalizer.finalize);
+    }
+    return (appointment != null);
+  }
+}
+
+class _AppointmentFinalizer {
+  final VCalendar appointment;
+  final PartBuilder attachmentBuilder;
+
+  _AppointmentFinalizer(this.appointment, this.attachmentBuilder);
+
+  void finalize(MessageBuilder messageBuilder) {
+    final event = appointment.event!;
+    if (messageBuilder.from?.isNotEmpty == true) {
+      final organizer = messageBuilder.from!.first;
+      event.organizer = OrganizerProperty.create(
+        email: organizer.email,
+        commonName: organizer.personalName,
+      );
+      event.addAttendee(AttendeeProperty.create(
+        attendeeEmail: organizer.email,
+        commonName: organizer.personalName,
+        participantStatus: ParticipantStatus.accepted,
+      )!);
+    }
+    final recipients = <MailAddress>[];
+    if (messageBuilder.to != null) {
+      recipients.addAll(messageBuilder.to!);
+    }
+    if (messageBuilder.cc != null) {
+      recipients.addAll(messageBuilder.cc!);
+    }
+    for (final mailAddress in recipients) {
+      event.addAttendee(AttendeeProperty.create(
+        attendeeEmail: mailAddress.email,
+        commonName: mailAddress.personalName,
+        rsvp: true,
+      )!);
+    }
+    attachmentBuilder.text = appointment.toString();
   }
 }
 
@@ -258,12 +343,23 @@ class ComposeAttachment extends StatelessWidget {
               AttachmentMediaProviderFactory.fromAttachmentInfo(attachment),
           width: 60,
           height: 60,
-          showInteractiveDelegate: (interactiveMedia) {
+          showInteractiveDelegate: (interactiveMedia) async {
             if (attachment.mediaType.sub == MediaSubtype.messageRfc822) {
               final mime = MimeMessage.parseFromData(attachment.data!);
               final message = Message.embedded(mime, Message.of(context)!);
               return locator<NavigationService>()
                   .push(Routes.mailDetails, arguments: message);
+            }
+            if (attachment.mediaType.sub == MediaSubtype.applicationIcs ||
+                attachment.mediaType.sub == MediaSubtype.textCalendar) {
+              final text = attachment.part.text!;
+              final appointment = VComponent.parse(text) as VCalendar;
+              final update = await IcalComposer.createOrEditAppointment(context,
+                  appointment: appointment);
+              if (update != null) {
+                attachment.part.text = update.toString();
+              }
+              return;
             }
 
             return locator<NavigationService>()
