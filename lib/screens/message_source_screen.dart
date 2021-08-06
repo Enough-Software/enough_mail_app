@@ -252,6 +252,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         ),
       );
     }
+    final isSentFolder = source.isSent;
     return PlatformPageScaffold(
       bottomBar: _isInSelectionMode
           ? buildSelectionModeBottomBar(localizations)
@@ -525,6 +526,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                   _isInSelectionMode,
                                   onMessageTap,
                                   onMessageLongPress,
+                                  isSentMessage: isSentFolder,
                                 ),
                                 onDismissed: (direction) {
                                   final action =
@@ -1115,10 +1117,11 @@ class MessageOverview extends StatefulWidget {
   final void Function(Message message) onTap;
   final void Function(Message message) onLongPress;
   final AnimationController? animationController;
+  final bool isSentMessage;
 
   MessageOverview(
       this.message, this.isInSelectionMode, this.onTap, this.onLongPress,
-      {this.animationController})
+      {this.animationController, required this.isSentMessage})
       : super(key: ValueKey(message.sourceIndex));
 
   @override
@@ -1176,12 +1179,18 @@ class _MessageOverviewState extends State<MessageOverview> {
         ? PlatformCheckboxListTile(
             value: widget.message.isSelected,
             selected: widget.message.isSelected,
-            title: MessageOverviewContent(message: widget.message),
+            title: MessageOverviewContent(
+              message: widget.message,
+              isSentMessage: widget.isSentMessage,
+            ),
             onChanged: (value) => widget.onTap(widget.message),
           )
         : PlatformListTile(
             visualDensity: VisualDensity.compact,
-            title: MessageOverviewContent(message: widget.message),
+            title: MessageOverviewContent(
+              message: widget.message,
+              isSentMessage: widget.isSentMessage,
+            ),
             onTap: () => widget.onTap(widget.message),
             onLongPress: () => widget.onLongPress(widget.message),
           );

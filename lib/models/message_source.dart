@@ -55,6 +55,7 @@ abstract class MessageSource extends ChangeNotifier
   bool get isJunk;
   bool get isArchive;
   bool get isTrash;
+  bool get isSent;
   bool get supportsMessageFolders;
   bool get supportsSearching;
 
@@ -487,6 +488,9 @@ class MailboxMessageSource extends MessageSource {
   bool get isTrash => _mimeSource.isTrash;
 
   @override
+  bool get isSent => _mimeSource.isSent;
+
+  @override
   bool get supportsMessageFolders => _mimeSource.supportsMessageFolders;
 
   @override
@@ -668,6 +672,9 @@ class MultipleMessageSource extends MessageSource {
   bool get isTrash => mimeSources.every((source) => source.isTrash);
 
   @override
+  bool get isSent => mimeSources.every((source) => source.isSent);
+
+  @override
   bool get supportsSearching =>
       mimeSources.every((source) => source.supportsSearching);
 
@@ -777,6 +784,9 @@ class SingleMessageSource extends MessageSource {
   bool get isTrash => false;
 
   @override
+  bool get isSent => false;
+
+  @override
   MessageSource search(MailSearch search) {
     throw UnimplementedError();
   }
@@ -840,6 +850,9 @@ class ListMessageSource extends MessageSource {
 
   @override
   bool get isTrash => false;
+
+  @override
+  bool get isSent => false;
 
   @override
   MessageSource search(MailSearch search) {
@@ -915,6 +928,9 @@ class ErrorMessageSource extends MessageSource {
 
   @override
   bool get isTrash => false;
+
+  @override
+  bool get isSent => false;
 
   @override
   Future<bool> markAllMessagesSeen(bool seen) {
