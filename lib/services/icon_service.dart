@@ -67,6 +67,8 @@ class IconService {
       : CommunityMaterialIcons.archive_outline;
   IconData get messageActionRedirect =>
       _isCupertino ? CupertinoIcons.arrow_branch : Icons.compare_arrows;
+  IconData get messageActionViewInSafeMode =>
+      _isCupertino ? CupertinoIcons.lock : Icons.lock;
 
   IconData get folderGeneric => CommunityMaterialIcons.folder_outline;
   IconData get folderInbox => CommunityMaterialIcons.inbox;

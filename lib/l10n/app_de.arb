@@ -53,6 +53,7 @@
   "messageActionMultipleMarkUnseen": "Als ungelesen markieren",
   "messageActionMultipleMarkFlagged": "Markieren",
   "messageActionMultipleMarkUnflagged": "Markierung entfernen",
+  "messageActionViewInSafeMode": "Sicher anzeigen",
   "emailSenderUnknown": "<unbekannt>",
   "dateRangeFuture": "Zukunft",
   "dateRangeTomorrow": "morgen",

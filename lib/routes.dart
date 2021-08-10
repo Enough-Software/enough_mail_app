@@ -86,7 +86,16 @@ class AppRouter {
         page = MessageSourceScreen(messageSource: arguments as MessageSource);
         break;
       case Routes.mailDetails:
-        page = MessageDetailsScreen(message: arguments as Message);
+        if (arguments is Message) {
+          page = MessageDetailsScreen(message: arguments);
+        } else if (arguments is DisplayMessageArguments) {
+          page = MessageDetailsScreen(
+            message: arguments.message,
+            blockExternalContents: arguments.blockExternalContent,
+          );
+        } else {
+          page = WelcomeScreen();
+        }
         break;
       case Routes.mailContents:
         page = MessageContentsScreen(message: arguments as Message);

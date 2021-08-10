@@ -766,6 +766,13 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     ),
                   },
                 },
+                PlatformPopupMenuItem(
+                  value: _MultipleChoice.viewInSafeMode,
+                  child: IconText(
+                    icon: Icon(iconService.messageActionViewInSafeMode),
+                    label: Text(localizations.messageActionViewInSafeMode),
+                  ),
+                ),
               ],
             ),
           ],
@@ -836,6 +843,13 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             localizations.multipleMovedToArchive(_selectedMessages.length);
         await source.moveMessagesToFlag(
             _selectedMessages, MailboxFlag.archive, notification);
+        break;
+      case _MultipleChoice.viewInSafeMode:
+        if (_selectedMessages.isNotEmpty) {
+          locator<NavigationService>().push(Routes.mailDetails,
+              arguments:
+                  DisplayMessageArguments(_selectedMessages.first, true));
+        }
         break;
     }
     if (endSelectionMode) {
@@ -1109,6 +1123,7 @@ enum _MultipleChoice {
   move,
   junk,
   archive,
+  viewInSafeMode,
 }
 
 class MessageOverview extends StatefulWidget {

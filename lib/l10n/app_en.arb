@@ -255,6 +255,10 @@
   "@messageActionMultipleMarkUnflagged": {
     "description": "Action for several messages."
   },
+  "messageActionViewInSafeMode": "View securely",
+  "@messageActionMultipleViewInSafeMode": {
+    "description": "Action for message."
+  },  
   "emailSenderUnknown": "<no sender>",
   "@emailSenderUnknown": {
     "description": "Shown as replacement when there is no known sender of a message."

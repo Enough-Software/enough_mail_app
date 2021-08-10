@@ -309,3 +309,10 @@ extension NewsLetter on MimeMessage {
     return client.sendMessage(message, appendToSent: false);
   }
 }
+
+class DisplayMessageArguments {
+  final Message message;
+  final bool blockExternalContent;
+
+  const DisplayMessageArguments(this.message, this.blockExternalContent);
+}
