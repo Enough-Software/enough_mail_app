@@ -33,7 +33,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MessageDetailsScreen extends StatefulWidget {
   final Message message;
-  const MessageDetailsScreen({Key? key, required this.message})
+  final bool blockExternalContents;
+  const MessageDetailsScreen(
+      {Key? key, required this.message, this.blockExternalContents = false})
       : super(key: key);
 
   @override
@@ -45,13 +47,13 @@ enum _OverflowMenuChoice { showContents, showSourceCode }
 class _DetailsScreenState extends State<MessageDetailsScreen> {
   PageController? _pageController;
   late MessageSource _source;
-  Message? _current;
+  late Message _current;
 
   @override
   void initState() {
     _pageController = PageController(initialPage: widget.message.sourceIndex);
     _current = widget.message;
-    _source = _current!.source;
+    _source = _current.source;
     super.initState();
   }
 
@@ -61,12 +63,20 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
     super.dispose();
   }
 
-  Message? _getMessage(int index) {
-    if (_current!.sourceIndex == index) {
+  Message _getMessage(int index) {
+    if (_current.sourceIndex == index) {
       return _current;
     }
     _current = _source.getMessageAt(index);
     return _current;
+  }
+
+  bool _blockExternalContents(int index) {
+    if (_current.sourceIndex == index) {
+      return widget.blockExternalContents;
+    } else {
+      return false;
+    }
   }
 
   @override
@@ -74,14 +84,20 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
     return PageView.builder(
       controller: _pageController,
       itemCount: _source.size,
-      itemBuilder: (context, index) => _MessageContent(_getMessage(index)!),
+      itemBuilder: (context, index) => _MessageContent(
+        _getMessage(index),
+        blockExternalContents: _blockExternalContents(index),
+      ),
     );
   }
 }
 
 class _MessageContent extends StatefulWidget {
   final Message message;
-  const _MessageContent(this.message, {Key? key}) : super(key: key);
+  final bool blockExternalContents;
+  const _MessageContent(this.message,
+      {Key? key, this.blockExternalContents = false})
+      : super(key: key);
 
   @override
   _MessageContentState createState() => _MessageContentState();
@@ -98,7 +114,9 @@ class _MessageContentState extends State<_MessageContent> {
   @override
   void initState() {
     final mime = widget.message.mimeMessage;
-    if (mime != null && mime.isDownloaded) {
+    if (widget.blockExternalContents) {
+      _blockExternalImages = true;
+    } else if (mime != null && mime.isDownloaded) {
       _blockExternalImages = _shouldImagesBeBlocked(mime);
     } else {
       _messageRequiresRefresh = mime?.envelope == null;
@@ -368,9 +386,9 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   bool _shouldImagesBeBlocked(MimeMessage mimeMessage) {
-    var blockExternalImages =
+    var blockExternalImages = widget.blockExternalContents ||
         locator<SettingsService>().settings.blockExternalImages ||
-            widget.message.source.shouldBlockImages;
+        widget.message.source.shouldBlockImages;
     if (blockExternalImages) {
       final html = mimeMessage.decodeTextHtmlPart();
       final hasImages = (html != null) && (html.contains('<img '));
