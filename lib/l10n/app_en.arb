@@ -255,7 +255,7 @@
   "@messageActionMultipleMarkUnflagged": {
     "description": "Action for several messages."
   },
-  "messageActionViewInSafeMode": "View securely",
+  "messageActionViewInSafeMode": "View without external content",
   "@messageActionMultipleViewInSafeMode": {
     "description": "Action for message."
   },  

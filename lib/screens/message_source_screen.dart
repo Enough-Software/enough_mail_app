@@ -766,13 +766,15 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     ),
                   },
                 },
-                PlatformPopupMenuItem(
-                  value: _MultipleChoice.viewInSafeMode,
-                  child: IconText(
-                    icon: Icon(iconService.messageActionViewInSafeMode),
-                    label: Text(localizations.messageActionViewInSafeMode),
+                if (_selectedMessages.length == 1) ...{
+                  PlatformPopupMenuItem(
+                    value: _MultipleChoice.viewInSafeMode,
+                    child: IconText(
+                      icon: Icon(iconService.messageActionViewInSafeMode),
+                      label: Text(localizations.messageActionViewInSafeMode),
+                    ),
                   ),
-                ),
+                },
               ],
             ),
           ],
