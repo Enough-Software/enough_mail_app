@@ -179,22 +179,22 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           },
         ),
       },
-      if (!_isInSearchMode) ...{
-        PlatformPopupMenuButton<_Visualization>(
-          onSelected: switchVisualization,
-          itemBuilder: (context) => [
-            _visualization == _Visualization.list
-                ? PlatformPopupMenuItem<_Visualization>(
-                    value: _Visualization.stack,
-                    child: Text(localizations.homeActionsShowAsStack),
-                  )
-                : PlatformPopupMenuItem<_Visualization>(
-                    value: _Visualization.list,
-                    child: Text(localizations.homeActionsShowAsList),
-                  ),
-          ],
-        ),
-      },
+      // if (!_isInSearchMode) ...{
+      //   PlatformPopupMenuButton<_Visualization>(
+      //     onSelected: switchVisualization,
+      //     itemBuilder: (context) => [
+      //       _visualization == _Visualization.list
+      //           ? PlatformPopupMenuItem<_Visualization>(
+      //               value: _Visualization.stack,
+      //               child: Text(localizations.homeActionsShowAsStack),
+      //             )
+      //           : PlatformPopupMenuItem<_Visualization>(
+      //               value: _Visualization.list,
+      //               child: Text(localizations.homeActionsShowAsList),
+      //             ),
+      //     ],
+      //   ),
+      // },
     ];
     final i18nService = locator<I18nService>();
     Widget? zeroPosWidget;
