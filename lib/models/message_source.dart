@@ -158,10 +158,9 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> deleteMessages(
       List<Message> messages, String notification) async {
-    final NotificationService? notificationService =
-        locator<NotificationService>();
+    final notificationService = locator<NotificationService>();
     for (final message in messages) {
-      _removeMessageAndCancelNotification(message, notificationService!);
+      _removeMessageAndCancelNotification(message, notificationService);
     }
     notifyListeners();
     final sequenceByClient = orderByClient(messages);
@@ -250,10 +249,9 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> moveMessagesToFlag(List<Message> messages,
       MailboxFlag targetMailboxFlag, String notification) async {
-    final NotificationService? notificationService =
-        locator<NotificationService>();
+    final notificationService = locator<NotificationService>();
     for (final message in messages) {
-      _removeMessageAndCancelNotification(message, notificationService!);
+      _removeMessageAndCancelNotification(message, notificationService);
     }
     notifyListeners();
     final sequenceByClient = orderByClient(messages);
@@ -287,10 +285,9 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> moveMessages(List<Message> messages, Mailbox targetMailbox,
       String notification) async {
-    final NotificationService? notificationService =
-        locator<NotificationService>();
+    final notificationService = locator<NotificationService>();
     for (final message in messages) {
-      _removeMessageAndCancelNotification(message, notificationService!);
+      _removeMessageAndCancelNotification(message, notificationService);
     }
     notifyListeners();
     final mailClient = messages.first.mailClient;
@@ -326,6 +323,9 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> markAsSeen(Message msg, bool seen) {
     msg.isSeen = seen;
+    if (seen) {
+      locator<NotificationService>().cancelNotificationForMailMessage(msg);
+    }
     return msg.mailClient.flagMessage(msg.mimeMessage!, isSeen: seen);
   }
 
@@ -335,7 +335,13 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> markMessagesAsSeen(List<Message> messages, bool seen) {
-    messages.forEach((msg) => msg.isSeen = seen);
+    final notificationService = locator<NotificationService>();
+    messages.forEach((msg) {
+      msg.isSeen = seen;
+      if (seen) {
+        notificationService.cancelNotificationForMailMessage(msg);
+      }
+    });
     return storeMessageFlags(messages, MessageFlags.seen,
         seen ? StoreAction.add : StoreAction.remove);
   }
