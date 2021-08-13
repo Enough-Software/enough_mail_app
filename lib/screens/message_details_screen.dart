@@ -131,7 +131,7 @@ class _MessageContentState extends State<_MessageContent> {
     final localizations = AppLocalizations.of(context)!;
     return Base.buildAppChrome(
       context,
-      title: widget.message.mimeMessage!.decodeSubject() ??
+      title: widget.message.mimeMessage?.decodeSubject() ??
           localizations.subjectUndefined,
       content: MessageWidget(
         message: widget.message,
