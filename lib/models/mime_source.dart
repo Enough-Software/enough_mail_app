@@ -87,17 +87,22 @@ abstract class MimeSource {
   }
 
   void _onMessageAdded(MailLoadEvent e) {
-    print('${DateTime.now()}: ${e.message.decodeSubject()}');
+    print(
+        '$name ${e.mailClient.account.name} ${DateTime.now()}: ${e.message.decodeSubject()}');
     if (e.mailClient == mailClient) {
+      // display notification when the message is not seen and
+      // when the user does not see the message because the user is looking at the list of messages
       bool sendNotification;
       if (matches(e.message)) {
+        // print('adding message');
         addMessage(e.message);
         _notifyMessageAdded(e.message);
-        sendNotification = locator<AppService>()
-            .isInBackground; // it should also show a notification when the user is on a different page...
+        sendNotification =
+            locator<AppService>().isInBackground && !e.message.isSeen;
+        // it should also show a notification when the user is on a different page...
         //TODO update uidNext for background service
       } else {
-        sendNotification = true;
+        sendNotification = !e.message.isSeen;
       }
       if (sendNotification) {
         locator<NotificationService>().sendLocalNotificationForMailLoadEvent(e);
