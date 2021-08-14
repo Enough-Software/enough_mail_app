@@ -332,9 +332,9 @@ class MailboxMimeSource extends MimeSource {
     final mimeMessages = await mailClient.fetchMessageSequence(sequence,
         fetchPreference: FetchPreference.envelope);
     _requestedPages.remove(pageIndex);
-    final now = DateTime.now();
-    mimeMessages.sort(
-        (m1, m2) => (m2.decodeDate() ?? now).compareTo(m1.decodeDate() ?? now));
+    mimeMessages.sort((m1, m2) =>
+        (m2.decodeDate() ?? _estimateDate(m2, mimeMessages))
+            .compareTo(m1.decodeDate() ?? _estimateDate(m1, mimeMessages)));
     var sourceIndex = pageIndex * pageSize;
     _cache.addAll(mimeMessages, sourceIndex);
     for (final mime in mimeMessages) {
@@ -349,6 +349,25 @@ class MailboxMimeSource extends MimeSource {
     } else {
       mailClient.startPolling();
     }
+  }
+
+  DateTime _estimateDate(MimeMessage m, List<MimeMessage> messages) {
+    final index = messages.indexOf(m);
+    for (var i = index + 1; i < messages.length; i++) {
+      final m2 = messages[i];
+      final date = m2.decodeDate();
+      if (date != null) {
+        return date.subtract(const Duration(seconds: 1));
+      }
+    }
+    for (var i = index - 1; i >= 0; i--) {
+      final m2 = messages[i];
+      final date = m2.decodeDate();
+      if (date != null) {
+        return date.add(const Duration(seconds: 1));
+      }
+    }
+    return DateTime.now();
   }
 
   @override
