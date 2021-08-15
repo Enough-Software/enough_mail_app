@@ -321,29 +321,53 @@ abstract class MessageSource extends ChangeNotifier
         locator<I18nService>().localizations.resultArchived);
   }
 
-  Future<void> markAsSeen(Message msg, bool seen) {
-    msg.isSeen = seen;
-    if (seen) {
+  Future<void> markAsSeen(Message msg, bool isSeen) {
+    onMarkedAsSeen(msg, isSeen);
+    if (isSeen) {
       locator<NotificationService>().cancelNotificationForMailMessage(msg);
     }
-    return msg.mailClient.flagMessage(msg.mimeMessage!, isSeen: seen);
+    return msg.mailClient.flagMessage(msg.mimeMessage!, isSeen: isSeen);
   }
 
-  Future<void> markAsFlagged(Message msg, bool flagged) {
-    msg.isFlagged = flagged;
-    return msg.mailClient.flagMessage(msg.mimeMessage!, isFlagged: flagged);
+  void onMarkedAsSeen(Message msg, bool isSeen) {
+    msg.isSeen = isSeen;
+    final parent = _parentMessageSource;
+    if (parent != null) {
+      final parentMsg =
+          parent.cache.getWithMime(msg.mimeMessage!, msg.mailClient);
+      if (parentMsg != null) {
+        parent.onMarkedAsSeen(parentMsg, isSeen);
+      }
+    }
   }
 
-  Future<void> markMessagesAsSeen(List<Message> messages, bool seen) {
+  Future<void> markAsFlagged(Message msg, bool isFlagged) {
+    onMarkedAsFlagged(msg, isFlagged);
+    return msg.mailClient.flagMessage(msg.mimeMessage!, isFlagged: isFlagged);
+  }
+
+  void onMarkedAsFlagged(Message msg, bool isFlagged) {
+    msg.isFlagged = isFlagged;
+    final parent = _parentMessageSource;
+    if (parent != null) {
+      final parentMsg =
+          parent.cache.getWithMime(msg.mimeMessage!, msg.mailClient);
+      if (parentMsg != null) {
+        parent.onMarkedAsFlagged(parentMsg, isFlagged);
+      }
+    }
+  }
+
+  Future<void> markMessagesAsSeen(List<Message> messages, bool isSeen) {
     final notificationService = locator<NotificationService>();
     messages.forEach((msg) {
-      msg.isSeen = seen;
-      if (seen) {
+      onMarkedAsSeen(msg, isSeen);
+      if (isSeen) {
         notificationService.cancelNotificationForMailMessage(msg);
       }
     });
     return storeMessageFlags(messages, MessageFlags.seen,
-        seen ? StoreAction.add : StoreAction.remove);
+        isSeen ? StoreAction.add : StoreAction.remove);
   }
 
   Future<void> markMessagesAsFlagged(List<Message> messages, bool flagged) {
