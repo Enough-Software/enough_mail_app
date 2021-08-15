@@ -160,6 +160,7 @@ class NotificationService {
     bool channelShowBadge = true,
   }) async {
     AndroidNotificationDetails? androidPlatformChannelSpecifics;
+    IOSNotificationDetails? iosPlatformChannelSpecifics;
     if (Platform.isAndroid) {
       androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'maily',
@@ -173,9 +174,13 @@ class NotificationService {
         playSound: true,
         sound: RawResourceAndroidNotificationSound('pop'),
       );
+    } else if (Platform.isIOS) {
+      iosPlatformChannelSpecifics = IOSNotificationDetails(presentSound: true);
     }
-    final platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+    final platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iosPlatformChannelSpecifics,
+    );
     await _flutterLocalNotificationsPlugin
         .show(id, title, text, platformChannelSpecifics, payload: payloadText);
   }
