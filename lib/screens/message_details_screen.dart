@@ -110,6 +110,7 @@ class _MessageContentState extends State<_MessageContent> {
   bool _isWebViewZoomedOut = false;
   Object? errorObject;
   StackTrace? errorStackTrace;
+  bool _notifyMarkedAsSeen = false;
 
   @override
   void initState() {
@@ -123,6 +124,7 @@ class _MessageContentState extends State<_MessageContent> {
       _blockExternalImages = false;
     }
     _messageDownloadError = false;
+    _notifyMarkedAsSeen = !(mime?.isSeen ?? false);
     super.initState();
   }
 
@@ -415,6 +417,9 @@ class _MessageContentState extends State<_MessageContent> {
     }
     locator<NotificationService>()
         .cancelNotificationForMailMessage(widget.message);
+    if (_notifyMarkedAsSeen) {
+      widget.message.source.onMarkedAsSeen(widget.message, true);
+    }
   }
 
   void _onMimeMessageError(Object? e, StackTrace? s) {
