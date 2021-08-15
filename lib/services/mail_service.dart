@@ -20,7 +20,7 @@ import 'package:flutter/foundation.dart' as foundation;
 import '../locator.dart';
 
 class MailService {
-  //MailClient current;
+  static const _clientId = const Id(name: 'Maily', version: '1.0');
   MessageSource? messageSource;
   Account? _currentAccount;
   Account? get currentAccount => _currentAccount;
@@ -335,6 +335,7 @@ class MailService {
         eventBus: AppEventBus.eventBus,
         isLogEnabled: foundation.kDebugMode, // enable log only for debug  mode
         logName: account.account.name,
+        clientId: _clientId,
       );
       _mailClientsPerAccount[account] = client;
       await client.connect();
@@ -558,8 +559,12 @@ class MailService {
   }
 
   Future<MailClient?> connect(MailAccount mailAccount) async {
-    var mailClient = MailClient(mailAccount,
-        isLogEnabled: true, eventBus: AppEventBus.eventBus);
+    var mailClient = MailClient(
+      mailAccount,
+      isLogEnabled: true,
+      eventBus: AppEventBus.eventBus,
+      clientId: _clientId,
+    );
     try {
       await mailClient.connect();
     } on MailException {
@@ -578,8 +583,12 @@ class MailService {
           outgoingAuth.userName = preferredUserName;
         }
         mailClient.disconnect();
-        mailClient = MailClient(mailAccount,
-            isLogEnabled: true, eventBus: AppEventBus.eventBus);
+        mailClient = MailClient(
+          mailAccount,
+          isLogEnabled: true,
+          eventBus: AppEventBus.eventBus,
+          clientId: _clientId,
+        );
         try {
           await mailClient.connect();
         } on MailException {
@@ -605,7 +614,10 @@ class MailService {
     for (final mailAccount in mailAccounts) {
       var client = existingMailClients
           .firstWhereOrNull((client) => client.account == mailAccount);
-      client ??= MailClient(mailAccount);
+      client ??= MailClient(
+        mailAccount,
+        clientId: _clientId,
+      );
       mailClients.add(client);
     }
     return mailClients;
