@@ -151,8 +151,14 @@ class NotificationService {
     return email.hashCode + uid;
   }
 
-  Future sendLocalNotification(int id, String title, String? text,
-      {String? payloadText, DateTime? when, bool channelShowBadge = true}) async {
+  Future sendLocalNotification(
+    int id,
+    String title,
+    String? text, {
+    String? payloadText,
+    DateTime? when,
+    bool channelShowBadge = true,
+  }) async {
     AndroidNotificationDetails? androidPlatformChannelSpecifics;
     if (Platform.isAndroid) {
       androidPlatformChannelSpecifics = AndroidNotificationDetails(
