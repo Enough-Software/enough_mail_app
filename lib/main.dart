@@ -37,6 +37,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   ThemeMode _themeMode = ThemeMode.system;
   ThemeService? _themeService;
   Locale? _locale;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -53,7 +54,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    locator<AppService>().didChangeAppLifecycleState(state);
+    if (_isInitialized) {
+      locator<AppService>().didChangeAppLifecycleState(state);
+    }
   }
 
   Future<MailService> _initApp() async {
@@ -111,6 +114,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           .push(Routes.welcome, fade: true, replace: true);
     }
     await locator<BackgroundService>().init();
+    _isInitialized = true;
     return mailService;
   }
 
