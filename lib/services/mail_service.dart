@@ -189,7 +189,7 @@ class MailService {
       Mailbox? mailbox, UnifiedAccount unifiedAccount) async {
     final futures = <Future<MailClient?>>[];
     final mimeSources = <MimeSource>[];
-    MailboxFlag? flag = mailbox?.flags.first;
+    final flag = mailbox?.flags.first;
     for (final subAccount in unifiedAccount.accounts) {
       futures.add(_getClientAndStopPolling(subAccount));
     }
