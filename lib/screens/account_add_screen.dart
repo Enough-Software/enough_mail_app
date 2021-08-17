@@ -306,6 +306,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                         DecoratedPlatformTextField(
                           controller: _userNameController,
                           keyboardType: TextInputType.text,
+                          textCapitalization: TextCapitalization.words,
                           onChanged: (value) {
                             bool isValid = value.isNotEmpty &&
                                 _accountNameController.text.isNotEmpty;
