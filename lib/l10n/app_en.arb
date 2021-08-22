@@ -1064,6 +1064,14 @@
       }
     }  
   },
+  "addAccountOauthOptionsText": "You can try again to sign in or use an app-specific password.",
+  "@addAccountOauthOptionsText": {
+    "description": "Info shown oauth process fails and the user can try again or use an app-specific password."
+  },
+  "addAccountOauthOptionsTryAgainLabel": "Try again",
+  "@addAccountOauthOptionsTryAgainLabel": {
+    "description": "Label of button to try the oauth login again after it was aborted."
+  },
   "accountAddImapAccessSetuptMightBeRequired": "Your provider might require you to setup access for email apps manually.",
   "@accountAddImapAccessSetuptMightBeRequired": {
     "description": "Info shown when login fails for a provider that is know to require manual activation of IMAP access."

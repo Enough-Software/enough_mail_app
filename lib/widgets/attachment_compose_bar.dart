@@ -7,7 +7,7 @@ import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
-import 'package:enough_mail_app/util/api_keys.dart';
+import 'package:enough_mail_app/services/key_service.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/ical_composer.dart';
@@ -138,22 +138,24 @@ class AddAttachmentPopupButton extends StatelessWidget {
             brightness: brightness,
           ),
         ),
-        PlatformPopupMenuItem(
-          value: 5,
-          child: IconText(
-            icon: Icon(iconService.mediaGif),
-            label: Text(localizations.attachTypeGif),
-            brightness: brightness,
+        if (locator<KeyService>().hasGiphy) ...{
+          PlatformPopupMenuItem(
+            value: 5,
+            child: IconText(
+              icon: Icon(iconService.mediaGif),
+              label: Text(localizations.attachTypeGif),
+              brightness: brightness,
+            ),
           ),
-        ),
-        PlatformPopupMenuItem(
-          value: 6,
-          child: IconText(
-            icon: Icon(iconService.mediaSticker),
-            label: Text(localizations.attachTypeSticker),
-            brightness: brightness,
+          PlatformPopupMenuItem(
+            value: 6,
+            child: IconText(
+              icon: Icon(iconService.mediaSticker),
+              label: Text(localizations.attachTypeSticker),
+              brightness: brightness,
+            ),
           ),
-        ),
+        },
         PlatformPopupMenuItem(
           value: 7,
           child: IconText(
@@ -230,10 +232,8 @@ class AddAttachmentPopupButton extends StatelessWidget {
   Future<bool> addAttachmentGif(
       BuildContext context, AppLocalizations localizations,
       {bool searchSticker = false}) async {
-    if (!ApiKeys.isInitialized) {
-      await ApiKeys.init();
-    }
-    if (ApiKeys.giphy == null) {
+    final giphy = locator<KeyService>().giphy;
+    if (giphy == null) {
       LocalizedDialogHelper.showTextDialog(context, localizations.errorTitle,
           'No GIPHY API key found. Please check set up instructions.');
       return false;
@@ -241,7 +241,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
 
     final gif = await GiphyPicker.pickGif(
         context: context,
-        apiKey: ApiKeys.giphy!,
+        apiKey: giphy,
         searchText: searchSticker
             ? localizations.attachTypeStickerSearch
             : localizations.attachTypeGifSearch,

@@ -4,19 +4,24 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
+import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/key_service.dart';
+import 'package:enough_mail_app/util/http_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:convert' show jsonDecode;
 
 class AccountAddScreen extends StatefulWidget {
   final bool launchedFromWelcome;
@@ -28,61 +33,61 @@ class AccountAddScreen extends StatefulWidget {
 }
 
 class _AccountAddScreenState extends State<AccountAddScreen> {
-  MailAccount account = MailAccount();
+  static const int _stepEmail = 0;
+  static const int _stepPassword = 1;
+  static const int _stepAccountSetup = 2;
+  MailAccount _account = MailAccount();
   late int _availableSteps;
   int _currentStep = 0;
   int _progressedSteps = 0;
   bool _isContinueAvailable = false;
-  String? _providerAppplicationPasswordUrl;
   bool? _isApplicationSpecificPasswordAcknowledged = false;
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _accountNameController = TextEditingController();
   TextEditingController _userNameController = TextEditingController();
 
-  ClientConfig? _clientConfig;
-  bool _isClientConfigResolving = false;
+  bool _isProviderResolving = false;
+  Provider? _provider;
   bool _isManualSettings = false;
   bool _isAccountVerifying = false;
-
   bool _isAccountVerified = false;
   List<AppExtension>? _extensions;
-  MailClient? mailClient;
-
+  MailClient? _mailClient;
   AppExtensionActionDescription? _extensionForgotPassword;
 
-  String? _providerManualImapAccessSetupUrl;
-
   Future<void> navigateToManualSettings() async {
-    if (_clientConfig == null) {
-      account.incoming = MailServerConfig(
+    if (_provider == null) {
+      _account.incoming = MailServerConfig(
         authentication: PlainAuthentication('', ''),
         serverConfig: ServerConfig(),
       );
-      account.outgoing = MailServerConfig(
+      _account.outgoing = MailServerConfig(
         authentication: PlainAuthentication('', ''),
         serverConfig: ServerConfig(),
       );
     } else {
-      account.incoming = MailServerConfig(
+      _account.incoming = MailServerConfig(
         authentication: PlainAuthentication(
-            _clientConfig!.preferredIncomingServer!.getUserName(account.email!),
+            _provider!.clientConfig.preferredIncomingServer!
+                .getUserName(_account.email!),
             ''),
-        serverConfig: _clientConfig!.preferredIncomingServer,
+        serverConfig: _provider!.clientConfig.preferredIncomingServer,
       );
-      account.outgoing = MailServerConfig(
+      _account.outgoing = MailServerConfig(
         authentication: PlainAuthentication(
-            _clientConfig!.preferredOutgoingServer!.getUserName(account.email!),
+            _provider!.clientConfig.preferredOutgoingServer!
+                .getUserName(_account.email!),
             ''),
-        serverConfig: _clientConfig!.preferredOutgoingServer,
+        serverConfig: _provider!.clientConfig.preferredOutgoingServer,
       );
     }
     final result = await locator<NavigationService>()
-        .push(Routes.accountServerDetails, arguments: Account(account));
+        .push(Routes.accountServerDetails, arguments: Account(_account));
     if (result is ConnectedAccount) {
       setState(() {
-        account = result.account;
-        mailClient = result.mailClient;
+        _account = result.account;
+        _mailClient = result.mailClient;
         _currentStep = 2;
         _isAccountVerified = true;
       });
@@ -103,6 +108,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   Widget build(BuildContext context) {
     // print('build: current step=$_currentStep');
     final localizations = AppLocalizations.of(context)!;
+    final provider = _provider;
     return Base.buildAppChrome(
       context,
       title: localizations.addAccountTitle,
@@ -146,7 +152,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                         onChanged: (value) {
                           final isValid = Validator.validateEmail(value);
                           if (isValid) {
-                            account.email = value;
+                            _account.email = value;
                           }
                           if (isValid != _isContinueAvailable) {
                             setState(() {
@@ -173,7 +179,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                   content: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      if (_isClientConfigResolving) ...{
+                      if (_isProviderResolving) ...{
                         Row(
                           children: [
                             Container(
@@ -182,20 +188,34 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             Expanded(
                               child: Text(
                                   localizations.addAccountResolvingSetingsLabel(
-                                      account.email!)),
+                                      _account.email!)),
                             ),
                           ],
                         ),
-                      } else if (_clientConfig != null) ...{
+                      } else if (provider != null) ...{
                         Column(
                           children: [
-                            if (_providerAppplicationPasswordUrl != null) ...{
+                            if (provider.hasOAuthClient) ...{
+                              // this step is only shown when the user has aborted the login or when another error occurred.
+                              // The user has now 2 options:
+                              // 1. try again
+                              // 2. use an app-specific password
+                              Text(localizations.addAccountOauthOptionsText),
+                              PlatformElevatedButton(
+                                onPressed: () =>
+                                    _loginWithOAuth(provider, _account.email!),
+                                child: ButtonText(localizations
+                                    .addAccountOauthOptionsTryAgainLabel),
+                              ),
+                            },
+                            if (provider.appSpecificPasswordSetupUrl !=
+                                null) ...{
                               Text(localizations
                                   .addAccountApplicationPasswordRequiredInfo),
                               PlatformElevatedButton(
                                 onPressed: () async {
                                   await launcher.launch(
-                                      _providerAppplicationPasswordUrl!);
+                                      provider.appSpecificPasswordSetupUrl!);
                                 },
                                 child: ButtonText(localizations
                                     .addAccountApplicationPasswordRequiredButton),
@@ -210,14 +230,14 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                     .addAccountApplicationPasswordRequiredAcknowledged),
                               ),
                             },
-                            if (_providerAppplicationPasswordUrl == null ||
+                            if (provider.appSpecificPasswordSetupUrl == null ||
                                 _isApplicationSpecificPasswordAcknowledged!) ...{
                               PasswordField(
                                 controller: _passwordController,
                                 cupertinoShowLabel: false,
                                 onChanged: (value) {
                                   bool isValid = value.isNotEmpty &&
-                                      (_clientConfig != null ||
+                                      (_provider?.clientConfig != null ||
                                           _isManualSettings);
                                   if (isValid != _isContinueAvailable) {
                                     setState(() {
@@ -235,7 +255,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                 child: ButtonText(
                                   localizations
                                       .addAccountResolvedSettingsWrongAction(
-                                          _clientConfig?.displayName ??
+                                          _provider?.displayName ??
                                               '<unknown>'),
                                 ),
                               ),
@@ -249,7 +269,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                                         _extensionForgotPassword!.action!.url;
                                     url = url
                                       ..replaceAll(
-                                          '{user.email}', account.email ?? '')
+                                          '{user.email}', _account.email ?? '')
                                       ..replaceAll('{language}', languageCode);
                                     launcher.launch(url);
                                   },
@@ -268,7 +288,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                           children: [
                             Text(localizations
                                 .addAccountResolvingSetingsFailedInfo(
-                                    account.email ?? '')),
+                                    _account.email ?? '')),
                             PlatformElevatedButton(
                               child: ButtonText(
                                   localizations.addAccountEditManuallyAction),
@@ -296,13 +316,13 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             Expanded(
                               child: Text(localizations
                                   .addAccountVerifyingSettingsLabel(
-                                      account.email!)),
+                                      _account.email!)),
                             ),
                           ],
                         ),
                       } else if (_isAccountVerified) ...{
                         Text(localizations
-                            .addAccountVerifyingSuccessInfo(account.email!)),
+                            .addAccountVerifyingSuccessInfo(_account.email!)),
                         DecoratedPlatformTextField(
                           controller: _userNameController,
                           keyboardType: TextInputType.text,
@@ -346,8 +366,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                         ),
                       } else ...{
                         Text(localizations.addAccountVerifyingFailedInfo(
-                            account.email ?? '')),
-                        if (_providerManualImapAccessSetupUrl != null) ...{
+                            _account.email ?? '')),
+                        if (_provider?.manualImapAccessSetupUrl != null) ...{
                           Padding(
                             padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
                             child: Text(localizations
@@ -357,7 +377,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                             child: ButtonText(localizations
                                 .addAccoutSetupImapAccessButtonLabel),
                             onPressed: () => launcher
-                                .launch(_providerManualImapAccessSetupUrl!),
+                                .launch(_provider!.manualImapAccessSetupUrl!),
                           ),
                         },
                       }
@@ -375,110 +395,148 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   Future<void> _onStepProgressed(int step) async {
     _progressedSteps = step;
     switch (step) {
-      case 1:
-        // email address has been entered
-        if (!_isClientConfigResolving) {
+      case _stepEmail + 1:
+        await _discover(_account.email!);
+        break;
+      case _stepPassword + 1:
+        await _verifyAccount();
+        break;
+      case _stepAccountSetup + 1:
+        await _finalizeAccount();
+        break;
+    }
+  }
+
+  Future _discover(String email) async {
+    // email address has been entered
+    if (!_isProviderResolving) {
+      setState(() {
+        _isProviderResolving = true;
+      });
+    }
+    print('discover settings for $email');
+    final provider = await locator<ProviderService>().discover(email);
+    print('done discovering settings: ${provider?.displayName}');
+    if (provider?.appSpecificPasswordSetupUrl != null) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+    _isApplicationSpecificPasswordAcknowledged = false;
+    final domainName = email.substring(email.lastIndexOf('@') + 1);
+    _accountNameController.text = domainName;
+    if (provider != null) {
+      if (provider.hasOAuthClient) {
+        // continue directly with oauth flow:
+        _loginWithOAuth(provider, email);
+      }
+      final mailAccount = MailAccount.fromDiscoveredSettings(
+        _emailController.text,
+        _emailController.text,
+        _passwordController.text,
+        provider.clientConfig,
+      );
+      AppExtension.loadFor(mailAccount).then((value) {
+        _extensions = value;
+        final forgotPwUrl = mailAccount.appExtensionForgotPassword;
+        if (forgotPwUrl != null) {
           setState(() {
-            _isClientConfigResolving = true;
+            _extensionForgotPassword = forgotPwUrl;
           });
         }
-        final email = account.email!;
-        print('discover settings for $email');
-        final clientConfig = await Discover.discover(email, isLogEnabled: true);
-        print('done discovering settings: ${clientConfig?.displayName}');
-        final incomingHostname =
-            clientConfig?.preferredIncomingServer?.hostname;
-        if (incomingHostname != null) {
-          print('incoming host: $incomingHostname');
-          _providerAppplicationPasswordUrl = <String, String>{
-            'outlook.office365.com':
-                'https://support.microsoft.com/account-billing/using-app-passwords-with-apps-that-don-t-support-two-step-verification-5896ed9b-4263-e681-128a-a6f2979a7944',
-            'imap.yahoo.com': 'https://help.yahoo.com/kb/SLN15241.html',
-            'imap.gmail.com':
-                'https://support.google.com/accounts/answer/185833',
-            'imap.aol.com':
-                'https://help.aol.com/articles/Create-and-manage-app-password',
-            'imap.mail.me.com': 'https://support.apple.com/en-us/HT204397',
-          }[incomingHostname];
-          if (_providerAppplicationPasswordUrl != null) {
-            FocusManager.instance.primaryFocus?.unfocus();
-          }
-          _isApplicationSpecificPasswordAcknowledged = false;
-        }
-        var domainName = email.substring(email.lastIndexOf('@') + 1);
-        _accountNameController.text = domainName;
-        if (clientConfig != null) {
-          final mailAccount = MailAccount.fromDiscoveredSettings(
-              _emailController.text,
-              _emailController.text,
-              _passwordController.text,
-              clientConfig);
-          AppExtension.loadFor(mailAccount).then((value) {
-            _extensions = value;
-            final forgotPwUrl = mailAccount.appExtensionForgotPassword;
-            if (forgotPwUrl != null) {
-              setState(() {
-                _extensionForgotPassword = forgotPwUrl;
-              });
-            }
-          });
-        }
+      });
+    }
 
-        setState(() {
-          _isClientConfigResolving = false;
-          _clientConfig = clientConfig;
-          _isContinueAvailable =
-              (clientConfig != null) && _passwordController.text.isNotEmpty;
-        });
-        break;
-      case 2:
-        // password and possibly manual account details have been specified
-        setState(() {
-          _isAccountVerifying = true;
-        });
-        final mailAccount = MailAccount.fromDiscoveredSettings(
-            _emailController.text,
-            _emailController.text,
-            _passwordController.text,
-            _clientConfig!);
-        mailClient = await locator<MailService>().connect(mailAccount);
+    setState(() {
+      _isProviderResolving = false;
+      _provider = provider;
+      _isContinueAvailable =
+          (provider != null) && _passwordController.text.isNotEmpty;
+    });
+  }
 
-        final isVerified = mailClient?.isConnected ?? false;
-        if (isVerified) {
-          mailAccount.appExtensions = _extensions;
-          account = mailAccount;
-        } else {
-          FocusManager.instance.primaryFocus?.unfocus();
-          // check if the provider might require manual setup of IMAP access:
-          _providerManualImapAccessSetupUrl = {
-            'imap.gmx.net': 'https://hilfe.gmx.net/pop-imap/einschalten.html',
-          }[mailAccount.incoming?.serverConfig?.hostname];
-        }
-        setState(() {
-          _isAccountVerifying = false;
-          _isAccountVerified = isVerified;
-          _isContinueAvailable =
-              isVerified && _userNameController.text.isNotEmpty;
-        });
-        break;
-      case 3:
-        // Account name has been specified
-        account.name = _accountNameController.text;
-        account.userName = _userNameController.text;
-        final service = locator<MailService>();
-        final added = await service.addAccount(account, mailClient!, context);
-        if (added) {
-          if (Platform.isIOS && widget.launchedFromWelcome) {
-            locator<NavigationService>().push(Routes.appDrawer, clear: true);
-          }
-          locator<NavigationService>().push(
-            Routes.messageSource,
-            arguments: service.messageSource,
-            clear: !Platform.isIOS && widget.launchedFromWelcome,
-            replace: !widget.launchedFromWelcome,
-            fade: true,
-          );
-        }
+  Future _loginWithOAuth(Provider provider, String email) async {
+    setState(() {
+      _isAccountVerifying = true;
+      _currentStep = _stepAccountSetup;
+      _progressedSteps = _stepAccountSetup;
+    });
+    final token = await provider.oauthClient!.authenticate(email);
+
+    // whenthe user either has cancelled the verification, not granted the scope or the verification failed for other reasons,
+    // then token will be null
+    if (token == null) {
+      setState(() {
+        _isAccountVerifying = false;
+        _currentStep = _stepPassword;
+        _progressedSteps = _stepAccountSetup;
+      });
+    } else {
+      final mailAccount = MailAccount.fromDiscoveredSettingsWithAuth(
+        email,
+        email,
+        OauthAuthentication(email, token),
+        provider.clientConfig,
+      );
+      _mailClient = await locator<MailService>().connect(mailAccount);
+      final isVerified = _mailClient?.isConnected ?? false;
+      if (isVerified) {
+        mailAccount.appExtensions = _extensions;
+        _account = mailAccount;
+      } else {
+        FocusManager.instance.primaryFocus?.unfocus();
+      }
+      setState(() {
+        _isAccountVerifying = false;
+        _isAccountVerified = isVerified;
+        _isContinueAvailable =
+            isVerified && _userNameController.text.isNotEmpty;
+      });
+    }
+  }
+
+  Future _verifyAccount() async {
+    // password and possibly manual account details have been specified
+    setState(() {
+      _isAccountVerifying = true;
+    });
+    final mailAccount = MailAccount.fromDiscoveredSettings(
+      _emailController.text,
+      _emailController.text,
+      _passwordController.text,
+      _provider!.clientConfig,
+    );
+    _mailClient = await locator<MailService>().connect(mailAccount);
+
+    final isVerified = _mailClient?.isConnected ?? false;
+    if (isVerified) {
+      mailAccount.appExtensions = _extensions;
+      _account = mailAccount;
+    } else {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+    setState(() {
+      _isAccountVerifying = false;
+      _isAccountVerified = isVerified;
+      _isContinueAvailable = isVerified && _userNameController.text.isNotEmpty;
+    });
+  }
+
+  Future _finalizeAccount() async {
+    // Account name has been specified
+    _account.name = _accountNameController.text;
+    _account.userName = _userNameController.text;
+    final service = locator<MailService>();
+    final added = await service.addAccount(_account, _mailClient!, context);
+    if (added) {
+      if (Platform.isIOS && widget.launchedFromWelcome) {
+        locator<NavigationService>().push(Routes.appDrawer, clear: true);
+      }
+      locator<NavigationService>().push(
+        Routes.messageSource,
+        arguments: service.messageSource,
+        clear: !Platform.isIOS && widget.launchedFromWelcome,
+        replace: !widget.launchedFromWelcome,
+        fade: true,
+      );
     }
   }
 }

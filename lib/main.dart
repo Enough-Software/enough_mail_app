@@ -6,6 +6,7 @@ import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/background_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
+import 'package:enough_mail_app/services/key_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
@@ -82,6 +83,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       }
     }
     final mailService = locator<MailService>();
+    // key service is required before mail service due to Oauth configs
+    await locator<KeyService>().init();
     await mailService.init(i18nService.localizations);
 
     if (mailService.messageSource != null) {
