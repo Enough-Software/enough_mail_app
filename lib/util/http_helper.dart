@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 
 class HttpHelper {
   HttpHelper._();
@@ -17,6 +18,21 @@ class HttpHelper {
       }
       final data = await _readHttpResponse(response);
       return HttpResult(response.statusCode, data);
+    } catch (e) {
+      return HttpResult(400);
+    }
+  }
+
+  static Future<HttpResult> httpPost(String url,
+      {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
+    try {
+      final response = await http.post(Uri.parse(url),
+          headers: headers, body: body, encoding: encoding);
+
+      if (response.statusCode != 200) {
+        return HttpResult(response.statusCode);
+      }
+      return HttpResult(response.statusCode, response.bodyBytes);
     } catch (e) {
       return HttpResult(400);
     }

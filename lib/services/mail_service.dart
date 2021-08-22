@@ -9,6 +9,7 @@ import 'package:enough_mail_app/models/sender.dart';
 import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/gravatar.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
@@ -324,12 +325,18 @@ class MailService {
     return _storage!.write(key: _keyAccounts, value: json);
   }
 
-  Future<MailClient> getClientFor(Account account) async {
+  Future<MailClient> getClientFor(
+    Account account, {
+    bool connectIfRequired = true,
+  }) async {
     if (account is UnifiedAccount) {
       account = account.accounts.first;
     }
     var client = _mailClientsPerAccount[account];
     if (client == null) {
+      if (!connectIfRequired) {
+        throw StateError('No MailClient conected for account ${account.name}');
+      }
       client = MailClient(
         account.account,
         eventBus: AppEventBus.eventBus,
@@ -338,7 +345,7 @@ class MailService {
         clientId: _clientId,
       );
       _mailClientsPerAccount[account] = client;
-      await client.connect();
+      await _connect(client);
       await loadMailboxesFor(client);
     }
     return client;
@@ -516,8 +523,12 @@ class MailService {
     if (withErrors != null) {
       withErrors.remove(account);
     }
-    final client = await getClientFor(account);
-    await client.disconnect();
+    try {
+      final client = await getClientFor(account, connectIfRequired: false);
+      await client.disconnect();
+    } catch (e) {
+      // ignore
+    }
     // as the original context may belong to a widget that is now disposed, use the navigator's context:
     context = locator<NavigationService>().currentContext!;
     if (!account.excludeFromUnified) {
@@ -566,7 +577,7 @@ class MailService {
       clientId: _clientId,
     );
     try {
-      await mailClient.connect();
+      await _connect(mailClient);
     } on MailException {
       final email = mailAccount.email!;
       var preferredUserName =
@@ -590,7 +601,7 @@ class MailService {
           clientId: _clientId,
         );
         try {
-          await mailClient.connect();
+          await _connect(mailClient);
         } on MailException {
           mailClient.disconnect();
           return null;
@@ -598,6 +609,30 @@ class MailService {
       }
     }
     return mailClient;
+  }
+
+  Future<void> _connect(MailClient client) {
+    return client.connect(refresh: _refreshToken, onConfigChanged: saveAccount);
+  }
+
+  Future<OauthToken?> _refreshToken(
+      MailClient mailClient, OauthToken expiredToken) {
+    final providerId = expiredToken.provider;
+    if (providerId == null) {
+      throw MailException(
+          mailClient, 'no provider registered for token $expiredToken');
+    }
+    final provider = locator<ProviderService>()[providerId];
+    if (provider == null) {
+      throw MailException(mailClient,
+          'no provider "$providerId" found -  token: $expiredToken');
+    }
+    final oauthClient = provider.oauthClient;
+    if (oauthClient == null || !oauthClient.isEnabled) {
+      throw MailException(
+          mailClient, 'provider $providerId has no valid OAuth configuration');
+    }
+    return oauthClient.refresh(expiredToken);
   }
 
   Future _checkForAddingSentMessages(MailAccount mailAccount) async {
