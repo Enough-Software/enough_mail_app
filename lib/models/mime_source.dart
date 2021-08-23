@@ -209,7 +209,7 @@ class MailboxMimeSource extends MimeSource {
   bool get isArchive => mailbox?.isArchive ?? false;
 
   @override
-  bool get supportsSearching => true;
+  bool get supportsSearching => (size > 0);
 
   MailboxMimeSource(MailClient mailClient, this.mailbox,
       {this.pageSize = 40, MimeSourceSubscriber? subscriber})
