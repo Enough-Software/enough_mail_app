@@ -706,7 +706,7 @@ class MultipleMessageSource extends MessageSource {
 
   @override
   bool get supportsSearching =>
-      mimeSources.every((source) => source.supportsSearching);
+      mimeSources.any((source) => source.supportsSearching);
 
   @override
   MessageSource search(MailSearch search) {
