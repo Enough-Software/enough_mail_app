@@ -139,6 +139,14 @@
   "@homeDeleteAllAction": {
     "description": "Action to tap to delete all messages (must be short)."
   },
+  "homeDeleteAllScrubOption": "Scrub messages",
+  "@homeDeleteAllScrubOption": {
+    "description": "Option to remove deleted mesages from disk."
+  },
+  "homeDeleteAllSuccess": "All messages deleted.",
+  "@homeDeleteAllSuccess": {
+    "description": "Message shown after all messages have been deleted."
+  },
   "homeMarkAllSeenAction": "All read",
   "@homeMarkAllSeenAction": {
     "description": "Action to tap to mark all messages as seen / read (must be short)."

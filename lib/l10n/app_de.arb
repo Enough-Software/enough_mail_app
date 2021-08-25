@@ -34,6 +34,8 @@
   "homeDeleteAllTitle": "Bestätigung",
   "homeDeleteAllQuestion": "Wirklich alle Emails löschen?",
   "homeDeleteAllAction": "Alle löschen",
+  "homeDeleteAllScrubOption": "Endgültig löschen",
+  "homeDeleteAllSuccess": "Alle Emails gelöscht.",
   "homeMarkAllSeenAction": "Gelesen",
   "homeMarkAllUnseenAction": "Ungelesen",
   "homeFabTooltip": "Neue Email",
