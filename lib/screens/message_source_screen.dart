@@ -218,17 +218,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               style: style,
               icon: Icon(iconService.messageActionDelete),
               label: Text(localizations.homeDeleteAllAction, style: textStyle),
-              onPressed: () async {
-                bool? confirmed =
-                    await LocalizedDialogHelper.askForConfirmation(context,
-                        title: localizations.homeDeleteAllTitle,
-                        query: localizations.homeDeleteAllQuestion,
-                        action: localizations.homeDeleteAllAction,
-                        isDangerousAction: true);
-                if (confirmed == true) {
-                  await source.deleteAllMessages();
-                }
-              },
+              onPressed: _deleteAllMessages,
             ),
             PlatformTextButtonIcon(
               style: style,
@@ -1113,6 +1103,97 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       ),
     );
   }
+
+  void _deleteAllMessages() async {
+    final localizations = AppLocalizations.of(context)!;
+    bool expunge = false;
+    final confirmed = await LocalizedDialogHelper.showWidgetDialog(
+      context,
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(localizations.homeDeleteAllQuestion),
+          CheckboxText(
+            initialValue: false,
+            onChanged: (value) => expunge = value,
+            text: localizations.homeDeleteAllScrubOption,
+          ),
+        ],
+      ),
+      title: localizations.homeDeleteAllTitle,
+      actions: [
+        PlatformDialogActionText(
+          text: localizations.actionCancel,
+          onPressed: () => Navigator.of(context).pop(false),
+        ),
+        PlatformDialogActionText(
+          text: localizations.homeDeleteAllAction,
+          isDestructiveAction: true,
+          onPressed: () => Navigator.of(context).pop(true),
+        ),
+      ],
+    );
+    if (confirmed == true) {
+      final results =
+          await widget.messageSource.deleteAllMessages(expunge: expunge);
+      Function()? undo;
+      if (!expunge && results.any((result) => result.isUndoable)) {
+        undo = () async {
+          final futures = <Future>[];
+          for (final result in results) {
+            if (result.isUndoable) {
+              futures.add(result.mailClient.undoDeleteMessages(result));
+            }
+          }
+          if (futures.isNotEmpty) {
+            await Future.wait(futures);
+            await _sectionedMessageSource.refresh();
+          }
+        };
+      }
+      locator<ScaffoldMessengerService>()
+          .showTextSnackBar(localizations.homeDeleteAllSuccess, undo: undo);
+    }
+  }
+}
+
+class CheckboxText extends StatefulWidget {
+  final bool initialValue;
+  final Function(bool value) onChanged;
+  final String text;
+  CheckboxText(
+      {Key? key,
+      required this.initialValue,
+      required this.onChanged,
+      required this.text})
+      : super(key: key);
+
+  @override
+  _CheckboxTextState createState() => _CheckboxTextState();
+}
+
+class _CheckboxTextState extends State<CheckboxText> {
+  late bool _value;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.initialValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PlatformCheckboxListTile(
+      title: Text(widget.text),
+      value: _value,
+      onChanged: (value) {
+        widget.onChanged(value == true);
+        setState(() {
+          _value = (value == true);
+        });
+      },
+    );
+  }
 }
 
 enum _MultipleChoice {
@@ -1194,8 +1275,6 @@ class _MessageOverviewState extends State<MessageOverview> {
   }
 
   Widget buildMessageOverview() {
-    print(
-        'build message overview for [${widget.message.mimeMessage?.decodeSubject()}');
     return widget.isInSelectionMode
         ? PlatformCheckboxListTile(
             value: widget.message.isSelected,

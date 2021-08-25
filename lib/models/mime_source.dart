@@ -40,7 +40,7 @@ abstract class MimeSource {
   bool get isSent;
   bool get isArchive;
 
-  Future<List<DeleteResult>> deleteAllMessages();
+  Future<List<DeleteResult>> deleteAllMessages({bool expunge = false});
 
   bool get supportsSearching;
 
@@ -269,8 +269,9 @@ class MailboxMimeSource extends MimeSource {
   }
 
   @override
-  Future<List<DeleteResult>> deleteAllMessages() async {
-    final deleteResult = await mailClient.deleteAllMessages(mailbox!);
+  Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) async {
+    final deleteResult =
+        await mailClient.deleteAllMessages(mailbox!, expunge: expunge);
     mailbox!.messagesExists = 0;
     return [deleteResult];
   }
@@ -417,7 +418,7 @@ class SearchMimeSource extends MimeSource {
   }
 
   @override
-  Future<List<DeleteResult>> deleteAllMessages() async {
+  Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) async {
     if (size == 0) {
       return [];
     }

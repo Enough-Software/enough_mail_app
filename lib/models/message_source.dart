@@ -66,7 +66,7 @@ abstract class MessageSource extends ChangeNotifier
   /// Deletes all messages
   ///
   /// Only available when `supportsDeleteAll` is `true`
-  Future<List<DeleteResult>> deleteAllMessages();
+  Future<List<DeleteResult>> deleteAllMessages({bool expunge = false});
 
   /// Marks all messages as seen (read) `true` or unseen (unread) when `false` is given
   ///
@@ -479,10 +479,10 @@ class MailboxMessageSource extends MessageSource {
   }
 
   @override
-  Future<List<DeleteResult>> deleteAllMessages() async {
+  Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) async {
     final removedMessages = cache.allMessages.toList();
     cache.clear();
-    final futureResults = _mimeSource.deleteAllMessages();
+    final futureResults = _mimeSource.deleteAllMessages(expunge: expunge);
     clear();
     notifyListeners();
     final results = await futureResults;
@@ -654,12 +654,12 @@ class MultipleMessageSource extends MessageSource {
   }
 
   @override
-  Future<List<DeleteResult>> deleteAllMessages() async {
+  Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) async {
     final removedMessages = cache.allMessages.toList();
     cache.clear();
     final futures = <Future<List<DeleteResult>>>[];
     for (final mimeSource in mimeSources) {
-      futures.add(mimeSource.deleteAllMessages());
+      futures.add(mimeSource.deleteAllMessages(expunge: expunge));
     }
     clear();
     notifyListeners();
@@ -795,7 +795,7 @@ class SingleMessageSource extends MessageSource {
   }
 
   @override
-  Future<List<DeleteResult>> deleteAllMessages() {
+  Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) {
     throw UnimplementedError();
   }
 
@@ -863,7 +863,7 @@ class ListMessageSource extends MessageSource {
   Message _getUncachedMessage(int index) => messages![index];
 
   @override
-  Future<List<DeleteResult>> deleteAllMessages() {
+  Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) {
     throw UnimplementedError();
   }
 
@@ -936,7 +936,7 @@ class ErrorMessageSource extends MessageSource {
   void clear() {}
 
   @override
-  Future<List<DeleteResult>> deleteAllMessages() {
+  Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) {
     throw UnimplementedError();
   }
 
