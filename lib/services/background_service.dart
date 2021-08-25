@@ -65,18 +65,18 @@ class BackgroundService {
     await prefs.setString(_keyInboxUids, stringValue);
   }
 
-  Future<int> getNextUidFor(MailClient mailClient) async {
+  Future<int> getNextUidFor(final MailClient mailClient) async {
     try {
-      if (mailClient.selectedMailbox == null) {
-        await mailClient.connect();
-        await mailClient.selectInbox();
-      } else if (!mailClient.selectedMailbox!.isInbox) {
-        // do not interfere with other operations
-        mailClient = MailClient(mailClient.account);
-        await mailClient.connect();
-        await mailClient.selectInbox();
+      var box = mailClient.selectedMailbox;
+      if (box == null || !box.isInbox) {
+        final connected =
+            await locator<MailService>().connect(mailClient.account);
+        if (connected == null) {
+          return 0;
+        }
+        box = await connected.selectInbox();
       }
-      return mailClient.selectedMailbox!.uidNext ?? 0;
+      return box.uidNext ?? 0;
     } catch (e, s) {
       print(
           'Error while getting Inbox.nextUids for ${mailClient.account.email}: $e $s');
@@ -109,6 +109,7 @@ class BackgroundService {
       final account = accounts[index];
       final accountEmail = account.email;
       futures.add(loadNewMessage(
+          mailService,
           account,
           previousUidNext,
           notificationService,
@@ -125,14 +126,16 @@ class BackgroundService {
   }
 
   static Future<int> loadNewMessage(
+      MailService mailService,
       MailAccount account,
       int previousUidNext,
       NotificationService notificationService,
       List<MailNotificationPayload> activeNotifications) async {
     try {
-      final mailClient =
-          MailClient(account, isLogEnabled: true, logName: account.name);
-      await mailClient.connect();
+      final mailClient = await mailService.connect(account);
+      if (mailClient == null) {
+        return previousUidNext;
+      }
       final inbox = await mailClient.selectInbox();
       if (inbox.uidNext == previousUidNext) {
         // print(
