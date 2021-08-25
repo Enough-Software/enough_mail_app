@@ -253,6 +253,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       );
     }
     final isSentFolder = source.isSent;
+    final showSearchTextField =
+        CommonPlatformIcons.isCupertino && source.supportsSearching;
     return PlatformPageScaffold(
       bottomBar: _isInSelectionMode
           ? buildSelectionModeBottomBar(localizations)
@@ -371,8 +373,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
                               //print('building message item at $index');
-                              if (CommonPlatformIcons.isCupertino &&
-                                  source.supportsSearching) {
+                              if (showSearchTextField) {
                                 if (index == 0) {
                                   return Padding(
                                     padding: EdgeInsets.symmetric(
@@ -562,7 +563,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                               );
                             },
                             childCount: _sectionedMessageSource.size +
-                                ((zeroPosWidget != null) ? 1 : 0),
+                                ((zeroPosWidget != null) ? 1 : 0) +
+                                (showSearchTextField ? 1 : 0),
                             semanticIndexCallback:
                                 (Widget widget, int localIndex) {
                               if (widget is MessageOverview) {
@@ -1192,6 +1194,8 @@ class _MessageOverviewState extends State<MessageOverview> {
   }
 
   Widget buildMessageOverview() {
+    print(
+        'build message overview for [${widget.message.mimeMessage?.decodeSubject()}');
     return widget.isInSelectionMode
         ? PlatformCheckboxListTile(
             value: widget.message.isSelected,
