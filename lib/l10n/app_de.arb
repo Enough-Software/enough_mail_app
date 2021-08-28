@@ -259,6 +259,8 @@
   "editAccountEditAliasDuplicateError": "Es gibt bereits einen Alias mit {email}.",
   "accountDetailsFallbackTitle": "Server Einstellungen",
   "errorTitle": "Fehler",
+  "accountProviderStepTitle": "Email Service Anbieter",
+  "accountProviderCustom": "Anderer E-Mail Service",
   "accountDetailsErrorHostProblem": "Maily kann den angegeben Server nicht erreich. Bitte überprüfe die Einstellugen des Posteingang-Servers \"{incomingHost}\" und des Postausgang-Servers \"{outgoingHost}\".",
   "accountDetailsErrorLoginProblem": "Anmeldung fehlgeschlagen. Bitte überprüfe den Login-Namen \"{userName}\" und das Passwort \"{password}\".",
   "accountDetailsUserNameLabel": "Login Name",

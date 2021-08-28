@@ -1278,6 +1278,14 @@
   "@errorTitle": {
     "description": "Title for error dialogs."
   },
+  "accountProviderStepTitle": "Email Service Provider",
+  "@accountProviderStepTitle": {
+    "description": "Step to select a provider."
+  },
+  "accountProviderCustom": "Other email service",
+  "@accountProviderCustom": {
+    "description": "When no standard provider is chosen."
+  },
   "accountDetailsErrorHostProblem": "Maily cannot reach the specified mail server. Please check your incoming server setting \"{incomingHost}\" and your outgoing server setting \"{outgoingHost}\".",
   "@accountDetailsErrorHostProblem": {
     "description": "Error details when no connection to server could be established at all",
