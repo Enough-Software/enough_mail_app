@@ -12,7 +12,9 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/key_service.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
+import 'package:enough_mail_app/util/modal_bottom_sheet_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
+import 'package:enough_mail_app/widgets/account_provider_selector.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -56,41 +58,48 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   MailClient? _mailClient;
   AppExtensionActionDescription? _extensionForgotPassword;
 
-  Future<void> navigateToManualSettings() async {
-    if (_provider == null) {
-      _account.incoming = MailServerConfig(
-        authentication: PlainAuthentication('', ''),
-        serverConfig: ServerConfig(),
-      );
-      _account.outgoing = MailServerConfig(
-        authentication: PlainAuthentication('', ''),
-        serverConfig: ServerConfig(),
-      );
+  Future<void> _navigateToManualSettings(
+      BuildContext context, AppLocalizations localizations) async {
+    Provider? selectedProvider;
+    final result = await ModelBottomSheetHelper.showModalBottomSheet(
+      context,
+      localizations.accountProviderStepTitle,
+      AccountProviderSelector(onSelected: (provider) {
+        selectedProvider = provider;
+        Navigator.of(context).pop(true);
+      }),
+      useScrollView: false,
+      appBarActions: [],
+    );
+    if (!result) {
+      return;
+    }
+    if (selectedProvider != null) {
+      // a standard provider has been chosen, now query the password or start the oauth process:
+      setState(() {
+        _provider = selectedProvider;
+      });
+      _onProviderChanged(selectedProvider!, _emailController.text);
     } else {
       _account.incoming = MailServerConfig(
-        authentication: PlainAuthentication(
-            _provider!.clientConfig.preferredIncomingServer!
-                .getUserName(_account.email!),
-            ''),
-        serverConfig: _provider!.clientConfig.preferredIncomingServer,
+        authentication: PlainAuthentication('', ''),
+        serverConfig: ServerConfig(),
       );
       _account.outgoing = MailServerConfig(
-        authentication: PlainAuthentication(
-            _provider!.clientConfig.preferredOutgoingServer!
-                .getUserName(_account.email!),
-            ''),
-        serverConfig: _provider!.clientConfig.preferredOutgoingServer,
+        authentication: PlainAuthentication('', ''),
+        serverConfig: ServerConfig(),
       );
-    }
-    final result = await locator<NavigationService>()
-        .push(Routes.accountServerDetails, arguments: Account(_account));
-    if (result is ConnectedAccount) {
-      setState(() {
-        _account = result.account;
-        _mailClient = result.mailClient;
-        _currentStep = 2;
-        _isAccountVerified = true;
-      });
+
+      final editResult = await locator<NavigationService>()
+          .push(Routes.accountServerDetails, arguments: Account(_account));
+      if (result is ConnectedAccount) {
+        setState(() {
+          _account = editResult.account;
+          _mailClient = editResult.mailClient;
+          _currentStep = 2;
+          _isAccountVerified = true;
+        });
+      }
     }
   }
 
@@ -108,7 +117,6 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   Widget build(BuildContext context) {
     // print('build: current step=$_currentStep');
     final localizations = AppLocalizations.of(context)!;
-    final provider = _provider;
     return Base.buildAppChrome(
       context,
       title: localizations.addAccountTitle,
@@ -140,250 +148,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                 }
               },
               steps: [
-                Step(
-                  title: Text(localizations.addAccountEmailLabel),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      DecoratedPlatformTextField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        cupertinoShowLabel: false,
-                        onChanged: (value) {
-                          final isValid = Validator.validateEmail(value);
-                          if (isValid) {
-                            _account.email = value;
-                          }
-                          if (isValid != _isContinueAvailable) {
-                            setState(() {
-                              _isContinueAvailable = isValid;
-                            });
-                          }
-                        },
-                        decoration: InputDecoration(
-                          labelText: localizations.addAccountEmailLabel,
-                          hintText: localizations.addAccountEmailHint,
-                          icon: const Icon(Icons.email),
-                        ),
-                        autofocus: true,
-                      ),
-                    ],
-                  ),
-                  //state: StepState.editing,
-                  isActive: true,
-                ),
-                Step(
-                  title: Text(localizations.addAccountPasswordLabel),
-                  //state: StepState.complete,
-                  isActive: _currentStep >= 1,
-                  content: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      if (_isProviderResolving) ...{
-                        Row(
-                          children: [
-                            Container(
-                                padding: EdgeInsets.all(8),
-                                child: PlatformProgressIndicator()),
-                            Expanded(
-                              child: Text(
-                                  localizations.addAccountResolvingSetingsLabel(
-                                      _account.email!)),
-                            ),
-                          ],
-                        ),
-                      } else if (provider != null) ...{
-                        Column(
-                          children: [
-                            if (provider.hasOAuthClient) ...{
-                              // this step is only shown when the user has aborted the login or when another error occurred.
-                              // The user has now 2 options:
-                              // 1. try again
-                              // 2. use an app-specific password
-                              Text(localizations.addAccountOauthOptionsText),
-                              PlatformElevatedButton(
-                                onPressed: () =>
-                                    _loginWithOAuth(provider, _account.email!),
-                                child: ButtonText(localizations
-                                    .addAccountOauthOptionsTryAgainLabel),
-                              ),
-                            },
-                            if (provider.appSpecificPasswordSetupUrl !=
-                                null) ...{
-                              Text(localizations
-                                  .addAccountApplicationPasswordRequiredInfo),
-                              PlatformElevatedButton(
-                                onPressed: () async {
-                                  await launcher.launch(
-                                      provider.appSpecificPasswordSetupUrl!);
-                                },
-                                child: ButtonText(localizations
-                                    .addAccountApplicationPasswordRequiredButton),
-                              ),
-                              PlatformCheckboxListTile(
-                                onChanged: (value) => setState(() =>
-                                    _isApplicationSpecificPasswordAcknowledged =
-                                        value),
-                                value:
-                                    _isApplicationSpecificPasswordAcknowledged,
-                                title: Text(localizations
-                                    .addAccountApplicationPasswordRequiredAcknowledged),
-                              ),
-                            },
-                            if (provider.appSpecificPasswordSetupUrl == null ||
-                                _isApplicationSpecificPasswordAcknowledged!) ...{
-                              PasswordField(
-                                controller: _passwordController,
-                                cupertinoShowLabel: false,
-                                onChanged: (value) {
-                                  bool isValid = value.isNotEmpty &&
-                                      (_provider?.clientConfig != null ||
-                                          _isManualSettings);
-                                  if (isValid != _isContinueAvailable) {
-                                    setState(() {
-                                      _isContinueAvailable = isValid;
-                                    });
-                                  }
-                                },
-                                autofocus: true,
-                                labelText:
-                                    localizations.addAccountPasswordLabel,
-                                hintText: localizations.addAccountPasswordHint,
-                              ),
-                              PlatformTextButton(
-                                onPressed: navigateToManualSettings,
-                                child: ButtonText(
-                                  localizations
-                                      .addAccountResolvedSettingsWrongAction(
-                                          _provider?.displayName ??
-                                              '<unknown>'),
-                                ),
-                              ),
-                              if (_extensionForgotPassword != null) ...{
-                                PlatformTextButton(
-                                  onPressed: () {
-                                    final languageCode = locator<I18nService>()
-                                        .locale!
-                                        .languageCode;
-                                    var url =
-                                        _extensionForgotPassword!.action!.url;
-                                    url = url
-                                      ..replaceAll(
-                                          '{user.email}', _account.email ?? '')
-                                      ..replaceAll('{language}', languageCode);
-                                    launcher.launch(url);
-                                  },
-                                  child: ButtonText(_extensionForgotPassword!
-                                      .getLabel(locator<I18nService>()
-                                          .locale!
-                                          .languageCode)),
-                                ),
-                              },
-                            },
-                          ],
-                        ),
-                      } else ...{
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(localizations
-                                .addAccountResolvingSetingsFailedInfo(
-                                    _account.email ?? '')),
-                            PlatformElevatedButton(
-                              child: ButtonText(
-                                  localizations.addAccountEditManuallyAction),
-                              onPressed: navigateToManualSettings,
-                            )
-                          ],
-                        ),
-                      },
-                    ],
-                  ),
-                ),
-                Step(
-                  title: Text(_isAccountVerified
-                      ? localizations.addAccountSetupAccountStep
-                      : localizations.addAccountVerificationStep),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      if (_isAccountVerifying) ...{
-                        Row(
-                          children: [
-                            Container(
-                                padding: EdgeInsets.all(8),
-                                child: PlatformProgressIndicator()),
-                            Expanded(
-                              child: Text(localizations
-                                  .addAccountVerifyingSettingsLabel(
-                                      _account.email!)),
-                            ),
-                          ],
-                        ),
-                      } else if (_isAccountVerified) ...{
-                        Text(localizations
-                            .addAccountVerifyingSuccessInfo(_account.email!)),
-                        DecoratedPlatformTextField(
-                          controller: _userNameController,
-                          keyboardType: TextInputType.text,
-                          textCapitalization: TextCapitalization.words,
-                          onChanged: (value) {
-                            bool isValid = value.isNotEmpty &&
-                                _accountNameController.text.isNotEmpty;
-                            if (isValid != _isContinueAvailable) {
-                              setState(() {
-                                _isContinueAvailable = isValid;
-                              });
-                            }
-                          },
-                          decoration: InputDecoration(
-                            labelText: localizations.addAccountNameOfUserLabel,
-                            hintText: localizations.addAccountNameOfUserHint,
-                            icon: const Icon(Icons.account_circle),
-                          ),
-                          autofocus: true,
-                          cupertinoAlignLabelOnTop: true,
-                        ),
-                        DecoratedPlatformTextField(
-                          controller: _accountNameController,
-                          keyboardType: TextInputType.text,
-                          onChanged: (value) {
-                            bool isValid = value.isNotEmpty &&
-                                _userNameController.text.isNotEmpty;
-                            if (isValid != _isContinueAvailable) {
-                              setState(() {
-                                _isContinueAvailable = isValid;
-                              });
-                            }
-                          },
-                          decoration: InputDecoration(
-                            labelText:
-                                localizations.addAccountNameOfAccountLabel,
-                            hintText: localizations.addAccountNameOfAccountHint,
-                            icon: const Icon(Icons.email),
-                          ),
-                          cupertinoAlignLabelOnTop: true,
-                        ),
-                      } else ...{
-                        Text(localizations.addAccountVerifyingFailedInfo(
-                            _account.email ?? '')),
-                        if (_provider?.manualImapAccessSetupUrl != null) ...{
-                          Padding(
-                            padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-                            child: Text(localizations
-                                .accountAddImapAccessSetuptMightBeRequired),
-                          ),
-                          PlatformTextButton(
-                            child: ButtonText(localizations
-                                .addAccoutSetupImapAccessButtonLabel),
-                            onPressed: () => launcher
-                                .launch(_provider!.manualImapAccessSetupUrl!),
-                          ),
-                        },
-                      }
-                    ],
-                  ),
-                ),
+                _buildEmailStep(context, localizations),
+                _buildPasswordStep(context, localizations),
+                _buildAccountSetupStep(context, localizations),
               ],
             ),
           )
@@ -416,6 +183,10 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     }
     print('discover settings for $email');
     final provider = await locator<ProviderService>().discover(email);
+    if (!mounted) {
+      // ignore if user has cancelled operation
+      return;
+    }
     print('done discovering settings: ${provider?.displayName}');
     if (provider?.appSpecificPasswordSetupUrl != null) {
       FocusManager.instance.primaryFocus?.unfocus();
@@ -424,25 +195,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     final domainName = email.substring(email.lastIndexOf('@') + 1);
     _accountNameController.text = domainName;
     if (provider != null) {
-      if (provider.hasOAuthClient) {
-        // continue directly with oauth flow:
-        _loginWithOAuth(provider, email);
-      }
-      final mailAccount = MailAccount.fromDiscoveredSettings(
-        _emailController.text,
-        _emailController.text,
-        _passwordController.text,
-        provider.clientConfig,
-      );
-      AppExtension.loadFor(mailAccount).then((value) {
-        _extensions = value;
-        final forgotPwUrl = mailAccount.appExtensionForgotPassword;
-        if (forgotPwUrl != null) {
-          setState(() {
-            _extensionForgotPassword = forgotPwUrl;
-          });
-        }
-      });
+      _onProviderChanged(provider, email);
     }
 
     setState(() {
@@ -538,5 +291,266 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         fade: true,
       );
     }
+  }
+
+  _buildEmailStep(BuildContext context, AppLocalizations localizations) {
+    return Step(
+      title: Text(localizations.addAccountEmailLabel +
+          (_currentStep > 0 ? ' ${_account.email}' : '')),
+      content: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          DecoratedPlatformTextField(
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+            cupertinoShowLabel: false,
+            onChanged: (value) {
+              final isValid = Validator.validateEmail(value);
+              if (isValid) {
+                _account.email = value;
+              }
+              if (isValid != _isContinueAvailable) {
+                setState(() {
+                  _isContinueAvailable = isValid;
+                });
+              }
+            },
+            decoration: InputDecoration(
+              labelText: localizations.addAccountEmailLabel,
+              hintText: localizations.addAccountEmailHint,
+              icon: const Icon(Icons.email),
+            ),
+            autofocus: true,
+          ),
+        ],
+      ),
+      //state: StepState.editing,
+      isActive: true,
+    );
+  }
+
+  _buildPasswordStep(BuildContext context, AppLocalizations localizations) {
+    final provider = _provider;
+
+    return Step(
+      title: Text(localizations.addAccountPasswordLabel),
+      //state: StepState.complete,
+      isActive: _currentStep >= 1,
+      content: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          if (_isProviderResolving) ...{
+            Row(
+              children: [
+                Container(
+                    padding: EdgeInsets.all(8),
+                    child: PlatformProgressIndicator()),
+                Expanded(
+                  child: Text(localizations
+                      .addAccountResolvingSetingsLabel(_account.email!)),
+                ),
+              ],
+            ),
+          } else if (provider != null) ...{
+            Column(
+              children: [
+                if (provider.hasOAuthClient) ...{
+                  // this step is only shown when the user has aborted the login or when another error occurred.
+                  // The user has now 2 options:
+                  // 1. try again
+                  // 2. use an app-specific password
+                  Text(localizations.addAccountOauthOptionsText),
+                  PlatformElevatedButton(
+                    onPressed: () => _loginWithOAuth(provider, _account.email!),
+                    child: ButtonText(
+                        localizations.addAccountOauthOptionsTryAgainLabel),
+                  ),
+                },
+                if (provider.appSpecificPasswordSetupUrl != null) ...{
+                  Text(localizations.addAccountApplicationPasswordRequiredInfo),
+                  PlatformElevatedButton(
+                    onPressed: () async {
+                      await launcher
+                          .launch(provider.appSpecificPasswordSetupUrl!);
+                    },
+                    child: ButtonText(localizations
+                        .addAccountApplicationPasswordRequiredButton),
+                  ),
+                  PlatformCheckboxListTile(
+                    onChanged: (value) => setState(() =>
+                        _isApplicationSpecificPasswordAcknowledged = value),
+                    value: _isApplicationSpecificPasswordAcknowledged,
+                    title: Text(localizations
+                        .addAccountApplicationPasswordRequiredAcknowledged),
+                  ),
+                },
+                if (provider.appSpecificPasswordSetupUrl == null ||
+                    _isApplicationSpecificPasswordAcknowledged!) ...{
+                  PasswordField(
+                    controller: _passwordController,
+                    cupertinoShowLabel: false,
+                    onChanged: (value) {
+                      bool isValid = value.isNotEmpty &&
+                          (_provider?.clientConfig != null ||
+                              _isManualSettings);
+                      if (isValid != _isContinueAvailable) {
+                        setState(() {
+                          _isContinueAvailable = isValid;
+                        });
+                      }
+                    },
+                    autofocus: true,
+                    labelText: localizations.addAccountPasswordLabel,
+                    hintText: localizations.addAccountPasswordHint,
+                  ),
+                  PlatformTextButton(
+                    onPressed: () =>
+                        _navigateToManualSettings(context, localizations),
+                    child: ButtonText(
+                      localizations.addAccountResolvedSettingsWrongAction(
+                          _provider?.displayName ?? '<unknown>'),
+                    ),
+                  ),
+                  if (_extensionForgotPassword != null) ...{
+                    PlatformTextButton(
+                      onPressed: () {
+                        final languageCode =
+                            locator<I18nService>().locale!.languageCode;
+                        var url = _extensionForgotPassword!.action!.url;
+                        url = url
+                          ..replaceAll('{user.email}', _account.email ?? '')
+                          ..replaceAll('{language}', languageCode);
+                        launcher.launch(url);
+                      },
+                      child: ButtonText(_extensionForgotPassword!.getLabel(
+                          locator<I18nService>().locale!.languageCode)),
+                    ),
+                  },
+                },
+              ],
+            ),
+          } else ...{
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.addAccountResolvingSetingsFailedInfo(
+                    _account.email ?? '')),
+                PlatformElevatedButton(
+                  child: ButtonText(localizations.addAccountEditManuallyAction),
+                  onPressed: () =>
+                      _navigateToManualSettings(context, localizations),
+                )
+              ],
+            ),
+          },
+        ],
+      ),
+    );
+  }
+
+  _buildAccountSetupStep(BuildContext context, AppLocalizations localizations) {
+    return Step(
+      title: Text(_isAccountVerified
+          ? localizations.addAccountSetupAccountStep
+          : localizations.addAccountVerificationStep),
+      content: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          if (_isAccountVerifying) ...{
+            Row(
+              children: [
+                Container(
+                    padding: EdgeInsets.all(8),
+                    child: PlatformProgressIndicator()),
+                Expanded(
+                  child: Text(localizations
+                      .addAccountVerifyingSettingsLabel(_account.email!)),
+                ),
+              ],
+            ),
+          } else if (_isAccountVerified) ...{
+            Text(localizations.addAccountVerifyingSuccessInfo(_account.email!)),
+            DecoratedPlatformTextField(
+              controller: _userNameController,
+              keyboardType: TextInputType.text,
+              textCapitalization: TextCapitalization.words,
+              onChanged: (value) {
+                bool isValid =
+                    value.isNotEmpty && _accountNameController.text.isNotEmpty;
+                if (isValid != _isContinueAvailable) {
+                  setState(() {
+                    _isContinueAvailable = isValid;
+                  });
+                }
+              },
+              decoration: InputDecoration(
+                labelText: localizations.addAccountNameOfUserLabel,
+                hintText: localizations.addAccountNameOfUserHint,
+                icon: const Icon(Icons.account_circle),
+              ),
+              autofocus: true,
+              cupertinoAlignLabelOnTop: true,
+            ),
+            DecoratedPlatformTextField(
+              controller: _accountNameController,
+              keyboardType: TextInputType.text,
+              onChanged: (value) {
+                bool isValid =
+                    value.isNotEmpty && _userNameController.text.isNotEmpty;
+                if (isValid != _isContinueAvailable) {
+                  setState(() {
+                    _isContinueAvailable = isValid;
+                  });
+                }
+              },
+              decoration: InputDecoration(
+                labelText: localizations.addAccountNameOfAccountLabel,
+                hintText: localizations.addAccountNameOfAccountHint,
+                icon: const Icon(Icons.email),
+              ),
+              cupertinoAlignLabelOnTop: true,
+            ),
+          } else ...{
+            Text(localizations
+                .addAccountVerifyingFailedInfo(_account.email ?? '')),
+            if (_provider?.manualImapAccessSetupUrl != null) ...{
+              Padding(
+                padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Text(
+                    localizations.accountAddImapAccessSetuptMightBeRequired),
+              ),
+              PlatformTextButton(
+                child: ButtonText(
+                    localizations.addAccoutSetupImapAccessButtonLabel),
+                onPressed: () =>
+                    launcher.launch(_provider!.manualImapAccessSetupUrl!),
+              ),
+            },
+          }
+        ],
+      ),
+    );
+  }
+
+  void _onProviderChanged(Provider provider, String email) {
+    if (provider.hasOAuthClient) {
+      // continue directly with oauth flow:
+      _loginWithOAuth(provider, email);
+    }
+    final mailAccount = MailAccount.fromDiscoveredSettings(
+      _emailController.text,
+      _emailController.text,
+      _passwordController.text,
+      provider.clientConfig,
+    );
+    AppExtension.loadFor(mailAccount).then((value) {
+      _extensions = value;
+      final forgotPwUrl = mailAccount.appExtensionForgotPassword;
+      if (forgotPwUrl != null) {
+        setState(() {
+          _extensionForgotPassword = forgotPwUrl;
+        });
+      }
+    });
   }
 }

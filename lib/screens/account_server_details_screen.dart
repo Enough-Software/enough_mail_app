@@ -2,19 +2,20 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class AccountServerDetailsScreen extends StatefulWidget {
+class AccountServerDetailsScreen extends StatelessWidget {
   final Account account;
   final String? title;
   final bool includeDrawer;
-
   AccountServerDetailsScreen({
     Key? key,
     required this.account,
@@ -23,60 +24,117 @@ class AccountServerDetailsScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _AccountServerDetailsScreenState createState() =>
-      _AccountServerDetailsScreenState();
+  Widget build(BuildContext context) {
+    final editor = AccountServerDetailsEditor(account: account);
+    return Base.buildAppChrome(
+      context,
+      title: title ?? account.name,
+      content: editor,
+      includeDrawer: includeDrawer,
+      appBarActions: [
+        PlatformIconButton(
+          icon: Icon(Icons.save),
+          onPressed: () => editor.testConnection(context),
+        ),
+      ],
+    );
+  }
 }
 
-class _AccountServerDetailsScreenState
-    extends State<AccountServerDetailsScreen> {
-  late TextEditingController _emailController;
-  late TextEditingController _userNameController;
-  late TextEditingController _passwordController;
-  late TextEditingController _incomingHostDomainController;
-  late TextEditingController _incomingHostPortController;
-  late TextEditingController _incomingUserNameController;
-  late TextEditingController _incomingPasswordController;
+class AccountServerDetailsEditor extends StatefulWidget {
+  final Account account;
+
+  AccountServerDetailsEditor({
+    Key? key,
+    required this.account,
+  }) : super(key: key);
+
+  @override
+  _AccountServerDetailsEditorState createState() =>
+      _AccountServerDetailsEditorState();
+
+  void testConnection(BuildContext context) {
+    _AccountServerDetailsEditorState._currentState?.testConnection(context);
+  }
+}
+
+class _AccountServerDetailsEditorState
+    extends State<AccountServerDetailsEditor> {
+  static _AccountServerDetailsEditorState? _currentState;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _incomingHostDomainController =
+      TextEditingController();
+  final TextEditingController _incomingHostPortController =
+      TextEditingController();
+  final TextEditingController _incomingUserNameController =
+      TextEditingController();
+  final TextEditingController _incomingPasswordController =
+      TextEditingController();
   late SocketType _incomingSecurity;
   late ServerType _incomingServerType;
-  late TextEditingController _outgoingHostDomainController;
-  late TextEditingController _outgoingHostPortController;
-  late TextEditingController _outgoingUserNameController;
-  late TextEditingController _outgoingPasswordController;
+  final TextEditingController _outgoingHostDomainController =
+      TextEditingController();
+  final TextEditingController _outgoingHostPortController =
+      TextEditingController();
+  final TextEditingController _outgoingUserNameController =
+      TextEditingController();
+  final TextEditingController _outgoingPasswordController =
+      TextEditingController();
   late SocketType _outgoingSecurity;
   late ServerType _outgoingServerType;
 
   @override
   void initState() {
+    _currentState = this;
     final mailAccount = widget.account.account;
     final incoming = mailAccount.incoming;
-    final incomingAuth = incoming?.authentication as PlainAuthentication?;
+    final incomingAuth =
+        incoming?.authentication as UserNameBasedAuthentication?;
     final outgoing = mailAccount.outgoing;
-    final outgoingAuth = outgoing?.authentication as PlainAuthentication?;
-    _emailController = TextEditingController(text: mailAccount.email);
-    _userNameController = TextEditingController(text: incomingAuth?.userName);
-    _passwordController = TextEditingController(text: incomingAuth?.password);
-    _incomingHostDomainController =
-        TextEditingController(text: incoming?.serverConfig?.hostname);
-    _incomingHostPortController =
-        TextEditingController(text: incoming?.serverConfig?.port?.toString());
-    _incomingUserNameController =
-        TextEditingController(text: incomingAuth?.userName);
-    _incomingPasswordController =
-        TextEditingController(text: incomingAuth?.password);
-    _incomingSecurity = incoming?.serverConfig?.socketType ?? SocketType.ssl;
-    _incomingServerType = incoming?.serverConfig?.type ?? ServerType.imap;
-    _outgoingHostDomainController =
-        TextEditingController(text: outgoing?.serverConfig?.hostname);
-    _outgoingHostPortController =
-        TextEditingController(text: outgoing?.serverConfig?.port?.toString());
-    _outgoingUserNameController =
-        TextEditingController(text: outgoingAuth?.userName);
-    _outgoingPasswordController =
-        TextEditingController(text: outgoingAuth?.password);
-    _outgoingSecurity = outgoing?.serverConfig?.socketType ?? SocketType.ssl;
-    _outgoingServerType = outgoing?.serverConfig?.type ?? ServerType.smtp;
-
+    final outgoingAuth =
+        outgoing?.authentication as UserNameBasedAuthentication?;
+    _emailController.text = mailAccount.email ?? '';
+    _setupFields(incoming?.serverConfig, outgoing?.serverConfig, incomingAuth,
+        outgoingAuth);
     super.initState();
+  }
+
+  void _setupFields(
+      ServerConfig? incoming,
+      ServerConfig? outgoing,
+      UserNameBasedAuthentication? incomingAuth,
+      UserNameBasedAuthentication? outgoingAuth) {
+    final incomingPassword =
+        incomingAuth is PlainAuthentication ? incomingAuth.password : null;
+    if (incomingAuth?.userName != null) {
+      _userNameController.text = incomingAuth!.userName;
+    }
+    if (incomingPassword != null) {
+      _passwordController.text = incomingPassword;
+    }
+    final incomingHostName = incoming?.hostname;
+    _incomingHostDomainController.text = incomingHostName ?? '';
+    _incomingHostPortController.text = incoming?.port?.toString() ?? '';
+    if (incomingAuth?.userName != null) {
+      _incomingUserNameController.text = incomingAuth!.userName;
+    }
+    if (incomingPassword != null) {
+      _incomingPasswordController.text = incomingPassword;
+    }
+    _incomingSecurity = incoming?.socketType ?? SocketType.ssl;
+    _incomingServerType = incoming?.type ?? ServerType.imap;
+    _outgoingHostDomainController.text = outgoing?.hostname ?? '';
+    _outgoingHostPortController.text = outgoing?.port?.toString() ?? '';
+    if (outgoingAuth?.userName != null) {
+      _outgoingUserNameController.text = outgoingAuth!.userName;
+    }
+    if (outgoingAuth is PlainAuthentication) {
+      _outgoingPasswordController.text = outgoingAuth.password;
+    }
+    _outgoingSecurity = outgoing?.socketType ?? SocketType.ssl;
+    _outgoingServerType = outgoing?.type ?? ServerType.smtp;
   }
 
   @override
@@ -95,7 +153,8 @@ class _AccountServerDetailsScreenState
     super.dispose();
   }
 
-  Future<void> testConnection(AppLocalizations localizations) async {
+  Future<void> testConnection(BuildContext context) async {
+    final localizations = AppLocalizations.of(context)!;
     final mailAccount = widget.account.account;
     mailAccount.email = _emailController.text;
     final userName = (_userNameController.text.isEmpty)
@@ -191,21 +250,6 @@ class _AccountServerDetailsScreenState
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    return Base.buildAppChrome(
-      context,
-      title: widget.title ?? widget.account.name,
-      content: buildContent(localizations, context),
-      includeDrawer: widget.includeDrawer,
-      appBarActions: [
-        PlatformIconButton(
-          icon: Icon(Icons.save),
-          onPressed: () => testConnection(localizations),
-        ),
-      ],
-    );
-  }
-
-  Widget buildContent(AppLocalizations localizations, BuildContext context) {
     return SingleChildScrollView(
       child: Material(
         child: SafeArea(
@@ -228,9 +272,10 @@ class _AccountServerDetailsScreenState
                   ),
                 ),
                 PasswordField(
-                    controller: _passwordController,
-                    labelText: localizations.accountDetailsPasswordLabel,
-                    hintText: localizations.accountDetailsPasswordHint),
+                  controller: _passwordController,
+                  labelText: localizations.accountDetailsPasswordLabel,
+                  hintText: localizations.accountDetailsPasswordHint,
+                ),
                 ExpansionTile(
                   title: Text(localizations.accountDetailsBaseSectionTitle),
                   initiallyExpanded: true,

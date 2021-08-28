@@ -2,7 +2,9 @@ import 'package:enough_mail/discover.dart';
 import 'package:enough_mail_app/oauth/oauth.dart';
 
 class ProviderService {
-  final _providers = <String, Provider>{};
+  final _providersByDomains = <String, Provider>{};
+  final _providers = <Provider>[];
+  List<Provider> get providers => _providers;
 
   ProviderService() {
     addAll([
@@ -17,25 +19,32 @@ class ProviderService {
   }
 
   Provider? operator [](String incomingHostName) =>
-      _providers[incomingHostName];
+      _providersByDomains[incomingHostName];
 
   Future<Provider?> discover(String email) async {
     final emailDomain = email.substring(email.indexOf('@') + 1);
-    final providerEmail = _providers[emailDomain];
+    final providerEmail = _providersByDomains[emailDomain];
     if (providerEmail != null) {
       return providerEmail;
     }
-    final clientConfig = await Discover.discover(email,
-        forceSslConnection: true, isLogEnabled: true);
-    if (clientConfig == null || clientConfig.preferredIncomingServer == null) {
+    try {
+      final clientConfig = await Discover.discover(email,
+          forceSslConnection: true, isLogEnabled: true);
+      if (clientConfig == null ||
+          clientConfig.preferredIncomingServer == null) {
+        return null;
+      }
+      final hostName = clientConfig.preferredIncomingServer!.hostname!;
+      final providerHostName = _providersByDomains[hostName];
+      if (providerHostName != null) {
+        return providerHostName;
+      }
+      final id = email.substring(email.indexOf('@') + 1);
+      return Provider(id, hostName, clientConfig);
+    } catch (e, s) {
+      print('Unable to discover settings for [$email]: $e $s');
       return null;
     }
-    final hostName = clientConfig.preferredIncomingServer!.hostname!;
-    final providerHostName = _providers[hostName];
-    if (providerHostName != null) {
-      return providerHostName;
-    }
-    return Provider(hostName, clientConfig);
   }
 
   void addAll(Iterable<Provider> providers) {
@@ -43,17 +52,20 @@ class ProviderService {
   }
 
   void add(Provider provider) {
-    _providers[provider.incomingHostName] = provider;
+    _providers.add(provider);
+    _providersByDomains[provider.incomingHostName] = provider;
     final domains = provider.domains;
     if (domains != null) {
       for (final domain in domains) {
-        _providers[domain] = provider;
+        _providersByDomains[domain] = provider;
       }
     }
   }
 }
 
 class Provider {
+  /// The key of the provider, help to resolves image resources and possibly other settings like branding guidelines
+  final String key;
   final String incomingHostName;
   final ClientConfig clientConfig;
   final OauthClient? oauthClient;
@@ -68,6 +80,7 @@ class Provider {
       : clientConfig.emailProviders!.first.displayName;
 
   const Provider(
+    this.key,
     this.incomingHostName,
     this.clientConfig, {
     this.oauthClient,
@@ -80,6 +93,7 @@ class Provider {
 class GmailProvider extends Provider {
   GmailProvider()
       : super(
+          'gmail',
           'imap.gmail.com',
           ClientConfig()
             ..emailProviders = [
@@ -118,6 +132,7 @@ class GmailProvider extends Provider {
 class OutlookProvider extends Provider {
   OutlookProvider()
       : super(
+          'outlook',
           'outlook.office365.com',
           ClientConfig()
             ..emailProviders = [
@@ -259,6 +274,7 @@ class OutlookProvider extends Provider {
 class YahooProvider extends Provider {
   YahooProvider()
       : super(
+          'yahoo',
           'imap.mail.yahoo.com',
           ClientConfig()
             ..emailProviders = [
@@ -314,6 +330,7 @@ class YahooProvider extends Provider {
 class AolProvider extends Provider {
   AolProvider()
       : super(
+          'aol',
           'imap.aol.com',
           ClientConfig()
             ..emailProviders = [
@@ -371,6 +388,7 @@ class AolProvider extends Provider {
 class AppleProvider extends Provider {
   AppleProvider()
       : super(
+          'apple',
           'imap.mail.me.com',
           ClientConfig()
             ..emailProviders = [
@@ -408,6 +426,7 @@ class AppleProvider extends Provider {
 class GmxProvider extends Provider {
   GmxProvider()
       : super(
+          'gmx',
           'imap.gmx.net',
           ClientConfig()
             ..emailProviders = [
@@ -454,6 +473,7 @@ class GmxProvider extends Provider {
 class MailboxOrgProvider extends Provider {
   MailboxOrgProvider()
       : super(
+          'mailbox_org',
           'imap.gmx.net',
           ClientConfig()
             ..emailProviders = [

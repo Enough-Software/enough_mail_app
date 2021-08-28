@@ -8,7 +8,7 @@ class ModelBottomSheetHelper {
 
   static Future<bool> showModalBottomSheet(
       BuildContext context, String title, Widget child,
-      {List<Widget>? appBarActions}) async {
+      {List<Widget>? appBarActions, bool useScrollView = true}) async {
     appBarActions ??= [
       DensePlatformIconButton(
         icon: Icon(CommonPlatformIcons.ok),
@@ -24,16 +24,18 @@ class ModelBottomSheetHelper {
           title: title,
           includeDrawer: false,
           appBarActions: appBarActions,
-          content: SingleChildScrollView(
-            child: SafeArea(
-              child: child,
-            ),
-          ),
+          content: useScrollView
+              ? SingleChildScrollView(
+                  child: SafeArea(
+                    child: child,
+                  ),
+                )
+              : SafeArea(child: child),
         ),
       ),
     );
 
-    bool? result;
+    dynamic result;
     if (CommonPlatformIcons.isCupertino) {
       result = await showCupertinoModalBottomSheet(
         context: context,
