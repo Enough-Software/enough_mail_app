@@ -66,6 +66,7 @@ dependencies:
   background_fetch: ^1.0.0
   file_picker: ^3.0.2+2
   fluttercontactpicker: ^4.5.1
+  google_fonts: ^2.1.0
   cupertino_icons: ^1.0.3
   package_info: ^2.0.2
   device_info: ^2.0.2

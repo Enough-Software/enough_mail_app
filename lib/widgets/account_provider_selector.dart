@@ -19,22 +19,8 @@ class AccountProviderSelector extends StatelessWidget {
           if (index < providers.length) {
             final provider = providers[index];
             return Center(
-              child: PlatformTextButton(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      'assets/images/providers/${provider.key}.png',
-                      height: 50,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stacktrace) => Container(),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: PlatformText(provider.displayName ?? '<unknown>'),
-                    ),
-                  ],
-                ),
+              child: provider.buildSignInButton(
+                context,
                 onPressed: () => onSelected(provider),
               ),
             );
