@@ -1025,7 +1025,7 @@
   "@addAccountApplicationPasswordRequiredInfo": {
     "description": "Text shown when the provider of the email account requires app specific passwords to be set up."
   },
-  "addAccountApplicationPasswordRequiredButton": "Setup app specific password",
+  "addAccountApplicationPasswordRequiredButton": "Create app specific password",
   "@addAccountApplicationPasswordRequiredButton": {
     "description": "Button text for setting up app specific password."
   },
@@ -1072,13 +1072,33 @@
       }
     }  
   },
-  "addAccountOauthOptionsText": "You can try again to sign in or use an app-specific password.",
+  "addAccountOauthOptionsText": "Sign in with {provider} or create an app-specific password.",
   "@addAccountOauthOptionsText": {
-    "description": "Info shown oauth process fails and the user can try again or use an app-specific password."
+    "description": "Info shown oauth process fails and the user can try again or use an app-specific password.",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "Mailbox.org"
+      }
+    }
   },
-  "addAccountOauthOptionsTryAgainLabel": "Try again",
-  "@addAccountOauthOptionsTryAgainLabel": {
-    "description": "Label of button to try the oauth login again after it was aborted."
+  "addAccountOauthSignIn": "Sign in with {provider}",
+  "@addAccountOauthSignIn": {
+    "description": "Label of button to sign in via oauth with the given provider.",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "Mailbox.org"
+      }
+    }
+  },
+  "addAccountOauthSignInGoogle": "Sign in with Google",
+  "@addAccountOauthSignInGoogle": {
+    "description": "Label of button to sign in via oauth with the Google."
+  },
+  "addAccountOauthSignInWithAppPassword": "Alternatively, create an app password to sign in.",
+  "@addAccountOauthSignInWithAppPassword": {
+    "description": "Info to set up app specific password."
   },
   "accountAddImapAccessSetuptMightBeRequired": "Your provider might require you to setup access for email apps manually.",
   "@accountAddImapAccessSetuptMightBeRequired": {

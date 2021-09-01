@@ -10,8 +10,6 @@ import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/key_service.dart';
-import 'package:enough_mail_app/util/http_helper.dart';
 import 'package:enough_mail_app/util/modal_bottom_sheet_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/account_provider_selector.dart';
@@ -20,10 +18,8 @@ import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'dart:convert' show jsonDecode;
 
 class AccountAddScreen extends StatefulWidget {
   final bool launchedFromWelcome;
@@ -355,20 +351,41 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
             Column(
               children: [
                 if (provider.hasOAuthClient) ...{
-                  // this step is only shown when the user has aborted the login or when another error occurred.
-                  // The user has now 2 options:
-                  // 1. try again
-                  // 2. use an app-specific password
-                  Text(localizations.addAccountOauthOptionsText),
-                  PlatformElevatedButton(
-                    onPressed: () => _loginWithOAuth(provider, _account.email!),
-                    child: ButtonText(
-                        localizations.addAccountOauthOptionsTryAgainLabel),
+                  // The user can continue to sign in with the provider or by using an app-specific password
+                  Text(
+                    localizations.addAccountOauthOptionsText(
+                        provider.displayName ?? '<unknown>'),
                   ),
-                },
-                if (provider.appSpecificPasswordSetupUrl != null) ...{
+                  provider.buildSignInButton(
+                    context,
+                    onPressed: () => _loginWithOAuth(provider, _account.email!),
+                    isSignInButton: true,
+                  ),
+                  if (provider.appSpecificPasswordSetupUrl != null) ...{
+                    Padding(
+                      padding: EdgeInsets.only(top: 8.0),
+                      child: Text(
+                          localizations.addAccountOauthSignInWithAppPassword),
+                    ),
+                    PlatformTextButton(
+                      onPressed: () async {
+                        await launcher
+                            .launch(provider.appSpecificPasswordSetupUrl!);
+                      },
+                      child: ButtonText(localizations
+                          .addAccountApplicationPasswordRequiredButton),
+                    ),
+                    PlatformCheckboxListTile(
+                      onChanged: (value) => setState(() =>
+                          _isApplicationSpecificPasswordAcknowledged = value),
+                      value: _isApplicationSpecificPasswordAcknowledged,
+                      title: Text(localizations
+                          .addAccountApplicationPasswordRequiredAcknowledged),
+                    ),
+                  },
+                } else if (provider.appSpecificPasswordSetupUrl != null) ...{
                   Text(localizations.addAccountApplicationPasswordRequiredInfo),
-                  PlatformElevatedButton(
+                  PlatformTextButton(
                     onPressed: () async {
                       await launcher
                           .launch(provider.appSpecificPasswordSetupUrl!);
@@ -403,29 +420,29 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                     labelText: localizations.addAccountPasswordLabel,
                     hintText: localizations.addAccountPasswordHint,
                   ),
-                  PlatformTextButton(
-                    onPressed: () =>
-                        _navigateToManualSettings(context, localizations),
-                    child: ButtonText(
-                      localizations.addAccountResolvedSettingsWrongAction(
-                          _provider?.displayName ?? '<unknown>'),
-                    ),
+                },
+                PlatformTextButton(
+                  onPressed: () =>
+                      _navigateToManualSettings(context, localizations),
+                  child: ButtonText(
+                    localizations.addAccountResolvedSettingsWrongAction(
+                        _provider?.displayName ?? '<unknown>'),
                   ),
-                  if (_extensionForgotPassword != null) ...{
-                    PlatformTextButton(
-                      onPressed: () {
-                        final languageCode =
-                            locator<I18nService>().locale!.languageCode;
-                        var url = _extensionForgotPassword!.action!.url;
-                        url = url
-                          ..replaceAll('{user.email}', _account.email ?? '')
-                          ..replaceAll('{language}', languageCode);
-                        launcher.launch(url);
-                      },
-                      child: ButtonText(_extensionForgotPassword!.getLabel(
-                          locator<I18nService>().locale!.languageCode)),
-                    ),
-                  },
+                ),
+                if (_extensionForgotPassword != null) ...{
+                  PlatformTextButton(
+                    onPressed: () {
+                      final languageCode =
+                          locator<I18nService>().locale!.languageCode;
+                      var url = _extensionForgotPassword!.action!.url;
+                      url = url
+                        ..replaceAll('{user.email}', _account.email ?? '')
+                        ..replaceAll('{language}', languageCode);
+                      launcher.launch(url);
+                    },
+                    child: ButtonText(_extensionForgotPassword!
+                        .getLabel(locator<I18nService>().locale!.languageCode)),
+                  ),
                 },
               ],
             ),
@@ -533,10 +550,6 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   }
 
   void _onProviderChanged(Provider provider, String email) {
-    if (provider.hasOAuthClient) {
-      // continue directly with oauth flow:
-      _loginWithOAuth(provider, email);
-    }
     final mailAccount = MailAccount.fromDiscoveredSettings(
       _emailController.text,
       _emailController.text,

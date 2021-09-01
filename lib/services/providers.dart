@@ -1,5 +1,10 @@
 import 'package:enough_mail/discover.dart';
 import 'package:enough_mail_app/oauth/oauth.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProviderService {
   final _providersByDomains = <String, Provider>{};
@@ -88,6 +93,39 @@ class Provider {
     this.manualImapAccessSetupUrl,
     this.domains,
   });
+
+  /// Builds the sign in button for this provider
+  ///
+  /// As this is UI, consider moving to a widget extension class?
+  Widget buildSignInButton(
+    BuildContext context, {
+    required Function() onPressed,
+    bool isSignInButton = false,
+  }) {
+    final localizations = AppLocalizations.of(context)!;
+    final providerName = displayName ?? '<unknown>';
+    final buttonText = isSignInButton
+        ? localizations.addAccountOauthSignIn(providerName)
+        : providerName;
+    return PlatformTextButton(
+      onPressed: onPressed,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            'assets/images/providers/$key.png',
+            height: 50,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stacktrace) => Container(),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: PlatformText(buttonText),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class GmailProvider extends Provider {
@@ -127,6 +165,47 @@ class GmailProvider extends Provider {
           domains: ['gmail.com', 'googlemail.com', 'google.com', 'jazztel.es'],
           oauthClient: GmailOAuthClient(),
         );
+
+  @override
+  Widget buildSignInButton(
+    BuildContext context, {
+    required Function() onPressed,
+    bool isSignInButton = false,
+  }) {
+    final localizations = AppLocalizations.of(context)!;
+    final googleBlue = Color(0xff4285F4);
+    final googleText = Color(0x89000000);
+    return Theme(
+      data: ThemeData(accentColor: googleBlue, brightness: Brightness.light),
+      child: PlatformTextButton(
+        onPressed: onPressed,
+        child: Container(
+          decoration: BoxDecoration(border: Border.all(color: googleBlue)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/providers/$key.png',
+                height: 50,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stacktrace) => Container(),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 16.0),
+                child: PlatformText(
+                  localizations.addAccountOauthSignInGoogle,
+                  style: GoogleFonts.roboto(
+                    color: googleText,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class OutlookProvider extends Provider {
