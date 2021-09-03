@@ -289,10 +289,21 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     }
   }
 
-  _buildEmailStep(BuildContext context, AppLocalizations localizations) {
+  Step _buildEmailStep(BuildContext context, AppLocalizations localizations) {
     return Step(
-      title: Text(localizations.addAccountEmailLabel +
-          (_currentStep > 0 ? ' ${_account.email}' : '')),
+      title: _currentStep == 0
+          ? Text(localizations.addAccountEmailLabel)
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.addAccountEmailLabel),
+                Text(
+                  _account.email ?? '',
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              ],
+            ),
       content: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -325,7 +336,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     );
   }
 
-  _buildPasswordStep(BuildContext context, AppLocalizations localizations) {
+  Step _buildPasswordStep(
+      BuildContext context, AppLocalizations localizations) {
     final provider = _provider;
 
     return Step(
@@ -465,7 +477,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     );
   }
 
-  _buildAccountSetupStep(BuildContext context, AppLocalizations localizations) {
+  Step _buildAccountSetupStep(
+      BuildContext context, AppLocalizations localizations) {
     return Step(
       title: Text(_isAccountVerified
           ? localizations.addAccountSetupAccountStep
