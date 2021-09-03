@@ -35,7 +35,7 @@ abstract class OauthClient {
       refreshedToken.provider = incomingHostName;
       return refreshedToken;
     } catch (e, s) {
-      print('Unable to authenticate: $e $s');
+      print('Unable to refresh tokens: $e $s');
       return Future.value();
     }
   }
@@ -96,11 +96,12 @@ class GmailOAuthClient extends OauthClient {
       'refresh_token': token.refreshToken,
       'grant_type': 'refresh_token',
     });
-
-    // Get the access token from the response
-    print('refresh token:');
-    print(response.text);
-    return OauthToken.fromText(response.text!);
+    final text = response.text;
+    if (response.statusCode != 200 || text == null) {
+      throw new StateError(
+          'Unable to refresh Google OAuth token $token, status code=${response.statusCode}, response=$text');
+    }
+    return OauthToken.fromText(text);
   }
 }
 
@@ -161,10 +162,11 @@ class OutlookOAuthClient extends OauthClient {
       'refresh_token': token.refreshToken,
       'grant_type': 'refresh_token',
     });
-
-    // Get the access token from the response
-    print('refresh token:');
-    print(response.text);
-    return OauthToken.fromText(response.text!);
+    final text = response.text;
+    if (response.statusCode != 200 || text == null) {
+      throw new StateError(
+          'Unable to refresh Google OAuth token $token, status code=${response.statusCode}, response=$text');
+    }
+    return OauthToken.fromText(text);
   }
 }
