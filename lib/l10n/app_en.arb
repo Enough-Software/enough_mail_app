@@ -757,7 +757,7 @@
   "@settingsActionAccounts": {
     "description": "Settings action to manage accounts."
   },
-  "settingsActionDesign": "Change design",
+  "settingsActionDesign": "Appearance",
   "@settingsActionDesign": {
     "description": "Settings action to manage the visualization of the app."
   },
