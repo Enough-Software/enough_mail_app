@@ -10,23 +10,8 @@ import 'package:shimmer_animation/shimmer_animation.dart';
 import '../locator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class WelcomeScreen extends StatefulWidget {
+class WelcomeScreen extends StatelessWidget {
   WelcomeScreen({Key? key}) : super(key: key);
-
-  @override
-  _WelcomeScreenState createState() => _WelcomeScreenState();
-}
-
-class _WelcomeScreenState extends State<WelcomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      final localizations = AppLocalizations.of(context)!;
-      LocalizedDialogHelper.showTextDialog(context,
-          localizations.welcomeBetaTitle, localizations.welcomeBetaText);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {

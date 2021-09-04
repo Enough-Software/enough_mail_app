@@ -63,14 +63,6 @@
   "@splashLoading3": {
     "description": "Message shown on splash screen while loading"
   },
-  "welcomeBetaTitle": "Maily Beta",
-  "@welcomeBetaTitle": {
-    "description": "Title for beta information dialog shown on welcome page"
-  },
-  "welcomeBetaText": "Thanks for testing Maily! Please note that Maily is still in beta and should not be used in production. Improve Maily by giving feedback - you will find the links in the feedback section of the app settings.\nThanks!",
-  "@welcomeBetaText": {
-    "description": "Text for beta information dialog shown on welcome page"
-  },
   "welcomePanel1Title": "Maily",
   "@welcomePanel1Title": {
     "description": "Welcome panel title"
