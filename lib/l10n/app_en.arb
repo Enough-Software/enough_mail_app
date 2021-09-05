@@ -1458,6 +1458,14 @@
   "@composeEmptyMessage": {
     "description": "Message text for message without text."
   },
+  "composeWarningNoSubject": "You have not specified a subject. Do you want to sent the message without a subject?",
+  "@composeWarningNoSubject": {
+    "description": "Warning shown when trying to send a message without subject."
+  },
+  "composeActionSentWithoutSubject": "Send",
+  "@composeActionSentWithoutSubject": {
+    "description": "Action to send message without subject."
+  },
   "composeMailSendSuccess": "Mail sent 😊",
   "@composeMailSendSuccess": {
     "description": "Notification shown after a mail was sent successfully."

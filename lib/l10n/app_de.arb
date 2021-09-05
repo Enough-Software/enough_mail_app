@@ -296,6 +296,8 @@
   "composeTitleForward": "Weiterleitung",
   "composeTitleReply": "Antwort",
   "composeEmptyMessage": "Leere Nachricht",
+  "composeWarningNoSubject": "Du hast kein Betreff geschrieben. Möchtest du die Nachricht ohne Betreff senden?",
+  "composeActionSentWithoutSubject": "Senden",
   "composeMailSendSuccess": "Gesendet 😊",
   "composeSendErrorInfo": "Leider konnte die Email nicht versendet werden.\nDer Postausgang Server liefert folgende Antwort:\n{details}",
   "composeRequestReadReceiptAction": "Lesebestätigung anfordern",
