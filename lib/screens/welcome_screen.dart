@@ -1,8 +1,9 @@
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_mail_app/widgets/legalese.dart';
+import 'package:enough_mail_app/widgets/text_with_links.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
@@ -89,23 +90,31 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   Widget _buildFooter(AppLocalizations localizations) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Shimmer(
-        duration: const Duration(seconds: 4),
-        interval: const Duration(seconds: 6),
-        child: PlatformFilledButtonIcon(
-          icon: Icon(locator<IconService>().email),
-          label: Expanded(
-            child:
-                Center(child: PlatformText(localizations.welcomeActionSignIn)),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Shimmer(
+            duration: const Duration(seconds: 4),
+            interval: const Duration(seconds: 6),
+            child: PlatformFilledButtonIcon(
+              icon: Icon(locator<IconService>().email),
+              label: Expanded(
+                child: Center(
+                    child: PlatformText(localizations.welcomeActionSignIn)),
+              ),
+              onPressed: () {
+                locator<NavigationService>()
+                    .push(Routes.accountAdd, arguments: true);
+              },
+            ),
           ),
-          onPressed: () {
-            locator<NavigationService>()
-                .push(Routes.accountAdd, arguments: true);
-          },
         ),
-      ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+          child: Legalese(),
+        ),
+      ],
     );
   }
 }
