@@ -561,7 +561,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
         return Future.value(false);
       },
       child: PlatformIconButton(
-        icon: IconService.buildNumericIcon(length),
+        icon: IconService.buildNumericIcon(context, length),
         onPressed: () {
           if (_overlayEntry != null) {
             _removeOverlay();
