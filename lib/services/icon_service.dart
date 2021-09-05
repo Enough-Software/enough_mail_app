@@ -135,7 +135,8 @@ class IconService {
     return iconData;
   }
 
-  static Widget buildNumericIcon(int value, {double? size}) {
+  static Widget buildNumericIcon(BuildContext context, int value,
+      {double? size}) {
     switch (value) {
       case 1:
         return Icon(
@@ -154,8 +155,11 @@ class IconService {
         return Icon(Icons.looks_6_outlined, size: size);
       default:
         final style = size == null ? null : TextStyle(fontSize: (size * 0.8));
+        final borderColor = (Theme.of(context).brightness == Brightness.dark)
+            ? const Color(0xffeeeeee)
+            : const Color(0xff000000);
         return Container(
-          decoration: BoxDecoration(border: Border.all()),
+          decoration: BoxDecoration(border: Border.all(color: borderColor)),
           child: Text(value.toString(), style: style),
         );
     }

@@ -72,7 +72,8 @@ class MessageOverviewContent extends StatelessWidget {
                         Icon(Icons.forward, size: 12),
                       },
                       if (threadLength != 0) ...{
-                        IconService.buildNumericIcon(threadLength, size: 12.0),
+                        IconService.buildNumericIcon(context, threadLength,
+                            size: 12.0),
                       },
                     ],
                   ),
