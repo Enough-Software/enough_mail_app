@@ -25,9 +25,11 @@ class IconText extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           icon,
-          Padding(
-            padding: horizontalPadding,
-            child: label,
+          Expanded(
+            child: Padding(
+              padding: horizontalPadding,
+              child: label,
+            ),
           )
         ],
       ),
