@@ -1,7 +1,9 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
+import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/contact.dart';
+import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:flutter/foundation.dart' as foundation;
 
 class ContactService {
@@ -15,10 +17,7 @@ class ContactService {
   }
 
   Future<ContactManager> init(MailAccount mailAccount) async {
-    final mailClient = MailClient(mailAccount,
-        eventBus: AppEventBus.eventBus,
-        isLogEnabled: foundation.kDebugMode,
-        logName: 'send.${mailAccount.name}');
+    final mailClient = locator<MailService>().createMailClient(mailAccount);
     try {
       await mailClient.connect();
       await mailClient.listMailboxes();
