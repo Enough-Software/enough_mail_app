@@ -216,6 +216,18 @@ class _ComposeScreenState extends State<ComposeScreen> {
   }
 
   Future<void> _send(AppLocalizations localizations) async {
+    final subject = _subjectController.text.trim();
+    if (subject.isEmpty) {
+      final result = await LocalizedDialogHelper.askForConfirmation(
+        context,
+        title: localizations.composeSubjectHint,
+        query: localizations.composeWarningNoSubject,
+        action: localizations.composeActionSentWithoutSubject,
+      );
+      if (result != true) {
+        return;
+      }
+    }
     locator<NavigationService>().pop();
     final mailClient = await _getMailClient();
     final mimeMessage = await _buildMimeMessage(mailClient);
