@@ -57,3 +57,46 @@ class TextWithLinks extends StatelessWidget {
     );
   }
 }
+
+class TextWithNamedLinks extends StatelessWidget {
+  final List<TextLink> parts;
+  final TextStyle? style;
+
+  const TextWithNamedLinks({Key? key, required this.parts, this.style})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textStyle = style ??
+        theme.textTheme.bodyText2 ??
+        TextStyle(
+            color: theme.brightness == Brightness.light
+                ? Colors.black
+                : Colors.white);
+    final linkStyle = textStyle.copyWith(
+        decoration: TextDecoration.underline, color: theme.accentColor);
+    final spans = <TextSpan>[];
+    for (final part in parts) {
+      final url = part.url;
+      if (url == null) {
+        spans.add(TextSpan(text: part.text));
+      } else {
+        spans.add(TextSpan(
+            text: part.text,
+            style: linkStyle,
+            recognizer: TapGestureRecognizer()..onTap = () => launch(url)));
+      }
+    }
+    return SelectableText.rich(
+      TextSpan(children: spans, style: textStyle),
+    );
+  }
+}
+
+class TextLink {
+  final String text;
+  final String? url;
+
+  const TextLink(this.text, [this.url]);
+}

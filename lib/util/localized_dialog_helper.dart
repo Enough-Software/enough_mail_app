@@ -1,4 +1,5 @@
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_mail_app/widgets/legalese.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 // import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,6 +41,7 @@ class LocalizedDialogHelper {
                 .launch('https://github.com/Enough-Software/enough_mail_app');
           },
         ),
+        Legalese(),
       ],
     );
   }

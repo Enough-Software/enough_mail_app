@@ -705,6 +705,18 @@
       }
     }  
   },
+  "legaleseUsage": "By using Maily you agree to our [PP] and to our [TC].",
+  "@legaleseUsage": {
+    "description": "Legal info shown on initial welcome screen and later in about. [PP] is replaced with the legalesePrivacyPolicy text and [TC] with legaleseTermsAndConditions."
+  },
+  "legalesePrivacyPolicy": "Privacy Policy",
+  "@legalesePrivacyPolicy": {
+    "description": "Translation of privacy policy"
+  },
+  "legaleseTermsAndConditions": "Terms & Conditions",
+  "@legaleseTermsAndConditions": {
+    "description": "Translation of Terms & Conditions "
+  },
   "aboutApplicationLegalese": "Maily is free software published under the GNU General Public License.",
   "@aboutApplicationLegalese": {
     "description": "Legal info shown in about dialog."
