@@ -337,13 +337,7 @@ class MailService {
       if (!connectIfRequired) {
         throw StateError('No MailClient conected for account ${account.name}');
       }
-      client = MailClient(
-        account.account,
-        eventBus: AppEventBus.eventBus,
-        isLogEnabled: foundation.kDebugMode, // enable log only for debug  mode
-        logName: account.account.name,
-        clientId: _clientId,
-      );
+      client = createMailClient(account.account);
       _mailClientsPerAccount[account] = client;
       await _connect(client);
       await loadMailboxesFor(client);
@@ -570,12 +564,7 @@ class MailService {
   }
 
   Future<MailClient?> connect(MailAccount mailAccount) async {
-    var mailClient = MailClient(
-      mailAccount,
-      isLogEnabled: true,
-      eventBus: AppEventBus.eventBus,
-      clientId: _clientId,
-    );
+    var mailClient = createMailClient(mailAccount);
     try {
       await _connect(mailClient);
     } on MailException {
@@ -594,12 +583,7 @@ class MailService {
           outgoingAuth.userName = preferredUserName;
         }
         mailClient.disconnect();
-        mailClient = MailClient(
-          mailAccount,
-          isLogEnabled: true,
-          eventBus: AppEventBus.eventBus,
-          clientId: _clientId,
-        );
+        mailClient = createMailClient(mailAccount);
         try {
           await _connect(mailClient);
         } on MailException {
@@ -611,8 +595,20 @@ class MailService {
     return mailClient;
   }
 
+  MailClient createMailClient(MailAccount mailAccount,
+      {bool isLogEnabled = foundation.kDebugMode}) {
+    return MailClient(
+      mailAccount,
+      isLogEnabled: isLogEnabled,
+      eventBus: AppEventBus.eventBus,
+      clientId: _clientId,
+      refresh: _refreshToken,
+      onConfigChanged: saveAccount,
+    );
+  }
+
   Future<void> _connect(MailClient client) {
-    return client.connect(refresh: _refreshToken, onConfigChanged: saveAccount);
+    return client.connect();
   }
 
   Future<OauthToken?> _refreshToken(
@@ -649,10 +645,7 @@ class MailService {
     for (final mailAccount in mailAccounts) {
       var client = existingMailClients
           .firstWhereOrNull((client) => client.account == mailAccount);
-      client ??= MailClient(
-        mailAccount,
-        clientId: _clientId,
-      );
+      client ??= createMailClient(mailAccount);
       mailClients.add(client);
     }
     return mailClients;
