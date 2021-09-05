@@ -358,6 +358,7 @@ class _MessageContentState extends State<_MessageContent> {
       onDownloaded: _onMimeMessageDownloaded,
       onError: _onMimeMessageError,
       blockExternalImages: _blockExternalImages,
+      enableDarkMode: Theme.of(context).brightness == Brightness.dark,
       mailtoDelegate: _handleMailto,
       maxImageWidth: 320,
       showMediaDelegate: _navigateToMedia,
