@@ -51,21 +51,7 @@ class WelcomeScreen extends StatelessWidget {
           fit: BoxFit.cover,
         ),
         decoration: PageDecoration(pageColor: Colors.green[700]),
-        footer: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Shimmer(
-            duration: const Duration(seconds: 4),
-            interval: const Duration(seconds: 6),
-            child: PlatformFilledButtonIcon(
-              icon: Icon(locator<IconService>().email),
-              label: ButtonText(localizations.welcomeActionSignIn),
-              onPressed: () {
-                locator<NavigationService>()
-                    .push(Routes.accountAdd, arguments: true);
-              },
-            ),
-          ),
-        ),
+        footer: _buildFooter(localizations),
       ),
       PageViewModel(
         title: localizations.welcomePanel2Title,
@@ -76,21 +62,7 @@ class WelcomeScreen extends StatelessWidget {
           fit: BoxFit.cover,
         ),
         decoration: PageDecoration(pageColor: Color(0xff543226)),
-        footer: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Shimmer(
-            duration: const Duration(seconds: 4),
-            interval: const Duration(seconds: 6),
-            child: PlatformFilledButtonIcon(
-              icon: Icon(locator<IconService>().email),
-              label: ButtonText(localizations.welcomeActionSignIn),
-              onPressed: () {
-                locator<NavigationService>()
-                    .push(Routes.accountAdd, arguments: true);
-              },
-            ),
-          ),
-        ),
+        footer: _buildFooter(localizations),
       ),
       PageViewModel(
         title: localizations.welcomePanel3Title,
@@ -101,21 +73,7 @@ class WelcomeScreen extends StatelessWidget {
           fit: BoxFit.cover,
         ),
         decoration: PageDecoration(pageColor: Color(0xff761711)),
-        footer: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Shimmer(
-            duration: const Duration(seconds: 4),
-            interval: const Duration(seconds: 6),
-            child: PlatformFilledButtonIcon(
-              icon: Icon(locator<IconService>().email),
-              label: ButtonText(localizations.welcomeActionSignIn),
-              onPressed: () {
-                locator<NavigationService>()
-                    .push(Routes.accountAdd, arguments: true);
-              },
-            ),
-          ),
-        ),
+        footer: _buildFooter(localizations),
       ),
       PageViewModel(
         title: localizations.welcomePanel4Title,
@@ -125,22 +83,29 @@ class WelcomeScreen extends StatelessWidget {
           height: 200,
           fit: BoxFit.cover,
         ),
-        footer: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Shimmer(
-            duration: const Duration(seconds: 4),
-            interval: const Duration(seconds: 6),
-            child: PlatformFilledButtonIcon(
-              icon: Icon(locator<IconService>().email),
-              label: ButtonText(localizations.welcomeActionSignIn),
-              onPressed: () {
-                locator<NavigationService>()
-                    .push(Routes.accountAdd, arguments: true);
-              },
-            ),
-          ),
-        ),
+        footer: _buildFooter(localizations),
       ),
     ];
+  }
+
+  Widget _buildFooter(AppLocalizations localizations) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Shimmer(
+        duration: const Duration(seconds: 4),
+        interval: const Duration(seconds: 6),
+        child: PlatformFilledButtonIcon(
+          icon: Icon(locator<IconService>().email),
+          label: Expanded(
+            child:
+                Center(child: PlatformText(localizations.welcomeActionSignIn)),
+          ),
+          onPressed: () {
+            locator<NavigationService>()
+                .push(Routes.accountAdd, arguments: true);
+          },
+        ),
+      ),
+    );
   }
 }
