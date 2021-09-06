@@ -107,22 +107,33 @@ class Provider {
     final buttonText = isSignInButton
         ? localizations.addAccountOauthSignIn(providerName)
         : providerName;
-    return PlatformTextButton(
-      onPressed: onPressed,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            'assets/images/providers/$key.png',
-            height: 50,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stacktrace) => Container(),
+    return Theme(
+      data: ThemeData(brightness: Brightness.light),
+      child: PlatformTextButton(
+        onPressed: onPressed,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
           ),
-          Padding(
+          child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: PlatformText(buttonText),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  'assets/images/providers/$key.png',
+                  height: 50,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stacktrace) => Container(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: PlatformText(buttonText),
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -180,7 +191,10 @@ class GmailProvider extends Provider {
       child: PlatformTextButton(
         onPressed: onPressed,
         child: Container(
-          decoration: BoxDecoration(border: Border.all(color: googleBlue)),
+          decoration: BoxDecoration(
+            border: Border.all(color: googleBlue),
+            color: Colors.white,
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
