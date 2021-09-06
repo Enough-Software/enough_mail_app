@@ -484,6 +484,7 @@ class MessageContentsScreen extends StatelessWidget {
           adjustHeight: false,
           mailtoDelegate: _handleMailto,
           showMediaDelegate: _navigateToMedia,
+          enableDarkMode: (Theme.of(context).brightness == Brightness.dark),
         ),
       ),
     );
