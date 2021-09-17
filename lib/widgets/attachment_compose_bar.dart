@@ -1,3 +1,4 @@
+import 'package:enough_giphy_flutter/enough_giphy_flutter.dart';
 import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
@@ -17,7 +18,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:giphy_picker/giphy_picker.dart';
 import '../locator.dart';
 
 class AttachmentMediaProviderFactory {
@@ -147,17 +147,9 @@ class AddAttachmentPopupButton extends StatelessWidget {
               brightness: brightness,
             ),
           ),
-          PlatformPopupMenuItem(
-            value: 6,
-            child: IconText(
-              icon: Icon(iconService.mediaSticker),
-              label: Text(localizations.attachTypeSticker),
-              brightness: brightness,
-            ),
-          ),
         },
         PlatformPopupMenuItem(
-          value: 7,
+          value: 6,
           child: IconText(
             icon: Icon(iconService.appointment),
             label: Text(localizations.attachTypeAppointment),
@@ -190,14 +182,10 @@ class AddAttachmentPopupButton extends StatelessWidget {
               changed = true;
             }
             break;
-          case 5: // gif file
+          case 5: // gif / sticker / emoji file
             changed = await addAttachmentGif(context, localizations);
             break;
-          case 6: // gif sticker file
-            changed = await addAttachmentGif(context, localizations,
-                searchSticker: true);
-            break;
-          case 7: // appointment
+          case 6: // appointment
             changed = await addAttachmentAppointment(context, localizations);
             break;
         }
@@ -230,8 +218,9 @@ class AddAttachmentPopupButton extends StatelessWidget {
   }
 
   Future<bool> addAttachmentGif(
-      BuildContext context, AppLocalizations localizations,
-      {bool searchSticker = false}) async {
+    BuildContext context,
+    AppLocalizations localizations,
+  ) async {
     final giphy = locator<KeyService>().giphy;
     if (giphy == null) {
       LocalizedDialogHelper.showTextDialog(context, localizations.errorTitle,
@@ -239,25 +228,30 @@ class AddAttachmentPopupButton extends StatelessWidget {
       return false;
     }
 
-    final gif = await GiphyPicker.pickGif(
-        context: context,
-        apiKey: giphy,
-        searchText: searchSticker
-            ? localizations.attachTypeStickerSearch
-            : localizations.attachTypeGifSearch,
-        lang: locator<I18nService>().locale!.languageCode,
-        sticker: searchSticker,
-        showPreviewPage: false);
-    if (gif == null) {
+    final gif = await Giphy.getGif(
+      context: context,
+      apiKey: giphy,
+      // searchLabelText: searchSticker
+      //     ? localizations.attachTypeStickerSearch
+      //     : localizations.attachTypeGifSearch,
+      lang: locator<I18nService>().locale!.languageCode,
+      keepState: true,
+      showPreview: true,
+      // sticker: searchSticker,
+      // showPreviewPage: false,
+    );
+    final contentUrl = gif?.recommendedMobileSend.url;
+    if (gif == null || contentUrl == null) {
       return false;
     }
-    final result = await HttpHelper.httpGet(gif.images.original!.url!);
-    if (result.data == null) {
+    final result = await HttpHelper.httpGet(contentUrl);
+    final data = result.data;
+    if (data == null) {
       return false;
     }
     composeData.messageBuilder.addBinary(
-        result.data!, MediaType.fromSubtype(MediaSubtype.imageGif),
-        filename: gif.title! + '.gif');
+        data, MediaType.fromSubtype(MediaSubtype.imageGif),
+        filename: gif.title + '.gif');
 
     return true;
   }
