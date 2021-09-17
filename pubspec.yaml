@@ -26,29 +26,29 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   enough_mail: #^1.3.6
-    # git:
-    #   url: https://github.com/Enough-Software/enough_mail.git
-    path: ../enough_mail
-  enough_mail_flutter: #^1.3.0
-    # git:
-    #   url: https://github.com/Enough-Software/enough_mail_flutter.git
-    path: ../enough_mail_flutter
-  enough_html_editor: #^0.0.3
     git:
-      url: https://github.com/Enough-Software/enough_html_editor.git
-    # path: ../enough_html_editor
+      url: https://github.com/Enough-Software/enough_mail.git
+    # path: ../enough_mail
+  enough_mail_flutter: #^1.3.0
+    git:
+      url: https://github.com/Enough-Software/enough_mail_flutter.git
+    # path: ../enough_mail_flutter
+  enough_html_editor: #^0.0.3
+    # git:
+    #   url: https://github.com/Enough-Software/enough_html_editor.git
+    path: ../enough_html_editor
   enough_icalendar: #^0.5.0
-    # git:
-    #   url: https://github.com/Enough-Software/enough_icalendar.git
-    path: ../enough_icalendar
+    git:
+      url: https://github.com/Enough-Software/enough_icalendar.git
+    # path: ../enough_icalendar
   enough_mail_icalendar: #^0.2.0
-    # git:
-    #   url: https://github.com/Enough-Software/enough_mail_icalendar.git
-    path: ../enough_mail_icalendar
+    git:
+      url: https://github.com/Enough-Software/enough_mail_icalendar.git
+    # path: ../enough_mail_icalendar
   enough_icalendar_export: #^0.2.0
-    # git:
-    #   url: https://github.com/Enough-Software/enough_icalendar_export.git
-    path: ../enough_icalendar_export
+    git:
+      url: https://github.com/Enough-Software/enough_icalendar_export.git
+    # path: ../enough_icalendar_export
   enough_serialization: ^1.4.0
     # git:
     #   url: https://github.com/Enough-Software/enough_serialization.git
@@ -81,9 +81,9 @@ dependencies:
   shimmer_animation: ^2.0.0
   badges: ^2.0.1
   community_material_icon: ^5.9.55
-  enough_platform_widgets: ^0.2.0
-    # git:
-    #   url: https://github.com/Enough-Software/enough_platform_widgets.git
+  enough_platform_widgets: #^0.2.0
+    git:
+      url: https://github.com/Enough-Software/enough_platform_widgets.git
     # path: ../enough_platform_widgets
   collection: ^1.15.0
   modal_bottom_sheet: ^2.0.0
