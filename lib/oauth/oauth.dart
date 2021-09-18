@@ -112,7 +112,9 @@ class OutlookOAuthClient extends OauthClient {
   Future<OauthToken> _authenticate(String email) async {
     final clientId = oauthClientId!.id;
     final clientSecret = oauthClientId!.secret;
-    final callbackUrlScheme = 'maily://oauth';
+    final callbackUrlScheme =
+        //'https://login.microsoftonline.com/common/oauth2/nativeclient';
+        'maily://oauth';
 
     // Construct the url
     final uri = Uri.https(
@@ -120,34 +122,37 @@ class OutlookOAuthClient extends OauthClient {
       'response_type': 'code',
       'client_id': clientId,
       'client_secret': clientSecret,
-      'redirect_uri': '$callbackUrlScheme',
-      'scope': //TODO check scopes once test app registration is completed
-          'https://outlook.office.com/mail.read https://outlook.office.com/mail.send',
+      'redirect_uri': callbackUrlScheme,
+      'scope':
+          // source: https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
+          'https://outlook.office.com/IMAP.AccessAsUser.All https://outlook.office.com/SMTP.Send offline_access',
       'login_hint': email,
     });
-    print('authenticate URL: $uri');
+    // print('authenticate URL: $uri');
 
     // Present the dialog to the user
     final result = await FlutterWebAuth.authenticate(
-        url: uri.toString(), callbackUrlScheme: callbackUrlScheme);
+        url: uri.toString(), callbackUrlScheme: 'maily'); // callbackUrlScheme);
 
     // Extract code from resulting url
     final code = Uri.parse(result).queryParameters['code'];
-
+    // print('result: $result');
+    // print('got code: "$code"');
     // Use this code to get an access token
     final response = await HttpHelper.httpPost(
         'https://login.microsoftonline.com/common/oauth2/v2.0/token',
         body: {
           'client_id': clientId,
-          'client_secret': clientSecret,
-          'redirect_uri': '$callbackUrlScheme:/',
+          //'client_secret': clientSecret,
+          'redirect_uri': callbackUrlScheme,
           'grant_type': 'authorization_code',
           'code': code,
         });
 
     // Get the access token from the response
-    print('authorization code token:');
-    print(response.text);
+    // print('authorization code token:');
+    // print(response.text);
+    // print('response.code=${response.statusCode}');
     return OauthToken.fromText(response.text!);
   }
 

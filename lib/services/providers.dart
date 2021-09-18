@@ -238,7 +238,7 @@ class OutlookProvider extends Provider {
                     hostname: 'outlook.office365.com',
                     port: 993,
                     socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.oauth2,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
@@ -246,9 +246,9 @@ class OutlookProvider extends Provider {
                   ServerConfig(
                     type: ServerType.smtp,
                     hostname: 'smtp.office365.com',
-                    port: 465,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    port: 587,
+                    socketType: SocketType.starttls,
+                    authentication: Authentication.oauth2,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
