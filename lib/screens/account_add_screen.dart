@@ -339,7 +339,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   Step _buildPasswordStep(
       BuildContext context, AppLocalizations localizations) {
     final provider = _provider;
-
+    final appSpecificPasswordSetupUrl = provider?.appSpecificPasswordSetupUrl;
     return Step(
       title: Text(localizations.addAccountPasswordLabel),
       //state: StepState.complete,
@@ -368,12 +368,15 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                     localizations.addAccountOauthOptionsText(
                         provider.displayName ?? '<unknown>'),
                   ),
-                  provider.buildSignInButton(
-                    context,
-                    onPressed: () => _loginWithOAuth(provider, _account.email!),
-                    isSignInButton: true,
+                  FittedBox(
+                    child: provider.buildSignInButton(
+                      context,
+                      onPressed: () =>
+                          _loginWithOAuth(provider, _account.email!),
+                      isSignInButton: true,
+                    ),
                   ),
-                  if (provider.appSpecificPasswordSetupUrl != null) ...{
+                  if (appSpecificPasswordSetupUrl != null) ...{
                     Padding(
                       padding: EdgeInsets.only(top: 8.0),
                       child: Text(
@@ -381,8 +384,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                     ),
                     PlatformTextButton(
                       onPressed: () async {
-                        await launcher
-                            .launch(provider.appSpecificPasswordSetupUrl!);
+                        await launcher.launch(appSpecificPasswordSetupUrl);
                       },
                       child: ButtonText(localizations
                           .addAccountApplicationPasswordRequiredButton),
