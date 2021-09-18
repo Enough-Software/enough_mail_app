@@ -504,6 +504,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                             });
                           },
                           initialContent: text,
+                          minHeight: 400,
                         );
                     }
                   },
