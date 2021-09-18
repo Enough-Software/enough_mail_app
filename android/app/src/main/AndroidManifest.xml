@@ -68,7 +68,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="com.googleusercontent.apps.424146727626-6rrctb5oaovtghijvt091puvpo33u5c1" />
-                <data android:scheme="maily" />
+                <data android:scheme="maily" android:pathPrefix="oauth" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
