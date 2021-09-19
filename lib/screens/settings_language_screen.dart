@@ -17,10 +17,10 @@ class SettingsLanguageScreen extends StatefulWidget {
 }
 
 class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
-  _Language? selectedLanguage;
-  late List<_Language> languages;
-  AppLocalizations? selectedLocalizations;
-  bool systemSettingApplied = false;
+  _Language? _selectedLanguage;
+  late List<_Language> _languages;
+  AppLocalizations? _selectedLocalizations;
+  bool _systemSettingApplied = false;
 
   @override
   void initState() {
@@ -34,13 +34,13 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
         .toList();
     final systemLanguage = _Language(
         null, locator<I18nService>().localizations.designThemeOptionSystem);
-    languages = [systemLanguage, ...available];
+    _languages = [systemLanguage, ...available];
     final languageTag = locator<SettingsService>().settings.languageTag;
     if (languageTag != null) {
-      selectedLanguage = available
+      _selectedLanguage = available
           .firstWhereOrNull((l) => l.locale!.toLanguageTag() == languageTag);
     } else {
-      selectedLanguage = systemLanguage;
+      _selectedLanguage = systemLanguage;
     }
 
     super.initState();
@@ -63,13 +63,13 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                 Text(localizations.languageSettingLabel,
                     style: theme.textTheme.caption),
                 PlatformDropdownButton<_Language>(
-                  value: selectedLanguage,
+                  value: _selectedLanguage,
                   onChanged: (value) async {
                     if (value!.locale == null) {
                       setState(() {
-                        selectedLanguage = value;
-                        this.selectedLocalizations = null;
-                        systemSettingApplied = true;
+                        _selectedLanguage = value;
+                        this._selectedLocalizations = null;
+                        _systemSettingApplied = true;
                       });
                       locator<SettingsService>().settings.languageTag = null;
                       await locator<SettingsService>().save();
@@ -97,27 +97,27 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                         ]);
                     if (confirmed) {
                       setState(() {
-                        selectedLanguage = value;
-                        this.selectedLocalizations = selectedLocalizations;
-                        systemSettingApplied = false;
+                        _selectedLanguage = value;
+                        this._selectedLocalizations = selectedLocalizations;
+                        _systemSettingApplied = false;
                       });
                       locator<SettingsService>().settings.languageTag =
-                          selectedLanguage?.locale?.toLanguageTag();
+                          _selectedLanguage?.locale?.toLanguageTag();
                       await locator<SettingsService>().save();
                     }
                   },
-                  selectedItemBuilder: (context) => languages
+                  selectedItemBuilder: (context) => _languages
                       .map((language) => Text(language.displayName!))
                       .toList(),
-                  items: languages
+                  items: _languages
                       .map((language) => DropdownMenuItem(
                           value: language, child: Text(language.displayName!)))
                       .toList(),
                 ),
-                if (selectedLocalizations != null) ...{
-                  Text(selectedLocalizations!.languageSetInfo,
+                if (_selectedLocalizations != null) ...{
+                  Text(_selectedLocalizations!.languageSetInfo,
                       style: theme.textTheme.subtitle1),
-                } else if (systemSettingApplied) ...{
+                } else if (_systemSettingApplied) ...{
                   Text(localizations.languageSystemSetInfo,
                       style: theme.textTheme.subtitle1),
                 },
