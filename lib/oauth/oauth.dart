@@ -106,6 +106,9 @@ class GmailOAuthClient extends OauthClient {
 }
 
 class OutlookOAuthClient extends OauthClient {
+  // source: https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
+  static const String _scope =
+      'https://outlook.office.com/IMAP.AccessAsUser.All https://outlook.office.com/SMTP.Send offline_access';
   OutlookOAuthClient() : super('outlook.office365.com');
 
   @override
@@ -123,9 +126,7 @@ class OutlookOAuthClient extends OauthClient {
       'client_id': clientId,
       'client_secret': clientSecret,
       'redirect_uri': callbackUrlScheme,
-      'scope':
-          // source: https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
-          'https://outlook.office.com/IMAP.AccessAsUser.All https://outlook.office.com/SMTP.Send offline_access',
+      'scope': _scope,
       'login_hint': email,
     });
     // print('authenticate URL: $uri');
@@ -143,7 +144,6 @@ class OutlookOAuthClient extends OauthClient {
         'https://login.microsoftonline.com/common/oauth2/v2.0/token',
         body: {
           'client_id': clientId,
-          //'client_secret': clientSecret,
           'redirect_uri': callbackUrlScheme,
           'grant_type': 'authorization_code',
           'code': code,
@@ -159,18 +159,18 @@ class OutlookOAuthClient extends OauthClient {
   @override
   Future<OauthToken> _refresh(OauthToken token) async {
     final clientId = oauthClientId!.id;
-    final callbackUrlScheme = clientId.split('.').reversed.join('.');
-    final response =
-        await HttpHelper.httpPost('https://oauth2.googleapis.com/token', body: {
-      'client_id': clientId,
-      'redirect_uri': '$callbackUrlScheme:/',
-      'refresh_token': token.refreshToken,
-      'grant_type': 'refresh_token',
-    });
+    final response = await HttpHelper.httpPost(
+        'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+        body: {
+          'client_id': clientId,
+          'scope': _scope,
+          'refresh_token': token.refreshToken,
+          'grant_type': 'refresh_token',
+        });
     final text = response.text;
     if (response.statusCode != 200 || text == null) {
       throw new StateError(
-          'Unable to refresh Google OAuth token $token, status code=${response.statusCode}, response=$text');
+          'Unable to refresh Outlook OAuth token $token, status code=${response.statusCode}, response=$text');
     }
     return OauthToken.fromText(text);
   }
