@@ -75,17 +75,30 @@ class TextWithNamedLinks extends StatelessWidget {
                 ? Colors.black
                 : Colors.white);
     final linkStyle = textStyle.copyWith(
-        decoration: TextDecoration.underline, color: theme.accentColor);
+      decoration: TextDecoration.underline,
+      color: theme.colorScheme.secondary,
+    );
     final spans = <TextSpan>[];
     for (final part in parts) {
       final url = part.url;
-      if (url == null) {
-        spans.add(TextSpan(text: part.text));
-      } else {
-        spans.add(TextSpan(
+      final callback = part.callback;
+      if (url != null || callback != null) {
+        spans.add(
+          TextSpan(
             text: part.text,
             style: linkStyle,
-            recognizer: TapGestureRecognizer()..onTap = () => launch(url)));
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                if (callback != null) {
+                  callback();
+                } else {
+                  launch(url!);
+                }
+              },
+          ),
+        );
+      } else {
+        spans.add(TextSpan(text: part.text));
       }
     }
     return SelectableText.rich(
@@ -97,6 +110,8 @@ class TextWithNamedLinks extends StatelessWidget {
 class TextLink {
   final String text;
   final String? url;
+  final void Function()? callback;
 
-  const TextLink(this.text, [this.url]);
+  const TextLink(this.text, [this.url]) : callback = null;
+  const TextLink.callback(this.text, this.callback) : url = null;
 }

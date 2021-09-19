@@ -1,3 +1,4 @@
+import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/models/theme_settings.dart';
@@ -14,6 +15,7 @@ class Settings extends SerializableObject {
   Settings() {
     objectCreators['themeSettings'] = (map) => ThemeSettings();
     objectCreators['customFolderNames'] = (map) => <String>[];
+    objectCreators['defaultSender'] = (map) => MailAddress.empty();
     transformers['swipeLeftToRightAction'] = (value) =>
         value is SwipeAction ? value.index : SwipeAction.values[value];
     transformers['swipeRightToLeftAction'] = (value) =>
@@ -91,4 +93,7 @@ class Settings extends SerializableObject {
       ReadReceiptDisplaySetting.always;
   set readReceiptDisplaySetting(ReadReceiptDisplaySetting? value) =>
       attributes['readReceiptDisplaySetting'] = value;
+
+  MailAddress? get defaultSender => attributes['defaultSender'];
+  set defaultSender(MailAddress? value) => attributes['defaultSender'] = value;
 }
