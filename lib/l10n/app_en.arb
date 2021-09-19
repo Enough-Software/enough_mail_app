@@ -1650,6 +1650,32 @@
       }
     }  
   },
+  "defaultSenderSettingsTitle": "Default sender",
+  "@defaultSenderSettingsTitle": {
+    "description": "Title of default sender setting screen"
+  },
+  "defaultSenderSettingsLabel": "Select the sender for new messages.",
+  "@defaultSenderSettingsLabel": {
+    "description": "Description of default sender setting screen"
+  },
+  "defaultSenderSettingsFirstAccount": "First account ({email})",
+  "@defaultSenderSettingsFirstAccount": {
+    "description": "The default sender is the one from the first account",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "email@domain.com"
+      }
+    }  
+  },
+  "defaultSenderSettingsAliasInfo": "You can set up email alias addresses in the [AS].",
+  "@defaultSenderSettingsAliasInfo": {
+    "description": "Info about that email aliases can be set up in the account settings. [AS] is the place, where defaultSenderSettingsAliasAccountSettings is included as a link."
+  },
+  "defaultSenderSettingsAliasAccountSettings": "account settings",
+  "@defaultSenderSettingsAliasAccountSettings": {
+    "description": "Text of the account settings link."
+  },
   "moveTitle": "Move message",
   "@moveTitle": {
     "description": "Title of move to mailbox dialog."

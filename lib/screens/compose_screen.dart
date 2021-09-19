@@ -70,12 +70,19 @@ class _ComposeScreenState extends State<ComposeScreen> {
             : _Autofocus.text;
     _senders = locator<MailService>().getSenders();
     final currentAccount = locator<MailService>().currentAccount!;
+    final defaultSender = locator<SettingsService>().settings.defaultSender;
     if (mb.from == null) {
-      mb.from = [currentAccount.fromAddress];
+      mb.from = [defaultSender ?? currentAccount.fromAddress];
     }
-    final senderEmail = mb.from?.first.email.toLowerCase();
-    var from = _senders
-        .firstWhereOrNull((s) => s.address.email.toLowerCase() == senderEmail);
+    Sender? from;
+    if (mb.from?.first == defaultSender) {
+      from = _senders
+          .firstWhereOrNull((sender) => sender.address == defaultSender);
+    } else {
+      final senderEmail = mb.from?.first.email.toLowerCase();
+      from = _senders.firstWhereOrNull(
+          (s) => s.address.email.toLowerCase() == senderEmail);
+    }
     if (from == null) {
       from = Sender(mb.from!.first, currentAccount);
       _senders.insert(0, from);

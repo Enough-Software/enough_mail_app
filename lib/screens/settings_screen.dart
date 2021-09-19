@@ -75,6 +75,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         .push(Routes.settingsSignature, containsModals: true);
                   },
                 ),
+                PlatformListTile(
+                  title: Text(localizations.defaultSenderSettingsTitle),
+                  onTap: () {
+                    locator<NavigationService>()
+                        .push(Routes.settingsDefaultSender);
+                  },
+                ),
                 if (!CommonPlatformIcons.isCupertino) ...{
                   PlatformListTile(
                     title: Text(localizations.settingsActionDesign),
