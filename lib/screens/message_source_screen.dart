@@ -244,11 +244,11 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     }
     final isSentFolder = source.isSent;
     final showSearchTextField =
-        CommonPlatformIcons.isCupertino && source.supportsSearching;
+        PlatformInfo.isCupertino && source.supportsSearching;
     return PlatformPageScaffold(
       bottomBar: _isInSelectionMode
           ? buildSelectionModeBottomBar(localizations)
-          : CommonPlatformIcons.isCupertino
+          : PlatformInfo.isCupertino
               ? CupertinoStatusBar(
                   info: CupertinoStatusBar.createInfo(source.description),
                   rightAction: PlatformIconButton(

@@ -36,7 +36,7 @@ class ModelBottomSheetHelper {
     );
 
     dynamic result;
-    if (CommonPlatformIcons.isCupertino) {
+    if (PlatformInfo.isCupertino) {
       result = await showCupertinoModalBottomSheet(
         context: context,
         builder: (context) => bottomSheetContent,
