@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,10 +22,10 @@ class NavigationService {
     Route route;
     if (containsModals) {
       route = MaterialWithModalsPageRoute(builder: (_) => page);
-    } else if (fade && !CommonPlatformIcons.isCupertino) {
+    } else if (fade && !PlatformInfo.isCupertino) {
       route = FadeRoute(page: page);
     } else {
-      route = CommonPlatformIcons.isCupertino
+      route = PlatformInfo.isCupertino
           ? CupertinoPageRoute(builder: (_) => page)
           : MaterialPageRoute(builder: (_) => page);
     }

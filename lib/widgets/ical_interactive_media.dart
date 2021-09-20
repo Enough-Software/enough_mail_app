@@ -429,7 +429,7 @@ extension ExtensionParticipantStatusTextStyle on ParticipantStatus {
       case ParticipantStatus.declined:
         return Icon(CommonPlatformIcons.cancel);
       case ParticipantStatus.tentative:
-        return Icon(CommonPlatformIcons.isCupertino
+        return Icon(PlatformInfo.isCupertino
             ? CupertinoIcons.question
             : Icons.question_answer);
       case ParticipantStatus.delegated:
