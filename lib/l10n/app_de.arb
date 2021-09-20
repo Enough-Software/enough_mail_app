@@ -162,6 +162,8 @@
   "accountsActionReorder": "Konten Reihenfolge ändern",
   "settingsTitle": "Einstellungen",
   "settingsSecurityBlockExternalImages": "Externe Bilder blockieren",
+  "settingsSecurityBlockExternalImagesDescriptionTitle": "Externe Bilder",
+  "settingsSecurityBlockExternalImagesDescriptionText": "E-Mail können Bilder enthalten, die entweder in der Nachricht integriert sind oder die von externen Servern bereitgestellt werden. Solche externe Bilder können Daten zu dem Absender der Nachricht freigeben, zum Beispiel dass die Nachricht geöffnet wurde. Diese Option erlaubt es solche externen Bilder zu blockieren, um solche Datenlecks zu minimieren. Beim Lesen einer E-Mail kannst für jede Nachricht individual externe Bilder nachladen.",
   "settingsActionAccounts": "Konten verwalten",
   "settingsActionDesign": "Darstellung",
   "settingsActionFeedback": "Feedback geben",

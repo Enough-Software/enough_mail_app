@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:enough_platform_widgets/platform.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
@@ -43,17 +42,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                PlatformCheckboxListTile(
-                  value: blockExternalImages,
-                  onChanged: (value) async {
-                    setState(() {
-                      blockExternalImages = value;
-                    });
-                    settings!.blockExternalImages = value;
-                    await locator<SettingsService>().save();
-                  },
-                  title:
-                      Text(localizations.settingsSecurityBlockExternalImages),
+                Row(
+                  children: [
+                    Expanded(
+                      child: PlatformCheckboxListTile(
+                        value: blockExternalImages,
+                        onChanged: (value) async {
+                          setState(() {
+                            blockExternalImages = value;
+                          });
+                          settings!.blockExternalImages = value;
+                          await locator<SettingsService>().save();
+                        },
+                        title: Text(
+                            localizations.settingsSecurityBlockExternalImages),
+                      ),
+                    ),
+                    PlatformIconButton(
+                      icon: Icon(CommonPlatformIcons.info),
+                      onPressed: () => LocalizedDialogHelper.showTextDialog(
+                        context,
+                        localizations
+                            .settingsSecurityBlockExternalImagesDescriptionTitle,
+                        localizations
+                            .settingsSecurityBlockExternalImagesDescriptionText,
+                      ),
+                    ),
+                  ],
                 ),
                 Divider(),
                 PlatformListTile(
@@ -82,7 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         .push(Routes.settingsDefaultSender);
                   },
                 ),
-                if (!CommonPlatformIcons.isCupertino) ...{
+                if (!PlatformInfo.isCupertino) ...{
                   PlatformListTile(
                     title: Text(localizations.settingsActionDesign),
                     onTap: () {

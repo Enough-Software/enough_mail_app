@@ -765,6 +765,14 @@
   "@settingsSecurityBlockExternalImages": {
     "description": "Settings option to block external options."
   },
+  "settingsSecurityBlockExternalImagesDescriptionTitle": "External images",
+  "@settingsSecurityBlockExternalImagesDescriptionTitle": {
+    "description": "Title of dialog that shows additional information about the 'block external images' option."
+  },
+  "settingsSecurityBlockExternalImagesDescriptionText": "Email messages can contain images that are either integrated or hosted on external servers. The latter, external images can expose information to the sender of the message, e.g. to let the sender know that you have opened the message. This option allows you to block such external images, which reduces the risk of exposing sensitive information. You can still opt in to load such images on a per-message-basis when you read a message.",
+  "@settingsSecurityBlockExternalImagesDescriptionText": {
+    "description": "Text of dialog that shows additional information about the 'block external images' option."
+  },
   "settingsActionAccounts": "Manage accounts",
   "@settingsActionAccounts": {
     "description": "Settings action to manage accounts."
