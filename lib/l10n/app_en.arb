@@ -773,6 +773,14 @@
   "@settingsSecurityBlockExternalImagesDescriptionText": {
     "description": "Text of dialog that shows additional information about the 'block external images' option."
   },
+  "settingsSecurityMessageRenderingHtml": "Show full message contents",
+  "@settingsSecurityMessageRenderingHtml": {
+    "description": "Option for how to render messages."
+  },
+  "settingsSecurityMessageRenderingPlainText": "Show only the text of messages",
+  "@settingsSecurityMessageRenderingPlainText": {
+    "description": "Option for how to render messages."
+  },
   "settingsActionAccounts": "Manage accounts",
   "@settingsActionAccounts": {
     "description": "Settings action to manage accounts."

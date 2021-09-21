@@ -12,22 +12,30 @@ enum ReadReceiptDisplaySetting {
 }
 
 class Settings extends SerializableObject {
+  static const _themeSettings = 'themeSettings';
+  static const _customFolderNames = 'customFolderNames';
+  static const _defaultSender = 'defaultSender';
+  static const _swipeLeftToRightAction = 'swipeLeftToRightAction';
+  static const _swipeRightToLeftAction = 'swipeRightToLeftAction';
+  static const _folderNameSetting = 'folderNameSetting';
+  static const _readReceiptDisplaySetting = 'readReceiptDisplaySetting';
+  static const _signatureActions = 'signatureActions';
   Settings() {
-    objectCreators['themeSettings'] = (map) => ThemeSettings();
-    objectCreators['customFolderNames'] = (map) => <String>[];
-    objectCreators['defaultSender'] = (map) => MailAddress.empty();
-    transformers['swipeLeftToRightAction'] = (value) =>
+    objectCreators[_themeSettings] = (map) => ThemeSettings();
+    objectCreators[_customFolderNames] = (map) => <String>[];
+    objectCreators[_defaultSender] = (map) => MailAddress.empty();
+    transformers[_swipeLeftToRightAction] = (value) =>
         value is SwipeAction ? value.index : SwipeAction.values[value];
-    transformers['swipeRightToLeftAction'] = (value) =>
+    transformers[_swipeRightToLeftAction] = (value) =>
         value is SwipeAction ? value.index : SwipeAction.values[value];
-    transformers['folderNameSetting'] = (value) => value is FolderNameSetting
+    transformers[_folderNameSetting] = (value) => value is FolderNameSetting
         ? value.index
         : FolderNameSetting.values[value];
-    transformers['readReceiptDisplaySetting'] = (value) =>
+    transformers[_readReceiptDisplaySetting] = (value) =>
         value is ReadReceiptDisplaySetting
             ? value.index
             : ReadReceiptDisplaySetting.values[value];
-    transformers['signatureActions'] = (value) =>
+    transformers[_signatureActions] = (value) =>
         value is ComposeAction ? value.index : ComposeAction.values[value];
   }
 
@@ -44,34 +52,34 @@ class Settings extends SerializableObject {
   set languageTag(String? value) => attributes['languageTag'] = value;
 
   ThemeSettings get themeSettings {
-    var themeSettings = attributes['themeSettings'];
+    var themeSettings = attributes[_themeSettings];
     if (themeSettings == null) {
       themeSettings = ThemeSettings();
-      attributes['themeSettings'] = themeSettings;
+      attributes[_themeSettings] = themeSettings;
     }
     return themeSettings;
   }
 
-  set themeSettings(ThemeSettings value) => attributes['themeSettings'] = value;
+  set themeSettings(ThemeSettings value) => attributes[_themeSettings] = value;
 
   SwipeAction get swipeLeftToRightAction =>
-      attributes['swipeLeftToRightAction'] ?? SwipeAction.markRead;
+      attributes[_swipeLeftToRightAction] ?? SwipeAction.markRead;
   set swipeLeftToRightAction(SwipeAction value) =>
-      attributes['swipeLeftToRightAction'] = value;
+      attributes[_swipeLeftToRightAction] = value;
 
   SwipeAction get swipeRightToLeftAction =>
-      attributes['swipeRightToLeftAction'] ?? SwipeAction.delete;
+      attributes[_swipeRightToLeftAction] ?? SwipeAction.delete;
   set swipeRightToLeftAction(SwipeAction value) =>
-      attributes['swipeRightToLeftAction'] = value;
+      attributes[_swipeRightToLeftAction] = value;
 
   FolderNameSetting get folderNameSetting =>
-      attributes['folderNameSetting'] ?? FolderNameSetting.localized;
+      attributes[_folderNameSetting] ?? FolderNameSetting.localized;
   set folderNameSetting(FolderNameSetting? value) =>
-      attributes['folderNameSetting'] = value;
+      attributes[_folderNameSetting] = value;
 
-  List<String>? get customFolderNames => attributes['customFolderNames'];
+  List<String>? get customFolderNames => attributes[_customFolderNames];
   set customFolderNames(List<String>? value) =>
-      attributes['customFolderNames'] = value;
+      attributes[_customFolderNames] = value;
 
   bool get enableDeveloperMode => attributes['enableDeveloperMode'] ?? false;
   set enableDeveloperMode(bool? value) =>
@@ -84,16 +92,21 @@ class Settings extends SerializableObject {
   set signaturePlain(String? value) => attributes['signaturePlain'] = value;
 
   List<ComposeAction> get signatureActions =>
-      attributes['signatureActions'] ?? [ComposeAction.newMessage];
+      attributes[_signatureActions] ?? [ComposeAction.newMessage];
   set signatureActions(List<ComposeAction> value) =>
-      attributes['signatureActions'] = value;
+      attributes[_signatureActions] = value;
 
   ReadReceiptDisplaySetting get readReceiptDisplaySetting =>
-      attributes['readReceiptDisplaySetting'] ??
+      attributes[_readReceiptDisplaySetting] ??
       ReadReceiptDisplaySetting.always;
   set readReceiptDisplaySetting(ReadReceiptDisplaySetting? value) =>
-      attributes['readReceiptDisplaySetting'] = value;
+      attributes[_readReceiptDisplaySetting] = value;
 
-  MailAddress? get defaultSender => attributes['defaultSender'];
-  set defaultSender(MailAddress? value) => attributes['defaultSender'] = value;
+  MailAddress? get defaultSender => attributes[_defaultSender];
+  set defaultSender(MailAddress? value) => attributes[_defaultSender] = value;
+
+  bool get preferPlainTextMessages =>
+      attributes['preferPlainTextMessages'] ?? false;
+  set preferPlainTextMessages(bool value) =>
+      attributes['preferPlainTextMessages'] = value;
 }

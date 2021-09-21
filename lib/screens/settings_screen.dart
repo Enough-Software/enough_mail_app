@@ -19,13 +19,15 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  Settings? settings;
-  bool? blockExternalImages;
+  late Settings _settings;
+  late bool _blockExternalImages;
+  late bool _preferPlainTextMessages;
 
   @override
   void initState() {
-    settings = locator<SettingsService>().settings;
-    blockExternalImages = settings!.blockExternalImages;
+    _settings = locator<SettingsService>().settings;
+    _blockExternalImages = _settings.blockExternalImages;
+    _preferPlainTextMessages = _settings.preferPlainTextMessages;
     super.initState();
   }
 
@@ -46,16 +48,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Expanded(
                       child: PlatformCheckboxListTile(
-                        value: blockExternalImages,
+                        value: _blockExternalImages,
                         onChanged: (value) async {
                           setState(() {
-                            blockExternalImages = value;
+                            _blockExternalImages = value ?? false;
                           });
-                          settings!.blockExternalImages = value;
+                          _settings.blockExternalImages = value;
                           await locator<SettingsService>().save();
                         },
                         title: Text(
-                            localizations.settingsSecurityBlockExternalImages),
+                          localizations.settingsSecurityBlockExternalImages,
+                        ),
                       ),
                     ),
                     PlatformIconButton(
@@ -69,6 +72,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: PlatformDropdownButton<bool>(
+                    value: _preferPlainTextMessages,
+                    onChanged: (value) async {
+                      _settings.preferPlainTextMessages = value ?? false;
+                      setState(() {
+                        _preferPlainTextMessages = value ?? false;
+                      });
+                      await locator<SettingsService>().save();
+                    },
+                    items: [
+                      DropdownMenuItem(
+                        value: false,
+                        child: Text(
+                            localizations.settingsSecurityMessageRenderingHtml),
+                      ),
+                      DropdownMenuItem(
+                        value: true,
+                        child: Text(localizations
+                            .settingsSecurityMessageRenderingPlainText),
+                      ),
+                    ],
+                  ),
                 ),
                 Divider(),
                 PlatformListTile(

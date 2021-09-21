@@ -358,6 +358,8 @@ class _MessageContentState extends State<_MessageContent> {
       onDownloaded: _onMimeMessageDownloaded,
       onError: _onMimeMessageError,
       blockExternalImages: _blockExternalImages,
+      preferPlainText:
+          locator<SettingsService>().settings.preferPlainTextMessages,
       enableDarkMode: Theme.of(context).brightness == Brightness.dark,
       mailtoDelegate: _handleMailto,
       maxImageWidth: 320,
