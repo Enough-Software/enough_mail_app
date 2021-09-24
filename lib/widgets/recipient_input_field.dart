@@ -64,7 +64,9 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
           child: Text(
             widget.labelText!,
             style: TextStyle(
-              color: _focusNode.hasFocus ? theme.accentColor : theme.hintColor,
+              color: _focusNode.hasFocus
+                  ? theme.colorScheme.secondary
+                  : theme.hintColor,
             ),
           ),
         ),

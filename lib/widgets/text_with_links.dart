@@ -27,7 +27,8 @@ class TextWithLinks extends StatelessWidget {
       return SelectableText(text, style: textStyle);
     }
     final linkStyle = textStyle.copyWith(
-        decoration: TextDecoration.underline, color: theme.accentColor);
+        decoration: TextDecoration.underline,
+        color: theme.colorScheme.secondary);
     final spans = <TextSpan>[];
     var end = 0;
     for (final match in matches) {

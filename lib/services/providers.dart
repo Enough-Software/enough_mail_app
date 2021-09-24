@@ -187,7 +187,10 @@ class GmailProvider extends Provider {
     final googleBlue = Color(0xff4285F4);
     final googleText = Color(0x89000000);
     return Theme(
-      data: ThemeData(accentColor: googleBlue, brightness: Brightness.light),
+      data: ThemeData(
+          brightness: Brightness.light,
+          colorScheme:
+              ColorScheme.fromSwatch().copyWith(secondary: googleBlue)),
       child: PlatformTextButton(
         onPressed: onPressed,
         child: Container(

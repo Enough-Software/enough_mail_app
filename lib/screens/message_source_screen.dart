@@ -437,7 +437,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                         child: Text(
                                           text,
                                           style: TextStyle(
-                                              color: theme.accentColor),
+                                            color: theme.colorScheme.secondary,
+                                          ),
                                         ),
                                       ),
                                       Divider()

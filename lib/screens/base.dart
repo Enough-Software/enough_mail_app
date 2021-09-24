@@ -11,19 +11,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import '../locator.dart';
 
 class Base {
-  static Widget onBottom(Widget child) => align(child, Alignment.bottomCenter);
-
-  static Widget onCenter(Widget child) => align(child, Alignment.center);
-
-  static Widget align(Widget child, Alignment alignment) {
-    return Positioned.fill(
-      child: Align(
-        alignment: alignment,
-        child: child,
-      ),
-    );
-  }
-
   static Widget buildAppChrome(
     BuildContext context, {
     required String? title,
