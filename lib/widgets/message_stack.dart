@@ -387,11 +387,11 @@ class _MessageDraggableState extends State<MessageDraggable>
           child: MessageCard(message: widget.message, angle: widget.angle),
           childWhenDragging: Container(),
           maxSimultaneousDrags: 1,
-          dragAnchor: DragAnchor.child,
           onDragStarted: () {
             animationController.reset();
             animationController.forward();
           },
+          dragAnchorStrategy: childDragAnchorStrategy,
         );
       },
     );
@@ -496,7 +496,6 @@ class _MessageCardState extends State<MessageCard> {
               case ConnectionState.waiting:
               case ConnectionState.active:
                 return Container(child: PlatformProgressIndicator());
-                break;
               case ConnectionState.done:
                 if (snapshot.hasError) {
                   return Text('Unable to download message');

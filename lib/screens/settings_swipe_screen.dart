@@ -138,7 +138,7 @@ class _SwipeSettingState extends State<_SwipeSetting> {
                             ),
                             child: Icon(
                               Icons.check,
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                         ),

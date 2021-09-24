@@ -36,7 +36,7 @@ class SourceCodeScreen extends StatelessWidget {
               SelectableText('BODY: ${mimeMessage!.body}'),
             },
             Divider(
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).colorScheme.secondary,
               thickness: 1,
               height: 16,
             ),
