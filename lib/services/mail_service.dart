@@ -600,6 +600,7 @@ class MailService {
     return MailClient(
       mailAccount,
       isLogEnabled: isLogEnabled,
+      logName: mailAccount.name,
       eventBus: AppEventBus.eventBus,
       clientId: _clientId,
       refresh: _refreshToken,
