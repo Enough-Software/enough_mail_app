@@ -219,8 +219,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         _progressedSteps = _stepAccountSetup;
       });
     } else {
+      final domainName = email.substring(email.lastIndexOf('@') + 1);
       final mailAccount = MailAccount.fromDiscoveredSettingsWithAuth(
-        email,
+        domainName,
         email,
         OauthAuthentication(email, token),
         provider.clientConfig,
