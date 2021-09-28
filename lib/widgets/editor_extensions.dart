@@ -81,7 +81,6 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
       UnicodeFont.underlinedSingle: localizations.fontUnderlinedSingle,
       UnicodeFont.underlinedDouble: localizations.fontUnderlinedDouble,
       UnicodeFont.strikethroughSingle: localizations.fontStrikethroughSingle,
-      UnicodeFont.crosshatch: localizations.fontCrosshatch,
     };
     final captionStyle = Theme.of(context).textTheme.caption;
     return SingleChildScrollView(

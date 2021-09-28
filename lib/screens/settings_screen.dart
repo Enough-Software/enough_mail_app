@@ -152,6 +152,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         .push(Routes.settingsReadReceipts);
                   },
                 ),
+                PlatformListTile(
+                  title: Text(localizations.replySettingsTitle),
+                  onTap: () {
+                    locator<NavigationService>()
+                        .push(Routes.settingsReplyFormat);
+                  },
+                ),
                 Divider(),
                 PlatformListTile(
                   title: Text(localizations.settingsActionFeedback),

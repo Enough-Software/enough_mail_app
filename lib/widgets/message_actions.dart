@@ -1,6 +1,7 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
+import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
@@ -9,6 +10,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
@@ -312,11 +314,13 @@ class _MessageActionsState extends State<MessageActions> {
     final account = widget.message.mailClient.account;
 
     final builder = MessageBuilder.prepareReplyToMessage(
-        widget.message.mimeMessage!, account.fromAddress,
-        aliases: account.aliases,
-        quoteOriginalText: false,
-        handlePlusAliases: account.supportsPlusAliases,
-        replyAll: all);
+      widget.message.mimeMessage!,
+      account.fromAddress,
+      aliases: account.aliases,
+      quoteOriginalText: false,
+      handlePlusAliases: account.supportsPlusAliases,
+      replyAll: all,
+    );
     _navigateToCompose(widget.message, builder, ComposeAction.answer);
   }
 
@@ -556,7 +560,37 @@ class _MessageActionsState extends State<MessageActions> {
   void _navigateToCompose(
       Message? message, MessageBuilder builder, ComposeAction action,
       [Future? composeFuture]) {
-    final data = ComposeData([message], builder, action, future: composeFuture);
+    final formatPreference =
+        locator<SettingsService>().settings.replyFormatPreference;
+    ComposeMode mode;
+    switch (formatPreference) {
+      case ReplyFormatPreference.alwaysHtml:
+        mode = ComposeMode.html;
+        break;
+      case ReplyFormatPreference.sameFormat:
+        if (message == null) {
+          mode = ComposeMode.html;
+        } else if (message.mimeMessage?.hasPart(MediaSubtype.textHtml) ??
+            false) {
+          mode = ComposeMode.html;
+        } else if (message.mimeMessage?.hasPart(MediaSubtype.textPlain) ??
+            false) {
+          mode = ComposeMode.plainText;
+        } else {
+          mode = ComposeMode.html;
+        }
+        break;
+      case ReplyFormatPreference.alwaysPlainText:
+        mode = ComposeMode.plainText;
+        break;
+    }
+    final data = ComposeData(
+      [message],
+      builder,
+      action,
+      future: composeFuture,
+      composeMode: mode,
+    );
     locator<NavigationService>()
         .push(Routes.mailCompose, arguments: data, replace: true);
   }

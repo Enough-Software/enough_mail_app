@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+60
+version: 1.0.0+63
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -37,6 +37,10 @@ dependencies:
     git:
       url: https://github.com/Enough-Software/enough_html_editor.git
     # path: ../enough_html_editor
+  enough_text_editor: #^0.0.3
+    git:
+      url: https://github.com/Enough-Software/enough_text_editor.git
+    #path: ../enough_text_editor
   enough_icalendar: #^0.5.0
     git:
       url: https://github.com/Enough-Software/enough_icalendar.git
@@ -53,7 +57,9 @@ dependencies:
     # git:
     #   url: https://github.com/Enough-Software/enough_serialization.git
     #path: ../enough_serialization
-  enough_ascii_art: ^1.0.0
+  enough_ascii_art: #^1.0.0
+    git:
+      url: https://github.com/Enough-Software/enough_ascii_art.git
   enough_giphy_flutter:
     git:
       url: https://github.com/Enough-Software/enough_giphy_flutter.git
