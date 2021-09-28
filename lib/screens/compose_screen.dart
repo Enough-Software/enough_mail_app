@@ -20,6 +20,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:enough_text_editor/enough_text_editor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -35,7 +36,13 @@ class ComposeScreen extends StatefulWidget {
   _ComposeScreenState createState() => _ComposeScreenState();
 }
 
-enum _OverflowMenuChoice { showSourceCode, saveAsDraft, requestReadReceipt }
+enum _OverflowMenuChoice {
+  showSourceCode,
+  saveAsDraft,
+  requestReadReceipt,
+  convertToPlainTextEditor,
+  convertToHtmlEditor
+}
 enum _Autofocus { to, subject, text }
 
 class _ComposeScreenState extends State<ComposeScreen> {
@@ -43,20 +50,25 @@ class _ComposeScreenState extends State<ComposeScreen> {
   late List<MailAddress> _ccRecipients;
   late List<MailAddress> _bccRecipients;
   TextEditingController _subjectController = TextEditingController();
+  TextEditingController _plainTextController = TextEditingController();
   late Sender _from;
   late List<Sender> _senders;
   _Autofocus? _focus;
   bool _isCcBccVisible = false;
   TransferEncoding? _usedTextEncoding;
-  Future<String>? loadMailTextFuture;
-  HtmlEditorApi? _editorApi;
+  Future<String>? _loadMailTextFuture;
+  HtmlEditorApi? _htmlEditorApi;
   Future? _downloadAttachmentsFuture;
   ComposeData? _resumeComposeData;
   bool _isReadReceiptRequested = false;
+  late ComposeMode _composeMode;
+
+  TextEditorApi? _plainTextEditorApi;
 
   @override
   void initState() {
     locator<AppService>().onSharedData = _onSharedData;
+    _composeMode = widget.data.composeMode;
     final mb = widget.data.messageBuilder;
     _toRecipients = mb.to ?? [];
     _ccRecipients = mb.cc ?? [];
@@ -89,10 +101,10 @@ class _ComposeScreenState extends State<ComposeScreen> {
     }
     _from = from;
     _checkAccountContactManager(_from.account);
-    if (widget.data.resumeHtmlText != null) {
-      loadMailTextFuture = _loadMailTextFromComposeData();
+    if (widget.data.resumeText != null) {
+      _loadMailTextFuture = _loadMailTextFromComposeData();
     } else {
-      loadMailTextFuture = _loadMailTextFromMessage();
+      _loadMailTextFuture = _loadMailTextFromMessage();
     }
     final future = widget.data.future;
     if (future != null) {
@@ -109,12 +121,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
   @override
   void dispose() {
     _subjectController.dispose();
+    _plainTextController.dispose();
     locator<AppService>().onSharedData = null;
     super.dispose();
   }
 
   Future<String> _loadMailTextFromComposeData() {
-    return Future.value(widget.data.resumeHtmlText);
+    return Future.value(widget.data.resumeText);
   }
 
   String get _signature => locator<SettingsService>()
@@ -124,8 +137,12 @@ class _ComposeScreenState extends State<ComposeScreen> {
     // find out signature:
     final mb = widget.data.messageBuilder;
     if (mb.originalMessage == null) {
-      final html = '<p>${mb.text ?? '&nbsp;'}</p>$_signature';
-      return html;
+      if (_composeMode == ComposeMode.html) {
+        final html = '<p>${mb.text ?? '&nbsp;'}</p>$_signature';
+        return html;
+      } else {
+        return '${mb.text ?? ''}\n$_signature';
+      }
     } else {
       final blockExternalImages = false;
       final emptyMessageText =
@@ -133,20 +150,40 @@ class _ComposeScreenState extends State<ComposeScreen> {
       final maxImageWidth = 300;
       if (widget.data.action == ComposeAction.newMessage) {
         // continue with draft:
-        final args = _HtmlGenerationArguments(null, mb.originalMessage,
-            blockExternalImages, emptyMessageText, maxImageWidth);
-        final html = await compute(_generateDraftHtmlImpl, args) + _signature;
-        return html;
+        if (_composeMode == ComposeMode.html) {
+          final args = _HtmlGenerationArguments(null, mb.originalMessage,
+              blockExternalImages, emptyMessageText, maxImageWidth);
+          final html = await compute(_generateDraftHtmlImpl, args) + _signature;
+          return html;
+        } else {
+          final text =
+              '${mb.originalMessage?.decodeTextPlainPart() ?? emptyMessageText}\n$_signature';
+          return text;
+        }
       }
+
+      //TODO localize quote templates
       final quoteTemplate = widget.data.action == ComposeAction.answer
           ? MailConventions.defaultReplyHeaderTemplate
           : widget.data.action == ComposeAction.forward
               ? MailConventions.defaultForwardHeaderTemplate
               : MailConventions.defaultReplyHeaderTemplate;
-      final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
-          blockExternalImages, emptyMessageText, maxImageWidth);
-      final html = await compute(_generateQuoteHtmlImpl, args) + _signature;
-      return html;
+      if (_composeMode == ComposeMode.html) {
+        final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
+            blockExternalImages, emptyMessageText, maxImageWidth);
+        final html = await compute(_generateQuoteHtmlImpl, args) + _signature;
+        return html;
+      } else {
+        final original = mb.originalMessage;
+        if (original != null) {
+          final header = MessageBuilder.fillTemplate(quoteTemplate, original);
+          final plainText = original.decodeTextPlainPart() ?? emptyMessageText;
+          final text = MessageBuilder.quotePlainText(header, plainText);
+          return '$text\n$_signature';
+        } else {
+          return '\n$_signature';
+        }
+      }
     }
   }
 
@@ -169,42 +206,61 @@ class _ComposeScreenState extends State<ComposeScreen> {
   }
 
   Future<void> _populateMessageBuilder(
-      {bool storeHtmlForResume = false}) async {
+      {bool storeComposeDataForResume = false}) async {
     final mb = widget.data.messageBuilder;
     mb.to = _toRecipients;
     mb.cc = _ccRecipients;
     mb.bcc = _bccRecipients;
     mb.subject = _subjectController.text;
 
-    final htmlText = await _editorApi!.getText();
-    _resumeComposeData = widget.data.resume(htmlText);
-    if (storeHtmlForResume) {
+    final text = _composeMode == ComposeMode.html
+        ? await _htmlEditorApi!.getText()
+        : _plainTextController.text;
+    _resumeComposeData = widget.data.resume(text, composeMode: _composeMode);
+    if (storeComposeDataForResume) {
       return;
     } else {
-      final plainText = HtmlToPlainTextConverter.convert(htmlText);
+      if (_composeMode == ComposeMode.plainText) {
+        // create a plain text mail
+        if (mb.hasAttachments) {
+          final builder = mb.getTextPlainPart();
+          if (builder != null) {
+            builder.text = text;
+          } else {
+            mb.addTextPlain(text);
+          }
+        } else {
+          mb.text = text;
+          mb.setContentType(MediaType.textPlain);
+        }
+      } else {
+        // create a normal mail with an HTML and a plain text part:
+        final plainText = _convertToPlainText(text);
 
-      final textPartBuilder = mb.hasAttachments
-          ? mb.getPart(MediaSubtype.multipartAlternative, recursive: false) ??
-              mb.addPart(
-                  mediaSubtype: MediaSubtype.multipartAlternative, insert: true)
-          : mb;
-      if (!mb.hasAttachments) {
-        mb.setContentType(
-            MediaType.fromSubtype(MediaSubtype.multipartAlternative));
-      }
-      final plainTextBuilder = textPartBuilder.getTextPlainPart();
-      if (plainTextBuilder != null) {
-        plainTextBuilder.text = plainText;
-      } else {
-        textPartBuilder.addTextPlain(plainText);
-      }
-      final fullHtmlMessageText =
-          await _editorApi!.getFullHtml(content: htmlText);
-      final htmlTextBuilder = textPartBuilder.getTextHtmlPart();
-      if (htmlTextBuilder != null) {
-        htmlTextBuilder.text = fullHtmlMessageText;
-      } else {
-        textPartBuilder.addTextHtml(fullHtmlMessageText);
+        final multipartAlternativeBuilder = mb.hasAttachments
+            ? mb.getPart(MediaSubtype.multipartAlternative, recursive: false) ??
+                mb.addPart(
+                    mediaSubtype: MediaSubtype.multipartAlternative,
+                    insert: true)
+            : mb;
+        if (!mb.hasAttachments) {
+          mb.setContentType(
+              MediaType.fromSubtype(MediaSubtype.multipartAlternative));
+        }
+        final plainTextBuilder = multipartAlternativeBuilder.getTextPlainPart();
+        if (plainTextBuilder != null) {
+          plainTextBuilder.text = plainText;
+        } else {
+          multipartAlternativeBuilder.addTextPlain(plainText);
+        }
+        final fullHtmlMessageText =
+            await _htmlEditorApi!.getFullHtml(content: text);
+        final htmlTextBuilder = multipartAlternativeBuilder.getTextHtmlPart();
+        if (htmlTextBuilder != null) {
+          htmlTextBuilder.text = fullHtmlMessageText;
+        } else {
+          multipartAlternativeBuilder.addTextHtml(fullHtmlMessageText);
+        }
       }
     }
   }
@@ -318,10 +374,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
     return WillPopScope(
       onWillPop: () async {
         // let it pop but show snackbar to return:
-        await _populateMessageBuilder(storeHtmlForResume: true);
+        await _populateMessageBuilder(storeComposeDataForResume: true);
         locator<ScaffoldMessengerService>().showTextSnackBar(
-            localizations.composeLeftByMistake,
-            undo: _returnToCompose);
+          localizations.composeLeftByMistake,
+          undo: _returnToCompose,
+        );
         return true;
       },
       child: MessageWidget(
@@ -357,6 +414,12 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         case _OverflowMenuChoice.requestReadReceipt:
                           _requestReadReceipt();
                           break;
+                        case _OverflowMenuChoice.convertToPlainTextEditor:
+                          _convertoPlainTextEditor();
+                          break;
+                        case _OverflowMenuChoice.convertToHtmlEditor:
+                          _convertToHtmlEditor();
+                          break;
                       }
                     },
                     itemBuilder: (context) => [
@@ -369,6 +432,19 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         child:
                             Text(localizations.composeRequestReadReceiptAction),
                       ),
+                      if (_composeMode == ComposeMode.html) ...{
+                        PlatformPopupMenuItem<_OverflowMenuChoice>(
+                          value: _OverflowMenuChoice.convertToPlainTextEditor,
+                          child: Text(localizations
+                              .composeConvertToPlainTextEditorAction),
+                        ),
+                      } else ...{
+                        PlatformPopupMenuItem<_OverflowMenuChoice>(
+                          value: _OverflowMenuChoice.convertToHtmlEditor,
+                          child: Text(
+                              localizations.composeConvertToHtmlEditorAction),
+                        ),
+                      },
                       if (locator<SettingsService>()
                           .settings
                           .enableDeveloperMode) ...{
@@ -410,7 +486,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           _from = s;
                           final newSignature = _signature;
                           if (newSignature != lastSignature) {
-                            _editorApi!.replaceAll(lastSignature, newSignature);
+                            _htmlEditorApi!
+                                .replaceAll(lastSignature, newSignature);
                           }
                           if (_isReadReceiptRequested) {
                             builder.requestReadReceipt(
@@ -450,7 +527,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           hintText: localizations.composeRecipientHint,
                         ),
                       },
-                      DecoratedPlatformTextField(
+                      TextEditor(
                         controller: _subjectController,
                         autofocus: _focus == _Autofocus.subject,
                         decoration: InputDecoration(
@@ -487,15 +564,21 @@ class _ComposeScreenState extends State<ComposeScreen> {
                   ),
                 ),
               },
-              if (_editorApi != null) ...{
+              if (_composeMode == ComposeMode.html &&
+                  _htmlEditorApi != null) ...{
                 SliverHeaderHtmlEditorControls(
-                  editorApi: _editorApi,
-                  suffix: EditorArtExtensionButton(editorApi: _editorApi!),
+                  editorApi: _htmlEditorApi,
+                  suffix: EditorArtExtensionButton(editorApi: _htmlEditorApi!),
+                ),
+              } else if (_composeMode == ComposeMode.plainText &&
+                  _plainTextEditorApi != null) ...{
+                SliverHeaderTextEditorControls(
+                  editorApi: _plainTextEditorApi,
                 ),
               },
               SliverToBoxAdapter(
                 child: FutureBuilder<String>(
-                  future: loadMailTextFuture,
+                  future: _loadMailTextFuture,
                   builder: (widget, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.none:
@@ -503,16 +586,34 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       case ConnectionState.active:
                         return Center(child: PlatformProgressIndicator());
                       case ConnectionState.done:
-                        final text = snapshot.data ?? '<p></p>';
-                        return HtmlEditor(
-                          onCreated: (api) {
-                            setState(() {
-                              _editorApi = api;
-                            });
-                          },
-                          initialContent: text,
-                          minHeight: 400,
-                        );
+                        if (_composeMode == ComposeMode.html) {
+                          final text = snapshot.data ?? '<p></p>';
+                          return HtmlEditor(
+                            onCreated: (api) {
+                              setState(() {
+                                _htmlEditorApi = api;
+                              });
+                            },
+                            initialContent: text,
+                            minHeight: 400,
+                          );
+                        } else {
+                          // compose mode is plainText
+                          _plainTextController.text = snapshot.data ?? '';
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextEditor(
+                              controller: _plainTextController,
+                              minLines: 10,
+                              maxLines: null,
+                              onCreated: (api) {
+                                setState(() {
+                                  _plainTextEditorApi = api;
+                                });
+                              },
+                            ),
+                          );
+                        }
                     }
                   },
                 ),
@@ -584,6 +685,22 @@ class _ComposeScreenState extends State<ComposeScreen> {
     });
   }
 
+  void _convertoPlainTextEditor() async {
+    final future = _htmlEditorApi!.getText();
+    setState(() {
+      _loadMailTextFuture = future.then((value) => _convertToPlainText(value));
+      _composeMode = ComposeMode.plainText;
+    });
+  }
+
+  void _convertToHtmlEditor() {
+    final text = _plainTextController.text.replaceAll('\n', '<br/>');
+    setState(() {
+      _loadMailTextFuture = Future.value('<p>$text</p>');
+      _composeMode = ComposeMode.html;
+    });
+  }
+
   void _removeReadReceiptRequest() {
     widget.data.messageBuilder.removeReadReceiptRequest();
     setState(() {
@@ -609,7 +726,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     if (firstData is SharedMailto) {
       //TODO add the recipients, set the subject, set the text?
     } else {
-      final api = _editorApi;
+      final api = _htmlEditorApi;
       if (api != null) {
         for (final data in sharedData) {
           data.addToMessageBuilder(widget.data.messageBuilder);
@@ -619,6 +736,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
     }
     return Future.value();
   }
+
+  _convertToPlainText(String htmlText) =>
+      HtmlToPlainTextConverter.convert(htmlText);
 }
 
 class _HtmlGenerationArguments {

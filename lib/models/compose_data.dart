@@ -3,6 +3,8 @@ import 'message.dart';
 
 enum ComposeAction { answer, forward, newMessage }
 
+enum ComposeMode { plainText, html }
+
 typedef void MessageFinalizer(MessageBuilder messageBuilder);
 
 class ComposeData {
@@ -11,16 +13,26 @@ class ComposeData {
   final List<Message?>? originalMessages;
   final MessageBuilder messageBuilder;
   final ComposeAction action;
-  final String? resumeHtmlText;
+  final String? resumeText;
   final Future? future;
+  final ComposeMode composeMode;
   List<MessageFinalizer>? finalizers;
 
-  ComposeData(this.originalMessages, this.messageBuilder, this.action,
-      {this.resumeHtmlText, this.future, this.finalizers});
+  ComposeData(
+    this.originalMessages,
+    this.messageBuilder,
+    this.action, {
+    this.resumeText,
+    this.future,
+    this.finalizers,
+    this.composeMode = ComposeMode.html,
+  });
 
-  ComposeData resume(String htmlText) {
+  ComposeData resume(String text, {ComposeMode? composeMode}) {
     return ComposeData(originalMessages, messageBuilder, action,
-        resumeHtmlText: htmlText, finalizers: finalizers);
+        resumeText: text,
+        finalizers: finalizers,
+        composeMode: composeMode ?? this.composeMode);
   }
 
   /// Adds a finalizer

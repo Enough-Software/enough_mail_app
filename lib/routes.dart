@@ -24,6 +24,7 @@ class Routes {
   static const String settingsSwipe = '/settings/swipe';
   static const String settingsSignature = '/settingsSignature';
   static const String settingsDefaultSender = '/settingsDefaultSender';
+  static const String settingsReplyFormat = '/settingsReplyFormat';
   static const String messageSource = '/messageSource';
   static const String mailDetails = '/mailDetails';
   static const String mailContents = '/mailContents';
@@ -85,6 +86,9 @@ class AppRouter {
         break;
       case Routes.settingsDefaultSender:
         page = SettingsDefaultSenderScreen();
+        break;
+      case Routes.settingsReplyFormat:
+        page = SettingsReplyScreen();
         break;
       case Routes.messageSource:
         page = MessageSourceScreen(messageSource: arguments as MessageSource);

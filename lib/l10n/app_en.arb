@@ -1518,6 +1518,14 @@
       }
     }  
   },
+  "composeConvertToPlainTextEditorAction": "Convert to plain text",
+  "@composeConvertToPlainTextEditorAction": {
+    "description": "Action to write a plain text message instead of an html message"
+  },
+  "composeConvertToHtmlEditorAction": "Convert to rich message (HTML)",
+  "@composeConvertToHtmlEditorAction": {
+    "description": "Action to write a HTML message instead of a text message"
+  },
   "composeContinueEditingAction": "Continue editing",
   "@composeContinueEditingAction": {
     "description": "Action to return to compose screen when draft cannot be saved"
@@ -1691,6 +1699,26 @@
   "defaultSenderSettingsAliasAccountSettings": "account settings",
   "@defaultSenderSettingsAliasAccountSettings": {
     "description": "Text of the account settings link."
+  },
+  "replySettingsTitle": "Message format",
+  "@replySettingsTitle": {
+    "description": "Reply settings title."
+  },
+  "replySettingsIntro": "In what format do you want to answer or forward email by default?",
+  "@replySettingsIntro": {
+    "description": "Reply settings introduction text."
+  },
+  "replySettingsFormatHtml": "Always rich format (HTML)",
+  "@replySettingsFormatHtml": {
+    "description": "Reply settings option."
+  },
+  "replySettingsFormatSameAsOriginal": "Use same format as originating email",
+  "@replySettingsFormatSameAsOriginal": {
+    "description": "Reply settings option."
+  },
+  "replySettingsFormatPlainText": "Always text-only",
+  "@replySettingsFormatPlainText": {
+    "description": "Reply settings option."
   },
   "moveTitle": "Move message",
   "@moveTitle": {

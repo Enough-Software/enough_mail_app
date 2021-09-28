@@ -11,6 +11,8 @@ enum ReadReceiptDisplaySetting {
   never, // forContacts
 }
 
+enum ReplyFormatPreference { alwaysHtml, sameFormat, alwaysPlainText }
+
 class Settings extends SerializableObject {
   static const _themeSettings = 'themeSettings';
   static const _customFolderNames = 'customFolderNames';
@@ -20,6 +22,7 @@ class Settings extends SerializableObject {
   static const _folderNameSetting = 'folderNameSetting';
   static const _readReceiptDisplaySetting = 'readReceiptDisplaySetting';
   static const _signatureActions = 'signatureActions';
+  static const _replyFormatPreference = 'replyFormatPreference';
   Settings() {
     objectCreators[_themeSettings] = (map) => ThemeSettings();
     objectCreators[_customFolderNames] = (map) => <String>[];
@@ -37,6 +40,10 @@ class Settings extends SerializableObject {
             : ReadReceiptDisplaySetting.values[value];
     transformers[_signatureActions] = (value) =>
         value is ComposeAction ? value.index : ComposeAction.values[value];
+    transformers[_replyFormatPreference] = (value) =>
+        value is ReplyFormatPreference
+            ? value.index
+            : ReplyFormatPreference.values[value];
   }
 
   bool get blockExternalImages => attributes['blockExternalImages'] ?? false;
@@ -109,4 +116,9 @@ class Settings extends SerializableObject {
       attributes['preferPlainTextMessages'] ?? false;
   set preferPlainTextMessages(bool value) =>
       attributes['preferPlainTextMessages'] = value;
+
+  ReplyFormatPreference get replyFormatPreference =>
+      attributes[_replyFormatPreference] ?? ReplyFormatPreference.alwaysHtml;
+  set replyFormatPreference(ReplyFormatPreference value) =>
+      attributes[_replyFormatPreference] = value;
 }
