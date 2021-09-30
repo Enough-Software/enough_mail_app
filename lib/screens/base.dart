@@ -62,6 +62,7 @@ class Base {
         elevation: 0,
       ),
       cupertino: (context, platform) => CupertinoNavigationBarData(
+        transitionBetweenRoutes: false,
         trailing: floatingActionButton == null
             ? null
             : CupertinoButton(
