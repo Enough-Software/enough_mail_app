@@ -98,9 +98,8 @@ class WelcomeScreen extends StatelessWidget {
             interval: const Duration(seconds: 6),
             child: PlatformFilledButtonIcon(
               icon: Icon(locator<IconService>().email),
-              label: Expanded(
-                child: Center(
-                    child: PlatformText(localizations.welcomeActionSignIn)),
+              label: Center(
+                child: PlatformText(localizations.welcomeActionSignIn),
               ),
               onPressed: () {
                 locator<NavigationService>()
