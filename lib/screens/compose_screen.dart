@@ -685,7 +685,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     });
   }
 
-  void _convertoPlainTextEditor() async {
+  void _convertoPlainTextEditor() {
     final future = _htmlEditorApi!.getText();
     setState(() {
       _loadMailTextFuture = future.then((value) => _convertToPlainText(value));
