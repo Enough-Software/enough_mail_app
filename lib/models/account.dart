@@ -14,6 +14,7 @@ class Account extends ChangeNotifier {
   static const String attributeSentMailAddedAutomatically = 'sendMailAdded';
   static const String attributeSignatureHtml = 'signatureHtml';
   static const String attributeSignaturePlain = 'signaturePlain';
+  static const String attributeBccMyself = 'bccMyself';
 
   final MailAccount account;
 
@@ -97,6 +98,15 @@ class Account extends ChangeNotifier {
   set supportsPlusAliases(bool value) {
     account.supportsPlusAliases = value;
     notifyListeners();
+  }
+
+  bool get bccMyself => account.hasAttribute(attributeBccMyself);
+  set bccMyself(bool value) {
+    if (value) {
+      account.attributes[attributeBccMyself] = value;
+    } else {
+      account.attributes.remove(attributeBccMyself);
+    }
   }
 
   ContactManager? contactManager;

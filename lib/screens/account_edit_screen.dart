@@ -192,6 +192,33 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   }
                 },
               ),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: PlatformCheckboxListTile(
+                      value: widget.account.bccMyself,
+                      onChanged: (value) async {
+                        final bccMyself = (value == true);
+                        widget.account.bccMyself = bccMyself;
+                        setState(() {});
+                        await locator<MailService>()
+                            .saveAccount(widget.account.account);
+                      },
+                      title: Text(localizations.editAccountBccMyself),
+                    ),
+                  ),
+                  PlatformIconButton(
+                    icon: Icon(CommonPlatformIcons.info),
+                    onPressed: () => LocalizedDialogHelper.showTextDialog(
+                      context,
+                      localizations.editAccountBccMyselfDescriptionTitle,
+                      localizations.editAccountBccMyselfDescriptionText,
+                    ),
+                  ),
+                ],
+              ),
+
               Divider(),
               PlatformTextButtonIcon(
                 onPressed: () => locator<NavigationService>().push(
