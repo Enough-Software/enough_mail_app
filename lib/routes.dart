@@ -36,7 +36,6 @@ class Routes {
   static const String sourceCode = '/sourceCode';
   static const String webview = '/webview';
   static const String appDrawer = '/appDrawer';
-  static const String search = '/search';
 }
 
 class AppRouter {
@@ -132,11 +131,6 @@ class AppRouter {
         break;
       case Routes.appDrawer:
         page = AppDrawer();
-        break;
-      case Routes.search:
-        page = SearchScreen(
-          messageSource: arguments as MessageSource,
-        );
         break;
       default:
         print('Unknown route: $name');

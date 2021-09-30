@@ -370,7 +370,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                       horizontal: 8.0,
                                       vertical: 4.0,
                                     ),
-                                    child: SearchTextField(
+                                    child: CupertinoSearch(
                                       messageSource: source,
                                     ),
                                   );
