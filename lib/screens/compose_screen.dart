@@ -55,7 +55,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
   late List<Sender> _senders;
   _Autofocus? _focus;
   bool _isCcBccVisible = false;
-  TransferEncoding? _usedTextEncoding;
   Future<String>? _loadMailTextFuture;
   HtmlEditorApi? _htmlEditorApi;
   Future? _downloadAttachmentsFuture;
@@ -269,7 +268,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
     await _populateMessageBuilder();
     widget.data.finalize();
     final mb = widget.data.messageBuilder;
-    _usedTextEncoding = TransferEncoding.automatic;
     final mimeMessage = mb.buildMimeMessage();
     return mimeMessage;
   }
@@ -296,12 +294,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
     final mimeMessage = await _buildMimeMessage(mailClient);
     try {
       final append = !_from.account.addsSentMailAutomatically;
-      final use8Bit = (_usedTextEncoding == TransferEncoding.eightBit);
       await mailClient.sendMessage(
         mimeMessage,
         from: _from.account.fromAddress,
         appendToSent: append,
-        use8BitEncoding: use8Bit,
+        use8BitEncoding: false,
       );
       locator<ScaffoldMessengerService>()
           .showTextSnackBar(localizations.composeMailSendSuccess);
