@@ -23,6 +23,7 @@ class Settings extends SerializableObject {
   static const _readReceiptDisplaySetting = 'readReceiptDisplaySetting';
   static const _signatureActions = 'signatureActions';
   static const _replyFormatPreference = 'replyFormatPreference';
+
   Settings() {
     objectCreators[_themeSettings] = (map) => ThemeSettings();
     objectCreators[_customFolderNames] = (map) => <String>[];

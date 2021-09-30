@@ -1194,6 +1194,18 @@
   "@editAccountCheckPlusAliasAction": {
     "description": "Button text for testing of + aliases are supported by this account."
   },
+  "editAccountBccMyself": "BCC myself",
+  "@editAccountBccMyself": {
+    "description": "Label of checkbox to enable the BCC-MYSELF-Feature."
+  },
+  "editAccountBccMyselfDescriptionTitle": "BCC myself",
+  "@editAccountBccMyselfDescriptionTitle": {
+    "description": "Title of alert explaining the BCC-MYSELF-Feature."
+  },
+  "editAccountBccMyselfDescriptionText": "You can automatically send messages to yourself for every message you send from this account with the \"BCC myself\" feature. Usually this is not required and wanted as all outgoing messages are stored in the \"Sent\" folder anyhow.",
+  "@editAccountBccMyselfDescriptionText": {
+    "description": "Explanation of the the BCC-MYSELF-Feature."
+  },
   "editAccountServerSettingsAction": "Edit server settings",
   "@editAccountServerSettingsAction": {
     "description": "Button text for editing the server settingg of  this account."

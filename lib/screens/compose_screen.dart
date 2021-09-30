@@ -268,6 +268,18 @@ class _ComposeScreenState extends State<ComposeScreen> {
     await _populateMessageBuilder();
     widget.data.finalize();
     final mb = widget.data.messageBuilder;
+    if (mailClient.account.hasAttribute(Account.attributeBccMyself)) {
+      final myAddress = mailClient.account.fromAddress;
+      final myEmail = myAddress.email;
+      final bcc = mb.bcc;
+      if (bcc == null || !bcc.any((address) => address.email == myEmail)) {
+        if (bcc == null) {
+          mb.bcc = [myAddress];
+        } else {
+          bcc.add(myAddress);
+        }
+      }
+    }
     final mimeMessage = mb.buildMimeMessage();
     return mimeMessage;
   }
