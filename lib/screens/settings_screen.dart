@@ -2,35 +2,14 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 import '../routes.dart';
 import 'base.dart';
 
-class SettingsScreen extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _SettingsScreenState();
-  }
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  late Settings _settings;
-  late bool _blockExternalImages;
-  late bool _preferPlainTextMessages;
-
-  @override
-  void initState() {
-    _settings = locator<SettingsService>().settings;
-    _blockExternalImages = _settings.blockExternalImages;
-    _preferPlainTextMessages = _settings.preferPlainTextMessages;
-    super.initState();
-  }
-
+class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -44,61 +23,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: PlatformCheckboxListTile(
-                        value: _blockExternalImages,
-                        onChanged: (value) async {
-                          setState(() {
-                            _blockExternalImages = value ?? false;
-                          });
-                          _settings.blockExternalImages = value;
-                          await locator<SettingsService>().save();
-                        },
-                        title: Text(
-                          localizations.settingsSecurityBlockExternalImages,
-                        ),
-                      ),
-                    ),
-                    PlatformIconButton(
-                      icon: Icon(CommonPlatformIcons.info),
-                      onPressed: () => LocalizedDialogHelper.showTextDialog(
-                        context,
-                        localizations
-                            .settingsSecurityBlockExternalImagesDescriptionTitle,
-                        localizations
-                            .settingsSecurityBlockExternalImagesDescriptionText,
-                      ),
-                    ),
-                  ],
+                PlatformListTile(
+                  title: Text(localizations.securitySettingsTitle),
+                  onTap: () {
+                    locator<NavigationService>().push(Routes.settingsSecurity);
+                  },
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: PlatformDropdownButton<bool>(
-                    value: _preferPlainTextMessages,
-                    onChanged: (value) async {
-                      _settings.preferPlainTextMessages = value ?? false;
-                      setState(() {
-                        _preferPlainTextMessages = value ?? false;
-                      });
-                      await locator<SettingsService>().save();
-                    },
-                    items: [
-                      DropdownMenuItem(
-                        value: false,
-                        child: Text(
-                            localizations.settingsSecurityMessageRenderingHtml),
-                      ),
-                      DropdownMenuItem(
-                        value: true,
-                        child: Text(localizations
-                            .settingsSecurityMessageRenderingPlainText),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(),
                 PlatformListTile(
                   title: Text(localizations.settingsActionAccounts),
                   onTap: () {

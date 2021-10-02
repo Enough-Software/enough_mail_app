@@ -9,6 +9,8 @@ class NavigationService {
       new GlobalKey<NavigatorState>();
 
   BuildContext? get currentContext => navigatorKey.currentContext;
+  String? get currentRouteName => _currentRouteName;
+  String? _currentRouteName;
 
   Future<dynamic> push(
     String routeName, {
@@ -18,6 +20,7 @@ class NavigationService {
     bool clear = false,
     bool containsModals = false,
   }) {
+    _currentRouteName = routeName;
     final page = AppRouter.generatePage(routeName, arguments);
     Route route;
     if (containsModals) {
@@ -60,11 +63,13 @@ class NavigationService {
   void popUntil(String routeName) {
     // history.popUntil(routeName);
     navigatorKey.currentState!.popUntil(ModalRoute.withName(routeName));
+    _currentRouteName = routeName;
   }
 
   void pop([Object? result]) {
     // history.pop();
     navigatorKey.currentState!.pop(result);
+    _currentRouteName = null;
   }
 }
 

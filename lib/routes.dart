@@ -14,6 +14,7 @@ class Routes {
   static const String accountEdit = '/accountEdit';
   static const String accountServerDetails = '/accountServerDetails';
   static const String settings = '/settings';
+  static const String settingsSecurity = '/settings/security';
   static const String settingsAccounts = '/settings/accounts';
   static const String settingsDesign = '/settings/design';
   static const String settingsFeedback = '/settings/feedback';
@@ -36,6 +37,7 @@ class Routes {
   static const String sourceCode = '/sourceCode';
   static const String webview = '/webview';
   static const String appDrawer = '/appDrawer';
+  static const String lockScreen = '/lock';
 }
 
 class AppRouter {
@@ -55,6 +57,9 @@ class AppRouter {
         break;
       case Routes.settings:
         page = SettingsScreen();
+        break;
+      case Routes.settingsSecurity:
+        page = SettingsSecurityScreen();
         break;
       case Routes.settingsAccounts:
         page = SettingsAccountsScreen();
@@ -131,6 +136,9 @@ class AppRouter {
         break;
       case Routes.appDrawer:
         page = AppDrawer();
+        break;
+      case Routes.lockScreen:
+        page = LockScreen();
         break;
       default:
         print('Unknown route: $name');

@@ -987,9 +987,73 @@
   "@designSectionColorTitle": {
     "description": "Title of color section on design settings screen."
   },
+  "securitySettingsTitle": "Security",
+  "@securitySettingsTitle": {
+    "description": "Title of security settings screen."
+  },
+  "securitySettingsIntro": "Adapt the security settings to your personal needs.",
+  "@securitySettingsIntro": {
+    "description": "Introduction of security settings screen."
+  },
+  "securityUnlockWithFaceId": "Unlock Maily with Face ID.",
+  "@securityUnlockWithFaceId": {
+    "description": "iOS-specific unlock reason."
+  },
+  "securityUnlockWithTouchId": "Unlock Maily with Touch ID.",
+  "@securityUnlockWithTouchId": {
+    "description": "iOS-specific unlock reason."
+  },
+  "securityUnlockReason": "Unlock Maily.",
+  "@securityUnlockReason": {
+    "description": "Generic unlock reason."
+  },
+  "securityUnlockDisableReason": "Unlock Maily to turn off lock.",
+  "@securityUnlockDisableReason": {
+    "description": "Generic unlock disable reason."
+  },
+  "securityUnlockNotAvailable": "Your device does not support biometrics, possibly you need to set up unlock options first.",
+  "@securityUnlockNotAvailable": {
+    "description": "Message when biometic authentication is not available."
+  },
+  "securityUnlockLabel": "Lock Maily",
+  "@securityUnlockLabel": {
+    "description": "Label of biometic authentication lock feature."
+  },
+  "securityUnlockDescriptionTitle": "Lock Maily",
+  "@securityUnlockDescriptionTitle": {
+    "description": "Title to explain lock feature via biometic authentication."
+  },
+  "securityUnlockDescriptionText": "You can choose to lock access to Maily, so that others cannot read your email even when they have access to your device.",
+  "@securityUnlockDescriptionText": {
+    "description": "Text explaining lock feature via biometic authentication."
+  },
+  "securityLockImmediately": "Lock immediately",
+  "@securityLockImmediately": {
+    "description": "Lock timing option."
+  },
+  "securityLockAfter5Minutes": "Lock after 5 minutes",
+  "@securityLockAfter5Minutes": {
+    "description": "Lock timing option."
+  },
+  "securityLockAfter30Minutes": "Lock after 30 minutes",
+  "@securityLockAfter30Minutes": {
+    "description": "Lock timing option."
+  },
+  "lockScreenTitle": "Maily is locked",
+  "@lockScreenTitle": {
+    "description": "Title of lock screen."
+  },
+  "lockScreenIntro": "Maily is locked, please authenticate to proceed.",
+  "@lockScreenIntro": {
+    "description": "Text on lock screen."
+  },
+  "lockScreenUnlockAction": "Unlock",
+  "@lockScreenUnlockAction": {
+    "description": "Action to unlock on lock screen."
+  },
   "addAccountTitle": "Add Account",
   "@addAccountTitle": {
-    "description": "Title ofadd account screen."
+    "description": "Title of add account screen."
   },
   "addAccountEmailLabel": "Email",
   "@addAccountEmailLabel": {

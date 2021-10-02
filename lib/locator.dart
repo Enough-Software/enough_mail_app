@@ -1,3 +1,4 @@
+import 'package:enough_mail_app/services/biometrics_service.dart';
 import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/background_service.dart';
@@ -33,4 +34,5 @@ void setupLocator() {
   locator.registerLazySingleton(() => ContactService());
   locator.registerLazySingleton(() => KeyService());
   locator.registerLazySingleton(() => ProviderService());
+  locator.registerLazySingleton(() => BiometricsService());
 }

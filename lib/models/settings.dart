@@ -13,38 +13,63 @@ enum ReadReceiptDisplaySetting {
 
 enum ReplyFormatPreference { alwaysHtml, sameFormat, alwaysPlainText }
 
+enum LockTimePreference { immediately, after5minutes, after30minutes }
+
+extension ExtensionLockTimePreference on LockTimePreference {
+  bool requiresAuthorization(DateTime? lastPausedTimeStamp) =>
+      lastPausedTimeStamp == null ||
+      lastPausedTimeStamp.isBefore(DateTime.now().subtract(duration));
+
+  Duration get duration {
+    switch (this) {
+      case LockTimePreference.immediately:
+        return const Duration();
+      case LockTimePreference.after5minutes:
+        return const Duration(minutes: 5);
+      case LockTimePreference.after30minutes:
+        return const Duration(minutes: 30);
+    }
+  }
+}
+
 class Settings extends SerializableObject {
-  static const _themeSettings = 'themeSettings';
-  static const _customFolderNames = 'customFolderNames';
-  static const _defaultSender = 'defaultSender';
-  static const _swipeLeftToRightAction = 'swipeLeftToRightAction';
-  static const _swipeRightToLeftAction = 'swipeRightToLeftAction';
-  static const _folderNameSetting = 'folderNameSetting';
-  static const _readReceiptDisplaySetting = 'readReceiptDisplaySetting';
-  static const _signatureActions = 'signatureActions';
-  static const _replyFormatPreference = 'replyFormatPreference';
+  static const _keyThemeSettings = 'themeSettings';
+  static const _keyCustomFolderNames = 'customFolderNames';
+  static const _keyDefaultSender = 'defaultSender';
+  static const _keySwipeLeftToRightAction = 'swipeLeftToRightAction';
+  static const _keySwipeRightToLeftAction = 'swipeRightToLeftAction';
+  static const _keyFolderNameSetting = 'folderNameSetting';
+  static const _keyReadReceiptDisplaySetting = 'readReceiptDisplaySetting';
+  static const _keySignatureActions = 'signatureActions';
+  static const _keyReplyFormatPreference = 'replyFormatPreference';
+  static const _keyEnableBiometricLock = 'enableBiometricLock';
+  static const _keyLockTimePreference = 'enableBiometricLockTime';
 
   Settings() {
-    objectCreators[_themeSettings] = (map) => ThemeSettings();
-    objectCreators[_customFolderNames] = (map) => <String>[];
-    objectCreators[_defaultSender] = (map) => MailAddress.empty();
-    transformers[_swipeLeftToRightAction] = (value) =>
+    objectCreators[_keyThemeSettings] = (map) => ThemeSettings();
+    objectCreators[_keyCustomFolderNames] = (map) => <String>[];
+    objectCreators[_keyDefaultSender] = (map) => MailAddress.empty();
+    transformers[_keySwipeLeftToRightAction] = (value) =>
         value is SwipeAction ? value.index : SwipeAction.values[value];
-    transformers[_swipeRightToLeftAction] = (value) =>
+    transformers[_keySwipeRightToLeftAction] = (value) =>
         value is SwipeAction ? value.index : SwipeAction.values[value];
-    transformers[_folderNameSetting] = (value) => value is FolderNameSetting
+    transformers[_keyFolderNameSetting] = (value) => value is FolderNameSetting
         ? value.index
         : FolderNameSetting.values[value];
-    transformers[_readReceiptDisplaySetting] = (value) =>
+    transformers[_keyReadReceiptDisplaySetting] = (value) =>
         value is ReadReceiptDisplaySetting
             ? value.index
             : ReadReceiptDisplaySetting.values[value];
-    transformers[_signatureActions] = (value) =>
+    transformers[_keySignatureActions] = (value) =>
         value is ComposeAction ? value.index : ComposeAction.values[value];
-    transformers[_replyFormatPreference] = (value) =>
+    transformers[_keyReplyFormatPreference] = (value) =>
         value is ReplyFormatPreference
             ? value.index
             : ReplyFormatPreference.values[value];
+    transformers[_keyLockTimePreference] = (value) =>
+        value is LockTimePreference
+            ? value.index
+            : LockTimePreference.values[value];
   }
 
   bool get blockExternalImages => attributes['blockExternalImages'] ?? false;
@@ -60,34 +85,35 @@ class Settings extends SerializableObject {
   set languageTag(String? value) => attributes['languageTag'] = value;
 
   ThemeSettings get themeSettings {
-    var themeSettings = attributes[_themeSettings];
+    var themeSettings = attributes[_keyThemeSettings];
     if (themeSettings == null) {
       themeSettings = ThemeSettings();
-      attributes[_themeSettings] = themeSettings;
+      attributes[_keyThemeSettings] = themeSettings;
     }
     return themeSettings;
   }
 
-  set themeSettings(ThemeSettings value) => attributes[_themeSettings] = value;
+  set themeSettings(ThemeSettings value) =>
+      attributes[_keyThemeSettings] = value;
 
   SwipeAction get swipeLeftToRightAction =>
-      attributes[_swipeLeftToRightAction] ?? SwipeAction.markRead;
+      attributes[_keySwipeLeftToRightAction] ?? SwipeAction.markRead;
   set swipeLeftToRightAction(SwipeAction value) =>
-      attributes[_swipeLeftToRightAction] = value;
+      attributes[_keySwipeLeftToRightAction] = value;
 
   SwipeAction get swipeRightToLeftAction =>
-      attributes[_swipeRightToLeftAction] ?? SwipeAction.delete;
+      attributes[_keySwipeRightToLeftAction] ?? SwipeAction.delete;
   set swipeRightToLeftAction(SwipeAction value) =>
-      attributes[_swipeRightToLeftAction] = value;
+      attributes[_keySwipeRightToLeftAction] = value;
 
   FolderNameSetting get folderNameSetting =>
-      attributes[_folderNameSetting] ?? FolderNameSetting.localized;
+      attributes[_keyFolderNameSetting] ?? FolderNameSetting.localized;
   set folderNameSetting(FolderNameSetting? value) =>
-      attributes[_folderNameSetting] = value;
+      attributes[_keyFolderNameSetting] = value;
 
-  List<String>? get customFolderNames => attributes[_customFolderNames];
+  List<String>? get customFolderNames => attributes[_keyCustomFolderNames];
   set customFolderNames(List<String>? value) =>
-      attributes[_customFolderNames] = value;
+      attributes[_keyCustomFolderNames] = value;
 
   bool get enableDeveloperMode => attributes['enableDeveloperMode'] ?? false;
   set enableDeveloperMode(bool? value) =>
@@ -100,18 +126,19 @@ class Settings extends SerializableObject {
   set signaturePlain(String? value) => attributes['signaturePlain'] = value;
 
   List<ComposeAction> get signatureActions =>
-      attributes[_signatureActions] ?? [ComposeAction.newMessage];
+      attributes[_keySignatureActions] ?? [ComposeAction.newMessage];
   set signatureActions(List<ComposeAction> value) =>
-      attributes[_signatureActions] = value;
+      attributes[_keySignatureActions] = value;
 
   ReadReceiptDisplaySetting get readReceiptDisplaySetting =>
-      attributes[_readReceiptDisplaySetting] ??
+      attributes[_keyReadReceiptDisplaySetting] ??
       ReadReceiptDisplaySetting.always;
   set readReceiptDisplaySetting(ReadReceiptDisplaySetting? value) =>
-      attributes[_readReceiptDisplaySetting] = value;
+      attributes[_keyReadReceiptDisplaySetting] = value;
 
-  MailAddress? get defaultSender => attributes[_defaultSender];
-  set defaultSender(MailAddress? value) => attributes[_defaultSender] = value;
+  MailAddress? get defaultSender => attributes[_keyDefaultSender];
+  set defaultSender(MailAddress? value) =>
+      attributes[_keyDefaultSender] = value;
 
   bool get preferPlainTextMessages =>
       attributes['preferPlainTextMessages'] ?? false;
@@ -119,7 +146,17 @@ class Settings extends SerializableObject {
       attributes['preferPlainTextMessages'] = value;
 
   ReplyFormatPreference get replyFormatPreference =>
-      attributes[_replyFormatPreference] ?? ReplyFormatPreference.alwaysHtml;
+      attributes[_keyReplyFormatPreference] ?? ReplyFormatPreference.alwaysHtml;
   set replyFormatPreference(ReplyFormatPreference value) =>
-      attributes[_replyFormatPreference] = value;
+      attributes[_keyReplyFormatPreference] = value;
+
+  bool get enableBiometricLock => attributes[_keyEnableBiometricLock] ?? false;
+  set enableBiometricLock(bool value) =>
+      attributes[_keyEnableBiometricLock] = value;
+
+  LockTimePreference get lockTimePreference =>
+      attributes[_keyLockTimePreference] ?? LockTimePreference.immediately;
+
+  set lockTimePreference(LockTimePreference value) =>
+      attributes[_keyLockTimePreference] = value;
 }
