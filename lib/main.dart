@@ -5,6 +5,7 @@ import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/background_service.dart';
+import 'package:enough_mail_app/services/biometrics_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/key_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
@@ -110,6 +111,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           NotificationServiceInitResult.appLaunchedByNotification) {
         // the app has not been launched by a notification
         await locator<AppService>().checkForShare();
+      }
+      if (settings.enableBiometricLock) {
+        locator<NavigationService>().push(Routes.lockScreen);
+        final didAuthenticate =
+            await locator<BiometricsService>().authenticate();
+        if (didAuthenticate) {
+          locator<NavigationService>().pop();
+        }
       }
     } else {
       // this app has no mail accounts yet, so switch to welcome screen:

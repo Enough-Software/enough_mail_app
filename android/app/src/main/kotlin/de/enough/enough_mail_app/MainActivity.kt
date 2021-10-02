@@ -8,13 +8,14 @@ import android.provider.OpenableColumns
 import androidx.annotation.NonNull
 
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.embedding.android.FlutterActivity
+// import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugins.GeneratedPluginRegistrant
 
 import java.io.File
 
-class MainActivity: FlutterActivity() {
+class MainActivity: FlutterFragmentActivity() {
     var sharedDataMap : Map<String, Any>? = null;
 
     private val CHANNEL = "app.channel.shared.data"

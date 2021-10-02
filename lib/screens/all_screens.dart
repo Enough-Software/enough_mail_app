@@ -22,4 +22,6 @@ export 'media_screen.dart';
 export 'location_screen.dart';
 export 'sourcecode_screen.dart';
 export 'webview_screen.dart';
-export 'settings_reply.dart';
+export 'settings_reply_screen.dart';
+export 'settings_security_screen.dart';
+export 'lock_screen.dart';
