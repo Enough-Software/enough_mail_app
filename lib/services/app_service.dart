@@ -20,6 +20,16 @@ import 'navigation_service.dart';
 class AppService {
   static const _platform = const MethodChannel('app.channel.shared.data');
   AppLifecycleState appLifecycleState = AppLifecycleState.resumed;
+
+  bool _ignoreBiometricsCheckAtNextResume = false;
+  DateTime _ignoreBiometricsCheckAtNextResumeTS = DateTime.now();
+  set ignoreBiometricsCheckAtNextResume(bool value) {
+    _ignoreBiometricsCheckAtNextResume = value;
+    if (value) {
+      _ignoreBiometricsCheckAtNextResumeTS = DateTime.now();
+    }
+  }
+
   bool get isInBackground => (appLifecycleState != AppLifecycleState.resumed);
   Future Function(List<SharedData> sharedData)? onSharedData;
   DateTime? _lastPausedTimeStamp;
@@ -33,6 +43,15 @@ class AppService {
         final futures = [checkForShare(), locator<MailService>().resume()];
         final Settings settings = locator<SettingsService>().settings;
         if (settings.enableBiometricLock) {
+          if (_ignoreBiometricsCheckAtNextResume) {
+            _ignoreBiometricsCheckAtNextResume = false;
+            // double check time stamp, everything more than a minute requires a check
+            if (_ignoreBiometricsCheckAtNextResumeTS
+                .isAfter(DateTime.now().subtract(const Duration(minutes: 1)))) {
+              await Future.wait(futures);
+              return;
+            }
+          }
           if (settings.lockTimePreference
               .requiresAuthorization(_lastPausedTimeStamp)) {
             final navService = locator<NavigationService>();

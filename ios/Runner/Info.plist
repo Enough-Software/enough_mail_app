@@ -26,12 +26,14 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Allows you to add appointment invitations</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Allows you to attach your location to a message</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allows you to attach photos to a message</string>
-	<key>NSCalendarsUsageDescription</key>
-	<string>Allows you to add appointment invitations</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>To help users protect mail access a Face ID check can be enabled.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
