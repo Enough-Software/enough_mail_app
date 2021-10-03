@@ -1,6 +1,7 @@
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/biometrics_service.dart';
+import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class LockScreen extends StatelessWidget {
   void _authenticate(BuildContext context) async {
     final didAuthencate = await locator<BiometricsService>().authenticate();
     if (didAuthencate) {
-      Navigator.of(context).pop();
+      locator<NavigationService>().pop();
     }
   }
 }
