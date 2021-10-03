@@ -1,4 +1,5 @@
 import 'package:enough_mail_app/locator.dart';
+import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:local_auth/local_auth.dart';
@@ -27,11 +28,17 @@ class BiometricsService {
       return false;
     }
     reason ??= await _getLocalizedUnlockReason();
-
-    return _localAuth.authenticate(
-      localizedReason: reason,
-      biometricOnly: true,
-    );
+    locator<AppService>().ignoreBiometricsCheckAtNextResume = true;
+    try {
+      final result = await _localAuth.authenticate(
+        localizedReason: reason,
+        biometricOnly: true,
+      );
+      return result;
+    } catch (e, s) {
+      print('Authentication failed with $e $s');
+    }
+    return false;
   }
 
   Future<String> _getLocalizedUnlockReason() async {
