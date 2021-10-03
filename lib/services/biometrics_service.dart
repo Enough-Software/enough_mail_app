@@ -34,6 +34,10 @@ class BiometricsService {
         localizedReason: reason,
         biometricOnly: true,
       );
+      Future.delayed(const Duration(seconds: 2)).then(
+        (value) =>
+            locator<AppService>().ignoreBiometricsCheckAtNextResume = false,
+      );
       return result;
     } catch (e, s) {
       print('Authentication failed with $e $s');
