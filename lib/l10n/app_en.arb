@@ -1995,6 +1995,10 @@
   "@icalendarLabelLocation": {
     "description": "Label of the location info of an icalendar object"
   },
+  "icalendarLabelTeamsUrl": "Link",
+  "@icalendarLabelTeamsUrl": {
+    "description": "Label of the ms teams url info of an icalendar object"
+  },
   "icalendarLabelRecurrenceRule": "Repeats",
   "@icalendarLabelRecurrenceRule": {
     "description": "Label of the reccurence info of an icalendar object"

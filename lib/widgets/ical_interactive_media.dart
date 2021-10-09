@@ -113,6 +113,22 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                   ),
                 ],
               ),
+            } else if (_participantStatus != null) ...{
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                        _participantStatus?.localization(localizations) ?? ''),
+                  ),
+                  PlatformTextButton(
+                    child: PlatformText(
+                        localizations.icalendarActionChangeParticipantStatus),
+                    onPressed: () => _queryParticipantStatus(localizations),
+                  ),
+                ],
+              ),
             },
             Table(
               columnWidths: {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
@@ -129,32 +145,6 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                             localizations.icalendarNoSummaryInfo),
                   )
                 ]),
-                if (event.description != null) ...{
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(localizations.icalendarLabelDescription),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextWithLinks(
-                        text: event.description!,
-                      ),
-                    ),
-                  ]),
-                },
-                if (event.location != null) ...{
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(localizations.icalendarLabelLocation),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextWithLinks(text: event.location!),
-                    )
-                  ]),
-                },
                 if (start != null) ...{
                   TableRow(children: [
                     Padding(
@@ -208,6 +198,45 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                       child: Text(recurrenceRule.toHumanReadableText(
                         languageCode: localizations.localeName,
                       )),
+                    )
+                  ]),
+                },
+                if (event.description != null) ...{
+                  TableRow(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(localizations.icalendarLabelDescription),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextWithLinks(
+                        text: event.description!,
+                      ),
+                    ),
+                  ]),
+                },
+                if (event.location != null) ...{
+                  TableRow(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(localizations.icalendarLabelLocation),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextWithLinks(text: event.location!),
+                    )
+                  ]),
+                },
+                if (event.microsoftTeamsMeetingUrl != null) ...{
+                  TableRow(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(localizations.icalendarLabelTeamsUrl),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child:
+                          TextWithLinks(text: event.microsoftTeamsMeetingUrl!),
                     )
                   ]),
                 },
@@ -277,23 +306,6 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                 },
               ],
             ),
-            if (_participantStatus != null) ...{
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                        _participantStatus?.localization(localizations) ?? ''),
-                  ),
-                  PlatformTextButton(
-                    child: PlatformText(
-                        localizations.icalendarActionChangeParticipantStatus),
-                    onPressed: () => _queryParticipantStatus(localizations),
-                  ),
-                ],
-              ),
-            },
             if (!isReply) ...{
               PlatformElevatedButton(
                 child: PlatformText(localizations.icalendarExportAction),

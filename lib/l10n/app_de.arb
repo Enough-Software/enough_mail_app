@@ -417,6 +417,7 @@
   "icalendarLabelStart": "Start",
   "icalendarLabelEnd": "Ende",
   "icalendarLabelDuration": "Dauer",
+  "icalendarLabelTeamsUrl": "Link",
   "icalendarLabelLocation": "Ort",
   "icalendarLabelRecurrenceRule": "Wiederholung",
   "icalendarLabelParticipants": "Teilnehmer",
