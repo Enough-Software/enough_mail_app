@@ -18,11 +18,9 @@ class MailAddressChip extends StatelessWidget {
   const MailAddressChip({Key? key, required this.mailAddress, this.icon})
       : super(key: key);
 
-  String getText() {
-    return (mailAddress.personalName?.isNotEmpty ?? false)
-        ? mailAddress.personalName!
-        : mailAddress.email;
-  }
+  String get text => (mailAddress.hasPersonalName)
+      ? mailAddress.personalName!
+      : mailAddress.email;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +29,7 @@ class MailAddressChip extends StatelessWidget {
     return PlatformPopupMenuButton<_AddressAction>(
       cupertinoButtonPadding: EdgeInsets.zero,
       icon: icon,
-      child: PlatformChip(label: Text(getText())),
+      child: PlatformChip(label: Text(text)),
       title:
           mailAddress.hasPersonalName ? Text(mailAddress.personalName!) : null,
       message: Text(mailAddress.email, style: theme.textTheme.caption),
