@@ -36,7 +36,7 @@ class LockScreen extends StatelessWidget {
               child: Text(localizations.lockScreenIntro),
             ),
             PlatformButton(
-              child: Text(localizations.lockScreenUnlockAction),
+              child: PlatformText(localizations.lockScreenUnlockAction),
               onPressed: () => _authenticate(context),
             )
           ],
