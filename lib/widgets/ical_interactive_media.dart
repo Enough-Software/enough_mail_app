@@ -309,7 +309,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
             if (!isReply) ...{
               PlatformElevatedButton(
                 child: PlatformText(localizations.icalendarExportAction),
-                onPressed: () => _calendar?.exportToNativeCalendar(),
+                onPressed: () => _exportToNativeCalendar(_calendar),
               ),
             },
           ],
@@ -318,7 +318,19 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
     );
   }
 
-  _changeParticipantStatus(
+  Future<void> _exportToNativeCalendar(VCalendar? calendar) async {
+    if (calendar == null) {
+      print('Warning: no calendar to export.');
+      return;
+    }
+    try {
+      await calendar.exportToNativeCalendar();
+    } catch (e, s) {
+      print('Unable to export calendar: $e $s');
+    }
+  }
+
+  Future<void> _changeParticipantStatus(
       ParticipantStatus status, AppLocalizations localizations) async {
     setState(() {
       _participantStatus = status;
