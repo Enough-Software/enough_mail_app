@@ -1,3 +1,6 @@
+ # keep inner classes attributes
+ -keepattributes InnerClasses
+
 # for file picker plugin:
 -keep class androidx.lifecycle.DefaultLifecycleObserver
 

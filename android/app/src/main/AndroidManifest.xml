@@ -5,6 +5,12 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+    <queries>
+    <intent>
+        <action android:name="android.intent.action.INSERT" />
+        <data android:mimeType="vnd.android.cursor.item/event" />
+    </intent>
+    </queries>
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
          In most cases you can leave this as-is, but you if you want to provide
