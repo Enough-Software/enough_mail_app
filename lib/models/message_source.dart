@@ -138,8 +138,10 @@ abstract class MessageSource extends ChangeNotifier
 
   @override
   void onMailVanished(MimeMessage mime, MimeSource source) {
-    final message = cache.getWithMime(mime, source.mailClient)!;
-    remove(message);
+    final message = cache.getWithMime(mime, source.mailClient);
+    if (message != null) {
+      remove(message);
+    }
   }
 
   @override

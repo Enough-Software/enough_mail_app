@@ -16,11 +16,14 @@ abstract class MimeSourceSubscriber {
 
 abstract class MimeSource {
   final MailClient mailClient;
+
   int get size;
   final _subscribers = <MimeSourceSubscriber>[];
   late StreamSubscription<MailLoadEvent> _mailLoadEventSubscription;
   late StreamSubscription<MailVanishedEvent> _mailVanishedEventSubscription;
   late StreamSubscription<MailUpdateEvent> _mailUpdatedEventSubscription;
+  late StreamSubscription<MailConnectionReEstablishedEvent>
+      _mailReconnectedEventSubscription;
   Future? _downloadFuture;
   Future? get downloadFuture => _downloadFuture;
 
@@ -78,12 +81,16 @@ abstract class MimeSource {
         mailClient.eventBus.on<MailVanishedEvent>().listen(_onMessageVanished);
     _mailUpdatedEventSubscription =
         mailClient.eventBus.on<MailUpdateEvent>().listen(_onMailFlagsUpdated);
+    _mailReconnectedEventSubscription = mailClient.eventBus
+        .on<MailConnectionReEstablishedEvent>()
+        .listen(_onMailReconnected);
   }
 
   void _deregisterEvents() {
     _mailLoadEventSubscription.cancel();
     _mailVanishedEventSubscription.cancel();
     _mailUpdatedEventSubscription.cancel();
+    _mailReconnectedEventSubscription.cancel();
   }
 
   void _onMessageAdded(MailLoadEvent e) {
@@ -177,6 +184,15 @@ abstract class MimeSource {
   Future<bool> markAllMessagesSeen(bool seen);
 
   void clear();
+
+  void _onMailReconnected(MailConnectionReEstablishedEvent event) {
+    if (event.mailClient == mailClient &&
+        event.isManualSynchronizationRequired) {
+      resyncMessagesManually(event);
+    }
+  }
+
+  void resyncMessagesManually(MailConnectionReEstablishedEvent event);
 }
 
 class MailboxMimeSource extends MimeSource {
@@ -394,6 +410,31 @@ class MailboxMimeSource extends MimeSource {
     mailbox!.messagesExists = 0;
     //mailbox = Mailbox()..messagesExists = 0;
   }
+
+  @override
+  void resyncMessagesManually(MailConnectionReEstablishedEvent event) async {
+    // when mail server does not support QRESYNC, compare the latest messages
+    // and check for changed flags (seen, flagged, ...) or vanished messages
+    // fetch and compare the 20 latest messages:
+    final messages = await event.mailClient
+        .fetchMessages(fetchPreference: FetchPreference.envelope);
+    if (messages.isEmpty) {
+      print(
+          'MESSAGES ARE EMPTY FOR ${event.mailClient.lowLevelOutgoingMailClient.logName}');
+      //clear();
+      return;
+    }
+    final result = _cache.refreshWith(messages);
+    for (final mime in result.vanished) {
+      _notifyVanished(mime);
+    }
+    for (final mime in result.added) {
+      _notifyMessageAdded(mime);
+    }
+    for (final mime in result.updated) {
+      _notifyFlagsUpdated(mime);
+    }
+  }
 }
 
 class SearchMimeSource extends MimeSource {
@@ -531,6 +572,11 @@ class SearchMimeSource extends MimeSource {
   @override
   void clear() {
     searchResult = MailSearchResult.empty(mailSearch);
+  }
+
+  @override
+  void resyncMessagesManually(MailConnectionReEstablishedEvent event) {
+    // TODO: resyncMessagesManually in SearchMimeSource
   }
 }
 

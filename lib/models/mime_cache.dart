@@ -1,5 +1,6 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:collection/collection.dart' show IterableExtension;
+import 'package:collection/collection.dart'
+    show IterableExtension, ListEquality;
 
 class MimeCache {
   final int maxCacheSize;
@@ -77,6 +78,46 @@ class MimeCache {
         .firstWhereOrNull((msg) => msg.mime.sequenceId == sequenceId)
         ?.mime;
   }
+
+  /// Refreshes this cache with the data from the provided [newMessages].
+  ///
+  /// This is used after reconnecing to a mail service that does
+  /// not support semi-automatic syncing like QRSYNC.
+  RefreshResult refreshWith(List<MimeMessage> newMessages) {
+    // for each message:
+    // compare flags / compare if it is present at all and then update/add the message to the cache
+    // for each message in cache with a sequence ID higher than the last message:
+    //  check if the message is also available in messages, if not remove
+    final oldestMessageSequenceId = newMessages.first.sequenceId!;
+    final result = RefreshResult();
+    for (final cachedWithSourceIndex in _messages) {
+      final cachedMime = cachedWithSourceIndex.mime;
+      if (cachedMime.uid != null &&
+          cachedMime.sequenceId! >= oldestMessageSequenceId) {
+        final newMessage =
+            newMessages.firstWhereOrNull((m) => m.uid == cachedMime.uid);
+        if (newMessage == null) {
+          result.vanished.add(cachedMime);
+        } else {
+          // remove this is so that I later know which messages are to be added
+          newMessages.remove(newMessage);
+          final equals = const ListEquality().equals;
+          if (!equals(newMessage.flags, cachedMime.flags)) {
+            cachedMime.flags = newMessage.flags;
+            result.updated.add(cachedMime);
+          }
+        }
+      }
+    }
+    result.added.addAll(newMessages);
+    return result;
+  }
+}
+
+class RefreshResult {
+  final vanished = <MimeMessage>[];
+  final added = <MimeMessage>[];
+  final updated = <MimeMessage>[];
 }
 
 class _MimeWithSourceIndex {
