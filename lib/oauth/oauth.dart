@@ -60,7 +60,6 @@ class GmailOAuthClient extends OauthClient {
       'scope': 'https://mail.google.com/',
       'login_hint': email,
     });
-    print('authenticate URL: $uri');
 
     // Present the dialog to the user
     final result = await FlutterWebAuth.authenticate(
@@ -71,18 +70,22 @@ class GmailOAuthClient extends OauthClient {
 
     // Use this code to get an access token
     final response = await HttpHelper.httpPost(
-        'https://oauth2.googleapis.com/token', //'https://www.googleapis.com/oauth2/v4/token',
-        body: {
-          'client_id': clientId,
-          'redirect_uri': '$callbackUrlScheme:/',
-          'grant_type': 'authorization_code',
-          'code': code,
-        });
+      'https://oauth2.googleapis.com/token',
+      body: {
+        'client_id': clientId,
+        'redirect_uri': '$callbackUrlScheme:/',
+        'grant_type': 'authorization_code',
+        'code': code,
+      },
+    );
 
     // Get the access token from the response
-    print('authorization code token:');
-    print(response.text);
-    return OauthToken.fromText(response.text!);
+    final text = response.text;
+    if (response.statusCode != 200 || text == null) {
+      throw new StateError(
+          'Unable to get Google OAuth token with code $code, status code=${response.statusCode}, response=$text');
+    }
+    return OauthToken.fromText(text);
   }
 
   @override
