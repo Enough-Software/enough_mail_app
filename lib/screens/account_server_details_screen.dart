@@ -161,7 +161,7 @@ class _AccountServerDetailsEditorState
     mailAccount.userName = userName;
     final password = _passwordController.text;
 
-    final incomingServerConfig = mailAccount.incoming?.serverConfig ??
+    final incomingServerConfig =
         ServerConfig(
           type: _incomingServerType,
           hostname: _incomingHostDomainController.text,
@@ -178,7 +178,7 @@ class _AccountServerDetailsEditorState
         serverConfig: incomingServerConfig,
         authentication:
             PlainAuthentication(incomingUserName, incomingPassword));
-    final outgoingServerConfig = mailAccount.outgoing?.serverConfig ??
+    final outgoingServerConfig =
         ServerConfig(
           type: _outgoingServerType,
           hostname: _outgoingHostDomainController.text,
@@ -256,6 +256,7 @@ class _AccountServerDetailsEditorState
             child: Column(
               children: [
                 DecoratedPlatformTextField(
+                  autocorrect: false,
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: localizations.addAccountEmailLabel,
@@ -263,6 +264,7 @@ class _AccountServerDetailsEditorState
                   ),
                 ),
                 DecoratedPlatformTextField(
+                  autocorrect: false,
                   controller: _userNameController,
                   decoration: InputDecoration(
                     labelText: localizations.accountDetailsUserNameLabel,
@@ -279,6 +281,7 @@ class _AccountServerDetailsEditorState
                   initiallyExpanded: true,
                   children: [
                     DecoratedPlatformTextField(
+                      autocorrect: false,
                       controller: _incomingHostDomainController,
                       decoration: InputDecoration(
                         labelText: localizations.accountDetailsIncomingLabel,
@@ -286,6 +289,7 @@ class _AccountServerDetailsEditorState
                       ),
                     ),
                     DecoratedPlatformTextField(
+                      autocorrect: false,
                       controller: _outgoingHostDomainController,
                       decoration: InputDecoration(
                         labelText: localizations.accountDetailsOutgoingLabel,
@@ -358,6 +362,7 @@ class _AccountServerDetailsEditorState
                       ],
                     ),
                     DecoratedPlatformTextField(
+                      autocorrect: false,
                       controller: _incomingHostPortController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -368,6 +373,7 @@ class _AccountServerDetailsEditorState
                       ),
                     ),
                     DecoratedPlatformTextField(
+                      autocorrect: false,
                       controller: _incomingUserNameController,
                       decoration: InputDecoration(
                         labelText:
@@ -444,6 +450,7 @@ class _AccountServerDetailsEditorState
                       ],
                     ),
                     DecoratedPlatformTextField(
+                      autocorrect: false,
                       controller: _outgoingHostPortController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -454,6 +461,7 @@ class _AccountServerDetailsEditorState
                       ),
                     ),
                     DecoratedPlatformTextField(
+                      autocorrect: false,
                       controller: _outgoingUserNameController,
                       decoration: InputDecoration(
                         labelText:
