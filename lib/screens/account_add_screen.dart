@@ -88,7 +88,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
 
       final editResult = await locator<NavigationService>()
           .push(Routes.accountServerDetails, arguments: Account(_account));
-      if (result is ConnectedAccount) {
+      if (editResult is ConnectedAccount) {
         setState(() {
           _account = editResult.account;
           _mailClient = editResult.mailClient;
@@ -309,6 +309,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         mainAxisSize: MainAxisSize.max,
         children: [
           DecoratedPlatformTextField(
+            autocorrect: false,
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             cupertinoShowLabel: false,
