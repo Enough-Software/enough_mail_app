@@ -1,5 +1,7 @@
 PODS:
-  - background_fetch (1.0.0-nullsafety.2):
+  - add_2_calendar (0.0.1):
+    - Flutter
+  - background_fetch (1.0.1):
     - Flutter
   - device_info (0.0.1):
     - Flutter
@@ -49,11 +51,15 @@ PODS:
     - Flutter
   - flutter_secure_storage (3.3.1):
     - Flutter
-  - fluttercontactpicker (4.4.0):
+  - flutter_web_auth (0.3.1):
+    - Flutter
+  - fluttercontactpicker (4.5.1):
     - Flutter
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
+  - local_auth (0.0.1):
+    - Flutter
   - location (0.0.1):
     - Flutter
   - native_pdf_renderer (1.2.0):
@@ -82,6 +88,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - add_2_calendar (from `.symlinks/plugins/add_2_calendar/ios`)
   - background_fetch (from `.symlinks/plugins/background_fetch/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
@@ -89,7 +96,9 @@ DEPENDENCIES:
   - flutter_inappwebview (from `.symlinks/plugins/flutter_inappwebview/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
+  - flutter_web_auth (from `.symlinks/plugins/flutter_web_auth/ios`)
   - fluttercontactpicker (from `.symlinks/plugins/fluttercontactpicker/ios`)
+  - local_auth (from `.symlinks/plugins/local_auth/ios`)
   - location (from `.symlinks/plugins/location/ios`)
   - native_pdf_renderer (from `.symlinks/plugins/native_pdf_renderer/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
@@ -111,6 +120,8 @@ SPEC REPOS:
     - SwiftyGif
 
 EXTERNAL SOURCES:
+  add_2_calendar:
+    :path: ".symlinks/plugins/add_2_calendar/ios"
   background_fetch:
     :path: ".symlinks/plugins/background_fetch/ios"
   device_info:
@@ -125,8 +136,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_secure_storage:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
+  flutter_web_auth:
+    :path: ".symlinks/plugins/flutter_web_auth/ios"
   fluttercontactpicker:
     :path: ".symlinks/plugins/fluttercontactpicker/ios"
+  local_auth:
+    :path: ".symlinks/plugins/local_auth/ios"
   location:
     :path: ".symlinks/plugins/location/ios"
   native_pdf_renderer:
@@ -149,29 +164,32 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/wakelock/ios"
 
 SPEC CHECKSUMS:
-  background_fetch: 67b227578932e795dbe3ea6d3f7c006e45f3ce66
+  add_2_calendar: e9d68636aed37fb18e12f5a3d74c2e0589487af0
+  background_fetch: 2edffc19a5a465c47f073efa35db57f7910738fa
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   DKImagePickerController: b5eb7f7a388e4643264105d648d01f727110fc3d
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
-  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   flutter_inappwebview: bfd58618f49dc62f2676de690fc6dcda1d6c3721
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
-  fluttercontactpicker: 36cf7811f583f3c5aec3c53efcbf366b9cdfdf51
+  flutter_web_auth: eae2fc62b97d9a44c5c2a1ed0404a6ce396e3d7f
+  fluttercontactpicker: 141493596bfca4a786d695d2572c65885bc4f088
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  local_auth: ef62030a2731330b95df7ef1331bd15f6a64b8a6
   location: 3a2eed4dd2fab25e7b7baf2a9efefe82b512d740
   native_pdf_renderer: 0e545bf94fb341e0fe7508bf72d4c1c42c30aa02
   OrderedSet: aaeb196f7fef5a9edf55d89760da9176ad40b93c
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
-  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
+  path_provider: d1e9807085df1f9cc9318206cd649dc0b76be3de
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
-  shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
+  shared_preferences: 5033afbb22d372e15aff8ff766df9021b845f273
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
   SwiftyGif: 5d4af95df24caf1c570dbbcb32a3b8a0763bc6d7
-  url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
-  video_player: 9cc823b1d9da7e8427ee591e8438bfbcde500e6e
+  url_launcher: b6e016d912f04be9f5bf6e8e82dc599b7ba59649
+  video_player: ecd305f42e9044793efd34846e1ce64c31ea6fcb
   wakelock: d0fc7c864128eac40eba1617cb5264d9c940b46f
 
 PODFILE CHECKSUM: 7368163408c647b7eb699d0d788ba6718e18fb8d
