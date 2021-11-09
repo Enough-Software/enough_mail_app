@@ -15,25 +15,25 @@ class AccountProviderSelector extends StatelessWidget {
     final providers = locator<ProviderService>().providers;
 
     return ListView.separated(
-        itemBuilder: (context, index) {
-          if (index < providers.length) {
-            final provider = providers[index];
-            return Center(
-              child: provider.buildSignInButton(
-                context,
-                onPressed: () => onSelected(provider),
-              ),
-            );
-          } else {
-            return Center(
-              child: PlatformTextButton(
-                child: PlatformText(localizations.accountProviderCustom),
-                onPressed: () => onSelected(null),
-              ),
-            );
-          }
-        },
-        separatorBuilder: (context, index) => Divider(),
-        itemCount: providers.length + 1);
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return Center(
+            child: PlatformTextButton(
+              child: PlatformText(localizations.accountProviderCustom),
+              onPressed: () => onSelected(null),
+            ),
+          );
+        }
+        final provider = providers[index - 1];
+        return Center(
+          child: provider.buildSignInButton(
+            context,
+            onPressed: () => onSelected(provider),
+          ),
+        );
+      },
+      separatorBuilder: (context, index) => Divider(),
+      itemCount: providers.length + 1,
+    );
   }
 }
