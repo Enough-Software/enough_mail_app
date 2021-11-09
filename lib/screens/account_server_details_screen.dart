@@ -64,7 +64,7 @@ class _SaveButton extends StatefulWidget {
 }
 
 class _SaveButtonState extends State<_SaveButton> {
-  bool _isSaving = false;
+  var _isSaving = false;
   @override
   Widget build(BuildContext context) {
     if (_isSaving) {
