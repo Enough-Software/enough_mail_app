@@ -4,8 +4,10 @@ import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -30,10 +32,7 @@ class AccountServerDetailsScreen extends StatelessWidget {
       content: editor,
       includeDrawer: includeDrawer,
       appBarActions: [
-        PlatformIconButton(
-          icon: Icon(Icons.save),
-          onPressed: () => editor.testConnection(context),
-        ),
+        _SaveButton(),
       ],
     );
   }
@@ -51,8 +50,43 @@ class AccountServerDetailsEditor extends StatefulWidget {
   _AccountServerDetailsEditorState createState() =>
       _AccountServerDetailsEditorState();
 
-  void testConnection(BuildContext context) {
-    _AccountServerDetailsEditorState._currentState?.testConnection(context);
+  void testConnection(BuildContext context) async {
+    await _AccountServerDetailsEditorState._currentState
+        ?.testConnection(context);
+  }
+}
+
+class _SaveButton extends StatefulWidget {
+  _SaveButton({Key? key}) : super(key: key);
+
+  @override
+  _SaveButtonState createState() => _SaveButtonState();
+}
+
+class _SaveButtonState extends State<_SaveButton> {
+  bool _isSaving = false;
+  @override
+  Widget build(BuildContext context) {
+    if (_isSaving) {
+      return PlatformProgressIndicator();
+    }
+    return PlatformIconButton(
+      icon: Icon(PlatformInfo.isCupertino
+          ? CupertinoIcons.check_mark_circled
+          : Icons.save),
+      onPressed: () async {
+        setState(() {
+          _isSaving = true;
+        });
+        await _AccountServerDetailsEditorState._currentState
+            ?.testConnection(context);
+        if (mounted) {
+          setState(() {
+            _isSaving = false;
+          });
+        }
+      },
+    );
   }
 }
 
@@ -161,13 +195,12 @@ class _AccountServerDetailsEditorState
     mailAccount.userName = userName;
     final password = _passwordController.text;
 
-    final incomingServerConfig = mailAccount.incoming?.serverConfig ??
-        ServerConfig(
-          type: _incomingServerType,
-          hostname: _incomingHostDomainController.text,
-          port: int.tryParse(_incomingHostPortController.text),
-          socketType: _incomingSecurity,
-        );
+    final incomingServerConfig = ServerConfig(
+      type: _incomingServerType,
+      hostname: _incomingHostDomainController.text,
+      port: int.tryParse(_incomingHostPortController.text),
+      socketType: _incomingSecurity,
+    );
     final incomingUserName = (_incomingUserNameController.text.isEmpty)
         ? userName
         : _incomingUserNameController.text;
@@ -175,16 +208,15 @@ class _AccountServerDetailsEditorState
         ? password
         : _incomingPasswordController.text;
     mailAccount.incoming = MailServerConfig(
-        serverConfig: incomingServerConfig,
-        authentication:
-            PlainAuthentication(incomingUserName, incomingPassword));
-    final outgoingServerConfig = mailAccount.outgoing?.serverConfig ??
-        ServerConfig(
-          type: _outgoingServerType,
-          hostname: _outgoingHostDomainController.text,
-          port: int.tryParse(_outgoingHostPortController.text),
-          socketType: _outgoingSecurity,
-        );
+      serverConfig: incomingServerConfig,
+      authentication: PlainAuthentication(incomingUserName, incomingPassword),
+    );
+    final outgoingServerConfig = ServerConfig(
+      type: _outgoingServerType,
+      hostname: _outgoingHostDomainController.text,
+      port: int.tryParse(_outgoingHostPortController.text),
+      socketType: _outgoingSecurity,
+    );
     final outgoingUserName = (_outgoingUserNameController.text.isEmpty)
         ? userName
         : _outgoingUserNameController.text;
@@ -198,32 +230,32 @@ class _AccountServerDetailsEditorState
     //print('account: $mailAccount');
     final completed = await Discover.complete(mailAccount);
     if (!completed) {
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(localizations.errorTitle),
-          content: Text(
-            localizations.accountDetailsErrorHostProblem(
-              _incomingHostDomainController.text,
-              _outgoingHostDomainController.text,
-            ),
-          ),
+      await LocalizedDialogHelper.showTextDialog(
+        context,
+        localizations.errorTitle,
+        localizations.accountDetailsErrorHostProblem(
+          _incomingHostDomainController.text,
+          _outgoingHostDomainController.text,
         ),
       );
       return;
     } else {
       final incoming = mailAccount.incoming!;
       final outgoing = mailAccount.outgoing!;
-      setState(() {
-        _incomingHostPortController.text =
-            incoming.serverConfig?.port?.toString() ?? '';
-        _incomingServerType = incoming.serverConfig?.type ?? ServerType.imap;
-        _incomingSecurity = incoming.serverConfig?.socketType ?? SocketType.ssl;
-        _outgoingHostPortController.text =
-            outgoing.serverConfig?.port?.toString() ?? '';
-        _outgoingServerType = outgoing.serverConfig?.type ?? ServerType.smtp;
-        _outgoingSecurity = outgoing.serverConfig?.socketType ?? SocketType.ssl;
-      });
+      if (mounted) {
+        setState(() {
+          _incomingHostPortController.text =
+              incoming.serverConfig?.port?.toString() ?? '';
+          _incomingServerType = incoming.serverConfig?.type ?? ServerType.imap;
+          _incomingSecurity =
+              incoming.serverConfig?.socketType ?? SocketType.ssl;
+          _outgoingHostPortController.text =
+              outgoing.serverConfig?.port?.toString() ?? '';
+          _outgoingServerType = outgoing.serverConfig?.type ?? ServerType.smtp;
+          _outgoingSecurity =
+              outgoing.serverConfig?.socketType ?? SocketType.ssl;
+        });
+      }
     }
     // now try to sign in:
     final mailClient = await locator<MailService>().connect(mailAccount);
@@ -232,15 +264,11 @@ class _AccountServerDetailsEditorState
         ConnectedAccount(widget.account.account, mailClient),
       );
     } else {
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(localizations.errorTitle),
-          content: Text(
-            localizations.accountDetailsErrorLoginProblem(
-                incomingUserName!, password),
-          ),
-        ),
+      await LocalizedDialogHelper.showTextDialog(
+        context,
+        localizations.errorTitle,
+        localizations.accountDetailsErrorLoginProblem(
+            incomingUserName ?? '<null>', password),
       );
     }
   }
