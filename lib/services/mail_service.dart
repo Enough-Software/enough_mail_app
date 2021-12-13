@@ -59,7 +59,7 @@ class MailService {
       if (unifiedAccount != null) {
         unifiedAccount!.name = value!.unifiedAccountName;
         final mailboxes = _mailboxesPerAccount[unifiedAccount]!
-            .root!
+            .root
             .children!
             .map((c) => c.value);
         for (final mailbox in mailboxes) {
