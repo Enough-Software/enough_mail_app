@@ -145,8 +145,9 @@ class _SignatureWidgetState extends State<SignatureWidget> {
           _signature!,
           onTapUrl: (url) async {
             if (await launcher.canLaunch(url)) {
-              await launcher.launch(url);
+              return await launcher.launch(url);
             }
+            return false;
           },
         ),
         Align(
