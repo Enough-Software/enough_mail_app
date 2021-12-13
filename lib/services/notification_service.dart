@@ -165,7 +165,7 @@ class NotificationService {
       androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'maily',
         'Mail',
-        'Maily',
+        channelDescription: 'Maily',
         importance: Importance.max,
         priority: Priority.high,
         channelShowBadge: channelShowBadge,
