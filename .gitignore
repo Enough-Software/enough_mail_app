@@ -43,6 +43,9 @@ lib/generated_plugin_registrant.dart
 ios/Podfile.lock
 ios/build
 
+# android related
+android/app/build/
+
 # Symbolication related
 app.*.symbols
 
