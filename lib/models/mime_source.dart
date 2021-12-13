@@ -197,7 +197,7 @@ abstract class MimeSource {
 
 class MailboxMimeSource extends MimeSource {
   Mailbox? mailbox;
-  int? messagesExistAtInit;
+  late int messagesExistAtInit;
   final _requestedPages = <int>[];
   final _cache = MimeCache();
   final int pageSize;
@@ -240,7 +240,7 @@ class MailboxMimeSource extends MimeSource {
         mailbox = await mailClient.selectMailbox(mailbox!);
       }
       messagesExistAtInit = mailbox!.messagesExists;
-      if (messagesExistAtInit! > 0) {
+      if (messagesExistAtInit > 0) {
         // pre-cache first page:
         if (mailClient.supportsThreading &&
             !(mailbox!.isTrash ||

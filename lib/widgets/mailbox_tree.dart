@@ -22,7 +22,7 @@ class MailboxTree extends StatelessWidget {
     if (mailboxTreeData == null) {
       return Container();
     }
-    final mailboxTreeElements = mailboxTreeData.root!.children!;
+    final mailboxTreeElements = mailboxTreeData.root.children!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
