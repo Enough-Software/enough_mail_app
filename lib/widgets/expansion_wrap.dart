@@ -354,14 +354,6 @@ class RenderExpansionWrap extends RenderBox {
   @override
   bool get sizedByParent => false;
 
-  static double _minWidth(RenderBox? box, double height) {
-    return box == null ? 0.0 : box.getMinIntrinsicWidth(height);
-  }
-
-  static double _maxWidth(RenderBox? box, double height) {
-    return box == null ? 0.0 : box.getMaxIntrinsicWidth(height);
-  }
-
   @override
   double computeMinIntrinsicWidth(double height) {
     var min = 0.0;
@@ -413,19 +405,10 @@ class RenderExpansionWrap extends RenderBox {
     return parentData.offset.dy + first.getDistanceToActualBaseline(baseline)!;
   }
 
-  static double? _boxBaseline(RenderBox box, TextBaseline baseline) {
-    return box.getDistanceToBaseline(baseline);
-  }
-
   static Size _layoutBox(RenderBox? box, BoxConstraints constraints) {
     if (box == null) return Size.zero;
     box.layout(constraints, parentUsesSize: true);
     return box.size;
-  }
-
-  static void _positionBox(RenderBox box, Offset offset) {
-    final BoxParentData parentData = box.parentData as BoxParentData;
-    parentData.offset = offset;
   }
 
   @override

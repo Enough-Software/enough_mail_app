@@ -8,7 +8,6 @@ import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/ical_interactive_media.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
-import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -49,9 +48,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
     final name = widget.info.fileName;
     if (_mediaProvider == null) {
       final fallbackIcon = locator<IconService>().getForMediaType(mediaType);
-      return PlatformButton(
-        materialFlat: (context, platform) =>
-            MaterialFlatButtonData(padding: EdgeInsets.zero),
+      return PlatformTextButton(
         onPressed: _isDownloading ? null : _download,
         child: Padding(
           padding: const EdgeInsets.all(4.0),

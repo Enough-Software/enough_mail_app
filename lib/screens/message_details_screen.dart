@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
@@ -25,7 +24,6 @@ import 'package:enough_mail_app/widgets/message_actions.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
-import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

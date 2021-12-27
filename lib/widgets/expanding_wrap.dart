@@ -650,8 +650,6 @@ class RenderExpansionWrap extends RenderBox
     }
   }
 
-  bool _hasVisualOverflow = false;
-
   @override
   Size computeDryLayout(BoxConstraints constraints) {
     return _computeDryLayout(constraints);
@@ -680,7 +678,7 @@ class RenderExpansionWrap extends RenderBox
     RenderBox overflow = lastChild!;
     final overflowSize = layoutChild(overflow, childConstraints);
     final double overflowMainAxisExtent = _getMainAxisExtent(overflowSize);
-    final double overflowCrossAxisExtent = _getCrossAxisExtent(overflowSize);
+    // final double overflowCrossAxisExtent = _getCrossAxisExtent(overflowSize);
     int numberOfRuns = 1;
     final runsMax = _maxRuns ?? 1000;
     RenderBox? child = firstChild;
@@ -741,7 +739,6 @@ class RenderExpansionWrap extends RenderBox
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
     assert(_debugHasNecessaryDirections);
-    _hasVisualOverflow = false;
     RenderBox? child = firstChild;
     RenderBox overflow = lastChild!;
     if (child == null || child == overflow) {
