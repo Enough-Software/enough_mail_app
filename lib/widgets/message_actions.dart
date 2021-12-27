@@ -291,20 +291,20 @@ class _MessageActionsState extends State<MessageActions> {
     }
   }
 
-  void _next() {
-    _navigateToMessage(widget.message.next);
-  }
+  // void _next() {
+  //   _navigateToMessage(widget.message.next);
+  // }
 
-  void _previous() {
-    _navigateToMessage(widget.message.previous);
-  }
+  // void _previous() {
+  //   _navigateToMessage(widget.message.previous);
+  // }
 
-  void _navigateToMessage(Message? message) {
-    if (message != null) {
-      locator<NavigationService>()
-          .push(Routes.mailDetails, arguments: message, replace: true);
-    }
-  }
+  // void _navigateToMessage(Message? message) {
+  //   if (message != null) {
+  //     locator<NavigationService>()
+  //         .push(Routes.mailDetails, arguments: message, replace: true);
+  //   }
+  // }
 
   void _replyAll() {
     _reply(all: true);
