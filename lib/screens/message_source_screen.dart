@@ -1050,8 +1050,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       case SwipeAction.markRead:
         final isSeen = !message.isSeen;
         message.isSeen = isSeen;
-        await message.mailClient
-            .flagMessage(message.mimeMessage!, isSeen: isSeen);
+        await _sectionedMessageSource.messageSource.markAsSeen(message, isSeen);
         break;
       case SwipeAction.archive:
         await _sectionedMessageSource.messageSource.archive(message);
