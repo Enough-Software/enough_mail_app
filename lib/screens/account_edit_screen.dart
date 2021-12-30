@@ -175,7 +175,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 child:
                     ButtonText(localizations.editAccountCheckPlusAliasAction),
                 onPressed: () async {
-                  var result = await showDialog<bool>(
+                  final result = await showPlatformDialog<bool>(
                     context: context,
                     builder: (context) =>
                         PlusAliasTestingDialog(account: widget.account),
@@ -265,7 +265,6 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   },
                 ),
               ),
-              //}
             ],
           ),
         ),
@@ -286,7 +285,7 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
   bool _isContinueAvailable = true;
   int _step = 0;
   static const int _maxStep = 1;
-  String? _generatedAliasAdddress;
+  late String _generatedAliasAdddress;
   // MimeMessage? _testMessage;
 
   @override
@@ -296,37 +295,38 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
     super.initState();
   }
 
-  bool filter(MailEvent event) {
+  bool _filter(MailEvent event) {
     if (event is MailLoadEvent) {
       final msg = event.message;
-      if (msg.to?.length == 1 &&
-          msg.to!.first.email == _generatedAliasAdddress) {
+      final to = msg.to;
+      if (to != null &&
+          to.length == 1 &&
+          to.first.email == _generatedAliasAdddress) {
         // this is the test message, plus aliases are supported
         widget.account.supportsPlusAliases = true;
         setState(() {
           _isContinueAvailable = true;
           _step++;
         });
-        deleteMessage(msg);
+        _deleteMessage(msg);
         return true;
       } else if ((msg.getHeaderValue('auto-submitted') != null) &&
           (msg.isTextPlainMessage()) &&
-          (msg.decodeContentText()?.contains(_generatedAliasAdddress!) ??
+          (msg.decodeContentText()?.contains(_generatedAliasAdddress) ??
               false)) {
         // this is an automatic reply telling that the address is not available
-
         setState(() {
           _isContinueAvailable = true;
           _step++;
         });
-        deleteMessage(msg);
+        _deleteMessage(msg);
         return true;
       }
     }
     return false;
   }
 
-  Future<void> deleteMessage(MimeMessage msg) async {
+  Future<void> _deleteMessage(MimeMessage msg) async {
     var mailClient = await locator<MailService>().getClientFor(widget.account);
     await mailClient.flagMessage(msg, isDeleted: true);
   }
@@ -335,73 +335,80 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
   void dispose() async {
     super.dispose();
     var mailClient = await locator<MailService>().getClientFor(widget.account);
-    mailClient.removeEventFilter(filter);
+    mailClient.removeEventFilter(_filter);
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    return AlertDialog(
+    return PlatformAlertDialog(
       title: Text(
           localizations.editAccountTestPlusAliasTitle(widget.account.name)),
-      content: Stepper(
-        onStepCancel: _step == 3 ? null : () => Navigator.of(context).pop(),
-        onStepContinue: !_isContinueAvailable
-            ? null
-            : () async {
-                if (_step < _maxStep) {
-                  _step++;
-                } else {
-                  Navigator.of(context).pop(widget.account.supportsPlusAliases);
-                }
-                switch (_step) {
-                  case 1:
-                    setState(() {
-                      _isContinueAvailable = false;
-                    });
-                    // send the email and wait for a response:
-                    final msg = MessageBuilder.buildSimpleTextMessage(
-                        widget.account.fromAddress,
-                        [MailAddress(null, _generatedAliasAdddress!)],
-                        'This is an automated message testing support for + aliases. Please ignore.',
-                        subject: 'Testing + Alias');
-                    // _testMessage = msg;
-                    var mailClient = await locator<MailService>()
-                        .getClientFor(widget.account);
-                    mailClient.addEventFilter(filter);
-                    mailClient.sendMessage(msg, appendToSent: false);
-                    break;
-                }
-              },
-        steps: [
-          Step(
-            title: Text(
-                localizations.editAccountTestPlusAliasStepIntroductionTitle),
-            content: Text(
-              localizations.editAccountTestPlusAliasStepIntroductionText(
-                  widget.account.name, _generatedAliasAdddress!),
-              style: TextStyle(fontSize: 12),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: PlatformStepper(
+          onStepCancel: _step == 3 ? null : () => Navigator.of(context).pop(),
+          onStepContinue: !_isContinueAvailable
+              ? null
+              : () async {
+                  if (_step < _maxStep) {
+                    _step++;
+                  } else {
+                    Navigator.of(context)
+                        .pop(widget.account.supportsPlusAliases);
+                  }
+                  switch (_step) {
+                    case 1:
+                      setState(() {
+                        _isContinueAvailable = false;
+                      });
+                      // send the email and wait for a response:
+                      final msg = MessageBuilder.buildSimpleTextMessage(
+                          widget.account.fromAddress,
+                          [MailAddress(null, _generatedAliasAdddress)],
+                          'This is an automated message testing support for + aliases. Please ignore.',
+                          subject: 'Testing + Alias');
+                      // _testMessage = msg;
+                      final mailClient = await locator<MailService>()
+                          .getClientFor(widget.account);
+                      mailClient.addEventFilter(_filter);
+                      mailClient.sendMessage(msg, appendToSent: false);
+                      break;
+                  }
+                },
+          steps: [
+            Step(
+              title: Text(
+                  localizations.editAccountTestPlusAliasStepIntroductionTitle),
+              content: Text(
+                localizations.editAccountTestPlusAliasStepIntroductionText(
+                    widget.account.name, _generatedAliasAdddress),
+                style: TextStyle(fontSize: 12),
+              ),
+              isActive: (_step == 0),
             ),
-            isActive: (_step == 0),
-          ),
-          Step(
-            title: Text(localizations.editAccountTestPlusAliasStepTestingTitle),
-            content: Center(child: PlatformProgressIndicator()),
-            isActive: (_step == 1),
-          ),
-          Step(
-            title: Text(localizations.editAccountTestPlusAliasStepResultTitle),
-            content: widget.account.supportsPlusAliases
-                ? Text(localizations.editAccountTestPlusAliasStepResultSuccess(
-                    widget.account.name))
-                : Text(
-                    localizations.editAccountTestPlusAliasStepResultNoSuccess(
-                        widget.account.name)),
-            isActive: (_step == 3),
-            state: StepState.complete,
-          ),
-        ],
-        currentStep: _step,
+            Step(
+              title:
+                  Text(localizations.editAccountTestPlusAliasStepTestingTitle),
+              content: Center(child: PlatformProgressIndicator()),
+              isActive: (_step == 1),
+            ),
+            Step(
+              title:
+                  Text(localizations.editAccountTestPlusAliasStepResultTitle),
+              content: widget.account.supportsPlusAliases
+                  ? Text(
+                      localizations.editAccountTestPlusAliasStepResultSuccess(
+                          widget.account.name))
+                  : Text(
+                      localizations.editAccountTestPlusAliasStepResultNoSuccess(
+                          widget.account.name)),
+              isActive: (_step == 3),
+              state: StepState.complete,
+            ),
+          ],
+          currentStep: _step,
+        ),
       ),
     );
   }
@@ -444,8 +451,9 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
       title: Text(widget.isNewAlias
           ? localizations.editAccountAddAliasTitle
           : localizations.editAccountEditAliasTitle),
-      content:
-          _isSaving ? PlatformProgressIndicator() : buildContent(localizations),
+      content: _isSaving
+          ? PlatformProgressIndicator()
+          : _buildContent(localizations),
       actions: [
         PlatformTextButton(
           child: ButtonText(localizations.actionCancel),
@@ -471,7 +479,7 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
     );
   }
 
-  Widget buildContent(AppLocalizations localizations) {
+  Widget _buildContent(AppLocalizations localizations) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
