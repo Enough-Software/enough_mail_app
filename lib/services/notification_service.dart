@@ -123,7 +123,7 @@ class NotificationService {
 
   Future sendLocalNotificationForMail(
       MimeMessage mimeMessage, MailClient mailClient) {
-    final notificationId = getNotificationIdForMail(mimeMessage, mailClient);
+    final notificationId = mimeMessage.guid!;
     if (notificationId == _lastNotificationId) {
       return Future.value();
     }
@@ -143,13 +143,13 @@ class NotificationService {
         payloadText: payloadText, when: mimeMessage.decodeDate());
   }
 
-  int getNotificationIdForMail(MimeMessage mimeMessage, MailClient mailClient) {
-    return getNotificationIdForUid(mimeMessage.uid!, mailClient.account.email);
-  }
+  // int getNotificationIdForMail(MimeMessage mimeMessage, MailClient mailClient) {
+  //   return getNotificationIdForUid(mimeMessage.uid!, mailClient.account.email);
+  // }
 
-  int getNotificationIdForUid(int uid, String? email) {
-    return email.hashCode + uid;
-  }
+  // int getNotificationIdForUid(int uid, String? email) {
+  //   return (email?.hashCode ?? 0) + uid;
+  // }
 
   Future sendLocalNotification(
     int id,
@@ -191,12 +191,12 @@ class NotificationService {
 
   void cancelNotificationForMail(
       MimeMessage mimeMessage, MailClient mailClient) {
-    cancelNotification(getNotificationIdForMail(mimeMessage, mailClient));
+    cancelNotification(mimeMessage.guid!);
   }
 
-  void cancelNotificationForUid(int uid, MailClient mailClient) {
-    cancelNotification(getNotificationIdForUid(uid, mailClient.account.email));
-  }
+  // void cancelNotificationForUid(int uid, MailClient mailClient) {
+  //   cancelNotification(getNotificationIdForUid(uid, mailClient.account.email));
+  // }
 
   void cancelNotification(int id) {
     _flutterLocalNotificationsPlugin.cancel(id);
@@ -204,6 +204,8 @@ class NotificationService {
 }
 
 class MailNotificationPayload extends SerializableObject {
+  int? get guid => attributes['guid'];
+  set guid(int? value) => attributes['guid'] = value;
   int? get uid => attributes['uid'];
   set uid(int? value) => attributes['uid'] = value;
   int? get id => attributes['id'];
@@ -220,6 +222,7 @@ class MailNotificationPayload extends SerializableObject {
   MailNotificationPayload.fromMail(
       MimeMessage mimeMessage, MailClient mailClient) {
     uid = mimeMessage.uid;
+    guid = mimeMessage.guid;
     id = mimeMessage.sequenceId;
     subject = mimeMessage.decodeSubject();
     size = mimeMessage.size;

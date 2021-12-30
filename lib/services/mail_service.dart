@@ -599,7 +599,7 @@ class MailService {
       {bool isLogEnabled = foundation.kDebugMode}) {
     return MailClient(
       mailAccount,
-      isLogEnabled: isLogEnabled,
+      isLogEnabled: isLogEnabled || true,
       logName: mailAccount.name,
       eventBus: AppEventBus.eventBus,
       clientId: _clientId,

@@ -155,8 +155,17 @@ class BackgroundService {
             uids.remove(mimeMessage.uid);
           }
           // remove notifications for messages that have been deleted:
+          final email = mailClient.account.email ?? '';
+          final mailboxName = mailClient.selectedMailbox?.name ?? '';
+          final mailboxValidity = mailClient.selectedMailbox?.uidValidity ?? 0;
           for (final uid in uids) {
-            notificationService.cancelNotificationForUid(uid, mailClient);
+            final guid = MimeMessage.calculateGuid(
+              email: email,
+              mailboxName: mailboxName,
+              mailboxUidValidity: mailboxValidity,
+              messageUid: uid,
+            );
+            notificationService.cancelNotification(guid);
           }
         }
       } else {
