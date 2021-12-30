@@ -133,12 +133,11 @@ class AppDrawer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 accountNameWithBadge,
-                if (userName != null) ...{
+                if (userName != null)
                   Text(
                     userName,
                     style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
                   ),
-                },
                 Text(
                   currentAccount is UnifiedAccount
                       ? currentAccount.accounts.map((a) => a.name).join(', ')
@@ -165,7 +164,7 @@ class AppDrawer extends StatelessWidget {
         title: Text(localizations
             .drawerAccountsSectionTitle(mailService.accounts.length)),
         children: [
-          for (final account in accounts) ...{
+          for (final account in accounts)
             PlatformListTile(
               leading: mailService.hasError(account)
                   ? Icon(Icons.error_outline)
@@ -204,7 +203,6 @@ class AppDrawer extends StatelessWidget {
                 }
               },
             ),
-          },
           _buildAddAccountTile(localizations),
         ],
       );

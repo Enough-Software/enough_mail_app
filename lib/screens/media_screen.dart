@@ -50,7 +50,7 @@ class InteractiveMediaScreen extends StatelessWidget {
           onPressed: _share,
         ),
         if (mediaWidget.mediaProvider.isText &&
-            locator<SettingsService>().settings.enableDeveloperMode) ...{
+            locator<SettingsService>().settings.enableDeveloperMode)
           PlatformPopupMenuButton<_OverflowMenuChoice>(
             onSelected: (_OverflowMenuChoice result) async {
               switch (result) {
@@ -96,7 +96,6 @@ class InteractiveMediaScreen extends StatelessWidget {
               ),
             ],
           ),
-        },
       ],
     );
   }

@@ -158,12 +158,11 @@ class _MessageContentState extends State<_MessageContent> {
               value: _OverflowMenuChoice.showContents,
               child: Text(localizations.viewContentsAction),
             ),
-            if (locator<SettingsService>().settings.enableDeveloperMode) ...{
+            if (locator<SettingsService>().settings.enableDeveloperMode)
               PlatformPopupMenuItem<_OverflowMenuChoice>(
                 value: _OverflowMenuChoice.showSourceCode,
                 child: Text(localizations.viewSourceAction),
               ),
-            },
           ],
         ),
       ],
@@ -197,44 +196,49 @@ class _MessageContentState extends State<_MessageContent> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            columnWidths: {
-              0: IntrinsicColumnWidth(),
-              1: FlexColumnWidth()
-            },
-            children: [
-              TableRow(children: [
+          defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          columnWidths: {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
+          children: [
+            TableRow(
+              children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                   child: Text(localizations.detailsHeaderFrom),
                 ),
                 _buildMailAddresses(mime.from)
-              ]),
-              TableRow(children: [
+              ],
+            ),
+            TableRow(
+              children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                   child: Text(localizations.detailsHeaderTo),
                 ),
                 _buildMailAddresses(mime.to)
-              ]),
-              if (mime.cc?.isNotEmpty ?? false) ...{
-                TableRow(children: [
+              ],
+            ),
+            if (mime.cc?.isNotEmpty ?? false)
+              TableRow(
+                children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                     child: Text(localizations.detailsHeaderCc),
                   ),
                   _buildMailAddresses(mime.cc)
-                ]),
-              },
-              TableRow(children: [
+                ],
+              ),
+            TableRow(
+              children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                   child: Text(localizations.detailsHeaderDate),
                 ),
                 Text(date),
-              ]),
-            ]),
+              ],
+            ),
+          ],
+        ),
         SelectableText(
           subject ?? localizations.subjectUndefined,
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -247,49 +251,44 @@ class _MessageContentState extends State<_MessageContent> {
         if (_blockExternalImages ||
             mime.isNewsletter ||
             mime.threadSequence != null ||
-            _isWebViewZoomedOut) ...{
+            _isWebViewZoomedOut)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (mime.threadSequence != null) ...{
-                ThreadSequenceButton(message: widget.message),
-              } else ...{
+              if (mime.threadSequence != null)
+                ThreadSequenceButton(message: widget.message)
+              else
                 Container(),
-              },
-              if (_isWebViewZoomedOut) ...{
+              if (_isWebViewZoomedOut)
                 PlatformIconButton(
                   icon: Icon(Icons.zoom_in),
                   onPressed: () {
                     locator<NavigationService>()
                         .push(Routes.mailContents, arguments: widget.message);
                   },
-                ),
-              } else ...{
+                )
+              else
                 Container(),
-              },
-              if (_blockExternalImages) ...{
+              if (_blockExternalImages)
                 PlatformElevatedButton(
                   child: ButtonText(localizations.detailsActionShowImages),
-                  onPressed: () => setState(() {
-                    _blockExternalImages = false;
-                  }),
-                ),
-              } else ...{
+                  onPressed: () => setState(
+                    () {
+                      _blockExternalImages = false;
+                    },
+                  ),
+                )
+              else
                 Container(),
-              },
-              if (mime.isNewsletter) ...{
+              if (mime.isNewsletter)
                 UnsubscribeButton(
                   message: widget.message,
-                ),
-              } else ...{
+                )
+              else
                 Container(),
-              },
             ],
           ),
-        },
-        if (ReadReceiptButton.shouldBeShown(mime)) ...{
-          ReadReceiptButton(),
-        }
+        if (ReadReceiptButton.shouldBeShown(mime)) ReadReceiptButton(),
       ],
     );
   }
@@ -304,9 +303,8 @@ class _MessageContentState extends State<_MessageContent> {
   Widget _buildAttachments(List<ContentInfo> attachments) {
     return Wrap(
       children: [
-        for (var attachment in attachments) ...{
-          AttachmentChip(info: attachment, message: widget.message)
-        }
+        for (var attachment in attachments)
+          AttachmentChip(info: attachment, message: widget.message),
       ],
     );
   }
@@ -330,7 +328,7 @@ class _MessageContentState extends State<_MessageContent> {
               });
             },
           ),
-          if (locator<SettingsService>().settings.enableDeveloperMode) ...{
+          if (locator<SettingsService>().settings.enableDeveloperMode) ...[
             Text('Details:'),
             Text(errorObject?.toString() ?? '<unknown error>'),
             Text(errorStackTrace?.toString() ?? '<no stacktrace>'),
@@ -346,7 +344,7 @@ class _MessageContentState extends State<_MessageContent> {
                 Clipboard.setData(data);
               },
             ),
-          },
+          ],
         ],
       );
     }
@@ -849,9 +847,8 @@ class _MailAddressListState extends State<MailAddressList> {
       spacing: 4.0,
       runSpacing: 0.0,
       children: [
-        for (var address in widget.mailAddresses) ...{
-          MailAddressChip(mailAddress: address)
-        }
+        for (var address in widget.mailAddresses)
+          MailAddressChip(mailAddress: address),
       ],
       expandIndicator: DensePlatformIconButton(
         icon: Icon(Icons.keyboard_arrow_down),

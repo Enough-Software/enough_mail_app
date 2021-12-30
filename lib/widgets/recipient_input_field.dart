@@ -58,7 +58,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Wrap(children: [
-      if (widget.addresses.isNotEmpty && widget.labelText != null) ...{
+      if (widget.addresses.isNotEmpty && widget.labelText != null)
         Padding(
           padding: EdgeInsets.only(top: 8.0, right: 8.0),
           child: Text(
@@ -70,14 +70,11 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
             ),
           ),
         ),
-      },
-      for (final address in widget.addresses) ...{
+      for (final address in widget.addresses)
         PlatformChip(
           label: Column(
             children: [
-              if (address.hasPersonalName) ...{
-                Text(address.personalName!),
-              },
+              if (address.hasPersonalName) Text(address.personalName!),
               Text(address.email, style: theme.textTheme.caption),
             ],
           ),
@@ -87,7 +84,6 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
             setState(() {});
           },
         ),
-      },
       buildInput(theme, context),
     ]);
   }
@@ -167,9 +163,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                   return PlatformActionChip(
                     label: Column(
                       children: [
-                        if (option.hasPersonalName) ...{
-                          Text(option.personalName!),
-                        },
+                        if (option.hasPersonalName) Text(option.personalName!),
                         Text(option.email, style: theme.textTheme.caption),
                       ],
                     ),

@@ -51,15 +51,14 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
     // final localizations = AppLocalizations.of(context);
     return Wrap(
       children: [
-        for (final attachment in _attachments) ...{
+        for (final attachment in _attachments)
           ComposeAttachment(
             attachment: attachment,
             onRemove: removeAttachment,
           ),
-        },
-        if (widget.isDownloading) ...{
-          PlatformProgressIndicator(),
-        },
+
+        if (widget.isDownloading) PlatformProgressIndicator(),
+
         AddAttachmentPopupButton(
           composeData: widget.composeData,
           update: () => setState(() {}),
@@ -138,7 +137,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
             brightness: brightness,
           ),
         ),
-        if (locator<KeyService>().hasGiphy) ...{
+        if (locator<KeyService>().hasGiphy)
           PlatformPopupMenuItem(
             value: 5,
             child: IconText(
@@ -147,7 +146,6 @@ class AddAttachmentPopupButton extends StatelessWidget {
               brightness: brightness,
             ),
           ),
-        },
         PlatformPopupMenuItem(
           value: 6,
           child: IconText(

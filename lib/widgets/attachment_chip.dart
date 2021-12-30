@@ -96,7 +96,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
             size: _width,
             color: Colors.grey[700],
           ),
-          if (name != null) ...{
+          if (name != null)
             Align(
               alignment: Alignment.bottomLeft,
               child: Container(
@@ -118,8 +118,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
                 ),
               ),
             ),
-          },
-          if (includeDownloadOption) ...{
+          if (includeDownloadOption) ...[
             Align(
               alignment: Alignment.topLeft,
               child: Container(
@@ -137,10 +136,8 @@ class _AttachmentChipState extends State<AttachmentChip> {
                 ),
               ),
             ),
-            if (_isDownloading) ...{
-              Center(child: PlatformProgressIndicator()),
-            },
-          }
+            if (_isDownloading) Center(child: PlatformProgressIndicator()),
+          ],
         ],
       ),
     );
@@ -220,12 +217,11 @@ class _AttachmentChipState extends State<AttachmentChip> {
               mediaProvider.name,
               style: Theme.of(context).textTheme.headline6,
             ),
-            if (sizeText != null) ...{
+            if (sizeText != null)
               Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(sizeText),
               ),
-            },
             PlatformTextButton(
               child: ButtonText(localizations.attachmentActionOpen),
               onPressed: () => InteractiveMediaScreen.share(mediaProvider),

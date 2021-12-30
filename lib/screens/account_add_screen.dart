@@ -348,7 +348,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
       content: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          if (_isProviderResolving) ...{
+          if (_isProviderResolving)
             Row(
               children: [
                 Container(
@@ -359,11 +359,11 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                       .addAccountResolvingSetingsLabel(_account.email!)),
                 ),
               ],
-            ),
-          } else if (provider != null) ...{
+            )
+          else if (provider != null)
             Column(
               children: [
-                if (provider.hasOAuthClient) ...{
+                if (provider.hasOAuthClient) ...[
                   // The user can continue to sign in with the provider or by using an app-specific password
                   Text(
                     localizations.addAccountOauthOptionsText(
@@ -377,7 +377,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                       isSignInButton: true,
                     ),
                   ),
-                  if (appSpecificPasswordSetupUrl != null) ...{
+                  if (appSpecificPasswordSetupUrl != null) ...[
                     Padding(
                       padding: EdgeInsets.only(top: 8.0),
                       child: Text(
@@ -397,8 +397,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                       title: Text(localizations
                           .addAccountApplicationPasswordRequiredAcknowledged),
                     ),
-                  },
-                } else if (provider.appSpecificPasswordSetupUrl != null) ...{
+                  ],
+                ] else if (provider.appSpecificPasswordSetupUrl != null) ...[
                   Text(localizations.addAccountApplicationPasswordRequiredInfo),
                   PlatformTextButton(
                     onPressed: () async {
@@ -415,9 +415,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                     title: Text(localizations
                         .addAccountApplicationPasswordRequiredAcknowledged),
                   ),
-                },
+                ],
                 if (provider.appSpecificPasswordSetupUrl == null ||
-                    _isApplicationSpecificPasswordAcknowledged!) ...{
+                    _isApplicationSpecificPasswordAcknowledged!)
                   PasswordField(
                     controller: _passwordController,
                     cupertinoShowLabel: false,
@@ -435,7 +435,6 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                     labelText: localizations.addAccountPasswordLabel,
                     hintText: localizations.addAccountPasswordHint,
                   ),
-                },
                 PlatformTextButton(
                   onPressed: () =>
                       _navigateToManualSettings(context, localizations),
@@ -444,7 +443,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                         _provider?.displayName ?? '<unknown>'),
                   ),
                 ),
-                if (_extensionForgotPassword != null) ...{
+                if (_extensionForgotPassword != null) ...[
                   PlatformTextButton(
                     onPressed: () {
                       final languageCode =
@@ -458,10 +457,10 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                     child: ButtonText(_extensionForgotPassword!
                         .getLabel(locator<I18nService>().locale!.languageCode)),
                   ),
-                },
+                ],
               ],
-            ),
-          } else ...{
+            )
+          else
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -474,7 +473,6 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                 )
               ],
             ),
-          },
         ],
       ),
     );
@@ -489,7 +487,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
       content: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          if (_isAccountVerifying) ...{
+          if (_isAccountVerifying)
             Row(
               children: [
                 Container(
@@ -500,8 +498,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                       .addAccountVerifyingSettingsLabel(_account.email!)),
                 ),
               ],
-            ),
-          } else if (_isAccountVerified) ...{
+            )
+          else if (_isAccountVerified) ...[
             Text(localizations.addAccountVerifyingSuccessInfo(_account.email!)),
             DecoratedPlatformTextField(
               controller: _userNameController,
@@ -543,10 +541,10 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
               ),
               cupertinoAlignLabelOnTop: true,
             ),
-          } else ...{
+          ] else ...[
             Text(localizations
                 .addAccountVerifyingFailedInfo(_account.email ?? '')),
-            if (_provider?.manualImapAccessSetupUrl != null) ...{
+            if (_provider?.manualImapAccessSetupUrl != null) ...[
               Padding(
                 padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: Text(
@@ -558,8 +556,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                 onPressed: () =>
                     launcher.launch(_provider!.manualImapAccessSetupUrl!),
               ),
-            },
-          }
+            ],
+          ],
         ],
       ),
     );

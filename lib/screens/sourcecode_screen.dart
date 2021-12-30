@@ -29,12 +29,12 @@ class SourceCodeScreen extends StatelessWidget {
           children: [
             SelectableText('ID: ${mimeMessage!.sequenceId}'),
             SelectableText('UID: ${mimeMessage!.uid}'),
-            if (sizeText != null) ...{
+            if (sizeText != null) 
               SelectableText(sizeText),
-            },
-            if (mimeMessage!.body != null) ...{
+            
+            if (mimeMessage!.body != null) 
               SelectableText('BODY: ${mimeMessage!.body}'),
-            },
+            
             Divider(
               color: Theme.of(context).colorScheme.secondary,
               thickness: 1,

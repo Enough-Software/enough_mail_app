@@ -178,7 +178,7 @@ class _SettingsDeveloperModeScreenState
       SingleChildScrollView(
         child: Column(
           children: [
-            for (final domain in domains) ...{
+            for (final domain in domains)
               PlatformListTile(
                 title: Text(domain.domain),
                 subtitle: Text(AppExtension.urlFor(domain.domain)),
@@ -200,7 +200,6 @@ class _SettingsDeveloperModeScreenState
                   },
                 ),
               ),
-            },
           ],
         ),
       ),
@@ -235,24 +234,23 @@ class _SettingsDeveloperModeScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Version: ${data.version}'),
-          if (data.accountSideMenu != null) ...{
+          if (data.accountSideMenu != null) ...[
             Divider(),
             Text('Account side menus:'),
-            for (final entry in data.accountSideMenu!) ...{
+            for (final entry in data.accountSideMenu!)
               Text('"${entry.getLabel('en')}": ${entry.action!.url}'),
-            },
-          },
-          if (data.forgotPasswordAction != null) ...{
+          ],
+          if (data.forgotPasswordAction != null) ...[
             Divider(),
             Text('Forgot password:'),
             Text(
                 '"${data.forgotPasswordAction!.getLabel('en')}": ${data.forgotPasswordAction!.action!.url}'),
-          },
-          if (data.signatureHtml != null) ...{
+          ],
+          if (data.signatureHtml != null) ...[
             Divider(),
             Text('Signature:'),
             Text('${data.getSignatureHtml('en')}'),
-          },
+          ],
         ],
       ),
       title: '$domainOrUrl Extension',

@@ -26,9 +26,8 @@ class MailboxTree extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final element in mailboxTreeElements) ...{
+        for (final element in mailboxTreeElements)
           buildMailboxElement(element, 0),
-        },
       ],
     );
   }
@@ -53,9 +52,9 @@ class MailboxTree extends StatelessWidget {
       child: ExpansionTile(
         title: title,
         children: [
-          for (final childElement in element.children!) ...{
+          for (final childElement in element.children!) 
             buildMailboxElement(childElement, level + 1),
-          },
+          
         ],
       ),
     );

@@ -92,7 +92,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   await locator<MailService>().saveAccounts();
                 },
               ),
-              if (locator<MailService>().hasUnifiedAccount) ...{
+              if (locator<MailService>().hasUnifiedAccount)
                 PlatformCheckboxListTile(
                   value: !widget.account.excludeFromUnified,
                   onChanged: (value) async {
@@ -104,7 +104,6 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   },
                   title: Text(localizations.editAccountIncludeInUnifiedLabel),
                 ),
-              },
               Divider(),
               Text(localizations.signatureSettingsTitle,
                   style: theme.textTheme.subtitle1),
@@ -117,14 +116,14 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 child: Text(
                     localizations.editAccountAliasLabel(widget.account.email)),
               ),
-              if (widget.account.hasNoAlias) ...{
+              if (widget.account.hasNoAlias)
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: Text(localizations.editAccountNoAliasesInfo,
                       style: TextStyle(fontStyle: FontStyle.italic)),
                 ),
-              },
-              for (final alias in widget.account.aliases) ...{
+
+              for (final alias in widget.account.aliases)
                 Dismissible(
                   key: ValueKey(alias),
                   child: PlatformListTile(
@@ -149,7 +148,6 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                         localizations.editAccountAliasRemoved(alias.email));
                   },
                 ),
-              },
               PlatformTextButtonIcon(
                 icon: Icon(iconService.add),
                 label: Text(localizations.editAccountAddAliasAction),
@@ -173,7 +171,6 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 onChanged: null,
                 title: Text(localizations.editAccountPlusAliasesSupported),
               ),
-              //if (!widget.account.supportsPlusAliases) ...{
               PlatformTextButton(
                 child:
                     ButtonText(localizations.editAccountCheckPlusAliasAction),
@@ -514,7 +511,7 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
             }
           },
         ),
-        if (_errorMessage != null) ...{
+        if (_errorMessage != null)
           Padding(
             padding: const EdgeInsets.all(8),
             child: Text(
@@ -522,7 +519,6 @@ class _AliasEditDialogState extends State<AliasEditDialog> {
               style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic),
             ),
           ),
-        },
       ],
     );
   }

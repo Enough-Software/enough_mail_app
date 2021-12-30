@@ -98,8 +98,8 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
               ),
             ),
           ),
-          for (final unicodeFont in UnicodeFont.values) ...{
-            if (unicodeFont != UnicodeFont.normal) ...{
+          for (final unicodeFont in UnicodeFont.values)
+            if (unicodeFont != UnicodeFont.normal) ...[
               Text(
                 captions[unicodeFont] ?? '',
                 style: captionStyle,
@@ -117,8 +117,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
                 },
               ),
               Divider(),
-            },
-          },
+            ],
         ],
       ),
     );
