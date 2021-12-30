@@ -1,6 +1,13 @@
 import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_flutter/enough_mail_flutter.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
+
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -8,8 +15,8 @@ import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
+import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
@@ -19,15 +26,10 @@ import 'package:enough_mail_app/widgets/attachment_chip.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/expansion_wrap.dart';
 import 'package:enough_mail_app/widgets/ical_interactive_media.dart';
+import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_mail_app/widgets/message_actions.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
-import 'package:enough_mail_app/widgets/inherited_widgets.dart';
-import 'package:enough_mail_flutter/enough_mail_flutter.dart';
-import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MessageDetailsScreen extends StatefulWidget {
   final Message message;
@@ -363,6 +365,12 @@ class _MessageContentState extends State<_MessageContent> {
       maxImageWidth: 320,
       showMediaDelegate: _navigateToMedia,
       includedInlineTypes: [MediaToptype.image],
+      urlLauncherDelegate: (url) {
+        // skip canLaunch check due to bug when handling URLs registered by apps
+        // https://github.com/flutter/flutter/issues/93765
+        launcher.launch(url);
+        return Future.value(true);
+      },
       onZoomed: (controller, factor) {
         if (factor < 0.9) {
           setState(() {
