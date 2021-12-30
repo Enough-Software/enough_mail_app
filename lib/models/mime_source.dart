@@ -99,19 +99,13 @@ abstract class MimeSource {
     if (e.mailClient == mailClient) {
       // display notification when the message is not seen and
       // when the user does not see the message because the user is looking at the list of messages
-      bool sendNotification;
       if (matches(e.message)) {
         // print('adding message');
         addMessage(e.message);
         _notifyMessageAdded(e.message);
-        sendNotification =
-            locator<AppService>().isInBackground && !e.message.isSeen;
-        // it should also show a notification when the user is on a different page...
         //TODO update uidNext for background service
-      } else {
-        sendNotification = !e.message.isSeen;
       }
-      if (sendNotification) {
+      if (!e.message.isSeen) {
         locator<NotificationService>().sendLocalNotificationForMailLoadEvent(e);
       }
     }
