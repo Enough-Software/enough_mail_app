@@ -441,27 +441,25 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         child:
                             Text(localizations.composeRequestReadReceiptAction),
                       ),
-                      if (_composeMode == ComposeMode.html) ...{
+                      if (_composeMode == ComposeMode.html)
                         PlatformPopupMenuItem<_OverflowMenuChoice>(
                           value: _OverflowMenuChoice.convertToPlainTextEditor,
                           child: Text(localizations
                               .composeConvertToPlainTextEditorAction),
-                        ),
-                      } else ...{
+                        )
+                      else
                         PlatformPopupMenuItem<_OverflowMenuChoice>(
                           value: _OverflowMenuChoice.convertToHtmlEditor,
                           child: Text(
                               localizations.composeConvertToHtmlEditorAction),
                         ),
-                      },
                       if (locator<SettingsService>()
                           .settings
-                          .enableDeveloperMode) ...{
+                          .enableDeveloperMode)
                         PlatformPopupMenuItem<_OverflowMenuChoice>(
                           value: _OverflowMenuChoice.showSourceCode,
                           child: Text(localizations.viewSourceAction),
                         ),
-                      }
                     ],
                   ),
                 ], // actions
@@ -522,7 +520,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           ),
                         ),
                       ),
-                      if (_isCcBccVisible) ...{
+                      if (_isCcBccVisible) ...[
                         RecipientInputField(
                           addresses: _ccRecipients,
                           contactManager: _from.account.contactManager,
@@ -535,7 +533,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           labelText: localizations.detailsHeaderBcc,
                           hintText: localizations.composeRecipientHint,
                         ),
-                      },
+                      ],
                       TextEditor(
                         controller: _subjectController,
                         autofocus: _focus == _Autofocus.subject,
@@ -546,7 +544,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         cupertinoShowLabel: false,
                       ),
                       if (widget.data.messageBuilder.attachments.isNotEmpty ||
-                          (_downloadAttachmentsFuture != null)) ...{
+                          (_downloadAttachmentsFuture != null)) ...[
                         Padding(
                           padding: EdgeInsets.only(top: 8.0),
                           child: AttachmentComposeBar(
@@ -557,12 +555,12 @@ class _ComposeScreenState extends State<ComposeScreen> {
                         Divider(
                           color: Colors.grey,
                         )
-                      },
+                      ],
                     ],
                   ),
                 ),
               ),
-              if (_isReadReceiptRequested) ...{
+              if (_isReadReceiptRequested)
                 SliverToBoxAdapter(
                   child: PlatformCheckboxListTile(
                     value: true,
@@ -572,19 +570,16 @@ class _ComposeScreenState extends State<ComposeScreen> {
                     },
                   ),
                 ),
-              },
-              if (_composeMode == ComposeMode.html &&
-                  _htmlEditorApi != null) ...{
+              if (_composeMode == ComposeMode.html && _htmlEditorApi != null)
                 SliverHeaderHtmlEditorControls(
                   editorApi: _htmlEditorApi,
                   suffix: EditorArtExtensionButton(editorApi: _htmlEditorApi!),
-                ),
-              } else if (_composeMode == ComposeMode.plainText &&
-                  _plainTextEditorApi != null) ...{
+                )
+              else if (_composeMode == ComposeMode.plainText &&
+                  _plainTextEditorApi != null)
                 SliverHeaderTextEditorControls(
                   editorApi: _plainTextEditorApi,
                 ),
-              },
               SliverToBoxAdapter(
                 child: FutureBuilder<String>(
                   future: _loadMailTextFuture,

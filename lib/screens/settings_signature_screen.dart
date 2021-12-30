@@ -63,7 +63,7 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(localizations.signatureSettingsComposeActionsInfo),
-                for (final action in ComposeAction.values) ...{
+                for (final action in ComposeAction.values)
                   PlatformCheckboxListTile(
                     value: _signatureEnabledFor[action],
                     onChanged: (value) async {
@@ -73,20 +73,19 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
                     },
                     title: Text(getActionName(action, localizations)),
                   ),
-                },
+
                 Divider(),
                 SignatureWidget(), //  global signature
-                if (accounts.length > 1) ...{
+                if (accounts.length > 1) ...[
                   Divider(),
-                  if (accountsWithSignature.isNotEmpty) ...{
-                    for (final account in accountsWithSignature) ...{
+                  if (accountsWithSignature.isNotEmpty)
+                    for (final account in accountsWithSignature) ...[
                       Text(account.name, style: theme.textTheme.subtitle1),
                       SignatureWidget(
                         account: account,
                       ),
                       Divider(),
-                    },
-                  },
+                    ],
                   Text(localizations.signatureSettingsAccountInfo),
                   PlatformTextButton(
                     onPressed: () {
@@ -95,7 +94,7 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
                     },
                     child: ButtonText(localizations.settingsActionAccounts),
                   ),
-                },
+                ],
               ],
             ),
           ),
@@ -175,7 +174,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
         onCreated: (api) => editorApi = api,
       ),
       appBarActions: [
-        if (_signature != null) ...{
+        if (_signature != null)
           DensePlatformIconButton(
             icon: Icon(iconService.messageActionDelete),
             onPressed: () async {
@@ -194,7 +193,6 @@ class _SignatureWidgetState extends State<SignatureWidget> {
               }
             },
           ),
-        },
         DensePlatformIconButton(
           icon: Icon(CommonPlatformIcons.ok),
           onPressed: () => Navigator.of(context).pop(true),

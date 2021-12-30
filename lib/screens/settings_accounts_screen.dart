@@ -42,20 +42,19 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (final account in accounts) ...{
+            for (final account in accounts)
               PlatformListTile(
                 leading: Icon(Icons.account_circle),
                 title: Text(account.name),
                 onTap: () => locator<NavigationService>()
                     .push(Routes.accountEdit, arguments: account),
               ),
-            },
             PlatformListTile(
               leading: Icon(Icons.add),
               title: Text(localizations.drawerEntryAddAccount),
               onTap: () => locator<NavigationService>().push(Routes.accountAdd),
             ),
-            if (accounts.length > 1) ...{
+            if (accounts.length > 1)
               Padding(
                 padding: EdgeInsets.all(8.0),
                 child: PlatformElevatedButton(
@@ -67,7 +66,6 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
                   child: ButtonText(localizations.accountsActionReorder),
                 ),
               ),
-            },
           ],
         ),
       ),
@@ -98,13 +96,12 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
               await locator<MailService>().reorderAccounts(accounts);
             },
             children: [
-              for (final account in accounts) ...{
+              for (final account in accounts)
                 ListTile(
                   key: ValueKey(account),
                   leading: Icon(Icons.account_circle),
                   title: Text(account.name),
                 ),
-              },
             ],
           ),
         ),

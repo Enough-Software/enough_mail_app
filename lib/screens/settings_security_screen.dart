@@ -130,12 +130,12 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                   ),
                 ),
                 Divider(),
-                if (_isBiometricsSupported == false) ...{
+                if (_isBiometricsSupported == false)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(localizations.securityUnlockNotAvailable),
-                  ),
-                } else if (_isBiometricsSupported == true) ...{
+                  )
+                else if (_isBiometricsSupported == true) ...[
                   Row(
                     children: [
                       Expanded(
@@ -173,7 +173,7 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                       ),
                     ],
                   ),
-                  if (_enableBiometricLock) ...{
+                  if (_enableBiometricLock)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: PlatformDropdownButton<LockTimePreference>(
@@ -198,15 +198,13 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                             .toList(),
                       ),
                     ),
-                  },
-                } else ...{
+                ] else
                   const Center(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: CircularProgressIndicator(),
                     ),
                   ),
-                },
               ],
             ),
           ),

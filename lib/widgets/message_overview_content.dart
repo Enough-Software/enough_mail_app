@@ -54,31 +54,21 @@ class MessageOverviewContent extends StatelessWidget {
                   msg.isAnswered ||
                   msg.isForwarded ||
                   msg.isFlagged ||
-                  threadLength != 0) ...{
+                  threadLength != 0)
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Row(
                     children: [
-                      if (msg.isFlagged) ...{
-                        Icon(Icons.outlined_flag, size: 12),
-                      },
-                      if (hasAttachments) ...{
-                        Icon(Icons.attach_file, size: 12),
-                      },
-                      if (msg.isAnswered) ...{
-                        Icon(Icons.reply, size: 12),
-                      },
-                      if (msg.isForwarded) ...{
-                        Icon(Icons.forward, size: 12),
-                      },
-                      if (threadLength != 0) ...{
+                      if (msg.isFlagged) Icon(Icons.outlined_flag, size: 12),
+                      if (hasAttachments) Icon(Icons.attach_file, size: 12),
+                      if (msg.isAnswered) Icon(Icons.reply, size: 12),
+                      if (msg.isForwarded) Icon(Icons.forward, size: 12),
+                      if (threadLength != 0)
                         IconService.buildNumericIcon(context, threadLength,
                             size: 12.0),
-                      },
                     ],
                   ),
                 ),
-              }
             ],
           ),
           Text(

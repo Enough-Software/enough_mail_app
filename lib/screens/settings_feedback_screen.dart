@@ -71,12 +71,12 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                   child: Text(localizations.feedbackIntro,
                       style: theme.textTheme.subtitle1),
                 ),
-                if (info == null) ...{
+                if (info == null)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: PlatformProgressIndicator(),
-                  ),
-                } else ...{
+                  )
+                else ...[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
@@ -99,7 +99,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                       },
                     ),
                   ),
-                },
+                ],
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: PlatformTextButton(

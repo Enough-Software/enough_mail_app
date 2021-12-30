@@ -85,7 +85,7 @@ class _MessageStackState extends State<MessageStack> {
       fit: StackFit.expand,
       children: [
         // center: stack of messages
-        for (var i = _nextMessages.length; --i >= 0;) ...{
+        for (var i = _nextMessages.length; --i >= 0;)
           Padding(
             padding: EdgeInsets.all(30),
             child: MessageCard(
@@ -93,7 +93,7 @@ class _MessageStackState extends State<MessageStack> {
               angle: _nextAngles[i],
             ),
           ),
-        },
+
         // top right: day of message
         Align(
           alignment: Alignment.topRight,
@@ -163,20 +163,19 @@ class _MessageStackState extends State<MessageStack> {
           ),
         ),
         // center: first / current message
-        if (_currentMessage != null) ...{
+        if (_currentMessage != null)
           Padding(
             padding: EdgeInsets.all(30),
             child: MessageDraggable(
               message: _currentMessage,
               angle: _currentAngle,
             ),
-          ),
-        } else ...{
+          )
+        else
           Padding(
             padding: EdgeInsets.all(30),
             child: Center(child: Text('All messages processed, well done!')),
           ),
-        },
       ],
     );
   }
@@ -454,31 +453,30 @@ class _MessageCardState extends State<MessageCard> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text('From '),
-            for (final address in mime.from!) ...{
+            for (final address in mime.from!)
               MailAddressChip(mailAddress: address),
-            },
           ],
         ),
-        if (mime.to?.isNotEmpty ?? false) ...{
+        if (mime.to?.isNotEmpty ?? false) 
           Wrap(
             children: [
               Text('To '),
-              for (final address in mime.to!) ...{
+              for (final address in mime.to!)
                 MailAddressChip(mailAddress: address),
-              },
+              
             ],
           ),
-        },
-        if (mime.cc?.isNotEmpty ?? false) ...{
+        
+        if (mime.cc?.isNotEmpty ?? false) 
           Wrap(
             children: [
               Text('CC '),
-              for (final address in mime.cc!) ...{
+              for (final address in mime.cc!) 
                 MailAddressChip(mailAddress: address),
-              },
+              
             ],
           ),
-        },
+        
         buildContent(),
       ],
     );

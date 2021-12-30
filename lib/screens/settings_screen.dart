@@ -54,14 +54,13 @@ class SettingsScreen extends StatelessWidget {
                         .push(Routes.settingsDefaultSender);
                   },
                 ),
-                if (!PlatformInfo.isCupertino) ...{
+                if (!PlatformInfo.isCupertino)
                   PlatformListTile(
                     title: Text(localizations.settingsActionDesign),
                     onTap: () {
                       locator<NavigationService>().push(Routes.settingsDesign);
                     },
                   ),
-                },
                 PlatformListTile(
                   title: Text(localizations.languageSettingTitle),
                   onTap: () {

@@ -128,7 +128,7 @@ class _SwipeSettingState extends State<_SwipeSetting> {
                         swipeAction: action,
                         isSmall: true,
                       ),
-                      if (action == current) ...{
+                      if (action == current)
                         Align(
                           alignment: Alignment.topLeft,
                           child: Container(
@@ -142,7 +142,6 @@ class _SwipeSettingState extends State<_SwipeSetting> {
                             ),
                           ),
                         ),
-                      },
                     ],
                   ),
                   onPressed: () {

@@ -66,14 +66,14 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
                   onChanged: _onFolderNameSettingChanged,
                   title: Text(localizations.folderNamesSettingCustom),
                 ),
-                if (folderNameSetting == FolderNameSetting.custom) ...{
+                if (folderNameSetting == FolderNameSetting.custom) ...[
                   Divider(),
                   PlatformTextButtonIcon(
                     icon: Icon(Icons.edit),
                     label: ButtonText(localizations.folderNamesEditAction),
                     onPressed: _editFolderNames,
                   ),
-                },
+                ],
                 Divider(
                   height: 8.0,
                 ),
@@ -332,7 +332,7 @@ class MailboxWidget extends StatelessWidget {
           icon: Icon(Icons.add),
           label: ButtonText(localizations.folderAddAction),
         ),
-        if (mailbox != null) ...{
+        if (mailbox != null) 
           PlatformTextButtonIcon(
             onPressed: () => _deleteFolder(context),
             backgroundColor: Colors.red,
@@ -349,7 +349,7 @@ class MailboxWidget extends StatelessWidget {
                   .copyWith(color: Colors.white),
             ),
           ),
-        },
+        
       ],
     );
   }

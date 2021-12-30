@@ -162,7 +162,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             : Base.buildTitle(source.name ?? '', source.description ?? '');
 
     final appBarActions = [
-      if (source.supportsSearching && !Platform.isIOS) ...{
+      if (source.supportsSearching && !Platform.isIOS)
         PlatformIconButton(
           icon: Icon(_isInSearchMode ? Icons.arrow_back : Icons.search),
           onPressed: () {
@@ -177,8 +177,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             }
           },
         ),
-      },
-      // if (!_isInSearchMode) ...{
+
+      // if (!_isInSearchMode)
       //   PlatformPopupMenuButton<_Visualization>(
       //     onSelected: switchVisualization,
       //     itemBuilder: (context) => [
@@ -193,7 +193,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       //             ),
       //     ],
       //   ),
-      // },
     ];
     final i18nService = locator<I18nService>();
     Widget? zeroPosWidget;
@@ -592,51 +591,47 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text('${_selectedMessages.length}'),
             ),
-            if (isAnyUnseen) ...{
+            if (isAnyUnseen)
               PlatformIconButton(
                 icon: Icon(iconService.messageIsNotSeen),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.seen),
-              ),
-            } else ...{
+              )
+            else
               PlatformIconButton(
                 icon: Icon(iconService.messageIsSeen),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.unseen),
               ),
-            },
-            if (isAnyUnflagged) ...{
+            if (isAnyUnflagged)
               PlatformIconButton(
                 icon: Icon(iconService.messageIsNotFlagged),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.flag),
-              ),
-            } else ...{
+              )
+            else
               PlatformIconButton(
                 icon: Icon(iconService.messageIsFlagged),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.unflag),
               ),
-            },
-            if (isJunk) ...{
+            if (isJunk)
               PlatformIconButton(
                 icon: Icon(iconService.messageActionMoveFromJunkToInbox),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
-              ),
-            } else ...{
+              )
+            else
               PlatformIconButton(
                 icon: Icon(iconService.messageActionMoveToJunk),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.junk),
               ),
-            },
             Spacer(),
-            if (isTrash) ...{
+            if (isTrash)
               PlatformIconButton(
                 icon: Icon(iconService.messageActionMoveToInbox),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
-              ),
-            } else ...{
+              )
+            else
               PlatformIconButton(
                 icon: Icon(iconService.messageActionDelete),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.delete),
               ),
-            },
             PlatformIconButton(
               icon: Icon(Icons.close),
               onPressed: leaveSelectionMode,
@@ -658,15 +653,15 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     label: Text(localizations.messagesActionForwardAttachments),
                   ),
                 ),
-                if (isTrash) ...{
+                if (isTrash)
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.inbox,
                     child: IconText(
                       icon: Icon(iconService.messageActionMoveToInbox),
                       label: Text(localizations.messageActionMoveToInbox),
                     ),
-                  ),
-                } else ...{
+                  )
+                else
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.delete,
                     child: IconText(
@@ -674,17 +669,16 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       label: Text(localizations.messageActionDelete),
                     ),
                   ),
-                },
                 PlatformPopupDivider(),
-                if (isAnyUnseen) ...{
+                if (isAnyUnseen)
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.seen,
                     child: IconText(
                       icon: Icon(iconService.messageIsSeen),
                       label: Text(localizations.messageActionMultipleMarkSeen),
                     ),
-                  ),
-                } else ...{
+                  )
+                else
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.unseen,
                     child: IconText(
@@ -693,8 +687,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           Text(localizations.messageActionMultipleMarkUnseen),
                     ),
                   ),
-                },
-                if (isAnyUnflagged) ...{
+                if (isAnyUnflagged)
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.flag,
                     child: IconText(
@@ -702,8 +695,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       label:
                           Text(localizations.messageActionMultipleMarkFlagged),
                     ),
-                  ),
-                } else ...{
+                  )
+                else
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.unflag,
                     child: IconText(
@@ -712,8 +705,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           localizations.messageActionMultipleMarkUnflagged),
                     ),
                   ),
-                },
-                if (source.supportsMessageFolders) ...{
+                if (source.supportsMessageFolders) ...[
                   PlatformPopupDivider(),
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.move,
@@ -722,7 +714,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       label: Text(localizations.messageActionMove),
                     ),
                   ),
-                  if (isJunk) ...{
+                  if (isJunk)
                     PlatformPopupMenuItem(
                       value: _MultipleChoice.inbox,
                       child: IconText(
@@ -730,8 +722,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                             Icon(iconService.messageActionMoveFromJunkToInbox),
                         label: Text(localizations.messageActionMarkAsNotJunk),
                       ),
-                    ),
-                  } else ...{
+                    )
+                  else
                     PlatformPopupMenuItem(
                       value: _MultipleChoice.junk,
                       child: IconText(
@@ -739,16 +731,15 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                         label: Text(localizations.messageActionMarkAsJunk),
                       ),
                     ),
-                  },
-                  if (source.isArchive) ...{
+                  if (source.isArchive)
                     PlatformPopupMenuItem(
                       value: _MultipleChoice.inbox,
                       child: IconText(
                         icon: Icon(iconService.messageActionMoveToInbox),
                         label: Text(localizations.messageActionUnarchive),
                       ),
-                    ),
-                  } else ...{
+                    )
+                  else
                     PlatformPopupMenuItem(
                       value: _MultipleChoice.archive,
                       child: IconText(
@@ -756,9 +747,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                         label: Text(localizations.messageActionArchive),
                       ),
                     ),
-                  },
-                },
-                if (_selectedMessages.length == 1) ...{
+                ],
+                if (_selectedMessages.length == 1)
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.viewInSafeMode,
                     child: IconText(
@@ -766,7 +756,6 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       label: Text(localizations.messageActionViewInSafeMode),
                     ),
                   ),
-                },
               ],
             ),
           ],

@@ -114,13 +114,13 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                           value: language, child: Text(language.displayName!)))
                       .toList(),
                 ),
-                if (_selectedLocalizations != null) ...{
+                if (_selectedLocalizations != null)
                   Text(_selectedLocalizations!.languageSetInfo,
-                      style: theme.textTheme.subtitle1),
-                } else if (_systemSettingApplied) ...{
+                      style: theme.textTheme.subtitle1)
+                else if (_systemSettingApplied)
                   Text(localizations.languageSystemSetInfo,
                       style: theme.textTheme.subtitle1),
-                },
+                
               ],
             ),
           ),

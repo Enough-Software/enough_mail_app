@@ -86,24 +86,21 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
                   child: middle,
                 ),
               ),
-              if (lAction != null) ...{
+              if (lAction != null)
                 Align(
                   alignment: Alignment.centerLeft,
                   child: lAction,
                 ),
-              },
-              if (rAction != null) ...{
+              if (rAction != null)
                 Align(
                   alignment: Alignment.centerRight,
                   child: rAction,
                 ),
-              },
-              if (sAction != null) ...{
+              if (sAction != null)
                 Align(
                   alignment: Alignment.centerRight,
                   child: sAction,
                 ),
-              },
             ],
           ),
         ),

@@ -86,12 +86,12 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            if (isReply) ...{
+            if (isReply)
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: _buildReply(context, localizations, event),
-              ),
-            } else if (_canReply && _participantStatus == null) ...{
+              )
+            else if (_canReply && _participantStatus == null)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -112,8 +112,8 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                         ParticipantStatus.declined, localizations),
                   ),
                 ],
-              ),
-            } else if (_participantStatus != null) ...{
+              )
+            else if (_participantStatus != null)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -129,7 +129,6 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                   ),
                 ],
               ),
-            },
             Table(
               columnWidths: {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
               children: [
@@ -145,173 +144,183 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                             localizations.icalendarNoSummaryInfo),
                   )
                 ]),
-                if (start != null) ...{
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(localizations.icalendarLabelStart),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        i18nService.formatDateTime(start.toLocal(),
-                            alwaysUseAbsoluteFormat: true, useLongFormat: true),
+                if (start != null)
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(localizations.icalendarLabelStart),
                       ),
-                    )
-                  ]),
-                },
-                if (end != null) ...{
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(localizations.icalendarLabelEnd),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        i18nService.formatDateTime(end.toLocal(),
-                            alwaysUseAbsoluteFormat: true, useLongFormat: true),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          i18nService.formatDateTime(start.toLocal(),
+                              alwaysUseAbsoluteFormat: true,
+                              useLongFormat: true),
+                        ),
+                      )
+                    ],
+                  ),
+                if (end != null)
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(localizations.icalendarLabelEnd),
                       ),
-                    ),
-                  ]),
-                } else if (event.duration != null) ...{
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(localizations.icalendarLabelDuration),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child:
-                          Text(i18nService.formatIsoDuration(event.duration!)),
-                    )
-                  ]),
-                },
-                if (recurrenceRule != null) ...{
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(localizations.icalendarLabelRecurrenceRule),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(recurrenceRule.toHumanReadableText(
-                        languageCode: localizations.localeName,
-                      )),
-                    )
-                  ]),
-                },
-                if (event.description != null) ...{
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(localizations.icalendarLabelDescription),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextWithLinks(
-                        text: event.description!,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          i18nService.formatDateTime(end.toLocal(),
+                              alwaysUseAbsoluteFormat: true,
+                              useLongFormat: true),
+                        ),
                       ),
-                    ),
-                  ]),
-                },
-                if (event.location != null) ...{
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(localizations.icalendarLabelLocation),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextWithLinks(text: event.location!),
-                    )
-                  ]),
-                },
-                if (event.microsoftTeamsMeetingUrl != null) ...{
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(localizations.icalendarLabelTeamsUrl),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child:
-                          TextWithLinks(text: event.microsoftTeamsMeetingUrl!),
-                    )
-                  ]),
-                },
-                if (attendees.isNotEmpty) ...{
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(localizations.icalendarLabelParticipants),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: attendees.map((attendee) {
-                        final isMe = attendee.email?.toLowerCase() == userEmail;
-                        final address = isMe
-                            ? widget.message.account.fromAddress
-                            : attendee.mailAddress;
-                        final participantStatus = (isMe)
-                            ? _participantStatus ?? attendee.participantStatus
-                            : attendee.participantStatus;
-                        final icon = participantStatus?.icon;
-                        final name = isMe
-                            ? widget.message.account.userName ??
-                                attendee.commonName
-                            : attendee.commonName;
-                        final textStyle = participantStatus?.textStyle;
-                        return Row(
-                          children: [
-                            if (icon != null) ...{
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: icon,
-                              ),
-                            },
-                            address != null
-                                ? MailAddressChip(mailAddress: address)
-                                : Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          if (name != null) ...{
-                                            Text(
-                                              name,
-                                              style: textStyle,
+                    ],
+                  )
+                else if (event.duration != null)
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(localizations.icalendarLabelDuration),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                            i18nService.formatIsoDuration(event.duration!)),
+                      )
+                    ],
+                  ),
+                if (recurrenceRule != null)
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(localizations.icalendarLabelRecurrenceRule),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(recurrenceRule.toHumanReadableText(
+                          languageCode: localizations.localeName,
+                        )),
+                      )
+                    ],
+                  ),
+                if (event.description != null)
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(localizations.icalendarLabelDescription),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextWithLinks(
+                          text: event.description!,
+                        ),
+                      ),
+                    ],
+                  ),
+                if (event.location != null)
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(localizations.icalendarLabelLocation),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextWithLinks(text: event.location!),
+                      )
+                    ],
+                  ),
+                if (event.microsoftTeamsMeetingUrl != null)
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(localizations.icalendarLabelTeamsUrl),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextWithLinks(
+                            text: event.microsoftTeamsMeetingUrl!),
+                      )
+                    ],
+                  ),
+                if (attendees.isNotEmpty)
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(localizations.icalendarLabelParticipants),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: attendees.map((attendee) {
+                          final isMe =
+                              attendee.email?.toLowerCase() == userEmail;
+                          final address = isMe
+                              ? widget.message.account.fromAddress
+                              : attendee.mailAddress;
+                          final participantStatus = (isMe)
+                              ? _participantStatus ?? attendee.participantStatus
+                              : attendee.participantStatus;
+                          final icon = participantStatus?.icon;
+                          final name = isMe
+                              ? widget.message.account.userName ??
+                                  attendee.commonName
+                              : attendee.commonName;
+                          final textStyle = participantStatus?.textStyle;
+                          return Row(
+                            children: [
+                              if (icon != null)
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: icon,
+                                ),
+                              address != null
+                                  ? MailAddressChip(mailAddress: address)
+                                  : Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (name != null)
+                                              Text(
+                                                name,
+                                                style: textStyle,
+                                              ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 4.0),
+                                              child: Text(
+                                                attendee.email ??
+                                                    attendee.uri.toString(),
+                                                style: textStyle,
+                                              ),
                                             ),
-                                          },
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 4.0),
-                                            child: Text(
-                                              attendee.email ??
-                                                  attendee.uri.toString(),
-                                              style: textStyle,
-                                            ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                          ],
-                        );
-                      }).toList(),
-                    ),
-                  ]),
-                },
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
               ],
             ),
-            if (!isReply) ...{
+            if (!isReply)
               PlatformElevatedButton(
                 child: PlatformText(localizations.icalendarExportAction),
                 onPressed: () => _exportToNativeCalendar(_calendar),
               ),
-            },
           ],
         ),
       ),

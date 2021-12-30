@@ -74,7 +74,7 @@ class _MessageActionsState extends State<MessageActions> {
         top: false,
         child: Row(
           children: [
-            if (!widget.message.isEmbedded) ...{
+            if (!widget.message.isEmbedded) ...[
               DensePlatformIconButton(
                 icon: Icon(iconService.getMessageIsSeen(widget.message.isSeen)),
                 onPressed: _toggleSeen,
@@ -84,7 +84,7 @@ class _MessageActionsState extends State<MessageActions> {
                     iconService.getMessageIsFlagged(widget.message.isFlagged)),
                 onPressed: _toggleFlagged,
               ),
-            },
+            ],
             Spacer(),
             DensePlatformIconButton(
               icon: Icon(iconService.messageActionReply),
@@ -98,17 +98,16 @@ class _MessageActionsState extends State<MessageActions> {
               icon: Icon(iconService.messageActionForward),
               onPressed: _forward,
             ),
-            if (widget.message.source.isTrash) ...{
+            if (widget.message.source.isTrash)
               DensePlatformIconButton(
                 icon: Icon(iconService.messageActionMoveToInbox),
                 onPressed: _moveToInbox,
-              ),
-            } else if (!widget.message.isEmbedded) ...{
+              )
+            else if (!widget.message.isEmbedded)
               DensePlatformIconButton(
                 icon: Icon(iconService.messageActionDelete),
                 onPressed: _delete,
               ),
-            },
             PlatformPopupMenuButton<_OverflowMenuChoice>(
               onSelected: _onOverflowChoiceSelected,
               itemBuilder: (context) => [
@@ -140,7 +139,7 @@ class _MessageActionsState extends State<MessageActions> {
                     label: Text(localizations.messageActionForwardAsAttachment),
                   ),
                 ),
-                if (attachments.isNotEmpty) ...{
+                if (attachments.isNotEmpty)
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.forwardAttachments,
                     child: IconText(
@@ -149,16 +148,15 @@ class _MessageActionsState extends State<MessageActions> {
                           .messageActionForwardAttachments(attachments.length)),
                     ),
                   ),
-                },
-                if (widget.message.source.isTrash) ...{
+                if (widget.message.source.isTrash)
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.inbox,
                     child: IconText(
                       icon: Icon(iconService.messageActionMoveToInbox),
                       label: Text(localizations.messageActionMoveToInbox),
                     ),
-                  ),
-                } else if (!widget.message.isEmbedded) ...{
+                  )
+                else if (!widget.message.isEmbedded)
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.delete,
                     child: IconText(
@@ -166,8 +164,7 @@ class _MessageActionsState extends State<MessageActions> {
                       label: Text(localizations.messageActionDelete),
                     ),
                   ),
-                },
-                if (!widget.message.isEmbedded) ...{
+                if (!widget.message.isEmbedded) ...[
                   PlatformPopupDivider(),
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.seen,
@@ -193,7 +190,7 @@ class _MessageActionsState extends State<MessageActions> {
                       ),
                     ),
                   ),
-                  if (widget.message.source.supportsMessageFolders) ...{
+                  if (widget.message.source.supportsMessageFolders) ...[
                     PlatformPopupDivider(),
                     PlatformPopupMenuItem(
                       value: _OverflowMenuChoice.move,
@@ -228,7 +225,7 @@ class _MessageActionsState extends State<MessageActions> {
                         ),
                       ),
                     ),
-                  },
+                  ],
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.redirect,
                     child: IconText(
@@ -238,7 +235,7 @@ class _MessageActionsState extends State<MessageActions> {
                       ),
                     ),
                   ),
-                },
+                ],
               ],
             ),
           ],

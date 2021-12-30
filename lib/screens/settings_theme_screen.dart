@@ -96,7 +96,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                       });
                     },
                   ),
-                  if (_themeModeSetting == ThemeModeSetting.custom) ...{
+                  if (_themeModeSetting == ThemeModeSetting.custom) ...[
                     Text(localizations.designSectionCustomTitle,
                         style: theme.textTheme.subtitle1),
                     Row(
@@ -141,7 +141,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                         ),
                       ],
                     ),
-                  },
+                  ],
                   Divider(),
                   Text(localizations.designSectionColorTitle,
                       style: theme.textTheme.subtitle1),
@@ -150,23 +150,23 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                     primary: false,
                     shrinkWrap: true,
                     children: [
-                      for (final color in availableColors) ...{
+                      for (final color in availableColors)
                         PlatformListTile(
-                            title: CircleAvatar(
-                              backgroundColor: color,
-                              child: (color == primarySwatch)
-                                  ? Icon(Icons.check)
-                                  : null,
-                            ),
-                            onTap: () async {
-                              primarySwatch = color as MaterialColor?;
-                              setState(() {});
-                              themeSettings.primarySwatch =
-                                  color as MaterialColor;
-                              locator<ThemeService>().checkForChangedTheme();
-                              await locator<SettingsService>().save();
-                            }),
-                      },
+                          title: CircleAvatar(
+                            backgroundColor: color,
+                            child: (color == primarySwatch)
+                                ? Icon(Icons.check)
+                                : null,
+                          ),
+                          onTap: () async {
+                            primarySwatch = color as MaterialColor?;
+                            setState(() {});
+                            themeSettings.primarySwatch =
+                                color as MaterialColor;
+                            locator<ThemeService>().checkForChangedTheme();
+                            await locator<SettingsService>().save();
+                          },
+                        ),
                     ],
                   ),
                 ],

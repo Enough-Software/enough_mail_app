@@ -46,7 +46,7 @@ class _SettingsReplyScreenState extends State<SettingsReplyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(localizations.replySettingsIntro),
-                for (final preference in ReplyFormatPreference.values) ...{
+                for (final preference in ReplyFormatPreference.values)
                   PlatformRadioListTile<ReplyFormatPreference>(
                     value: preference,
                     groupValue: _preference,
@@ -63,7 +63,6 @@ class _SettingsReplyScreenState extends State<SettingsReplyScreen> {
                     title: Text(
                         _getFormatPreferenceName(preference, localizations)),
                   ),
-                },
               ],
             ),
           ),

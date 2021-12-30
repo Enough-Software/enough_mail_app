@@ -150,7 +150,7 @@ class _IcalComposerState extends State<IcalComposer> {
                 },
               ),
             ),
-            if (!isAllday) ...{
+            if (!isAllday) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
                 child: Text(localizations.icalendarLabelEnd,
@@ -167,7 +167,7 @@ class _IcalComposerState extends State<IcalComposer> {
                   },
                 ),
               ),
-            },
+            ],
             PlatformCheckboxListTile(
               value: isAllday,
               title: Text(localizations.composeAppointmentLabelAllDayEvent),
@@ -331,7 +331,7 @@ class DateTimePicker extends StatelessWidget {
             }
           },
         ),
-        if (!onlyDate) ...{
+        if (!onlyDate) 
           // set time button:
           PlatformTextButton(
             child: PlatformText(
@@ -356,7 +356,7 @@ class DateTimePicker extends StatelessWidget {
               }
             },
           ),
-        },
+        
       ],
     );
   }
@@ -477,7 +477,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
               ),
             ],
           ),
-          if (rule != null) ...{
+          if (rule != null) ...[
             Row(
               children: [
                 Padding(
@@ -502,7 +502,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                 ),
               ],
             ),
-            if (rule.frequency == RecurrenceFrequency.weekly) ...{
+            if (rule.frequency == RecurrenceFrequency.weekly) ...[
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child:
@@ -523,7 +523,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                   });
                 },
               ),
-            } else if (rule.frequency == RecurrenceFrequency.monthly) ...{
+             ] else if (rule.frequency == RecurrenceFrequency.monthly) ...[
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child:
@@ -538,7 +538,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                   });
                 },
               ),
-            },
+             ],
             PlatformListTile(
               title: Text(localizations.composeAppointmentRecurrenceUntilLabel),
               trailing: Text(rule.until == null
@@ -574,7 +574,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                 startDate: widget.startDate,
               )),
             ),
-          },
+        ],
         ],
       ),
     );
@@ -771,7 +771,7 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
             });
           },
         ),
-        if (_option == _DayOfMonthOption.dayInNumberedWeek && rule != null) ...{
+        if (_option == _DayOfMonthOption.dayInNumberedWeek && rule != null) ...[
           Padding(
             padding: EdgeInsets.fromLTRB(32.0, 8.0, 8.0, 32.0),
             child: Row(
@@ -835,7 +835,7 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
               ],
             ),
           ),
-        }
+      ],
       ],
     );
   }
@@ -904,9 +904,9 @@ class _UntilComposerState extends State<UntilComposer> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final value in _UntilOption.values) ...{
+          for (final value in _UntilOption.values)
             if (_recommendationDate != null ||
-                value != _UntilOption.recommendation) ...{
+                value != _UntilOption.recommendation) 
               PlatformRadioListTile<_UntilOption>(
                 groupValue: _option,
                 value: value,
@@ -914,9 +914,9 @@ class _UntilComposerState extends State<UntilComposer> {
                 title: Text(
                     value.localization(localizations, widget.recommendation)),
               ),
-            },
-          },
-          if (_option == _UntilOption.date) ...{
+            
+          
+          if (_option == _UntilOption.date) ...[
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
               child: Text(localizations.composeAppointmentRecurrenceUntilLabel,
@@ -934,7 +934,7 @@ class _UntilComposerState extends State<UntilComposer> {
                 },
               ),
             ),
-          },
+          ],
         ],
       ),
     );
