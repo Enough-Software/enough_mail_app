@@ -128,16 +128,24 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     }
     final appBarTitle = _isInSearchMode
         ? TextField(
-            cursorColor: Colors.white,
+            cursorColor: theme.primaryColorBrightness == Brightness.dark
+                ? Colors.white
+                : Colors.black,
             controller: _searchEditingController,
             textInputAction: TextInputAction.search,
             decoration: InputDecoration(
               hintText: localizations.homeSearchHint,
-              hintStyle: TextStyle(color: Colors.white30),
+              hintStyle: TextStyle(
+                  color: theme.primaryColorBrightness == Brightness.dark
+                      ? Colors.white30
+                      : Colors.black54),
             ),
             autofocus: true,
             autocorrect: false,
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(
+                color: theme.primaryColorBrightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black),
             onSubmitted: _search,
             onChanged: (text) {
               if (text.isNotEmpty != _hasSearchInput) {
