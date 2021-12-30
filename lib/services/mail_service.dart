@@ -605,6 +605,7 @@ class MailService {
       clientId: _clientId,
       refresh: _refreshToken,
       onConfigChanged: saveAccount,
+      downloadSizeLimit: 32 * 1024,
     );
   }
 
