@@ -128,26 +128,16 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     }
     final appBarTitle = _isInSearchMode
         ? TextField(
+            cursorColor: Colors.white,
             controller: _searchEditingController,
             textInputAction: TextInputAction.search,
             decoration: InputDecoration(
               hintText: localizations.homeSearchHint,
               hintStyle: TextStyle(color: Colors.white30),
-              suffix: _hasSearchInput
-                  ? IconButton(
-                      icon: Icon(Icons.clear),
-                      onPressed: () {
-                        _searchEditingController.text = '';
-                        setState(() {
-                          _hasSearchInput = false;
-                        });
-                      },
-                    )
-                  : null,
             ),
             autofocus: true,
             autocorrect: false,
-            style: TextStyle(color: Colors.white), //TODO remove hardcoded color
+            style: TextStyle(color: Colors.white),
             onSubmitted: _search,
             onChanged: (text) {
               if (text.isNotEmpty != _hasSearchInput) {
@@ -157,12 +147,23 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               }
             },
           )
-        : (Platform.isIOS || Platform.isMacOS)
+        : (PlatformInfo.isCupertino)
             ? Text(source.name ?? '')
             : Base.buildTitle(source.name ?? '', source.description ?? '');
 
     final appBarActions = [
-      if (source.supportsSearching && !Platform.isIOS)
+      if (_isInSearchMode && _hasSearchInput)
+        IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () {
+            _searchEditingController.text = '';
+            setState(() {
+              _hasSearchInput = false;
+            });
+          },
+        ),
+
+      if (source.supportsSearching && !PlatformInfo.isCupertino)
         PlatformIconButton(
           icon: Icon(_isInSearchMode ? Icons.arrow_back : Icons.search),
           onPressed: () {
@@ -350,8 +351,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                               (locator<MailService>().hasAccountsWithErrors())
                                   ? MenuWithBadge()
                                   : null,
-                          floating: _isInSearchMode ? false : true,
-                          pinned: _isInSearchMode ? true : false,
+                          floating: !_isInSearchMode,
+                          pinned: _isInSearchMode,
                           stretch: true,
                           actions: appBarActions,
                           previousPageTitle:
