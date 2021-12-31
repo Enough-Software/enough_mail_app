@@ -1,12 +1,11 @@
-import 'dart:io';
-
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class IconService {
-  static final _isCupertino = Platform.isIOS || Platform.isMacOS;
+  static final _isCupertino = PlatformInfo.isCupertino;
 
   IconData get share => _isCupertino ? CupertinoIcons.share : Icons.share;
   IconData get location =>
@@ -29,7 +28,10 @@ class IconService {
   IconData get appointment =>
       _isCupertino ? CupertinoIcons.calendar : Icons.calendar_today;
 
-  IconData? get add => _isCupertino ? CupertinoIcons.add : Icons.add;
+  IconData get add => _isCupertino ? CupertinoIcons.add : Icons.add;
+
+  IconData get retry =>
+      _isCupertino ? CupertinoIcons.arrow_clockwise : Icons.repeat;
 
   IconData getMessageIsSeen(bool isSeen) =>
       isSeen ? messageIsSeen : messageIsNotSeen;

@@ -6,7 +6,7 @@ class PasswordField extends StatefulWidget {
   final TextEditingController? controller;
   final String? labelText;
   final String? hintText;
-  final Function(String)? onChanged;
+  final void Function(String text)? onChanged;
   final bool autofocus;
   final bool cupertinoShowLabel;
 

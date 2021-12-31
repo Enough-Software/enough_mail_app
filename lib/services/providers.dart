@@ -22,6 +22,7 @@ class ProviderService {
     ]);
   }
 
+  /// Retrieves the provider for the given [incomingHostName]
   Provider? operator [](String incomingHostName) =>
       _providersByDomains[incomingHostName];
 

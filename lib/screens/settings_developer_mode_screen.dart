@@ -144,7 +144,7 @@ class _SettingsDeveloperModeScreenState
           await LocalizedDialogHelper.showTextDialog(
             context,
             localizations.errorTitle,
-            localizations.extensionsManualLoardingError(url!),
+            localizations.extensionsManualLoadingError(url!),
           );
         }
       } else {
