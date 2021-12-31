@@ -8,10 +8,12 @@ import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -27,6 +29,7 @@ class AccountEditScreen extends StatefulWidget {
 class _AccountEditScreenState extends State<AccountEditScreen> {
   late TextEditingController _accountNameController;
   late TextEditingController _userNameController;
+  bool _isRetryingToConnect = false;
 
   void _update() {
     setState(() {});
@@ -63,6 +66,8 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
       AppLocalizations localizations, BuildContext context) {
     final theme = Theme.of(context);
     final iconService = locator<IconService>();
+    final mailService = locator<MailService>();
+    final account = widget.account;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -70,6 +75,36 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (mailService.hasError(account)) ...[
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(localizations
+                      .editAccountFailureToConnectInfo(account.name)),
+                ),
+                if (_isRetryingToConnect)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: PlatformProgressIndicator(),
+                  )
+                else
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      PlatformTextButtonIcon(
+                        onPressed: _reconnect,
+                        icon: Icon(iconService.retry),
+                        label: PlatformText(localizations
+                            .editAccountFailureToConnectRetryAction),
+                      ),
+                      PlatformTextButton(
+                        child: PlatformText(localizations
+                            .editAccountFailureToConnectChangePasswordAction),
+                        onPressed: _updateAuthentication,
+                      )
+                    ],
+                  ),
+                Divider(),
+              ],
               DecoratedPlatformTextField(
                 controller: _accountNameController,
                 decoration: InputDecoration(
@@ -131,7 +166,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (context) => AliasEditDialog(
+                        builder: (context) => _AliasEditDialog(
                           isNewAlias: false,
                           alias: alias,
                           account: widget.account,
@@ -157,7 +192,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   final alias = MailAddress(widget.account.userName, email);
                   showDialog(
                     context: context,
-                    builder: (context) => AliasEditDialog(
+                    builder: (context) => _AliasEditDialog(
                       isNewAlias: true,
                       alias: alias,
                       account: widget.account,
@@ -178,7 +213,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   final result = await showPlatformDialog<bool>(
                     context: context,
                     builder: (context) =>
-                        PlusAliasTestingDialog(account: widget.account),
+                        _PlusAliasTestingDialog(account: widget.account),
                   );
                   if (result != null) {
                     widget.account.supportsPlusAliases = result;
@@ -271,17 +306,108 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
       ),
     );
   }
+
+  Future<void> _updateAuthentication() async {
+    final mailService = locator<MailService>();
+    final authentication = widget.account.account.incoming?.authentication;
+    if (authentication is PlainAuthentication) {
+      // simple case: password is directly given,
+      // can be edited and account can be updated
+      final result = await LocalizedDialogHelper.showWidgetDialog(
+          context, _PasswordUpdateDialog(authentication: authentication),
+          defaultActions: DialogActions.okAndCancel);
+      if (result == true) {
+        final outgoingAuth = widget.account.account.outgoing?.authentication;
+        if (outgoingAuth is PlainAuthentication) {
+          outgoingAuth.password = authentication.password;
+        }
+        final result = await _reconnect();
+        if (result) {
+          await mailService.saveAccounts();
+        }
+      }
+    } else if (authentication is OauthAuthentication) {
+      // oauth case: restart oauth authentication,
+      // save new token
+      final provider = locator<ProviderService>()[
+          widget.account.account.incoming?.serverConfig?.hostname ?? ''];
+      if (provider != null && provider.hasOAuthClient) {
+        final token = await provider.oauthClient!
+            .authenticate(widget.account.account.email!);
+        if (token != null) {
+          authentication.token = token;
+          final outgoingAuth = widget.account.account.outgoing?.authentication;
+          if (outgoingAuth is OauthAuthentication) {
+            outgoingAuth.token = token;
+          }
+          await mailService.saveAccounts();
+          _reconnect();
+        }
+      }
+    }
+  }
+
+  Future<bool> _reconnect() async {
+    setState(() {
+      _isRetryingToConnect = true;
+    });
+    final account = widget.account;
+    final mailService = locator<MailService>();
+    final result = await mailService.reconnect(account);
+    if (mounted) {
+      setState(() {
+        _isRetryingToConnect = false;
+      });
+      if (result) {
+        final localizations = AppLocalizations.of(context)!;
+        LocalizedDialogHelper.showTextDialog(
+          context,
+          localizations.editAccountFailureToConnectFixedTitle,
+          localizations.editAccountFailureToConnectFixedInfo,
+        );
+      }
+    }
+    return result;
+  }
 }
 
-class PlusAliasTestingDialog extends StatefulWidget {
+class _PasswordUpdateDialog extends StatefulWidget {
+  const _PasswordUpdateDialog({Key? key, required this.authentication})
+      : super(key: key);
+
+  final PlainAuthentication authentication;
+
+  @override
+  _PasswordUpdateDialogState createState() => _PasswordUpdateDialogState();
+}
+
+class _PasswordUpdateDialogState extends State<_PasswordUpdateDialog> {
+  late TextEditingController _controller;
+  @override
+  void initState() {
+    _controller = TextEditingController(text: widget.authentication.password);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PasswordField(
+      controller: _controller,
+      labelText: 'Password',
+      onChanged: (text) => widget.authentication.password = text,
+    );
+  }
+}
+
+class _PlusAliasTestingDialog extends StatefulWidget {
   final Account account;
-  PlusAliasTestingDialog({Key? key, required this.account}) : super(key: key);
+  _PlusAliasTestingDialog({Key? key, required this.account}) : super(key: key);
 
   @override
   _PlusAliasTestingDialogState createState() => _PlusAliasTestingDialogState();
 }
 
-class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
+class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
   bool _isContinueAvailable = true;
   int _step = 0;
   static const int _maxStep = 1;
@@ -414,11 +540,11 @@ class _PlusAliasTestingDialogState extends State<PlusAliasTestingDialog> {
   }
 }
 
-class AliasEditDialog extends StatefulWidget {
+class _AliasEditDialog extends StatefulWidget {
   final MailAddress alias;
   final Account account;
   final bool isNewAlias;
-  AliasEditDialog({
+  _AliasEditDialog({
     Key? key,
     required this.isNewAlias,
     required this.alias,
@@ -429,7 +555,7 @@ class AliasEditDialog extends StatefulWidget {
   _AliasEditDialogState createState() => _AliasEditDialogState();
 }
 
-class _AliasEditDialogState extends State<AliasEditDialog> {
+class _AliasEditDialogState extends State<_AliasEditDialog> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late bool _isEmailValid;

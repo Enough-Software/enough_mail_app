@@ -356,7 +356,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                     child: PlatformProgressIndicator()),
                 Expanded(
                   child: Text(localizations
-                      .addAccountResolvingSetingsLabel(_account.email!)),
+                      .addAccountResolvingSettingsLabel(_account.email!)),
                 ),
               ],
             )
@@ -464,7 +464,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(localizations.addAccountResolvingSetingsFailedInfo(
+                Text(localizations.addAccountResolvingSettingsFailedInfo(
                     _account.email ?? '')),
                 PlatformElevatedButton(
                   child: ButtonText(localizations.addAccountEditManuallyAction),
@@ -552,7 +552,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
               ),
               PlatformTextButton(
                 child: ButtonText(
-                    localizations.addAccoutSetupImapAccessButtonLabel),
+                    localizations.addAccountSetupImapAccessButtonLabel),
                 onPressed: () =>
                     launcher.launch(_provider!.manualImapAccessSetupUrl!),
               ),

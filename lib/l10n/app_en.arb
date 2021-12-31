@@ -133,7 +133,7 @@
   },
   "homeDeleteAllScrubOption": "Scrub messages",
   "@homeDeleteAllScrubOption": {
-    "description": "Option to remove deleted mesages from disk."
+    "description": "Option to remove deleted messages from disk."
   },
   "homeDeleteAllSuccess": "All messages deleted.",
   "@homeDeleteAllSuccess": {
@@ -677,7 +677,7 @@
   "@redirectTitle": {
     "description": "Title of redirect dialog."
   },
-  "redirectInfo": "Redirect this message to the following recpient(s). Redirecting does not alter the message.",
+  "redirectInfo": "Redirect this message to the following recipient(s). Redirecting does not alter the message.",
   "@redirectInfo": {
     "description": "Short explanation of redirect action in redirect dialog."
   },
@@ -1013,19 +1013,19 @@
   },
   "securityUnlockNotAvailable": "Your device does not support biometrics, possibly you need to set up unlock options first.",
   "@securityUnlockNotAvailable": {
-    "description": "Message when biometic authentication is not available."
+    "description": "Message when biometric authentication is not available."
   },
   "securityUnlockLabel": "Lock Maily",
   "@securityUnlockLabel": {
-    "description": "Label of biometic authentication lock feature."
+    "description": "Label of biometric authentication lock feature."
   },
   "securityUnlockDescriptionTitle": "Lock Maily",
   "@securityUnlockDescriptionTitle": {
-    "description": "Title to explain lock feature via biometic authentication."
+    "description": "Title to explain lock feature via biometric authentication."
   },
   "securityUnlockDescriptionText": "You can choose to lock access to Maily, so that others cannot read your email even when they have access to your device.",
   "@securityUnlockDescriptionText": {
-    "description": "Text explaining lock feature via biometic authentication."
+    "description": "Text explaining lock feature via biometric authentication."
   },
   "securityLockImmediately": "Lock immediately",
   "@securityLockImmediately": {
@@ -1063,8 +1063,8 @@
   "@addAccountEmailHint": {
     "description": "Hint text of email address input field."
   },
-  "addAccountResolvingSetingsLabel": "Resolving {email}...",
-  "@addAccountResolvingSetingsLabel": {
+  "addAccountResolvingSettingsLabel": "Resolving {email}...",
+  "@addAccountResolvingSettingsLabel": {
     "description": "Label shown while resolving the settings for the specified email address.",
     "placeholders": {
       "email": {
@@ -1083,8 +1083,8 @@
       }
     }  
   },
-  "addAccountResolvingSetingsFailedInfo": "Unable to resolve {email}. Please go back to change it or set up the account manually.",
-  "@addAccountResolvingSetingsFailedInfo": {
+  "addAccountResolvingSettingsFailedInfo": "Unable to resolve {email}. Please go back to change it or set up the account manually.",
+  "@addAccountResolvingSettingsFailedInfo": {
     "description": "Info shown after resolving the settings for the specified email address failed.",
     "placeholders": {
       "email": {
@@ -1115,7 +1115,7 @@
   },
   "addAccountApplicationPasswordRequiredAcknowledged": "Understood",
   "@addAccountApplicationPasswordRequiredAcknowledged": {
-    "description": "Acknowldegement to be confirmed by user to acknowledge the fact that an app specific password is required."
+    "description": "Acknowledgement to be confirmed by user to acknowledge the fact that an app specific password is required."
   },
   "addAccountVerificationStep": "Verification",
   "@addAccountVerificationStep": {
@@ -1188,8 +1188,8 @@
   "@accountAddImapAccessSetuptMightBeRequired": {
     "description": "Info shown when login fails for a provider that is know to require manual activation of IMAP access."
   },
-  "addAccoutSetupImapAccessButtonLabel": "Setup email access",
-  "@addAccoutSetupImapAccessButtonLabel": {
+  "addAccountSetupImapAccessButtonLabel": "Setup email access",
+  "@addAccountSetupImapAccessButtonLabel": {
     "description": "Label of button to launch website with instructions."
   },
   "addAccountNameOfUserLabel": "Your name",
@@ -1217,6 +1217,32 @@
         "example": "domain.com"
       }
     }  
+  },
+  "editAccountFailureToConnectInfo": "Maily could not connect {name}.",
+  "@editAccountFailureToConnectInfo": {
+    "description": "Info about not being able to connect to the named service. Most common causes are temporary network problems or a changed password.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }  
+  },
+  "editAccountFailureToConnectRetryAction": "Retry",
+  "@editAccountFailureToConnectRetryAction": {
+    "description": "Action to retry connecting to service again."
+  },
+  "editAccountFailureToConnectChangePasswordAction": "Change Password",
+  "@editAccountFailureToConnectChangePasswordAction": {
+    "description": "Action to change password for the service."
+  },
+  "editAccountFailureToConnectFixedTitle": "Connected",
+  "@editAccountFailureToConnectFixedTitle": {
+    "description": "Title of dialog shown after successfully connecting a failed account again."
+  },
+  "editAccountFailureToConnectFixedInfo": "The account is connected again.",
+  "@editAccountFailureToConnectFixedInfo": {
+    "description": "Message of dialog shown after successfully connecting a failed account again."
   },
   "editAccountIncludeInUnifiedLabel": "Include in unified account",
   "@editAccountIncludeInUnifiedLabel": {
@@ -1272,7 +1298,7 @@
   },
   "editAccountServerSettingsAction": "Edit server settings",
   "@editAccountServerSettingsAction": {
-    "description": "Button text for editing the server settingg of  this account."
+    "description": "Button text for editing the server settings of  this account."
   },
   "editAccountDeleteAccountAction": "Delete account",
   "@editAccountDeleteAccountAction": {
@@ -1484,7 +1510,7 @@
   },
   "accountDetailsSecurityOptionNone": "Plain (no encryption)",
   "@accountDetailsSecurityOptionNone": {
-    "description": "Label for security dropdown option without anycryption."
+    "description": "Label for security dropdown option without encryption."
   },
   "accountDetailsIncomingPortLabel": "Incoming port",
   "@accountDetailsIncomingPortLabel": {
@@ -1646,27 +1672,27 @@
   },
   "attachTypeFile": "File",
   "@attachTypeFile": {
-    "description": "Attachmment type to add"
+    "description": "Attachment type to add"
   },
   "attachTypePhoto": "Photo",
   "@attachTypePhoto": {
-    "description": "Attachmment type to add"
+    "description": "Attachment type to add"
   },
   "attachTypeVideo": "Video",
   "@attachTypeVideo": {
-    "description": "Attachmment type to add"
+    "description": "Attachment type to add"
   },
   "attachTypeAudio": "Audio",
   "@attachTypeAudio": {
-    "description": "Attachmment type to add"
+    "description": "Attachment type to add"
   },
   "attachTypeLocation": "Location",
   "@attachTypeLocation": {
-    "description": "Attachmment type to add"
+    "description": "Attachment type to add"
   },
   "attachTypeGif": "Animated Gif",
   "@attachTypeGif": {
-    "description": "Attachmment type to add"
+    "description": "Attachment type to add"
   },
   "attachTypeGifSearch": "search GIPHY",
   "@attachTypeGifSearch": {
@@ -1674,7 +1700,7 @@
   },
   "attachTypeSticker": "Sticker",
   "@attachTypeSticker": {
-    "description": "Attachmment type to add"
+    "description": "Attachment type to add"
   },
   "attachTypeStickerSearch": "search GIPHY",
   "@attachTypeStickerSearch": {
@@ -1682,7 +1708,7 @@
   },
   "attachTypeAppointment": "Appointment",
   "@attachTypeAppointment": {
-    "description": "Attachmment type to add"
+    "description": "Attachment type to add"
   },
  "languageSettingTitle": "Language",
   "@languageSettingTitle": {
@@ -1949,13 +1975,13 @@
   "@extensionsManualUrlLabel": {
     "description": "Label for URL input field"
   },
-  "extensionsManualLoardingError": "Unable to download extension from \"{url}\".",
-  "@extensionsManualLoardingError": {
+  "extensionsManualLoadingError": "Unable to download extension from \"{url}\".",
+  "@extensionsManualLoadingError": {
     "description": "Message shown when extensions could not be loaded.",
     "placeholders": {
       "url": {
         "type": "String",
-        "example": "htttps://domain.com/.maily.json"
+        "example": "https://domain.com/.maily.json"
       }
     }  
   },
@@ -2001,11 +2027,11 @@
   },
   "icalendarLabelRecurrenceRule": "Repeats",
   "@icalendarLabelRecurrenceRule": {
-    "description": "Label of the reccurence info of an icalendar object"
+    "description": "Label of the recurrence info of an icalendar object"
   },
   "icalendarLabelParticipants": "Participants",
   "@icalendarLabelParticipants": {
-    "description": "Label of the participiants info of an icalendar object"
+    "description": "Label of the participants info of an icalendar object"
   },
   "icalendarParticipantStatusNeedsAction": "You are asked to answer this invitation.",
   "@icalendarParticipantStatusNeedsAction": {
@@ -2125,7 +2151,7 @@
       }
     }
   },
-  "icalendarReplyStatusPartial": "{attendee} has partically done this task.",
+  "icalendarReplyStatusPartial": "{attendee} has partially done this task.",
   "@icalendarReplyStatusPartial": {
     "description":  "Valid Calendar reply",
     "placeholders": {
@@ -2159,7 +2185,7 @@
   "@icalendarReplyWithoutParticipants": {
     "description":  "Calendar reply without any participant"
   },
-  "icalendarReplyWithoutStatus": "{attendee} replied without an participations status.",
+  "icalendarReplyWithoutStatus": "{attendee} replied without an participation status.",
   "@icalendarReplyWithoutStatus": {
     "description":  "Calendar reply without any participant status",
     "placeholders": {
@@ -2209,7 +2235,7 @@
   "@composeAppointmentLabelRepeatOptionYearly": {
     "description":  "Option for repeat drop-down"
   },
-  "composeAppointmentRecurrenceFrequencyLabel": "Frequence",
+  "composeAppointmentRecurrenceFrequencyLabel": "Frequency",
   "@composeAppointmentRecurrenceFrequencyLabel": {
     "description":  "Label for frequency drop-down"
   },
