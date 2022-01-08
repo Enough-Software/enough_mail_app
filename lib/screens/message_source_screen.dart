@@ -10,6 +10,7 @@ import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
+import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
@@ -754,7 +755,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                         label: Text(localizations.messageActionArchive),
                       ),
                     ),
-                ],
+                ], // folders are supported
                 if (_selectedMessages.length == 1)
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.viewInSafeMode,
@@ -763,6 +764,15 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       label: Text(localizations.messageActionViewInSafeMode),
                     ),
                   ),
+                PlatformPopupMenuItem(
+                  value: _MultipleChoice.addNotification,
+                  child: IconText(
+                    icon: Icon(iconService.messageActionAddNotification),
+                    label: Text(
+                      localizations.messageActionAddNotification,
+                    ),
+                  ),
+                ),
               ],
             ),
           ],
@@ -839,6 +849,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           locator<NavigationService>().push(Routes.mailDetails,
               arguments:
                   DisplayMessageArguments(_selectedMessages.first, true));
+        }
+        break;
+      case _MultipleChoice.addNotification:
+        final notificationService = locator<NotificationService>();
+        for (final message in _selectedMessages) {
+          notificationService.sendLocalNotificationForMailMessage(message);
         }
         break;
     }
@@ -1204,6 +1220,7 @@ enum _MultipleChoice {
   junk,
   archive,
   viewInSafeMode,
+  addNotification,
 }
 
 class MessageOverview extends StatefulWidget {

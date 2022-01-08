@@ -643,6 +643,10 @@
   "@messageActionRedirect": {
     "description": "Action for single message."
   },
+  "messageActionAddNotification": "Add notification",
+  "@messageActionAddNotification": {
+    "description": "Action for single message."
+  },
   "resultDeleted": "Deleted",
   "@resultDeleted": {
     "description": "Successful short snackbar message after deleting message(s)."
