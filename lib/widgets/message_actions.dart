@@ -44,6 +44,7 @@ enum _OverflowMenuChoice {
   junk,
   archive,
   redirect,
+  addNotification,
 }
 
 class _MessageActionsState extends State<MessageActions> {
@@ -225,7 +226,7 @@ class _MessageActionsState extends State<MessageActions> {
                         ),
                       ),
                     ),
-                  ],
+                  ], // folders are supported
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.redirect,
                     child: IconText(
@@ -235,7 +236,16 @@ class _MessageActionsState extends State<MessageActions> {
                       ),
                     ),
                   ),
-                ],
+                  PlatformPopupMenuItem(
+                    value: _OverflowMenuChoice.addNotification,
+                    child: IconText(
+                      icon: Icon(iconService.messageActionAddNotification),
+                      label: Text(
+                        localizations.messageActionAddNotification,
+                      ),
+                    ),
+                  ),
+                ], // message is not embedded in a different message
               ],
             ),
           ],
@@ -284,6 +294,9 @@ class _MessageActionsState extends State<MessageActions> {
         break;
       case _OverflowMenuChoice.redirect:
         _redirectMessage();
+        break;
+      case _OverflowMenuChoice.addNotification:
+        _addNotification();
         break;
     }
   }
@@ -590,5 +603,10 @@ class _MessageActionsState extends State<MessageActions> {
     );
     locator<NavigationService>()
         .push(Routes.mailCompose, arguments: data, replace: true);
+  }
+
+  void _addNotification() {
+    locator<NotificationService>()
+        .sendLocalNotificationForMailMessage(widget.message);
   }
 }

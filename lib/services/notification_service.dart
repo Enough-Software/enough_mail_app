@@ -17,8 +17,6 @@ class NotificationService {
   static const String _messagePayloadStart = 'msg:';
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  int? _lastNotificationId;
-
   Future<NotificationServiceInitResult> init(
       {bool checkForLaunchDetails = true}) async {
     // print('init notification service...');
@@ -96,7 +94,8 @@ class NotificationService {
           await mailClient.selectInbox();
         }
         final mimeMessage = MimeMessage()
-          ..sequenceId = payload.id
+          ..sequenceId = payload.sequenceId
+          ..guid = payload.guid
           ..uid = payload.uid
           ..size = payload.size;
         final currentMessageSource = locator<MailService>().messageSource;
@@ -123,11 +122,9 @@ class NotificationService {
 
   Future sendLocalNotificationForMail(
       MimeMessage mimeMessage, MailClient mailClient) {
+    print(
+        'sending notification for mime ${mimeMessage.decodeSubject()} with GUID ${mimeMessage.guid}');
     final notificationId = mimeMessage.guid!;
-    if (notificationId == _lastNotificationId) {
-      return Future.value();
-    }
-    _lastNotificationId = notificationId;
     var from = mimeMessage.from?.isNotEmpty ?? false
         ? mimeMessage.from!.first.personalName
         : mimeMessage.sender?.personalName;
@@ -208,8 +205,8 @@ class MailNotificationPayload extends SerializableObject {
   set guid(int? value) => attributes['guid'] = value;
   int? get uid => attributes['uid'];
   set uid(int? value) => attributes['uid'] = value;
-  int? get id => attributes['id'];
-  set id(int? value) => attributes['id'] = value;
+  int? get sequenceId => attributes['id'];
+  set sequenceId(int? value) => attributes['id'] = value;
   String? get accountEmail => attributes['account-email'];
   set accountEmail(String? value) => attributes['account-email'] = value;
   String? get subject => attributes['subject'];
@@ -223,7 +220,7 @@ class MailNotificationPayload extends SerializableObject {
       MimeMessage mimeMessage, MailClient mailClient) {
     uid = mimeMessage.uid;
     guid = mimeMessage.guid;
-    id = mimeMessage.sequenceId;
+    sequenceId = mimeMessage.sequenceId;
     subject = mimeMessage.decodeSubject();
     size = mimeMessage.size;
     accountEmail = mailClient.account.email;

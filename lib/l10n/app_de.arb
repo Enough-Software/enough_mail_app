@@ -136,6 +136,7 @@
   "messageActionArchive": "Archivieren",
   "messageActionUnarchive": "In Posteingang verschieben",
   "messageActionRedirect": "Umleiten",
+  "messageActionAddNotification": "Benachrichtigung hinzufügen",
   "resultDeleted": "Gelöscht",
   "resultMovedToJunk": "Als Spam markiert",
   "resultMovedToInbox": "In Posteingang verschoben",

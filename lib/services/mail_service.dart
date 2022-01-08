@@ -130,26 +130,16 @@ class MailService {
       unifiedAccount = UnifiedAccount(
           mailAccountsForUnified, _localizations.unifiedAccountName);
       final mailboxes = [
-        Mailbox()
-          ..name = _localizations.unifiedFolderInbox
-          ..flags = [MailboxFlag.inbox],
-        Mailbox()
-          ..name = _localizations.unifiedFolderDrafts
-          ..flags = [MailboxFlag.drafts],
-        Mailbox()
-          ..name = _localizations.unifiedFolderSent
-          ..flags = [MailboxFlag.sent],
-        Mailbox()
-          ..name = _localizations.unifiedFolderTrash
-          ..flags = [MailboxFlag.trash],
-        Mailbox()
-          ..name = _localizations.unifiedFolderArchive
-          ..flags = [MailboxFlag.archive],
-        Mailbox()
-          ..name = _localizations.unifiedFolderJunk
-          ..flags = [MailboxFlag.junk],
+        Mailbox.virtual(_localizations.unifiedFolderInbox, [MailboxFlag.inbox]),
+        Mailbox.virtual(
+            _localizations.unifiedFolderDrafts, [MailboxFlag.drafts]),
+        Mailbox.virtual(_localizations.unifiedFolderSent, [MailboxFlag.sent]),
+        Mailbox.virtual(_localizations.unifiedFolderTrash, [MailboxFlag.trash]),
+        Mailbox.virtual(
+            _localizations.unifiedFolderArchive, [MailboxFlag.archive]),
+        Mailbox.virtual(_localizations.unifiedFolderJunk, [MailboxFlag.junk]),
       ];
-      final tree = Tree<Mailbox?>(Mailbox())
+      final tree = Tree<Mailbox?>(Mailbox.virtual('', []))
         ..populateFromList(mailboxes, (child) => null);
       _mailboxesPerAccount[unifiedAccount!] = tree;
     }
@@ -241,7 +231,6 @@ class MailService {
   Future<bool> addAccount(MailAccount mailAccount, MailClient mailClient,
       BuildContext context) async {
     //TODO check if other account with the same name already exists
-    //TODO how to save extension data?
     final existing = mailAccounts
         .firstWhereOrNull((account) => account.email == mailAccount.email);
     if (existing != null) {

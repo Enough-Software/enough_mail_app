@@ -181,9 +181,11 @@ abstract class MessageSource extends ChangeNotifier
               for (final client in resultsByClient.keys) {
                 final undelete =
                     await client.undoDeleteMessages(resultsByClient[client]!);
-                if (undelete.originalSequence?.isNotEmpty == true) {
-                  final originalUids = undelete.originalSequence!.toList();
-                  final newUids = undelete.targetSequence!.toList();
+                final targetSequence = undelete.targetSequence;
+                if (undelete.originalSequence.isNotEmpty &&
+                    targetSequence != null) {
+                  final originalUids = undelete.originalSequence.toList();
+                  final newUids = targetSequence.toList();
                   for (var i = 0; i < originalUids.length; i++) {
                     final originalUid = originalUids[i];
                     final message = messages.firstWhereOrNull(
