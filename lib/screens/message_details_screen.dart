@@ -114,11 +114,15 @@ class _MessageContentState extends State<_MessageContent> {
 
   @override
   void initState() {
-    final mime = widget.message.mimeMessage;
+    final message = widget.message;
+    final mime = message.mimeMessage;
     if (widget.blockExternalContents) {
       _blockExternalImages = true;
     } else if (mime != null && mime.isDownloaded) {
       _blockExternalImages = _shouldImagesBeBlocked(mime);
+      if (!mime.isSeen) {
+        unawaited(message.source.markAsSeen(message, true));
+      }
     } else {
       _messageRequiresRefresh = mime?.envelope == null;
       _blockExternalImages = false;
@@ -619,7 +623,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                   future: _loadingFuture,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return PlatformProgressIndicator();
+                      return Center(child: PlatformProgressIndicator());
                     }
                     final messages = snapshot.data!;
                     final isSentFolder = widget.message.source.isSent;
