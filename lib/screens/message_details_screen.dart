@@ -45,7 +45,7 @@ class MessageDetailsScreen extends StatefulWidget {
 enum _OverflowMenuChoice { showContents, showSourceCode }
 
 class _DetailsScreenState extends State<MessageDetailsScreen> {
-  PageController? _pageController;
+  late PageController _pageController;
   late MessageSource _source;
   late Message _current;
 
@@ -59,7 +59,7 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
 
   @override
   void dispose() {
-    _pageController!.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -67,8 +67,7 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
     if (_current.sourceIndex == index) {
       return _current;
     }
-    _current = _source.getMessageAt(index);
-    return _current;
+    return _source.getMessageAt(index);
   }
 
   bool _blockExternalContents(int index) {
@@ -81,14 +80,57 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PageView.builder(
-      controller: _pageController,
-      itemCount: _source.size,
-      itemBuilder: (context, index) => _MessageContent(
-        _getMessage(index),
-        blockExternalContents: _blockExternalContents(index),
+    final localizations = AppLocalizations.of(context)!;
+    return BasePage(
+      title: _current.mimeMessage?.decodeSubject() ??
+          localizations.subjectUndefined,
+      appBarActions: [
+        //PlatformIconButton(icon: Icon(Icons.reply), onPressed: reply),
+        PlatformPopupMenuButton<_OverflowMenuChoice>(
+          onSelected: (_OverflowMenuChoice result) {
+            switch (result) {
+              case _OverflowMenuChoice.showContents:
+                locator<NavigationService>()
+                    .push(Routes.mailContents, arguments: _current);
+                break;
+              case _OverflowMenuChoice.showSourceCode:
+                _showSourceCode();
+                break;
+            }
+          },
+          itemBuilder: (BuildContext context) => [
+            PlatformPopupMenuItem<_OverflowMenuChoice>(
+              value: _OverflowMenuChoice.showContents,
+              child: Text(localizations.viewContentsAction),
+            ),
+            if (locator<SettingsService>().settings.enableDeveloperMode)
+              PlatformPopupMenuItem<_OverflowMenuChoice>(
+                value: _OverflowMenuChoice.showSourceCode,
+                child: Text(localizations.viewSourceAction),
+              ),
+          ],
+        ),
+      ],
+      bottom: MessageActions(message: _current),
+      content: PageView.builder(
+        controller: _pageController,
+        itemCount: _source.size,
+        itemBuilder: (context, index) => _MessageContent(
+          _getMessage(index),
+          blockExternalContents: _blockExternalContents(index),
+        ),
+        onPageChanged: (index) {
+          setState(() {
+            _current = _getMessage(index);
+          });
+        },
       ),
     );
+  }
+
+  void _showSourceCode() {
+    locator<NavigationService>()
+        .push(Routes.sourceCode, arguments: _current.mimeMessage);
   }
 }
 
@@ -134,42 +176,9 @@ class _MessageContentState extends State<_MessageContent> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    return Base.buildAppChrome(
-      context,
-      title: widget.message.mimeMessage?.decodeSubject() ??
-          localizations.subjectUndefined,
-      content: MessageWidget(
-        message: widget.message,
-        child: _buildMailDetails(localizations),
-      ),
-      appBarActions: [
-        //PlatformIconButton(icon: Icon(Icons.reply), onPressed: reply),
-        PlatformPopupMenuButton<_OverflowMenuChoice>(
-          onSelected: (_OverflowMenuChoice result) {
-            switch (result) {
-              case _OverflowMenuChoice.showContents:
-                locator<NavigationService>()
-                    .push(Routes.mailContents, arguments: widget.message);
-                break;
-              case _OverflowMenuChoice.showSourceCode:
-                _showSourceCode();
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) => [
-            PlatformPopupMenuItem<_OverflowMenuChoice>(
-              value: _OverflowMenuChoice.showContents,
-              child: Text(localizations.viewContentsAction),
-            ),
-            if (locator<SettingsService>().settings.enableDeveloperMode)
-              PlatformPopupMenuItem<_OverflowMenuChoice>(
-                value: _OverflowMenuChoice.showSourceCode,
-                child: Text(localizations.viewSourceAction),
-              ),
-          ],
-        ),
-      ],
-      bottom: MessageActions(message: widget.message),
+    return MessageWidget(
+      message: widget.message,
+      child: _buildMailDetails(localizations),
     );
   }
 
@@ -452,11 +461,6 @@ class _MessageContentState extends State<_MessageContent> {
   Future _navigateToMedia(InteractiveMediaWidget mediaWidget) async {
     return locator<NavigationService>()
         .push(Routes.interactiveMedia, arguments: mediaWidget);
-  }
-
-  void _showSourceCode() {
-    locator<NavigationService>()
-        .push(Routes.sourceCode, arguments: widget.message.mimeMessage);
   }
 
   // void _next() {
