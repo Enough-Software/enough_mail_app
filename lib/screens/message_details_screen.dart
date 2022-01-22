@@ -105,7 +105,7 @@ class _MessageContent extends StatefulWidget {
 
 class _MessageContentState extends State<_MessageContent> {
   late bool _blockExternalImages;
-  late bool _messageDownloadError;
+  bool _messageDownloadError = false;
   bool _messageRequiresRefresh = false;
   bool _isWebViewZoomedOut = false;
   Object? errorObject;
@@ -127,7 +127,6 @@ class _MessageContentState extends State<_MessageContent> {
       _messageRequiresRefresh = mime?.envelope == null;
       _blockExternalImages = false;
     }
-    _messageDownloadError = false;
     _notifyMarkedAsSeen = !(mime?.isSeen ?? false);
     super.initState();
   }
@@ -334,16 +333,15 @@ class _MessageContentState extends State<_MessageContent> {
           ),
           if (locator<SettingsService>().settings.enableDeveloperMode) ...[
             Text('Details:'),
-            Text(errorObject?.toString() ?? '<unknown error>'),
-            Text(errorStackTrace?.toString() ?? '<no stacktrace>'),
+            SelectableText(errorObject?.toString() ?? '<unknown error>'),
+            SelectableText(errorStackTrace?.toString() ?? '<no stacktrace>'),
             TextButton.icon(
               icon: Icon(Icons.copy),
               label: ButtonText('Copy to clipboard'),
               onPressed: () {
-                final text = errorObject?.toString() ??
-                    '<unknown error>' +
-                        '\n\n' +
-                        (errorStackTrace?.toString() ?? '<no stacktrace>');
+                final text =
+                    '${errorObject?.toString() ?? '<unknown error>'} \n'
+                    '${errorStackTrace?.toString() ?? '<no stacktrace>'}';
                 final data = ClipboardData(text: text);
                 Clipboard.setData(data);
               },
