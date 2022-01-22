@@ -300,8 +300,10 @@ class RenderExpansionWrap extends RenderBox {
 
   // The returned list is ordered for hit testing.
   Iterable<RenderBox> get _allChildren sync* {
-    if (_expandIndicator != null) yield _expandIndicator!;
-    if (_compressIndicator != null) yield _compressIndicator!;
+    final expandIndicator = _expandIndicator;
+    if (expandIndicator != null) yield expandIndicator;
+    final compressIndicator = _compressIndicator;
+    if (compressIndicator != null) yield compressIndicator;
     final children = _wrapChildren;
     if (children != null) {
       for (final child in children) yield child;
@@ -432,15 +434,20 @@ class RenderExpansionWrap extends RenderBox {
     final compressIndicator = _compressIndicator;
     if (expanded) {
       if (expandIndicator != null) {
-        (expandIndicator.parentData! as _WrapParentData)._isVisible = false;
+        (expandIndicator.parentData as _WrapParentData)._isVisible = false;
       }
     } else if (compressIndicator != null) {
-      (compressIndicator.parentData! as _WrapParentData)._isVisible = false;
+      (compressIndicator.parentData as _WrapParentData)._isVisible = false;
     }
     final spacing = _spacing;
     final runSpacing = _runSpacing;
+    final compressIndicatorSize =
+        _layoutBox(compressIndicator, looseConstraints);
+    final expandIndicatorSize = _layoutBox(expandIndicator, looseConstraints);
     final indicator = expanded ? compressIndicator : expandIndicator;
-    final indicatorSize = _layoutBox(indicator, looseConstraints);
+    final indicatorSize =
+        expanded ? compressIndicatorSize : expandIndicatorSize;
+
     final indicatorWith = indicatorSize.width;
     final originalMaxRuns = _maxRuns ?? double.maxFinite.floor();
     final maxRuns = expanded ? double.maxFinite.floor() : originalMaxRuns;
@@ -457,7 +464,7 @@ class RenderExpansionWrap extends RenderBox {
       for (var i = 0; i <= lastChildIndex; i++) {
         final child = children[i];
         final childSize = _layoutBox(child, looseConstraints);
-        final parentData = child.parentData! as _WrapParentData;
+        final parentData = child.parentData as _WrapParentData;
         parentData._isVisible = (currentRun <= maxRuns);
         if (currentRunNumberOfChildren > 0 &&
             ((currentRunWidth + childSize.width > availableWidth) ||
@@ -485,7 +492,7 @@ class RenderExpansionWrap extends RenderBox {
             if (indicator != null) {
               // this is the last visible run, add indicator:
               final indicatorParentData =
-                  indicator.parentData! as _WrapParentData;
+                  indicator.parentData as _WrapParentData;
               indicatorParentData._isVisible = true;
               final dx =
                   _indicatorPosition == ExpansionWrapIndicatorPosition.border
@@ -516,7 +523,7 @@ class RenderExpansionWrap extends RenderBox {
     }
     if (expanded && currentRun >= originalMaxRuns && indicator != null) {
       // add compress indicator at the end:
-      final indicatorParentData = indicator.parentData! as _WrapParentData;
+      final indicatorParentData = indicator.parentData as _WrapParentData;
       indicatorParentData._isVisible = true;
       final dx = _indicatorPosition == ExpansionWrapIndicatorPosition.border
           ? availableWidth - indicatorWith
@@ -525,7 +532,7 @@ class RenderExpansionWrap extends RenderBox {
           dx, currentRunY + (currentRunHeight - indicatorSize.height) / 2);
     }
     if (!expanded && currentRun <= originalMaxRuns && indicator != null) {
-      final indicatorParentData = indicator.parentData! as _WrapParentData;
+      final indicatorParentData = indicator.parentData as _WrapParentData;
       indicatorParentData._isVisible = false;
     }
     if (crossAxisMaxInCompressedState != null) {
@@ -541,7 +548,7 @@ class RenderExpansionWrap extends RenderBox {
   void paint(PaintingContext context, Offset offset) {
     void doPaint(RenderBox? child) {
       if (child != null) {
-        final parentData = child.parentData! as _WrapParentData;
+        final parentData = child.parentData as _WrapParentData;
         if (parentData._isVisible) {
           context.paintChild(child, parentData.offset + offset);
         }
