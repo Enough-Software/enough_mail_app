@@ -54,6 +54,13 @@ class _MessageActionsState extends State<MessageActions> {
     super.initState();
   }
 
+  @override
+  void didUpdateWidget(covariant MessageActions oldWidget) {
+    oldWidget.message.removeListener(_update);
+    widget.message.addListener(_update);
+    super.didUpdateWidget(oldWidget);
+  }
+
   void _update() {
     setState(() {});
   }

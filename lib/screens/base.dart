@@ -1,13 +1,82 @@
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/widgets/app_drawer.dart';
-import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
-// import 'package:enough_style/enough_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import 'package:enough_mail_app/services/mail_service.dart';
+import 'package:enough_mail_app/widgets/app_drawer.dart';
+import 'package:enough_mail_app/widgets/menu_with_badge.dart';
+
 import '../locator.dart';
+
+class BasePage extends StatelessWidget {
+  const BasePage({
+    Key? key,
+    this.title,
+    this.subtitle,
+    this.content,
+    this.floatingActionButton,
+    this.appBarActions,
+    this.appBar,
+    this.drawer,
+    this.bottom,
+    this.includeDrawer = true,
+  }) : super(key: key);
+
+  final String? title;
+  final String? subtitle;
+  final Widget? content;
+  final FloatingActionButton? floatingActionButton;
+  final List<Widget>? appBarActions;
+  final PlatformAppBar? appBar;
+  final Widget? drawer;
+  final Widget? bottom;
+  final bool includeDrawer;
+
+  @override
+  Widget build(BuildContext context) {
+    return Base.buildAppChrome(
+      context,
+      title: title,
+      subtitle: subtitle,
+      content: content,
+      floatingActionButton: floatingActionButton,
+      appBarActions: appBarActions,
+      appBar: appBar,
+      drawer: drawer,
+      bottom: bottom,
+      includeDrawer: includeDrawer,
+    );
+  }
+}
+
+class BaseAppBar extends StatelessWidget {
+  const BaseAppBar({
+    Key? key,
+    this.title,
+    this.actions,
+    this.subtitle,
+    this.floatingActionButton,
+    this.includeDrawer = true,
+  }) : super(key: key);
+
+  final String? title;
+  final List<Widget>? actions;
+  final String? subtitle;
+  final FloatingActionButton? floatingActionButton;
+  final bool includeDrawer;
+
+  @override
+  Widget build(BuildContext context) {
+    return Base.buildAppBar(
+      context,
+      title,
+      subtitle: subtitle,
+      floatingActionButton: floatingActionButton,
+      includeDrawer: includeDrawer,
+    );
+  }
+}
 
 class Base {
   static Widget buildAppChrome(
