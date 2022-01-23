@@ -53,6 +53,7 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
   void initState() {
     _pageController = PageController(initialPage: widget.message.sourceIndex);
     _current = widget.message;
+    _current.addListener(_update);
     _source = _current.source;
     super.initState();
   }
@@ -60,7 +61,12 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
   @override
   void dispose() {
     _pageController.dispose();
+    _current.removeListener(_update);
     super.dispose();
+  }
+
+  void _update() {
+    setState(() {});
   }
 
   Message _getMessage(int index) {
@@ -121,7 +127,9 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
         ),
         onPageChanged: (index) {
           setState(() {
+            _current.removeListener(_update);
             _current = _getMessage(index);
+            _current.addListener(_update);
           });
         },
       ),
