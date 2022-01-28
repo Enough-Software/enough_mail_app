@@ -1,8 +1,9 @@
 import 'package:enough_mail_app/models/web_view_configuration.dart';
 import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WebViewScreen extends StatelessWidget {
@@ -19,8 +20,8 @@ class WebViewScreen extends StatelessWidget {
       context,
       title: configuration.title ?? configuration.uri.host,
       content: SafeArea(
-        child: InAppWebView(
-          initialUrlRequest: URLRequest(url: configuration.uri),
+        child: WebView(
+          initialUrl: configuration.uri.toString(),
         ),
       ),
     );
