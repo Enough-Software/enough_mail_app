@@ -14,6 +14,7 @@ import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/gravatar.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_serialization/enough_serialization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -194,9 +195,15 @@ class MailService {
         if (flag != null) {
           accountMailbox = client.getMailbox(flag);
           if (accountMailbox == null) {
-            print(
-                'unable to find mailbox with $flag in account ${client.account.name}');
-            continue;
+            await client.listMailboxes();
+            accountMailbox = client.getMailbox(flag);
+            if (accountMailbox == null) {
+              if (kDebugMode) {
+                print(
+                    'unable to find mailbox with $flag in account ${client.account.name}');
+              }
+              continue;
+            }
           }
         }
         mimeSources.add(MailboxMimeSource(client, accountMailbox));
