@@ -125,7 +125,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       locator<NavigationService>()
           .push(Routes.welcome, fade: true, replace: true);
     }
-    await locator<BackgroundService>().init();
+    if (BackgroundService.isSupported) {
+      await locator<BackgroundService>().init();
+    }
     _isInitialized = true;
     return mailService;
   }

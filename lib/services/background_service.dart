@@ -5,6 +5,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/background_update_info.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_serialization/enough_serialization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../locator.dart';
@@ -12,6 +13,10 @@ import 'mail_service.dart';
 
 class BackgroundService {
   static const String _keyInboxUids = 'nextUidsInfo';
+
+  static bool get isSupported =>
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS;
 
   Future init() async {
     await BackgroundFetch.configure(
@@ -64,7 +69,9 @@ class BackgroundService {
     }
     await Future.wait(futures);
     final stringValue = Serializer().serialize(info);
-    print('nextUids: $stringValue');
+    if (kDebugMode) {
+      print('nextUids: $stringValue');
+    }
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyInboxUids, stringValue);
   }
