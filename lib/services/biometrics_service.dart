@@ -2,6 +2,7 @@ import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:local_auth/local_auth.dart';
 
 class BiometricsService {
@@ -13,9 +14,16 @@ class BiometricsService {
     if (_isResolved) {
       return _isSupported;
     }
-    final canCheck = await _localAuth.canCheckBiometrics;
-    final isDeviceSupported = await _localAuth.isDeviceSupported();
-    _isSupported = canCheck && isDeviceSupported;
+    try {
+      final canCheck = await _localAuth.canCheckBiometrics;
+      final isDeviceSupported = await _localAuth.isDeviceSupported();
+      _isSupported = canCheck && isDeviceSupported;
+    } catch (e, s) {
+      if (kDebugMode) {
+        print('Unable to check local auth for biometrics support: $e $s');
+        _isSupported = false;
+      }
+    }
     _isResolved = true;
     return _isSupported;
   }
