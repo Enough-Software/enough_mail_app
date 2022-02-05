@@ -4,33 +4,38 @@ import 'package:flutter/material.dart';
 enum ThemeModeSetting { light, dark, system, custom }
 
 class ThemeSettings extends SerializableObject {
+  static const _keyColorSchemeSeed = 'colorSchemeSeed';
+  static const _keyPrimaryColorSwatchIndex = 'primarySwatchIndex';
+  static const _keyThemeModeSetting = 'themeModeSetting';
+  static const _keyThemeDarkStartTime = 'themeDarkEndTime';
+  static const _keyThemeDarkEndTime = 'themeDarkStartTime';
   ThemeSettings() {
-    transformers['themeModeSetting'] = (value) => value is ThemeModeSetting
+    transformers[_keyThemeModeSetting] = (value) => value is ThemeModeSetting
         ? value.index
         : ThemeModeSetting.values[value];
-    transformers['themeDarkStartTime'] = _convertTimeOfDay;
-    transformers['themeDarkEndTime'] = _convertTimeOfDay;
-    transformers['colorSchemeSeed'] = _convertColor;
+    transformers[_keyThemeDarkEndTime] = _convertTimeOfDay;
+    transformers[_keyThemeDarkStartTime] = _convertTimeOfDay;
+    transformers[_keyColorSchemeSeed] = _convertColor;
   }
 
   ThemeModeSetting get themeModeSetting =>
-      attributes['themeModeSetting'] ?? ThemeModeSetting.system;
+      attributes[_keyThemeModeSetting] ?? ThemeModeSetting.system;
   set themeModeSetting(ThemeModeSetting? value) =>
-      attributes['themeModeSetting'] = value;
+      attributes[_keyThemeModeSetting] = value;
 
   TimeOfDay get themeDarkStartTime =>
-      attributes['themeDarkStartTime'] ?? const TimeOfDay(hour: 22, minute: 0);
+      attributes[_keyThemeDarkEndTime] ?? const TimeOfDay(hour: 22, minute: 0);
   set themeDarkStartTime(TimeOfDay value) =>
-      attributes['themeDarkStartTime'] = value;
+      attributes[_keyThemeDarkEndTime] = value;
   TimeOfDay get themeDarkEndTime =>
-      attributes['themeDarkEndTime'] ?? const TimeOfDay(hour: 7, minute: 0);
+      attributes[_keyThemeDarkStartTime] ?? const TimeOfDay(hour: 7, minute: 0);
   set themeDarkEndTime(TimeOfDay value) =>
-      attributes['themeDarkEndTime'] = value;
+      attributes[_keyThemeDarkStartTime] = value;
 
   Color get colorSchemeSeed {
-    Color? color = attributes['colorSchemeSeed'];
+    Color? color = attributes[_keyColorSchemeSeed];
     if (color == null) {
-      int? index = attributes['primarySwatchIndex'];
+      int? index = attributes[_keyPrimaryColorSwatchIndex];
       if (index != null && index >= 0 && index < availableColors.length) {
         color = availableColors[index];
       }
@@ -38,7 +43,17 @@ class ThemeSettings extends SerializableObject {
     return color ?? Colors.green;
   }
 
-  set colorSchemeSeed(Color value) => attributes['colorSchemeSeed'] = value;
+  set colorSchemeSeed(Color value) {
+    if (value is MaterialColor) {
+      final index = availableColors.indexOf(value);
+      if (index != -1) {
+        attributes[_keyPrimaryColorSwatchIndex] = index;
+        attributes[_keyColorSchemeSeed] = null;
+        return;
+      }
+    }
+    attributes[_keyColorSchemeSeed] = value;
+  }
 
   List<Color> get availableColors => const [
         Colors.red,
