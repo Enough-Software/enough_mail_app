@@ -9,6 +9,8 @@ import '../routes.dart';
 import 'base.dart';
 
 class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -87,7 +89,7 @@ class SettingsScreen extends StatelessWidget {
                         .push(Routes.settingsReplyFormat);
                   },
                 ),
-                Divider(),
+                const Divider(),
                 PlatformListTile(
                   title: Text(localizations.settingsActionFeedback),
                   onTap: () {
@@ -106,7 +108,7 @@ class SettingsScreen extends StatelessWidget {
                   },
                   title: Text(localizations.settingsActionWelcome),
                 ),
-                Divider(),
+                const Divider(),
                 PlatformListTile(
                   title: Text(localizations.settingsDevelopment),
                   onTap: () {

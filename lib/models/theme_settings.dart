@@ -18,11 +18,11 @@ class ThemeSettings extends SerializableObject {
       attributes['themeModeSetting'] = value;
 
   TimeOfDay get themeDarkStartTime =>
-      attributes['themeDarkStartTime'] ?? TimeOfDay(hour: 22, minute: 0);
+      attributes['themeDarkStartTime'] ?? const TimeOfDay(hour: 22, minute: 0);
   set themeDarkStartTime(TimeOfDay value) =>
       attributes['themeDarkStartTime'] = value;
   TimeOfDay get themeDarkEndTime =>
-      attributes['themeDarkEndTime'] ?? TimeOfDay(hour: 7, minute: 0);
+      attributes['themeDarkEndTime'] ?? const TimeOfDay(hour: 7, minute: 0);
   set themeDarkEndTime(TimeOfDay value) =>
       attributes['themeDarkEndTime'] = value;
 

@@ -3,14 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PasswordField extends StatefulWidget {
-  final TextEditingController? controller;
-  final String? labelText;
-  final String? hintText;
-  final void Function(String text)? onChanged;
-  final bool autofocus;
-  final bool cupertinoShowLabel;
-
-  PasswordField({
+  const PasswordField({
     Key? key,
     required this.controller,
     this.labelText,
@@ -19,6 +12,13 @@ class PasswordField extends StatefulWidget {
     this.autofocus = false,
     this.cupertinoShowLabel = true,
   }) : super(key: key);
+
+  final TextEditingController? controller;
+  final String? labelText;
+  final String? hintText;
+  final void Function(String text)? onChanged;
+  final bool autofocus;
+  final bool cupertinoShowLabel;
 
   @override
   _PasswordFieldState createState() => _PasswordFieldState();

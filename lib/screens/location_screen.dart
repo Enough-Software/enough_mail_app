@@ -3,6 +3,7 @@ import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/location_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -13,7 +14,7 @@ import 'dart:ui' as ui;
 import '../locator.dart';
 
 class LocationScreen extends StatefulWidget {
-  LocationScreen({Key? key}) : super(key: key);
+  const LocationScreen({Key? key}) : super(key: key);
 
   @override
   _LocationScreenState createState() => _LocationScreenState();
@@ -73,7 +74,7 @@ class _LocationScreenState extends State<LocationScreen> {
       title: localizations.attachTypeLocation,
       appBarActions: [
         PlatformIconButton(
-          icon: Icon(Icons.check),
+          icon: const Icon(Icons.check),
           onPressed: onLocationSelected,
         ),
       ],
@@ -84,7 +85,7 @@ class _LocationScreenState extends State<LocationScreen> {
             case ConnectionState.none:
             case ConnectionState.waiting:
             case ConnectionState.active:
-              return Center(child: PlatformProgressIndicator());
+              return const Center(child: PlatformProgressIndicator());
             case ConnectionState.done:
               if (snapshot.hasData) {
                 defaultLocation =
@@ -115,8 +116,10 @@ class _LocationScreenState extends State<LocationScreen> {
       onScaleStart: _onScaleStart,
       onScaleUpdate: _onScaleUpdate,
       onScaleEnd: (details) {
-        print(
-            "Location: ${controller.center.latitude}, ${controller.center.longitude}");
+        if (kDebugMode) {
+          print(
+              "Location: ${controller.center.latitude}, ${controller.center.longitude}");
+        }
       },
       child: SizedBox(
         width: size.width,
@@ -137,7 +140,7 @@ class _LocationScreenState extends State<LocationScreen> {
                   );
                 },
               ),
-              Center(
+              const Center(
                 child: Icon(Icons.close, color: Colors.red),
               ),
               Align(
@@ -145,7 +148,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: PlatformIconButton(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.location_searching,
                       color: Colors.grey,
                     ),

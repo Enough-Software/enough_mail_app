@@ -10,6 +10,8 @@ import '../locator.dart';
 import 'base.dart';
 
 class SettingsLanguageScreen extends StatefulWidget {
+  const SettingsLanguageScreen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _SettingsLanguageScreenState();
@@ -68,7 +70,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                     if (value!.locale == null) {
                       setState(() {
                         _selectedLanguage = value;
-                        this._selectedLocalizations = null;
+                        _selectedLocalizations = null;
                         _systemSettingApplied = true;
                       });
                       locator<SettingsService>().settings.languageTag = null;
@@ -98,7 +100,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                     if (confirmed) {
                       setState(() {
                         _selectedLanguage = value;
-                        this._selectedLocalizations = selectedLocalizations;
+                        _selectedLocalizations = selectedLocalizations;
                         _systemSettingApplied = false;
                       });
                       locator<SettingsService>().settings.languageTag =
@@ -120,7 +122,6 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                 else if (_systemSettingApplied)
                   Text(localizations.languageSystemSetInfo,
                       style: theme.textTheme.subtitle1),
-                
               ],
             ),
           ),

@@ -12,7 +12,7 @@ import '../locator.dart';
 import '../routes.dart';
 
 class SettingsAccountsScreen extends StatefulWidget {
-  SettingsAccountsScreen({Key? key}) : super(key: key);
+  const SettingsAccountsScreen({Key? key}) : super(key: key);
 
   @override
   _SettingsAccountsScreenState createState() => _SettingsAccountsScreenState();
@@ -44,19 +44,19 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
           children: [
             for (final account in accounts)
               PlatformListTile(
-                leading: Icon(Icons.account_circle),
+                leading: Icon(CommonPlatformIcons.account),
                 title: Text(account.name),
                 onTap: () => locator<NavigationService>()
                     .push(Routes.accountEdit, arguments: account),
               ),
             PlatformListTile(
-              leading: Icon(Icons.add),
+              leading: Icon(CommonPlatformIcons.add),
               title: Text(localizations.drawerEntryAddAccount),
               onTap: () => locator<NavigationService>().push(Routes.accountAdd),
             ),
             if (accounts.length > 1)
               Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: PlatformElevatedButton(
                   onPressed: () {
                     setState(() {
@@ -99,7 +99,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
               for (final account in accounts)
                 ListTile(
                   key: ValueKey(account),
-                  leading: Icon(Icons.account_circle),
+                  leading: const Icon(Icons.account_circle),
                   title: Text(account.name),
                 ),
             ],

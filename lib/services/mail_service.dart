@@ -22,7 +22,7 @@ import 'package:flutter/foundation.dart' as foundation;
 import '../locator.dart';
 
 class MailService {
-  static const _clientId = const Id(name: 'Maily', version: '1.0');
+  static const _clientId = Id(name: 'Maily', version: '1.0');
   MessageSource? messageSource;
   Account? _currentAccount;
   Account? get currentAccount => _currentAccount;
@@ -34,10 +34,9 @@ class MailService {
   bool get hasUnifiedAccount => (unifiedAccount != null);
 
   static const String _keyAccounts = 'accts';
-  final FlutterSecureStorage _storage = FlutterSecureStorage();
+  final _storage = const FlutterSecureStorage();
   final _mailClientsPerAccount = <Account, MailClient>{};
-  final Map<Account, Tree<Mailbox?>> _mailboxesPerAccount =
-      <Account, Tree<Mailbox?>>{};
+  final _mailboxesPerAccount = <Account, Tree<Mailbox?>>{};
   late AppLocalizations _localizations;
   AppLocalizations get localizations => _localizations;
 
@@ -221,7 +220,9 @@ class MailService {
       await client.stopPollingIfNeeded();
       return client;
     } catch (e, s) {
-      print('Unable to get client for ${account.email}: $e $s');
+      if (kDebugMode) {
+        print('Unable to get client for ${account.email}: $e $s');
+      }
       return null;
     }
   }
@@ -417,7 +418,9 @@ class MailService {
   Future<void> loadMailboxesFor(MailClient client) async {
     final account = getAccountFor(client.account);
     if (account == null) {
-      print('Unable to find account for ${client.account}');
+      if (kDebugMode) {
+        print('Unable to find account for ${client.account}');
+      }
       return;
     }
     final mailboxTree =

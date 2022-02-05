@@ -10,6 +10,8 @@ import '../locator.dart';
 import 'base.dart';
 
 class SettingsSwipeScreen extends StatelessWidget {
+  const SettingsSwipeScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final settings = locator<SettingsService>().settings;
@@ -34,7 +36,7 @@ class SettingsSwipeScreen extends StatelessWidget {
                   swipeAction: leftToRightAction,
                   isLeftToRight: true,
                 ),
-                Divider(),
+                const Divider(),
                 Text(localizations.swipeSettingRightToLeftLabel,
                     style: theme.textTheme.caption),
                 _SwipeSetting(
@@ -85,7 +87,7 @@ class _SwipeSettingState extends State<_SwipeSetting> {
         ),
         PlatformTextButtonIcon(
           onPressed: _onPressed,
-          icon: Icon(Icons.edit),
+          icon: const Icon(Icons.edit),
           label: ButtonText(localizations.swipeSettingChangeAction),
         ),
       ],
@@ -132,7 +134,7 @@ class _SwipeSettingState extends State<_SwipeSetting> {
                         Align(
                           alignment: Alignment.topLeft,
                           child: Container(
-                            decoration: new BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
                             ),
@@ -184,7 +186,7 @@ class _SwipeWidget extends StatelessWidget {
           width: 128,
           height: 128,
           child: Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,

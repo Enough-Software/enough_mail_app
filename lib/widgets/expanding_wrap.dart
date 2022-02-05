@@ -536,8 +536,9 @@ class RenderExpansionWrap extends RenderBox
 
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! ExpansionWrapParentData)
+    if (child.parentData is! ExpansionWrapParentData) {
       child.parentData = ExpansionWrapParentData();
+    }
   }
 
   @override
@@ -945,17 +946,19 @@ class RenderExpansionWrap extends RenderBox
         if (flipMainAxis) childMainPosition -= childMainAxisExtent;
         childParentData.offset = _getOffset(
             childMainPosition, crossAxisOffset + childCrossAxisOffset);
-        if (flipMainAxis)
+        if (flipMainAxis) {
           childMainPosition -= childBetweenSpace;
-        else
+        } else {
           childMainPosition += childMainAxisExtent + childBetweenSpace;
+        }
         child = childParentData.nextSibling;
       }
 
-      if (flipCrossAxis)
+      if (flipCrossAxis) {
         crossAxisOffset -= runBetweenSpace;
-      else
+      } else {
         crossAxisOffset += runCrossAxisExtent + runBetweenSpace;
+      }
     }
   }
 

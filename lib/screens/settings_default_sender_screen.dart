@@ -12,6 +12,8 @@ import '../routes.dart';
 import 'base.dart';
 
 class SettingsDefaultSenderScreen extends StatefulWidget {
+  const SettingsDefaultSenderScreen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _SettingsDefaultSenderScreenState();
@@ -95,7 +97,7 @@ class _SettingsDefaultSenderScreenState
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 16),
+                  padding: const EdgeInsets.only(top: 16),
                   child: TextWithNamedLinks(
                     parts: aliasInfoParts,
                   ),

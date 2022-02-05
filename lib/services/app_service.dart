@@ -9,6 +9,7 @@ import 'package:enough_mail_app/models/shared_data.dart';
 import 'package:enough_mail_app/services/biometrics_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../locator.dart';
@@ -18,7 +19,7 @@ import 'mail_service.dart';
 import 'navigation_service.dart';
 
 class AppService {
-  static const _platform = const MethodChannel('app.channel.shared.data');
+  static const _platform = MethodChannel('app.channel.shared.data');
   AppLifecycleState appLifecycleState = AppLifecycleState.resumed;
 
   bool _ignoreBiometricsCheckAtNextResume = false;
@@ -35,7 +36,9 @@ class AppService {
   DateTime? _lastPausedTimeStamp;
 
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    print('AppLifecycleState = $state');
+    if (kDebugMode) {
+      print('AppLifecycleState = $state');
+    }
     appLifecycleState = state;
     switch (state) {
       case AppLifecycleState.resumed:
@@ -105,7 +108,9 @@ class AppService {
         : MediaType.fromText(mimeTypeText);
     final int? length = shared['length'];
     final String? text = shared['text'];
-    print('share text: "$text"');
+    if (kDebugMode) {
+      print('share text: "$text"');
+    }
     if (length != null && length > 0) {
       for (var i = 0; i < length; i++) {
         final String? filename = shared['name.$i'];
@@ -115,8 +120,10 @@ class AppService {
             ? MediaType.fromText(typeName!)
             : mediaType ?? MediaType.guessFromFileName(filename!);
         sharedData.add(SharedBinary(data, filename, localMediaType));
-        print(
-            'share: loaded ${localMediaType.text}  "$filename" with ${data?.length} bytes');
+        if (kDebugMode) {
+          print(
+              'share: loaded ${localMediaType.text}  "$filename" with ${data?.length} bytes');
+        }
       }
     } else if (text != null) {
       if (text.startsWith('mailto:')) {

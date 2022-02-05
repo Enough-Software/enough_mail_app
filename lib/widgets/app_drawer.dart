@@ -18,7 +18,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../routes.dart';
 
 class AppDrawer extends StatelessWidget {
-  AppDrawer({Key? key}) : super(key: key);
+  const AppDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +56,7 @@ class AppDrawer extends StatelessWidget {
                       _buildFolderTree(currentAccount),
                       ExtensionActionTile.buildSideMenuForAccount(
                           context, currentAccount),
-                      Divider(),
+                      const Divider(),
                       PlatformListTile(
                         leading: Icon(iconService.about),
                         title: Text(localizations.drawerEntryAbout),
@@ -99,7 +99,7 @@ class AppDrawer extends StatelessWidget {
     final userName = currentAccount.userName;
     final accountName = Text(
       currentAccount.name,
-      style: TextStyle(fontWeight: FontWeight.bold),
+      style: const TextStyle(fontWeight: FontWeight.bold),
     );
     final accountNameWithBadge = locator<MailService>().hasError(currentAccount)
         ? Badge(child: accountName)
@@ -124,7 +124,7 @@ class AppDrawer extends StatelessWidget {
             ),
             radius: 30,
           ),
-          Padding(
+          const Padding(
             padding: EdgeInsets.only(left: 8),
           ),
           Expanded(
@@ -136,13 +136,15 @@ class AppDrawer extends StatelessWidget {
                 if (userName != null)
                   Text(
                     userName,
-                    style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
+                    style: const TextStyle(
+                        fontStyle: FontStyle.italic, fontSize: 14),
                   ),
                 Text(
                   currentAccount is UnifiedAccount
                       ? currentAccount.accounts.map((a) => a.name).join(', ')
                       : currentAccount.email,
-                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
+                  style: const TextStyle(
+                      fontStyle: FontStyle.italic, fontSize: 14),
                 ),
               ],
             ),
@@ -167,7 +169,7 @@ class AppDrawer extends StatelessWidget {
           for (final account in accounts)
             PlatformListTile(
               leading: mailService.hasError(account)
-                  ? Icon(Icons.error_outline)
+                  ? const Icon(Icons.error_outline)
                   : null,
               tileColor: mailService.hasError(account) ? Colors.red : null,
               title: Text(account.name),
@@ -213,7 +215,7 @@ class AppDrawer extends StatelessWidget {
 
   Widget _buildAddAccountTile(AppLocalizations localizations) {
     return PlatformListTile(
-      leading: Icon(Icons.add),
+      leading: const Icon(Icons.add),
       title: Text(localizations.drawerEntryAddAccount),
       onTap: () {
         final navService = locator<NavigationService>();

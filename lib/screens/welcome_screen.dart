@@ -11,7 +11,7 @@ import '../locator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,7 @@ class WelcomeScreen extends StatelessWidget {
           height: 200,
           fit: BoxFit.cover,
         ),
-        decoration: PageDecoration(pageColor: Color(0xff543226)),
+        decoration: const PageDecoration(pageColor: Color(0xff543226)),
         footer: _buildFooter(localizations),
       ),
       PageViewModel(
@@ -72,7 +72,7 @@ class WelcomeScreen extends StatelessWidget {
           height: 200,
           fit: BoxFit.cover,
         ),
-        decoration: PageDecoration(pageColor: Color(0xff761711)),
+        decoration: const PageDecoration(pageColor: Color(0xff761711)),
         footer: _buildFooter(localizations),
       ),
       PageViewModel(
@@ -108,8 +108,8 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
           child: Legalese(),
         ),
       ],

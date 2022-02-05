@@ -34,7 +34,9 @@ class BackgroundService {
       try {
         await locator<MailService>().resume();
       } catch (e, s) {
-        print('Error: Unable to finish foreground background fetch: $e $s');
+        if (kDebugMode) {
+          print('Error: Unable to finish foreground background fetch: $e $s');
+        }
       }
       BackgroundFetch.finish(taskId);
     }, (String taskId) {
@@ -45,8 +47,10 @@ class BackgroundService {
 
   static void backgroundFetchHeadlessTask(HeadlessTask task) async {
     final taskId = task.taskId;
-    print(
-        'backgroundFetchHeadlessTask with taskId $taskId, timeout=${task.timeout}');
+    if (kDebugMode) {
+      print(
+          'backgroundFetchHeadlessTask with taskId $taskId, timeout=${task.timeout}');
+    }
     if (task.timeout) {
       BackgroundFetch.finish(taskId);
       return;
@@ -54,7 +58,9 @@ class BackgroundService {
     try {
       await checkForNewMail();
     } catch (e, s) {
-      print('Error during backgroundFetchHeadlessTask $e $s');
+      if (kDebugMode) {
+        print('Error during backgroundFetchHeadlessTask $e $s');
+      }
     } finally {
       BackgroundFetch.finish(taskId);
     }
@@ -93,18 +99,24 @@ class BackgroundService {
         info.updateForClient(mailClient, uidNext);
       }
     } catch (e, s) {
-      print(
-          'Error while getting Inbox.nextUids for ${mailClient.account.email}: $e $s');
+      if (kDebugMode) {
+        print(
+            'Error while getting Inbox.nextUids for ${mailClient.account.email}: $e $s');
+      }
     }
   }
 
   static Future checkForNewMail() async {
-    print('background check at ${DateTime.now()}');
+    if (kDebugMode) {
+      print('background check at ${DateTime.now()}');
+    }
     final prefs = await SharedPreferences.getInstance();
 
     final prefsValue = prefs.getString(_keyInboxUids);
     if (prefsValue == null) {
-      print('WARNING: no previous UID infos found, exiting.');
+      if (kDebugMode) {
+        print('WARNING: no previous UID infos found, exiting.');
+      }
       return;
     }
     final info = BackgroundUpdateInfo();
@@ -186,8 +198,10 @@ class BackgroundService {
         //   }
         // }
       } else {
-        print(
-            'new uidNext=$uidNext, previous=$previousUidNext for ${account.name} uidValidity=${inbox.uidValidity}');
+        if (kDebugMode) {
+          print(
+              'new uidNext=$uidNext, previous=$previousUidNext for ${account.name} uidValidity=${inbox.uidValidity}');
+        }
         final sequence = MessageSequence.fromRangeToLast(
           // special care when uidnext of the account was not known before:
           // do not load _all_ messages
@@ -211,8 +225,10 @@ class BackgroundService {
 
       await mailClient.disconnect();
     } catch (e, s) {
-      print(
-          'Unable to process background operation for ${account.name}: $e $s');
+      if (kDebugMode) {
+        print(
+            'Unable to process background operation for ${account.name}: $e $s');
+      }
     }
   }
 }

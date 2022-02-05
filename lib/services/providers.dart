@@ -1,6 +1,7 @@
 import 'package:enough_mail/discover.dart';
 import 'package:enough_mail_app/oauth/oauth.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -47,13 +48,17 @@ class ProviderService {
       final id = email.substring(email.indexOf('@') + 1);
       return Provider(id, hostName, clientConfig);
     } catch (e, s) {
-      print('Unable to discover settings for [$email]: $e $s');
+      if (kDebugMode) {
+        print('Unable to discover settings for [$email]: $e $s');
+      }
       return null;
     }
   }
 
   void addAll(Iterable<Provider> providers) {
-    providers.forEach((p) => add(p));
+    for (var p in providers) {
+      add(p);
+    }
   }
 
   void add(Provider provider) {
@@ -112,7 +117,7 @@ class Provider {
       child: PlatformTextButton(
         onPressed: onPressed,
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
           ),
           child: Padding(
@@ -184,8 +189,8 @@ class GmailProvider extends Provider {
     bool isSignInButton = false,
   }) {
     final localizations = AppLocalizations.of(context)!;
-    final googleBlue = Color(0xff4285F4);
-    final googleText = Color(0x89000000);
+    const googleBlue = Color(0xff4285F4);
+    const googleText = Color(0x89000000);
     return Theme(
       data: ThemeData(
           brightness: Brightness.light,

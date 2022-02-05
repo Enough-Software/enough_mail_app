@@ -1,10 +1,12 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart' as url_launcher;
+
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart' as urlLauncher;
 
 import 'account.dart';
 import 'message_source.dart';
@@ -142,7 +144,7 @@ class Message extends ChangeNotifier {
   }
 
   void updateMime(MimeMessage mime) {
-    this.mimeMessage = mime;
+    mimeMessage = mime;
     _attachments = null;
     notifyListeners();
   }
@@ -215,7 +217,9 @@ extension NewsLetter on MimeMessage {
       if (part.isNotEmpty) {
         final uri = Uri.tryParse(part);
         if (uri == null) {
-          print('Invalid $name $value: unable to pars URI $part');
+          if (kDebugMode) {
+            print('Invalid $name $value: unable to pars URI $part');
+          }
         } else {
           uris.add(uri);
         }
@@ -255,7 +259,7 @@ extension NewsLetter on MimeMessage {
     }
     // manually open unsubscribe web page:
     if (httpUri != null) {
-      return urlLauncher.launch(httpUri.toString());
+      return url_launcher.launch(httpUri.toString());
     }
     return false;
   }
@@ -280,7 +284,7 @@ extension NewsLetter on MimeMessage {
             (uri) => uri!.scheme.toLowerCase() == 'http',
             orElse: () => null));
     if (httpUri != null) {
-      return urlLauncher.launch(httpUri.toString());
+      return url_launcher.launch(httpUri.toString());
     }
     return false;
   }
@@ -299,12 +303,8 @@ extension NewsLetter on MimeMessage {
         allowPlusAliases: account.supportsPlusAliases);
     me ??= account.fromAddress;
     final builder = MessageBuilder.prepareMailtoBasedMessage(mailtoUri, me);
-    if (builder.subject == null) {
-      builder.subject = defaultSubject;
-    }
-    if (builder.text == null) {
-      builder.text = defaultSubject;
-    }
+    builder.subject ??= defaultSubject;
+    builder.text ??= defaultSubject;
     final message = builder.buildMimeMessage();
     return client.sendMessage(message, appendToSent: false);
   }

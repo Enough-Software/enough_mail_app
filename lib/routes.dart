@@ -6,6 +6,7 @@ import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Routes {
@@ -56,43 +57,43 @@ class AppRouter {
         page = AccountEditScreen(account: arguments as Account);
         break;
       case Routes.settings:
-        page = SettingsScreen();
+        page = const SettingsScreen();
         break;
       case Routes.settingsSecurity:
-        page = SettingsSecurityScreen();
+        page = const SettingsSecurityScreen();
         break;
       case Routes.settingsAccounts:
-        page = SettingsAccountsScreen();
+        page = const SettingsAccountsScreen();
         break;
       case Routes.settingsDesign:
-        page = SettingsThemeScreen();
+        page = const SettingsThemeScreen();
         break;
       case Routes.settingsFeedback:
-        page = SettingsFeedbackScreen();
+        page = const SettingsFeedbackScreen();
         break;
       case Routes.settingsLanguage:
-        page = SettingsLanguageScreen();
+        page = const SettingsLanguageScreen();
         break;
       case Routes.settingsFolders:
-        page = SettingsFoldersScreen();
+        page = const SettingsFoldersScreen();
         break;
       case Routes.settingsReadReceipts:
-        page = SettingsReadReceiptsScreen();
+        page = const SettingsReadReceiptsScreen();
         break;
       case Routes.settingsDevelopment:
-        page = SettingsDeveloperModeScreen();
+        page = const SettingsDeveloperModeScreen();
         break;
       case Routes.settingsSwipe:
-        page = SettingsSwipeScreen();
+        page = const SettingsSwipeScreen();
         break;
       case Routes.settingsSignature:
-        page = SettingsSignatureScreen();
+        page = const SettingsSignatureScreen();
         break;
       case Routes.settingsDefaultSender:
-        page = SettingsDefaultSenderScreen();
+        page = const SettingsDefaultSenderScreen();
         break;
       case Routes.settingsReplyFormat:
-        page = SettingsReplyScreen();
+        page = const SettingsReplyScreen();
         break;
       case Routes.messageSource:
         page = MessageSourceScreen(messageSource: arguments as MessageSource);
@@ -106,7 +107,7 @@ class AppRouter {
             blockExternalContents: arguments.blockExternalContent,
           );
         } else {
-          page = WelcomeScreen();
+          page = const WelcomeScreen();
         }
         break;
       case Routes.mailContents:
@@ -120,13 +121,13 @@ class AppRouter {
             mediaWidget: arguments as InteractiveMediaWidget);
         break;
       case Routes.locationPicker:
-        page = LocationScreen();
+        page = const LocationScreen();
         break;
       case Routes.splash:
-        page = SplashScreen();
+        page = const SplashScreen();
         break;
       case Routes.welcome:
-        page = WelcomeScreen();
+        page = const WelcomeScreen();
         break;
       case Routes.sourceCode:
         page = SourceCodeScreen(mimeMessage: arguments as MimeMessage);
@@ -135,13 +136,15 @@ class AppRouter {
         page = WebViewScreen(configuration: arguments as WebViewConfiguration);
         break;
       case Routes.appDrawer:
-        page = AppDrawer();
+        page = const AppDrawer();
         break;
       case Routes.lockScreen:
-        page = LockScreen();
+        page = const LockScreen();
         break;
       default:
-        print('Unknown route: $name');
+        if (kDebugMode) {
+          print('Unknown route: $name');
+        }
         page = Scaffold(
           body: Center(child: Text('No route defined for $name')),
         );

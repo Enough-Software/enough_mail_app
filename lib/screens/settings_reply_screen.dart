@@ -7,6 +7,8 @@ import '../locator.dart';
 import 'base.dart';
 
 class SettingsReplyScreen extends StatefulWidget {
+  const SettingsReplyScreen({Key? key}) : super(key: key);
+
   @override
   _SettingsReplyScreenState createState() => _SettingsReplyScreenState();
 }

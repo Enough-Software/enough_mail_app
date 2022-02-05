@@ -27,7 +27,7 @@ class MessageOverviewContent extends StatelessWidget {
     final hasAttachments = msg.hasAttachment;
     final date = locator<I18nService>().formatDateTime(mime.decodeDate());
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
       color: msg.isFlagged ? Colors.amber[50] : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +49,7 @@ class MessageOverviewContent extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(date, style: TextStyle(fontSize: 12)),
+              Text(date, style: const TextStyle(fontSize: 12)),
               if (hasAttachments ||
                   msg.isAnswered ||
                   msg.isForwarded ||
@@ -59,10 +59,12 @@ class MessageOverviewContent extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Row(
                     children: [
-                      if (msg.isFlagged) Icon(Icons.outlined_flag, size: 12),
-                      if (hasAttachments) Icon(Icons.attach_file, size: 12),
-                      if (msg.isAnswered) Icon(Icons.reply, size: 12),
-                      if (msg.isForwarded) Icon(Icons.forward, size: 12),
+                      if (msg.isFlagged)
+                        const Icon(Icons.outlined_flag, size: 12),
+                      if (hasAttachments)
+                        const Icon(Icons.attach_file, size: 12),
+                      if (msg.isAnswered) const Icon(Icons.reply, size: 12),
+                      if (msg.isForwarded) const Icon(Icons.forward, size: 12),
                       if (threadLength != 0)
                         IconService.buildNumericIcon(context, threadLength,
                             size: 12.0),

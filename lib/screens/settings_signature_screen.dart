@@ -17,6 +17,8 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 class SettingsSignatureScreen extends StatefulWidget {
+  const SettingsSignatureScreen({Key? key}) : super(key: key);
+
   @override
   _SettingsSignatureScreenState createState() =>
       _SettingsSignatureScreenState();
@@ -74,17 +76,17 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
                     title: Text(getActionName(action, localizations)),
                   ),
 
-                Divider(),
-                SignatureWidget(), //  global signature
+                const Divider(),
+                const SignatureWidget(), //  global signature
                 if (accounts.length > 1) ...[
-                  Divider(),
+                  const Divider(),
                   if (accountsWithSignature.isNotEmpty)
                     for (final account in accountsWithSignature) ...[
                       Text(account.name, style: theme.textTheme.subtitle1),
                       SignatureWidget(
                         account: account,
                       ),
-                      Divider(),
+                      const Divider(),
                     ],
                   Text(localizations.signatureSettingsAccountInfo),
                   PlatformTextButton(
@@ -105,8 +107,8 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
 }
 
 class SignatureWidget extends StatefulWidget {
+  const SignatureWidget({Key? key, this.account}) : super(key: key);
   final Account? account;
-  SignatureWidget({Key? key, this.account}) : super(key: key);
 
   @override
   _SignatureWidgetState createState() => _SignatureWidgetState();
@@ -129,7 +131,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
     final localizations = AppLocalizations.of(context)!;
     if (_signature == null) {
       return PlatformListTile(
-        leading: Icon(Icons.add),
+        leading: const Icon(Icons.add),
         title: Text(
           localizations
               .signatureSettingsAddForAccount(widget.account?.name ?? ''),
@@ -151,7 +153,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
         Align(
           alignment: Alignment.topRight,
           child: PlatformIconButton(
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
             onPressed: _showEditor,
           ),
         ),

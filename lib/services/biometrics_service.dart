@@ -8,7 +8,7 @@ import 'package:local_auth/local_auth.dart';
 class BiometricsService {
   bool _isResolved = false;
   bool _isSupported = false;
-  LocalAuthentication _localAuth = LocalAuthentication();
+  final _localAuth = LocalAuthentication();
 
   Future<bool> isDeviceSupported() async {
     if (_isResolved) {
@@ -48,7 +48,9 @@ class BiometricsService {
       );
       return result;
     } catch (e, s) {
-      print('Authentication failed with $e $s');
+      if (kDebugMode) {
+        print('Authentication failed with $e $s');
+      }
     }
     return false;
   }

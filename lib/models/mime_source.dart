@@ -1,9 +1,9 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/mime_cache.dart';
-import 'package:enough_mail_app/services/app_service.dart';
 import 'dart:async';
 
 import 'package:enough_mail_app/services/notification_service.dart';
+import 'package:flutter/foundation.dart';
 
 import '../locator.dart';
 
@@ -35,7 +35,8 @@ abstract class MimeSource {
 
   MimeSource search(MailSearch search);
 
-  bool get supportsMessageFolders => (mailClient.mailboxes?.length != 0);
+  bool get supportsMessageFolders =>
+      (mailClient.mailboxes?.isNotEmpty ?? false);
   bool get shouldBlockImages => isJunk || isTrash;
 
   bool get isJunk;
@@ -94,8 +95,10 @@ abstract class MimeSource {
   }
 
   void _onMessageAdded(MailLoadEvent e) {
-    print(
-        '$name ${e.mailClient.account.name} ${DateTime.now()}: ${e.message.decodeSubject()}');
+    if (kDebugMode) {
+      print(
+          '$name ${e.mailClient.account.name} ${DateTime.now()}: ${e.message.decodeSubject()}');
+    }
     if (e.mailClient == mailClient) {
       // display notification when the message is not seen and
       // when the user does not see the message because the user is looking at the list of messages
@@ -249,7 +252,9 @@ class MailboxMimeSource extends MimeSource {
       }
       return true;
     } catch (e, s) {
-      print('Error while initializing mime source for $mailbox: $e $s');
+      if (kDebugMode) {
+        print('Error while initializing mime source for $mailbox: $e $s');
+      }
       return false;
     }
   }
@@ -392,7 +397,9 @@ class MailboxMimeSource extends MimeSource {
           action: seen ? StoreAction.add : StoreAction.remove);
       return true;
     } catch (e, s) {
-      print('unable to mark all messages as seen($seen): $e $s');
+      if (kDebugMode) {
+        print('unable to mark all messages as seen($seen): $e $s');
+      }
     }
     return false;
   }
@@ -413,8 +420,10 @@ class MailboxMimeSource extends MimeSource {
     final messages = await event.mailClient
         .fetchMessages(fetchPreference: FetchPreference.envelope);
     if (messages.isEmpty) {
-      print(
-          'MESSAGES ARE EMPTY FOR ${event.mailClient.lowLevelOutgoingMailClient.logName}');
+      if (kDebugMode) {
+        print(
+            'MESSAGES ARE EMPTY FOR ${event.mailClient.lowLevelOutgoingMailClient.logName}');
+      }
       //clear();
       return;
     }
@@ -447,7 +456,9 @@ class SearchMimeSource extends MimeSource {
       searchResult = await mailClient.searchMessages(mailSearch);
     } catch (e, s) {
       searchResult = MailSearchResult.empty(mailSearch);
-      print('Unable to search: $e $s');
+      if (kDebugMode) {
+        print('Unable to search: $e $s');
+      }
     }
     return true;
   }
@@ -558,7 +569,9 @@ class SearchMimeSource extends MimeSource {
           action: seen ? StoreAction.add : StoreAction.remove);
       return true;
     } catch (e, s) {
-      print('unable to mark searched message sequence as seen($seen): $e $s');
+      if (kDebugMode) {
+        print('unable to mark searched message sequence as seen($seen): $e $s');
+      }
     }
     return false;
   }

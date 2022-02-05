@@ -24,11 +24,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
   setupLocator();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   _MyAppState createState() => _MyAppState();
@@ -155,7 +155,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               case ConnectionState.none:
               case ConnectionState.waiting:
               case ConnectionState.active:
-                return SplashScreen();
+                return const SplashScreen();
               case ConnectionState.done:
                 // in the meantime the app has navigated away
                 break;
@@ -197,8 +197,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       materialDarkTheme:
           _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
       materialThemeMode: _themeMode,
-      cupertinoTheme: CupertinoThemeData(
+      cupertinoTheme: const CupertinoThemeData(
         brightness: Brightness.light,
+        //TODO support theming on Cupertino
       ),
     );
   }

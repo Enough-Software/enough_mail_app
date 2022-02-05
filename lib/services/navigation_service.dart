@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class NavigationService {
-  final GlobalKey<NavigatorState> navigatorKey =
-      new GlobalKey<NavigatorState>();
+  final navigatorKey = GlobalKey<NavigatorState>();
 
   BuildContext? get currentContext => navigatorKey.currentContext;
   String? get currentRouteName => _currentRouteName;

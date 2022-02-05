@@ -4,7 +4,8 @@ import 'package:flutter/widgets.dart';
 enum ExpansionWrapIndicatorPosition { inline, border }
 
 class ExpansionWrap extends RenderObjectWidget {
-  ExpansionWrap({
+  const ExpansionWrap({
+    Key? key,
     required this.children,
     required this.expandIndicator,
     required this.maxRuns,
@@ -13,7 +14,7 @@ class ExpansionWrap extends RenderObjectWidget {
     this.spacing = 0.0,
     this.runSpacing = 0.0,
     this.indicatorPosition = ExpansionWrapIndicatorPosition.border,
-  });
+  }) : super(key: key);
 
   final List<Widget> children;
   final Widget expandIndicator;
@@ -306,7 +307,9 @@ class RenderExpansionWrap extends RenderBox {
     if (compressIndicator != null) yield compressIndicator;
     final children = _wrapChildren;
     if (children != null) {
-      for (final child in children) yield child;
+      for (final child in children) {
+        yield child;
+      }
     }
   }
 
@@ -314,14 +317,18 @@ class RenderExpansionWrap extends RenderBox {
   void attach(PipelineOwner owner) {
     // print('attach');
     super.attach(owner);
-    for (final RenderBox child in _allChildren) child.attach(owner);
+    for (final RenderBox child in _allChildren) {
+      child.attach(owner);
+    }
   }
 
   @override
   void detach() {
     // print('dettach');
     super.detach();
-    for (final RenderBox child in _allChildren) child.detach();
+    for (final RenderBox child in _allChildren) {
+      child.detach();
+    }
   }
 
   @override

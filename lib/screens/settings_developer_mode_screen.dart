@@ -13,6 +13,8 @@ import '../locator.dart';
 import 'base.dart';
 
 class SettingsDeveloperModeScreen extends StatefulWidget {
+  const SettingsDeveloperModeScreen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _SettingsDeveloperModeScreenState();
@@ -60,7 +62,7 @@ class _SettingsDeveloperModeScreenState
                   },
                   title: Text(localizations.developerModeEnable),
                 ),
-                Divider(),
+                const Divider(),
                 Text(localizations.extensionsTitle,
                     style: theme.textTheme.subtitle1),
                 Text(localizations.extensionsIntro,
@@ -120,9 +122,9 @@ class _SettingsDeveloperModeScreenState
       ],
     );
     // controller.dispose();
-    if (result == true) {
+    if (result == true && url != null) {
       if (url!.length > 4) {
-        if (url!.indexOf(':') == -1) {
+        if (!url!.contains(':')) {
           url = 'https://$url';
         }
         if (!url!.endsWith('json')) {
@@ -188,15 +190,15 @@ class _SettingsDeveloperModeScreenState
                     if (snapshot.hasData) {
                       domain.account!.appExtensions!.add(snapshot.data);
                       return PlatformIconButton(
-                        icon: Icon(Icons.check),
+                        icon: const Icon(Icons.check),
                         onPressed: () => _showExtensionDetails(
                             domain.domain, snapshot.data!),
                       );
                     } else if (snapshot.connectionState ==
                         ConnectionState.done) {
-                      return Icon(Icons.cancel_outlined);
+                      return const Icon(Icons.cancel_outlined);
                     }
-                    return PlatformProgressIndicator();
+                    return const PlatformProgressIndicator();
                   },
                 ),
               ),
@@ -235,20 +237,20 @@ class _SettingsDeveloperModeScreenState
         children: [
           Text('Version: ${data.version}'),
           if (data.accountSideMenu != null) ...[
-            Divider(),
-            Text('Account side menus:'),
+            const Divider(),
+            const Text('Account side menus:'),
             for (final entry in data.accountSideMenu!)
               Text('"${entry.getLabel('en')}": ${entry.action!.url}'),
           ],
           if (data.forgotPasswordAction != null) ...[
-            Divider(),
-            Text('Forgot password:'),
+            const Divider(),
+            const Text('Forgot password:'),
             Text(
                 '"${data.forgotPasswordAction!.getLabel('en')}": ${data.forgotPasswordAction!.action!.url}'),
           ],
           if (data.signatureHtml != null) ...[
-            Divider(),
-            Text('Signature:'),
+            const Divider(),
+            const Text('Signature:'),
             Text('${data.getSignatureHtml('en')}'),
           ],
         ],

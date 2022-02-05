@@ -9,16 +9,17 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/widgets/ical_interactive_media.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'button_text.dart';
 
 class AttachmentChip extends StatefulWidget {
+  const AttachmentChip({Key? key, required this.info, required this.message})
+      : super(key: key);
   final ContentInfo info;
   final Message message;
-  AttachmentChip({Key? key, required this.info, required this.message})
-      : super(key: key);
 
   @override
   _AttachmentChipState createState() => _AttachmentChipState();
@@ -85,7 +86,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
 
   Widget _buildPreviewWidget(
       bool includeDownloadOption, IconData iconData, String? name) {
-    return Container(
+    return SizedBox(
       width: _width,
       height: _height,
       //color: Colors.yellow,
@@ -101,7 +102,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
               alignment: Alignment.bottomLeft,
               child: Container(
                 width: _width,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -113,7 +114,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
                   child: Text(
                     name,
                     overflow: TextOverflow.fade,
-                    style: TextStyle(fontSize: 8, color: Colors.white),
+                    style: const TextStyle(fontSize: 8, color: Colors.white),
                   ),
                 ),
               ),
@@ -123,20 +124,21 @@ class _AttachmentChipState extends State<AttachmentChip> {
               alignment: Alignment.topLeft,
               child: Container(
                 width: _width,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [Color(0x00000000), Color(0xff000000)],
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
+                child: const Padding(
+                  padding: EdgeInsets.all(4.0),
                   child: Icon(Icons.download_rounded, color: Colors.white),
                 ),
               ),
             ),
-            if (_isDownloading) Center(child: PlatformProgressIndicator()),
+            if (_isDownloading)
+              const Center(child: PlatformProgressIndicator()),
           ],
         ],
       ),
@@ -172,8 +174,10 @@ class _AttachmentChipState extends State<AttachmentChip> {
       );
       _showAttachment(media);
     } on MailException catch (e) {
-      print(
-          'Unable to download attachment with fetch id ${widget.info.fetchId}: $e');
+      if (kDebugMode) {
+        print(
+            'Unable to download attachment with fetch id ${widget.info.fetchId}: $e');
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -210,7 +214,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Icon(iconData),
             ),
             Text(
@@ -219,7 +223,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
             ),
             if (sizeText != null)
               Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Text(sizeText),
               ),
             PlatformTextButton(

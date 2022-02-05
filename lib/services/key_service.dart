@@ -1,6 +1,7 @@
 /// contains rate limited beta keys,
 /// production keys are stored locally only
 import 'package:enough_mail_app/oauth/oauth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class KeyService {
@@ -31,8 +32,10 @@ class KeyService {
         }
       }
     } catch (e) {
-      print(
-          'no assets/keys.txt found. Ensure to specify it in the pubspec.yaml and add the relevant keys there.');
+      if (kDebugMode) {
+        print(
+            'no assets/keys.txt found. Ensure to specify it in the pubspec.yaml and add the relevant keys there.');
+      }
     }
   }
 

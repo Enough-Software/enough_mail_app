@@ -9,8 +9,8 @@ import '../locator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class IcalComposer extends StatefulWidget {
+  const IcalComposer({Key? key, required this.appointment}) : super(key: key);
   final VCalendar appointment;
-  IcalComposer({Key? key, required this.appointment}) : super(key: key);
   @override
   _IcalComposerState createState() => _IcalComposerState();
 
@@ -188,7 +188,7 @@ class _IcalComposerState extends State<IcalComposer> {
                 });
               },
             ),
-            Divider(),
+            const Divider(),
             PlatformListTile(
               title: Text(localizations.composeAppointmentLabelRepeat),
               trailing: recurrenceRule == null
@@ -331,7 +331,7 @@ class DateTimePicker extends StatelessWidget {
             }
           },
         ),
-        if (!onlyDate) 
+        if (!onlyDate)
           // set time button:
           PlatformTextButton(
             child: PlatformText(
@@ -356,7 +356,6 @@ class DateTimePicker extends StatelessWidget {
               }
             },
           ),
-        
       ],
     );
   }
@@ -365,7 +364,8 @@ class DateTimePicker extends StatelessWidget {
 class RecurrenceComposer extends StatefulWidget {
   final Recurrence? recurrenceRule;
   final DateTime startDate;
-  RecurrenceComposer({Key? key, this.recurrenceRule, required this.startDate})
+  const RecurrenceComposer(
+      {Key? key, this.recurrenceRule, required this.startDate})
       : super(key: key);
 
   @override
@@ -523,7 +523,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                   });
                 },
               ),
-             ] else if (rule.frequency == RecurrenceFrequency.monthly) ...[
+            ] else if (rule.frequency == RecurrenceFrequency.monthly) ...[
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child:
@@ -538,7 +538,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                   });
                 },
               ),
-             ],
+            ],
             PlatformListTile(
               title: Text(localizations.composeAppointmentRecurrenceUntilLabel),
               trailing: Text(rule.until == null
@@ -566,7 +566,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                 });
               },
             ),
-            Divider(),
+            const Divider(),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(rule.toHumanReadableText(
@@ -574,7 +574,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                 startDate: widget.startDate,
               )),
             ),
-        ],
+          ],
         ],
       ),
     );
@@ -585,7 +585,7 @@ class WeekDaySelector extends StatefulWidget {
   final Recurrence recurrence;
   final DateTime startDate;
   final void Function(List<ByDayRule>? rules) onChanged;
-  WeekDaySelector({
+  const WeekDaySelector({
     Key? key,
     required this.recurrence,
     required this.onChanged,
@@ -675,7 +675,7 @@ class DayOfMonthSelector extends StatefulWidget {
   final Recurrence recurrence;
   final DateTime startDate;
   final void Function(Recurrence recurrence) onChanged;
-  DayOfMonthSelector(
+  const DayOfMonthSelector(
       {Key? key,
       required this.recurrence,
       required this.startDate,
@@ -773,7 +773,7 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
         ),
         if (_option == _DayOfMonthOption.dayInNumberedWeek && rule != null) ...[
           Padding(
-            padding: EdgeInsets.fromLTRB(32.0, 8.0, 8.0, 32.0),
+            padding: const EdgeInsets.fromLTRB(32.0, 8.0, 8.0, 32.0),
             child: Row(
               children: [
                 PlatformDropdownButton<int>(
@@ -813,7 +813,7 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
                     widget.onChanged(recurrence);
                   },
                 ),
-                Padding(
+                const Padding(
                   padding: EdgeInsets.all(8.0),
                 ),
                 PlatformDropdownButton<WeekDay>(
@@ -835,7 +835,7 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
               ],
             ),
           ),
-      ],
+        ],
       ],
     );
   }
@@ -845,7 +845,7 @@ class UntilComposer extends StatefulWidget {
   final DateTime start;
   final DateTime? until;
   final IsoDuration? recommendation;
-  UntilComposer(
+  const UntilComposer(
       {Key? key, required this.start, this.until, this.recommendation})
       : super(key: key);
 
@@ -906,7 +906,7 @@ class _UntilComposerState extends State<UntilComposer> {
         children: [
           for (final value in _UntilOption.values)
             if (_recommendationDate != null ||
-                value != _UntilOption.recommendation) 
+                value != _UntilOption.recommendation)
               PlatformRadioListTile<_UntilOption>(
                 groupValue: _option,
                 value: value,
@@ -914,8 +914,6 @@ class _UntilComposerState extends State<UntilComposer> {
                 title: Text(
                     value.localization(localizations, widget.recommendation)),
               ),
-            
-          
           if (_option == _UntilOption.date) ...[
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),

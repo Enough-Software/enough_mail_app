@@ -14,6 +14,8 @@ import '../locator.dart';
 import 'base.dart';
 
 class SettingsFeedbackScreen extends StatefulWidget {
+  const SettingsFeedbackScreen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _SettingsFeedbackScreenState();
@@ -72,8 +74,8 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                       style: theme.textTheme.subtitle1),
                 ),
                 if (info == null)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: PlatformProgressIndicator(),
                   )
                 else ...[
@@ -91,7 +93,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: PlatformIconButton(
-                      icon: Icon(Icons.copy),
+                      icon: Icon(CommonPlatformIcons.copy),
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: info));
                         locator<ScaffoldMessengerService>().showTextSnackBar(

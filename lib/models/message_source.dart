@@ -6,6 +6,7 @@ import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'account.dart';
@@ -148,7 +149,9 @@ abstract class MessageSource extends ChangeNotifier
     // the source index is 0 since this is the new first message:
     final message = Message(mime, source.mailClient, this, 0);
     cache.insert(message);
-    print('onMailAdded: ${mime.decodeSubject()}');
+    if (kDebugMode) {
+      print('onMailAdded: ${mime.decodeSubject()}');
+    }
     notifyListeners();
   }
 
@@ -363,18 +366,20 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> markMessagesAsSeen(List<Message> messages, bool isSeen) {
     final notificationService = locator<NotificationService>();
-    messages.forEach((msg) {
+    for (final msg in messages) {
       onMarkedAsSeen(msg, isSeen);
       if (isSeen) {
         notificationService.cancelNotificationForMailMessage(msg);
       }
-    });
+    }
     return storeMessageFlags(messages, MessageFlags.seen,
         isSeen ? StoreAction.add : StoreAction.remove);
   }
 
   Future<void> markMessagesAsFlagged(List<Message> messages, bool flagged) {
-    messages.forEach((msg) => msg.isFlagged = flagged);
+    for (final msg in messages) {
+      msg.isFlagged = flagged;
+    }
     return storeMessageFlags(messages, MessageFlags.flagged,
         flagged ? StoreAction.add : StoreAction.remove);
   }
@@ -546,6 +551,7 @@ class MailboxMessageSource extends MessageSource {
     return _mimeSource;
   }
 
+  @override
   void clear() {
     _mimeSource.clear();
   }
@@ -555,9 +561,9 @@ class MultipleMessageSource extends MessageSource {
   @override
   int get size {
     var complete = 0;
-    mimeSources.forEach((s) {
+    for (final s in mimeSources) {
       complete += s.size;
-    });
+    }
     //print('MultipleMessageSource.size: $complete');
     return complete;
   }
@@ -570,10 +576,10 @@ class MultipleMessageSource extends MessageSource {
   MultipleMessageSource(this.mimeSources, String name, MailboxFlag? flag,
       {MessageSource? parent, bool isSearch = false})
       : super(parent: parent, isSearch: isSearch) {
-    mimeSources.forEach((s) {
+    for (final s in mimeSources) {
       s.addSubscriber(this);
       _multipleMimeSources.add(_MultipleMimeSource(s));
-    });
+    }
     _name = name;
     _flag = flag;
     supportsDeleteAll =
@@ -590,10 +596,10 @@ class MultipleMessageSource extends MessageSource {
 
   @override
   void dispose() {
-    mimeSources.forEach((s) {
+    for (final s in mimeSources) {
       s.removeSubscriber(this);
       s.dispose();
-    });
+    }
     super.dispose();
   }
 
@@ -605,14 +611,16 @@ class MultipleMessageSource extends MessageSource {
       final mime = source.peek();
       if (mime != null) {
         if (mime.isEmpty) {
-          //TODO
+          //TODO handle download problems
           //await waitForDownload();
         }
         var date = mime.decodeDate();
         if (date == null) {
           date = DateTime.now();
-          print(
-              'unable to decode date for $_lastUncachedIndex on ${mimeSources[i].mailClient.account.name} message is empty: ${mime.isEmpty}.');
+          if (kDebugMode) {
+            print(
+                'unable to decode date for $_lastUncachedIndex on ${mimeSources[i].mailClient.account.name} message is empty: ${mime.isEmpty}.');
+          }
         }
         if (newestTime == null || date.isAfter(newestTime)) {
           newestIndex = i;
@@ -760,9 +768,7 @@ class _MultipleMimeSource {
   _MultipleMimeSource(this.mimeSource);
 
   MimeMessage? peek() {
-    if (_currentMessage == null) {
-      _currentMessage = _next();
-    }
+    _currentMessage ??= _next();
     return _currentMessage;
   }
 

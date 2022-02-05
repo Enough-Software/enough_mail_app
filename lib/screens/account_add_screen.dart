@@ -1,29 +1,34 @@
 import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
+
 import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/util/modal_bottom_sheet_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/account_provider_selector.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/password_field.dart';
-import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart' as launcher;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AccountAddScreen extends StatefulWidget {
   final bool launchedFromWelcome;
 
-  const AccountAddScreen({Key? key, this.launchedFromWelcome = false});
+  const AccountAddScreen({
+    Key? key,
+    required this.launchedFromWelcome,
+  }) : super(key: key);
 
   @override
   _AccountAddScreenState createState() => _AccountAddScreenState();
@@ -39,14 +44,14 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   int _progressedSteps = 0;
   bool _isContinueAvailable = false;
   bool? _isApplicationSpecificPasswordAcknowledged = false;
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _accountNameController = TextEditingController();
-  TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _accountNameController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
 
   bool _isProviderResolving = false;
   Provider? _provider;
-  bool _isManualSettings = false;
+  final bool _isManualSettings = false;
   bool _isAccountVerifying = false;
   bool _isAccountVerified = false;
   List<AppExtension>? _extensions;
@@ -176,13 +181,17 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         _isProviderResolving = true;
       });
     }
-    print('discover settings for $email');
+    if (kDebugMode) {
+      print('discover settings for $email');
+    }
     final provider = await locator<ProviderService>().discover(email);
     if (!mounted) {
       // ignore if user has cancelled operation
       return;
     }
-    print('done discovering settings: ${provider?.displayName}');
+    if (kDebugMode) {
+      print('done discovering settings: ${provider?.displayName}');
+    }
     if (provider?.appSpecificPasswordSetupUrl != null) {
       FocusManager.instance.primaryFocus?.unfocus();
     }
@@ -352,8 +361,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
             Row(
               children: [
                 Container(
-                    padding: EdgeInsets.all(8),
-                    child: PlatformProgressIndicator()),
+                  padding: const EdgeInsets.all(8),
+                  child: const PlatformProgressIndicator(),
+                ),
                 Expanded(
                   child: Text(localizations
                       .addAccountResolvingSettingsLabel(_account.email!)),
@@ -379,7 +389,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                   ),
                   if (appSpecificPasswordSetupUrl != null) ...[
                     Padding(
-                      padding: EdgeInsets.only(top: 8.0),
+                      padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
                           localizations.addAccountOauthSignInWithAppPassword),
                     ),
@@ -491,8 +501,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
             Row(
               children: [
                 Container(
-                    padding: EdgeInsets.all(8),
-                    child: PlatformProgressIndicator()),
+                  padding: const EdgeInsets.all(8),
+                  child: const PlatformProgressIndicator(),
+                ),
                 Expanded(
                   child: Text(localizations
                       .addAccountVerifyingSettingsLabel(_account.email!)),
@@ -546,7 +557,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                 .addAccountVerifyingFailedInfo(_account.email ?? '')),
             if (_provider?.manualImapAccessSetupUrl != null) ...[
               Padding(
-                padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: Text(
                     localizations.accountAddImapAccessSetuptMightBeRequired),
               ),

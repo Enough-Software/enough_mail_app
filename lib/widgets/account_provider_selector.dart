@@ -32,7 +32,7 @@ class AccountProviderSelector extends StatelessWidget {
           ),
         );
       },
-      separatorBuilder: (context, index) => Divider(),
+      separatorBuilder: (context, index) => const Divider(),
       itemCount: providers.length + 1,
     );
   }
