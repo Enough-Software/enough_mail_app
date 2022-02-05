@@ -97,26 +97,26 @@ dependency_overrides:
   flutter_colorpicker: ^1.0.3
   photo_view: ^0.13.0
   # out-comment the following to enable local development:
-  enough_mail:
-    path: ../enough_mail
-  enough_mail_flutter:
-    path: ../enough_mail_flutter
-  enough_html_editor: 
-    path: ../enough_html_editor
-  enough_text_editor:
-    path: ../enough_text_editor
-  enough_icalendar:
-    path: ../enough_icalendar
-  enough_mail_icalendar:
-    path: ../enough_mail_icalendar
-  enough_icalendar_export:
-    path: ../enough_icalendar_export  
-  enough_ascii_art:
-    path: ../enough_ascii_art
-  enough_giphy_flutter:
-    path: ../enough_giphy_flutter
-  enough_platform_widgets:
-    path: ../enough_platform_widgets
+  # enough_mail:
+  #   path: ../enough_mail
+  # enough_mail_flutter:
+  #   path: ../enough_mail_flutter
+  # enough_html_editor: 
+  #   path: ../enough_html_editor
+  # enough_text_editor:
+  #   path: ../enough_text_editor
+  # enough_icalendar:
+  #   path: ../enough_icalendar
+  # enough_mail_icalendar:
+  #   path: ../enough_mail_icalendar
+  # enough_icalendar_export:
+  #   path: ../enough_icalendar_export  
+  # enough_ascii_art:
+  #   path: ../enough_ascii_art
+  # enough_giphy_flutter:
+  #   path: ../enough_giphy_flutter
+  # enough_platform_widgets:
+  #   path: ../enough_platform_widgets
 
 dev_dependencies:
   flutter_lints: ^1.0.4
