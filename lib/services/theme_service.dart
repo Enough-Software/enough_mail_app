@@ -39,24 +39,27 @@ class ThemeService with ChangeNotifier {
   }
 
   void checkForChangedTheme() {
+    ThemeData generateTheme(Brightness brightness, Color color) {
+      if (color is MaterialColor) {
+        return ThemeData(
+            brightness: brightness, primarySwatch: color, useMaterial3: false);
+      } else {
+        return ThemeData(
+            brightness: brightness, colorSchemeSeed: color, useMaterial3: true);
+      }
+    }
+
     var isChanged = false;
     final mode = _themeSettings.getCurrentThemeMode();
     if (mode != _themeMode) {
       _themeMode = mode;
       isChanged = true;
     }
-    final primarySwatch = _themeSettings.colorSchemeSeed;
-    if (primarySwatch != _colorSchemeSeed) {
-      _colorSchemeSeed = primarySwatch;
-      _lightTheme = ThemeData(
-        colorSchemeSeed: primarySwatch,
-        useMaterial3: true,
-      );
-      _darkTheme = ThemeData(
-        brightness: Brightness.dark,
-        colorSchemeSeed: primarySwatch,
-        useMaterial3: true,
-      );
+    final colorSchemeSeed = _themeSettings.colorSchemeSeed;
+    if (colorSchemeSeed != _colorSchemeSeed) {
+      _colorSchemeSeed = colorSchemeSeed;
+      _lightTheme = generateTheme(Brightness.light, colorSchemeSeed);
+      _darkTheme = generateTheme(Brightness.dark, colorSchemeSeed);
       isChanged = true;
     }
     if (isChanged) {
