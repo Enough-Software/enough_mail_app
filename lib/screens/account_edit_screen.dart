@@ -82,8 +82,8 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                       .editAccountFailureToConnectInfo(account.name)),
                 ),
                 if (_isRetryingToConnect)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: PlatformProgressIndicator(),
                   )
                 else
@@ -103,7 +103,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                       )
                     ],
                   ),
-                Divider(),
+                const Divider(),
               ],
               DecoratedPlatformTextField(
                 controller: _accountNameController,
@@ -139,13 +139,13 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   },
                   title: Text(localizations.editAccountIncludeInUnifiedLabel),
                 ),
-              Divider(),
+              const Divider(),
               Text(localizations.signatureSettingsTitle,
                   style: theme.textTheme.subtitle1),
               SignatureWidget(
                 account: widget.account,
               ),
-              Divider(),
+              const Divider(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
                 child: Text(
@@ -155,7 +155,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: Text(localizations.editAccountNoAliasesInfo,
-                      style: TextStyle(fontStyle: FontStyle.italic)),
+                      style: const TextStyle(fontStyle: FontStyle.italic)),
                 ),
 
               for (final alias in widget.account.aliases)
@@ -251,22 +251,22 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 ],
               ),
 
-              Divider(),
+              const Divider(),
               PlatformTextButtonIcon(
                 onPressed: () => locator<NavigationService>().push(
                     Routes.accountServerDetails,
                     arguments: widget.account),
-                icon: Icon(Icons.edit),
+                icon: const Icon(Icons.edit),
                 label:
                     ButtonText(localizations.editAccountServerSettingsAction),
               ),
-              Divider(),
+              const Divider(),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: PlatformTextButtonIcon(
                   backgroundColor: Colors.red,
                   style: TextButton.styleFrom(backgroundColor: Colors.red),
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.delete,
                     color: Colors.white,
                   ),
@@ -401,7 +401,8 @@ class _PasswordUpdateDialogState extends State<_PasswordUpdateDialog> {
 
 class _PlusAliasTestingDialog extends StatefulWidget {
   final Account account;
-  _PlusAliasTestingDialog({Key? key, required this.account}) : super(key: key);
+  const _PlusAliasTestingDialog({Key? key, required this.account})
+      : super(key: key);
 
   @override
   _PlusAliasTestingDialogState createState() => _PlusAliasTestingDialogState();
@@ -509,14 +510,14 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
               content: Text(
                 localizations.editAccountTestPlusAliasStepIntroductionText(
                     widget.account.name, _generatedAliasAdddress),
-                style: TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: 12),
               ),
               isActive: (_step == 0),
             ),
             Step(
               title:
                   Text(localizations.editAccountTestPlusAliasStepTestingTitle),
-              content: Center(child: PlatformProgressIndicator()),
+              content: const Center(child: PlatformProgressIndicator()),
               isActive: (_step == 1),
             ),
             Step(
@@ -544,7 +545,7 @@ class _AliasEditDialog extends StatefulWidget {
   final MailAddress alias;
   final Account account;
   final bool isNewAlias;
-  _AliasEditDialog({
+  const _AliasEditDialog({
     Key? key,
     required this.isNewAlias,
     required this.alias,
@@ -578,7 +579,7 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
           ? localizations.editAccountAddAliasTitle
           : localizations.editAccountEditAliasTitle),
       content: _isSaving
-          ? PlatformProgressIndicator()
+          ? const PlatformProgressIndicator()
           : _buildContent(localizations),
       actions: [
         PlatformTextButton(
@@ -650,7 +651,8 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
             padding: const EdgeInsets.all(8),
             child: Text(
               _errorMessage!,
-              style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic),
+              style: const TextStyle(
+                  color: Colors.red, fontStyle: FontStyle.italic),
             ),
           ),
       ],

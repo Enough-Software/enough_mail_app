@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -218,7 +219,7 @@ class _MessageContentState extends State<_MessageContent> {
         Table(
           defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
-          columnWidths: {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
+          columnWidths: const {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
           children: [
             TableRow(
               children: [
@@ -261,11 +262,11 @@ class _MessageContentState extends State<_MessageContent> {
         ),
         SelectableText(
           subject ?? localizations.subjectUndefined,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         _buildAttachments(attachments),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
           child: Divider(height: 2),
         ),
         if (_blockExternalImages ||
@@ -281,7 +282,7 @@ class _MessageContentState extends State<_MessageContent> {
                 Container(),
               if (_isWebViewZoomedOut)
                 PlatformIconButton(
-                  icon: Icon(Icons.zoom_in),
+                  icon: const Icon(Icons.zoom_in),
                   onPressed: () {
                     locator<NavigationService>()
                         .push(Routes.mailContents, arguments: widget.message);
@@ -308,7 +309,7 @@ class _MessageContentState extends State<_MessageContent> {
                 Container(),
             ],
           ),
-        if (ReadReceiptButton.shouldBeShown(mime)) ReadReceiptButton(),
+        if (ReadReceiptButton.shouldBeShown(mime)) const ReadReceiptButton(),
       ],
     );
   }
@@ -340,7 +341,7 @@ class _MessageContentState extends State<_MessageContent> {
             child: Text(localizations.detailsErrorDownloadInfo),
           ),
           TextButton.icon(
-            icon: Icon(Icons.refresh),
+            icon: Icon(CommonPlatformIcons.refresh),
             label: ButtonText(localizations.detailsErrorDownloadRetry),
             onPressed: () {
               setState(() {
@@ -349,12 +350,12 @@ class _MessageContentState extends State<_MessageContent> {
             },
           ),
           if (locator<SettingsService>().settings.enableDeveloperMode) ...[
-            Text('Details:'),
+            const Text('Details:'),
             SelectableText(errorObject?.toString() ?? '<unknown error>'),
             SelectableText(errorStackTrace?.toString() ?? '<no stacktrace>'),
             TextButton.icon(
-              icon: Icon(Icons.copy),
-              label: ButtonText('Copy to clipboard'),
+              icon: const Icon(Icons.copy),
+              label: const ButtonText('Copy to clipboard'),
               onPressed: () {
                 final text =
                     '${errorObject?.toString() ?? '<unknown error>'} \n'
@@ -381,7 +382,7 @@ class _MessageContentState extends State<_MessageContent> {
       mailtoDelegate: _handleMailto,
       maxImageWidth: 320,
       showMediaDelegate: _navigateToMedia,
-      includedInlineTypes: [MediaToptype.image],
+      includedInlineTypes: const [MediaToptype.image],
       urlLauncherDelegate: (url) {
         // skip canLaunch check due to bug when handling URLs registered by apps
         // https://github.com/flutter/flutter/issues/93765
@@ -526,7 +527,8 @@ class MessageContentsScreen extends StatelessWidget {
 
 class ThreadSequenceButton extends StatefulWidget {
   final Message message;
-  ThreadSequenceButton({Key? key, required this.message}) : super(key: key);
+  const ThreadSequenceButton({Key? key, required this.message})
+      : super(key: key);
 
   @override
   _ThreadSequenceButtonState createState() => _ThreadSequenceButtonState();
@@ -622,7 +624,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
         },
         child: Stack(
           children: [
-            Positioned.fill(child: Container(color: Color(0x09000000))),
+            Positioned.fill(child: Container(color: const Color(0x09000000))),
             Positioned(
               left: offset.dx,
               top: top,
@@ -633,7 +635,9 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                   future: _loadingFuture,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return Center(child: PlatformProgressIndicator());
+                      return const Center(
+                        child: PlatformProgressIndicator(),
+                      );
                     }
                     final messages = snapshot.data!;
                     final isSentFolder = widget.message.source.isSent;
@@ -667,7 +671,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
 }
 
 class ReadReceiptButton extends StatefulWidget {
-  ReadReceiptButton({Key? key}) : super(key: key);
+  const ReadReceiptButton({Key? key}) : super(key: key);
 
   @override
   _ReadReceiptButtonState createState() => _ReadReceiptButtonState();
@@ -690,7 +694,7 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
       return Text(localizations.detailsReadReceiptSentStatus,
           style: Theme.of(context).textTheme.caption);
     } else if (_isSendingReadReceipt) {
-      return PlatformProgressIndicator();
+      return const PlatformProgressIndicator();
     } else {
       return ElevatedButton(
         child: ButtonText(localizations.detailsSendReadReceiptAction),
@@ -718,7 +722,7 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
 
 class UnsubscribeButton extends StatefulWidget {
   final Message message;
-  UnsubscribeButton({Key? key, required this.message}) : super(key: key);
+  const UnsubscribeButton({Key? key, required this.message}) : super(key: key);
 
   @override
   _UnsubscribeButtonState createState() => _UnsubscribeButtonState();
@@ -730,7 +734,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
   @override
   Widget build(BuildContext context) {
     if (_isActive) {
-      return PlatformProgressIndicator();
+      return const PlatformProgressIndicator();
     }
     final localizations = AppLocalizations.of(context)!;
     if (widget.message.isNewsletterUnsubscribed) {
@@ -742,7 +746,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
             )
           : Text(
               localizations.detailsNewsletterStatusUnsubscribed,
-              style: TextStyle(fontStyle: FontStyle.italic),
+              style: const TextStyle(fontStyle: FontStyle.italic),
             );
     } else {
       return PlatformElevatedButton(
@@ -811,7 +815,9 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
       try {
         unsubscribed = await mime.unsubscribe(mailClient);
       } catch (e, s) {
-        print('error during unsubscribe: $e $s');
+        if (kDebugMode) {
+          print('error during unsubscribe: $e $s');
+        }
       }
       setState(() {
         _isActive = false;
@@ -826,7 +832,9 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
               [Message.keywordFlagUnsubscribed],
               action: StoreAction.add);
         } catch (e, s) {
-          print('error during unsubscribe flag store operation: $e $s');
+          if (kDebugMode) {
+            print('error during unsubscribe flag store operation: $e $s');
+          }
         }
       }
       await LocalizedDialogHelper.showTextDialog(
@@ -865,7 +873,7 @@ class _MailAddressListState extends State<MailAddressList> {
           MailAddressChip(mailAddress: address),
       ],
       expandIndicator: DensePlatformIconButton(
-        icon: Icon(Icons.keyboard_arrow_down),
+        icon: const Icon(Icons.keyboard_arrow_down),
         onPressed: () {
           setState(() {
             _isExpanded = true;
@@ -873,7 +881,7 @@ class _MailAddressListState extends State<MailAddressList> {
         },
       ),
       compressIndicator: DensePlatformIconButton(
-        icon: Icon(Icons.keyboard_arrow_up),
+        icon: const Icon(Icons.keyboard_arrow_up),
         onPressed: () {
           setState(() {
             _isExpanded = false;

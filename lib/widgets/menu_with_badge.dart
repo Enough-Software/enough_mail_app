@@ -34,7 +34,7 @@ class MenuWithBadge extends StatelessWidget {
       final localizations = AppLocalizations.of(context)!;
       return Text('\u2329 ${localizations.accountsTitle}');
     } else {
-      return Icon(Icons.menu);
+      return const Icon(Icons.menu);
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_serialization/enough_serialization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:enough_mail_app/models/message.dart' as maily;
 import 'package:enough_mail/enough_mail.dart';
@@ -22,10 +23,10 @@ class NotificationService {
     // print('init notification service...');
     // set up local notifications:
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
-    final android = AndroidInitializationSettings('ic_stat_notification');
+    const android = AndroidInitializationSettings('ic_stat_notification');
     final ios = IOSInitializationSettings(
         onDidReceiveLocalNotification: _onDidReceiveLocalNotification);
-    final macos = MacOSInitializationSettings();
+    const macos = MacOSInitializationSettings();
     final initSettings =
         InitializationSettings(android: android, iOS: ios, macOS: macos);
     await _flutterLocalNotificationsPlugin.initialize(initSettings,
@@ -46,7 +47,9 @@ class NotificationService {
 
   Future _onDidReceiveLocalNotification(
       int id, String? title, String? body, String? payload) async {
-    print('iOS onDidReceiveLocalNotification $id $title $body $payload');
+    if (kDebugMode) {
+      print('iOS onDidReceiveLocalNotification $id $title $body $payload');
+    }
   }
 
   Future<List<MailNotificationPayload>> getActiveMailNotifications() {
@@ -83,7 +86,9 @@ class NotificationService {
   }
 
   Future _selectNotification(String? payloadText) async {
-    print('select notification: $payloadText');
+    if (kDebugMode) {
+      print('select notification: $payloadText');
+    }
     if (payloadText!.startsWith(_messagePayloadStart)) {
       try {
         final payload = _deserialize(payloadText);
@@ -106,7 +111,9 @@ class NotificationService {
         locator<NavigationService>()
             .push(Routes.mailDetails, arguments: message);
       } on MailException catch (e, s) {
-        print('Unable to fetch notification message $payloadText: $e $s ');
+        if (kDebugMode) {
+          print('Unable to fetch notification message $payloadText: $e $s ');
+        }
       }
     }
   }
@@ -122,8 +129,10 @@ class NotificationService {
 
   Future sendLocalNotificationForMail(
       MimeMessage mimeMessage, MailClient mailClient) {
-    print(
-        'sending notification for mime ${mimeMessage.decodeSubject()} with GUID ${mimeMessage.guid}');
+    if (kDebugMode) {
+      print(
+          'sending notification for mime ${mimeMessage.decodeSubject()} with GUID ${mimeMessage.guid}');
+    }
     final notificationId = mimeMessage.guid!;
     var from = mimeMessage.from?.isNotEmpty ?? false
         ? mimeMessage.from!.first.personalName
@@ -169,10 +178,11 @@ class NotificationService {
         showWhen: (when != null),
         when: when?.millisecondsSinceEpoch,
         playSound: true,
-        sound: RawResourceAndroidNotificationSound('pop'),
+        sound: const RawResourceAndroidNotificationSound('pop'),
       );
     } else if (Platform.isIOS) {
-      iosPlatformChannelSpecifics = IOSNotificationDetails(presentSound: true);
+      iosPlatformChannelSpecifics =
+          const IOSNotificationDetails(presentSound: true);
     }
     final platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,

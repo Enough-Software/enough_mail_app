@@ -30,7 +30,7 @@ import '../routes.dart';
 
 class ComposeScreen extends StatefulWidget {
   final ComposeData data;
-  ComposeScreen({Key? key, required this.data}) : super(key: key);
+  const ComposeScreen({Key? key, required this.data}) : super(key: key);
 
   @override
   _ComposeScreenState createState() => _ComposeScreenState();
@@ -49,8 +49,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
   late List<MailAddress> _toRecipients;
   late List<MailAddress> _ccRecipients;
   late List<MailAddress> _bccRecipients;
-  TextEditingController _subjectController = TextEditingController();
-  TextEditingController _plainTextController = TextEditingController();
+  final TextEditingController _subjectController = TextEditingController();
+  final TextEditingController _plainTextController = TextEditingController();
   late Sender _from;
   late List<Sender> _senders;
   _Autofocus? _focus;
@@ -82,9 +82,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     _senders = locator<MailService>().getSenders();
     final currentAccount = locator<MailService>().currentAccount!;
     final defaultSender = locator<SettingsService>().settings.defaultSender;
-    if (mb.from == null) {
-      mb.from = [defaultSender ?? currentAccount.fromAddress];
-    }
+    mb.from ??= [defaultSender ?? currentAccount.fromAddress];
     Sender? from;
     if (mb.from?.first == defaultSender) {
       from = _senders
@@ -143,10 +141,10 @@ class _ComposeScreenState extends State<ComposeScreen> {
         return '${mb.text ?? ''}\n$_signature';
       }
     } else {
-      final blockExternalImages = false;
+      const blockExternalImages = false;
       final emptyMessageText =
           locator<I18nService>().localizations.composeEmptyMessage;
-      final maxImageWidth = 300;
+      const maxImageWidth = 300;
       if (widget.data.action == ComposeAction.newMessage) {
         // continue with draft:
         if (_composeMode == ComposeMode.html) {
@@ -315,7 +313,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
       locator<ScaffoldMessengerService>()
           .showTextSnackBar(localizations.composeMailSendSuccess);
     } catch (e, s) {
-      print('Unable to send or append mail: $e $s');
+      if (kDebugMode) {
+        print('Unable to send or append mail: $e $s');
+      }
       // this state's context is now invalid because this widget is not mounted anymore
       final currentContext = locator<NavigationService>().currentContext!;
       final message = (e is MailException) ? e.message! : e.toString();
@@ -354,7 +354,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
               originalMessage.mimeMessage!.flags!,
               action: StoreAction.replace);
         } catch (e, s) {
-          print('Unable to update message flags: $e $s'); // otherwise ignore
+          if (kDebugMode) {
+            print('Unable to update message flags: $e $s'); // otherwise ignore
+          }
         }
       }
     } else if ((widget.data.originalMessage != null) &&
@@ -367,7 +369,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
         await mailClient.flagMessage(originalMessage.mimeMessage!,
             isDeleted: true);
       } catch (e, s) {
-        print('Unable to update message flags: $e $s'); // otherwise ignore
+        if (kDebugMode) {
+          print('Unable to update message flags: $e $s'); // otherwise ignore
+        }
       }
     }
   }
@@ -394,7 +398,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
         message: widget.data.originalMessage,
         child: PlatformScaffold(
           material: (context, platform) =>
-              MaterialScaffoldData(drawer: AppDrawer()),
+              MaterialScaffoldData(drawer: const AppDrawer()),
           body: CustomScrollView(
             slivers: [
               PlatformSliverAppBar(
@@ -408,7 +412,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                     update: () => setState(() {}),
                   ),
                   PlatformIconButton(
-                    icon: Icon(Icons.send),
+                    icon: const Icon(Icons.send),
                     onPressed: () => _send(localizations),
                   ),
                   PlatformPopupMenuButton<_OverflowMenuChoice>(
@@ -466,7 +470,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
               ),
               SliverToBoxAdapter(
                 child: Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -546,13 +550,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       if (widget.data.messageBuilder.attachments.isNotEmpty ||
                           (_downloadAttachmentsFuture != null)) ...[
                         Padding(
-                          padding: EdgeInsets.only(top: 8.0),
+                          padding: const EdgeInsets.only(top: 8.0),
                           child: AttachmentComposeBar(
                               composeData: widget.data,
                               isDownloading:
                                   (_downloadAttachmentsFuture != null)),
                         ),
-                        Divider(
+                        const Divider(
                           color: Colors.grey,
                         )
                       ],
@@ -588,7 +592,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       case ConnectionState.none:
                       case ConnectionState.waiting:
                       case ConnectionState.active:
-                        return Center(child: PlatformProgressIndicator());
+                        return const Center(child: PlatformProgressIndicator());
                       case ConnectionState.done:
                         if (_composeMode == ComposeMode.html) {
                           final text = snapshot.data ?? '<p></p>';
@@ -654,12 +658,16 @@ class _ComposeScreenState extends State<ComposeScreen> {
           try {
             await mailClient.flagMessage(originalMime, isDeleted: true);
           } catch (e, s) {
-            print('(ignored) unable to delete previous draft message $e $s');
+            if (kDebugMode) {
+              print('(ignored) unable to delete previous draft message $e $s');
+            }
           }
         }
       }
     } catch (e, s) {
-      print('unable to save draft message $e $s');
+      if (kDebugMode) {
+        print('unable to save draft message $e $s');
+      }
       final currentContext = locator<NavigationService>().currentContext!;
       LocalizedDialogHelper.showTextDialog(
         currentContext,

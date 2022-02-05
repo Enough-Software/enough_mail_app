@@ -7,6 +7,8 @@ import '../locator.dart';
 import 'base.dart';
 
 class SettingsReadReceiptsScreen extends StatefulWidget {
+  const SettingsReadReceiptsScreen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _SettingsFoldersScreenState();

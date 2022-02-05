@@ -36,7 +36,7 @@ class ExtensionActionTile extends StatelessWidget {
     }
     final widgets = <Widget>[];
     if (withDivider) {
-      widgets.add(Divider());
+      widgets.add(const Divider());
     }
     for (final action in actions) {
       widgets.add(ExtensionActionTile(actionDescription: action));

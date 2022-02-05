@@ -2,6 +2,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
 import 'package:enough_serialization/enough_serialization.dart';
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:flutter/foundation.dart';
 
 extension MailAccountExtension on MailAccount {
   void addExtensionSerializationConfiguration() {
@@ -38,7 +39,7 @@ class AppExtension extends SerializableObject {
         (map) => <AppExtensionActionDescription>[];
     objectCreators['accountSideMenu.value'] =
         (map) => AppExtensionActionDescription();
-    objectCreators['signatureHtml'] = (map) => Map<String, String>();
+    objectCreators['signatureHtml'] = (map) => <String, String>{};
   }
 
   int? get version => attributes['version'];
@@ -71,11 +72,11 @@ class AppExtension extends SerializableObject {
     _addHostname(mailAccount.outgoing!.serverConfig!.hostname!, domains);
     final allExtensions = await Future.wait(domains.values);
     final appExtensions = <AppExtension>[];
-    allExtensions.forEach((ext) {
+    for (final ext in allExtensions) {
       if (ext != null) {
         appExtensions.add(ext);
       }
-    });
+    }
     mailAccount.appExtensions = appExtensions;
     return appExtensions;
   }
@@ -116,7 +117,9 @@ class AppExtension extends SerializableObject {
         return result;
       }
     } catch (e, s) {
-      print('Unable to load extension from $url: $e $s');
+      if (kDebugMode) {
+        print('Unable to load extension from $url: $e $s');
+      }
     }
     return null;
   }
@@ -124,7 +127,7 @@ class AppExtension extends SerializableObject {
 
 class AppExtensionActionDescription extends SerializableObject {
   AppExtensionActionDescription() {
-    objectCreators['label'] = (map) => Map<String, String>();
+    objectCreators['label'] = (map) => <String, String>{};
   }
 
   AppExtensionAction? get action =>

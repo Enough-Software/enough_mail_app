@@ -2,19 +2,12 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/contact.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 
 class RecipientInputField extends StatefulWidget {
-  final String? labelText;
-  final String? hintText;
-  final TextEditingController? controller;
-  final Widget? additionalSuffixIcon;
-  final bool autofocus;
-  final List<MailAddress> addresses;
-  final ContactManager? contactManager;
-
-  RecipientInputField({
+  const RecipientInputField({
     Key? key,
     this.labelText,
     this.hintText,
@@ -24,6 +17,14 @@ class RecipientInputField extends StatefulWidget {
     required this.addresses,
     required this.contactManager,
   }) : super(key: key);
+
+  final String? labelText;
+  final String? hintText;
+  final TextEditingController? controller;
+  final Widget? additionalSuffixIcon;
+  final bool autofocus;
+  final List<MailAddress> addresses;
+  final ContactManager? contactManager;
 
   @override
   _RecipientInputFieldState createState() => _RecipientInputFieldState();
@@ -60,7 +61,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
     return Wrap(children: [
       if (widget.addresses.isNotEmpty && widget.labelText != null)
         Padding(
-          padding: EdgeInsets.only(top: 8.0, right: 8.0),
+          padding: const EdgeInsets.only(top: 8.0, right: 8.0),
           child: Text(
             widget.labelText!,
             style: TextStyle(
@@ -78,7 +79,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
               Text(address.email, style: theme.textTheme.caption),
             ],
           ),
-          deleteIcon: Icon(Icons.close),
+          deleteIcon: const Icon(Icons.close),
           onDeleted: () {
             widget.addresses.remove(address);
             setState(() {});
@@ -132,7 +133,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
             hintText: widget.hintText,
             suffixIcon: widget.additionalSuffixIcon == null
                 ? PlatformIconButton(
-                    icon: Icon(Icons.contacts),
+                    icon: const Icon(Icons.contacts),
                     onPressed: () => _pickContact(textEditingController),
                   )
                 : Row(
@@ -140,7 +141,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                     children: [
                       widget.additionalSuffixIcon!,
                       PlatformIconButton(
-                        icon: Icon(Icons.contacts),
+                        icon: const Icon(Icons.contacts),
                         onPressed: () => _pickContact(textEditingController),
                       ),
                     ],
@@ -153,7 +154,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
           child: Align(
             alignment: Alignment.topLeft,
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 200),
+              constraints: const BoxConstraints(maxHeight: 200),
               child: ListView.builder(
                 shrinkWrap: true,
                 padding: const EdgeInsets.all(8.0),
@@ -216,7 +217,9 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
       // controller.selection =
       //     TextSelection.collapsed(offset: controller.text.length);
     } catch (e, s) {
-      print('Unable to pick contact $e $s');
+      if (kDebugMode) {
+        print('Unable to pick contact $e $s');
+      }
     }
   }
 }

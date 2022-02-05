@@ -1,6 +1,11 @@
 import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/date_sectioned_message_source.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -8,28 +13,25 @@ import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/base.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
+import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/util/string_helper.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
+import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
-import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
 import 'package:enough_mail_app/widgets/search_text_field.dart';
-import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../locator.dart';
 
 enum _Visualization { stack, list }
@@ -38,7 +40,10 @@ enum _Visualization { stack, list }
 class MessageSourceScreen extends StatefulWidget {
   final MessageSource messageSource;
 
-  const MessageSourceScreen({Key? key, required this.messageSource});
+  const MessageSourceScreen({
+    Key? key,
+    required this.messageSource,
+  }) : super(key: key);
 
   @override
   _MessageSourceScreenState createState() => _MessageSourceScreenState();
@@ -127,7 +132,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     }
     final appBarTitle = _isInSearchMode
         ? TextField(
-            cursorColor: theme.primaryColorBrightness == Brightness.dark
+            cursorColor: theme.brightness == Brightness.dark
                 ? Colors.white
                 : Colors.black,
             controller: _searchEditingController,
@@ -135,14 +140,14 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             decoration: InputDecoration(
               hintText: localizations.homeSearchHint,
               hintStyle: TextStyle(
-                  color: theme.primaryColorBrightness == Brightness.dark
+                  color: theme.brightness == Brightness.dark
                       ? Colors.white30
                       : Colors.black54),
             ),
             autofocus: true,
             autocorrect: false,
             style: TextStyle(
-                color: theme.primaryColorBrightness == Brightness.dark
+                color: theme.brightness == Brightness.dark
                     ? Colors.white
                     : Colors.black),
             onSubmitted: _search,
@@ -161,7 +166,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     final appBarActions = [
       if (_isInSearchMode && _hasSearchInput)
         IconButton(
-          icon: Icon(Icons.clear),
+          icon: Icon(CommonPlatformIcons.clear),
           onPressed: () {
             _searchEditingController.text = '';
             setState(() {
@@ -209,7 +214,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
           ? localizations.homeEmptySearchMessage
           : localizations.homeEmptyFolderMessage;
       zeroPosWidget = Padding(
-        padding: EdgeInsets.symmetric(vertical: 32, horizontal: 32),
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 32),
         child: Text(emptyMessage),
       );
     } else if (source.supportsDeleteAll) {
@@ -217,7 +222,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       final style = TextButton.styleFrom(primary: Colors.grey[600]);
       final textStyle = Theme.of(context).textTheme.button;
       zeroPosWidget = Padding(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Wrap(
           children: [
             PlatformTextButtonIcon(
@@ -259,7 +264,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   info: CupertinoStatusBar.createInfo(source.description),
                   rightAction: PlatformIconButton(
                     //TODO use CupertinoIcons.create once it's not buggy anymore
-                    icon: Icon(CupertinoIcons.pen),
+                    icon: const Icon(CupertinoIcons.pen),
                     onPressed: () => locator<NavigationService>().push(
                       Routes.mailCompose,
                       arguments: ComposeData(
@@ -272,7 +277,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                 )
               : null,
       material: (context, platform) => MaterialScaffoldData(
-        drawer: AppDrawer(),
+        drawer: const AppDrawer(),
         floatingActionButton: _visualization == _Visualization.stack
             ? null
             : FloatingActionButton(
@@ -285,7 +290,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   ),
                 ),
                 tooltip: localizations.homeFabTooltip,
-                child: Icon(Icons.add),
+                child: const Icon(Icons.add),
                 elevation: 2.0,
               ),
       ),
@@ -295,7 +300,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               title: appBarTitle,
               trailingActions: appBarActions,
               leading: (locator<MailService>().hasAccountsWithErrors())
-                  ? MenuWithBadge()
+                  ? const MenuWithBadge()
                   : null,
             )
           : null,
@@ -311,8 +316,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                 return Center(
                   child: Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: PlatformProgressIndicator(),
                       ),
                       Expanded(
@@ -350,13 +355,13 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       await _sectionedMessageSource.refresh();
                     },
                     child: CustomScrollView(
-                      physics: BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       slivers: [
                         PlatformSliverAppBar(
                           title: appBarTitle,
                           leading:
                               (locator<MailService>().hasAccountsWithErrors())
-                                  ? MenuWithBadge()
+                                  ? const MenuWithBadge()
                                   : null,
                           floating: !_isInSearchMode,
                           pinned: _isInSearchMode,
@@ -372,7 +377,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                               if (showSearchTextField) {
                                 if (index == 0) {
                                   return Padding(
-                                    padding: EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                       horizontal: 8.0,
                                       vertical: 4.0,
                                     ),
@@ -399,8 +404,9 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                   onLongPress: () {
                                     _selectedMessages = _sectionedMessageSource
                                         .getMessagesForSection(section);
-                                    _selectedMessages
-                                        .forEach((m) => m.isSelected = true);
+                                    for (var m in _selectedMessages) {
+                                      m.isSelected = true;
+                                    }
                                     setState(() {
                                       _isInSelectionMode = true;
                                     });
@@ -447,7 +453,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                           ),
                                         ),
                                       ),
-                                      Divider()
+                                      const Divider()
                                     ],
                                   ),
                                 );
@@ -471,8 +477,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 },
                                 background: Container(
                                   color: swipeLeftToRightAction.colorBackground,
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
                                   alignment: AlignmentDirectional.centerStart,
                                   child: Row(
                                     children: [
@@ -495,8 +501,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 ),
                                 secondaryBackground: Container(
                                   color: swipeRightToLeftAction.colorBackground,
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
                                   alignment: AlignmentDirectional.centerEnd,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
@@ -629,7 +635,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                 icon: Icon(iconService.messageActionMoveToJunk),
                 onPressed: () => handleMultipleChoice(_MultipleChoice.junk),
               ),
-            Spacer(),
+            const Spacer(),
             if (isTrash)
               PlatformIconButton(
                 icon: Icon(iconService.messageActionMoveToInbox),
@@ -641,7 +647,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                 onPressed: () => handleMultipleChoice(_MultipleChoice.delete),
               ),
             PlatformIconButton(
-              icon: Icon(Icons.close),
+              icon: const Icon(Icons.close),
               onPressed: leaveSelectionMode,
             ),
             PlatformPopupMenuButton<_MultipleChoice>(
@@ -677,7 +683,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       label: Text(localizations.messageActionDelete),
                     ),
                   ),
-                PlatformPopupDivider(),
+                const PlatformPopupDivider(),
                 if (isAnyUnseen)
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.seen,
@@ -714,7 +720,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     ),
                   ),
                 if (source.supportsMessageFolders) ...[
-                  PlatformPopupDivider(),
+                  const PlatformPopupDivider(),
                   PlatformPopupMenuItem(
                     value: _MultipleChoice.move,
                     child: IconText(
@@ -1050,7 +1056,9 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   void leaveSelectionMode() {
-    _selectedMessages.forEach((m) => m.isSelected = false);
+    for (var m in _selectedMessages) {
+      m.isSelected = false;
+    }
     _selectedMessages = [];
     setState(() {
       _isInSelectionMode = false;
@@ -1169,15 +1177,15 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 }
 
 class CheckboxText extends StatefulWidget {
-  final bool initialValue;
-  final Function(bool value) onChanged;
-  final String text;
-  CheckboxText(
+  const CheckboxText(
       {Key? key,
       required this.initialValue,
       required this.onChanged,
       required this.text})
       : super(key: key);
+  final bool initialValue;
+  final Function(bool value) onChanged;
+  final String text;
 
   @override
   _CheckboxTextState createState() => _CheckboxTextState();
@@ -1266,11 +1274,11 @@ class _MessageOverviewState extends State<MessageOverview> {
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: PlatformWidget(
-          material: (context, platform) => ListTile(
+          material: (context, platform) => const ListTile(
             title: Text('...'),
             subtitle: Text('-'),
           ),
-          cupertino: (context, platform) => Text('...'),
+          cupertino: (context, platform) => const Text('...'),
         ),
       );
     }

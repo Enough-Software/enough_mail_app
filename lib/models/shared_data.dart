@@ -7,9 +7,8 @@ import 'package:enough_mail/enough_mail.dart';
 enum SharedDataAddState { added, notAdded }
 
 class SharedDataAddResult {
-  static final added = const SharedDataAddResult(SharedDataAddState.added);
-  static final notAdded =
-      const SharedDataAddResult(SharedDataAddState.notAdded);
+  static const added = SharedDataAddResult(SharedDataAddState.added);
+  static const notAdded = SharedDataAddResult(SharedDataAddState.notAdded);
   final SharedDataAddState state;
   final dynamic details;
 

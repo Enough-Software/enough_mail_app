@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class LifecyleManager extends StatefulWidget {
   final Widget child;
-  LifecyleManager({Key? key, required this.child}) : super(key: key);
+  const LifecyleManager({Key? key, required this.child}) : super(key: key);
 
   @override
   _LifecyleManagerState createState() => _LifecyleManagerState();

@@ -7,15 +7,16 @@ import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 enum DragAction { noted, later, delete, reply }
 
 class MessageStack extends StatefulWidget {
-  final MessageSource? messageSource;
-  MessageStack({Key? key, required this.messageSource}) : super(key: key);
+  const MessageStack({Key? key, required this.messageSource}) : super(key: key);
 
+  final MessageSource? messageSource;
   @override
   _MessageStackState createState() => _MessageStackState();
 }
@@ -25,8 +26,8 @@ class _MessageStackState extends State<MessageStack> {
   int _currentMessageIndex = 0;
   Message? _currentMessage;
   double? _currentAngle;
-  List<Message?> _nextMessages = [];
-  List<double> _nextAngles = [];
+  final List<Message?> _nextMessages = [];
+  final List<double> _nextAngles = [];
 
   double createAngle() {
     return (_random.nextInt(200) - 100.0) / 4000;
@@ -87,7 +88,7 @@ class _MessageStackState extends State<MessageStack> {
         // center: stack of messages
         for (var i = _nextMessages.length; --i >= 0;)
           Padding(
-            padding: EdgeInsets.all(30),
+            padding: const EdgeInsets.all(30),
             child: MessageCard(
               message: _nextMessages[i],
               angle: _nextAngles[i],
@@ -156,7 +157,7 @@ class _MessageStackState extends State<MessageStack> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: PlatformIconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed:
                   _currentMessageIndex == 0 ? null : moveToPreviousMessage,
             ),
@@ -165,14 +166,14 @@ class _MessageStackState extends State<MessageStack> {
         // center: first / current message
         if (_currentMessage != null)
           Padding(
-            padding: EdgeInsets.all(30),
+            padding: const EdgeInsets.all(30),
             child: MessageDraggable(
               message: _currentMessage,
               angle: _currentAngle,
             ),
           )
         else
-          Padding(
+          const Padding(
             padding: EdgeInsets.all(30),
             child: Center(child: Text('All messages processed, well done!')),
           ),
@@ -228,12 +229,7 @@ class _MessageStackState extends State<MessageStack> {
 }
 
 class MessageDragTarget extends StatefulWidget {
-  final DragAction action;
-  final Object? data;
-  final Function(Message message, DragAction action, {Object? data}) onComplete;
-  final double? width;
-  final double? height;
-  MessageDragTarget(
+  const MessageDragTarget(
       {Key? key,
       required this.action,
       required this.onComplete,
@@ -241,6 +237,11 @@ class MessageDragTarget extends StatefulWidget {
       this.width,
       this.height})
       : super(key: key);
+  final DragAction action;
+  final Object? data;
+  final Function(Message message, DragAction action, {Object? data}) onComplete;
+  final double? width;
+  final double? height;
 
   @override
   _MessageDragTargetState createState() => _MessageDragTargetState();
@@ -434,7 +435,7 @@ class _MessageCardState extends State<MessageCard> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: widget.message!.mimeMessage!.isEmpty
-                ? Text('...')
+                ? const Text('...')
                 : buildMessageContents(),
           ),
         ),
@@ -452,31 +453,27 @@ class _MessageCardState extends State<MessageCard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text('From '),
+            const Text('From '),
             for (final address in mime.from!)
               MailAddressChip(mailAddress: address),
           ],
         ),
-        if (mime.to?.isNotEmpty ?? false) 
+        if (mime.to?.isNotEmpty ?? false)
           Wrap(
             children: [
-              Text('To '),
+              const Text('To '),
               for (final address in mime.to!)
                 MailAddressChip(mailAddress: address),
-              
             ],
           ),
-        
-        if (mime.cc?.isNotEmpty ?? false) 
+        if (mime.cc?.isNotEmpty ?? false)
           Wrap(
             children: [
-              Text('CC '),
-              for (final address in mime.cc!) 
+              const Text('CC '),
+              for (final address in mime.cc!)
                 MailAddressChip(mailAddress: address),
-              
             ],
           ),
-        
         buildContent(),
       ],
     );
@@ -493,10 +490,10 @@ class _MessageCardState extends State<MessageCard> {
               case ConnectionState.none:
               case ConnectionState.waiting:
               case ConnectionState.active:
-                return Container(child: PlatformProgressIndicator());
+                return const Center(child: PlatformProgressIndicator());
               case ConnectionState.done:
                 if (snapshot.hasError) {
-                  return Text('Unable to download message');
+                  return const Text('Unable to download message');
                 }
                 break;
             }
@@ -515,7 +512,9 @@ class _MessageCardState extends State<MessageCard> {
         setState(() {});
       }
     } on MailException catch (e) {
-      print('unable to download message contents: $e');
+      if (kDebugMode) {
+        print('unable to download message contents: $e');
+      }
     }
     return message;
   }

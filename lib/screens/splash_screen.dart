@@ -18,7 +18,7 @@ class SplashScreen extends StatelessWidget {
     final text = texts[index];
     final timeOfDay = TimeOfDay.now();
     final isNight = timeOfDay.hour >= 22 || timeOfDay.hour <= 6;
-    final splashColor = isNight ? Colors.black87 : Color(0xff99cc00);
+    final splashColor = isNight ? Colors.black87 : const Color(0xff99cc00);
     final textColor = isNight ? Colors.white : Colors.black87;
     return PlatformScaffold(
       body: Container(

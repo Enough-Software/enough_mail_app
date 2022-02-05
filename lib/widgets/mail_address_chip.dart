@@ -37,21 +37,21 @@ class MailAddressChip extends StatelessWidget {
         PlatformPopupMenuItem(
           value: _AddressAction.copy,
           child: IconText(
-            icon: Icon(Icons.copy),
+            icon: Icon(CommonPlatformIcons.copy),
             label: Text(localizations!.actionAddressCopy),
           ),
         ),
         PlatformPopupMenuItem(
           value: _AddressAction.compose,
           child: IconText(
-            icon: Icon(Icons.add),
+            icon: Icon(CommonPlatformIcons.add),
             label: Text(localizations.actionAddressCompose),
           ),
         ),
         PlatformPopupMenuItem(
           value: _AddressAction.search,
           child: IconText(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             label: Text(localizations.actionAddressSearch),
           ),
         ),

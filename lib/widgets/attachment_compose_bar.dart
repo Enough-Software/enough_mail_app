@@ -27,11 +27,11 @@ class AttachmentMediaProviderFactory {
 }
 
 class AttachmentComposeBar extends StatefulWidget {
-  final ComposeData composeData;
-  final bool isDownloading;
-  AttachmentComposeBar(
+  const AttachmentComposeBar(
       {Key? key, required this.composeData, this.isDownloading = false})
       : super(key: key);
+  final ComposeData composeData;
+  final bool isDownloading;
 
   @override
   _AttachmentComposeBarState createState() => _AttachmentComposeBarState();
@@ -57,7 +57,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
             onRemove: removeAttachment,
           ),
 
-        if (widget.isDownloading) PlatformProgressIndicator(),
+        if (widget.isDownloading) const PlatformProgressIndicator(),
 
         AddAttachmentPopupButton(
           composeData: widget.composeData,
@@ -95,7 +95,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
     final themeService = locator<ThemeService>();
     final brightness = themeService.brightness(context);
     return PlatformPopupMenuButton<int>(
-      icon: Icon(Icons.add),
+      icon: Icon(CommonPlatformIcons.add),
       itemBuilder: (context) => [
         PlatformPopupMenuItem(
           value: 0,

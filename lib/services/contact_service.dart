@@ -3,6 +3,7 @@ import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/contact.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
+import 'package:flutter/foundation.dart';
 
 class ContactService {
   Future<ContactManager> getForAccount(Account account) async {
@@ -37,7 +38,9 @@ class ContactService {
         return ContactManager(addressesByEmail.values.toList());
       }
     } catch (e, s) {
-      print('unable to load sent messages: $e $s');
+      if (kDebugMode) {
+        print('unable to load sent messages: $e $s');
+      }
     } finally {
       await mailClient.disconnect();
     }

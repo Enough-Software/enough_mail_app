@@ -11,14 +11,14 @@ import 'package:enough_ascii_art/enough_ascii_art.dart';
 import '../locator.dart';
 
 class EditorArtExtensionButton extends StatelessWidget {
-  final HtmlEditorApi editorApi;
-  EditorArtExtensionButton({Key? key, required this.editorApi})
+  const EditorArtExtensionButton({Key? key, required this.editorApi})
       : super(key: key);
+  final HtmlEditorApi editorApi;
 
   @override
   Widget build(BuildContext context) {
     return PlatformIconButton(
-      icon: Icon(CommunityMaterialIcons.format_font),
+      icon: const Icon(CommunityMaterialIcons.format_font),
       onPressed: () => showArtExtensionDialog(context, editorApi),
     );
   }
@@ -36,7 +36,7 @@ class EditorArtExtensionButton extends StatelessWidget {
 
 class EditorArtExtensionWidget extends StatefulWidget {
   final HtmlEditorApi editorApi;
-  EditorArtExtensionWidget({Key? key, required this.editorApi})
+  const EditorArtExtensionWidget({Key? key, required this.editorApi})
       : super(key: key);
 
   @override
@@ -116,7 +116,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
                   navService.pop();
                 },
               ),
-              Divider(),
+              const Divider(),
             ],
         ],
       ),

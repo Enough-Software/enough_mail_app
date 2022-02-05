@@ -1,7 +1,8 @@
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
+
+import 'package:enough_mail_app/services/i18n_service.dart';
+import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 
 import '../locator.dart';
 
@@ -9,11 +10,17 @@ import '../locator.dart';
 ///
 /// Contains compose action and can display snackbar notifications on ios.
 class CupertinoStatusBar extends StatefulWidget {
-  static const _statusTextStyle = const TextStyle(fontSize: 10.0);
+  const CupertinoStatusBar({
+    Key? key,
+    this.leftAction,
+    this.rightAction,
+    this.info,
+  }) : super(key: key);
+
+  static const _statusTextStyle = TextStyle(fontSize: 10.0);
   final Widget? leftAction;
   final Widget? rightAction;
   final Widget? info;
-  CupertinoStatusBar({this.leftAction, this.info, this.rightAction});
 
   @override
   CupertinoStatusBarState createState() => CupertinoStatusBarState();
@@ -117,7 +124,7 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
       _statusAction = Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0),
         child: CupertinoButton.filled(
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           minSize: 20.0,
           child: Text(
             locator<I18nService>().localizations.actionUndo,

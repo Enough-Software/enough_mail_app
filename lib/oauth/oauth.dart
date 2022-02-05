@@ -2,6 +2,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/services/key_service.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 
 class OauthClientId {
@@ -24,7 +25,9 @@ abstract class OauthClient {
       token.provider = incomingHostName;
       return token;
     } catch (e, s) {
-      print('Unable to authenticate: $e $s');
+      if (kDebugMode) {
+        print('Unable to authenticate: $e $s');
+      }
       return Future.value();
     }
   }
@@ -35,7 +38,9 @@ abstract class OauthClient {
       refreshedToken.provider = incomingHostName;
       return refreshedToken;
     } catch (e, s) {
-      print('Unable to refresh tokens: $e $s');
+      if (kDebugMode) {
+        print('Unable to refresh tokens: $e $s');
+      }
       return Future.value();
     }
   }
@@ -82,7 +87,7 @@ class GmailOAuthClient extends OauthClient {
     // Get the access token from the response
     final text = response.text;
     if (response.statusCode != 200 || text == null) {
-      throw new StateError(
+      throw StateError(
           'Unable to get Google OAuth token with code $code, status code=${response.statusCode}, response=$text');
     }
     return OauthToken.fromText(text);
@@ -101,7 +106,7 @@ class GmailOAuthClient extends OauthClient {
     });
     final text = response.text;
     if (response.statusCode != 200 || text == null) {
-      throw new StateError(
+      throw StateError(
           'Unable to refresh Google OAuth token $token, status code=${response.statusCode}, response=$text');
     }
     return OauthToken.fromText(text);
@@ -118,7 +123,7 @@ class OutlookOAuthClient extends OauthClient {
   Future<OauthToken> _authenticate(String email) async {
     final clientId = oauthClientId!.id;
     final clientSecret = oauthClientId!.secret;
-    final callbackUrlScheme =
+    const callbackUrlScheme =
         //'https://login.microsoftonline.com/common/oauth2/nativeclient';
         'maily://oauth';
 
@@ -172,7 +177,7 @@ class OutlookOAuthClient extends OauthClient {
         });
     final text = response.text;
     if (response.statusCode != 200 || text == null) {
-      throw new StateError(
+      throw StateError(
           'Unable to refresh Outlook OAuth token $token, status code=${response.statusCode}, response=$text');
     }
     return OauthToken.fromText(text);

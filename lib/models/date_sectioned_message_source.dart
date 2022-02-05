@@ -4,7 +4,6 @@ import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/date_service.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 
 import 'message.dart';
 import 'message_date_section.dart';
@@ -29,7 +28,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
 
   Future<bool> init() async {
     try {
-      final success = await this.messageSource.init();
+      final success = await messageSource.init();
       if (success) {
         _sections = await downloadDateSections();
         _numberOfSections = _sections.length;
@@ -38,7 +37,9 @@ class DateSectionedMessageSource extends ChangeNotifier {
       }
       return success;
     } catch (e, s) {
-      print('unexpected error $e at $s');
+      if (kDebugMode) {
+        print('unexpected error $e at $s');
+      }
       return false;
     }
   }
@@ -46,7 +47,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
   Future<bool> refresh() async {
     try {
       _numberOfSections = 0;
-      final success = await this.messageSource.refresh();
+      final success = await messageSource.refresh();
       if (success) {
         _sections = await downloadDateSections();
         _numberOfSections = _sections.length;
@@ -55,7 +56,9 @@ class DateSectionedMessageSource extends ChangeNotifier {
       }
       return success;
     } catch (e, s) {
-      print('unexpected error $e at $s');
+      if (kDebugMode) {
+        print('unexpected error $e at $s');
+      }
       return false;
     }
   }

@@ -16,6 +16,7 @@ import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
@@ -23,8 +24,8 @@ import 'button_text.dart';
 import 'mailbox_tree.dart';
 
 class MessageActions extends StatefulWidget {
+  const MessageActions({Key? key, required this.message}) : super(key: key);
   final Message message;
-  MessageActions({Key? key, required this.message}) : super(key: key);
 
   @override
   _MessageActionsState createState() => _MessageActionsState();
@@ -93,7 +94,7 @@ class _MessageActionsState extends State<MessageActions> {
                 onPressed: _toggleFlagged,
               ),
             ],
-            Spacer(),
+            const Spacer(),
             DensePlatformIconButton(
               icon: Icon(iconService.messageActionReply),
               onPressed: _reply,
@@ -173,7 +174,7 @@ class _MessageActionsState extends State<MessageActions> {
                     ),
                   ),
                 if (!widget.message.isEmbedded) ...[
-                  PlatformPopupDivider(),
+                  const PlatformPopupDivider(),
                   PlatformPopupMenuItem(
                     value: _OverflowMenuChoice.seen,
                     child: IconText(
@@ -199,7 +200,7 @@ class _MessageActionsState extends State<MessageActions> {
                     ),
                   ),
                   if (widget.message.source.supportsMessageFolders) ...[
-                    PlatformPopupDivider(),
+                    const PlatformPopupDivider(),
                     PlatformPopupMenuItem(
                       value: _OverflowMenuChoice.move,
                       child: IconText(
@@ -407,7 +408,9 @@ class _MessageActionsState extends State<MessageActions> {
           locator<ScaffoldMessengerService>()
               .showTextSnackBar(localizations.resultRedirectedSuccess);
         } on MailException catch (e, s) {
-          print('message could not get redirected: $e $s');
+          if (kDebugMode) {
+            print('message could not get redirected: $e $s');
+          }
           await LocalizedDialogHelper.showTextDialog(
               context,
               localizations.errorTitle,

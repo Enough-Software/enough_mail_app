@@ -154,7 +154,7 @@ class Account extends ChangeNotifier {
       account.appExtensions = value;
 
   @override
-  operator ==(Object o) => o is Account && o.key == key;
+  operator ==(Object other) => other is Account && other.key == key;
 
   @override
   int get hashCode => key.hashCode;

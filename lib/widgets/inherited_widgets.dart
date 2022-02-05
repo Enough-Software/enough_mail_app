@@ -5,15 +5,14 @@ import 'package:enough_mail_app/models/message_source.dart';
 import 'package:flutter/cupertino.dart';
 
 class _InheritedMessageContainer extends InheritedWidget {
-  final MessageWidgetState data;
-
   // You must pass through a child and your state.
-  _InheritedMessageContainer({
+  const _InheritedMessageContainer({
     Key? key,
     required this.data,
     required Widget child,
   }) : super(key: key, child: child);
 
+  final MessageWidgetState data;
   // This is a built in method which you can use to check if
   // any state has changed. If not, no reason to rebuild all the widgets
   // that rely on your state.
@@ -26,7 +25,7 @@ class MessageWidget extends StatefulWidget {
   final Widget child;
   final Message? message;
 
-  MessageWidget({
+  const MessageWidget({
     Key? key,
     required this.child,
     required this.message,
@@ -65,7 +64,7 @@ class _InheritedMessageSourceContainer extends InheritedWidget {
   final MessageSourceWidgetState data;
 
   // You must pass through a child and your state.
-  _InheritedMessageSourceContainer({
+  const _InheritedMessageSourceContainer({
     Key? key,
     required this.data,
     required Widget child,
@@ -84,7 +83,7 @@ class MessageSourceWidget extends StatefulWidget {
   final Widget child;
   final MessageSource? messageSource;
 
-  MessageSourceWidget({
+  const MessageSourceWidget({
     Key? key,
     required this.child,
     required this.messageSource,
@@ -119,7 +118,7 @@ class _InheritedMailServiceContainer extends InheritedWidget {
   final MailServiceWidgetState data;
 
   // You must pass through a child and your state.
-  _InheritedMailServiceContainer({
+  const _InheritedMailServiceContainer({
     Key? key,
     required this.data,
     required Widget child,
@@ -136,7 +135,7 @@ class MailServiceWidget extends StatefulWidget {
   final List<Account>? accounts;
   final MessageSource? messageSource;
 
-  MailServiceWidget({
+  const MailServiceWidget({
     Key? key,
     required this.child,
     required this.account,

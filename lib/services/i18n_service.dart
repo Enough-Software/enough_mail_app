@@ -3,14 +3,14 @@ import 'package:enough_mail_app/services/date_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbols.dart';
 import 'package:intl/intl.dart' as intl;
-import 'package:intl/date_symbol_data_local.dart' as dateIntl;
+import 'package:intl/date_symbol_data_local.dart' as date_intl;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class I18nService {
   /// Day of week for countries (in two letter code) for which the week does not start on Monday
   /// Source: http://chartsbin.com/view/41671
-  static const firstDayOfWeekPerCountryCode = const <String, int>{
+  static const firstDayOfWeekPerCountryCode = <String, int>{
     'ae': DateTime.saturday, // United Arab Emirates
     'af': DateTime.saturday, // Afghanistan
     'ar': DateTime.sunday, // Argentina
@@ -89,7 +89,7 @@ class I18nService {
           firstDayOfWeekPerCountryCode[countryCode] ?? DateTime.monday;
     }
     final localeText = locale.toString();
-    dateIntl.initializeDateFormatting(localeText).then((value) {
+    date_intl.initializeDateFormatting(localeText).then((value) {
       _dateTimeFormatToday = intl.DateFormat.jm(localeText);
       _dateTimeFormatLastWeek = intl.DateFormat.E(localeText).add_jm();
       _dateTimeFormat = intl.DateFormat.yMd(localeText).add_jm();
@@ -121,7 +121,7 @@ class I18nService {
         minutes: nw.minute,
         seconds: nw.second,
         milliseconds: nw.millisecond));
-    final lastWeek = today.subtract(Duration(days: 7));
+    final lastWeek = today.subtract(const Duration(days: 7));
     String date;
     if (dateTime.isAfter(today)) {
       date = _dateTimeFormatToday.format(dateTime);
@@ -159,9 +159,9 @@ class I18nService {
         milliseconds: nw.millisecond));
     if (messageDate.isAfter(today)) {
       return localizations.dateDayToday;
-    } else if (messageDate.isAfter(today.subtract(Duration(days: 1)))) {
+    } else if (messageDate.isAfter(today.subtract(const Duration(days: 1)))) {
       return localizations.dateDayYesterday;
-    } else if (messageDate.isAfter(today.subtract(Duration(days: 7)))) {
+    } else if (messageDate.isAfter(today.subtract(const Duration(days: 7)))) {
       return localizations
           .dateDayLastWeekday(_dateFormatDayInLastWeek.format(messageDate));
     } else {
@@ -176,7 +176,7 @@ class I18nService {
   List<WeekDay> formatWeekDays({int? startOfWeekDay, bool abbreviate = false}) {
     startOfWeekDay ??= firstDayOfWeek;
     final dateSymbols =
-        (dateIntl.dateTimeSymbolMap()[_locale.toString()] as DateSymbols);
+        (date_intl.dateTimeSymbolMap()[_locale.toString()] as DateSymbols);
     final weekdays = abbreviate
         ? dateSymbols.STANDALONESHORTWEEKDAYS
         : dateSymbols.STANDALONEWEEKDAYS;

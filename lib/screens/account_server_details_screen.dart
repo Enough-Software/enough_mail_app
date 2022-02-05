@@ -16,7 +16,7 @@ class AccountServerDetailsScreen extends StatelessWidget {
   final Account account;
   final String? title;
   final bool includeDrawer;
-  AccountServerDetailsScreen({
+  const AccountServerDetailsScreen({
     Key? key,
     required this.account,
     this.title,
@@ -32,7 +32,7 @@ class AccountServerDetailsScreen extends StatelessWidget {
       content: editor,
       includeDrawer: includeDrawer,
       appBarActions: [
-        _SaveButton(),
+        const _SaveButton(),
       ],
     );
   }
@@ -41,7 +41,7 @@ class AccountServerDetailsScreen extends StatelessWidget {
 class AccountServerDetailsEditor extends StatefulWidget {
   final Account account;
 
-  AccountServerDetailsEditor({
+  const AccountServerDetailsEditor({
     Key? key,
     required this.account,
   }) : super(key: key);
@@ -57,7 +57,7 @@ class AccountServerDetailsEditor extends StatefulWidget {
 }
 
 class _SaveButton extends StatefulWidget {
-  _SaveButton({Key? key}) : super(key: key);
+  const _SaveButton({Key? key}) : super(key: key);
 
   @override
   _SaveButtonState createState() => _SaveButtonState();
@@ -68,7 +68,7 @@ class _SaveButtonState extends State<_SaveButton> {
   @override
   Widget build(BuildContext context) {
     if (_isSaving) {
-      return PlatformProgressIndicator();
+      return const PlatformProgressIndicator();
     }
     return PlatformIconButton(
       icon: Icon(PlatformInfo.isCupertino
@@ -343,11 +343,11 @@ class _AccountServerDetailsEditorState
                               DropdownMenuItem(
                                   child: Text(localizations
                                       .accountDetailsOptionAutomatic)),
-                              DropdownMenuItem(
+                              const DropdownMenuItem(
                                 child: Text('IMAP'),
                                 value: ServerType.imap,
                               ),
-                              DropdownMenuItem(
+                              const DropdownMenuItem(
                                 child: Text('POP'),
                                 value: ServerType.pop,
                               ),
@@ -370,11 +370,11 @@ class _AccountServerDetailsEditorState
                               DropdownMenuItem(
                                   child: Text(localizations
                                       .accountDetailsOptionAutomatic)),
-                              DropdownMenuItem(
+                              const DropdownMenuItem(
                                 child: Text('SSL'),
                                 value: SocketType.ssl,
                               ),
-                              DropdownMenuItem(
+                              const DropdownMenuItem(
                                 child: Text('Start TLS'),
                                 value: SocketType.starttls,
                               ),
@@ -435,7 +435,7 @@ class _AccountServerDetailsEditorState
                               DropdownMenuItem(
                                   child: Text(localizations
                                       .accountDetailsOptionAutomatic)),
-                              DropdownMenuItem(
+                              const DropdownMenuItem(
                                 child: Text('SMTP'),
                                 value: ServerType.smtp,
                               ),
@@ -458,11 +458,11 @@ class _AccountServerDetailsEditorState
                               DropdownMenuItem(
                                   child: Text(localizations
                                       .accountDetailsOptionAutomatic)),
-                              DropdownMenuItem(
+                              const DropdownMenuItem(
                                 child: Text('SSL'),
                                 value: SocketType.ssl,
                               ),
-                              DropdownMenuItem(
+                              const DropdownMenuItem(
                                 child: Text('Start TLS'),
                                 value: SocketType.starttls,
                               ),

@@ -25,9 +25,9 @@ class DateService {
   void _setupDates() {
     final nw = DateTime.now();
     _today = DateTime(nw.year, nw.month, nw.day);
-    _tomorrow = _today!.add(Duration(days: 1));
-    _dayAfterTomorrow = _tomorrow.add(Duration(days: 1));
-    _yesterday = _today!.subtract(Duration(days: 1));
+    _tomorrow = _today!.add(const Duration(days: 1));
+    _dayAfterTomorrow = _tomorrow.add(const Duration(days: 1));
+    _yesterday = _today!.subtract(const Duration(days: 1));
     final firstDayOfWeek = locator<I18nService>().firstDayOfWeek;
     if (_today!.weekday == firstDayOfWeek) {
       _thisWeek = _today;
@@ -42,7 +42,7 @@ class DateService {
             .subtract(Duration(days: (_today!.weekday + 7 - firstDayOfWeek)));
       }
     }
-    _lastWeek = _thisWeek!.subtract(Duration(days: 7));
+    _lastWeek = _thisWeek!.subtract(const Duration(days: 7));
   }
 
   DateSectionRange determineDateSection(DateTime localTime) {
@@ -66,11 +66,12 @@ class DateService {
       return DateSectionRange.thisWeek;
     } else if (localTime.isAfter(_lastWeek)) {
       return DateSectionRange.lastWeek;
-    } else if (localTime.year == _today!.year) if (localTime.month ==
-        _today!.month) {
-      return DateSectionRange.thisMonth;
-    } else {
-      return DateSectionRange.monthOfThisYear;
+    } else if (localTime.year == _today!.year) {
+      if (localTime.month == _today!.month) {
+        return DateSectionRange.thisMonth;
+      } else {
+        return DateSectionRange.monthOfThisYear;
+      }
     }
     return DateSectionRange.monthAndYear;
   }

@@ -16,6 +16,8 @@ import '../locator.dart';
 import 'base.dart';
 
 class SettingsFoldersScreen extends StatefulWidget {
+  const SettingsFoldersScreen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _SettingsFoldersScreenState();
@@ -67,17 +69,17 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
                   title: Text(localizations.folderNamesSettingCustom),
                 ),
                 if (folderNameSetting == FolderNameSetting.custom) ...[
-                  Divider(),
+                  const Divider(),
                   PlatformTextButtonIcon(
-                    icon: Icon(Icons.edit),
+                    icon: Icon(CommonPlatformIcons.edit),
                     label: ButtonText(localizations.folderNamesEditAction),
                     onPressed: _editFolderNames,
                   ),
                 ],
-                Divider(
+                const Divider(
                   height: 8.0,
                 ),
-                FolderManagement(),
+                const FolderManagement(),
               ],
             ),
           ),
@@ -124,9 +126,10 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
 }
 
 class CustomFolderNamesEditor extends StatefulWidget {
-  final List<String> customNames;
-  CustomFolderNamesEditor({Key? key, required this.customNames})
+  const CustomFolderNamesEditor({Key? key, required this.customNames})
       : super(key: key);
+
+  final List<String> customNames;
 
   @override
   _CustomFolderNamesEditorState createState() =>
@@ -234,7 +237,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
 }
 
 class FolderManagement extends StatefulWidget {
-  FolderManagement({Key? key}) : super(key: key);
+  const FolderManagement({Key? key}) : super(key: key);
 
   @override
   _FolderManagementState createState() => _FolderManagementState();
@@ -276,7 +279,7 @@ class _FolderManagementState extends State<FolderManagement> {
                 });
               },
             ),
-            Divider(),
+            const Divider(),
             Text(localizations.folderMailboxLabel),
             MailboxSelector(
               account: _account,
@@ -287,7 +290,7 @@ class _FolderManagementState extends State<FolderManagement> {
                 });
               },
             ),
-            Divider(),
+            const Divider(),
             MailboxWidget(
               mailbox: _mailbox,
               account: _account,
@@ -329,16 +332,16 @@ class MailboxWidget extends StatelessWidget {
       children: [
         PlatformTextButtonIcon(
           onPressed: () => _createFolder(context),
-          icon: Icon(Icons.add),
+          icon: Icon(CommonPlatformIcons.add),
           label: ButtonText(localizations.folderAddAction),
         ),
-        if (mailbox != null) 
+        if (mailbox != null)
           PlatformTextButtonIcon(
             onPressed: () => _deleteFolder(context),
             backgroundColor: Colors.red,
             style: TextButton.styleFrom(backgroundColor: Colors.red),
             icon: Icon(
-              Icons.delete,
+              CommonPlatformIcons.delete,
               color: Colors.white,
             ),
             label: ButtonText(
@@ -349,7 +352,6 @@ class MailboxWidget extends StatelessWidget {
                   .copyWith(color: Colors.white),
             ),
           ),
-        
       ],
     );
   }

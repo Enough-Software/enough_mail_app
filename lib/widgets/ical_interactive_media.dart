@@ -13,6 +13,7 @@ import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:collection/collection.dart' show IterableExtension;
@@ -56,7 +57,9 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
             widget.message.mimeMessage?.calendarParticipantStatus;
       }
     } catch (e, s) {
-      print('Unable to parse text/calendar format: $e $s');
+      if (kDebugMode) {
+        print('Unable to parse text/calendar format: $e $s');
+      }
       _isPermanentError = true;
     }
   }
@@ -72,7 +75,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
           child: Text(localizations.errorTitle),
         );
       }
-      return Center(child: PlatformProgressIndicator());
+      return const Center(child: PlatformProgressIndicator());
     }
     final isReply = _calendar?.method == Method.reply;
     final attendees = isReply ? <AttendeeProperty>[] : event.attendees;
@@ -130,7 +133,10 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                 ],
               ),
             Table(
-              columnWidths: {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
+              columnWidths: const {
+                0: IntrinsicColumnWidth(),
+                1: FlexColumnWidth()
+              },
               children: [
                 TableRow(children: [
                   Padding(
@@ -329,13 +335,17 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
 
   Future<void> _exportToNativeCalendar(VCalendar? calendar) async {
     if (calendar == null) {
-      print('Warning: no calendar to export.');
+      if (kDebugMode) {
+        print('Warning: no calendar to export.');
+      }
       return;
     }
     try {
       await calendar.exportToNativeCalendar();
     } catch (e, s) {
-      print('Unable to export calendar: $e $s');
+      if (kDebugMode) {
+        print('Unable to export calendar: $e $s');
+      }
     }
   }
 
@@ -354,7 +364,9 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
       locator<ScaffoldMessengerService>()
           .showTextSnackBar(status.localization(localizations));
     } catch (e, s) {
-      print('Unable to send status update: $e $s');
+      if (kDebugMode) {
+        print('Unable to send status update: $e $s');
+      }
       LocalizedDialogHelper.showTextDialog(context, localizations.errorTitle,
           localizations.icalendarParticipantStatusSentFailure(e.toString()));
     }
@@ -415,17 +427,17 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
     return Text(
       status.participantReplyText(
           localizations, attendee.mailAddress.toString()),
-      style: TextStyle(fontStyle: FontStyle.italic),
+      style: const TextStyle(fontStyle: FontStyle.italic),
     );
   }
 }
 
 extension ExtensionParticipantStatusTextStyle on ParticipantStatus {
   // static const TextStyle _styleAccepted = const TextStyle(color: Colors.green);
-  static const TextStyle _styleDeclined = const TextStyle(
-      color: Colors.red, decorationStyle: TextDecorationStyle.dashed);
+  static const TextStyle _styleDeclined =
+      TextStyle(color: Colors.red, decorationStyle: TextDecorationStyle.dashed);
   static const TextStyle _styleTentative =
-      const TextStyle(fontStyle: FontStyle.italic);
+      TextStyle(fontStyle: FontStyle.italic);
 
   TextStyle? get textStyle {
     switch (this) {

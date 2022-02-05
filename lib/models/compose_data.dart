@@ -5,7 +5,7 @@ enum ComposeAction { answer, forward, newMessage }
 
 enum ComposeMode { plainText, html }
 
-typedef void MessageFinalizer(MessageBuilder messageBuilder);
+typedef MessageFinalizer = void Function(MessageBuilder messageBuilder);
 
 class ComposeData {
   Message? get originalMessage =>

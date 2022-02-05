@@ -9,6 +9,8 @@ import '../locator.dart';
 import 'base.dart';
 
 class SettingsThemeScreen extends StatefulWidget {
+  const SettingsThemeScreen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _SettingsThemeScreenState();
@@ -142,7 +144,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                       ],
                     ),
                   ],
-                  Divider(),
+                  const Divider(),
                   Text(localizations.designSectionColorTitle,
                       style: theme.textTheme.subtitle1),
                   GridView.count(
@@ -155,7 +157,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                           title: CircleAvatar(
                             backgroundColor: color,
                             child: (color == primarySwatch)
-                                ? Icon(Icons.check)
+                                ? Icon(CommonPlatformIcons.ok)
                                 : null,
                           ),
                           onTap: () async {

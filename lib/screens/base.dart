@@ -139,7 +139,7 @@ class Base {
               ),
       ),
       leading: (includeDrawer && locator<MailService>().hasAccountsWithErrors())
-          ? MenuWithBadge()
+          ? const MenuWithBadge()
           : null,
       title: buildTitle(title, subtitle),
       automaticallyImplyLeading: true,
@@ -165,11 +165,11 @@ class Base {
             overflow: TextOverflow.fade,
           ),
           Padding(
-            padding: EdgeInsets.only(top: 4.0),
+            padding: const EdgeInsets.only(top: 4.0),
             child: Text(
               subtitle,
               overflow: TextOverflow.fade,
-              style: TextStyle(fontSize: 10, fontStyle: FontStyle.italic),
+              style: const TextStyle(fontSize: 10, fontStyle: FontStyle.italic),
             ),
           ),
         ],
@@ -178,7 +178,7 @@ class Base {
   }
 
   static Widget buildDrawer(BuildContext context) {
-    return AppDrawer();
+    return const AppDrawer();
   }
 }
 

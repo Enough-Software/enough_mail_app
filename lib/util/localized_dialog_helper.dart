@@ -17,7 +17,7 @@ class LocalizedDialogHelper {
       context: context,
       applicationName: 'Maily',
       applicationVersion: version,
-      applicationIcon: Icon(Icons.email),
+      applicationIcon: Icon(CommonPlatformIcons.mailRead),
       applicationLegalese: localizations.aboutApplicationLegalese,
       children: [
         TextButton(

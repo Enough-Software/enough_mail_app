@@ -14,6 +14,7 @@ import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:share/share.dart';
@@ -78,7 +79,9 @@ class InteractiveMediaScreen extends StatelessWidget {
                           .push(Routes.mailDetails, arguments: message);
                     }
                   } catch (e, s) {
-                    print('Unable to convert text into mime: $e $s');
+                    if (kDebugMode) {
+                      print('Unable to convert text into mime: $e $s');
+                    }
                   }
                   if (showErrorMessage) {
                     LocalizedDialogHelper.showTextDialog(
@@ -130,7 +133,9 @@ class InteractiveMediaScreen extends StatelessWidget {
     } else if (provider is MemoryMediaProvider) {
       return _shareFile(provider);
     } else {
-      print('Unable to share provider $provider');
+      if (kDebugMode) {
+        print('Unable to share media provider $provider');
+      }
       return Future.value();
     }
   }

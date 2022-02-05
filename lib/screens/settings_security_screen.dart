@@ -9,6 +9,8 @@ import '../locator.dart';
 import 'base.dart';
 
 class SettingsSecurityScreen extends StatefulWidget {
+  const SettingsSecurityScreen({Key? key}) : super(key: key);
+
   @override
   _SettingsSecurityScreenState createState() => _SettingsSecurityScreenState();
 }
@@ -74,7 +76,7 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(localizations.securitySettingsIntro),
-                Divider(),
+                const Divider(),
                 Row(
                   children: [
                     Expanded(
@@ -129,7 +131,7 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                     ],
                   ),
                 ),
-                Divider(),
+                const Divider(),
                 if (_isBiometricsSupported == false)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -201,7 +203,7 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                 ] else
                   const Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(8.0),
                       child: CircularProgressIndicator(),
                     ),
                   ),
