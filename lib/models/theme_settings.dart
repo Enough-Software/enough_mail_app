@@ -10,6 +10,7 @@ class ThemeSettings extends SerializableObject {
         : ThemeModeSetting.values[value];
     transformers['themeDarkStartTime'] = _convertTimeOfDay;
     transformers['themeDarkEndTime'] = _convertTimeOfDay;
+    transformers['colorSchemeSeed'] = _convertColor;
   }
 
   ThemeModeSetting get themeModeSetting =>
@@ -26,20 +27,18 @@ class ThemeSettings extends SerializableObject {
   set themeDarkEndTime(TimeOfDay value) =>
       attributes['themeDarkEndTime'] = value;
 
-  MaterialColor get primarySwatch {
-    int? index = attributes['primarySwatchIndex'];
-    if (index == null || index < 0) {
-      return Colors.green;
+  Color get colorSchemeSeed {
+    Color? color = attributes['colorSchemeSeed'];
+    if (color == null) {
+      int? index = attributes['primarySwatchIndex'];
+      if (index != null && index >= 0 && index < availableColors.length) {
+        color = availableColors[index];
+      }
     }
-    return availableColors[index] as MaterialColor;
+    return color ?? Colors.green;
   }
 
-  set primarySwatch(MaterialColor value) {
-    final index = availableColors.indexOf(value);
-    if (index != -1) {
-      attributes['primarySwatchIndex'] = index;
-    }
-  }
+  set colorSchemeSeed(Color value) => attributes['colorSchemeSeed'] = value;
 
   List<Color> get availableColors => const [
         Colors.red,
@@ -89,6 +88,13 @@ class ThemeSettings extends SerializableObject {
     return value is TimeOfDay
         ? _convertTimeOfDayToInt(value)
         : _convertIntToTimeOfDay(value);
+  }
+
+  static dynamic _convertColor(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    return value is Color ? value.value : Color(value);
   }
 
   static int _convertTimeOfDayToInt(TimeOfDay input) =>

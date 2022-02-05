@@ -4,17 +4,22 @@ import 'package:flutter/material.dart';
 
 class ThemeService with ChangeNotifier {
   late ThemeSettings _themeSettings;
-  static final ThemeData defaultLightTheme =
-      ThemeData(primarySwatch: Colors.green);
-  static final ThemeData defaultDarkTheme =
-      ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green);
+  static final ThemeData defaultLightTheme = ThemeData(
+    colorSchemeSeed: Colors.green,
+    useMaterial3: true,
+  );
+  static final ThemeData defaultDarkTheme = ThemeData(
+    brightness: Brightness.dark,
+    colorSchemeSeed: Colors.green,
+    useMaterial3: true,
+  );
   ThemeData _lightTheme = defaultLightTheme;
   ThemeData get lightTheme => _lightTheme;
   ThemeData _darkTheme = defaultDarkTheme;
   ThemeData get darkTheme => _darkTheme;
   ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;
-  MaterialColor _primarySwatch = Colors.green;
+  Color _colorSchemeSeed = Colors.green;
 
   Brightness brightness(BuildContext context) {
     final mode = _themeSettings.getCurrentThemeMode();
@@ -40,12 +45,18 @@ class ThemeService with ChangeNotifier {
       _themeMode = mode;
       isChanged = true;
     }
-    final primarySwatch = _themeSettings.primarySwatch;
-    if (primarySwatch != _primarySwatch) {
-      _primarySwatch = primarySwatch;
-      _lightTheme = ThemeData(primarySwatch: primarySwatch);
-      _darkTheme =
-          ThemeData(brightness: Brightness.dark, primarySwatch: primarySwatch);
+    final primarySwatch = _themeSettings.colorSchemeSeed;
+    if (primarySwatch != _colorSchemeSeed) {
+      _colorSchemeSeed = primarySwatch;
+      _lightTheme = ThemeData(
+        colorSchemeSeed: primarySwatch,
+        useMaterial3: true,
+      );
+      _darkTheme = ThemeData(
+        brightness: Brightness.dark,
+        colorSchemeSeed: primarySwatch,
+        useMaterial3: true,
+      );
       isChanged = true;
     }
     if (isChanged) {

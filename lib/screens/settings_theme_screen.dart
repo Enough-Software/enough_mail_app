@@ -1,9 +1,12 @@
 import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
 import 'base.dart';
@@ -18,32 +21,32 @@ class SettingsThemeScreen extends StatefulWidget {
 }
 
 class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
-  late ThemeSettings themeSettings;
+  late ThemeSettings _themeSettings;
 
   ThemeModeSetting? _themeModeSetting;
   set themeModeSetting(ThemeModeSetting? value) {
     _themeModeSetting = value;
-    themeSettings.themeModeSetting = value;
+    _themeSettings.themeModeSetting = value;
     locator<ThemeService>().checkForChangedTheme();
     locator<SettingsService>().save();
   }
 
-  MaterialColor? primarySwatch;
+  late Color _colorSchemeSeed;
 
   @override
   void initState() {
-    themeSettings = locator<SettingsService>().settings.themeSettings;
-    _themeModeSetting = themeSettings.themeModeSetting;
-    primarySwatch = themeSettings.primarySwatch;
+    _themeSettings = locator<SettingsService>().settings.themeSettings;
+    _themeModeSetting = _themeSettings.themeModeSetting;
+    _colorSchemeSeed = _themeSettings.colorSchemeSeed;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final darkThemeStartTime = themeSettings.themeDarkStartTime;
-    final darkThemeEndTime = themeSettings.themeDarkEndTime;
-    final availableColors = themeSettings.availableColors;
+    final darkThemeStartTime = _themeSettings.themeDarkStartTime;
+    final darkThemeEndTime = _themeSettings.themeDarkEndTime;
+    final availableColors = _themeSettings.availableColors;
     final theme = Theme.of(context);
     return Base.buildAppChrome(
       context,
@@ -115,7 +118,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                               initialEntryMode: TimePickerEntryMode.dial,
                             );
                             if (pickedTime != null) {
-                              themeSettings.themeDarkStartTime = pickedTime;
+                              _themeSettings.themeDarkStartTime = pickedTime;
                               // indirectly set theme again:
                               themeModeSetting = ThemeModeSetting.custom;
                               setState(() {});
@@ -133,7 +136,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                               initialEntryMode: TimePickerEntryMode.dial,
                             );
                             if (pickedTime != null) {
-                              themeSettings.themeDarkEndTime = pickedTime;
+                              _themeSettings.themeDarkEndTime = pickedTime;
                               // indirectly set theme again:
                               themeModeSetting = ThemeModeSetting.custom;
                               setState(() {});
@@ -145,26 +148,54 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                     ),
                   ],
                   const Divider(),
-                  Text(localizations.designSectionColorTitle,
-                      style: theme.textTheme.subtitle1),
+                  Text(
+                    localizations.designSectionColorTitle,
+                    style: theme.textTheme.subtitle1,
+                  ),
                   GridView.count(
                     crossAxisCount: 4,
                     primary: false,
                     shrinkWrap: true,
                     children: [
+                      PlatformListTile(
+                        title: CircleAvatar(
+                          backgroundColor: _colorSchemeSeed,
+                          child: Icon(PlatformInfo.isCupertino
+                              ? CupertinoIcons.color_filter
+                              : Icons.colorize),
+                        ),
+                        onTap: () async {
+                          Color selectedColor = _colorSchemeSeed;
+                          final result =
+                              await LocalizedDialogHelper.showWidgetDialog(
+                                  context,
+                                  ColorPicker(
+                                    pickerColor: _colorSchemeSeed,
+                                    onColorChanged: (value) =>
+                                        selectedColor = value,
+                                  ),
+                                  defaultActions: DialogActions.okAndCancel);
+                          if (result == true) {
+                            _colorSchemeSeed = selectedColor;
+                            setState(() {});
+                            _themeSettings.colorSchemeSeed = selectedColor;
+                            locator<ThemeService>().checkForChangedTheme();
+                            await locator<SettingsService>().save();
+                          }
+                        },
+                      ),
                       for (final color in availableColors)
                         PlatformListTile(
                           title: CircleAvatar(
                             backgroundColor: color,
-                            child: (color == primarySwatch)
+                            child: (color == _colorSchemeSeed)
                                 ? Icon(CommonPlatformIcons.ok)
                                 : null,
                           ),
                           onTap: () async {
-                            primarySwatch = color as MaterialColor?;
+                            _colorSchemeSeed = color;
                             setState(() {});
-                            themeSettings.primarySwatch =
-                                color as MaterialColor;
+                            _themeSettings.colorSchemeSeed = color;
                             locator<ThemeService>().checkForChangedTheme();
                             await locator<SettingsService>().save();
                           },

@@ -91,7 +91,7 @@ dependencies:
   local_auth: ^1.1.8
   open_settings: ^2.0.2
   webview_flutter: ^3.0.0
-
+  flutter_colorpicker: ^1.0.3
 
 dependency_overrides:
   flutter_colorpicker: ^1.0.3
