@@ -1,10 +1,11 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/contact.dart';
-import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
+
+import 'package:enough_mail_app/models/contact.dart';
+import 'package:enough_mail_app/util/validator.dart';
 
 class RecipientInputField extends StatefulWidget {
   const RecipientInputField({
@@ -58,35 +59,62 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Wrap(children: [
-      if (widget.addresses.isNotEmpty && widget.labelText != null)
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0, right: 8.0),
-          child: Text(
-            widget.labelText!,
-            style: TextStyle(
-              color: _focusNode.hasFocus
-                  ? theme.colorScheme.secondary
-                  : theme.hintColor,
-            ),
-          ),
-        ),
-      for (final address in widget.addresses)
-        PlatformChip(
-          label: Column(
+    return DragTarget<MailAddress>(
+      builder: (context, candidateData, rejectedData) {
+        return Container(
+          color: candidateData.isEmpty ? null : theme.hoverColor,
+          child: Wrap(
             children: [
-              if (address.hasPersonalName) Text(address.personalName!),
-              Text(address.email, style: theme.textTheme.caption),
+              if (widget.addresses.isNotEmpty && widget.labelText != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, right: 8.0),
+                  child: Text(
+                    widget.labelText!,
+                    style: TextStyle(
+                      color: _focusNode.hasFocus
+                          ? theme.colorScheme.secondary
+                          : theme.hintColor,
+                    ),
+                  ),
+                ),
+              for (final address in widget.addresses)
+                Draggable(
+                  data: address,
+                  child: _AddressChip(
+                    address: address,
+                    onDeleted: () {
+                      widget.addresses.remove(address);
+                      setState(() {});
+                    },
+                  ),
+                  feedback: Opacity(
+                    opacity: 0.8,
+                    child: Material(
+                      child: _AddressChip(
+                        address: address,
+                      ),
+                    ),
+                  ),
+                  feedbackOffset: const Offset(10.0, 10.0),
+                  childWhenDragging: Opacity(
+                    opacity: 0.6,
+                    child: _AddressChip(
+                      address: address,
+                    ),
+                  ),
+                ),
+              buildInput(theme, context),
             ],
           ),
-          deleteIcon: const Icon(Icons.close),
-          onDeleted: () {
-            widget.addresses.remove(address);
-            setState(() {});
-          },
-        ),
-      buildInput(theme, context),
-    ]);
+        );
+      },
+      onAccept: (mailAddress) {
+        widget.addresses.add(mailAddress);
+      },
+      onLeave: (mailAddress) {
+        widget.addresses.remove(mailAddress);
+      },
+    );
   }
 
   Widget buildInput(ThemeData theme, BuildContext context) {
@@ -221,5 +249,28 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
         print('Unable to pick contact $e $s');
       }
     }
+  }
+}
+
+class _AddressChip extends StatelessWidget {
+  const _AddressChip({
+    Key? key,
+    required this.address,
+    this.onDeleted,
+  }) : super(key: key);
+  final MailAddress address;
+  final VoidCallback? onDeleted;
+
+  @override
+  Widget build(BuildContext context) {
+    return PlatformChip(
+        label: Column(
+          children: [
+            Text(address.personalName ?? ''),
+            Text(address.email, style: Theme.of(context).textTheme.caption),
+          ],
+        ),
+        deleteIcon: const Icon(Icons.close),
+        onDeleted: onDeleted);
   }
 }
