@@ -194,8 +194,10 @@ class MailService {
         if (flag != null) {
           accountMailbox = client.getMailbox(flag);
           if (accountMailbox == null) {
-            await client.listMailboxes();
-            accountMailbox = client.getMailbox(flag);
+            if (client.isConnected) {
+              await client.listMailboxes();
+              accountMailbox = client.getMailbox(flag);
+            }
             if (accountMailbox == null) {
               if (kDebugMode) {
                 print(
