@@ -23,6 +23,10 @@ class NotificationService {
     // print('init notification service...');
     // set up local notifications:
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    if (defaultTargetPlatform == TargetPlatform.windows) {
+      // Windows is not yet supported:
+      return NotificationServiceInitResult.normal;
+    }
     const android = AndroidInitializationSettings('ic_stat_notification');
     final ios = IOSInitializationSettings(
         onDidReceiveLocalNotification: _onDidReceiveLocalNotification);

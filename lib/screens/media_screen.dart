@@ -17,7 +17,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart' as pathprovider;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../locator.dart';
