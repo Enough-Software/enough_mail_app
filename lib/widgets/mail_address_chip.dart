@@ -24,7 +24,7 @@ class MailAddressChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     return PlatformPopupMenuButton<_AddressAction>(
       cupertinoButtonPadding: EdgeInsets.zero,
@@ -38,7 +38,7 @@ class MailAddressChip extends StatelessWidget {
           value: _AddressAction.copy,
           child: IconText(
             icon: Icon(CommonPlatformIcons.copy),
-            label: Text(localizations!.actionAddressCopy),
+            label: Text(localizations.actionAddressCopy),
           ),
         ),
         PlatformPopupMenuItem(
@@ -63,7 +63,7 @@ class MailAddressChip extends StatelessWidget {
           case _AddressAction.copy:
             Clipboard.setData(ClipboardData(text: mailAddress.email));
             locator<ScaffoldMessengerService>()
-                .showTextSnackBar(localizations!.feedbackResultInfoCopied);
+                .showTextSnackBar(localizations.feedbackResultInfoCopied);
             break;
           case _AddressAction.compose:
             final messageBuilder = MessageBuilder()..to = [mailAddress];
