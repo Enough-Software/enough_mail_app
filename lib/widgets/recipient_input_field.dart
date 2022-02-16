@@ -1,8 +1,12 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:enough_mail_app/models/contact.dart';
 import 'package:enough_mail_app/util/validator.dart';
@@ -29,6 +33,10 @@ class RecipientInputField extends StatefulWidget {
 
   @override
   _RecipientInputFieldState createState() => _RecipientInputFieldState();
+}
+
+enum _AddressAction {
+  copy,
 }
 
 class _RecipientInputFieldState extends State<RecipientInputField> {
@@ -59,17 +67,19 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final localizations = AppLocalizations.of(context)!;
     return DragTarget<MailAddress>(
       builder: (context, candidateData, rejectedData) {
+        final labelText = widget.labelText;
         return Container(
           color: candidateData.isEmpty ? null : theme.hoverColor,
           child: Wrap(
             children: [
-              if (widget.addresses.isNotEmpty && widget.labelText != null)
+              if (widget.addresses.isNotEmpty && labelText != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, right: 8.0),
                   child: Text(
-                    widget.labelText!,
+                    labelText,
                     style: TextStyle(
                       color: _focusNode.hasFocus
                           ? theme.colorScheme.secondary
@@ -80,11 +90,27 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
               for (final address in widget.addresses)
                 Draggable(
                   data: address,
-                  child: _AddressChip(
+                  child: _AddressChip<_AddressAction>(
                     address: address,
                     onDeleted: () {
                       widget.addresses.remove(address);
                       setState(() {});
+                    },
+                    menuItems: [
+                      PlatformPopupMenuItem(
+                        value: _AddressAction.copy,
+                        child: IconText(
+                          icon: Icon(CommonPlatformIcons.copy),
+                          label: Text(localizations.actionAddressCopy),
+                        ),
+                      ),
+                    ],
+                    onMenuItemSelected: (action) {
+                      switch (action) {
+                        case _AddressAction.copy:
+                          Clipboard.setData(ClipboardData(text: address.email));
+                          break;
+                      }
                     },
                   ),
                   feedback: Opacity(
@@ -252,18 +278,26 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
   }
 }
 
-class _AddressChip extends StatelessWidget {
+class _AddressChip<T> extends StatelessWidget {
   const _AddressChip({
     Key? key,
     required this.address,
     this.onDeleted,
+    this.menuItems,
+    this.onMenuItemSelected,
   }) : super(key: key);
   final MailAddress address;
   final VoidCallback? onDeleted;
 
+  /// Compare [onMenuItemSelected]
+  final List<PlatformPopupMenuItem<T>>? menuItems;
+
+  /// Compare [menuItems]
+  final void Function(T value)? onMenuItemSelected;
+
   @override
   Widget build(BuildContext context) {
-    return PlatformChip(
+    final content = PlatformChip(
         label: Column(
           children: [
             Text(address.personalName ?? ''),
@@ -272,5 +306,18 @@ class _AddressChip extends StatelessWidget {
         ),
         deleteIcon: const Icon(Icons.close),
         onDeleted: onDeleted);
+    final menuItems = this.menuItems;
+    if (menuItems == null) {
+      return content;
+    }
+    final theme = Theme.of(context);
+    return PlatformPopupMenuButton<T>(
+      cupertinoButtonPadding: EdgeInsets.zero,
+      child: content,
+      title: address.hasPersonalName ? Text(address.personalName!) : null,
+      message: Text(address.email, style: theme.textTheme.caption),
+      itemBuilder: (context) => menuItems,
+      onSelected: onMenuItemSelected,
+    );
   }
 }
