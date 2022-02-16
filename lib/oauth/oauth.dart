@@ -64,11 +64,13 @@ class GmailOAuthClient extends OauthClient {
       'redirect_uri': '$callbackUrlScheme:/',
       'scope': 'https://mail.google.com/',
       'login_hint': email,
-    });
+    }).toString();
 
     // Present the dialog to the user
     final result = await FlutterWebAuth.authenticate(
-        url: uri.toString(), callbackUrlScheme: callbackUrlScheme);
+      url: uri,
+      callbackUrlScheme: callbackUrlScheme,
+    );
 
     // Extract code from resulting url
     final code = Uri.parse(result).queryParameters['code'];
@@ -136,12 +138,14 @@ class OutlookOAuthClient extends OauthClient {
       'redirect_uri': callbackUrlScheme,
       'scope': _scope,
       'login_hint': email,
-    });
+    }).toString();
     // print('authenticate URL: $uri');
 
     // Present the dialog to the user
     final result = await FlutterWebAuth.authenticate(
-        url: uri.toString(), callbackUrlScheme: 'maily'); // callbackUrlScheme);
+      url: uri,
+      callbackUrlScheme: 'maily', //callbackUrlScheme,
+    );
 
     // Extract code from resulting url
     final code = Uri.parse(result).queryParameters['code'];
