@@ -611,8 +611,9 @@ class MailService {
     return connected;
   }
 
-  MailClient createMailClient(MailAccount mailAccount,
-      {bool isLogEnabled = foundation.kDebugMode}) {
+  MailClient createMailClient(MailAccount mailAccount) {
+    bool isLogEnabled = foundation.kDebugMode ||
+        (mailAccount.attributes[Account.attributeEnableLogging] ?? false);
     return MailClient(
       mailAccount,
       isLogEnabled: isLogEnabled,

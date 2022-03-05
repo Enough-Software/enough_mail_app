@@ -10,6 +10,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/util/validator.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
@@ -30,6 +31,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
   late TextEditingController _accountNameController;
   late TextEditingController _userNameController;
   bool _isRetryingToConnect = false;
+  late bool _isLoggingEnabled;
 
   void _update() {
     setState(() {});
@@ -40,6 +42,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
     widget.account.addListener(_update);
     _accountNameController = TextEditingController(text: widget.account.name);
     _userNameController = TextEditingController(text: widget.account.userName);
+    _isLoggingEnabled = widget.account.enableLogging;
     super.initState();
   }
 
@@ -54,8 +57,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.editAccountTitle(widget.account.name),
       subtitle: widget.account.email,
       content: _buildEditContent(localizations, context),
@@ -300,6 +302,30 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   },
                 ),
               ),
+              if (locator<SettingsService>().settings.enableDeveloperMode) ...[
+                const Divider(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: PlatformCheckboxListTile(
+                    value: _isLoggingEnabled,
+                    title: Text(localizations.editAccountEnableLogging),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _isLoggingEnabled = value;
+                        });
+                        widget.account.enableLogging = value;
+                        locator<MailService>().saveAccounts();
+                        final message = value
+                            ? localizations.editAccountLoggingEnabled
+                            : localizations.editAccountLoggingDisabled;
+                        locator<ScaffoldMessengerService>()
+                            .showTextSnackBar(message);
+                      }
+                    },
+                  ),
+                ),
+              ]
             ],
           ),
         ),
