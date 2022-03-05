@@ -4,15 +4,10 @@ import 'package:flutter/material.dart';
 
 class ThemeService with ChangeNotifier {
   late ThemeSettings _themeSettings;
-  static final ThemeData defaultLightTheme = ThemeData(
-    colorSchemeSeed: Colors.green,
-    useMaterial3: true,
-  );
-  static final ThemeData defaultDarkTheme = ThemeData(
-    brightness: Brightness.dark,
-    colorSchemeSeed: Colors.green,
-    useMaterial3: true,
-  );
+  static final ThemeData defaultLightTheme =
+      _generateTheme(Brightness.light, Colors.green);
+  static final ThemeData defaultDarkTheme =
+      _generateTheme(Brightness.dark, Colors.green);
   ThemeData _lightTheme = defaultLightTheme;
   ThemeData get lightTheme => _lightTheme;
   ThemeData _darkTheme = defaultDarkTheme;
@@ -38,17 +33,17 @@ class ThemeService with ChangeNotifier {
     checkForChangedTheme();
   }
 
-  void checkForChangedTheme() {
-    ThemeData generateTheme(Brightness brightness, Color color) {
-      if (color is MaterialColor) {
-        return ThemeData(
-            brightness: brightness, primarySwatch: color, useMaterial3: false);
-      } else {
-        return ThemeData(
-            brightness: brightness, colorSchemeSeed: color, useMaterial3: true);
-      }
+  static ThemeData _generateTheme(Brightness brightness, Color color) {
+    if (color is MaterialColor) {
+      return ThemeData(
+          brightness: brightness, primarySwatch: color, useMaterial3: false);
+    } else {
+      return ThemeData(
+          brightness: brightness, colorSchemeSeed: color, useMaterial3: true);
     }
+  }
 
+  void checkForChangedTheme() {
     var isChanged = false;
     final mode = _themeSettings.getCurrentThemeMode();
     if (mode != _themeMode) {
@@ -58,8 +53,8 @@ class ThemeService with ChangeNotifier {
     final colorSchemeSeed = _themeSettings.colorSchemeSeed;
     if (colorSchemeSeed != _colorSchemeSeed) {
       _colorSchemeSeed = colorSchemeSeed;
-      _lightTheme = generateTheme(Brightness.light, colorSchemeSeed);
-      _darkTheme = generateTheme(Brightness.dark, colorSchemeSeed);
+      _lightTheme = _generateTheme(Brightness.light, colorSchemeSeed);
+      _darkTheme = _generateTheme(Brightness.dark, colorSchemeSeed);
       isChanged = true;
     }
     if (isChanged) {
