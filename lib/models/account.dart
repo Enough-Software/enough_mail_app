@@ -15,6 +15,7 @@ class Account extends ChangeNotifier {
   static const String attributeSignatureHtml = 'signatureHtml';
   static const String attributeSignaturePlain = 'signaturePlain';
   static const String attributeBccMyself = 'bccMyself';
+  static const String attributeEnableLogging = 'enableLogging';
 
   final MailAccount account;
 
@@ -37,6 +38,10 @@ class Account extends ChangeNotifier {
       account.attributes.remove(attributeExcludeFromUnified);
     }
   }
+
+  /// Developer mode option: should logging be enabled for this account?
+  bool get enableLogging => getAttribute(attributeEnableLogging) ?? false;
+  set enableLogging(bool value) => setAttribute(attributeEnableLogging, value);
 
   dynamic getAttribute(String key) {
     return account.attributes[key];

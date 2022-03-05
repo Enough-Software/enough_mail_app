@@ -1416,6 +1416,18 @@
       }
     }  
   },
+  "editAccountEnableLogging": "Enable logging",
+  "@editAccountEnableLogging": {
+    "description": "Label developer mode option to enable logging."
+  },
+  "editAccountLoggingEnabled": "Log enabled, please restart",
+  "@editAccountLoggingEnabled": {
+    "description": "Short message shown after the log has been enabled."
+  },
+  "editAccountLoggingDisabled": "Log disabled, please restart",
+  "@editAccountLoggingDisabled": {
+    "description": "Short message shown after the log has been disabled."
+  },
   "accountDetailsFallbackTitle": "Server Settings",
   "@accountDetailsFallbackTitle": {
     "description": "Title shown when account name is not set."
