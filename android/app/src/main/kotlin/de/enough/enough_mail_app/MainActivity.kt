@@ -1,6 +1,6 @@
 package de.enough.enough_mail_app
 
-import android.content.ContentProviderClient
+//import android.content.ContentProviderClient
 import android.content.Intent
 import android.os.Bundle
 import android.net.Uri
@@ -14,9 +14,9 @@ import io.flutter.plugins.GeneratedPluginRegistrant
 import java.io.File
 
 class MainActivity: FlutterFragmentActivity() {
-    var sharedDataMap : Map<String, Any>? = null;
+    private var sharedDataMap : Map<String, Any>? = null
 
-    private val CHANNEL = "app.channel.shared.data"
+    private val _channel = "app.channel.shared.data"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         checkForShareIntent(intent)
@@ -40,25 +40,25 @@ class MainActivity: FlutterFragmentActivity() {
     }
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
-        GeneratedPluginRegistrant.registerWith(flutterEngine);
-        val channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
+        GeneratedPluginRegistrant.registerWith(flutterEngine)
+        val channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, _channel)
 
         channel.setMethodCallHandler { call, result ->
             if (call.method == "getSharedData") {
                 result.success(sharedDataMap)
-                sharedDataMap = null;
+                sharedDataMap = null
             }
         }
     }
 
     private fun extractShareData(shareIntent: Intent, action: String, type: String?) {
         //println("extract share data from $shareIntent")
-        val result: MutableMap<String,Any> = HashMap<String, Any>();
-         if (type != null) {
+        val result: MutableMap<String,Any> = HashMap<String, Any>()
+        if (type != null) {
             result["mimeType"] = type
         }
         if (action == Intent.ACTION_SEND_MULTIPLE) {
-            val uris = shareIntent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM);
+            val uris = shareIntent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
             if (uris == null) {
                 result["length"] = 0
             } else {
@@ -73,7 +73,7 @@ class MainActivity: FlutterFragmentActivity() {
             }
         } else if (action == Intent.ACTION_SENDTO || action == Intent.ACTION_VIEW) {
             //println("$action: with data ${shareIntent.data} dataString ${shareIntent.dataString}")
-            val dataString = shareIntent.dataString;
+            val dataString = shareIntent.dataString
             if (dataString != null) {
                 result["text"] = dataString 
             }
@@ -86,7 +86,7 @@ class MainActivity: FlutterFragmentActivity() {
                 result["name.0"] = getFileName(uri)
                 result["type.0"] = getMimeType(uri)
             } else {
-                val dataString = shareIntent.dataString;
+                val dataString = shareIntent.dataString
                 if (dataString != null) {
                     result["text"] = dataString
                 } else if (shareIntent.hasExtra("android.intent.extra.TEXT")){
@@ -102,7 +102,7 @@ class MainActivity: FlutterFragmentActivity() {
             }
         }
         //println("sharedData: $result")
-        sharedDataMap = result;
+        sharedDataMap = result
     }
 
     private fun getMimeType(uri: Uri): String {
@@ -116,9 +116,9 @@ class MainActivity: FlutterFragmentActivity() {
             cursor.getString(nameIndex)
         }
         if (filename != null) {
-            return filename;
+            return filename
         }
-        val path = uri.path;
+        val path = uri.path
         if (path != null) {
             return File(path).name
         }
