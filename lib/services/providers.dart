@@ -388,7 +388,7 @@ class YahooProvider extends Provider {
                     hostname: 'imap.mail.yahoo.com',
                     port: 993,
                     socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
@@ -398,7 +398,7 @@ class YahooProvider extends Provider {
                     hostname: 'smtp.mail.yahoo.com',
                     port: 465,
                     socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
@@ -444,7 +444,7 @@ class AolProvider extends Provider {
                     hostname: 'imap.aol.com',
                     port: 993,
                     socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
@@ -454,7 +454,7 @@ class AolProvider extends Provider {
                     hostname: 'smtp.aol.com',
                     port: 465,
                     socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
@@ -502,7 +502,7 @@ class AppleProvider extends Provider {
                     hostname: 'imap.mail.me.com',
                     port: 993,
                     socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
@@ -512,7 +512,7 @@ class AppleProvider extends Provider {
                     hostname: 'smtp.mail.me.com',
                     port: 587,
                     socketType: SocketType.starttls,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
@@ -540,7 +540,7 @@ class GmxProvider extends Provider {
                     hostname: 'imap.gmx.net',
                     port: 993,
                     socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
@@ -550,7 +550,7 @@ class GmxProvider extends Provider {
                     hostname: 'mail.gmx.net',
                     port: 465,
                     socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
@@ -587,7 +587,7 @@ class MailboxOrgProvider extends Provider {
                     hostname: 'imap.mailbox.org',
                     port: 993,
                     socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
@@ -597,7 +597,7 @@ class MailboxOrgProvider extends Provider {
                     hostname: 'smtp.mailbox.org',
                     port: 465,
                     socketType: SocketType.ssl,
-                    authentication: Authentication.passwordCleartext,
+                    authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
                   )
                 ],
