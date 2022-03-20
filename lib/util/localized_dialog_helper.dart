@@ -39,7 +39,7 @@ class LocalizedDialogHelper {
                 .launch('https://github.com/Enough-Software/enough_mail_app');
           },
         ),
-        Legalese(),
+        const Legalese(),
       ],
     );
   }

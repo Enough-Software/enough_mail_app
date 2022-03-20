@@ -370,11 +370,11 @@ class MailService {
 
   void applyFolderNameSettings(Settings settings) {
     for (final client in _mailClientsPerAccount.values) {
-      _setMaiboxNames(settings, client);
+      _setMailboxNames(settings, client);
     }
   }
 
-  void _setMaiboxNames(Settings settings, MailClient client) {
+  void _setMailboxNames(Settings settings, MailClient client) {
     final folderNameSetting = settings.folderNameSetting;
     if (client.mailboxes == null) {
       return;
@@ -429,7 +429,7 @@ class MailService {
         await client.listMailboxesAsTree(createIntermediate: false);
     final settings = locator<SettingsService>().settings;
     if (settings.folderNameSetting != FolderNameSetting.server) {
-      _setMaiboxNames(settings, client);
+      _setMailboxNames(settings, client);
     }
 
     _mailboxesPerAccount[account] = mailboxTree;

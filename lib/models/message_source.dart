@@ -473,7 +473,7 @@ class MailboxMessageSource extends MessageSource {
   Future<bool> init() async {
     final result = await _mimeSource.init();
     name ??= _mimeSource.name;
-    supportsDeleteAll = _mimeSource.suppportsDeleteAll;
+    supportsDeleteAll = _mimeSource.supportsDeleteAll;
     return result;
   }
 
