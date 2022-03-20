@@ -29,7 +29,7 @@ abstract class MimeSource {
 
   String? get name;
 
-  bool get suppportsDeleteAll;
+  bool get supportsDeleteAll;
 
   bool get isSequenceIdBased;
 
@@ -206,7 +206,7 @@ class MailboxMimeSource extends MimeSource {
   String? get name => mailbox?.name;
 
   @override
-  bool get suppportsDeleteAll =>
+  bool get supportsDeleteAll =>
       (mailbox != null) && (mailbox!.isTrash || mailbox!.isJunk);
 
   @override
@@ -332,7 +332,7 @@ class MailboxMimeSource extends MimeSource {
     //print('queuing $pageIndex');
     _requestedPages.insert(0, pageIndex);
     if (_requestedPages.length > 5) {
-      // just skip the olded referenced messages
+      // just skip the oldest referenced messages
       _requestedPages.removeLast();
     }
     if (_requestedPages.length == 1) {
@@ -506,7 +506,7 @@ class SearchMimeSource extends MimeSource {
   bool get supportsSearching => false;
 
   @override
-  bool get suppportsDeleteAll => searchResult.isNotEmpty;
+  bool get supportsDeleteAll => searchResult.isNotEmpty;
 
   @override
   MimeMessage? getMessageAt(int index) {
@@ -703,8 +703,8 @@ class SearchMimeSource extends MimeSource {
 //   bool get supportsSearching => false;
 
 //   @override
-//   // TODO: implement suppportsDeleteAll
-//   bool get suppportsDeleteAll => false;
+//   // TODO: implement supportsDeleteAll
+//   bool get supportsDeleteAll => false;
 
 //   @override
 //   void clear() {

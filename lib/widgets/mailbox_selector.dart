@@ -22,7 +22,7 @@ class MailboxSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mailboxTreeData = locator<MailService>().getMailboxTreeFor(account)!;
-    final mailboxes = mailboxTreeData.flatten((box) => !box!.isUnselectable);
+    final mailboxes = mailboxTreeData.flatten((box) => !box!.isNotSelectable);
     final items = mailboxes
         .map((box) => DropdownMenuItem(value: box, child: Text(box!.path)))
         .toList();
