@@ -13,7 +13,7 @@ import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 
 import '../routes.dart';
 

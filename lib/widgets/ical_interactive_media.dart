@@ -15,7 +15,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 
 class IcalInteractiveMedia extends StatefulWidget {
@@ -54,7 +54,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
         _isPermanentError = true;
       } else {
         _participantStatus =
-            widget.message.mimeMessage?.calendarParticipantStatus;
+            widget.message.mimeMessage.calendarParticipantStatus;
       }
     } catch (e, s) {
       if (kDebugMode) {
@@ -410,7 +410,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
     if (attendees.isEmpty) {
       return Text(localizations.icalendarReplyWithoutParticipants);
     }
-    final fromEmail = widget.message.mimeMessage?.fromEmail;
+    final fromEmail = widget.message.mimeMessage.fromEmail;
     if (attendees.length > 1) {
       final attendee = attendees.firstWhereOrNull((a) => a.email == fromEmail);
       if (attendee != null) {

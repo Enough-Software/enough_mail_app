@@ -1188,8 +1188,8 @@
   "@addAccountOauthSignInWithAppPassword": {
     "description": "Info to set up app specific password."
   },
-  "accountAddImapAccessSetuptMightBeRequired": "Your provider might require you to setup access for email apps manually.",
-  "@accountAddImapAccessSetuptMightBeRequired": {
+  "accountAddImapAccessSetupMightBeRequired": "Your provider might require you to setup access for email apps manually.",
+  "@accountAddImapAccessSetupMightBeRequired": {
     "description": "Info shown when login fails for a provider that is know to require manual activation of IMAP access."
   },
   "addAccountSetupImapAccessButtonLabel": "Setup email access",

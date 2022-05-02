@@ -7,7 +7,7 @@ import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../locator.dart';
 import 'base.dart';
@@ -69,8 +69,10 @@ class _SettingsDeveloperModeScreenState
                     style: theme.textTheme.caption),
                 PlatformTextButton(
                   child: ButtonText(localizations.extensionsLearnMoreAction),
-                  onPressed: () => launch(
-                      'https://github.com/Enough-Software/enough_mail_app/wiki/Extensions'),
+                  onPressed: () => launchUrl(
+                    Uri.parse(
+                        'https://github.com/Enough-Software/enough_mail_app/wiki/Extensions'),
+                  ),
                 ),
                 PlatformListTile(
                   title: Text(localizations.extensionsReloadAction),

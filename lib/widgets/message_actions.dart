@@ -18,7 +18,7 @@ import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 import 'button_text.dart';
 import 'mailbox_tree.dart';
@@ -332,7 +332,7 @@ class _MessageActionsState extends State<MessageActions> {
     final account = widget.message.mailClient.account;
 
     final builder = MessageBuilder.prepareReplyToMessage(
-      widget.message.mimeMessage!,
+      widget.message.mimeMessage,
       account.fromAddress,
       aliases: account.aliases,
       quoteOriginalText: false,
@@ -397,7 +397,7 @@ class _MessageActionsState extends State<MessageActions> {
         await LocalizedDialogHelper.showTextDialog(context,
             localizations.errorTitle, localizations.redirectEmailInputRequired);
       } else {
-        final mime = widget.message.mimeMessage!;
+        final mime = widget.message.mimeMessage;
         if (mime.mimeData == null) {
           // download complete message first
           await mailClient.fetchMessageContents(mime);
@@ -422,9 +422,8 @@ class _MessageActionsState extends State<MessageActions> {
 
   void _delete() async {
     locator<NavigationService>().pop();
-    await widget.message.source.deleteMessage(widget.message);
-    locator<NotificationService>()
-        .cancelNotificationForMailMessage(widget.message);
+    await widget.message.source.deleteMessages(
+        [widget.message], locator<I18nService>().localizations.resultDeleted);
   }
 
   void _move() {
@@ -487,7 +486,7 @@ class _MessageActionsState extends State<MessageActions> {
   void _forward() {
     final from = widget.message.mailClient.account.fromAddress;
     final builder = MessageBuilder.prepareForwardMessage(
-      widget.message.mimeMessage!,
+      widget.message.mimeMessage,
       from: from,
       quoteMessage: false,
       forwardAttachments: false,
@@ -501,7 +500,7 @@ class _MessageActionsState extends State<MessageActions> {
     final message = widget.message;
     final mailClient = message.mailClient;
     final from = mailClient.account.fromAddress;
-    var mime = message.mimeMessage!;
+    var mime = message.mimeMessage;
     final builder = MessageBuilder();
     builder.from = [from];
 
@@ -524,7 +523,7 @@ class _MessageActionsState extends State<MessageActions> {
     final message = widget.message;
     final mailClient = message.mailClient;
     final from = mailClient.account.fromAddress;
-    var mime = message.mimeMessage!;
+    var mime = message.mimeMessage;
     final builder = MessageBuilder();
     builder.from = [from];
     builder.subject =
@@ -536,7 +535,7 @@ class _MessageActionsState extends State<MessageActions> {
   Future? _addAttachments(Message message, MessageBuilder builder) {
     final attachments = message.attachments;
     final mailClient = message.mailClient;
-    var mime = message.mimeMessage!;
+    var mime = message.mimeMessage;
     Future? composeFuture;
     if (mime.mimeData == null && attachments.length > 1) {
       composeFuture = mailClient.fetchMessageContents(mime).then((value) {
@@ -590,11 +589,9 @@ class _MessageActionsState extends State<MessageActions> {
       case ReplyFormatPreference.sameFormat:
         if (message == null) {
           mode = ComposeMode.html;
-        } else if (message.mimeMessage?.hasPart(MediaSubtype.textHtml) ??
-            false) {
+        } else if (message.mimeMessage.hasPart(MediaSubtype.textHtml)) {
           mode = ComposeMode.html;
-        } else if (message.mimeMessage?.hasPart(MediaSubtype.textPlain) ??
-            false) {
+        } else if (message.mimeMessage.hasPart(MediaSubtype.textPlain)) {
           mode = ComposeMode.plainText;
         } else {
           mode = ComposeMode.html;

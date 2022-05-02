@@ -23,7 +23,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:enough_text_editor/enough_text_editor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import '../locator.dart';
 import '../routes.dart';
@@ -350,8 +350,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
         }
         try {
           await mailClient.store(
-              MessageSequence.fromMessage(originalMessage.mimeMessage!),
-              originalMessage.mimeMessage!.flags!,
+              MessageSequence.fromMessage(originalMessage.mimeMessage),
+              originalMessage.mimeMessage.flags!,
               action: StoreAction.replace);
         } catch (e, s) {
           if (kDebugMode) {
@@ -360,13 +360,13 @@ class _ComposeScreenState extends State<ComposeScreen> {
         }
       }
     } else if ((widget.data.originalMessage != null) &&
-        widget.data.originalMessage!.mimeMessage!.hasFlag(MessageFlags.draft)) {
+        widget.data.originalMessage!.mimeMessage.hasFlag(MessageFlags.draft)) {
       // delete draft message:
       try {
         final originalMessage = widget.data.originalMessage!;
         final source = originalMessage.source;
-        source.remove(originalMessage);
-        await mailClient.flagMessage(originalMessage.mimeMessage!,
+        source.removeFromCache(originalMessage);
+        await mailClient.flagMessage(originalMessage.mimeMessage,
             isDeleted: true);
       } catch (e, s) {
         if (kDebugMode) {
@@ -428,7 +428,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           _requestReadReceipt();
                           break;
                         case _OverflowMenuChoice.convertToPlainTextEditor:
-                          _convertoPlainTextEditor();
+                          _convertToPlainTextEditor();
                           break;
                         case _OverflowMenuChoice.convertToHtmlEditor:
                           _convertToHtmlEditor();
@@ -651,7 +651,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
       final originalMessage = widget.data.originalMessage;
       if (originalMessage != null) {
         await Future.delayed(const Duration(milliseconds: 20));
-        originalMessage.source.remove(originalMessage);
+        originalMessage.source.removeFromCache(originalMessage);
         final originalMime = widget.data.messageBuilder.originalMessage;
         if (originalMime != null && originalMime.hasFlag(MessageFlags.draft)) {
           // delete previous draft message:
@@ -697,7 +697,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     });
   }
 
-  void _convertoPlainTextEditor() {
+  void _convertToPlainTextEditor() {
     final future = _htmlEditorApi!.getText();
     setState(() {
       _loadMailTextFuture = future.then((value) => _convertToPlainText(value));

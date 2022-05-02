@@ -5,6 +5,7 @@ import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/date_service.dart';
 import 'package:flutter/foundation.dart';
 
+import '../services/i18n_service.dart';
 import 'message.dart';
 import 'message_date_section.dart';
 
@@ -26,40 +27,32 @@ class DateSectionedMessageSource extends ChangeNotifier {
     messageSource.addListener(_update);
   }
 
-  Future<bool> init() async {
+  Future<void> init() async {
     try {
-      final success = await messageSource.init();
-      if (success) {
-        _sections = await downloadDateSections();
-        _numberOfSections = _sections.length;
-        isInitialized = true;
-        notifyListeners();
-      }
-      return success;
+      await messageSource.init();
+      _sections = await downloadDateSections();
+      _numberOfSections = _sections.length;
+      isInitialized = true;
+      notifyListeners();
     } catch (e, s) {
       if (kDebugMode) {
         print('unexpected error $e at $s');
       }
-      return false;
     }
   }
 
-  Future<bool> refresh() async {
+  Future<void> refresh() async {
     try {
       _numberOfSections = 0;
-      final success = await messageSource.refresh();
-      if (success) {
-        _sections = await downloadDateSections();
-        _numberOfSections = _sections.length;
-        isInitialized = true;
-        notifyListeners();
-      }
-      return success;
+      await messageSource.refresh();
+      _sections = await downloadDateSections();
+      _numberOfSections = _sections.length;
+      isInitialized = true;
+      notifyListeners();
     } catch (e, s) {
       if (kDebugMode) {
         print('unexpected error $e at $s');
       }
-      return false;
     }
   }
 
@@ -78,7 +71,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
     }
     final messages = <Message>[];
     for (var i = 0; i < numberOfMessagesToBeConsidered; i++) {
-      final message = await messageSource.waitForMessageAt(i);
+      final message = await messageSource.getMessageAt(i);
       messages.add(message);
     }
     return getDateSections(messages);
@@ -90,7 +83,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
     int foundSections = 0;
     for (var i = 0; i < messages.length; i++) {
       final message = messages[i];
-      final dateTime = message.mimeMessage?.decodeDate();
+      final dateTime = message.mimeMessage.decodeDate();
       if (dateTime != null) {
         final range = locator<DateService>().determineDateSection(dateTime);
         if (range != lastRange) {
@@ -104,7 +97,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
     return sections;
   }
 
-  SectionElement getElementAt(int index) {
+  SectionElement? getCachedElementAt(int index) {
     var messageIndex = index;
     if (_numberOfSections >= 0) {
       for (var i = 0; i < _numberOfSections; i++) {
@@ -118,11 +111,33 @@ class DateSectionedMessageSource extends ChangeNotifier {
         messageIndex--;
       }
     }
-    final message = messageSource.getMessageAt(messageIndex);
+    final message = messageSource.cache[messageIndex];
+    if (message != null) {
+      return SectionElement(null, message);
+    }
+    return null;
+  }
+
+  Future<SectionElement> getElementAt(int index) async {
+    var messageIndex = index;
+    if (_numberOfSections >= 0) {
+      for (var i = 0; i < _numberOfSections; i++) {
+        final section = _sections[i];
+        if (section.sourceStartIndex == index) {
+          return SectionElement(section, null);
+        }
+        if (section.sourceStartIndex > index) {
+          break;
+        }
+        messageIndex--;
+      }
+    }
+    final message = await messageSource.getMessageAt(messageIndex);
     return SectionElement(null, message);
   }
 
-  List<Message> getMessagesForSection(MessageDateSection section) {
+  Future<List<Message>> getMessagesForSection(
+      MessageDateSection section) async {
     final index = _sections.indexOf(section);
     if (index == -1) {
       return [];
@@ -131,10 +146,11 @@ class DateSectionedMessageSource extends ChangeNotifier {
     final endIndex = (index < _sections.length - 1)
         ? _sections[index + 1].sourceStartIndex - index - 1
         : min(startIndex + 5, messageSource.size);
-    final messages = <Message>[];
+    final futures = <Future<Message>>[];
     for (var i = startIndex; i < endIndex; i++) {
-      messages.add(messageSource.getMessageAt(i));
+      futures.add(messageSource.getMessageAt(i));
     }
+    final messages = await Future.wait(futures);
     return messages;
   }
 
@@ -145,7 +161,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
     }
     final messages = <Message>[];
     for (int i = 0; i < length; i++) {
-      final message = messageSource.cache.getWithSourceIndex(i);
+      final message = messageSource.cache[i];
       if (message != null) {
         messages.add(message);
       }
@@ -159,9 +175,10 @@ class DateSectionedMessageSource extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteMessage(Message message) async {
-    await messageSource.deleteMessage(message);
-  }
+  Future<void> deleteMessage(Message message) => messageSource.deleteMessages(
+        [message],
+        locator<I18nService>().localizations.resultDeleted,
+      );
 }
 
 class SectionElement {

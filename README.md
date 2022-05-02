@@ -67,6 +67,10 @@ When you have compile problems this is usually due to not getting the latest ver
 For some features you will need to add the relevant keys to *assets/keys.txt*, currently the following key is required:
 * giphy: https://developers.giphy.com/ 
 
+## Localizations
+When you change translations, re-generate the translations files by calling `flutter gen-l10n`.
+Missing translations will be listed in `missing-translations.txt`.
+
 ## License
 `enough_mail_app` is licensed under the [GNU Public License 3.0 "GPL"](LICENSE). In a nutshell this means that you can play around as much as possible for private reasons, but that you need to publish your changes under the GPL, as soon as you the code commercially.
 

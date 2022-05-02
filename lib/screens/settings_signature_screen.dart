@@ -10,7 +10,7 @@ import 'package:enough_mail_app/util/modal_bottom_sheet_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 import 'base.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -144,10 +144,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
         HtmlWidget(
           _signature!,
           onTapUrl: (url) async {
-            if (await launcher.canLaunch(url)) {
-              return await launcher.launch(url);
-            }
-            return false;
+            return await launcher.launchUrl(Uri.parse(url));
           },
         ),
         Align(

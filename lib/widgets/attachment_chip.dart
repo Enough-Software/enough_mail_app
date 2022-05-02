@@ -11,7 +11,7 @@ import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 
 import 'button_text.dart';
 
@@ -34,7 +34,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
 
   @override
   void initState() {
-    final mimeMessage = widget.message.mimeMessage!;
+    final mimeMessage = widget.message.mimeMessage;
     _mimePart = mimeMessage.getPart(widget.info.fetchId);
     if (_mimePart != null) {
       _mediaProvider =
@@ -164,9 +164,9 @@ class _AttachmentChipState extends State<AttachmentChip> {
     });
     try {
       _mimePart = await widget.message.mailClient
-          .fetchMessagePart(widget.message.mimeMessage!, widget.info.fetchId);
+          .fetchMessagePart(widget.message.mimeMessage, widget.info.fetchId);
       _mediaProvider = MimeMediaProviderFactory.fromMime(
-          widget.message.mimeMessage!, _mimePart!);
+          widget.message.mimeMessage, _mimePart!);
       final media = InteractiveMediaWidget(
         mediaProvider: _mediaProvider!,
         builder: _buildInteractiveMedia,
