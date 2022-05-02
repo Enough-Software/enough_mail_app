@@ -4,7 +4,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import 'package:enough_mail_app/extensions/extensions.dart';
@@ -395,7 +395,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                     ),
                     PlatformTextButton(
                       onPressed: () async {
-                        await launcher.launch(appSpecificPasswordSetupUrl);
+                        await launcher
+                            .launchUrl(Uri.parse(appSpecificPasswordSetupUrl));
                       },
                       child: ButtonText(localizations
                           .addAccountApplicationPasswordRequiredButton),
@@ -412,8 +413,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                   Text(localizations.addAccountApplicationPasswordRequiredInfo),
                   PlatformTextButton(
                     onPressed: () async {
-                      await launcher
-                          .launch(provider.appSpecificPasswordSetupUrl!);
+                      await launcher.launchUrl(
+                          Uri.parse(provider.appSpecificPasswordSetupUrl!));
                     },
                     child: ButtonText(localizations
                         .addAccountApplicationPasswordRequiredButton),
@@ -462,7 +463,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                       url = url
                         ..replaceAll('{user.email}', _account.email ?? '')
                         ..replaceAll('{language}', languageCode);
-                      launcher.launch(url);
+                      launcher.launchUrl(Uri.parse(url));
                     },
                     child: ButtonText(_extensionForgotPassword!
                         .getLabel(locator<I18nService>().locale!.languageCode)),
@@ -559,13 +560,13 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: Text(
-                    localizations.accountAddImapAccessSetuptMightBeRequired),
+                    localizations.accountAddImapAccessSetupMightBeRequired),
               ),
               PlatformTextButton(
                 child: ButtonText(
                     localizations.addAccountSetupImapAccessButtonLabel),
-                onPressed: () =>
-                    launcher.launch(_provider!.manualImapAccessSetupUrl!),
+                onPressed: () => launcher
+                    .launchUrl(Uri.parse(_provider!.manualImapAccessSetupUrl!)),
               ),
             ],
           ],

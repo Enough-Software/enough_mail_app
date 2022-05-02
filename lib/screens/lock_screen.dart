@@ -5,7 +5,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 
 class LockScreen extends StatelessWidget {
   const LockScreen({Key? key}) : super(key: key);

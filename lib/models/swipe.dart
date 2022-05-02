@@ -1,6 +1,6 @@
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 
 import '../locator.dart';
 
@@ -74,6 +74,7 @@ extension SwipeExtension on SwipeAction {
     }
   }
 
+  /// Icon of the action
   IconData get icon {
     final iconService = locator<IconService>();
     switch (this) {
@@ -90,6 +91,7 @@ extension SwipeExtension on SwipeAction {
     }
   }
 
+  /// localized name of the action
   String name(AppLocalizations localizations) {
     switch (this) {
       case SwipeAction.markRead:
@@ -105,6 +107,7 @@ extension SwipeExtension on SwipeAction {
     }
   }
 
+  /// The threshold in percent when the action is triggered
   double get dismissThreshold {
     switch (this) {
       case SwipeAction.markRead:
@@ -120,6 +123,7 @@ extension SwipeExtension on SwipeAction {
     }
   }
 
+  /// Does this action move the message away from the current list?
   bool get isMessageMoving {
     switch (this) {
       case SwipeAction.markRead:

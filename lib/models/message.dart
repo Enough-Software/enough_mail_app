@@ -12,9 +12,19 @@ import 'account.dart';
 import 'message_source.dart';
 
 class Message extends ChangeNotifier {
+  Message(this.mimeMessage, this.mailClient, this.source, this.sourceIndex);
+
+  Message.embedded(this.mimeMessage, Message parent)
+      : mailClient = parent.mailClient,
+        source = SingleMessageSource(parent.source),
+        sourceIndex = 0 {
+    (source as SingleMessageSource).singleMessage = this;
+    isEmbedded = true;
+  }
+
   static const String keywordFlagUnsubscribed = r'$Unsubscribed';
 
-  MimeMessage? mimeMessage;
+  MimeMessage mimeMessage;
   final MailClient mailClient;
   int sourceIndex;
   final MessageSource source;
@@ -26,8 +36,8 @@ class Message extends ChangeNotifier {
   List<ContentInfo> get attachments {
     var infos = _attachments;
     if (infos == null) {
-      infos = mimeMessage!.findContentInfo();
-      final inlineAttachments = mimeMessage!
+      infos = mimeMessage.findContentInfo();
+      final inlineAttachments = mimeMessage
           .findContentInfo(disposition: ContentDisposition.inline)
           .where((info) =>
               info.fetchId.isNotEmpty &&
@@ -53,82 +63,72 @@ class Message extends ChangeNotifier {
 
   bool isEmbedded = false;
 
-  Message(this.mimeMessage, this.mailClient, this.source, this.sourceIndex);
-
-  Message.embedded(this.mimeMessage, Message parent)
-      : mailClient = parent.mailClient,
-        source = SingleMessageSource(parent.source),
-        sourceIndex = 0 {
-    (source as SingleMessageSource).singleMessage = this;
-    isEmbedded = true;
-  }
-
-  bool get hasNext => (next != null);
-  Message? get next => source.next(this);
+  bool get hasNext => sourceIndex < source.size;
+  Future<Message?> get next => source.next(this);
   bool get hasPrevious => (sourceIndex > 0);
-  Message? get previous => source.previous(this);
+  Future<Message?> get previous => source.previous(this);
 
-  bool get isSeen => mimeMessage?.isSeen ?? false;
+  bool get isSeen => mimeMessage.isSeen;
   set isSeen(bool value) {
-    if (value != mimeMessage!.isSeen) {
-      mimeMessage!.isSeen = value;
+    if (value != mimeMessage.isSeen) {
+      mimeMessage.isSeen = value;
       notifyListeners();
     }
   }
 
-  bool get isFlagged => mimeMessage?.isFlagged ?? false;
+  bool get isFlagged => mimeMessage.isFlagged;
   set isFlagged(bool value) {
-    if (value != mimeMessage!.isFlagged) {
-      mimeMessage!.isFlagged = value;
+    if (value != mimeMessage.isFlagged) {
+      mimeMessage.isFlagged = value;
       notifyListeners();
     }
   }
 
-  bool get isAnswered => mimeMessage?.isAnswered ?? false;
+  bool get isAnswered => mimeMessage.isAnswered;
   set isAnswered(bool value) {
-    if (value != mimeMessage!.isAnswered) {
-      mimeMessage!.isAnswered = value;
+    if (value != mimeMessage.isAnswered) {
+      mimeMessage.isAnswered = value;
       notifyListeners();
     }
   }
 
-  bool get isForwarded => mimeMessage?.isForwarded ?? false;
+  bool get isForwarded => mimeMessage.isForwarded;
   set isForwarded(bool value) {
-    if (value != mimeMessage!.isForwarded) {
-      mimeMessage!.isForwarded = value;
+    if (value != mimeMessage.isForwarded) {
+      mimeMessage.isForwarded = value;
       notifyListeners();
     }
   }
 
-  bool get isDeleted => mimeMessage?.isDeleted ?? false;
+  bool get isDeleted => mimeMessage.isDeleted;
   set isDeleted(bool value) {
-    if (value != mimeMessage!.isDeleted) {
-      mimeMessage!.isDeleted = value;
+    if (value != mimeMessage.isDeleted) {
+      mimeMessage.isDeleted = value;
       notifyListeners();
     }
   }
 
-  bool get isMdnSent => mimeMessage?.isReadReceiptSent ?? false;
+  bool get isMdnSent => mimeMessage.isReadReceiptSent;
   set isMdnSent(bool value) {
-    if (value != mimeMessage!.isReadReceiptSent) {
-      mimeMessage!.isReadReceiptSent = value;
+    if (value != mimeMessage.isReadReceiptSent) {
+      mimeMessage.isReadReceiptSent = value;
       notifyListeners();
     }
   }
 
-  bool get isNewsLetter => mimeMessage!.isNewsletter;
+  bool get isNewsLetter => mimeMessage.isNewsletter;
 
-  bool get isNewsLetterSubscribable => mimeMessage!.isNewsLetterSubscribable;
+  bool get isNewsLetterSubscribable => mimeMessage.isNewsLetterSubscribable;
 
   bool get isNewsletterUnsubscribed =>
-      mimeMessage!.hasFlag(keywordFlagUnsubscribed);
+      mimeMessage.hasFlag(keywordFlagUnsubscribed);
   set isNewsletterUnsubscribed(bool value) {
-    mimeMessage!.setFlag(keywordFlagUnsubscribed, value);
+    mimeMessage.setFlag(keywordFlagUnsubscribed, value);
     notifyListeners();
   }
 
   bool get hasAttachment {
-    final mime = mimeMessage!;
+    final mime = mimeMessage;
     final size = mime.size;
     // when only the envelope is downloaded, the content-type header ergo mediaType is not yet available
     return mime.hasAttachments() ||
@@ -139,7 +139,7 @@ class Message extends ChangeNotifier {
   }
 
   void updateFlags(List<String>? flags) {
-    mimeMessage!.flags = flags;
+    mimeMessage.flags = flags;
     notifyListeners();
   }
 
@@ -155,6 +155,11 @@ class Message extends ChangeNotifier {
 
   static Message? of(BuildContext context) =>
       MessageWidget.of(context)?.message;
+
+  @override
+  String toString() {
+    return '${mailClient.account.name}[$sourceIndex]=$mimeMessage';
+  }
 }
 
 extension NewsLetter on MimeMessage {
@@ -178,7 +183,7 @@ extension NewsLetter on MimeMessage {
   String? decodeListName() {
     final listPost = decodeHeaderValue('list-post');
     if (listPost != null) {
-      // tyically only mailing lists that allow posting have a human understandable List-ID header:
+      // typically only mailing lists that allow posting have a human understandable List-ID header:
       final id = decodeHeaderValue('list-id');
       if (id != null && id.isNotEmpty) {
         return id;
@@ -259,7 +264,7 @@ extension NewsLetter on MimeMessage {
     }
     // manually open unsubscribe web page:
     if (httpUri != null) {
-      return url_launcher.launch(httpUri.toString());
+      return url_launcher.launchUrl(httpUri);
     }
     return false;
   }
@@ -284,7 +289,7 @@ extension NewsLetter on MimeMessage {
             (uri) => uri!.scheme.toLowerCase() == 'http',
             orElse: () => null));
     if (httpUri != null) {
-      return url_launcher.launch(httpUri.toString());
+      return url_launcher.launchUrl(httpUri);
     }
     return false;
   }

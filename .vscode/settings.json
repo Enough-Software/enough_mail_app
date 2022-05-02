@@ -7,7 +7,9 @@
         "icalendar",
         "imap",
         "Maily",
+        "QRESYNC",
         "Uids",
+        "unawaited",
         "undelete"
     ]
 }

@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/widgets/empty_message.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/date_sectioned_message_source.dart';
@@ -51,7 +52,7 @@ class MessageSourceScreen extends StatefulWidget {
 
 class _MessageSourceScreenState extends State<MessageSourceScreen>
     with TickerProviderStateMixin {
-  Future<void>? _messageLoader;
+  late Future<void> _messageLoader;
   _Visualization _visualization = _Visualization.list;
   late DateSectionedMessageSource _sectionedMessageSource;
   bool _isInSelectionMode = false;
@@ -70,7 +71,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     _messageLoader = initMessageSource();
   }
 
-  Future<bool> initMessageSource() {
+  Future<void> initMessageSource() {
     //print('${DateTime.now()}: initMessageSource()');
     return _sectionedMessageSource.init();
     //print('${DateTime.now()}: loaded ${_sectionedMessageSource.size} messages');
@@ -130,26 +131,25 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         }
       }
     }
+    final searchColor = theme.brightness == Brightness.light
+        ? theme.colorScheme.onSecondary
+        : theme.colorScheme.onPrimary;
     final appBarTitle = _isInSearchMode
         ? TextField(
-            cursorColor: theme.brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black,
+            cursorColor: searchColor,
             controller: _searchEditingController,
             textInputAction: TextInputAction.search,
             decoration: InputDecoration(
               hintText: localizations.homeSearchHint,
               hintStyle: TextStyle(
-                  color: theme.brightness == Brightness.dark
-                      ? Colors.white30
-                      : Colors.black54),
+                color: searchColor.withAlpha(0xa0),
+              ),
             ),
             autofocus: true,
             autocorrect: false,
             style: TextStyle(
-                color: theme.brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black),
+              color: searchColor,
+            ),
             onSubmitted: _search,
             onChanged: (text) {
               if (text.isNotEmpty != _hasSearchInput) {
@@ -342,6 +342,9 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     child: MessageStack(messageSource: source),
                   );
                 }
+                final settings = locator<SettingsService>().settings;
+                final swipeLeftToRightAction = settings.swipeLeftToRightAction;
+                final swipeRightToLeftAction = settings.swipeRightToLeftAction;
                 return WillPopScope(
                   onWillPop: () {
                     if (_isInSelectionMode) {
@@ -394,174 +397,182 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 }
                                 index--;
                               }
-                              final element =
-                                  _sectionedMessageSource.getElementAt(index);
-                              final section = element.section;
-                              if (section != null) {
-                                final text = i18nService.formatDateRange(
-                                    section.range, section.date);
-                                return GestureDetector(
-                                  onLongPress: () {
-                                    _selectedMessages = _sectionedMessageSource
-                                        .getMessagesForSection(section);
-                                    for (var m in _selectedMessages) {
-                                      m.isSelected = true;
-                                    }
-                                    setState(() {
-                                      _isInSelectionMode = true;
-                                    });
-                                  },
-                                  onTap: !_isInSelectionMode
-                                      ? null
-                                      : () {
-                                          final sectionMessages =
-                                              _sectionedMessageSource
-                                                  .getMessagesForSection(
-                                                      section);
-                                          final doSelect =
-                                              !sectionMessages.first.isSelected;
-                                          for (final msg in sectionMessages) {
-                                            if (doSelect) {
-                                              if (!msg.isSelected) {
-                                                msg.isSelected = true;
-                                                _selectedMessages.add(msg);
+                              return FutureBuilder<SectionElement>(
+                                future:
+                                    _sectionedMessageSource.getElementAt(index),
+                                initialData: _sectionedMessageSource
+                                    .getCachedElementAt(index),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError) {
+                                    return PlatformListTile(
+                                      title: Row(
+                                        children: const [
+                                          Icon(Icons.replay),
+                                          Text(' reload'),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        setState(() {});
+                                      },
+                                    );
+                                  }
+                                  final element = snapshot.data;
+
+                                  if (element == null) {
+                                    return const EmptyMessage();
+                                  }
+                                  final section = element.section;
+                                  if (section != null) {
+                                    final text = i18nService.formatDateRange(
+                                        section.range, section.date);
+                                    return GestureDetector(
+                                      onLongPress: () async {
+                                        _selectedMessages =
+                                            await _sectionedMessageSource
+                                                .getMessagesForSection(section);
+                                        for (var m in _selectedMessages) {
+                                          m.isSelected = true;
+                                        }
+                                        setState(() {
+                                          _isInSelectionMode = true;
+                                        });
+                                      },
+                                      onTap: !_isInSelectionMode
+                                          ? null
+                                          : () async {
+                                              final sectionMessages =
+                                                  await _sectionedMessageSource
+                                                      .getMessagesForSection(
+                                                          section);
+                                              final doSelect = !sectionMessages
+                                                  .first.isSelected;
+                                              for (final msg
+                                                  in sectionMessages) {
+                                                if (doSelect) {
+                                                  if (!msg.isSelected) {
+                                                    msg.isSelected = true;
+                                                    _selectedMessages.add(msg);
+                                                  }
+                                                } else {
+                                                  if (msg.isSelected) {
+                                                    msg.isSelected = false;
+                                                    _selectedMessages
+                                                        .remove(msg);
+                                                  }
+                                                }
                                               }
-                                            } else {
-                                              if (msg.isSelected) {
-                                                msg.isSelected = false;
-                                                _selectedMessages.remove(msg);
-                                              }
-                                            }
-                                          }
-                                          setState(() {});
-                                        },
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 16.0,
-                                          right: 8.0,
-                                          bottom: 4.0,
-                                          top: 16.0,
-                                        ),
-                                        child: Text(
-                                          text,
-                                          style: TextStyle(
-                                            color: theme.colorScheme.secondary,
+                                              setState(() {});
+                                            },
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 16.0,
+                                              right: 8.0,
+                                              bottom: 4.0,
+                                              top: 16.0,
+                                            ),
+                                            child: Text(
+                                              text,
+                                              style: TextStyle(
+                                                color:
+                                                    theme.colorScheme.secondary,
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                          const Divider()
+                                        ],
                                       ),
-                                      const Divider()
-                                    ],
-                                  ),
-                                );
-                              }
-                              final message = element.message!;
-                              final settings =
-                                  locator<SettingsService>().settings;
-                              final swipeLeftToRightAction =
-                                  settings.swipeLeftToRightAction;
-                              final swipeRightToLeftAction =
-                                  settings.swipeRightToLeftAction;
-                              // print(
-                              //     '$index subject=${message.mimeMessage?.decodeSubject()}');
-                              return Dismissible(
-                                key: ValueKey(message),
-                                dismissThresholds: {
-                                  DismissDirection.startToEnd:
-                                      swipeLeftToRightAction.dismissThreshold,
-                                  DismissDirection.endToStart:
-                                      swipeRightToLeftAction.dismissThreshold,
-                                },
-                                background: Container(
-                                  color: swipeLeftToRightAction.colorBackground,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  alignment: AlignmentDirectional.centerStart,
-                                  child: Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8.0),
-                                        child: Text(
+                                    );
+                                  }
+                                  final message = element.message!;
+                                  // print(
+                                  //     '$index subject=${message.mimeMessage?.decodeSubject()}');
+                                  return Dismissible(
+                                    key: ValueKey(message),
+                                    dismissThresholds: {
+                                      DismissDirection.startToEnd:
                                           swipeLeftToRightAction
-                                              .name(localizations),
-                                          style: TextStyle(
-                                              color: swipeLeftToRightAction
-                                                  .colorForeground),
-                                        ),
-                                      ),
-                                      Icon(swipeLeftToRightAction.icon,
-                                          color:
-                                              swipeLeftToRightAction.colorIcon),
-                                    ],
-                                  ),
-                                ),
-                                secondaryBackground: Container(
-                                  color: swipeRightToLeftAction.colorBackground,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  alignment: AlignmentDirectional.centerEnd,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Icon(
-                                        swipeRightToLeftAction.icon,
-                                        color: swipeRightToLeftAction.colorIcon,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8.0),
-                                        child: Text(
+                                              .dismissThreshold,
+                                      DismissDirection.endToStart:
                                           swipeRightToLeftAction
-                                              .name(localizations),
-                                          style: TextStyle(
-                                              color: swipeRightToLeftAction
-                                                  .colorForeground),
-                                        ),
+                                              .dismissThreshold,
+                                    },
+                                    background: Container(
+                                      color: swipeLeftToRightAction
+                                          .colorBackground,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      alignment:
+                                          AlignmentDirectional.centerStart,
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text(
+                                              swipeLeftToRightAction
+                                                  .name(localizations),
+                                              style: TextStyle(
+                                                  color: swipeLeftToRightAction
+                                                      .colorForeground),
+                                            ),
+                                          ),
+                                          Icon(swipeLeftToRightAction.icon,
+                                              color: swipeLeftToRightAction
+                                                  .colorIcon),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                child: MessageOverview(
-                                  element.message!,
-                                  _isInSelectionMode,
-                                  onMessageTap,
-                                  onMessageLongPress,
-                                  isSentMessage: isSentFolder,
-                                ),
-                                onDismissed: (direction) {
-                                  final action =
-                                      (direction == DismissDirection.startToEnd)
+                                    ),
+                                    secondaryBackground: Container(
+                                      color: swipeRightToLeftAction
+                                          .colorBackground,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      alignment: AlignmentDirectional.centerEnd,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Icon(
+                                            swipeRightToLeftAction.icon,
+                                            color: swipeRightToLeftAction
+                                                .colorIcon,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text(
+                                              swipeRightToLeftAction
+                                                  .name(localizations),
+                                              style: TextStyle(
+                                                  color: swipeRightToLeftAction
+                                                      .colorForeground),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    child: MessageOverview(
+                                      message,
+                                      _isInSelectionMode,
+                                      onMessageTap,
+                                      onMessageLongPress,
+                                      isSentMessage: isSentFolder,
+                                    ),
+                                    confirmDismiss: (direction) {
+                                      final swipeAction = direction ==
+                                              DismissDirection.startToEnd
                                           ? swipeLeftToRightAction
                                           : swipeRightToLeftAction;
-                                  if (action.isMessageMoving) {
-                                    fireSwipeAction(action, message);
-                                  }
-                                },
-                                confirmDismiss: (direction) {
-                                  if (direction ==
-                                      DismissDirection.startToEnd) {
-                                    if (swipeLeftToRightAction
-                                        .isMessageMoving) {
-                                      return Future.value(true);
-                                    } else {
-                                      fireSwipeAction(
-                                          swipeLeftToRightAction, message);
-                                      return Future.value(false);
-                                    }
-                                  } else {
-                                    if (swipeRightToLeftAction
-                                        .isMessageMoving) {
-                                      return Future.value(true);
-                                    } else {
-                                      fireSwipeAction(
-                                          swipeRightToLeftAction, message);
-                                      return Future.value(false);
-                                    }
-                                  }
+                                      fireSwipeAction(swipeAction, message);
+                                      return Future.value(
+                                        swipeAction.isMessageMoving,
+                                      );
+                                    },
+                                  );
                                 },
                               );
                             },
@@ -856,12 +867,16 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
               arguments:
                   DisplayMessageArguments(_selectedMessages.first, true));
         }
+        endSelectionMode = false;
+        leaveSelectionMode();
         break;
       case _MultipleChoice.addNotification:
+        endSelectionMode = false;
         final notificationService = locator<NotificationService>();
         for (final message in _selectedMessages) {
           notificationService.sendLocalNotificationForMailMessage(message);
         }
+        leaveSelectionMode();
         break;
     }
     if (endSelectionMode) {
@@ -892,7 +907,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       if (!fromAddresses.contains(from)) {
         fromAddresses.add(from);
       }
-      var mime = message.mimeMessage!;
+      var mime = message.mimeMessage;
       final subject = mime.decodeSubject();
       if (subject?.isNotEmpty ?? false) {
         subjects.add(subject!.replaceAll('\r\n ', '').replaceAll('\n', ''));
@@ -919,7 +934,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   Future? addMessageAttachment(Message message, MessageBuilder builder) {
-    final mime = message.mimeMessage!;
+    final mime = message.mimeMessage;
     if (mime.mimeData == null) {
       return message.mailClient.fetchMessageContents(mime).then((value) {
         message.updateMime(value);
@@ -933,7 +948,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 
   Future? addAttachments(Message message, MessageBuilder builder) {
     final mailClient = message.mailClient;
-    var mime = message.mimeMessage!;
+    var mime = message.mimeMessage;
     Future? composeFuture;
     if (mime.mimeData == null) {
       composeFuture = mailClient.fetchMessageContents(mime).then((value) {
@@ -1030,11 +1045,11 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       }
       setState(() {});
     } else {
-      if (message.mimeMessage!.hasFlag(MessageFlags.draft)) {
+      if (message.mimeMessage.hasFlag(MessageFlags.draft)) {
         // continue to edit message:
         // first download message:
         final mime =
-            await message.mailClient.fetchMessageContents(message.mimeMessage!);
+            await message.mailClient.fetchMessageContents(message.mimeMessage);
         //message.updateMime(mime);
         final builder = MessageBuilder.prepareFromDraft(mime);
         final data = ComposeData([message], builder, ComposeAction.newMessage);
@@ -1065,28 +1080,27 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     });
   }
 
-  void fireSwipeAction(SwipeAction action, Message message) async {
+  Future<void> fireSwipeAction(SwipeAction action, Message message) {
     switch (action) {
       case SwipeAction.markRead:
         final isSeen = !message.isSeen;
         message.isSeen = isSeen;
-        await _sectionedMessageSource.messageSource.markAsSeen(message, isSeen);
-        break;
+        return _sectionedMessageSource.messageSource
+            .markAsSeen(message, isSeen);
       case SwipeAction.archive:
-        await _sectionedMessageSource.messageSource.archive(message);
-        break;
+        return _sectionedMessageSource.messageSource.archive(message);
       case SwipeAction.markJunk:
-        await _sectionedMessageSource.messageSource.markAsJunk(message);
-        break;
+        return _sectionedMessageSource.messageSource.markAsJunk(message);
       case SwipeAction.delete:
-        await _sectionedMessageSource.deleteMessage(message);
-        break;
+        return _sectionedMessageSource.deleteMessage(message);
       case SwipeAction.flag:
         final isFlagged = !message.isFlagged;
         message.isFlagged = isFlagged;
-        await message.mailClient
-            .flagMessage(message.mimeMessage!, isFlagged: isFlagged);
-        break;
+        return _sectionedMessageSource.messageSource.storeMessageFlags(
+          [message],
+          [MessageFlags.flagged],
+          action: isFlagged ? StoreAction.add : StoreAction.remove,
+        );
     }
   }
 
@@ -1156,11 +1170,11 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       final results =
           await widget.messageSource.deleteAllMessages(expunge: expunge);
       Function()? undo;
-      if (!expunge && results.any((result) => result.isUndoable)) {
+      if (!expunge && results.any((result) => result.canUndo)) {
         undo = () async {
           final futures = <Future>[];
           for (final result in results) {
-            if (result.isUndoable) {
+            if (result.canUndo) {
               futures.add(result.mailClient.undoDeleteMessages(result));
             }
           }
@@ -1269,20 +1283,6 @@ class _MessageOverviewState extends State<MessageOverview> {
 
   @override
   Widget build(BuildContext context) {
-    final mime = widget.message.mimeMessage;
-    if (mime == null) {
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: PlatformWidget(
-          material: (context, platform) => const ListTile(
-            title: Text('...'),
-            subtitle: Text('-'),
-          ),
-          cupertino: (context, platform) => const Text('...'),
-        ),
-      );
-    }
-
     return (widget.animationController != null)
         ? SizeTransition(
             sizeFactor: CurvedAnimation(

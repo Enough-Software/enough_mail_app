@@ -35,12 +35,12 @@ class _MessageStackState extends State<MessageStack> {
 
   @override
   void initState() {
-    _currentMessage = widget.messageSource!.getMessageAt(0);
-    _currentAngle = createAngle();
-    for (var i = 1; i < math.min(3, widget.messageSource!.size); i++) {
-      _nextMessages.add(widget.messageSource!.getMessageAt(i));
-      _nextAngles.add(createAngle());
-    }
+    // _currentMessage = widget.messageSource!.getMessageAt(0);
+    // _currentAngle = createAngle();
+    // for (var i = 1; i < math.min(3, widget.messageSource!.size); i++) {
+    //   _nextMessages.add(widget.messageSource!.getMessageAt(i));
+    //   _nextAngles.add(createAngle());
+    // }
     super.initState();
   }
 
@@ -55,8 +55,8 @@ class _MessageStackState extends State<MessageStack> {
         _nextMessages.removeAt(0);
         _nextAngles.removeAt(0);
         if (widget.messageSource!.size > _currentMessageIndex + 3) {
-          _nextMessages.add(
-              widget.messageSource!.getMessageAt(_currentMessageIndex + 3));
+          // _nextMessages.add(
+          //     widget.messageSource!.getMessageAt(_currentMessageIndex + 3));
           _nextAngles.add(createAngle());
         }
       }
@@ -69,8 +69,8 @@ class _MessageStackState extends State<MessageStack> {
         _nextMessages.insert(0, _currentMessage);
         _nextAngles.insert(0, createAngle());
         _currentMessageIndex--;
-        _currentMessage =
-            widget.messageSource!.getMessageAt(_currentMessageIndex);
+        // _currentMessage =
+        //     widget.messageSource!.getMessageAt(_currentMessageIndex);
       });
     }
   }
@@ -78,7 +78,7 @@ class _MessageStackState extends State<MessageStack> {
   @override
   Widget build(BuildContext context) {
     final quickReplies = ['OK', 'Thank you!', '👍', '😊'];
-    final dateTime = _currentMessage!.mimeMessage!.decodeDate();
+    final dateTime = _currentMessage!.mimeMessage.decodeDate();
     final dayName =
         dateTime == null ? '' : locator<I18nService>().formatDay(dateTime);
     return Stack(
@@ -191,7 +191,7 @@ class _MessageStackState extends State<MessageStack> {
       case DragAction.noted:
         if (!message.isSeen) {
           await message.mailClient
-              .flagMessage(message.mimeMessage!, isSeen: true);
+              .flagMessage(message.mimeMessage, isSeen: true);
           snack = 'mark as read';
         }
         break;
@@ -201,9 +201,9 @@ class _MessageStackState extends State<MessageStack> {
       case DragAction.delete:
         //TODO remove from message source
         await message.mailClient
-            .flagMessage(message.mimeMessage!, isDeleted: true);
+            .flagMessage(message.mimeMessage, isDeleted: true);
         snack = 'deleted';
-        undo = () => message.mailClient.flagMessage(message.mimeMessage!,
+        undo = () => message.mailClient.flagMessage(message.mimeMessage,
             isDeleted: false); //TODO add re-integration into message source
         break;
       case DragAction.reply:
@@ -434,7 +434,7 @@ class _MessageCardState extends State<MessageCard> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: widget.message!.mimeMessage!.isEmpty
+            child: widget.message!.mimeMessage.isEmpty
                 ? const Text('...')
                 : buildMessageContents(),
           ),
@@ -444,7 +444,7 @@ class _MessageCardState extends State<MessageCard> {
   }
 
   Widget buildMessageContents() {
-    final mime = widget.message!.mimeMessage!;
+    final mime = widget.message!.mimeMessage;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -482,7 +482,7 @@ class _MessageCardState extends State<MessageCard> {
   Widget buildContent() {
     //TODO do not download or display the content
     // when the widget is not exposed, unless the content is there already
-    if (!widget.message!.mimeMessage!.isDownloaded) {
+    if (!widget.message!.mimeMessage.isDownloaded) {
       return FutureBuilder(
           future: downloadMessageContents(widget.message!),
           builder: (context, snapshot) {
@@ -506,7 +506,7 @@ class _MessageCardState extends State<MessageCard> {
   Future<Message> downloadMessageContents(Message message) async {
     try {
       final mime =
-          await message.mailClient.fetchMessageContents(message.mimeMessage!);
+          await message.mailClient.fetchMessageContents(message.mimeMessage);
       message.updateMime(mime);
       if (mime.isNewsletter || mime.hasAttachments()) {
         setState(() {});
@@ -545,12 +545,12 @@ class _MessageCardState extends State<MessageCard> {
     //     onLinkTap: (url) => urlLauncher.launch(url),
     //   );
     // }
-    var text = widget.message?.mimeMessage?.decodeTextPlainPart();
+    var text = widget.message?.mimeMessage.decodeTextPlainPart();
     if (text != null) {
       return SelectableText(text);
     }
     //TODO add other content, attachments, etc
     return Text(
-        'Unsupported content: ${widget.message?.mimeMessage?.mediaType.text}');
+        'Unsupported content: ${widget.message?.mimeMessage.mediaType.text}');
   }
 }

@@ -4,7 +4,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 
 class LocalizedDialogHelper {
   LocalizedDialogHelper._();
@@ -23,20 +23,20 @@ class LocalizedDialogHelper {
         TextButton(
           child: ButtonText(localizations.feedbackActionSuggestFeature),
           onPressed: () async {
-            await launcher.launch('https://maily.userecho.com/');
+            await launcher.launchUrl(Uri.parse('https://maily.userecho.com/'));
           },
         ),
         TextButton(
           child: ButtonText(localizations.feedbackActionReportProblem),
           onPressed: () async {
-            await launcher.launch('https://maily.userecho.com/');
+            await launcher.launchUrl(Uri.parse('https://maily.userecho.com/'));
           },
         ),
         TextButton(
           child: ButtonText(localizations.feedbackActionHelpDeveloping),
           onPressed: () async {
-            await launcher
-                .launch('https://github.com/Enough-Software/enough_mail_app');
+            await launcher.launchUrl(Uri.parse(
+                'https://github.com/Enough-Software/enough_mail_app'));
           },
         ),
         const Legalese(),

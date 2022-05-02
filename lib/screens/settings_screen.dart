@@ -3,7 +3,7 @@ import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 import '../routes.dart';
 import 'base.dart';

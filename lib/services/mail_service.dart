@@ -4,11 +4,11 @@ import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/message_source.dart';
-import 'package:enough_mail_app/models/mime_source.dart';
 import 'package:enough_mail_app/models/sender.dart';
 import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/gravatar.dart';
@@ -17,11 +17,11 @@ import 'package:enough_serialization/enough_serialization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter/foundation.dart' as foundation;
+import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
+import '../models/async_mime_source.dart';
 
-class MailService {
+class MailService implements MimeSourceSubscriber {
   static const _clientId = Id(name: 'Maily', version: '1.0');
   MessageSource? messageSource;
   Account? _currentAccount;
@@ -167,7 +167,14 @@ class MailService {
     } else {
       final mailClient = await _getClientAndStopPolling(account);
       if (mailClient != null) {
-        return MailboxMessageSource(mailbox, mailClient);
+        mailbox ??= await mailClient.selectInbox();
+        final source = AsyncMailboxMimeSource(mailbox, mailClient)
+          ..addSubscriber(this);
+        return MailboxMessageSource.fromMimeSource(
+          source,
+          mailClient.account.email!,
+          mailbox.name,
+        );
       }
       final accountWithErrors = _accountsWithErrors ?? <Account>[];
       if (!accountWithErrors.contains(account)) {
@@ -178,48 +185,59 @@ class MailService {
     }
   }
 
-  Future<List<MimeSource>> _getUnifiedMimeSources(
+  Future<List<AsyncMimeSource>> _getUnifiedMimeSources(
       Mailbox? mailbox, UnifiedAccount unifiedAccount) async {
-    final futures = <Future<MailClient?>>[];
-    final mimeSources = <MimeSource>[];
-    final flag = mailbox?.flags.first;
-    for (final subAccount in unifiedAccount.accounts) {
-      futures.add(_getClientAndStopPolling(subAccount));
-    }
-    final clients = await Future.wait(futures);
-    for (var i = 0; i < clients.length; i++) {
-      final client = clients[i];
-      if (client != null) {
-        Mailbox? accountMailbox;
-        if (flag != null) {
-          accountMailbox = client.getMailbox(flag);
-          if (accountMailbox == null) {
-            if (client.isConnected) {
-              await client.listMailboxes();
-              accountMailbox = client.getMailbox(flag);
-            }
-            if (accountMailbox == null) {
-              if (kDebugMode) {
-                print(
-                    'unable to find mailbox with $flag in account ${client.account.name}');
-              }
-              continue;
-            }
-          }
-        }
-        mimeSources.add(MailboxMimeSource(client, accountMailbox));
-      } else {
+    Future<AsyncMailboxMimeSource?> __selectMailbox(
+        MailboxFlag flag, Account account) async {
+      final client = await _getClientAndStopPolling(account);
+      if (client == null) {
         _accountsWithErrors ??= <Account>[];
-        _accountsWithErrors!.add(unifiedAccount.accounts[i]);
+        _accountsWithErrors!.add(account);
+        return null;
       }
+      Mailbox? accountMailbox = client.getMailbox(flag);
+      if (accountMailbox == null) {
+        if (client.isConnected) {
+          await client.listMailboxes();
+          accountMailbox = client.getMailbox(flag);
+        }
+        if (accountMailbox == null) {
+          if (kDebugMode) {
+            print(
+                'unable to find mailbox with $flag in account ${client.account.name}');
+          }
+          return null;
+        }
+      }
+      await client.selectMailbox(accountMailbox);
+      accountsWithErrors.remove(account);
+      return AsyncMailboxMimeSource(accountMailbox, client)
+        ..addSubscriber(this);
     }
-    return mimeSources;
+
+    Future<List<AsyncMimeSource>> __resolveFutures(
+        List<Future<AsyncMimeSource?>> unresolvedFutures) async {
+      final results = await Future.wait(unresolvedFutures);
+      final mimeSources =
+          List<AsyncMimeSource>.from(results.where((source) => source != null));
+      return mimeSources;
+    }
+
+    final futures = <Future<AsyncMimeSource?>>[];
+    final flag = mailbox?.flags.first ?? MailboxFlag.inbox;
+    for (final subAccount in unifiedAccount.accounts) {
+      futures.add(__selectMailbox(flag, subAccount));
+    }
+    return __resolveFutures(futures);
   }
 
   Future<MailClient?> _getClientAndStopPolling(Account account) async {
     try {
       final client = await getClientFor(account);
       await client.stopPollingIfNeeded();
+      if (!client.isConnected) {
+        await client.connect();
+      }
       return client;
     } catch (e, s) {
       if (kDebugMode) {
@@ -612,7 +630,7 @@ class MailService {
   }
 
   MailClient createMailClient(MailAccount mailAccount) {
-    bool isLogEnabled = foundation.kDebugMode ||
+    bool isLogEnabled = kDebugMode ||
         (mailAccount.attributes[Account.attributeEnableLogging] ?? false);
     return MailClient(
       mailAccount,
@@ -720,5 +738,33 @@ class MailService {
   bool hasAccountsWithErrors() {
     final accts = _accountsWithErrors;
     return accts != null && accts.isNotEmpty;
+  }
+
+  @override
+  void onMailArrived(MimeMessage mime, AsyncMimeSource source,
+      {int index = 0}) {
+    source.mailClient.lowLevelIncomingMailClient
+        .logApp('new message: ${mime.decodeSubject()}');
+    if (!mime.isSeen) {
+      locator<NotificationService>()
+          .sendLocalNotificationForMail(mime, source.mailClient);
+    }
+  }
+
+  @override
+  void onMailCacheInvalidated(AsyncMimeSource source) {
+    // ignore
+  }
+
+  @override
+  void onMailFlagsUpdated(MimeMessage mime, AsyncMimeSource source) {
+    if (mime.isSeen) {
+      locator<NotificationService>().cancelNotificationForMail(mime);
+    }
+  }
+
+  @override
+  void onMailVanished(MimeMessage mime, AsyncMimeSource source) {
+    locator<NotificationService>().cancelNotificationForMail(mime);
   }
 }

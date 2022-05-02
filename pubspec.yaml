@@ -15,7 +15,7 @@ publish_to: "none"
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+75
+version: 1.0.0+81
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -55,6 +55,9 @@ dependencies:
   enough_giphy_flutter:
     git:
       url: https://github.com/Enough-Software/enough_giphy_flutter.git
+  enough_platform_widgets: #^0.3.0
+    git:
+      url: https://github.com/Enough-Software/enough_platform_widgets.git
   event_bus: ^2.0.0
   intl: ^0.17.0
   flutter_secure_storage: ^5.0.2
@@ -79,10 +82,6 @@ dependencies:
   shimmer_animation: ^2.1.0+1
   badges: ^2.0.2
   community_material_icon: ^5.9.55
-  enough_platform_widgets: #^0.3.0
-    git:
-      url: https://github.com/Enough-Software/enough_platform_widgets.git
-    # path: ../enough_platform_widgets
   collection: ^1.15.0
   modal_bottom_sheet: ^2.0.0
   # snapping_sheet: ^3.1.0

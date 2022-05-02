@@ -1,4 +1,5 @@
 {
+  "_notUsed": "cSpell:disable",
   "signature": "Mit Maily gesendet",
   "actionCancel": "Abbrechen",
   "actionOk": "OK",
@@ -248,7 +249,7 @@
   "addAccountOauthSignIn": "Mit {provider} einloggen",
   "addAccountOauthSignInGoogle": "Mit Google einloggen",
   "addAccountOauthSignInWithAppPassword": "Oder erstelle ein Applikations-Passwort:",
-  "accountAddImapAccessSetuptMightBeRequired": "Vielleicht musst Du bei deinem Anbieter den Zugang für E-Mail Apps aktivieren.",
+  "accountAddImapAccessSetupMightBeRequired": "Vielleicht musst Du bei deinem Anbieter den Zugang für E-Mail Apps aktivieren.",
   "addAccountSetupImapAccessButtonLabel": "E-Mail Zugang aktivieren",
   "addAccountNameOfUserLabel": "Dein Name",
   "addAccountNameOfUserHint": "Name, den Empfänger:innen sehen",

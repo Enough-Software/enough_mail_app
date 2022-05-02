@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbols.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:intl/date_symbol_data_local.dart' as date_intl;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.g.dart';
 import 'package:intl/intl.dart';
 
 class I18nService {

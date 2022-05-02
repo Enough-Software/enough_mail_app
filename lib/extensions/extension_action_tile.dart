@@ -6,7 +6,7 @@ import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher.dart' hide WebViewConfiguration;
 
 import '../locator.dart';
 import '../routes.dart';
@@ -75,7 +75,7 @@ class ExtensionActionTile extends StatelessWidget {
             );
             break;
           case AppExtensionActionMechanism.external:
-            launch(url);
+            launchUrl(Uri.parse(url));
             break;
         }
       },

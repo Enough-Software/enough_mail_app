@@ -160,6 +160,7 @@ class BackgroundService {
     // List<MailNotificationPayload> activeNotifications,
   ) async {
     try {
+      print('${account.name} A: background fetch connecting');
       final mailClient = await mailService.connect(account);
       if (mailClient == null) {
         return;

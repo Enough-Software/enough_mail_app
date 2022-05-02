@@ -44,10 +44,14 @@ class TextWithLinks extends StatelessWidget {
       final urlText =
           endsWithDot ? group.substring(0, group.length - 1) : group;
       final url = !group.startsWith(schemeRegEx) ? 'https://$urlText' : urlText;
-      spans.add(TextSpan(
+      spans.add(
+        TextSpan(
           text: urlText,
           style: linkStyle,
-          recognizer: TapGestureRecognizer()..onTap = () => launch(url)));
+          recognizer: TapGestureRecognizer()
+            ..onTap = () => launchUrl(Uri.parse(url)),
+        ),
+      );
       end = endsWithDot ? match.end - 1 : match.end;
     }
     if (end < text.length) {
@@ -93,7 +97,7 @@ class TextWithNamedLinks extends StatelessWidget {
                 if (callback != null) {
                   callback();
                 } else {
-                  launch(url!);
+                  launchUrl(Uri.parse(url!));
                 }
               },
           ),

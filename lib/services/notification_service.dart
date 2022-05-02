@@ -22,7 +22,7 @@ class NotificationService {
       {bool checkForLaunchDetails = true}) async {
     // print('init notification service...');
     // set up local notifications:
-    // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    // initialize the plugin. app_icon needs to be a added as a drawable resource to the Android head project
     if (defaultTargetPlatform == TargetPlatform.windows) {
       // Windows is not yet supported:
       return NotificationServiceInitResult.normal;
@@ -128,7 +128,7 @@ class NotificationService {
 
   Future sendLocalNotificationForMailMessage(maily.Message message) {
     return sendLocalNotificationForMail(
-        message.mimeMessage!, message.mailClient);
+        message.mimeMessage, message.mailClient);
   }
 
   Future sendLocalNotificationForMail(
@@ -197,12 +197,14 @@ class NotificationService {
   }
 
   void cancelNotificationForMailMessage(maily.Message message) {
-    cancelNotificationForMail(message.mimeMessage!, message.mailClient);
+    cancelNotificationForMail(message.mimeMessage);
   }
 
-  void cancelNotificationForMail(
-      MimeMessage mimeMessage, MailClient mailClient) {
-    cancelNotification(mimeMessage.guid!);
+  void cancelNotificationForMail(MimeMessage mimeMessage) {
+    final guid = mimeMessage.guid;
+    if (guid != null) {
+      cancelNotification(guid);
+    }
   }
 
   // void cancelNotificationForUid(int uid, MailClient mailClient) {
@@ -210,7 +212,9 @@ class NotificationService {
   // }
 
   void cancelNotification(int id) {
-    _flutterLocalNotificationsPlugin.cancel(id);
+    if (defaultTargetPlatform != TargetPlatform.windows) {
+      _flutterLocalNotificationsPlugin.cancel(id);
+    }
   }
 }
 

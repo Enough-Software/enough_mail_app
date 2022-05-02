@@ -1,7 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/message_cache.dart';
-import 'package:enough_mail_app/models/mime_source.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
@@ -9,7 +7,9 @@ import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:collection/collection.dart' show IterableExtension;
+import '../util/indexed_cache.dart';
 import 'account.dart';
+import 'async_mime_source.dart';
 import 'message.dart';
 
 abstract class MessageSource extends ChangeNotifier
@@ -24,7 +24,7 @@ abstract class MessageSource extends ChangeNotifier
 
   int get size;
   bool get isEmpty => (size == 0);
-  final cache = MessageCache();
+  final cache = IndexedCache<Message>();
   String? _description;
   set description(String? value) {
     _description = value;
@@ -59,9 +59,7 @@ abstract class MessageSource extends ChangeNotifier
   bool get supportsMessageFolders;
   bool get supportsSearching;
 
-  Future<bool> init();
-
-  Future<void> waitForDownload();
+  Future<void> init();
 
   /// Deletes all messages
   ///
@@ -71,51 +69,58 @@ abstract class MessageSource extends ChangeNotifier
   /// Marks all messages as seen (read) `true` or unseen (unread) when `false` is given
   ///
   /// Only available when `supportsDeleteAll` is `true`
-  /// Returns `true` when the call succeeded
-  Future<bool> markAllMessagesSeen(bool seen);
+  Future<void> markAllMessagesSeen(bool seen);
 
-  Future<Message> waitForMessageAt(int index) async {
-    var message = getMessageAt(index);
-    if (message.mimeMessage?.envelope == null) {
-      await waitForDownload();
-    }
-    return message;
-  }
-
-  Message? _getUncachedMessage(int index);
-
-  Message getMessageAt(int index) {
+  /// Retrieves the message for the given [index]
+  Future<Message> getMessageAt(int index) async {
     var message = cache[index];
     if (message == null) {
-      message = _getUncachedMessage(index)!;
-      cache.add(message);
+      message = await loadMessage(index);
+      cache[index] = message;
     }
     return message;
   }
 
-  Message? next(Message current) {
+  /// Loads the message for the given [index]
+  Future<Message> loadMessage(int index);
+
+  Future<Message?> next(Message current) {
+    if (current.sourceIndex >= size - 1) {
+      return Future.value();
+    }
     return getMessageAt(current.sourceIndex + 1);
   }
 
-  Message? previous(Message current) {
+  Future<Message?> previous(Message current) {
+    if (current.sourceIndex == 0) {
+      return Future.value();
+    }
     return getMessageAt(current.sourceIndex - 1);
   }
 
-  MimeSource? getMimeSource(Message message);
+  AsyncMimeSource? getMimeSource(Message message);
 
-  void remove(Message message) {
-    final mimeSource = getMimeSource(message)!;
-    mimeSource.remove(message.mimeMessage);
-    cache.remove(message);
-    if (_parentMessageSource != null) {
-      _parentMessageSource!
-          .removeMime(message.mimeMessage!, message.mailClient);
+  /// Removes the given message from the internally used cache
+  bool removeFromCache(Message message, {bool notify = true}) {
+    final removed = cache.remove(message);
+    if (removed) {
+      final sourceIndex = message.sourceIndex;
+      cache.forEachWhere(
+          (msg) => msg.sourceIndex > sourceIndex, (msg) => msg.sourceIndex--);
     }
-    notifyListeners();
+    final parent = _parentMessageSource;
+    if (parent != null) {
+      final mime = message.mimeMessage;
+      parent.removeMime(mime, message.mailClient);
+    }
+    if (removed && notify) {
+      notifyListeners();
+    }
+    return removed;
   }
 
   @override
-  void onMailFlagsUpdated(MimeMessage mime, MimeSource source) {
+  void onMailFlagsUpdated(MimeMessage mime, AsyncMimeSource source) {
     final message = cache.getWithMime(mime, source.mailClient);
     if (message != null) {
       message.updateFlags(mime.flags);
@@ -123,67 +128,72 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   @override
-  void onMailLoaded(MimeMessage mime, int mimeSourceIndex, MimeSource source) {
-    // problem: mimeSourceIndex != sourceIndex when there are several sources
-    final message =
-        cache.getWithMimeSourceIndex(mimeSourceIndex, source.mailClient);
-
-    if (message != null) {
-      message.updateMime(mime);
-      // } else {
-      //   print(
-      //       'onMailLoaded: message not found for mime ${source.isSequenceIdBased ? 'ID' : 'UID'} ${source.isSequenceIdBased ? mime.sequenceId : mime.uid}');
-    }
-  }
-
-  @override
-  void onMailVanished(MimeMessage mime, MimeSource source) {
+  void onMailVanished(MimeMessage mime, AsyncMimeSource source) {
     final message = cache.getWithMime(mime, source.mailClient);
+
     if (message != null) {
-      remove(message);
+      removeFromCache(message);
     }
   }
 
   @override
-  void onMailAdded(MimeMessage mime, MimeSource source) {
+  void onMailArrived(MimeMessage mime, AsyncMimeSource source,
+      {int index = 0}) {
     // the source index is 0 since this is the new first message:
-    final message = Message(mime, source.mailClient, this, 0);
-    cache.insert(message);
-    if (kDebugMode) {
-      print('onMailAdded: ${mime.decodeSubject()}');
-    }
+    final message = Message(mime, source.mailClient, this, index);
+    insertIntoCache(index, message);
     notifyListeners();
   }
 
+  /// Inserts the [message] at the given [index].
+  void insertIntoCache(int index, Message message) {
+    message.mailClient.lowLevelIncomingMailClient
+        .logApp('cache[$index]=${message.mimeMessage.decodeSubject()}');
+    cache.insert(index, message);
+  }
+
+  /// Deletes the given message
+  ///
+  /// Just forwards to [deleteMessages]
+  @Deprecated('use deleteMessages instead')
   Future<void> deleteMessage(Message message) {
     return deleteMessages(
         [message], locator<I18nService>().localizations.resultDeleted);
   }
 
-  Future<void> deleteMessages(
-      List<Message> messages, String notification) async {
+  /// Deletes the given messages
+  Future<void> deleteMessages(List<Message> messages, String notification) {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
-      _removeMessageAndCancelNotification(message, notificationService);
+      _removeMessageFromCacheAndCancelNotification(
+        message,
+        notificationService,
+        notify: false,
+      );
     }
     notifyListeners();
-    final sequenceByClient = orderByClient(messages);
-    final resultsByClient = <MailClient, DeleteResult>{};
-    for (final client in sequenceByClient.keys) {
-      final sequence = sequenceByClient[client]!;
-      final deleteResult = await client.deleteMessages(sequence);
-      if (deleteResult.isUndoable) {
-        resultsByClient[client] = deleteResult;
+    return _deleteMessages(messages, notification);
+  }
+
+  Future<void> _deleteMessages(
+      List<Message> messages, String notification) async {
+    final sequenceBySource = orderByMimeSource(messages);
+    final resultsBySource = <AsyncMimeSource, DeleteResult>{};
+    for (final source in sequenceBySource.keys) {
+      final mimes = sequenceBySource[source]!;
+      final deleteResult = await source.deleteMessages(mimes);
+      if (deleteResult.canUndo) {
+        resultsBySource[source] = deleteResult;
       }
     }
     locator<ScaffoldMessengerService>().showTextSnackBar(
       notification,
-      undo: resultsByClient.isEmpty
+      undo: resultsBySource.isEmpty
           ? null
           : () async {
-              for (final client in resultsByClient.keys) {
+              for (final source in resultsBySource.keys) {
                 final undelete =
-                    await client.undoDeleteMessages(resultsByClient[client]!);
+                    await source.undoDeleteMessages(resultsBySource[source]!);
                 final targetSequence = undelete.targetSequence;
                 if (undelete.originalSequence.isNotEmpty &&
                     targetSequence != null) {
@@ -192,16 +202,16 @@ abstract class MessageSource extends ChangeNotifier
                   for (var i = 0; i < originalUids.length; i++) {
                     final originalUid = originalUids[i];
                     final message = messages.firstWhereOrNull(
-                        (m) => m.mimeMessage?.uid == originalUid);
+                        (m) => m.mimeMessage.uid == originalUid);
                     if (message != null) {
-                      message.mimeMessage!.uid = newUids[i];
+                      message.mimeMessage.uid = newUids[i];
                     }
                   }
                 }
               }
-              // TODO what should I do when not all delete are undoable?
+              // TODO what should I do when not all delete ops are undoable?
               for (final message in messages) {
-                cache.insert(message);
+                insertIntoCache(0, message);
               }
               notifyListeners();
             },
@@ -226,62 +236,73 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> moveMessage(
       Message message, Mailbox targetMailbox, String notification) async {
-    _removeMessageAndCancelNotification(
-        message, locator<NotificationService>());
+    _removeMessageFromCacheAndCancelNotification(
+      message,
+      locator<NotificationService>(),
+      notify: false,
+    );
     final moveResult = await message.mailClient
-        .moveMessage(message.mimeMessage!, targetMailbox);
-    if (moveResult.isUndoable) {
+        .moveMessage(message.mimeMessage, targetMailbox);
+    notifyListeners();
+    if (moveResult.canUndo) {
       locator<ScaffoldMessengerService>().showTextSnackBar(
         notification,
         undo: () async {
           final undoResponse =
               await message.mailClient.undoMoveMessages(moveResult);
           if (undoResponse.targetSequence?.isNotEmpty == true) {
-            message.mimeMessage!.uid =
+            message.mimeMessage.uid =
                 undoResponse.targetSequence!.toList().first;
           }
-          cache.insert(message);
+          insertIntoCache(0, message);
           notifyListeners();
         },
       );
     }
   }
 
-  void _removeMessageAndCancelNotification(
-      Message message, NotificationService notificationService) {
-    remove(message);
+  void _removeMessageFromCacheAndCancelNotification(
+    Message message,
+    NotificationService notificationService, {
+    bool notify = true,
+  }) {
     notificationService.cancelNotificationForMailMessage(message);
+    removeFromCache(message, notify: notify);
   }
 
   Future<void> moveMessagesToFlag(List<Message> messages,
       MailboxFlag targetMailboxFlag, String notification) async {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
-      _removeMessageAndCancelNotification(message, notificationService);
+      _removeMessageFromCacheAndCancelNotification(
+        message,
+        notificationService,
+        notify: false,
+      );
     }
-    notifyListeners();
-    final sequenceByClient = orderByClient(messages);
-    final resultsByClient = <MailClient, MoveResult>{};
-    for (final client in sequenceByClient.keys) {
-      final sequence = sequenceByClient[client]!;
+    final messagesBySource = orderByMimeSource(messages);
+    final resultsBySource = <AsyncMimeSource, MoveResult>{};
+    for (final source in messagesBySource.keys) {
+      final messages = messagesBySource[source]!;
       final moveResult =
-          await client.moveMessagesToFlag(sequence, targetMailboxFlag);
-      if (moveResult.isUndoable) {
-        resultsByClient[client] = moveResult;
+          await source.moveMessagesToFlag(messages, targetMailboxFlag);
+      if (moveResult.canUndo) {
+        resultsBySource[source] = moveResult;
       }
     }
-    if (resultsByClient.isNotEmpty) {
+    notifyListeners();
+    if (resultsBySource.isNotEmpty) {
       locator<ScaffoldMessengerService>().showTextSnackBar(
         notification,
         undo: () async {
-          for (final client in resultsByClient.keys) {
-            await client.undoMoveMessages(resultsByClient[client]!);
+          for (final source in resultsBySource.keys) {
+            await source.undoMoveMessages(resultsBySource[source]!);
           }
           //TODO update mimeMessage's UID and sequence ID?
           // TODO add mime message to mime source again?
           // TODO what should I do when not all delete are undoable?
           for (final message in messages) {
-            cache.insert(message);
+            insertIntoCache(0, message);
           }
           notifyListeners();
         },
@@ -293,28 +314,36 @@ abstract class MessageSource extends ChangeNotifier
       String notification) async {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
-      _removeMessageAndCancelNotification(message, notificationService);
+      _removeMessageFromCacheAndCancelNotification(
+        message,
+        notificationService,
+        notify: false,
+      );
     }
-    notifyListeners();
-    final mailClient = messages.first.mailClient;
-    final uids = messages.map((message) => message.mimeMessage!.uid).toList();
-    final sequence = MessageSequence.fromIds(uids as List<int>, isUid: true);
-    final moveResult = await mailClient.moveMessages(sequence, targetMailbox);
-    locator<ScaffoldMessengerService>().showTextSnackBar(
-      notification,
-      undo: moveResult.isUndoable
-          ? () async {
-              await mailClient.undoMoveMessages(moveResult);
-              //TODO update mimeMessage's UID and sequence ID?
-              // TODO add mime message to mime source again?
-              // TODO what should I do when not all delete are undoable?
-              for (final message in messages) {
-                cache.insert(message);
+    final source = getMimeSource(messages.first);
+    final parent = _parentMessageSource;
+    if (source != null) {
+      final mimes = messages.map((m) => m.mimeMessage).toList();
+      final moveResult = await source.moveMessages(mimes, targetMailbox);
+      notifyListeners();
+      locator<ScaffoldMessengerService>().showTextSnackBar(
+        notification,
+        undo: moveResult.canUndo
+            ? () async {
+                await source.undoMoveMessages(moveResult);
+                //TODO update mimeMessage's UID and sequence ID?
+                // TODO add mime message to mime source again?
+                // TODO what should I do when not all delete are undoable?
+                for (final message in messages) {
+                  insertIntoCache(0, message);
+                }
+                notifyListeners();
               }
-              notifyListeners();
-            }
-          : null,
-    );
+            : null,
+      );
+    } else if (parent != null) {
+      return parent.moveMessages(messages, targetMailbox, notification);
+    }
   }
 
   Future<void> moveToInbox(Message message) async {
@@ -328,11 +357,22 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> markAsSeen(Message msg, bool isSeen) {
-    onMarkedAsSeen(msg, isSeen);
-    if (isSeen) {
-      locator<NotificationService>().cancelNotificationForMailMessage(msg);
+    final source = getMimeSource(msg);
+    if (source != null) {
+      onMarkedAsSeen(msg, isSeen);
+      if (isSeen) {
+        locator<NotificationService>().cancelNotificationForMailMessage(msg);
+      }
+      return source.store([msg.mimeMessage], [MessageFlags.seen]);
     }
-    return msg.mailClient.flagMessage(msg.mimeMessage!, isSeen: isSeen);
+    msg.isSeen = isSeen;
+    final parent = _parentMessageSource;
+    final parentMsg =
+        parent?.cache.getWithMime(msg.mimeMessage, msg.mailClient);
+    if (parent != null && parentMsg != null) {
+      return parent.markAsSeen(parentMsg, isSeen);
+    }
+    return msg.mailClient.flagMessage(msg.mimeMessage, isSeen: isSeen);
   }
 
   void onMarkedAsSeen(Message msg, bool isSeen) {
@@ -340,7 +380,7 @@ abstract class MessageSource extends ChangeNotifier
     final parent = _parentMessageSource;
     if (parent != null) {
       final parentMsg =
-          parent.cache.getWithMime(msg.mimeMessage!, msg.mailClient);
+          parent.cache.getWithMime(msg.mimeMessage, msg.mailClient);
       if (parentMsg != null) {
         parent.onMarkedAsSeen(parentMsg, isSeen);
       }
@@ -349,7 +389,7 @@ abstract class MessageSource extends ChangeNotifier
 
   Future<void> markAsFlagged(Message msg, bool isFlagged) {
     onMarkedAsFlagged(msg, isFlagged);
-    return msg.mailClient.flagMessage(msg.mimeMessage!, isFlagged: isFlagged);
+    return msg.mailClient.flagMessage(msg.mimeMessage, isFlagged: isFlagged);
   }
 
   void onMarkedAsFlagged(Message msg, bool isFlagged) {
@@ -357,7 +397,7 @@ abstract class MessageSource extends ChangeNotifier
     final parent = _parentMessageSource;
     if (parent != null) {
       final parentMsg =
-          parent.cache.getWithMime(msg.mimeMessage!, msg.mailClient);
+          parent.cache.getWithMime(msg.mimeMessage, msg.mailClient);
       if (parentMsg != null) {
         parent.onMarkedAsFlagged(parentMsg, isFlagged);
       }
@@ -372,39 +412,63 @@ abstract class MessageSource extends ChangeNotifier
         notificationService.cancelNotificationForMailMessage(msg);
       }
     }
-    return storeMessageFlags(messages, MessageFlags.seen,
-        isSeen ? StoreAction.add : StoreAction.remove);
+    return storeMessageFlags(messages, [MessageFlags.seen],
+        action: isSeen ? StoreAction.add : StoreAction.remove);
   }
 
   Future<void> markMessagesAsFlagged(List<Message> messages, bool flagged) {
     for (final msg in messages) {
       msg.isFlagged = flagged;
     }
-    return storeMessageFlags(messages, MessageFlags.flagged,
-        flagged ? StoreAction.add : StoreAction.remove);
+    return storeMessageFlags(messages, [MessageFlags.flagged],
+        action: flagged ? StoreAction.add : StoreAction.remove);
   }
 
-  Map<MailClient, MessageSequence> orderByClient(List<Message?> messages) {
-    final sequenceByClient = <MailClient, MessageSequence>{};
-    for (final msg in messages) {
-      final client = msg!.mailClient;
-      if (sequenceByClient.containsKey(client)) {
-        sequenceByClient[client]!.addMessage(msg.mimeMessage!);
+  Map<AsyncMimeSource, List<MimeMessage>> orderByMimeSource(
+      List<Message> messages) {
+    final mimesBySource = <AsyncMimeSource, List<MimeMessage>>{};
+    for (final message in messages) {
+      final source = getMimeSource(message);
+      if (source == null) {
+        if (kDebugMode) {
+          print(
+              'unable to locate mime-source for message ${message.mimeMessage}');
+        }
+        continue;
+      }
+      final existingMessages = mimesBySource[source];
+      if (existingMessages != null) {
+        existingMessages.add(message.mimeMessage);
       } else {
-        sequenceByClient[client] =
-            MessageSequence.fromMessage(msg.mimeMessage!);
+        mimesBySource[source] = [message.mimeMessage];
       }
     }
-    return sequenceByClient;
+    return mimesBySource;
   }
 
-  Future<void> storeMessageFlags(
-      List<Message> messages, String flag, StoreAction action) async {
-    final sequenceByClient = orderByClient(messages);
-    for (final client in sequenceByClient.keys) {
-      final sequence = sequenceByClient[client]!;
-      await client.store(sequence, [flag], action: action);
+  // Map<MailClient, MessageSequence> orderByClient(List<Message?> messages) {
+  //   final sequenceByClient = <MailClient, MessageSequence>{};
+  //   for (final msg in messages) {
+  //     final client = msg!.mailClient;
+  //     if (sequenceByClient.containsKey(client)) {
+  //       sequenceByClient[client]!.addMessage(msg.mimeMessage);
+  //     } else {
+  //       sequenceByClient[client] = MessageSequence.fromMessage(msg.mimeMessage);
+  //     }
+  //   }
+  //   return sequenceByClient;
+  // }
+
+  Future<void> storeMessageFlags(List<Message> messages, List<String> flags,
+      {StoreAction action = StoreAction.add}) {
+    final messagesBySource = orderByMimeSource(messages);
+    final futures = <Future<void>>[];
+    for (final source in messagesBySource.keys) {
+      final messages = messagesBySource[source]!;
+      final future = source.store(messages, flags, action: action);
+      futures.add(future);
     }
+    return Future.wait(futures);
   }
 
   MessageSource search(MailSearch search);
@@ -412,16 +476,15 @@ abstract class MessageSource extends ChangeNotifier
   void removeMime(MimeMessage mimeMessage, MailClient mailClient) {
     final existingMessage = cache.getWithMime(mimeMessage, mailClient);
     if (existingMessage != null) {
-      remove(existingMessage);
+      removeFromCache(existingMessage);
     }
   }
 
-  Future<bool> refresh() async {
+  Future<void> refresh() async {
     clear();
     cache.clear();
-    final result = await init();
+    await init();
     notifyListeners();
-    return result;
   }
 
   void clear();
@@ -435,15 +498,11 @@ abstract class MessageSource extends ChangeNotifier
 }
 
 class MailboxMessageSource extends MessageSource {
-  @override
-  int get size => _mimeSource.size;
-
-  late MimeSource _mimeSource;
-
-  MailboxMessageSource(Mailbox? mailbox, MailClient mailClient) {
-    _mimeSource = MailboxMimeSource(mailClient, mailbox, subscriber: this);
+  MailboxMessageSource._(Mailbox mailbox, MailClient mailClient) {
+    _mimeSource = AsyncMailboxMimeSource(mailbox, mailClient)
+      ..addSubscriber(this);
     _description = mailClient.account.email;
-    _name = mailbox?.name;
+    _name = mailbox.name;
   }
 
   MailboxMessageSource.fromMimeSource(
@@ -456,6 +515,11 @@ class MailboxMessageSource extends MessageSource {
   }
 
   @override
+  int get size => _mimeSource.size;
+
+  late AsyncMimeSource _mimeSource;
+
+  @override
   void dispose() {
     _mimeSource.removeSubscriber(this);
     _mimeSource.dispose();
@@ -463,32 +527,22 @@ class MailboxMessageSource extends MessageSource {
   }
 
   @override
-  Message _getUncachedMessage(int index) {
+  Future<Message> loadMessage(int index) async {
     //print('get uncached $index');
-    final mime = _mimeSource.getMessageAt(index);
+    final mime = await _mimeSource.getMessage(index);
     return Message(mime, _mimeSource.mailClient, this, index);
   }
 
   @override
-  Future<bool> init() async {
-    final result = await _mimeSource.init();
+  Future<void> init() async {
+    await _mimeSource.init();
     name ??= _mimeSource.name;
     supportsDeleteAll = _mimeSource.supportsDeleteAll;
-    return result;
-  }
-
-  @override
-  Future<void> waitForDownload() {
-    final future = _mimeSource.downloadFuture;
-    if (future != null) {
-      return future;
-    }
-    return Future.value();
   }
 
   @override
   Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) async {
-    final removedMessages = cache.allMessages.toList();
+    final removedMessages = cache.getAllCachedEntries();
     cache.clear();
     final futureResults = _mimeSource.deleteAllMessages(expunge: expunge);
     clear();
@@ -498,9 +552,7 @@ class MailboxMessageSource extends MessageSource {
     if (parent != null) {
       for (final removedMessage in removedMessages) {
         final mime = removedMessage.mimeMessage;
-        if (mime != null) {
-          parent.removeMime(mime, removedMessage.mailClient);
-        }
+        parent.removeMime(mime, removedMessage.mailClient);
       }
     }
     return results;
@@ -509,8 +561,8 @@ class MailboxMessageSource extends MessageSource {
   @override
   Future<bool> markAllMessagesSeen(bool seen) async {
     cache.markAllMessageSeen(seen);
-    final marked = await _mimeSource.markAllMessagesSeen(seen);
-    return marked;
+    await _mimeSource.storeAll([MessageFlags.seen]);
+    return true;
   }
 
   @override
@@ -539,40 +591,41 @@ class MailboxMessageSource extends MessageSource {
     final searchSource = _mimeSource.search(search);
     final localizations = locator<I18nService>().localizations;
     return MailboxMessageSource.fromMimeSource(
-        searchSource,
-        localizations.searchQueryDescription(name!),
-        localizations.searchQueryTitle(search.query),
-        parent: this,
-        isSearch: true);
+      searchSource,
+      localizations.searchQueryDescription(name!),
+      localizations.searchQueryTitle(search.query),
+      parent: this,
+      isSearch: true,
+    );
   }
 
   @override
-  MimeSource? getMimeSource(Message message) {
+  AsyncMimeSource? getMimeSource(Message message) {
     return _mimeSource;
   }
 
   @override
   void clear() {
+    cache.clear();
     _mimeSource.clear();
+  }
+
+  @override
+  void onMailCacheInvalidated(AsyncMimeSource source) {
+    cache.clear();
+    notifyListeners();
   }
 }
 
+class _MultipleMessageSourceId {
+  const _MultipleMessageSourceId(this.source, this.index);
+  final AsyncMimeSource source;
+  final int index;
+}
+
+/// Provides a unified source of several messages sources.
+/// Each message is ordered by date
 class MultipleMessageSource extends MessageSource {
-  @override
-  int get size {
-    var complete = 0;
-    for (final s in mimeSources) {
-      complete += s.size;
-    }
-    //print('MultipleMessageSource.size: $complete');
-    return complete;
-  }
-
-  final List<MimeSource> mimeSources;
-  final _multipleMimeSources = <_MultipleMimeSource>[];
-  int _lastUncachedIndex = 0;
-  MailboxFlag? _flag;
-
   MultipleMessageSource(this.mimeSources, String name, MailboxFlag? flag,
       {MessageSource? parent, bool isSearch = false})
       : super(parent: parent, isSearch: isSearch) {
@@ -582,16 +635,29 @@ class MultipleMessageSource extends MessageSource {
     }
     _name = name;
     _flag = flag;
-    supportsDeleteAll =
-        (flag == MailboxFlag.trash) || (flag == MailboxFlag.junk);
     _description = mimeSources.map((s) => s.mailClient.account.name).join(', ');
   }
 
   @override
-  Future<bool> init() async {
+  Future<void> init() async {
     final futures = mimeSources.map((source) => source.init());
-    final results = await Future.wait(futures);
-    return !results.any((result) => (result == false));
+    await Future.wait(futures);
+    supportsDeleteAll = mimeSources.any((s) => s.supportsDeleteAll);
+  }
+
+  final List<AsyncMimeSource> mimeSources;
+  final _multipleMimeSources = <_MultipleMimeSource>[];
+  MailboxFlag? _flag;
+  final _indicesCache = <_MultipleMessageSourceId>[];
+
+  @override
+  int get size {
+    var complete = 0;
+    for (final s in mimeSources) {
+      complete += s.size;
+    }
+    //print('MultipleMessageSource.size: $complete');
+    return complete;
   }
 
   @override
@@ -603,82 +669,93 @@ class MultipleMessageSource extends MessageSource {
     super.dispose();
   }
 
-  Message _next() {
-    var newestIndex = 0;
+  Future<Message> _next(int index) async {
+    final previousCall = index == 0 ? null : _nextCalls[index - 1];
+    if (previousCall != null) {
+      // ensure that messages are retrieved sequentially
+      await previousCall;
+    }
+    _MultipleMimeSourceMessage? newestMessage;
+    final futures = _multipleMimeSources.map((source) => source.peek());
+    final sourceMessages = await Future.wait(futures);
     DateTime? newestTime;
-    for (var i = 0; i < _multipleMimeSources.length; i++) {
-      final source = _multipleMimeSources[i];
-      final mime = source.peek();
-      if (mime != null) {
-        if (mime.isEmpty) {
-          //TODO handle download problems
-          //await waitForDownload();
-        }
-        var date = mime.decodeDate();
+    for (final sourceMessage in sourceMessages) {
+      if (sourceMessage != null) {
+        var date = sourceMessage.mimeMessage.decodeDate();
         if (date == null) {
           date = DateTime.now();
           if (kDebugMode) {
-            print(
-                'unable to decode date for $_lastUncachedIndex on ${mimeSources[i].mailClient.account.name} message is empty: ${mime.isEmpty}.');
+            print('unable to decode date for $index on '
+                '${sourceMessage.source.mimeSource.mailClient.account.name} '
+                'message is empty: ${sourceMessage.mimeMessage.isEmpty}.');
           }
         }
         if (newestTime == null || date.isAfter(newestTime)) {
-          newestIndex = i;
+          newestMessage = sourceMessage;
           newestTime = date;
         }
       }
     }
-    final newestSource = _multipleMimeSources[newestIndex];
-    final newestMime = newestSource.pop();
-    return Message(newestMime, newestSource.mimeSource.mailClient, this,
-        newestSource._currentIndex);
+    if (newestMessage == null) {
+      throw Exception('Unable to get next message for index $index');
+    }
+    newestMessage.source.pop();
+    // newestSource._currentIndex could have changed in the meantime
+    _indicesCache.add(_MultipleMessageSourceId(
+        newestMessage.source.mimeSource, newestMessage.index));
+    final message = Message(newestMessage.mimeMessage,
+        newestMessage.source.mimeSource.mailClient, this, index);
+    return message;
   }
 
   @override
-  Message _getUncachedMessage(int index) {
+  Future<Message> loadMessage(int index) async {
+    if (index < _indicesCache.length) {
+      final id = _indicesCache[index];
+      final mime = await id.source.getMessage(id.index);
+      return Message(mime, id.source.mailClient, this, index);
+    }
     // print(
     //     'get uncached $index with lastUncachedIndex=$_lastUncachedIndex and size $size');
-    int diff = (index - _lastUncachedIndex);
-    while (diff > 1) {
-      final nextMessage = _next();
-      nextMessage.sourceIndex = index - diff;
-      cache.add(nextMessage);
+    int diff = (index - _indicesCache.length);
+    while (diff > 0) {
+      final sourceIndex = index - diff;
+      await getMessageAt(sourceIndex);
       diff--;
     }
-    // problem: what if user scrolls up a loooong way again?
-    final nextMessage = _next();
-    nextMessage.sourceIndex = index;
-    _lastUncachedIndex = index;
+    var nextCall = _nextCalls[index];
+    if (nextCall == null) {
+      nextCall = _next(index);
+      _nextCalls[index] = nextCall;
+    }
+    final nextMessage = await nextCall;
+    _nextCalls.remove(index);
     return nextMessage;
   }
 
+  final _nextCalls = <int, Future<Message>>{};
+
   @override
-  Future<void> waitForDownload() {
-    final futures = <Future>[];
-    for (final mimeSource in mimeSources) {
-      final future = mimeSource.downloadFuture;
-      if (future != null) {
-        futures.add(future);
-      }
-    }
-    return Future.wait(futures);
+  bool removeFromCache(Message message, {bool notify = true}) {
+    _indicesCache.removeAt(message.sourceIndex);
+    return super.removeFromCache(message, notify: notify);
   }
 
   @override
   Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) async {
-    final removedMessages = cache.allMessages.toList();
+    final removedMessages = cache.getAllCachedEntries();
     cache.clear();
+    _indicesCache.clear();
     final futures = <Future<List<DeleteResult>>>[];
-    for (final mimeSource in mimeSources) {
-      futures.add(mimeSource.deleteAllMessages(expunge: expunge));
+    for (final multipleMimeSource in _multipleMimeSources) {
+      futures.add(multipleMimeSource.deleteAllMessages(expunge: expunge));
     }
-    clear();
     notifyListeners();
     final parent = _parentMessageSource;
     if (parent != null) {
       for (final removedMessage in removedMessages) {
         parent.removeMime(
-            removedMessage.mimeMessage!, removedMessage.mailClient);
+            removedMessage.mimeMessage, removedMessage.mailClient);
       }
     }
     final futureResults = await Future.wait(futures);
@@ -690,7 +767,7 @@ class MultipleMessageSource extends MessageSource {
   }
 
   @override
-  MimeSource getMimeSource(Message message) {
+  AsyncMimeSource getMimeSource(Message message) {
     return mimeSources
         .firstWhere((source) => source.mailClient == message.mailClient);
   }
@@ -721,11 +798,10 @@ class MultipleMessageSource extends MessageSource {
 
   @override
   MessageSource search(MailSearch search) {
-    final searchMimeSources = <MimeSource>[];
-    for (final mimeSource in mimeSources) {
-      final searchMimeSource = mimeSource.search(search);
-      searchMimeSources.add(searchMimeSource);
-    }
+    final searchMimeSources = mimeSources
+        .where((source) => source.supportsSearching)
+        .map((source) => source.search(search))
+        .toList();
     final localizations = locator<I18nService>().localizations;
     final searchMessageSource = MultipleMessageSource(
       searchMimeSources,
@@ -735,62 +811,126 @@ class MultipleMessageSource extends MessageSource {
       isSearch: true,
     );
     searchMessageSource._description =
-        localizations.searchQueryDescription(name!);
-    searchMessageSource._supportsDeleteAll = true;
+        localizations.searchQueryDescription(name ?? '');
     return searchMessageSource;
   }
 
   @override
-  Future<bool> markAllMessagesSeen(bool seen) async {
+  Future<void> markAllMessagesSeen(bool seen) async {
     cache.markAllMessageSeen(seen);
     final futures = <Future>[];
     for (final mimeSource in mimeSources) {
-      futures.add(mimeSource.markAllMessagesSeen(seen));
+      futures.add(mimeSource.storeAll([MessageFlags.seen]));
     }
-    final result = await Future.wait(futures);
-    return result.every((element) => element == true);
+    await Future.wait(futures);
+  }
+
+  @override
+  void insertIntoCache(int index, Message message) {
+    final mimeSource = getMimeSource(message);
+    _indicesCache.insert(index, _MultipleMessageSourceId(mimeSource, index));
+    final multipleSource = _multipleMimeSources
+        .firstWhereOrNull((element) => element.mimeSource == mimeSource);
+    multipleSource?.onMailArrived();
+    for (var i = index + 1; i < _indicesCache.length; i++) {
+      final id = _indicesCache[i];
+      if (id.source == mimeSource) {
+        _indicesCache[i] = _MultipleMessageSourceId(mimeSource, id.index + 1);
+      }
+    }
+    super.insertIntoCache(index, message);
+  }
+
+  @override
+  void onMailArrived(MimeMessage mime, AsyncMimeSource source,
+      {int index = 0}) {
+    // find out index:
+    final mimeDate = mime.decodeDate() ?? DateTime.now();
+    var msgIndex = 0;
+    while (cache[msgIndex] != null &&
+        (cache[msgIndex]?.mimeMessage.decodeDate()?.isAfter(mimeDate) ??
+            false)) {
+      msgIndex++;
+    }
+    super.onMailArrived(mime, source, index: msgIndex);
+  }
+
+  @override
+  void onMailCacheInvalidated(AsyncMimeSource source) {
+    _indicesCache.clear();
+    _nextCalls.clear();
+    cache.clear();
+    for (final multipleSource in _multipleMimeSources) {
+      multipleSource.onMailCacheInvalidated();
+    }
+    notifyListeners();
   }
 
   @override
   void clear() {
-    _lastUncachedIndex = 0;
+    _indicesCache.clear();
+    _nextCalls.clear();
     for (final multipleSource in _multipleMimeSources) {
       multipleSource.clear();
     }
   }
 }
 
+class _MultipleMimeSourceMessage {
+  const _MultipleMimeSourceMessage(this.index, this.source, this.mimeMessage);
+  final int index;
+  final _MultipleMimeSource source;
+  final MimeMessage mimeMessage;
+}
+
 class _MultipleMimeSource {
-  final MimeSource mimeSource;
+  final AsyncMimeSource mimeSource;
   int _currentIndex = 0;
-  MimeMessage? _currentMessage;
+  _MultipleMimeSourceMessage? _currentMessage;
 
   _MultipleMimeSource(this.mimeSource);
 
-  MimeMessage? peek() {
-    _currentMessage ??= _next();
+  Future<_MultipleMimeSourceMessage?> peek() async {
+    _currentMessage ??= await _next();
     return _currentMessage;
   }
 
-  MimeMessage? pop() {
-    final mime = peek();
+  void pop() {
     _currentMessage = null;
-    return mime;
   }
 
-  MimeMessage? _next() {
-    if (_currentIndex >= mimeSource.size) {
+  Future<_MultipleMimeSourceMessage?> _next() async {
+    final index = _currentIndex;
+    if (index >= mimeSource.size) {
       return null;
     }
-    final mime = mimeSource.getMessageAt(_currentIndex);
     _currentIndex++;
-    return mime;
+    final mime = await mimeSource.getMessage(index);
+    return _MultipleMimeSourceMessage(index, this, mime);
   }
 
   void clear() {
     _currentIndex = 0;
     _currentMessage = null;
     mimeSource.clear();
+  }
+
+  Future<List<DeleteResult>> deleteAllMessages({required bool expunge}) {
+    if (mimeSource.supportsDeleteAll) {
+      _currentIndex = 0;
+      _currentMessage = null;
+      return mimeSource.deleteAllMessages(expunge: expunge);
+    }
+    return Future.value([]);
+  }
+
+  void onMailCacheInvalidated() {
+    _currentIndex = 0;
+    _currentMessage = null;
+  }
+
+  void onMailArrived() {
+    _currentIndex++;
   }
 }
 
@@ -799,8 +939,8 @@ class SingleMessageSource extends MessageSource {
   SingleMessageSource(MessageSource? parent) : super(parent: parent);
 
   @override
-  Message? _getUncachedMessage(int index) {
-    return singleMessage;
+  Future<Message> loadMessage(int index) {
+    return Future.value(singleMessage);
   }
 
   @override
@@ -809,8 +949,8 @@ class SingleMessageSource extends MessageSource {
   }
 
   @override
-  Future<bool> init() {
-    return Future.value(true);
+  Future<void> init() {
+    return Future.value();
   }
 
   @override
@@ -844,32 +984,44 @@ class SingleMessageSource extends MessageSource {
   bool get supportsSearching => false;
 
   @override
-  Future<void> waitForDownload() {
-    return Future.value();
-  }
-
-  @override
-  MimeSource? getMimeSource(Message message) {
+  AsyncMimeSource? getMimeSource(Message message) {
     return _parentMessageSource?.getMimeSource(message);
   }
 
   @override
-  Future<bool> markAllMessagesSeen(bool seen) {
-    return Future.value(false);
+  Future<void> markAllMessagesSeen(bool seen) {
+    return Future.value();
   }
 
   @override
   void clear() {
     // nothing to implement
   }
+
+  @override
+  void onMailCacheInvalidated(AsyncMimeSource source) {
+    // TODO: implement onMailCacheInvalidated
+  }
 }
 
 class ListMessageSource extends MessageSource {
-  List<Message>? messages;
+  late List<Message> messages;
   ListMessageSource(MessageSource parent) : super(parent: parent);
 
+  void initWithMimeMessages(
+      List<MimeMessage> mimeMessages, MailClient mailClient,
+      {bool reverse = true}) {
+    var result = mimeMessages
+        .mapIndexed((index, mime) => Message(mime, mailClient, this, index))
+        .toList();
+    if (reverse) {
+      result = result.reversed.toList();
+    }
+    messages = result;
+  }
+
   @override
-  Message _getUncachedMessage(int index) => messages![index];
+  Future<Message> loadMessage(int index) => Future.value(messages[index]);
 
   @override
   Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) {
@@ -877,8 +1029,8 @@ class ListMessageSource extends MessageSource {
   }
 
   @override
-  Future<bool> init() {
-    return Future.value(true);
+  Future<void> init() {
+    return Future.value();
   }
 
   @override
@@ -902,7 +1054,7 @@ class ListMessageSource extends MessageSource {
   bool get shouldBlockImages => false;
 
   @override
-  int get size => messages!.length;
+  int get size => messages.length;
 
   @override
   bool get supportsMessageFolders => false;
@@ -911,23 +1063,23 @@ class ListMessageSource extends MessageSource {
   bool get supportsSearching => false;
 
   @override
-  Future<void> waitForDownload() {
-    return Future.value();
-  }
-
-  @override
-  MimeSource? getMimeSource(Message message) {
+  AsyncMimeSource? getMimeSource(Message message) {
     return _parentMessageSource?.getMimeSource(message);
   }
 
   @override
-  Future<bool> markAllMessagesSeen(bool seen) {
-    return Future.value(false);
+  Future<void> markAllMessagesSeen(bool seen) {
+    return Future.value();
   }
 
   @override
   void clear() {
-    messages!.clear();
+    messages.clear();
+  }
+
+  @override
+  void onMailCacheInvalidated(AsyncMimeSource source) {
+    // TODO: implement onMailCacheInvalidated
   }
 }
 
@@ -937,8 +1089,8 @@ class ErrorMessageSource extends MessageSource {
   ErrorMessageSource(this.account);
 
   @override
-  Message? _getUncachedMessage(int index) {
-    return null;
+  Future<Message> loadMessage(int index) {
+    throw UnimplementedError();
   }
 
   @override
@@ -950,13 +1102,13 @@ class ErrorMessageSource extends MessageSource {
   }
 
   @override
-  MimeSource getMimeSource(Message message) {
+  AsyncMimeSource getMimeSource(Message message) {
     throw UnimplementedError();
   }
 
   @override
-  Future<bool> init() {
-    return Future.value(false);
+  Future<void> init() {
+    return Future.value();
   }
 
   @override
@@ -972,7 +1124,7 @@ class ErrorMessageSource extends MessageSource {
   bool get isSent => false;
 
   @override
-  Future<bool> markAllMessagesSeen(bool seen) {
+  Future<void> markAllMessagesSeen(bool seen) {
     throw UnimplementedError();
   }
 
@@ -994,8 +1146,8 @@ class ErrorMessageSource extends MessageSource {
   bool get supportsSearching => false;
 
   @override
-  Future<void> waitForDownload() {
-    return Future.value();
+  void onMailCacheInvalidated(AsyncMimeSource source) {
+    // TODO: implement onMailCacheInvalidated
   }
 }
 
@@ -1006,3 +1158,28 @@ class ErrorMessageSource extends MessageSource {
 //     _mimeSource.addSubscriber(this);
 //   }
 // }
+
+extension _ExtensionsOnMessageIndexedCache on IndexedCache<Message> {
+  Message? getWithMime(MimeMessage mime, MailClient mailClient) {
+    final uid = mime.uid;
+    if (uid != null) {
+      return firstWhereOrNull(
+          (msg) => msg.mailClient == mailClient && msg.mimeMessage.uid == uid);
+    }
+    final sequenceId = mime.sequenceId;
+    return firstWhereOrNull((msg) =>
+        msg.mailClient == mailClient &&
+        msg.mimeMessage.sequenceId == sequenceId);
+  }
+
+  Message? getWithSourceIndex(int sourceIndex, MailClient mailClient) =>
+      firstWhereOrNull((msg) =>
+          msg.mailClient == mailClient && msg.sourceIndex == sourceIndex);
+
+  void markAllMessageSeen(bool seen) {
+    final messages = getAllCachedEntries();
+    for (final message in messages) {
+      message.isSeen = seen;
+    }
+  }
+}
