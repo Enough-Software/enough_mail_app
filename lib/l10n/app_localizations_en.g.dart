@@ -122,6 +122,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeFabTooltip => 'New message';
 
   @override
+  String get homeLoadingMessageSourceTitle => 'Loading...';
+
+  @override
   String homeLoading(String name) {
     return 'loading $name...';
   }

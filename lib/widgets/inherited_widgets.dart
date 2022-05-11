@@ -79,15 +79,15 @@ class _InheritedMessageSourceContainer extends InheritedWidget {
 }
 
 class MessageSourceWidget extends StatefulWidget {
-  // You must pass through a child.
-  final Widget child;
-  final MessageSource? messageSource;
-
   const MessageSourceWidget({
     Key? key,
     required this.child,
     required this.messageSource,
   }) : super(key: key);
+
+  // You must pass through a child.
+  final Widget child;
+  final MessageSource? messageSource;
 
   // This is the secret sauce. Write your own 'of' method that will behave
   // Exactly like MediaQuery.of and Theme.of

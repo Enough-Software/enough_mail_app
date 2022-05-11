@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/widgets/empty_message.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/date_sectioned_message_source.dart';
@@ -25,6 +24,7 @@ import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/util/string_helper.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
+import 'package:enough_mail_app/widgets/empty_message.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
@@ -33,9 +33,44 @@ import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
 import 'package:enough_mail_app/widgets/search_text_field.dart';
 
+import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 
 enum _Visualization { stack, list }
+
+/// Loads a message source future
+class AsyncMessageSourceScreen extends StatelessWidget {
+  const AsyncMessageSourceScreen({
+    Key? key,
+    required this.messageSourceFuture,
+  }) : super(key: key);
+  final Future<MessageSource> messageSourceFuture;
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<MessageSource>(
+        future: messageSourceFuture,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          if (data != null) {
+            return MessageSourceScreen(messageSource: data);
+          }
+          if (snapshot.hasError) {
+            return BasePage(
+              title: context.text.errorTitle,
+              content: Center(
+                child: Text(context.text.detailsErrorDownloadInfo),
+              ),
+            );
+          }
+          return BasePage(
+            title: context.text.homeLoadingMessageSourceTitle,
+            content: Center(
+              child: PlatformCircularProgressIndicator(),
+            ),
+          );
+        },
+      );
+}
 
 /// Displays a list of mails
 class MessageSourceScreen extends StatefulWidget {

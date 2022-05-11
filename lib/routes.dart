@@ -28,6 +28,7 @@ class Routes {
   static const String settingsDefaultSender = '/settingsDefaultSender';
   static const String settingsReplyFormat = '/settingsReplyFormat';
   static const String messageSource = '/messageSource';
+  static const String messageSourceFuture = '/messageSource/future';
   static const String mailDetails = '/mailDetails';
   static const String mailContents = '/mailContents';
   static const String mailCompose = '/mailCompose';
@@ -94,6 +95,10 @@ class AppRouter {
         break;
       case Routes.settingsReplyFormat:
         page = const SettingsReplyScreen();
+        break;
+      case Routes.messageSourceFuture:
+        page = AsyncMessageSourceScreen(
+            messageSourceFuture: arguments as Future<MessageSource>);
         break;
       case Routes.messageSource:
         page = MessageSourceScreen(messageSource: arguments as MessageSource);

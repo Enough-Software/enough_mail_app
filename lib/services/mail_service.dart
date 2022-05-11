@@ -156,7 +156,9 @@ class MailService implements MimeSourceSubscriber {
   }
 
   Future<MessageSource> _createMessageSource(
-      Mailbox? mailbox, Account account) async {
+    Mailbox? mailbox,
+    Account account,
+  ) async {
     if (account is UnifiedAccount) {
       final mimeSources = await _getUnifiedMimeSources(mailbox, account);
       return MultipleMessageSource(
@@ -167,7 +169,11 @@ class MailService implements MimeSourceSubscriber {
     } else {
       final mailClient = await _getClientAndStopPolling(account);
       if (mailClient != null) {
-        mailbox ??= await mailClient.selectInbox();
+        if (mailbox == null) {
+          mailbox = await mailClient.selectInbox();
+        } else {
+          await mailClient.selectMailbox(mailbox);
+        }
         final source = AsyncMailboxMimeSource(mailbox, mailClient)
           ..addSubscriber(this);
         return MailboxMessageSource.fromMimeSource(
@@ -368,8 +374,11 @@ class MailService implements MimeSourceSubscriber {
     return getClientFor(account);
   }
 
-  Future<MessageSource> getMessageSourceFor(Account account,
-      {Mailbox? mailbox, bool switchToAccount = false}) async {
+  Future<MessageSource> getMessageSourceFor(
+    Account account, {
+    Mailbox? mailbox,
+    bool switchToAccount = false,
+  }) async {
     var source = await _createMessageSource(mailbox, account);
     if (switchToAccount) {
       messageSource = source;
