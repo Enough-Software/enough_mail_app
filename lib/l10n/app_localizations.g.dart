@@ -322,6 +322,12 @@ abstract class AppLocalizations {
   /// **'New message'**
   String get homeFabTooltip;
 
+  /// Title shown while message source itself is being loaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get homeLoadingMessageSourceTitle;
+
   /// Message shown while loading message.
   ///
   /// In en, this message translates to:

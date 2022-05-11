@@ -151,6 +151,10 @@
   "@homeFabTooltip": {
     "description": "Tooltip for 'compose new message' floating action button."
   },
+  "homeLoadingMessageSourceTitle": "Loading...",
+  "@homeLoadingMessageSourceTitle": {
+    "description": "Title shown while message source itself is being loaded."
+  },
   "homeLoading": "loading {name}...",
   "@homeLoading": {
     "description": "Message shown while loading message.",

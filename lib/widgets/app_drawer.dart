@@ -237,9 +237,13 @@ class AppDrawer extends StatelessWidget {
   void _navigateToMailbox(Mailbox mailbox) async {
     final mailService = locator<MailService>();
     final account = mailService.currentAccount!;
-    final messageSource =
-        await mailService.getMessageSourceFor(account, mailbox: mailbox);
-    locator<NavigationService>().push(Routes.messageSource,
-        arguments: messageSource, replace: !Platform.isIOS, fade: true);
+    final messageSourceFuture =
+        mailService.getMessageSourceFor(account, mailbox: mailbox);
+    locator<NavigationService>().push(
+      Routes.messageSourceFuture,
+      arguments: messageSourceFuture,
+      replace: !Platform.isIOS,
+      fade: true,
+    );
   }
 }

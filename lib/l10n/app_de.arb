@@ -38,6 +38,7 @@
   "homeMarkAllSeenAction": "Gelesen",
   "homeMarkAllUnseenAction": "Ungelesen",
   "homeFabTooltip": "Neue E-Mail",
+  "homeLoadingMessageSourceTitle": "Lade Daten...",
   "homeLoading": "Lade {name}...",
   "swipeActionToggleRead": "Gelesen / ungelesen",
   "swipeActionDelete": "Löschen",
