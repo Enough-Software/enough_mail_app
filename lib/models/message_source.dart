@@ -1172,9 +1172,9 @@ extension _ExtensionsOnMessageIndexedCache on IndexedCache<Message> {
         msg.mimeMessage.sequenceId == sequenceId);
   }
 
-  Message? getWithSourceIndex(int sourceIndex, MailClient mailClient) =>
-      firstWhereOrNull((msg) =>
-          msg.mailClient == mailClient && msg.sourceIndex == sourceIndex);
+  // Message? getWithSourceIndex(int sourceIndex, MailClient mailClient) =>
+  //     firstWhereOrNull((msg) =>
+  //         msg.mailClient == mailClient && msg.sourceIndex == sourceIndex);
 
   void markAllMessageSeen(bool seen) {
     final messages = getAllCachedEntries();

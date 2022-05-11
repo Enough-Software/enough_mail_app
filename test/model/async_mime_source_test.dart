@@ -139,6 +139,44 @@ void main() async {
         reason: 'second message should be the new message');
   });
 
+  Future<void> _expectMessagesOrderedByDate(AsyncMimeSource source,
+      {int? numberToTest}) async {
+    var lastDate = DateTime.now();
+    var lastSubject = '<no message>';
+    final length = numberToTest ?? source.size;
+    for (int i = 0; i < length; i++) {
+      final message = await source.getMessage(i);
+      final messageDate = message.decodeDate();
+      final subject = message.decodeSubject() ?? '<no subject for $i>';
+      expect(
+        messageDate,
+        isNotNull,
+        reason: 'no date for message at index $i $subject',
+      );
+      expect(
+        messageDate!.isBefore(lastDate),
+        isTrue,
+        reason:
+            'wrong date for message at $i: $messageDate of "$subject" should be before $lastDate of "$lastSubject"',
+      );
+      lastDate = messageDate;
+      lastSubject = subject;
+    }
+  }
+
+  test('init with old message in first result', () async {
+    final source = FakeMimeSource(size: 100);
+    expect(source.size, 100);
+    final firstMessage = source.messages[0];
+    final oldDate = firstMessage
+        .decodeDate()!
+        .subtract(const Duration(days: 120, seconds: 30));
+    source.messages[97]
+        .setHeader(MailConventions.headerDate, DateCodec.encodeDate(oldDate));
+    // first page should be sorted:
+    await _expectMessagesOrderedByDate(source, numberToTest: 20);
+  });
+
   test('onMessagesVanished - sequence IDs', () async {
     final AsyncMimeSource source = FakeMimeSource(size: 101);
     Future<void> expectMessage(int index, int expectedGuid,
