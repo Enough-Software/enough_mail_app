@@ -54,8 +54,7 @@ void main() async {
       expect(
         messageDate,
         isNotNull,
-        reason:
-            'no date for message at index $i ${message.mimeMessage.decodeSubject()}',
+        reason: 'no date for message at index $i $subject',
       );
       expect(
         messageDate!.isBefore(lastDate),

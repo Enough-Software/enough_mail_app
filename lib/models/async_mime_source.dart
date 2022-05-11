@@ -362,9 +362,10 @@ abstract class CachedMimeSource extends AsyncMimeSource {
 
 /// Keeps messages in a temporary cache and accesses them page-wise
 abstract class PagedCachedMimeSource extends CachedMimeSource {
-  PagedCachedMimeSource(
-      {this.pageSize = 20, int maxCacheSize = IndexedCache.defaultMaxCacheSize})
-      : super(maxCacheSize: maxCacheSize);
+  PagedCachedMimeSource({
+    this.pageSize = 30,
+    int maxCacheSize = IndexedCache.defaultMaxCacheSize,
+  }) : super(maxCacheSize: maxCacheSize);
 
   /// The size of a single page
   final int pageSize;
@@ -384,16 +385,18 @@ abstract class PagedCachedMimeSource extends CachedMimeSource {
     final completer = _pageLoadersByPageIndex[pageIndex] ?? queue(pageIndex);
     try {
       final messages = await completer;
-      _pageLoadersByPageIndex.remove(pageIndex);
       int pageEndIndex = pageIndex * pageSize + messages.length - 1;
-      for (int i = 0; i < messages.length; i++) {
-        final cacheIndex = pageEndIndex - i;
-        if (cache[cacheIndex] != null) {
-          // this has been done already
-          break;
+      if (cache[pageEndIndex] == null) {
+        // messages have not been added by another thread yet:
+        final receivingDate = DateTime.now();
+        messages.sort((m1, m2) => (m1.decodeDate() ?? receivingDate)
+            .compareTo(m2.decodeDate() ?? receivingDate));
+        _pageLoadersByPageIndex.remove(pageIndex);
+        for (int i = 0; i < messages.length; i++) {
+          final cacheIndex = pageEndIndex - i;
+          final message = messages[i];
+          cache[cacheIndex] = message;
         }
-        final message = messages[i];
-        cache[cacheIndex] = message;
       }
       return messages[pageEndIndex - index];
     } on MailException {
