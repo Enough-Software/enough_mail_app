@@ -98,7 +98,7 @@ class _SettingsDeveloperModeScreenState
     final localizations = AppLocalizations.of(context)!;
     final controller = TextEditingController();
     String? url;
-    final NavigationService? navService = locator<NavigationService>();
+    final NavigationService navService = locator<NavigationService>();
     final result = await LocalizedDialogHelper.showWidgetDialog(
       context,
       DecoratedPlatformTextField(
@@ -112,13 +112,13 @@ class _SettingsDeveloperModeScreenState
       actions: [
         PlatformTextButton(
           child: ButtonText(localizations.actionCancel),
-          onPressed: () => navService!.pop(false),
+          onPressed: () => navService.pop(false),
         ),
         PlatformTextButton(
           child: ButtonText(localizations.actionOk),
           onPressed: () {
             url = controller.text.trim();
-            navService!.pop(true);
+            navService.pop(true);
           },
         ),
       ],

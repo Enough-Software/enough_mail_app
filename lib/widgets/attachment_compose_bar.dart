@@ -249,7 +249,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
     }
     composeData.messageBuilder.addBinary(
         data, MediaType.fromSubtype(MediaSubtype.imageGif),
-        filename: gif.title + '.gif');
+        filename: '${gif.title}.gif');
 
     return true;
   }
@@ -359,9 +359,9 @@ class ComposeAttachment extends StatelessWidget {
           },
           contextMenuEntries: [
             PopupMenuItem<String>(
+              value: 'remove',
               child: Text(localizations
                   .composeRemoveAttachmentAction(attachment.name!)),
-              value: 'remove',
             ),
           ],
           onContextMenuSelected: (provider, value) => onRemove(attachment),

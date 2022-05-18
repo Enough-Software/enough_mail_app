@@ -43,14 +43,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     _appInitialization = _initApp();
     super.initState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -165,10 +165,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         );
         final mailService = locator<MailService>();
         return MailServiceWidget(
-          child: child,
           account: mailService.currentAccount,
           accounts: mailService.accounts,
           messageSource: mailService.messageSource,
+          child: child,
         );
       },
       // home: Builder(

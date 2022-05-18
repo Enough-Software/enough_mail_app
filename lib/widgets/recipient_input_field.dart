@@ -90,6 +90,21 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
               for (final address in widget.addresses)
                 Draggable(
                   data: address,
+                  feedback: Opacity(
+                    opacity: 0.8,
+                    child: Material(
+                      child: _AddressChip(
+                        address: address,
+                      ),
+                    ),
+                  ),
+                  feedbackOffset: const Offset(10.0, 10.0),
+                  childWhenDragging: Opacity(
+                    opacity: 0.6,
+                    child: _AddressChip(
+                      address: address,
+                    ),
+                  ),
                   child: _AddressChip<_AddressAction>(
                     address: address,
                     onDeleted: () {
@@ -112,21 +127,6 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                           break;
                       }
                     },
-                  ),
-                  feedback: Opacity(
-                    opacity: 0.8,
-                    child: Material(
-                      child: _AddressChip(
-                        address: address,
-                      ),
-                    ),
-                  ),
-                  feedbackOffset: const Offset(10.0, 10.0),
-                  childWhenDragging: Opacity(
-                    opacity: 0.6,
-                    child: _AddressChip(
-                      address: address,
-                    ),
                   ),
                 ),
               buildInput(theme, context),
@@ -260,9 +260,19 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
     try {
       final contact =
           await FlutterContactPicker.pickEmailContact(askForPermission: true);
-      widget.addresses
-          .add(MailAddress(contact.fullName, contact.email!.email!));
+      widget.addresses.add(
+        MailAddress(
+          contact.fullName,
+          contact.email!.email!,
+        ),
+      );
       setState(() {});
+
+      // final contact =
+      //     await FlutterContactPicker.pickEmailContact(askForPermission: true);
+      // widget.addresses
+      //     .add(MailAddress(contact.fullName, contact.email!.email!));
+      // setState(() {});
       // if (controller.text.isNotEmpty) {
       //   controller.text += '; ' + contact.email.email;
       // } else {
@@ -313,11 +323,11 @@ class _AddressChip<T> extends StatelessWidget {
     final theme = Theme.of(context);
     return PlatformPopupMenuButton<T>(
       cupertinoButtonPadding: EdgeInsets.zero,
-      child: content,
       title: address.hasPersonalName ? Text(address.personalName!) : null,
       message: Text(address.email, style: theme.textTheme.caption),
       itemBuilder: (context) => menuItems,
       onSelected: onMenuItemSelected,
+      child: content,
     );
   }
 }

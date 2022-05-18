@@ -106,6 +106,6 @@ class IndexedCache<T> {
       bool Function(T element) test, void Function(T element) action) {
     _entries
         .where((value) => value != null && test(value))
-        .forEach((element) => action(element!));
+        .forEach((element) => action(element as T));
   }
 }

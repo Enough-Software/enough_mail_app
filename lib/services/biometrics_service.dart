@@ -40,7 +40,10 @@ class BiometricsService {
     try {
       final result = await _localAuth.authenticate(
         localizedReason: reason,
-        biometricOnly: true,
+        options: const AuthenticationOptions(
+          stickyAuth: false,
+          sensitiveTransaction: false,
+        ),
       );
       Future.delayed(const Duration(seconds: 2)).then(
         (value) =>

@@ -656,14 +656,14 @@ class _WeekDaySelectorState extends State<WeekDaySelector> {
   Widget build(BuildContext context) {
     return FittedBox(
       child: PlatformToggleButtons(
+        isSelected: _selectedDays,
+        onPressed: _toggle,
         children: _weekdays
             .map((day) => Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(day.name),
                 ))
             .toList(),
-        isSelected: _selectedDays,
-        onPressed: _toggle,
       ),
     );
   }

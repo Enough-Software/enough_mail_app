@@ -344,12 +344,12 @@ class _AccountServerDetailsEditorState
                                   child: Text(localizations
                                       .accountDetailsOptionAutomatic)),
                               const DropdownMenuItem(
-                                child: Text('IMAP'),
                                 value: ServerType.imap,
+                                child: Text('IMAP'),
                               ),
                               const DropdownMenuItem(
-                                child: Text('POP'),
                                 value: ServerType.pop,
+                                child: Text('POP'),
                               ),
                             ],
                             value: _incomingServerType,
@@ -371,17 +371,17 @@ class _AccountServerDetailsEditorState
                                   child: Text(localizations
                                       .accountDetailsOptionAutomatic)),
                               const DropdownMenuItem(
-                                child: Text('SSL'),
                                 value: SocketType.ssl,
+                                child: Text('SSL'),
                               ),
                               const DropdownMenuItem(
-                                child: Text('Start TLS'),
                                 value: SocketType.starttls,
+                                child: Text('Start TLS'),
                               ),
                               DropdownMenuItem(
+                                value: SocketType.plain,
                                 child: Text(localizations
                                     .accountDetailsSecurityOptionNone),
-                                value: SocketType.plain,
                               ),
                             ],
                             value: _incomingSecurity,
@@ -436,8 +436,8 @@ class _AccountServerDetailsEditorState
                                   child: Text(localizations
                                       .accountDetailsOptionAutomatic)),
                               const DropdownMenuItem(
-                                child: Text('SMTP'),
                                 value: ServerType.smtp,
+                                child: Text('SMTP'),
                               ),
                             ],
                             value: _outgoingServerType,
@@ -459,17 +459,17 @@ class _AccountServerDetailsEditorState
                                   child: Text(localizations
                                       .accountDetailsOptionAutomatic)),
                               const DropdownMenuItem(
-                                child: Text('SSL'),
                                 value: SocketType.ssl,
+                                child: Text('SSL'),
                               ),
                               const DropdownMenuItem(
-                                child: Text('Start TLS'),
                                 value: SocketType.starttls,
+                                child: Text('Start TLS'),
                               ),
                               DropdownMenuItem(
+                                value: SocketType.plain,
                                 child: Text(localizations
                                     .accountDetailsSecurityOptionNone),
-                                value: SocketType.plain,
                               ),
                             ],
                             value: _outgoingSecurity,

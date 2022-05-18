@@ -99,9 +99,9 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                             .editAccountFailureToConnectRetryAction),
                       ),
                       PlatformTextButton(
+                        onPressed: _updateAuthentication,
                         child: PlatformText(localizations
                             .editAccountFailureToConnectChangePasswordAction),
-                        onPressed: _updateAuthentication,
                       )
                     ],
                   ),
@@ -163,6 +163,14 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
               for (final alias in widget.account.aliases)
                 Dismissible(
                   key: ValueKey(alias),
+                  background: Container(
+                      color: Colors.red,
+                      child: Icon(iconService.messageActionDelete)),
+                  onDismissed: (direction) async {
+                    await widget.account.removeAlias(alias);
+                    locator<ScaffoldMessengerService>().showTextSnackBar(
+                        localizations.editAccountAliasRemoved(alias.email));
+                  },
                   child: PlatformListTile(
                     title: Text(alias.toString()),
                     onTap: () {
@@ -176,14 +184,6 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                       );
                     },
                   ),
-                  background: Container(
-                      color: Colors.red,
-                      child: Icon(iconService.messageActionDelete)),
-                  onDismissed: (direction) async {
-                    await widget.account.removeAlias(alias);
-                    locator<ScaffoldMessengerService>().showTextSnackBar(
-                        localizations.editAccountAliasRemoved(alias.email));
-                  },
                 ),
               PlatformTextButtonIcon(
                 icon: Icon(iconService.add),
@@ -613,9 +613,6 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         PlatformTextButton(
-          child: ButtonText(widget.isNewAlias
-              ? localizations.editAccountAliasAddAction
-              : localizations.editAccountAliasUpdateAction),
           onPressed: _isEmailValid
               ? () async {
                   setState(() {
@@ -627,6 +624,9 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
                   Navigator.of(context).pop();
                 }
               : null,
+          child: ButtonText(widget.isNewAlias
+              ? localizations.editAccountAliasAddAction
+              : localizations.editAccountAliasUpdateAction),
         ),
       ],
     );
