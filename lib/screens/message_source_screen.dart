@@ -325,8 +325,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   ),
                 ),
                 tooltip: localizations.homeFabTooltip,
-                child: const Icon(Icons.add),
                 elevation: 2.0,
+                child: const Icon(Icons.add),
               ),
       ),
       // cupertino: (context, platform) => CupertinoPageScaffoldData(),
@@ -443,10 +443,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                       title: Row(
                                         children: const [
                                           Icon(Icons.replay),
+                                          // TODO(RV): localize reload
                                           Text(' reload'),
                                         ],
                                       ),
                                       onTap: () {
+                                        // TODO(RV): implement reload
                                         setState(() {});
                                       },
                                     );

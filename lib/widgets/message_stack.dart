@@ -9,7 +9,6 @@ import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 enum DragAction { noted, later, delete, reply }
 
@@ -384,7 +383,6 @@ class _MessageDraggableState extends State<MessageDraggable>
                       MessageCard(message: widget.message, angle: widget.angle),
                 ),
               )),
-          child: MessageCard(message: widget.message, angle: widget.angle),
           childWhenDragging: Container(),
           maxSimultaneousDrags: 1,
           onDragStarted: () {
@@ -392,6 +390,7 @@ class _MessageDraggableState extends State<MessageDraggable>
             animationController.forward();
           },
           dragAnchorStrategy: childDragAnchorStrategy,
+          child: MessageCard(message: widget.message, angle: widget.angle),
         );
       },
     );

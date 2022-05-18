@@ -132,7 +132,7 @@ class CustomFolderNamesEditor extends StatefulWidget {
   final List<String> customNames;
 
   @override
-  _CustomFolderNamesEditorState createState() =>
+  State<CustomFolderNamesEditor> createState() =>
       _CustomFolderNamesEditorState();
 }
 

@@ -29,7 +29,6 @@ class MailAddressChip extends StatelessWidget {
     return PlatformPopupMenuButton<_AddressAction>(
       cupertinoButtonPadding: EdgeInsets.zero,
       icon: icon,
-      child: PlatformChip(label: Text(text)),
       title:
           mailAddress.hasPersonalName ? Text(mailAddress.personalName!) : null,
       message: Text(mailAddress.email, style: theme.textTheme.caption),
@@ -81,6 +80,7 @@ class MailAddressChip extends StatelessWidget {
             break;
         }
       },
+      child: PlatformChip(label: Text(text)),
     );
   }
 }

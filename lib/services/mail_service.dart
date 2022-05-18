@@ -359,7 +359,7 @@ class MailService implements MimeSourceSubscriber {
     var client = _mailClientsPerAccount[account];
     if (client == null) {
       if (!connectIfRequired) {
-        throw StateError('No MailClient conected for account ${account.name}');
+        throw StateError('No MailClient connected for account ${account.name}');
       }
       client = createMailClient(account.account);
       _mailClientsPerAccount[account] = client;
@@ -502,7 +502,7 @@ class MailService implements MimeSourceSubscriber {
           'unable to create alias based on invalid email <$mail>.');
     }
     final random = MessageBuilder.createRandomId(length: 8);
-    return mail.substring(0, atIndex) + '+' + random + mail.substring(atIndex);
+    return '${mail.substring(0, atIndex)}+$random${mail.substring(atIndex)}';
   }
 
   Sender generateRandomPlusAliasSender(Sender sender) {

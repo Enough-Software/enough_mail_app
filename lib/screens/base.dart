@@ -134,8 +134,8 @@ class Base {
         trailing: floatingActionButton == null
             ? null
             : CupertinoButton(
-                child: floatingActionButton.child!,
                 onPressed: floatingActionButton.onPressed,
+                child: floatingActionButton.child!,
               ),
       ),
       leading: (includeDrawer && locator<MailService>().hasAccountsWithErrors())

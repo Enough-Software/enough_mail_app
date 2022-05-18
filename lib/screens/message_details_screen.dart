@@ -745,9 +745,9 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
     if (widget.message.isNewsletterUnsubscribed) {
       return widget.message.isNewsLetterSubscribable
           ? PlatformElevatedButton(
+              onPressed: _resubscribe,
               child:
                   ButtonText(localizations.detailsNewsletterActionResubscribe),
-              onPressed: _resubscribe,
             )
           : Text(
               localizations.detailsNewsletterStatusUnsubscribed,
@@ -755,8 +755,8 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
             );
     } else {
       return PlatformElevatedButton(
-        child: ButtonText(localizations.detailsNewsletterActionUnsubscribe),
         onPressed: _unsubscribe,
+        child: ButtonText(localizations.detailsNewsletterActionUnsubscribe),
       );
     }
   }
@@ -873,10 +873,6 @@ class _MailAddressListState extends State<MailAddressList> {
     return ExpansionWrap(
       spacing: 4.0,
       runSpacing: 0.0,
-      children: [
-        for (var address in widget.mailAddresses)
-          MailAddressChip(mailAddress: address),
-      ],
       expandIndicator: DensePlatformIconButton(
         icon: const Icon(Icons.keyboard_arrow_down),
         onPressed: () {
@@ -895,6 +891,10 @@ class _MailAddressListState extends State<MailAddressList> {
       ),
       isExpanded: _isExpanded,
       maxRuns: 2,
+      children: [
+        for (var address in widget.mailAddresses)
+          MailAddressChip(mailAddress: address),
+      ],
     );
   }
 }
