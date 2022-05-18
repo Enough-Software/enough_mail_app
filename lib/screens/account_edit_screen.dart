@@ -92,16 +92,24 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      PlatformTextButtonIcon(
-                        onPressed: _reconnect,
-                        icon: Icon(iconService.retry),
-                        label: PlatformText(localizations
-                            .editAccountFailureToConnectRetryAction),
+                      Expanded(
+                        child: PlatformTextButtonIcon(
+                          onPressed: _reconnect,
+                          icon: Icon(iconService.retry),
+                          label: PlatformText(
+                            localizations
+                                .editAccountFailureToConnectRetryAction,
+                          ),
+                        ),
                       ),
-                      PlatformTextButton(
-                        onPressed: _updateAuthentication,
-                        child: PlatformText(localizations
-                            .editAccountFailureToConnectChangePasswordAction),
+                      Expanded(
+                        child: PlatformTextButton(
+                          onPressed: _updateAuthentication,
+                          child: PlatformText(
+                            localizations
+                                .editAccountFailureToConnectChangePasswordAction,
+                          ),
+                        ),
                       )
                     ],
                   ),
@@ -142,8 +150,10 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                   title: Text(localizations.editAccountIncludeInUnifiedLabel),
                 ),
               const Divider(),
-              Text(localizations.signatureSettingsTitle,
-                  style: theme.textTheme.subtitle1),
+              Text(
+                localizations.signatureSettingsTitle,
+                style: theme.textTheme.subtitle1,
+              ),
               SignatureWidget(
                 account: widget.account,
               ),
@@ -151,7 +161,8 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
                 child: Text(
-                    localizations.editAccountAliasLabel(widget.account.email)),
+                  localizations.editAccountAliasLabel(widget.account.email),
+                ),
               ),
               if (widget.account.hasNoAlias)
                 Padding(
@@ -164,8 +175,9 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                 Dismissible(
                   key: ValueKey(alias),
                   background: Container(
-                      color: Colors.red,
-                      child: Icon(iconService.messageActionDelete)),
+                    color: Colors.red,
+                    child: Icon(iconService.messageActionDelete),
+                  ),
                   onDismissed: (direction) async {
                     await widget.account.removeAlias(alias);
                     locator<ScaffoldMessengerService>().showTextSnackBar(
