@@ -43,6 +43,7 @@ enum _OverflowMenuChoice {
   convertToPlainTextEditor,
   convertToHtmlEditor
 }
+
 enum _Autofocus { to, subject, text }
 
 class _ComposeScreenState extends State<ComposeScreen> {
@@ -602,6 +603,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
                                 _htmlEditorApi = api;
                               });
                             },
+                            enableDarkMode:
+                                Theme.of(context).brightness == Brightness.dark,
                             initialContent: text,
                             minHeight: 400,
                           );
