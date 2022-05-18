@@ -7,6 +7,7 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 
+import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 
 class BasePage extends StatelessWidget {
@@ -21,6 +22,7 @@ class BasePage extends StatelessWidget {
     this.drawer,
     this.bottom,
     this.includeDrawer = true,
+    this.isRoot = false,
   }) : super(key: key);
 
   final String? title;
@@ -32,6 +34,7 @@ class BasePage extends StatelessWidget {
   final Widget? drawer;
   final Widget? bottom;
   final bool includeDrawer;
+  final bool isRoot;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +49,7 @@ class BasePage extends StatelessWidget {
       drawer: drawer,
       bottom: bottom,
       includeDrawer: includeDrawer,
+      isRoot: isRoot,
     );
   }
 }
@@ -90,6 +94,7 @@ class Base {
     String? subtitle,
     Widget? bottom,
     bool includeDrawer = true,
+    bool isRoot = false,
   }) {
     appBar ??= (title == null && subtitle == null && appBarActions == null)
         ? null
@@ -100,6 +105,7 @@ class Base {
             subtitle: subtitle,
             floatingActionButton: floatingActionButton,
             includeDrawer: includeDrawer,
+            isRoot: isRoot,
           );
     if (includeDrawer) {
       drawer ??= buildDrawer(context);
@@ -124,6 +130,7 @@ class Base {
     String? subtitle,
     FloatingActionButton? floatingActionButton,
     bool includeDrawer = true,
+    bool isRoot = false,
   }) {
     return PlatformAppBar(
       material: (context, platform) => MaterialAppBarData(
