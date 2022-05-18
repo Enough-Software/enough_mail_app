@@ -10,6 +10,7 @@
   "actionDelete": "Löschen",
   "actionAccept": "Akzeptieren",
   "actionDecline": "Ablehnen",
+  "actionEdit": "Bearbeiten",
   "actionAddressCopy": "Kopieren",
   "actionAddressCompose": "Neue Nachricht",
   "actionAddressSearch": "Suchen",
