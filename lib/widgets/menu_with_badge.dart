@@ -4,12 +4,18 @@ import 'package:badges/badges.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.g.dart';
 
 class MenuWithBadge extends StatelessWidget {
+  const MenuWithBadge({
+    Key? key,
+    this.badgeContent,
+    this.iOSText,
+  }) : super(key: key);
   final Widget? badgeContent;
-  const MenuWithBadge({Key? key, this.badgeContent}) : super(key: key);
+  final String? iOSText;
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +37,12 @@ class MenuWithBadge extends StatelessWidget {
 
   Widget _buildIndicator(BuildContext context) {
     if (Platform.isIOS) {
-      final localizations = AppLocalizations.of(context)!;
-      return Text('\u2329 ${localizations.accountsTitle}');
+      final iOSText = this.iOSText;
+      if (iOSText != null) {
+        return Text(iOSText);
+      } else {
+        return const Icon(CupertinoIcons.back);
+      }
     } else {
       return const Icon(Icons.menu);
     }

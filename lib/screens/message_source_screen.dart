@@ -399,7 +399,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                           title: appBarTitle,
                           leading:
                               (locator<MailService>().hasAccountsWithErrors())
-                                  ? const MenuWithBadge()
+                                  ? MenuWithBadge(
+                                      iOSText:
+                                          '\u2329 ${localizations.accountsTitle}',
+                                    )
                                   : null,
                           floating: !_isInSearchMode,
                           pinned: _isInSearchMode,
