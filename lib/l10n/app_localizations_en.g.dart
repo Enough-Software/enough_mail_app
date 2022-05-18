@@ -38,6 +38,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionDecline => 'Decline';
 
   @override
+  String get actionEdit => 'Edit';
+
+  @override
   String get actionAddressCopy => 'Copy';
 
   @override

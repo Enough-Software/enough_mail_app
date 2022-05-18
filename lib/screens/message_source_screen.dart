@@ -225,6 +225,20 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
             }
           },
         ),
+      if (PlatformInfo.isCupertino)
+        CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Text(
+            _isInSelectionMode
+                ? localizations.actionCancel
+                : localizations.actionEdit,
+          ),
+          onPressed: () {
+            setState(() {
+              _isInSelectionMode = !_isInSelectionMode;
+            });
+          },
+        ),
 
       // if (!_isInSearchMode)
       //   PlatformPopupMenuButton<_Visualization>(
@@ -396,6 +410,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                       physics: const BouncingScrollPhysics(),
                       slivers: [
                         PlatformSliverAppBar(
+                          stretch: true,
                           title: appBarTitle,
                           leading:
                               (locator<MailService>().hasAccountsWithErrors())
@@ -404,12 +419,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                           '\u2329 ${localizations.accountsTitle}',
                                     )
                                   : null,
-                          floating: !_isInSearchMode,
-                          pinned: _isInSearchMode,
-                          stretch: true,
-                          actions: appBarActions,
                           previousPageTitle:
                               source.parentName ?? localizations.accountsTitle,
+                          floating: !_isInSearchMode,
+                          pinned: _isInSearchMode,
+                          actions: appBarActions,
+                          cupertinoTransitionBetweenRoutes: true,
                         ),
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
