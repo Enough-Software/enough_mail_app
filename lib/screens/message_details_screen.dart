@@ -397,7 +397,12 @@ class _MessageContentState extends State<_MessageContent> {
       urlLauncherDelegate: (url) {
         // skip canLaunch check due to bug when handling URLs registered by apps
         // https://github.com/flutter/flutter/issues/93765
-        launcher.launchUrl(Uri.parse(url));
+        final uri = Uri.parse(
+          url.startsWith('http://')
+              ? 'https://${url.substring('http://'.length)}'
+              : url,
+        );
+        launcher.launchUrl(uri);
         return Future.value(true);
       },
       onZoomed: (controller, factor) {
