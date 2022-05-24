@@ -754,7 +754,7 @@ class MailService implements MimeSourceSubscriber {
       {int index = 0}) {
     source.mailClient.lowLevelIncomingMailClient
         .logApp('new message: ${mime.decodeSubject()}');
-    if (!mime.isSeen) {
+    if (!mime.isSeen && source.isInbox) {
       locator<NotificationService>()
           .sendLocalNotificationForMail(mime, source.mailClient);
     }

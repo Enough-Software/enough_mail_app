@@ -37,6 +37,9 @@ abstract class AsyncMimeSource {
   /// Is this a source of archived messages?
   bool get isArchive;
 
+  /// Is this a source for inbox?
+  bool get isInbox;
+
   /// Does this source support deleting all messages?
   bool get supportsDeleteAll;
 
@@ -558,6 +561,9 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   bool get isTrash => mailbox.isTrash;
 
   @override
+  bool get isInbox => mailbox.isInbox;
+
+  @override
   String get name => mailbox.name;
 
   @override
@@ -602,7 +608,11 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
 class AsyncSearchMimeSource extends AsyncMimeSource {
   /// Creates a new search mime source
   AsyncSearchMimeSource(
-      this.mailSearch, this.mailbox, this.mailClient, this.parent);
+    this.mailSearch,
+    this.mailbox,
+    this.mailClient,
+    this.parent,
+  );
 
   /// The search terms
   final MailSearch mailSearch;
@@ -656,6 +666,9 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
 
   @override
   bool get isSent => mailbox.isSent;
+
+  @override
+  bool get isInbox => mailbox.isInbox;
 
   @override
   String get name => mailSearch.query;
