@@ -26,7 +26,7 @@ class IcalInteractiveMedia extends StatefulWidget {
       : super(key: key);
 
   @override
-  _IcalInteractiveMediaState createState() => _IcalInteractiveMediaState();
+  State<IcalInteractiveMedia> createState() => _IcalInteractiveMediaState();
 }
 
 class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {

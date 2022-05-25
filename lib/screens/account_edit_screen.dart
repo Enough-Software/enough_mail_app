@@ -24,7 +24,7 @@ class AccountEditScreen extends StatefulWidget {
   const AccountEditScreen({Key? key, required this.account}) : super(key: key);
 
   @override
-  _AccountEditScreenState createState() => _AccountEditScreenState();
+  State<AccountEditScreen> createState() => _AccountEditScreenState();
 }
 
 class _AccountEditScreenState extends State<AccountEditScreen> {
@@ -450,12 +450,12 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
   bool _isContinueAvailable = true;
   int _step = 0;
   static const int _maxStep = 1;
-  late String _generatedAliasAdddress;
+  late String _generatedAliasAddress;
   // MimeMessage? _testMessage;
 
   @override
   void initState() {
-    _generatedAliasAdddress =
+    _generatedAliasAddress =
         locator<MailService>().generateRandomPlusAlias(widget.account);
     super.initState();
   }
@@ -466,7 +466,7 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
       final to = msg.to;
       if (to != null &&
           to.length == 1 &&
-          to.first.email == _generatedAliasAdddress) {
+          to.first.email == _generatedAliasAddress) {
         // this is the test message, plus aliases are supported
         widget.account.supportsPlusAliases = true;
         setState(() {
@@ -477,7 +477,7 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
         return true;
       } else if ((msg.getHeaderValue('auto-submitted') != null) &&
           (msg.isTextPlainMessage()) &&
-          (msg.decodeContentText()?.contains(_generatedAliasAdddress) ??
+          (msg.decodeContentText()?.contains(_generatedAliasAddress) ??
               false)) {
         // this is an automatic reply telling that the address is not available
         setState(() {
@@ -530,7 +530,7 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
                       // send the email and wait for a response:
                       final msg = MessageBuilder.buildSimpleTextMessage(
                           widget.account.fromAddress,
-                          [MailAddress(null, _generatedAliasAdddress)],
+                          [MailAddress(null, _generatedAliasAddress)],
                           'This is an automated message testing support for + aliases. Please ignore.',
                           subject: 'Testing + Alias');
                       // _testMessage = msg;
@@ -547,7 +547,7 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
                   localizations.editAccountTestPlusAliasStepIntroductionTitle),
               content: Text(
                 localizations.editAccountTestPlusAliasStepIntroductionText(
-                    widget.account.name, _generatedAliasAdddress),
+                    widget.account.name, _generatedAliasAddress),
                 style: const TextStyle(fontSize: 12),
               ),
               isActive: (_step == 0),

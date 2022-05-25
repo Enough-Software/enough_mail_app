@@ -31,7 +31,7 @@ class AccountAddScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _AccountAddScreenState createState() => _AccountAddScreenState();
+  State<AccountAddScreen> createState() => _AccountAddScreenState();
 }
 
 class _AccountAddScreenState extends State<AccountAddScreen> {
@@ -218,7 +218,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     });
     final token = await provider.oauthClient!.authenticate(email);
 
-    // whenthe user either has cancelled the verification, not granted the scope or the verification failed for other reasons,
+    // when the user either has cancelled the verification,
+    // not granted the scope or the verification failed for other reasons,
     // then token will be null
     if (token == null) {
       setState(() {

@@ -235,4 +235,18 @@ class FakeMimeSource extends PagedCachedMimeSource {
     // TODO: implement undoMoveMessages
     throw UnimplementedError();
   }
+
+  @override
+  Future<MimeMessage> fetchMessageContents(MimeMessage message,
+      {int? maxSize,
+      bool markAsSeen = false,
+      List<MediaToptype>? includedInlineTypes,
+      Duration? responseTimeout}) {
+    // TODO: implement fetchMessageContents
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement isInbox
+  bool get isInbox => throw UnimplementedError();
 }

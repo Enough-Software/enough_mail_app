@@ -1,15 +1,15 @@
 import 'package:enough_mail_app/events/app_event_bus.dart';
 import 'package:flutter/material.dart';
 
-class LifecyleManager extends StatefulWidget {
+class LifecycleManager extends StatefulWidget {
   final Widget child;
-  const LifecyleManager({Key? key, required this.child}) : super(key: key);
+  const LifecycleManager({Key? key, required this.child}) : super(key: key);
 
   @override
-  _LifecyleManagerState createState() => _LifecyleManagerState();
+  State<LifecycleManager> createState() => _LifecycleManagerState();
 }
 
-class _LifecyleManagerState extends State<LifecyleManager>
+class _LifecycleManagerState extends State<LifecycleManager>
     with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

@@ -34,7 +34,7 @@ class AttachmentComposeBar extends StatefulWidget {
   final bool isDownloading;
 
   @override
-  _AttachmentComposeBarState createState() => _AttachmentComposeBarState();
+  State<AttachmentComposeBar> createState() => _AttachmentComposeBarState();
 }
 
 class _AttachmentComposeBarState extends State<AttachmentComposeBar> {

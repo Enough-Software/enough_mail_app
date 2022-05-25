@@ -47,7 +47,7 @@ class AccountServerDetailsEditor extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _AccountServerDetailsEditorState createState() =>
+  State<AccountServerDetailsEditor> createState() =>
       _AccountServerDetailsEditorState();
 
   void testConnection(BuildContext context) async {

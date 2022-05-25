@@ -379,10 +379,24 @@ class _MessageContentState extends State<_MessageContent> {
         ],
       );
     }
-
+    final message = widget.message;
     return MimeMessageDownloader(
-      mimeMessage: widget.message.mimeMessage,
-      mailClient: widget.message.mailClient,
+      mimeMessage: message.mimeMessage,
+      mailClient: message.mailClient,
+      fetchMessageContents: (
+        mimeMessage, {
+        int? maxSize,
+        bool markAsSeen = false,
+        List<MediaToptype>? includedInlineTypes,
+        Duration? responseTimeout,
+      }) =>
+          message.source.fetchMessageContents(
+        message,
+        maxSize: maxSize,
+        markAsSeen: markAsSeen,
+        includedInlineTypes: includedInlineTypes,
+        responseTimeout: responseTimeout,
+      ),
       markAsSeen: true,
       onDownloaded: _onMimeMessageDownloaded,
       onError: _onMimeMessageError,
