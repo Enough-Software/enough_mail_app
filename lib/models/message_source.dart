@@ -12,36 +12,57 @@ import 'account.dart';
 import 'async_mime_source.dart';
 import 'message.dart';
 
+/// Manages messages
 abstract class MessageSource extends ChangeNotifier
     implements MimeSourceSubscriber {
+  /// Creates a new message source with the optional [parent].
+  ///
+  /// Set [isSearch] to `true` in case this message source is deemed
+  /// to be a search.
   MessageSource({MessageSource? parent, this.isSearch = false})
       : _parentMessageSource = parent;
 
+  /// Retrieves the parent source's name
   String? get parentName => _parentMessageSource?.name;
 
+  /// Looks up the closest message source in the widget tree
   static MessageSource? of(BuildContext context) =>
       MessageSourceWidget.of(context)?.messageSource;
 
+  /// The number of messages in this source
   int get size;
+
+  /// Is the source empty?
+  ///
+  /// Compare [size]
   bool get isEmpty => (size == 0);
+
+  /// The cache for messages
   final cache = IndexedCache<Message>();
+
   String? _description;
+
+  /// the description of this source
+  String? get description => _description;
   set description(String? value) {
     _description = value;
     notifyListeners();
   }
 
-  String? get description => _description;
-
   String? _name;
+
+  /// The name of this source
+  String? get name => _name;
   set name(String? value) {
     _name = value;
     notifyListeners();
   }
 
-  String? get name => _name;
-
   bool _supportsDeleteAll = false;
+
+  /// Does this source support to delete all messages?
+  ///
+  /// Compare [deleteAllMessages] and [markAllMessagesSeen]
   bool get supportsDeleteAll => _supportsDeleteAll;
   set supportsDeleteAll(bool value) {
     _supportsDeleteAll = value;
@@ -49,6 +70,8 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   final MessageSource? _parentMessageSource;
+
+  /// Is this message source a search?
   final bool isSearch;
 
   bool get shouldBlockImages;
@@ -59,16 +82,17 @@ abstract class MessageSource extends ChangeNotifier
   bool get supportsMessageFolders;
   bool get supportsSearching;
 
+  /// Initializes this source
   Future<void> init();
 
   /// Deletes all messages
   ///
-  /// Only available when `supportsDeleteAll` is `true`
+  /// Only available when [supportsDeleteAll] is `true`
   Future<List<DeleteResult>> deleteAllMessages({bool expunge = false});
 
   /// Marks all messages as seen (read) `true` or unseen (unread) when `false` is given
   ///
-  /// Only available when `supportsDeleteAll` is `true`
+  /// Only available when [supportsDeleteAll] is `true`
   Future<void> markAllMessagesSeen(bool seen);
 
   /// Retrieves the message for the given [index]
@@ -84,6 +108,7 @@ abstract class MessageSource extends ChangeNotifier
   /// Loads the message for the given [index]
   Future<Message> loadMessage(int index);
 
+  /// Retrieves the next message
   Future<Message?> next(Message current) {
     if (current.sourceIndex >= size - 1) {
       return Future.value();
@@ -91,6 +116,7 @@ abstract class MessageSource extends ChangeNotifier
     return getMessageAt(current.sourceIndex + 1);
   }
 
+  /// Retrieves the previous message
   Future<Message?> previous(Message current) {
     if (current.sourceIndex == 0) {
       return Future.value();
@@ -98,6 +124,7 @@ abstract class MessageSource extends ChangeNotifier
     return getMessageAt(current.sourceIndex - 1);
   }
 
+  /// Retrieves the mime source for the given [message]
   AsyncMimeSource? getMimeSource(Message message);
 
   /// Removes the given message from the internally used cache
@@ -147,8 +174,6 @@ abstract class MessageSource extends ChangeNotifier
 
   /// Inserts the [message] at the given [index].
   void insertIntoCache(int index, Message message) {
-    message.mailClient.lowLevelIncomingMailClient
-        .logApp('cache[$index]=${message.mimeMessage.decodeSubject()}');
     cache.insert(index, message);
   }
 
@@ -162,7 +187,10 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   /// Deletes the given messages
-  Future<void> deleteMessages(List<Message> messages, String notification) {
+  Future<void> deleteMessages(
+    List<Message> messages,
+    String notification,
+  ) {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
       _removeMessageFromCacheAndCancelNotification(
@@ -176,11 +204,13 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> _deleteMessages(
-      List<Message> messages, String notification) async {
-    final sequenceBySource = orderByMimeSource(messages);
+    List<Message> messages,
+    String notification,
+  ) async {
+    final messagesBySource = orderByMimeSource(messages);
     final resultsBySource = <AsyncMimeSource, DeleteResult>{};
-    for (final source in sequenceBySource.keys) {
-      final mimes = sequenceBySource[source]!;
+    for (final source in messagesBySource.keys) {
+      final mimes = messagesBySource[source]!;
       final deleteResult = await source.deleteMessages(mimes);
       if (deleteResult.canUndo) {
         resultsBySource[source] = deleteResult;
@@ -192,27 +222,9 @@ abstract class MessageSource extends ChangeNotifier
           ? null
           : () async {
               for (final source in resultsBySource.keys) {
-                final undelete =
-                    await source.undoDeleteMessages(resultsBySource[source]!);
-                final targetSequence = undelete.targetSequence;
-                if (undelete.originalSequence.isNotEmpty &&
-                    targetSequence != null) {
-                  final originalUids = undelete.originalSequence.toList();
-                  final newUids = targetSequence.toList();
-                  for (var i = 0; i < originalUids.length; i++) {
-                    final originalUid = originalUids[i];
-                    final message = messages.firstWhereOrNull(
-                        (m) => m.mimeMessage.uid == originalUid);
-                    if (message != null) {
-                      message.mimeMessage.uid = newUids[i];
-                    }
-                  }
-                }
+                await source.undoDeleteMessages(resultsBySource[source]!);
               }
-              // TODO what should I do when not all delete ops are undoable?
-              for (final message in messages) {
-                insertIntoCache(0, message);
-              }
+              _reAddMessages(messages);
               notifyListeners();
             },
     );
@@ -229,13 +241,19 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> moveMessageToFlag(
-      Message message, MailboxFlag targetMailboxFlag, String notification) {
+    Message message,
+    MailboxFlag targetMailboxFlag,
+    String notification,
+  ) {
     return moveMessage(message,
         message.mailClient.getMailbox(targetMailboxFlag)!, notification);
   }
 
   Future<void> moveMessage(
-      Message message, Mailbox targetMailbox, String notification) async {
+    Message message,
+    Mailbox targetMailbox,
+    String notification,
+  ) async {
     _removeMessageFromCacheAndCancelNotification(
       message,
       locator<NotificationService>(),
@@ -248,13 +266,8 @@ abstract class MessageSource extends ChangeNotifier
       locator<ScaffoldMessengerService>().showTextSnackBar(
         notification,
         undo: () async {
-          final undoResponse =
-              await message.mailClient.undoMoveMessages(moveResult);
-          if (undoResponse.targetSequence?.isNotEmpty == true) {
-            message.mimeMessage.uid =
-                undoResponse.targetSequence!.toList().first;
-          }
-          insertIntoCache(0, message);
+          await message.mailClient.undoMoveMessages(moveResult);
+          insertIntoCache(message.sourceIndex, message);
           notifyListeners();
         },
       );
@@ -270,8 +283,11 @@ abstract class MessageSource extends ChangeNotifier
     removeFromCache(message, notify: notify);
   }
 
-  Future<void> moveMessagesToFlag(List<Message> messages,
-      MailboxFlag targetMailboxFlag, String notification) async {
+  Future<void> moveMessagesToFlag(
+    List<Message> messages,
+    MailboxFlag targetMailboxFlag,
+    String notification,
+  ) async {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
       _removeMessageFromCacheAndCancelNotification(
@@ -298,20 +314,18 @@ abstract class MessageSource extends ChangeNotifier
           for (final source in resultsBySource.keys) {
             await source.undoMoveMessages(resultsBySource[source]!);
           }
-          //TODO update mimeMessage's UID and sequence ID?
-          // TODO add mime message to mime source again?
-          // TODO what should I do when not all delete are undoable?
-          for (final message in messages) {
-            insertIntoCache(0, message);
-          }
+          _reAddMessages(messages);
           notifyListeners();
         },
       );
     }
   }
 
-  Future<void> moveMessages(List<Message> messages, Mailbox targetMailbox,
-      String notification) async {
+  Future<void> moveMessages(
+    List<Message> messages,
+    Mailbox targetMailbox,
+    String notification,
+  ) async {
     final notificationService = locator<NotificationService>();
     for (final message in messages) {
       _removeMessageFromCacheAndCancelNotification(
@@ -331,18 +345,20 @@ abstract class MessageSource extends ChangeNotifier
         undo: moveResult.canUndo
             ? () async {
                 await source.undoMoveMessages(moveResult);
-                //TODO update mimeMessage's UID and sequence ID?
-                // TODO add mime message to mime source again?
-                // TODO what should I do when not all delete are undoable?
-                for (final message in messages) {
-                  insertIntoCache(0, message);
-                }
+                _reAddMessages(messages);
                 notifyListeners();
               }
             : null,
       );
     } else if (parent != null) {
       return parent.moveMessages(messages, targetMailbox, notification);
+    }
+  }
+
+  void _reAddMessages(List<Message> messages) {
+    messages.sort((m1, m2) => m1.sourceIndex.compareTo(m2.sourceIndex));
+    for (final message in messages) {
+      insertIntoCache(message.sourceIndex, message);
     }
   }
 
@@ -489,6 +505,29 @@ abstract class MessageSource extends ChangeNotifier
 
   void clear();
 
+  /// Fetches the message contents for the partial [message].
+  ///
+  /// Compare [MailClient]'s `fetchMessageContents()` call.
+  Future<MimeMessage> fetchMessageContents(
+    Message message, {
+    int? maxSize,
+    bool markAsSeen = false,
+    List<MediaToptype>? includedInlineTypes,
+    Duration? responseTimeout,
+  }) {
+    final mimeSource = getMimeSource(message);
+    if (mimeSource == null) {
+      throw Exception('Unable to detect mime source from $message');
+    }
+    return mimeSource.fetchMessageContents(
+      message.mimeMessage,
+      maxSize: maxSize,
+      markAsSeen: markAsSeen,
+      includedInlineTypes: includedInlineTypes,
+      responseTimeout: responseTimeout,
+    );
+  }
+
   // void replaceMime(Message message, MimeMessage mime) {
   //   final mimeSource = getMimeSource(message);
   //   remove(message);
@@ -498,13 +537,6 @@ abstract class MessageSource extends ChangeNotifier
 }
 
 class MailboxMessageSource extends MessageSource {
-  MailboxMessageSource._(Mailbox mailbox, MailClient mailClient) {
-    _mimeSource = AsyncMailboxMimeSource(mailbox, mailClient)
-      ..addSubscriber(this);
-    _description = mailClient.account.email;
-    _name = mailbox.name;
-  }
-
   MailboxMessageSource.fromMimeSource(
       this._mimeSource, String description, String name,
       {MessageSource? parent, bool isSearch = false})
@@ -517,7 +549,7 @@ class MailboxMessageSource extends MessageSource {
   @override
   int get size => _mimeSource.size;
 
-  late AsyncMimeSource _mimeSource;
+  final AsyncMimeSource _mimeSource;
 
   @override
   void dispose() {
