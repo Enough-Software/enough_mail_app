@@ -10,7 +10,7 @@ class SettingsReplyScreen extends StatefulWidget {
   const SettingsReplyScreen({Key? key}) : super(key: key);
 
   @override
-  _SettingsReplyScreenState createState() => _SettingsReplyScreenState();
+  State<SettingsReplyScreen> createState() => _SettingsReplyScreenState();
 }
 
 class _SettingsReplyScreenState extends State<SettingsReplyScreen> {

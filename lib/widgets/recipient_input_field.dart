@@ -32,7 +32,7 @@ class RecipientInputField extends StatefulWidget {
   final ContactManager? contactManager;
 
   @override
-  _RecipientInputFieldState createState() => _RecipientInputFieldState();
+  State<RecipientInputField> createState() => _RecipientInputFieldState();
 }
 
 enum _AddressAction {
