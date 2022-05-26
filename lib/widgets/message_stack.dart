@@ -17,7 +17,7 @@ class MessageStack extends StatefulWidget {
 
   final MessageSource? messageSource;
   @override
-  _MessageStackState createState() => _MessageStackState();
+  State<MessageStack> createState() => _MessageStackState();
 }
 
 class _MessageStackState extends State<MessageStack> {
@@ -243,7 +243,7 @@ class MessageDragTarget extends StatefulWidget {
   final double? height;
 
   @override
-  _MessageDragTargetState createState() => _MessageDragTargetState();
+  State<MessageDragTarget> createState() => _MessageDragTargetState();
 }
 
 class _MessageDragTargetState extends State<MessageDragTarget> {
@@ -343,7 +343,7 @@ class MessageDraggable extends StatefulWidget {
       : super(key: key);
 
   @override
-  _MessageDraggableState createState() => _MessageDraggableState();
+  State<MessageDraggable> createState() => _MessageDraggableState();
 }
 
 class _MessageDraggableState extends State<MessageDraggable>
@@ -404,7 +404,7 @@ class MessageCard extends StatefulWidget {
       : super(key: key);
 
   @override
-  _MessageCardState createState() => _MessageCardState();
+  State<MessageCard> createState() => _MessageCardState();
 }
 
 class _MessageCardState extends State<MessageCard> {

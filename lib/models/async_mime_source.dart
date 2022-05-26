@@ -37,6 +37,9 @@ abstract class AsyncMimeSource {
   /// Is this a source of archived messages?
   bool get isArchive;
 
+  /// Is this a source for inbox?
+  bool get isInbox;
+
   /// Does this source support deleting all messages?
   bool get supportsDeleteAll;
 
@@ -101,8 +104,21 @@ abstract class AsyncMimeSource {
       {StoreAction action = StoreAction.add});
 
   /// Adds or removes [flags]to all messages
-  Future<void> storeAll(List<String> flags,
-      {StoreAction action = StoreAction.add});
+  Future<void> storeAll(
+    List<String> flags, {
+    StoreAction action = StoreAction.add,
+  });
+
+  /// Fetches the message contents for the partial [message].
+  ///
+  /// Compare [MailClient]'s `fetchMessageContents()` call.
+  Future<MimeMessage> fetchMessageContents(
+    MimeMessage message, {
+    int? maxSize,
+    bool markAsSeen = false,
+    List<MediaToptype>? includedInlineTypes,
+    Duration? responseTimeout,
+  });
 
   /// Informs this source about a new incoming [message] at the optional [index].
   ///
@@ -191,7 +207,14 @@ abstract class CachedMimeSource extends AsyncMimeSource {
   Future<MimeMessage> loadMessage(int index);
 
   @override
-  Future<void> onMessageArrived(MimeMessage message, {int? index}) {
+  Future<void> onMessageArrived(MimeMessage message, {int? index}) async {
+    final usedIndex = await addMessage(message, index: index);
+    notifySubscriberOnMessageArrived(message);
+    return handleOnMessageArrived(usedIndex, message);
+  }
+
+  /// Adds the [message] and retrieves the used cache index.
+  Future<int> addMessage(MimeMessage message, {int? index}) {
     int findIndex(DateTime? messageDate) {
       if (messageDate == null) {
         return 0;
@@ -207,8 +230,7 @@ abstract class CachedMimeSource extends AsyncMimeSource {
 
     final usedIndex = index ?? findIndex(message.decodeDate());
     cache.insert(usedIndex, message);
-    notifySubscriberOnMessageArrived(message);
-    return handleOnMessageArrived(usedIndex, message);
+    return Future.value(usedIndex);
   }
 
   /// Handles a newly arrived message.
@@ -492,13 +514,14 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   Future<DeleteResult> deleteMessages(List<MimeMessage> messages) {
     removeFromCache(messages);
     final sequence = MessageSequence.fromMessages(messages);
-    return mailClient.deleteMessages(sequence);
+    return mailClient.deleteMessages(sequence, messages: messages);
   }
 
   @override
-  Future<DeleteResult> undoDeleteMessages(DeleteResult deleteResult) {
-    //TODO re-add messages
-    return mailClient.undoDeleteMessages(deleteResult);
+  Future<DeleteResult> undoDeleteMessages(DeleteResult deleteResult) async {
+    final result = await mailClient.undoDeleteMessages(deleteResult);
+    await _reAddMessages(result);
+    return result;
   }
 
   @override
@@ -511,36 +534,56 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
 
   @override
   Future<MoveResult> moveMessages(
-      List<MimeMessage> messages, Mailbox targetMailbox) {
+    List<MimeMessage> messages,
+    Mailbox targetMailbox,
+  ) {
     removeFromCache(messages);
     final sequence = MessageSequence.fromMessages(messages);
-    return mailClient.moveMessages(sequence, targetMailbox);
+    return mailClient.moveMessages(sequence, targetMailbox, messages: messages);
   }
 
   @override
   Future<MoveResult> moveMessagesToFlag(
-      List<MimeMessage> messages, MailboxFlag targetMailboxFlag) {
+    List<MimeMessage> messages,
+    MailboxFlag targetMailboxFlag,
+  ) {
     removeFromCache(messages);
     final sequence = MessageSequence.fromMessages(messages);
-    return mailClient.moveMessagesToFlag(sequence, targetMailboxFlag);
+    return mailClient.moveMessagesToFlag(sequence, targetMailboxFlag,
+        messages: messages);
   }
 
   @override
-  Future<MoveResult> undoMoveMessages(MoveResult moveResult) {
-    //TODO re-add messages
-    return mailClient.undoMoveMessages(moveResult);
+  Future<MoveResult> undoMoveMessages(MoveResult moveResult) async {
+    final result = await mailClient.undoMoveMessages(moveResult);
+    await _reAddMessages(result);
+    return result;
+  }
+
+  Future<void> _reAddMessages(MessagesOperationResult result) async {
+    final messages = result.messages;
+    if (messages != null) {
+      for (final message in messages) {
+        await addMessage(message);
+      }
+    }
   }
 
   @override
-  Future<void> store(List<MimeMessage> messages, List<String> flags,
-      {StoreAction action = StoreAction.add}) {
+  Future<void> store(
+    List<MimeMessage> messages,
+    List<String> flags, {
+    StoreAction action = StoreAction.add,
+  }) {
     final sequence = MessageSequence.fromMessages(messages);
     return mailClient.store(sequence, flags, action: action);
   }
 
   @override
-  Future<void> storeAll(List<String> flags,
-      {StoreAction action = StoreAction.add}) {
+  Future<void> storeAll(
+    List<String> flags, {
+    StoreAction action = StoreAction.add,
+  }) {
     final sequence = MessageSequence.fromAll();
     return mailClient.store(sequence, flags, action: action);
   }
@@ -556,6 +599,9 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
 
   @override
   bool get isTrash => mailbox.isTrash;
+
+  @override
+  bool get isInbox => mailbox.isInbox;
 
   @override
   String get name => mailbox.name;
@@ -593,16 +639,30 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
     return Future.value();
   }
 
-  //TODO move messages to folder
-  //TODO load message fully
-  //TODO flag all messages
+  @override
+  Future<MimeMessage> fetchMessageContents(
+    MimeMessage message, {
+    int? maxSize,
+    bool markAsSeen = false,
+    List<MediaToptype>? includedInlineTypes,
+    Duration? responseTimeout,
+  }) =>
+      mailClient.fetchMessageContents(message,
+          maxSize: maxSize,
+          markAsSeen: markAsSeen,
+          includedInlineTypes: includedInlineTypes,
+          responseTimeout: responseTimeout);
 }
 
 /// Accesses search results
 class AsyncSearchMimeSource extends AsyncMimeSource {
   /// Creates a new search mime source
   AsyncSearchMimeSource(
-      this.mailSearch, this.mailbox, this.mailClient, this.parent);
+    this.mailSearch,
+    this.mailbox,
+    this.mailClient,
+    this.parent,
+  );
 
   /// The search terms
   final MailSearch mailSearch;
@@ -656,6 +716,9 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
 
   @override
   bool get isSent => mailbox.isSent;
+
+  @override
+  bool get isInbox => mailbox.isInbox;
 
   @override
   String get name => mailSearch.query;
@@ -779,4 +842,18 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
     // TODO: implement undoMoveMessages
     throw UnimplementedError();
   }
+
+  @override
+  Future<MimeMessage> fetchMessageContents(
+    MimeMessage message, {
+    int? maxSize,
+    bool markAsSeen = false,
+    List<MediaToptype>? includedInlineTypes,
+    Duration? responseTimeout,
+  }) =>
+      mailClient.fetchMessageContents(message,
+          maxSize: maxSize,
+          markAsSeen: markAsSeen,
+          includedInlineTypes: includedInlineTypes,
+          responseTimeout: responseTimeout);
 }

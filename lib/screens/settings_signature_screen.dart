@@ -20,7 +20,7 @@ class SettingsSignatureScreen extends StatefulWidget {
   const SettingsSignatureScreen({Key? key}) : super(key: key);
 
   @override
-  _SettingsSignatureScreenState createState() =>
+  State<SettingsSignatureScreen> createState() =>
       _SettingsSignatureScreenState();
 }
 
@@ -111,7 +111,7 @@ class SignatureWidget extends StatefulWidget {
   final Account? account;
 
   @override
-  _SignatureWidgetState createState() => _SignatureWidgetState();
+  State<SignatureWidget> createState() => _SignatureWidgetState();
 }
 
 class _SignatureWidgetState extends State<SignatureWidget> {

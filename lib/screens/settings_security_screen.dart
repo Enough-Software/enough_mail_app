@@ -12,7 +12,7 @@ class SettingsSecurityScreen extends StatefulWidget {
   const SettingsSecurityScreen({Key? key}) : super(key: key);
 
   @override
-  _SettingsSecurityScreenState createState() => _SettingsSecurityScreenState();
+  State<SettingsSecurityScreen> createState() => _SettingsSecurityScreenState();
 }
 
 class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {

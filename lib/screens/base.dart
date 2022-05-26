@@ -7,7 +7,6 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 
-import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 
 class BasePage extends StatelessWidget {

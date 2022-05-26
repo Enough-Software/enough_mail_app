@@ -12,7 +12,7 @@ class IcalComposer extends StatefulWidget {
   const IcalComposer({Key? key, required this.appointment}) : super(key: key);
   final VCalendar appointment;
   @override
-  _IcalComposerState createState() => _IcalComposerState();
+  State<IcalComposer> createState() => _IcalComposerState();
 
   static Future<VCalendar?> createOrEditAppointment(BuildContext context,
       {VCalendar? appointment}) async {
@@ -369,7 +369,7 @@ class RecurrenceComposer extends StatefulWidget {
       : super(key: key);
 
   @override
-  _RecurrenceComposerState createState() => _RecurrenceComposerState();
+  State<RecurrenceComposer> createState() => _RecurrenceComposerState();
 
   static Future<Recurrence?> createOrEditRecurrence(BuildContext context,
       Recurrence? recurrenceRule, DateTime startDate) async {
@@ -593,7 +593,7 @@ class WeekDaySelector extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _WeekDaySelectorState createState() => _WeekDaySelectorState();
+  State<WeekDaySelector> createState() => _WeekDaySelectorState();
 }
 
 class _WeekDaySelectorState extends State<WeekDaySelector> {
@@ -683,7 +683,7 @@ class DayOfMonthSelector extends StatefulWidget {
       : super(key: key);
 
   @override
-  _DayOfMonthSelectorState createState() => _DayOfMonthSelectorState();
+  State<DayOfMonthSelector> createState() => _DayOfMonthSelectorState();
 
   static Recurrence? updateMonthlyRecurrence(
       Recurrence recurrence, DateTime startDate) {
@@ -850,7 +850,7 @@ class UntilComposer extends StatefulWidget {
       : super(key: key);
 
   @override
-  _UntilComposerState createState() => _UntilComposerState();
+  State<UntilComposer> createState() => _UntilComposerState();
 
   static Future<DateTime?> createOrEditUntil(BuildContext context,
       DateTime start, DateTime? until, IsoDuration? recommendation) async {
