@@ -6,7 +6,6 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 
 class MenuWithBadge extends StatelessWidget {
   const MenuWithBadge({

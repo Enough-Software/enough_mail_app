@@ -28,7 +28,7 @@ class MessageActions extends StatefulWidget {
   final Message message;
 
   @override
-  _MessageActionsState createState() => _MessageActionsState();
+  State<MessageActions> createState() => _MessageActionsState();
 }
 
 enum _OverflowMenuChoice {

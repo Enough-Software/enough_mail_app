@@ -379,10 +379,24 @@ class _MessageContentState extends State<_MessageContent> {
         ],
       );
     }
-
+    final message = widget.message;
     return MimeMessageDownloader(
-      mimeMessage: widget.message.mimeMessage,
-      mailClient: widget.message.mailClient,
+      mimeMessage: message.mimeMessage,
+      mailClient: message.mailClient,
+      fetchMessageContents: (
+        mimeMessage, {
+        int? maxSize,
+        bool markAsSeen = false,
+        List<MediaToptype>? includedInlineTypes,
+        Duration? responseTimeout,
+      }) =>
+          message.source.fetchMessageContents(
+        message,
+        maxSize: maxSize,
+        markAsSeen: markAsSeen,
+        includedInlineTypes: includedInlineTypes,
+        responseTimeout: responseTimeout,
+      ),
       markAsSeen: true,
       onDownloaded: _onMimeMessageDownloaded,
       onError: _onMimeMessageError,
@@ -397,7 +411,12 @@ class _MessageContentState extends State<_MessageContent> {
       urlLauncherDelegate: (url) {
         // skip canLaunch check due to bug when handling URLs registered by apps
         // https://github.com/flutter/flutter/issues/93765
-        launcher.launchUrl(Uri.parse(url));
+        final uri = Uri.parse(
+          url.startsWith('http://')
+              ? 'https://${url.substring('http://'.length)}'
+              : url,
+        );
+        launcher.launchUrl(uri);
         return Future.value(true);
       },
       onZoomed: (controller, factor) {

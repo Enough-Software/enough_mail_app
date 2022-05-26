@@ -40,7 +40,7 @@ class EditorArtExtensionWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  _EditorArtExtensionWidgetState createState() =>
+  State<EditorArtExtensionWidget> createState() =>
       _EditorArtExtensionWidgetState();
 }
 

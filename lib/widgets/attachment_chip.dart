@@ -22,7 +22,7 @@ class AttachmentChip extends StatefulWidget {
   final Message message;
 
   @override
-  _AttachmentChipState createState() => _AttachmentChipState();
+  State<AttachmentChip> createState() => _AttachmentChipState();
 }
 
 class _AttachmentChipState extends State<AttachmentChip> {
