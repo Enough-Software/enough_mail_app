@@ -187,9 +187,9 @@ class AppDrawer extends StatelessWidget {
                   if (accountWidgetState != null) {
                     accountWidgetState.account = account;
                   }
-                  final messageSource = await locator<MailService>()
+                  final messageSource = locator<MailService>()
                       .getMessageSourceFor(account, switchToAccount: true);
-                  navService.push(Routes.messageSource,
+                  navService.push(Routes.messageSourceFuture,
                       arguments: messageSource,
                       replace: !Platform.isIOS,
                       fade: true);
