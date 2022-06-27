@@ -82,7 +82,7 @@ class MessageSourceScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MessageSourceScreenState createState() => _MessageSourceScreenState();
+  State<MessageSourceScreen> createState() => _MessageSourceScreenState();
 }
 
 class _MessageSourceScreenState extends State<MessageSourceScreen>
@@ -1242,7 +1242,7 @@ class CheckboxText extends StatefulWidget {
   final String text;
 
   @override
-  _CheckboxTextState createState() => _CheckboxTextState();
+  State<CheckboxText> createState() => _CheckboxTextState();
 }
 
 class _CheckboxTextState extends State<CheckboxText> {
@@ -1299,7 +1299,7 @@ class MessageOverview extends StatefulWidget {
       : super(key: ValueKey(message.sourceIndex));
 
   @override
-  _MessageOverviewState createState() => _MessageOverviewState();
+  State<MessageOverview> createState() => _MessageOverviewState();
 }
 
 class _MessageOverviewState extends State<MessageOverview> {

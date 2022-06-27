@@ -33,7 +33,7 @@ class ComposeScreen extends StatefulWidget {
   const ComposeScreen({Key? key, required this.data}) : super(key: key);
 
   @override
-  _ComposeScreenState createState() => _ComposeScreenState();
+  State<ComposeScreen> createState() => _ComposeScreenState();
 }
 
 enum _OverflowMenuChoice {
