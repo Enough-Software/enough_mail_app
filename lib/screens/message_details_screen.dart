@@ -41,7 +41,7 @@ class MessageDetailsScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _DetailsScreenState createState() => _DetailsScreenState();
+  State<MessageDetailsScreen> createState() => _DetailsScreenState();
 }
 
 enum _OverflowMenuChoice { showContents, showSourceCode }
@@ -561,7 +561,7 @@ class ThreadSequenceButton extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ThreadSequenceButtonState createState() => _ThreadSequenceButtonState();
+  State<ThreadSequenceButton> createState() => _ThreadSequenceButtonState();
 }
 
 class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
@@ -698,7 +698,7 @@ class ReadReceiptButton extends StatefulWidget {
   const ReadReceiptButton({Key? key}) : super(key: key);
 
   @override
-  _ReadReceiptButtonState createState() => _ReadReceiptButtonState();
+  State<ReadReceiptButton> createState() => _ReadReceiptButtonState();
 
   static bool shouldBeShown(MimeMessage mime) =>
       (mime.isReadReceiptSent || mime.isReadReceiptRequested) &&
@@ -749,7 +749,7 @@ class UnsubscribeButton extends StatefulWidget {
   const UnsubscribeButton({Key? key, required this.message}) : super(key: key);
 
   @override
-  _UnsubscribeButtonState createState() => _UnsubscribeButtonState();
+  State<UnsubscribeButton> createState() => _UnsubscribeButtonState();
 }
 
 class _UnsubscribeButtonState extends State<UnsubscribeButton> {
@@ -862,15 +862,15 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
         }
       }
       await LocalizedDialogHelper.showTextDialog(
-          context,
-          unsubscribed
-              ? localizations.detailsNewsletterUnsubscribeSuccessTitle
-              : localizations.detailsNewsletterUnsubscribeFailureTitle,
-          unsubscribed
-              ? localizations
-                  .detailsNewsletterUnsubscribeSuccessMessage(listName)
-              : localizations
-                  .detailsNewsletterUnsubscribeFailureMessage(listName));
+        context,
+        unsubscribed
+            ? localizations.detailsNewsletterUnsubscribeSuccessTitle
+            : localizations.detailsNewsletterUnsubscribeFailureTitle,
+        unsubscribed
+            ? localizations.detailsNewsletterUnsubscribeSuccessMessage(listName)
+            : localizations
+                .detailsNewsletterUnsubscribeFailureMessage(listName),
+      );
     }
   }
 }
@@ -881,7 +881,7 @@ class MailAddressList extends StatefulWidget {
   final List<MailAddress> mailAddresses;
 
   @override
-  _MailAddressListState createState() => _MailAddressListState();
+  State<MailAddressList> createState() => _MailAddressListState();
 }
 
 class _MailAddressListState extends State<MailAddressList> {
