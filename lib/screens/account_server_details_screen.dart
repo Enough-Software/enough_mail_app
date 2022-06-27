@@ -258,7 +258,8 @@ class _AccountServerDetailsEditorState
       }
     }
     // now try to sign in:
-    final mailClient = await locator<MailService>().connect(mailAccount);
+    final mailClient =
+        await locator<MailService>().connectFirstTime(mailAccount);
     if (mailClient != null && mailClient.isConnected) {
       locator<NavigationService>().pop(
         ConnectedAccount(widget.account.account, mailClient),

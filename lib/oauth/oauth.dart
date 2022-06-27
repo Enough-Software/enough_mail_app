@@ -149,8 +149,6 @@ class OutlookOAuthClient extends OauthClient {
 
     // Extract code from resulting url
     final code = Uri.parse(result).queryParameters['code'];
-    // print('result: $result');
-    // print('got code: "$code"');
     // Use this code to get an access token
     final response = await HttpHelper.httpPost(
         'https://login.microsoftonline.com/common/oauth2/v2.0/token',
@@ -162,10 +160,12 @@ class OutlookOAuthClient extends OauthClient {
         });
 
     // Get the access token from the response
-    // print('authorization code token:');
-    // print(response.text);
-    // print('response.code=${response.statusCode}');
-    return OauthToken.fromText(response.text!);
+    final responseText = response.text;
+    if (responseText == null) {
+      throw StateError(
+          'no response from https://login.microsoftonline.com/common/oauth2/v2.0/token');
+    }
+    return OauthToken.fromText(responseText);
   }
 
   @override
@@ -181,8 +181,8 @@ class OutlookOAuthClient extends OauthClient {
         });
     final text = response.text;
     if (response.statusCode != 200 || text == null) {
-      throw StateError(
-          'Unable to refresh Outlook OAuth token $token, status code=${response.statusCode}, response=$text');
+      throw StateError('Unable to refresh Outlook OAuth token $token, '
+          'status code=${response.statusCode}, response=$text');
     }
     return OauthToken.fromText(text);
   }
