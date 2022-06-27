@@ -39,6 +39,10 @@
   "@actionDecline": {
     "description": "Generic decline action"
   },
+  "actionEdit": "Edit",
+  "@actionEdit": {
+    "description": "Generic edit action"
+  },
   "actionAddressCopy": "Copy",
   "@actionAddressCopy": {
     "description": "Copy action for email addresses"
