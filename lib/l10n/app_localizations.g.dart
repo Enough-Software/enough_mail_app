@@ -154,6 +154,12 @@ abstract class AppLocalizations {
   /// **'Decline'**
   String get actionDecline;
 
+  /// Generic edit action
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get actionEdit;
+
   /// Copy action for email addresses
   ///
   /// In en, this message translates to:

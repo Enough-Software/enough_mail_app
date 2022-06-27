@@ -38,6 +38,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get actionDecline => 'Ablehnen';
 
   @override
+  String get actionEdit => 'Bearbeiten';
+
+  @override
   String get actionAddressCopy => 'Kopieren';
 
   @override
