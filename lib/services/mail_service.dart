@@ -592,7 +592,13 @@ class MailService implements MimeSourceSubscriber {
     return email.substring(startIndex + 1);
   }
 
-  Future<MailClient?> connect(MailAccount mailAccount) async {
+  Future<MailClient?> connectAccount(MailAccount mailAccount) async {
+    final mailClient = createMailClient(mailAccount);
+    await _connect(mailClient);
+    return mailClient;
+  }
+
+  Future<MailClient?> connectFirstTime(MailAccount mailAccount) async {
     var mailClient = createMailClient(mailAccount);
     try {
       await _connect(mailClient);
@@ -625,6 +631,7 @@ class MailService implements MimeSourceSubscriber {
   }
 
   Future<bool> reconnect(Account account) async {
+    _mailClientsPerAccount.remove(account);
     final source = await getMessageSourceFor(account);
     final connected = source is! ErrorMessageSource;
     if (connected) {
@@ -636,6 +643,12 @@ class MailService implements MimeSourceSubscriber {
       //TODO update unified account message source after connecting account
     }
     return connected;
+  }
+
+  /// Disconnects the mail client belonging to [account].
+  Future<void> disconnect(Account account) async {
+    final client = await getClientFor(account);
+    await client.disconnect();
   }
 
   MailClient createMailClient(MailAccount mailAccount) {

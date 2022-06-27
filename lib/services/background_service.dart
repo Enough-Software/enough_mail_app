@@ -78,8 +78,8 @@ class BackgroundService {
     if (kDebugMode) {
       print('nextUids: $stringValue');
     }
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyInboxUids, stringValue);
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(_keyInboxUids, stringValue);
   }
 
   Future<void> addNextUidFor(
@@ -88,7 +88,7 @@ class BackgroundService {
       var box = mailClient.selectedMailbox;
       if (box == null || !box.isInbox) {
         final connected =
-            await locator<MailService>().connect(mailClient.account);
+            await locator<MailService>().connectAccount(mailClient.account);
         if (connected == null) {
           return;
         }
@@ -161,7 +161,7 @@ class BackgroundService {
   ) async {
     try {
       print('${account.name} A: background fetch connecting');
-      final mailClient = await mailService.connect(account);
+      final mailClient = await mailService.connectAccount(account);
       if (mailClient == null) {
         return;
       }

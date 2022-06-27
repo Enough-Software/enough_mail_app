@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/routes.dart';
@@ -347,13 +348,16 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
 
   Future<void> _updateAuthentication() async {
     final mailService = locator<MailService>();
+    mailService.disconnect(widget.account);
     final authentication = widget.account.account.incoming?.authentication;
     if (authentication is PlainAuthentication) {
       // simple case: password is directly given,
       // can be edited and account can be updated
       final result = await LocalizedDialogHelper.showWidgetDialog(
-          context, _PasswordUpdateDialog(authentication: authentication),
-          defaultActions: DialogActions.okAndCancel);
+        context,
+        _PasswordUpdateDialog(authentication: authentication),
+        defaultActions: DialogActions.okAndCancel,
+      );
       if (result == true) {
         final outgoingAuth = widget.account.account.outgoing?.authentication;
         if (outgoingAuth is PlainAuthentication) {
@@ -369,16 +373,33 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
       // save new token
       final provider = locator<ProviderService>()[
           widget.account.account.incoming?.serverConfig?.hostname ?? ''];
-      if (provider != null && provider.hasOAuthClient) {
-        final token = await provider.oauthClient!
-            .authenticate(widget.account.account.email!);
+      final oauthClient = provider?.oauthClient;
+      if (provider != null && oauthClient != null) {
+        final token =
+            await oauthClient.authenticate(widget.account.account.email!);
+
+        print('acquired token $token');
         if (token != null) {
+          authentication.userName = widget.account.email;
           authentication.token = token;
           final outgoingAuth = widget.account.account.outgoing?.authentication;
           if (outgoingAuth is OauthAuthentication) {
+            outgoingAuth.userName = widget.account.email;
             outgoingAuth.token = token;
           }
           await mailService.saveAccounts();
+          // final account = widget.account;
+          // final mailAccount = MailAccount.fromDiscoveredSettingsWithAuth(
+          //   'new.${account.name}',
+          //   account.email,
+          //   OauthAuthentication(account.email, token),
+          //   provider.clientConfig,
+          // );
+          // mailAccount.attributes[Account.attributeEnableLogging] = true;
+          // final mailClient =
+          //     await locator<MailService>().connectAccount(mailAccount);
+          // print('=++++++++++++++++=');
+          // print('CONNECTED=${mailClient?.isConnected ?? false}');
           _reconnect();
         }
       }
@@ -431,7 +452,7 @@ class _PasswordUpdateDialogState extends State<_PasswordUpdateDialog> {
   Widget build(BuildContext context) {
     return PasswordField(
       controller: _controller,
-      labelText: 'Password',
+      labelText: context.text.accountDetailsPasswordLabel,
       onChanged: (text) => widget.authentication.password = text,
     );
   }

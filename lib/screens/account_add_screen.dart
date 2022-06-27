@@ -235,7 +235,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         OauthAuthentication(email, token),
         provider.clientConfig,
       );
-      _mailClient = await locator<MailService>().connect(mailAccount);
+      _mailClient = await locator<MailService>().connectFirstTime(mailAccount);
       final isVerified = _mailClient?.isConnected ?? false;
       if (isVerified) {
         mailAccount.appExtensions = _extensions;
@@ -263,7 +263,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
       _passwordController.text,
       _provider!.clientConfig,
     );
-    _mailClient = await locator<MailService>().connect(mailAccount);
+    _mailClient = await locator<MailService>().connectFirstTime(mailAccount);
 
     final isVerified = _mailClient?.isConnected ?? false;
     if (isVerified) {
