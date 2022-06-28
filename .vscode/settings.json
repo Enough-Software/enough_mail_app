@@ -6,10 +6,13 @@
         "giphy",
         "icalendar",
         "imap",
+        "LTRB",
         "Maily",
         "QRESYNC",
         "Uids",
         "unawaited",
-        "undelete"
+        "undelete",
+        "Unflagged",
+        "unfocus"
     ]
 }
