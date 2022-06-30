@@ -1114,6 +1114,24 @@ abstract class AppLocalizations {
   /// **'Show only the text of messages'**
   String get settingsSecurityMessageRenderingPlainText;
 
+  /// Option for how to launch URLs.
+  ///
+  /// In en, this message translates to:
+  /// **'How should Maily open links?'**
+  String get settingsSecurityLaunchModeLabel;
+
+  /// Option for how to launch URLs.
+  ///
+  /// In en, this message translates to:
+  /// **'Open links externally'**
+  String get settingsSecurityLaunchModeExternal;
+
+  /// Option for how to launch URLs.
+  ///
+  /// In en, this message translates to:
+  /// **'Open links in Maily'**
+  String get settingsSecurityLaunchModeInApp;
+
   /// Settings action to manage accounts.
   ///
   /// In en, this message translates to:

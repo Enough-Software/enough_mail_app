@@ -631,6 +631,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSecurityMessageRenderingPlainText => 'Show only the text of messages';
 
   @override
+  String get settingsSecurityLaunchModeLabel => 'How should Maily open links?';
+
+  @override
+  String get settingsSecurityLaunchModeExternal => 'Open links externally';
+
+  @override
+  String get settingsSecurityLaunchModeInApp => 'Open links in Maily';
+
+  @override
   String get settingsActionAccounts => 'Manage accounts';
 
   @override
