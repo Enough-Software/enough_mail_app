@@ -793,6 +793,18 @@
   "@settingsSecurityMessageRenderingPlainText": {
     "description": "Option for how to render messages."
   },
+  "settingsSecurityLaunchModeLabel": "How should Maily open links?",
+  "@settingsSecurityLaunchModeLabel": {
+    "description": "Option for how to launch URLs."
+  },
+  "settingsSecurityLaunchModeExternal": "Open links externally",
+  "@settingsSecurityLaunchModeExternal": {
+    "description": "Option for how to launch URLs."
+  },
+  "settingsSecurityLaunchModeInApp": "Open links in Maily",
+  "@settingsSecurityLaunchModeInApp": {
+    "description": "Option for how to launch URLs."
+  },
   "settingsActionAccounts": "Manage accounts",
   "@settingsActionAccounts": {
     "description": "Settings action to manage accounts."

@@ -416,7 +416,11 @@ class _MessageContentState extends State<_MessageContent> {
               ? 'https://${url.substring('http://'.length)}'
               : url,
         );
-        launcher.launchUrl(uri);
+
+        launcher.launchUrl(
+          uri,
+          mode: locator<SettingsService>().settings.urlLaunchMode,
+        );
         return Future.value(true);
       },
       onZoomed: (controller, factor) {

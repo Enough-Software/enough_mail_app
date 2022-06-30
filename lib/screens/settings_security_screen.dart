@@ -1,3 +1,4 @@
+import 'package:url_launcher/url_launcher.dart' as launcher;
 import 'package:enough_mail_app/models/settings.dart';
 import 'package:enough_mail_app/services/biometrics_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
@@ -21,6 +22,7 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
   late bool _preferPlainTextMessages;
   late bool _enableBiometricLock;
   late LockTimePreference _lockTimePreference;
+  late launcher.LaunchMode _urlLaunchMode;
   bool? _isBiometricsSupported;
   // Future<bool>? _biometricsSupportedFuture;
 
@@ -33,6 +35,7 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
     _preferPlainTextMessages = settings.preferPlainTextMessages;
     _enableBiometricLock = settings.enableBiometricLock;
     _lockTimePreference = settings.lockTimePreference;
+    _urlLaunchMode = settings.urlLaunchMode;
     if (_enableBiometricLock) {
       _isBiometricsSupported = true;
     } else {
@@ -75,7 +78,13 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(localizations.securitySettingsIntro),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8.0,
+                    horizontal: 4.0,
+                  ),
+                  child: Text(localizations.securitySettingsIntro),
+                ),
                 const Divider(),
                 Row(
                   children: [
@@ -207,6 +216,38 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                       child: CircularProgressIndicator(),
                     ),
                   ),
+                const Divider(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 4.0),
+                  child: Text(localizations.settingsSecurityLaunchModeLabel),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: PlatformDropdownButton<launcher.LaunchMode>(
+                    value: _urlLaunchMode,
+                    onChanged: (value) async {
+                      if (value != null) {
+                        _settings.urlLaunchMode = value;
+                        setState(() {
+                          _urlLaunchMode = value;
+                        });
+                        await locator<SettingsService>().save();
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(
+                        value: launcher.LaunchMode.externalApplication,
+                        child: Text(
+                            localizations.settingsSecurityLaunchModeExternal),
+                      ),
+                      DropdownMenuItem(
+                        value: launcher.LaunchMode.inAppWebView,
+                        child:
+                            Text(localizations.settingsSecurityLaunchModeInApp),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

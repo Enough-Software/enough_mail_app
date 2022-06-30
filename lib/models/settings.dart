@@ -3,6 +3,7 @@ import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:enough_serialization/enough_serialization.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
 
 enum FolderNameSetting { server, localized, custom }
 
@@ -44,6 +45,7 @@ class Settings extends SerializableObject {
   static const _keyReplyFormatPreference = 'replyFormatPreference';
   static const _keyEnableBiometricLock = 'enableBiometricLock';
   static const _keyLockTimePreference = 'enableBiometricLockTime';
+  static const _keyUrlLaunchMode = 'urlLaunchMode';
 
   Settings() {
     objectCreators[_keyThemeSettings] = (map) => ThemeSettings();
@@ -70,6 +72,9 @@ class Settings extends SerializableObject {
         value is LockTimePreference
             ? value.index
             : LockTimePreference.values[value];
+    transformers[_keyUrlLaunchMode] = (value) => value is launcher.LaunchMode
+        ? value.index
+        : launcher.LaunchMode.values[value];
   }
 
   bool get blockExternalImages => attributes['blockExternalImages'] ?? false;
@@ -144,6 +149,12 @@ class Settings extends SerializableObject {
       attributes['preferPlainTextMessages'] ?? false;
   set preferPlainTextMessages(bool value) =>
       attributes['preferPlainTextMessages'] = value;
+
+  /// The launch mode for links - either "in app" or "external"
+  launcher.LaunchMode get urlLaunchMode =>
+      attributes[_keyUrlLaunchMode] ?? launcher.LaunchMode.externalApplication;
+  set urlLaunchMode(launcher.LaunchMode value) =>
+      attributes[_keyUrlLaunchMode] = value;
 
   ReplyFormatPreference get replyFormatPreference =>
       attributes[_keyReplyFormatPreference] ?? ReplyFormatPreference.alwaysHtml;
