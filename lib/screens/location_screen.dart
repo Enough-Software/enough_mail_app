@@ -21,48 +21,13 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  final repaintBoundaryKey = GlobalKey();
-
-  LatLng defaultLocation = LatLng(53.07516, 8.80777);
-  late MapController controller;
-  Future<LocationData?>? findLocation;
-  late Offset _dragStart;
-  double _scaleStart = 1.0;
-
-  void _gotoDefault() {
-    controller.center = defaultLocation;
-  }
-
-  void _onDoubleTap() {
-    controller.zoom += 0.5;
-  }
-
-  void _onScaleStart(ScaleStartDetails details) {
-    _dragStart = details.focalPoint;
-    _scaleStart = 1.0;
-  }
-
-  void _onScaleUpdate(ScaleUpdateDetails details) {
-    final scaleDiff = details.scale - _scaleStart;
-    _scaleStart = details.scale;
-
-    if (scaleDiff > 0) {
-      controller.zoom += 0.02;
-    } else if (scaleDiff < 0) {
-      controller.zoom -= 0.02;
-    } else {
-      final now = details.focalPoint;
-      final diff = now - _dragStart;
-      _dragStart = now;
-      controller.drag(diff.dx, diff.dy);
-    }
-  }
+  final _repaintBoundaryKey = GlobalKey();
+  late Future<LocationData?> _findLocation;
 
   @override
   void initState() {
+    _findLocation = locator<LocationService>().getCurrentLocation();
     super.initState();
-    controller = MapController(location: defaultLocation);
-    findLocation = locator<LocationService>().getCurrentLocation();
   }
 
   @override
@@ -75,11 +40,11 @@ class _LocationScreenState extends State<LocationScreen> {
       appBarActions: [
         PlatformIconButton(
           icon: const Icon(Icons.check),
-          onPressed: onLocationSelected,
+          onPressed: _onLocationSelected,
         ),
       ],
       content: FutureBuilder<LocationData?>(
-        future: findLocation,
+        future: _findLocation,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -87,49 +52,98 @@ class _LocationScreenState extends State<LocationScreen> {
             case ConnectionState.active:
               return const Center(child: PlatformProgressIndicator());
             case ConnectionState.done:
-              if (snapshot.hasData) {
-                defaultLocation =
-                    LatLng(snapshot.data!.latitude!, snapshot.data!.longitude!);
-                controller.center = defaultLocation;
-                return buildMap();
+              final data = snapshot.data;
+              if (data != null) {
+                return _buildMap(context, data.latitude!, data.longitude!);
               }
           }
-          return buildMap();
+          return const Center(child: PlatformProgressIndicator());
         },
       ),
     );
   }
 
-  void onLocationSelected() async {
-    RenderRepaintBoundary boundary = repaintBoundaryKey.currentContext!
-        .findRenderObject() as RenderRepaintBoundary;
-    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+  void _onLocationSelected() async {
+    final context = _repaintBoundaryKey.currentContext;
+    if (context == null) {
+      locator<NavigationService>().pop();
+      return;
+    }
+    final boundary = context.findRenderObject() as RenderRepaintBoundary;
+    final image = await boundary.toImage(pixelRatio: 3.0);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     var pngBytes = byteData?.buffer.asUint8List();
     locator<NavigationService>().pop(pngBytes);
   }
 
-  Widget buildMap() {
+  Widget _buildMap(BuildContext context, double latitude, double longitude) {
     final size = MediaQuery.of(context).size;
-    return GestureDetector(
-      onDoubleTap: _onDoubleTap,
-      onScaleStart: _onScaleStart,
-      onScaleUpdate: _onScaleUpdate,
-      onScaleEnd: (details) {
-        if (kDebugMode) {
-          print(
-              "Location: ${controller.center.latitude}, ${controller.center.longitude}");
-        }
-      },
-      child: SizedBox(
-        width: size.width,
-        height: size.height,
-        child: RepaintBoundary(
-          key: repaintBoundaryKey,
-          child: Stack(
-            children: [
-              Map(
-                controller: controller,
+    return SizedBox(
+      width: size.width,
+      height: size.height,
+      child: _MapWidget(
+        repaintBoundaryKey: _repaintBoundaryKey,
+        latitude: latitude,
+        longitude: longitude,
+      ),
+    );
+  }
+}
+
+class _MapWidget extends StatefulWidget {
+  const _MapWidget({
+    Key? key,
+    required this.repaintBoundaryKey,
+    required this.longitude,
+    required this.latitude,
+  }) : super(key: key);
+
+  final Key repaintBoundaryKey;
+  final double longitude;
+  final double latitude;
+
+  @override
+  State<_MapWidget> createState() => _MapWidgetState();
+}
+
+class _MapWidgetState extends State<_MapWidget> {
+  late LatLng _defaultLocation;
+  late MapController _controller;
+  late Offset _dragStart;
+  double _scaleStart = 1.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _defaultLocation = LatLng(widget.latitude, widget.longitude);
+    _controller = MapController(location: _defaultLocation);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      key: widget.repaintBoundaryKey,
+      child: Stack(
+        children: [
+          MapLayout(
+            controller: _controller,
+            builder: (context, transformer) => GestureDetector(
+              onDoubleTap: _onDoubleTap,
+              onScaleStart: _onScaleStart,
+              onScaleUpdate: (details) => _onScaleUpdate(details, transformer),
+              onScaleEnd: (details) {
+                if (kDebugMode) {
+                  print(
+                      "Location: ${_controller.center.latitude}, ${_controller.center.longitude}");
+                }
+              },
+              child: TileLayer(
                 builder: (context, x, y, z) {
                   final url =
                       'https://www.google.com/maps/vt/pb=!1m4!1m3!1i$z!2i$x!3i$y!2m3!1e0!2sm!3i420120488!3m7!2sen!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0!5m1!1e0!23i4111425';
@@ -140,26 +154,59 @@ class _LocationScreenState extends State<LocationScreen> {
                   );
                 },
               ),
-              const Center(
-                child: Icon(Icons.close, color: Colors.red),
-              ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: PlatformIconButton(
-                    icon: const Icon(
-                      Icons.location_searching,
-                      color: Colors.grey,
-                    ),
-                    onPressed: _gotoDefault,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          const Center(
+            child: Icon(Icons.close, color: Colors.red),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: PlatformIconButton(
+                icon: const Icon(
+                  Icons.location_searching,
+                  color: Colors.grey,
+                ),
+                onPressed: _gotoDefault,
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  void _gotoDefault() {
+    _controller.center = _defaultLocation;
+    setState(() {});
+  }
+
+  void _onDoubleTap() {
+    _controller.zoom += 0.5;
+    setState(() {});
+  }
+
+  void _onScaleStart(ScaleStartDetails details) {
+    _dragStart = details.focalPoint;
+    _scaleStart = 1.0;
+  }
+
+  void _onScaleUpdate(ScaleUpdateDetails details, MapTransformer transformer) {
+    final scaleDiff = details.scale - _scaleStart;
+    //print('on scale update: scaleDiff=$scaleDiff focal=${details.focalPoint}');
+    _scaleStart = details.scale;
+
+    if (scaleDiff > 0) {
+      _controller.zoom += 0.02;
+    } else if (scaleDiff < 0) {
+      _controller.zoom -= 0.02;
+    } else {
+      final now = details.focalPoint;
+      final diff = now - _dragStart;
+      _dragStart = now;
+      transformer.drag(diff.dx, diff.dy);
+    }
+    setState(() {});
   }
 }

@@ -28,20 +28,23 @@ class NotificationService {
       return NotificationServiceInitResult.normal;
     }
     const android = AndroidInitializationSettings('ic_stat_notification');
-    final ios = IOSInitializationSettings(
-        onDidReceiveLocalNotification: _onDidReceiveLocalNotification);
-    const macos = MacOSInitializationSettings();
+    final ios = DarwinInitializationSettings(
+      onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
+    );
+    const macos = DarwinInitializationSettings();
     final initSettings =
         InitializationSettings(android: android, iOS: ios, macOS: macos);
     await _flutterLocalNotificationsPlugin.initialize(initSettings,
-        onSelectNotification: _selectNotification);
+        onDidReceiveNotificationResponse: (response) =>
+            _selectNotification(response.payload));
     if (checkForLaunchDetails) {
       final launchDetails = await _flutterLocalNotificationsPlugin
           .getNotificationAppLaunchDetails();
-      if (launchDetails?.payload != null) {
+      final payload = launchDetails?.notificationResponse?.payload;
+      if (payload != null) {
         // print(
         //     'got notification launched details: $launchDetails with payload ${launchDetails?.payload}');
-        await _selectNotification(launchDetails!.payload);
+        await _selectNotification(payload);
         return NotificationServiceInitResult.appLaunchedByNotification;
       }
     }
@@ -170,7 +173,7 @@ class NotificationService {
     bool channelShowBadge = true,
   }) async {
     AndroidNotificationDetails? androidPlatformChannelSpecifics;
-    IOSNotificationDetails? iosPlatformChannelSpecifics;
+    DarwinNotificationDetails? iosPlatformChannelSpecifics;
     if (Platform.isAndroid) {
       androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'maily',
@@ -185,8 +188,10 @@ class NotificationService {
         sound: const RawResourceAndroidNotificationSound('pop'),
       );
     } else if (Platform.isIOS) {
-      iosPlatformChannelSpecifics =
-          const IOSNotificationDetails(presentSound: true);
+      iosPlatformChannelSpecifics = const DarwinNotificationDetails(
+        presentSound: true,
+        presentBadge: true,
+      );
     }
     final platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
