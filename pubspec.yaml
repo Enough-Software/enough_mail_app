@@ -77,7 +77,6 @@ dependencies:
   webview_flutter: ^3.0.0
 
 dependency_overrides:
-  collection: ^1.16.0
   xml: ^6.1.0
   flutter_inappwebview:
     git: https://github.com/CodeEagle/flutter_inappwebview
