@@ -7,7 +7,24 @@ import 'package:flutter/cupertino.dart';
 
 import '../locator.dart';
 
-class Account extends ChangeNotifier {
+/// Common functionality for accounts
+abstract class Account extends ChangeNotifier {
+  /// Is this a virtual account, e.g. a unified one?
+  bool get isVirtual;
+
+  ///  The name of the account
+  String get name;
+  set name(String value);
+
+  /// The from address for this account
+  MailAddress get fromAddress;
+}
+
+/// Allows to listen to mail account changes
+class RealAccount extends Account {
+  /// Creates a new [Account]
+  RealAccount(MailAccount account) : _account = account;
+
   static const String attributeGravatarImageUrl = 'gravatar.img';
   static const String attributeExcludeFromUnified = 'excludeUnified';
   static const String attributePlusAliasTested = 'test.alias.plus';
@@ -17,25 +34,33 @@ class Account extends ChangeNotifier {
   static const String attributeBccMyself = 'bccMyself';
   static const String attributeEnableLogging = 'enableLogging';
 
-  final MailAccount account;
+  /// The underlying actual account
+  MailAccount _account;
 
-  Account(this.account);
+  /// Retrieves the mail account
+  MailAccount get mailAccount => _account;
 
+  @override
   bool get isVirtual => false;
 
-  String get name => account.name ?? '';
+  @override
+  String get name => _account.name;
+
+  @override
   set name(String value) {
-    account.name = value;
+    _account = _account.copyWith(name: value);
+    // TODO(RV): now this account is de-coupled from account manager aka MailService
     notifyListeners();
   }
 
+  /// Should this account be excluded from the unified account?
   bool get excludeFromUnified =>
-      account.hasAttribute(attributeExcludeFromUnified);
+      _account.hasAttribute(attributeExcludeFromUnified);
   set excludeFromUnified(bool value) {
     if (value) {
-      account.attributes[attributeExcludeFromUnified] = value;
+      _account = _account.copyWithAttribute(attributeExcludeFromUnified, value);
     } else {
-      account.attributes.remove(attributeExcludeFromUnified);
+      _account.attributes.remove(attributeExcludeFromUnified);
     }
   }
 
@@ -43,18 +68,25 @@ class Account extends ChangeNotifier {
   bool get enableLogging => getAttribute(attributeEnableLogging) ?? false;
   set enableLogging(bool value) => setAttribute(attributeEnableLogging, value);
 
+  /// Retrieves the attribute with the given [key] name
   dynamic getAttribute(String key) {
-    return account.attributes[key];
+    return _account.attributes[key];
   }
 
+  /// Sets the attribute [key] to [value]
   void setAttribute(String key, dynamic value) {
-    account.attributes[key] = value;
+    _account = _account.copyWithAttribute(key, value);
   }
 
+  /// Checks is this account has the [key] attribute
+  bool hasAttribute(String key) => _account.hasAttribute(name);
+
+  /// Retrieves the account specific signature for HTML messages
+  /// Compare [signaturePlain]
   String? get signatureHtml {
-    var signature = account.attributes[attributeSignatureHtml];
+    var signature = _account.attributes[attributeSignatureHtml];
     if (signature == null) {
-      final extensions = account.appExtensions;
+      final extensions = appExtensions;
       if (extensions != null) {
         final languageCode = locator<I18nService>().locale!.languageCode;
         for (final ext in extensions) {
@@ -70,81 +102,94 @@ class Account extends ChangeNotifier {
 
   set signatureHtml(String? value) {
     if (value == null) {
-      account.attributes.remove(attributeSignatureHtml);
+      _account.attributes.remove(attributeSignatureHtml);
     } else {
-      account.attributes[attributeSignatureHtml] = value;
+      _account = _account.copyWithAttribute(attributeSignatureHtml, value);
     }
   }
 
-  String? get signaturePlain => account.attributes[attributeSignaturePlain];
+  /// Account-specific signature for plain text messages
+  ///
+  /// Compare [signatureHtml]
+  String? get signaturePlain => _account.attributes[attributeSignaturePlain];
   set signaturePlain(String? value) {
     if (value == null) {
-      account.attributes.remove(attributeSignaturePlain);
+      _account.attributes.remove(attributeSignaturePlain);
     } else {
-      account.attributes[attributeSignaturePlain] = value;
+      _account = _account.copyWithAttribute(attributeSignaturePlain, value);
     }
   }
 
-  String? get userName => account.userName;
+  /// The name used for sending
+  String? get userName => _account.userName;
   set userName(String? value) {
-    account.userName = value;
+    _account = _account.copyWith(userName: value);
     notifyListeners();
   }
 
-  String get email => account.email!;
+  /// The email associated with this account
+  String get email => _account.email;
   set email(String value) {
-    account.email = value;
+    _account = _account.copyWith(email: value);
     notifyListeners();
   }
 
-  MailAddress get fromAddress => account.fromAddress;
+  @override
+  MailAddress get fromAddress => _account.fromAddress;
 
-  bool get supportsPlusAliases => account.supportsPlusAliases;
+  /// Does this account support + aliases like name+alias@domain.com?
+  bool get supportsPlusAliases => _account.supportsPlusAliases;
   set supportsPlusAliases(bool value) {
-    account.supportsPlusAliases = value;
+    _account = _account.copyWith(supportsPlusAliases: value);
     notifyListeners();
   }
 
-  bool get bccMyself => account.hasAttribute(attributeBccMyself);
+  /// Should all outgoing messages be sent to the user as well?
+  bool get bccMyself => _account.hasAttribute(attributeBccMyself);
   set bccMyself(bool value) {
     if (value) {
-      account.attributes[attributeBccMyself] = value;
+      setAttribute(attributeBccMyself, value);
     } else {
-      account.attributes.remove(attributeBccMyself);
+      _account.attributes.remove(attributeBccMyself);
     }
   }
 
+  /// Allows to access the [ContactManager]
   ContactManager? contactManager;
 
+  /// Adds the [alias]
   Future<void> addAlias(MailAddress alias) {
-    account.aliases ??= <MailAddress>[];
-    account.aliases!.add(alias);
+    _account = _account.copyWithAlias(alias);
     notifyListeners();
-    return locator<MailService>().saveAccount(account);
+    return locator<MailService>().saveAccount(_account);
   }
 
+  /// Removes the [alias]
   Future<void> removeAlias(MailAddress alias) {
-    account.aliases ??= <MailAddress>[];
-    account.aliases!.remove(alias);
+    _account.aliases.remove(alias);
     notifyListeners();
-    return locator<MailService>().saveAccount(account);
+    return locator<MailService>().saveAccount(_account);
   }
 
-  void updateAlias(MailAddress alias) {
-    notifyListeners();
-  }
+  /// Retrieves the known alias addresses
+  List<MailAddress> get aliases => _account.aliases;
 
-  List<MailAddress> get aliases => account.aliases ?? <MailAddress>[];
+  /// Checks if this account has at least 1 alias
+  bool get hasAlias => _account.aliases.isNotEmpty;
 
-  bool get hasAlias => account.aliases?.isNotEmpty ?? false;
-  bool get hasNoAlias => !hasAlias;
+  /// Checks if this account has now alias
+  bool get hasNoAlias => _account.aliases.isEmpty;
 
-  String? get imageUrlGravator => account.attributes[attributeGravatarImageUrl];
+  /// Retrieves the gravatar image URl for this email
+  String? get imageUrlGravatar =>
+      _account.attributes[attributeGravatarImageUrl];
 
+  /// Marks if this account adds sent messages to the default SENT mailbox
+  /// folder automatically
   bool get addsSentMailAutomatically =>
-      account.attributes[attributeSentMailAddedAutomatically] ?? false;
+      _account.attributes[attributeSentMailAddedAutomatically] ?? false;
 
-  String? _key;
+  /// Retrieves the key for comparing this account
   String get key {
     var k = _key;
     if (k == null) {
@@ -154,26 +199,36 @@ class Account extends ChangeNotifier {
     return k;
   }
 
-  List<AppExtension?>? get appExtensions => account.appExtensions;
-  set appExtensions(List<AppExtension?>? value) =>
-      account.appExtensions = value;
+  String? _key;
+
+  /// [AppExtension]s are account specific additional setting retrieved
+  /// from the server during initial setup
+  /// Retrieves the app extensions
+  List<AppExtension>? get appExtensions =>
+      _account.attributes[AppExtension.attributeName];
+  set appExtensions(List<AppExtension?>? value) {
+    setAttribute(AppExtension.attributeName, value);
+  }
 
   @override
-  operator ==(Object other) => other is Account && other.key == key;
+  operator ==(Object other) => other is RealAccount && other.key == key;
 
   @override
   int get hashCode => key.hashCode;
+
+  /// Copies this account with the given [mailAccount]
+  RealAccount copyWith({required MailAccount mailAccount}) =>
+      RealAccount(mailAccount);
 }
 
+/// A unified account bundles folders of several accounts
 class UnifiedAccount extends Account {
-  final List<Account> accounts;
-  final String _name;
+  /// Creates a new [UnifiedAccount]
+  UnifiedAccount(this.accounts, String name) : _name = name;
 
-  UnifiedAccount(this.accounts, String name)
-      : _name = name,
-        super(MailAccount()
-          ..name = 'unified'
-          ..email = 'info@enough.de');
+  /// The accounts
+  final List<RealAccount> accounts;
+  String _name;
 
   @override
   bool get isVirtual => true;
@@ -182,21 +237,33 @@ class UnifiedAccount extends Account {
   String get name => _name;
 
   @override
-  MailAddress get fromAddress => accounts.first.fromAddress;
+  set name(String value) {
+    _name = value;
+    notifyListeners();
+  }
 
   @override
+  MailAddress get fromAddress => accounts.first.fromAddress;
+
+  /// The emails of this account
   String get email => accounts.map((a) => a.email).join(';');
 
-  void removeAccount(Account account) {
+  /// Removes the given [account]
+  void removeAccount(RealAccount account) {
     accounts.remove(account);
   }
 
-  void addAccount(Account account) {
+  /// Adds the given [account]
+  void addAccount(RealAccount account) {
     accounts.add(account);
   }
 }
 
-class ConnectedAccount extends Account {
-  final MailClient mailClient;
+/// A account with an active [MailClient]
+class ConnectedAccount extends RealAccount {
+  /// Creates a new [ConnectedAccount]
   ConnectedAccount(MailAccount account, this.mailClient) : super(account);
+
+  /// The client
+  final MailClient mailClient;
 }

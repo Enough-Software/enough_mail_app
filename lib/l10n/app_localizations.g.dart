@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -9,14 +8,14 @@ import 'package:intl/intl.dart' as intl;
 import 'app_localizations_de.g.dart';
 import 'app_localizations_en.g.dart';
 
-/// Callers can lookup localized strings with an instance of AppLocalizations returned
-/// by `AppLocalizations.of(context)`.
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
 ///
 /// Applications need to include `AppLocalizations.delegate()` in their app's
-/// localizationDelegates list, and the locales they support in the app's
-/// supportedLocales list. For example:
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
 ///
-/// ```
+/// ```dart
 /// import 'l10n/app_localizations.g.dart';
 ///
 /// return MaterialApp(
@@ -31,14 +30,14 @@ import 'app_localizations_en.g.dart';
 /// Please make sure to update your pubspec.yaml to include the following
 /// packages:
 ///
-/// ```
+/// ```yaml
 /// dependencies:
 ///   # Internationalization support.
 ///   flutter_localizations:
 ///     sdk: flutter
 ///   intl: any # Use the pinned version from flutter_localizations
 ///
-///   # rest of dependencies
+///   # Rest of dependencies
 /// ```
 ///
 /// ## iOS Applications
@@ -65,8 +64,8 @@ abstract class AppLocalizations {
 
   final String localeName;
 
-  static AppLocalizations? of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  static AppLocalizations of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
   static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
@@ -90,8 +89,8 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
-    Locale('de'),
-    Locale('en')
+    Locale('en'),
+    Locale('de')
   ];
 
   /// Default signature text
@@ -374,25 +373,25 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{One message marked as junk} other{Marked {number} messages as junk}}'**
-  String multipleMovedToJunk(num number);
+  String multipleMovedToJunk(int number);
 
   /// Message shown after moving messages from junk, trash or archive back to the Inbox. Message formatted using the plural JSON scheme.
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{Moved one message to inbox} other{Moved {number} messages to inbox}}'**
-  String multipleMovedToInbox(num number);
+  String multipleMovedToInbox(int number);
 
   /// Message shown after moving messages to archive. Message formatted using the plural JSON scheme.
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{Archived one message} other{Archived {number} messages}}'**
-  String multipleMovedToArchive(num number);
+  String multipleMovedToArchive(int number);
 
   /// Message shown after moving messages to trash. Message formatted using the plural JSON scheme.
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{Deleted one message} other{Deleted {number} messages}}'**
-  String multipleMovedToTrash(num number);
+  String multipleMovedToTrash(int number);
 
   /// Short info shown when a multiple message action is triggered without selecting at least one message first.
   ///
@@ -404,7 +403,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{Move message} other{Move {number} messages}}'**
-  String multipleMoveTitle(num number);
+  String multipleMoveTitle(int number);
 
   /// Action for several messages.
   ///
@@ -542,7 +541,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{One account} other{{number} accounts}}'**
-  String drawerAccountsSectionTitle(num number);
+  String drawerAccountsSectionTitle(int number);
 
   /// Menu entry for adding a new account.
   ///
@@ -848,7 +847,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{Forward attachment} other{Forward {number} attachments}}'**
-  String messageActionForwardAttachments(num number);
+  String messageActionForwardAttachments(int number);
 
   /// Action for multiple selected messages to forward all attachments of the messages.
   ///
@@ -3002,37 +3001,37 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{1 year} other{{number} years}}'**
-  String durationYears(num number);
+  String durationYears(int number);
 
   /// Duration. Message formatted using the plural JSON scheme.
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{1 month} other{{number} months}}'**
-  String durationMonths(num number);
+  String durationMonths(int number);
 
   /// Duration. Message formatted using the plural JSON scheme.
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{1 week} other{{number} weeks}}'**
-  String durationWeeks(num number);
+  String durationWeeks(int number);
 
   /// Duration. Message formatted using the plural JSON scheme.
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{1 day} other{{number} days}}'**
-  String durationDays(num number);
+  String durationDays(int number);
 
   /// Duration. Message formatted using the plural JSON scheme.
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{1 hour} other{{number} hours}}'**
-  String durationHours(num number);
+  String durationHours(int number);
 
   /// Duration. Message formatted using the plural JSON scheme.
   ///
   /// In en, this message translates to:
   /// **'{number,plural, =1{1 minute} other{{number} minutes}}'**
-  String durationMinutes(num number);
+  String durationMinutes(int number);
 
   /// Text shown when the duration is 0
   ///

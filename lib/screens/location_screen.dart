@@ -23,7 +23,7 @@ class LocationScreen extends StatefulWidget {
 class _LocationScreenState extends State<LocationScreen> {
   final repaintBoundaryKey = GlobalKey();
 
-  LatLng defaultLocation = LatLng(53.07516, 8.80777);
+  LatLng defaultLocation = const LatLng(53.07516, 8.80777);
   late MapController controller;
   Future<LocationData?>? findLocation;
   late Offset _dragStart;
@@ -42,7 +42,7 @@ class _LocationScreenState extends State<LocationScreen> {
     _scaleStart = 1.0;
   }
 
-  void _onScaleUpdate(ScaleUpdateDetails details) {
+  void _onScaleUpdate(ScaleUpdateDetails details, MapTransformer transformer) {
     final scaleDiff = details.scale - _scaleStart;
     _scaleStart = details.scale;
 
@@ -54,8 +54,9 @@ class _LocationScreenState extends State<LocationScreen> {
       final now = details.focalPoint;
       final diff = now - _dragStart;
       _dragStart = now;
-      controller.drag(diff.dx, diff.dy);
+      transformer.drag(diff.dx, diff.dy);
     }
+    setState(() {});
   }
 
   @override
@@ -111,52 +112,55 @@ class _LocationScreenState extends State<LocationScreen> {
 
   Widget buildMap() {
     final size = MediaQuery.of(context).size;
-    return GestureDetector(
-      onDoubleTap: _onDoubleTap,
-      onScaleStart: _onScaleStart,
-      onScaleUpdate: _onScaleUpdate,
-      onScaleEnd: (details) {
-        if (kDebugMode) {
-          print(
-              "Location: ${controller.center.latitude}, ${controller.center.longitude}");
-        }
-      },
-      child: SizedBox(
-        width: size.width,
-        height: size.height,
-        child: RepaintBoundary(
-          key: repaintBoundaryKey,
-          child: Stack(
-            children: [
-              Map(
-                controller: controller,
-                builder: (context, x, y, z) {
-                  final url =
-                      'https://www.google.com/maps/vt/pb=!1m4!1m3!1i$z!2i$x!3i$y!2m3!1e0!2sm!3i420120488!3m7!2sen!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0!5m1!1e0!23i4111425';
+    return MapLayout(
+      controller: controller,
+      builder: (context, transformer) => GestureDetector(
+        onDoubleTap: _onDoubleTap,
+        onScaleStart: _onScaleStart,
+        onScaleUpdate: (details) => _onScaleUpdate(details, transformer),
+        onScaleEnd: (details) {
+          if (kDebugMode) {
+            print(
+                "Location: ${controller.center.latitude}, ${controller.center.longitude}");
+          }
+        },
+        child: SizedBox(
+          width: size.width,
+          height: size.height,
+          child: RepaintBoundary(
+            key: repaintBoundaryKey,
+            child: Stack(
+              children: [
+                Map(
+                  controller: controller,
+                  builder: (context, x, y, z) {
+                    final url =
+                        'https://www.google.com/maps/vt/pb=!1m4!1m3!1i$z!2i$x!3i$y!2m3!1e0!2sm!3i420120488!3m7!2sen!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0!5m1!1e0!23i4111425';
 
-                  return CachedNetworkImage(
-                    imageUrl: url,
-                    fit: BoxFit.cover,
-                  );
-                },
-              ),
-              const Center(
-                child: Icon(Icons.close, color: Colors.red),
-              ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: PlatformIconButton(
-                    icon: const Icon(
-                      Icons.location_searching,
-                      color: Colors.grey,
+                    return CachedNetworkImage(
+                      imageUrl: url,
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
+                const Center(
+                  child: Icon(Icons.close, color: Colors.red),
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: PlatformIconButton(
+                      icon: const Icon(
+                        Icons.location_searching,
+                        color: Colors.grey,
+                      ),
+                      onPressed: _gotoDefault,
                     ),
-                    onPressed: _gotoDefault,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

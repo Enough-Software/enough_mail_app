@@ -1,22 +1,29 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_serialization/enough_serialization.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-class BackgroundUpdateInfo extends SerializableObject {
-  BackgroundUpdateInfo() {
-    objectCreators['uidsByEmail'] = (map) => <String, int>{};
-  }
+part 'background_update_info.g.dart';
 
-  Map<String, int>? get _uidsByEmail => attributes['uidsByEmail'];
-  set _uidsByEmail(Map<String, int>? value) =>
-      attributes['uidsByEmail'] = value;
+@JsonSerializable()
+class BackgroundUpdateInfo {
+  BackgroundUpdateInfo({Map<String, int>? uidsByEmail})
+      : _uidsByEmail = uidsByEmail;
 
+  factory BackgroundUpdateInfo.fromJson(Map<String, dynamic> json) =>
+      _$BackgroundUpdateInfoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BackgroundUpdateInfoToJson(this);
+
+  @JsonKey(name: 'uidsByEmail')
+  Map<String, int>? _uidsByEmail;
+
+  @JsonKey(ignore: true)
   var _isDirty = false;
 
   /// Has this information been updated since the last persistence?
   bool get isDirty => _isDirty;
 
   void updateForClient(MailClient mailClient, int nextExpectedUid) =>
-      updateForEmail(mailClient.account.email ?? '', nextExpectedUid);
+      updateForEmail(mailClient.account.email, nextExpectedUid);
 
   void updateForEmail(String email, int nextExpectedUid) {
     final uidsByEmail = _uidsByEmail ?? <String, int>{};
@@ -27,11 +34,11 @@ class BackgroundUpdateInfo extends SerializableObject {
 
   /// Retrieves the next expected uid
   int? nextExpectedUidForClient(MailClient mailClient) =>
-      nextExpectedUidForEmail(mailClient.account.email ?? '');
+      nextExpectedUidForEmail(mailClient.account.email);
 
   /// Retrieves the next expected uid
   int? nextExpectedUidForAccount(MailAccount account) =>
-      nextExpectedUidForEmail(account.email ?? '');
+      nextExpectedUidForEmail(account.email);
 
   /// Retrieves the next expected uid
   int? nextExpectedUidForEmail(String email) {

@@ -52,10 +52,10 @@ class AppRouter {
         );
         break;
       case Routes.accountServerDetails:
-        page = AccountServerDetailsScreen(account: arguments as Account);
+        page = AccountServerDetailsScreen(account: arguments as RealAccount);
         break;
       case Routes.accountEdit:
-        page = AccountEditScreen(account: arguments as Account);
+        page = AccountEditScreen(account: arguments as RealAccount);
         break;
       case Routes.settings:
         page = const SettingsScreen();

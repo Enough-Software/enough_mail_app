@@ -71,6 +71,12 @@ For some features you will need to add the relevant keys to *assets/keys.txt*, c
 When you change translations, re-generate the translations files by calling `flutter gen-l10n`.
 Missing translations will be listed in `missing-translations.txt`.
 
+## JSON Generation for Persistence
+We use the standard [json_serializable](https://pub.dev/packages/json_serializable) package for generating 
+JSON and [hive](https://pub.dev/packages/hive) for storage. 
+When changing such classes, you have to re-run code generation
+by calling `flutter pub run build_runner build --delete-conflicting-outputs`.
+
 ## License
 `enough_mail_app` is licensed under the [GNU Public License 3.0 "GPL"](LICENSE). In a nutshell this means that you can play around as much as possible for private reasons, but that you need to publish your changes under the GPL, as soon as you the code commercially.
 

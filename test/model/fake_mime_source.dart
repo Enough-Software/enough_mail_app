@@ -14,12 +14,15 @@ class FakeMimeSource extends PagedCachedMimeSource {
   })  : _startDate = startDate ?? DateTime(2022, 04, 16, 08, 00),
         _differencePerMessage =
             differencePerMessage ?? const Duration(minutes: 5),
-        mailClient = MailClient(MailAccount.fromManualSettings(
-            name,
-            'test@domain.com',
-            'imap.domain.com',
-            'smtp.domain.com',
-            'password')),
+        mailClient = MailClient(
+          MailAccount.fromManualSettings(
+            name: name,
+            email: 'test@domain.com',
+            incomingHost: 'imap.domain.com',
+            outgoingHost: 'smtp.domain.com',
+            password: 'password',
+          ),
+        ),
         super(maxCacheSize: maxCacheSize) {
     messages = generateMessages(
       size: size,

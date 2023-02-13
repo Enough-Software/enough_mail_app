@@ -1,3 +1,5 @@
+# Run flutter gen-l10n  to generate
+# Run flutter gen-l10n --help to display options
 arb-dir: lib/l10n
 template-arb-file: app_en.arb
 output-localization-file: app_localizations.g.dart
@@ -5,3 +7,5 @@ output-dir: lib/l10n
 output-class: AppLocalizations
 synthetic-package: false
 untranslated-messages-file: missing-translations.txt
+preferred-supported-locales: en
+nullable-getter: false

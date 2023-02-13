@@ -21,8 +21,7 @@ abstract class OauthClient {
 
   Future<OauthToken?> authenticate(String email) async {
     try {
-      final token = await _authenticate(email);
-      token.provider = incomingHostName;
+      final token = await _authenticate(email, incomingHostName);
       return token;
     } catch (e, s) {
       if (kDebugMode) {
@@ -34,8 +33,7 @@ abstract class OauthClient {
 
   Future<OauthToken?> refresh(OauthToken token) async {
     try {
-      final refreshedToken = await _refresh(token);
-      refreshedToken.provider = incomingHostName;
+      final refreshedToken = await _refresh(token, incomingHostName);
       return refreshedToken;
     } catch (e, s) {
       if (kDebugMode) {
@@ -45,15 +43,15 @@ abstract class OauthClient {
     }
   }
 
-  Future<OauthToken> _authenticate(String email);
-  Future<OauthToken> _refresh(OauthToken token);
+  Future<OauthToken> _authenticate(String email, String provider);
+  Future<OauthToken> _refresh(OauthToken token, String provider);
 }
 
 class GmailOAuthClient extends OauthClient {
   GmailOAuthClient() : super('imap.gmail.com');
 
   @override
-  Future<OauthToken> _authenticate(String email) async {
+  Future<OauthToken> _authenticate(String email, String provider) async {
     final clientId = oauthClientId!.id;
     final callbackUrlScheme = clientId.split('.').reversed.join('.');
 
@@ -92,11 +90,11 @@ class GmailOAuthClient extends OauthClient {
       throw StateError(
           'Unable to get Google OAuth token with code $code, status code=${response.statusCode}, response=$text');
     }
-    return OauthToken.fromText(text);
+    return OauthToken.fromText(text, provider: provider);
   }
 
   @override
-  Future<OauthToken> _refresh(OauthToken token) async {
+  Future<OauthToken> _refresh(OauthToken token, String provider) async {
     final clientId = oauthClientId!.id;
     final callbackUrlScheme = clientId.split('.').reversed.join('.');
     final response =
@@ -111,7 +109,7 @@ class GmailOAuthClient extends OauthClient {
       throw StateError(
           'Unable to refresh Google OAuth token $token, status code=${response.statusCode}, response=$text');
     }
-    return OauthToken.fromText(text);
+    return OauthToken.fromText(text, provider: provider);
   }
 }
 
@@ -122,7 +120,7 @@ class OutlookOAuthClient extends OauthClient {
   OutlookOAuthClient() : super('outlook.office365.com');
 
   @override
-  Future<OauthToken> _authenticate(String email) async {
+  Future<OauthToken> _authenticate(String email, String provider) async {
     final clientId = oauthClientId!.id;
     final clientSecret = oauthClientId!.secret;
     const callbackUrlScheme =
@@ -165,11 +163,11 @@ class OutlookOAuthClient extends OauthClient {
       throw StateError(
           'no response from https://login.microsoftonline.com/common/oauth2/v2.0/token');
     }
-    return OauthToken.fromText(responseText);
+    return OauthToken.fromText(responseText, provider: provider);
   }
 
   @override
-  Future<OauthToken> _refresh(OauthToken token) async {
+  Future<OauthToken> _refresh(OauthToken token, String provider) async {
     final clientId = oauthClientId!.id;
     final response = await HttpHelper.httpPost(
         'https://login.microsoftonline.com/common/oauth2/v2.0/token',
@@ -184,6 +182,6 @@ class OutlookOAuthClient extends OauthClient {
       throw StateError('Unable to refresh Outlook OAuth token $token, '
           'status code=${response.statusCode}, response=$text');
     }
-    return OauthToken.fromText(text);
+    return OauthToken.fromText(text, provider: provider);
   }
 }

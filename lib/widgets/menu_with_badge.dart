@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -19,7 +19,7 @@ class MenuWithBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DensePlatformIconButton(
-      icon: Badge(
+      icon: badges.Badge(
         badgeContent: badgeContent,
         child: _buildIndicator(context),
       ),

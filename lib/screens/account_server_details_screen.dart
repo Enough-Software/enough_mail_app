@@ -13,7 +13,7 @@ import 'package:flutter/services.dart';
 import '../l10n/app_localizations.g.dart';
 
 class AccountServerDetailsScreen extends StatelessWidget {
-  final Account account;
+  final RealAccount account;
   final String? title;
   final bool includeDrawer;
   const AccountServerDetailsScreen({
@@ -39,7 +39,7 @@ class AccountServerDetailsScreen extends StatelessWidget {
 }
 
 class AccountServerDetailsEditor extends StatefulWidget {
-  final Account account;
+  final RealAccount account;
 
   const AccountServerDetailsEditor({
     Key? key,
@@ -120,15 +120,15 @@ class _AccountServerDetailsEditorState
   @override
   void initState() {
     _currentState = this;
-    final mailAccount = widget.account.account;
+    final mailAccount = widget.account.mailAccount;
     final incoming = mailAccount.incoming;
     final incomingAuth =
-        incoming?.authentication as UserNameBasedAuthentication?;
+        incoming.authentication as UserNameBasedAuthentication?;
     final outgoing = mailAccount.outgoing;
     final outgoingAuth =
-        outgoing?.authentication as UserNameBasedAuthentication?;
+        outgoing.authentication as UserNameBasedAuthentication?;
     _emailController.text = mailAccount.email ?? '';
-    _setupFields(incoming?.serverConfig, outgoing?.serverConfig, incomingAuth,
+    _setupFields(incoming.serverConfig, outgoing.serverConfig, incomingAuth,
         outgoingAuth);
     super.initState();
   }
@@ -186,15 +186,12 @@ class _AccountServerDetailsEditorState
   }
 
   Future<void> testConnection(BuildContext context) async {
-    final localizations = AppLocalizations.of(context)!;
-    final mailAccount = widget.account.account;
-    mailAccount.email = _emailController.text;
+    final localizations = AppLocalizations.of(context);
+    final mailAccount = widget.account.mailAccount;
     final userName = (_userNameController.text.isEmpty)
         ? mailAccount.email
         : _userNameController.text;
-    mailAccount.userName = userName;
     final password = _passwordController.text;
-
     final incomingServerConfig = ServerConfig(
       type: _incomingServerType,
       hostname: _incomingHostDomainController.text,
@@ -207,10 +204,6 @@ class _AccountServerDetailsEditorState
     final incomingPassword = (_incomingPasswordController.text.isEmpty)
         ? password
         : _incomingPasswordController.text;
-    mailAccount.incoming = MailServerConfig(
-        serverConfig: incomingServerConfig,
-        authentication:
-            PlainAuthentication(incomingUserName, incomingPassword));
     final outgoingServerConfig = ServerConfig(
       type: _outgoingServerType,
       hostname: _outgoingHostDomainController.text,
@@ -223,21 +216,33 @@ class _AccountServerDetailsEditorState
     final outgoingPassword = (_outgoingPasswordController.text.isEmpty)
         ? password
         : _outgoingPasswordController.text;
-    mailAccount.outgoing = MailServerConfig(
-      serverConfig: outgoingServerConfig,
-      authentication: PlainAuthentication(outgoingUserName, outgoingPassword),
+
+    final newAccount = mailAccount.copyWith(
+      email: _emailController.text,
+      userName: userName,
+      incoming: MailServerConfig(
+        serverConfig: incomingServerConfig,
+        authentication: PlainAuthentication(incomingUserName, incomingPassword),
+      ),
+      outgoing: MailServerConfig(
+        serverConfig: outgoingServerConfig,
+        authentication: PlainAuthentication(outgoingUserName, outgoingPassword),
+      ),
     );
+
     //print('account: $mailAccount');
-    final completed = await Discover.complete(mailAccount);
-    if (!completed) {
-      await LocalizedDialogHelper.showTextDialog(
-        context,
-        localizations.errorTitle,
-        localizations.accountDetailsErrorHostProblem(
-          _incomingHostDomainController.text,
-          _outgoingHostDomainController.text,
-        ),
-      );
+    final completedAccount = await Discover.complete(newAccount);
+    if (completedAccount == null) {
+      if (mounted) {
+        await LocalizedDialogHelper.showTextDialog(
+          context,
+          localizations.errorTitle,
+          localizations.accountDetailsErrorHostProblem(
+            _incomingHostDomainController.text,
+            _outgoingHostDomainController.text,
+          ),
+        );
+      }
       return;
     } else {
       final incoming = mailAccount.incoming!;
@@ -245,31 +250,32 @@ class _AccountServerDetailsEditorState
       if (mounted) {
         setState(() {
           _incomingHostPortController.text =
-              incoming.serverConfig?.port?.toString() ?? '';
-          _incomingServerType = incoming.serverConfig?.type ?? ServerType.imap;
+              incoming.serverConfig.port?.toString() ?? '';
+          _incomingServerType = incoming.serverConfig.type ?? ServerType.imap;
           _incomingSecurity =
-              incoming.serverConfig?.socketType ?? SocketType.ssl;
+              incoming.serverConfig.socketType ?? SocketType.ssl;
           _outgoingHostPortController.text =
-              outgoing.serverConfig?.port?.toString() ?? '';
-          _outgoingServerType = outgoing.serverConfig?.type ?? ServerType.smtp;
+              outgoing.serverConfig.port?.toString() ?? '';
+          _outgoingServerType = outgoing.serverConfig.type ?? ServerType.smtp;
           _outgoingSecurity =
-              outgoing.serverConfig?.socketType ?? SocketType.ssl;
+              outgoing.serverConfig.socketType ?? SocketType.ssl;
         });
       }
     }
     // now try to sign in:
-    final mailClient =
+    final connectedAccount =
         await locator<MailService>().connectFirstTime(mailAccount);
+    final mailClient = connectedAccount?.mailClient;
     if (mailClient != null && mailClient.isConnected) {
-      locator<NavigationService>().pop(
-        ConnectedAccount(widget.account.account, mailClient),
-      );
-    } else {
+      locator<NavigationService>().pop(connectedAccount);
+    } else if (mounted) {
       await LocalizedDialogHelper.showTextDialog(
         context,
         localizations.errorTitle,
         localizations.accountDetailsErrorLoginProblem(
-            incomingUserName ?? '<null>', password),
+          incomingUserName,
+          password,
+        ),
       );
     }
   }

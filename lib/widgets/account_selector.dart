@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import '../locator.dart';
 
 class AccountSelector extends StatelessWidget {
-  final Account? account;
+  final RealAccount? account;
   final bool excludeAccountsWithErrors;
-  final void Function(Account? account) onChanged;
+  final void Function(RealAccount? account) onChanged;
   const AccountSelector({
     Key? key,
     required this.onChanged,
@@ -18,13 +18,16 @@ class AccountSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accounts = excludeAccountsWithErrors
-        ? locator<MailService>().accountsWithoutErrors
-        : locator<MailService>().accounts;
-    return PlatformDropdownButton<Account>(
+    final accounts = List<RealAccount>.from(
+      (excludeAccountsWithErrors
+              ? locator<MailService>().accountsWithoutErrors
+              : locator<MailService>().accounts)
+          .whereType<RealAccount>(),
+    );
+    return PlatformDropdownButton<RealAccount>(
       value: account,
       items: accounts
-          .map((account) => DropdownMenuItem<Account>(
+          .map((account) => DropdownMenuItem<RealAccount>(
                 value: account,
                 child: Text(account.name),
               ))

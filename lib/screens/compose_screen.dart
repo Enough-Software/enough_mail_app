@@ -29,8 +29,9 @@ import '../locator.dart';
 import '../routes.dart';
 
 class ComposeScreen extends StatefulWidget {
+  const ComposeScreen({super.key, required this.data});
+
   final ComposeData data;
-  const ComposeScreen({Key? key, required this.data}) : super(key: key);
 
   @override
   State<ComposeScreen> createState() => _ComposeScreenState();
@@ -81,7 +82,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
             ? _Autofocus.subject
             : _Autofocus.text;
     _senders = locator<MailService>().getSenders();
-    final currentAccount = locator<MailService>().currentAccount!;
+    final currentAccount = (locator<MailService>().currentAccount is RealAccount
+        ? locator<MailService>().currentAccount
+        : locator<MailService>()
+            .accounts
+            .firstWhere((account) => account is RealAccount)) as RealAccount;
     final defaultSender = locator<SettingsService>().settings.defaultSender;
     mb.from ??= [defaultSender ?? currentAccount.fromAddress];
     Sender? from;
@@ -267,7 +272,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
     await _populateMessageBuilder();
     widget.data.finalize();
     final mb = widget.data.messageBuilder;
-    if (mailClient.account.hasAttribute(Account.attributeBccMyself)) {
+    if (mailClient.account.hasAttribute(RealAccount.attributeBccMyself)) {
       final myAddress = mailClient.account.fromAddress;
       final myEmail = myAddress.email;
       final bcc = mb.bcc;
@@ -475,10 +480,12 @@ class _ComposeScreenState extends State<ComposeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(localizations.detailsHeaderFrom,
-                          style: Theme.of(context).textTheme.caption),
+                      Text(
+                        localizations.detailsHeaderFrom,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                       PlatformDropdownButton<Sender>(
-                        isExpanded: true,
+                        //isExpanded: true,
                         items: _senders
                             .map(
                               (s) => DropdownMenuItem<Sender>(
@@ -728,7 +735,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
         .push(Routes.mailCompose, arguments: _resumeComposeData);
   }
 
-  void _checkAccountContactManager(Account account) {
+  void _checkAccountContactManager(RealAccount account) {
     if (account.contactManager == null) {
       locator<ContactService>().getForAccount(account).then((value) {
         setState(() {});

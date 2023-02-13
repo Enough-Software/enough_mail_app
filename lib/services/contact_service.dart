@@ -6,20 +6,18 @@ import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:flutter/foundation.dart';
 
 class ContactService {
-  Future<ContactManager> getForAccount(Account account) async {
+  Future<ContactManager> getForAccount(RealAccount account) async {
     var contactManager = account.contactManager;
     if (contactManager == null) {
-      contactManager = await init(account.account);
+      contactManager = await init(account);
       account.contactManager = contactManager;
     }
     return contactManager;
   }
 
-  Future<ContactManager> init(MailAccount mailAccount) async {
-    final mailClient = locator<MailService>().createMailClient(mailAccount);
+  Future<ContactManager> init(RealAccount account) async {
+    final mailClient = await locator<MailService>().createClientFor(account);
     try {
-      await mailClient.connect();
-      await mailClient.listMailboxes();
       final mailbox = await mailClient.selectMailboxByFlag(MailboxFlag.sent);
       if (mailbox.messagesExists > 0) {
         var startId = mailbox.messagesExists - 100;

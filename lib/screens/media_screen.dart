@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
@@ -67,16 +68,18 @@ class InteractiveMediaScreen extends StatelessWidget {
                     }
                     if (mime != null) {
                       final mailService = locator<MailService>();
-                      final client = await mailService
-                          .getClientFor(mailService.currentAccount!);
-                      final source =
-                          SingleMessageSource(mailService.messageSource);
-                      final message = Message(mime, client, source, 0);
-                      message.isEmbedded = true;
-                      source.singleMessage = message;
-                      showErrorMessage = false;
-                      locator<NavigationService>()
-                          .push(Routes.mailDetails, arguments: message);
+                      final account = mailService.currentAccount;
+                      if (account is RealAccount) {
+                        final client = await mailService.getClientFor(account);
+                        final source =
+                            SingleMessageSource(mailService.messageSource);
+                        final message = Message(mime, client, source, 0);
+                        message.isEmbedded = true;
+                        source.singleMessage = message;
+                        showErrorMessage = false;
+                        locator<NavigationService>()
+                            .push(Routes.mailDetails, arguments: message);
+                      }
                     }
                   } catch (e, s) {
                     if (kDebugMode) {

@@ -1,4 +1,5 @@
 import 'package:enough_icalendar/enough_icalendar.dart';
+import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/util/modal_bottom_sheet_helper.dart';
@@ -16,11 +17,14 @@ class IcalComposer extends StatefulWidget {
 
   static Future<VCalendar?> createOrEditAppointment(BuildContext context,
       {VCalendar? appointment}) async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
     // final iconService = locator<IconService>();
     var account = locator<MailService>().currentAccount!;
     if (account.isVirtual) {
       account = locator<MailService>().accounts.first;
+    }
+    if (account is! RealAccount) {
+      return null;
     }
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, now.day, (now.hour + 1) % 24);

@@ -1,22 +1,27 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_serialization/enough_serialization.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-class Group extends SerializableObject {
-  String? get name => attributes['name'];
-  set name(String? value) => attributes['name'] = value;
-  Group({String? groupName}) {
-    name = groupName;
-  }
+part 'contact.g.dart';
+
+@JsonSerializable()
+class Group {
+  const Group({required this.name});
+
+  final String name;
 }
 
-class Contact extends SerializableObject {
-  String? get name => attributes['name'];
-  set name(String? value) => attributes['name'] = value;
-  List<MailAddress>? get mailAddresses => attributes['mailAddresses'];
-  set mailAddresses(List<MailAddress>? value) =>
-      attributes['mailAddresses'] = value;
-  DateTime? get birthday => attributes['birthday'];
-  set birthday(DateTime? value) => attributes['birthday'] = value;
+@JsonSerializable()
+class Contact {
+  const Contact({
+    required this.name,
+    required this.mailAddresses,
+    this.birthday,
+  });
+
+  final String name;
+
+  final List<MailAddress> mailAddresses;
+  final DateTime? birthday;
   //phone numbers, profile photo(s),
   //TODO consider full vCard support
 }

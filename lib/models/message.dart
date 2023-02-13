@@ -51,7 +51,7 @@ class Message extends ChangeNotifier {
     return infos;
   }
 
-  Account get account =>
+  RealAccount get account =>
       locator<MailService>().getAccountFor(mailClient.account)!;
 
   set isSelected(bool value) {

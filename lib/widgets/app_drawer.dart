@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/extensions/extension_action_tile.dart';
 import 'package:enough_mail_app/locator.dart';
@@ -51,11 +51,19 @@ class AppDrawer extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildAccountSelection(context, mailService, accounts,
-                          currentAccount, localizations),
+                      _buildAccountSelection(
+                        context,
+                        mailService,
+                        accounts,
+                        currentAccount,
+                        localizations,
+                      ),
                       _buildFolderTree(currentAccount),
-                      ExtensionActionTile.buildSideMenuForAccount(
-                          context, currentAccount),
+                      if (currentAccount is RealAccount)
+                        ExtensionActionTile.buildSideMenuForAccount(
+                          context,
+                          currentAccount,
+                        ),
                       const Divider(),
                       PlatformListTile(
                         leading: Icon(iconService.about),
@@ -94,15 +102,17 @@ class AppDrawer extends StatelessWidget {
     if (currentAccount == null) {
       return Container();
     }
-    final avatarAccount =
-        currentAccount.isVirtual ? accounts.first : currentAccount;
-    final userName = currentAccount.userName;
+    final avatarAccount = currentAccount is RealAccount
+        ? currentAccount
+        : accounts.first as RealAccount;
+    final userName =
+        currentAccount is RealAccount ? currentAccount.userName : null;
     final accountName = Text(
       currentAccount.name,
       style: const TextStyle(fontWeight: FontWeight.bold),
     );
     final accountNameWithBadge = locator<MailService>().hasError(currentAccount)
-        ? Badge(child: accountName)
+        ? badges.Badge(child: accountName)
         : accountName;
 
     return PlatformListTile(
@@ -120,7 +130,7 @@ class AppDrawer extends StatelessWidget {
           CircleAvatar(
             backgroundColor: theme.secondaryHeaderColor,
             backgroundImage: NetworkImage(
-              avatarAccount.imageUrlGravator!,
+              avatarAccount.imageUrlGravatar!,
             ),
             radius: 30,
           ),
@@ -142,7 +152,7 @@ class AppDrawer extends StatelessWidget {
                 Text(
                   currentAccount is UnifiedAccount
                       ? currentAccount.accounts.map((a) => a.name).join(', ')
-                      : currentAccount.email,
+                      : (currentAccount as RealAccount).email,
                   style: const TextStyle(
                       fontStyle: FontStyle.italic, fontSize: 14),
                 ),

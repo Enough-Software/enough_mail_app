@@ -17,7 +17,6 @@ class SettingsSecurityScreen extends StatefulWidget {
 }
 
 class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
-  late Settings _settings;
   late bool _blockExternalImages;
   late bool _preferPlainTextMessages;
   late bool _enableBiometricLock;
@@ -30,7 +29,6 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
   void initState() {
     super.initState();
     final settings = locator<SettingsService>().settings;
-    _settings = settings;
     _blockExternalImages = settings.blockExternalImages;
     _preferPlainTextMessages = settings.preferPlainTextMessages;
     _enableBiometricLock = settings.enableBiometricLock;
@@ -95,8 +93,10 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                           setState(() {
                             _blockExternalImages = value ?? false;
                           });
-                          _settings.blockExternalImages = value;
-                          await locator<SettingsService>().save();
+                          final service = locator<SettingsService>();
+                          service.settings = service.settings
+                              .copyWith(blockExternalImages: value);
+                          await service.save();
                         },
                         title: Text(
                           localizations.settingsSecurityBlockExternalImages,
@@ -120,11 +120,13 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                   child: PlatformDropdownButton<bool>(
                     value: _preferPlainTextMessages,
                     onChanged: (value) async {
-                      _settings.preferPlainTextMessages = value ?? false;
+                      final service = locator<SettingsService>();
+                      service.settings = service.settings
+                          .copyWith(preferPlainTextMessages: value ?? false);
                       setState(() {
                         _preferPlainTextMessages = value ?? false;
                       });
-                      await locator<SettingsService>().save();
+                      await service.save();
                     },
                     items: [
                       DropdownMenuItem(
@@ -164,9 +166,10 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                               setState(() {
                                 _enableBiometricLock = enableBiometricLock;
                               });
-                              _settings.enableBiometricLock =
-                                  enableBiometricLock;
-                              await locator<SettingsService>().save();
+                              final service = locator<SettingsService>();
+                              service.settings = service.settings.copyWith(
+                                  enableBiometricLock: enableBiometricLock);
+                              await service.save();
                             }
                           },
                           title: Text(
@@ -191,11 +194,13 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                         value: _lockTimePreference,
                         onChanged: (value) async {
                           if (value != null) {
-                            _settings.lockTimePreference = value;
+                            final service = locator<SettingsService>();
+                            service.settings = service.settings
+                                .copyWith(lockTimePreference: value);
                             setState(() {
                               _lockTimePreference = value;
                             });
-                            await locator<SettingsService>().save();
+                            await service.save();
                           }
                         },
                         items: LockTimePreference.values
@@ -227,11 +232,13 @@ class _SettingsSecurityScreenState extends State<SettingsSecurityScreen> {
                     value: _urlLaunchMode,
                     onChanged: (value) async {
                       if (value != null) {
-                        _settings.urlLaunchMode = value;
+                        final service = locator<SettingsService>();
+                        service.settings =
+                            service.settings.copyWith(urlLaunchMode: value);
                         setState(() {
                           _urlLaunchMode = value;
                         });
-                        await locator<SettingsService>().save();
+                        await service.save();
                       }
                     },
                     items: [

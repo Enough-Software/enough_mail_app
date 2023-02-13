@@ -102,11 +102,13 @@ class _SwipeSettingState extends State<_SwipeSetting> {
       });
       final service = locator<SettingsService>();
       if (widget.isLeftToRight) {
-        service.settings.swipeLeftToRightAction = action;
+        service.settings =
+            service.settings.copyWith(swipeLeftToRightAction: action);
       } else {
-        service.settings.swipeRightToLeftAction = action;
+        service.settings =
+            service.settings.copyWith(swipeRightToLeftAction: action);
       }
-      await locator<SettingsService>().save();
+      await service.save();
     }
   }
 

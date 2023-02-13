@@ -1,7 +1,8 @@
+import 'dart:convert';
+
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/settings.dart';
-import 'package:enough_serialization/enough_serialization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../locator.dart';
@@ -9,34 +10,33 @@ import 'i18n_service.dart';
 
 class SettingsService {
   static const String _keySettings = 'settings';
-  final Serializer _serializer = Serializer();
   FlutterSecureStorage? _storage;
 
-  late Settings _settings;
-  Settings get settings => _settings;
+  late Settings settings;
 
   Future<Settings> init() async {
     _storage ??= const FlutterSecureStorage();
     final json = await _storage!.read(key: _keySettings);
-    _settings = Settings();
     if (json != null) {
-      _serializer.deserialize(json, _settings);
+      settings = Settings.fromJson(jsonDecode(json));
+    } else {
+      settings = const Settings();
     }
-    return _settings;
+    return settings;
   }
 
   Future<void> save() async {
-    final json = _serializer.serialize(_settings);
+    final json = settings.toJson();
     _storage ??= const FlutterSecureStorage();
-    await _storage!.write(key: _keySettings, value: json);
+    await _storage!.write(key: _keySettings, value: jsonEncode(json));
   }
 
   /// Retrieves the HTML signature for the specified [account] and [composeAction]
-  String getSignatureHtml(Account? account, ComposeAction composeAction) {
+  String getSignatureHtml(RealAccount account, ComposeAction composeAction) {
     if (!settings.signatureActions.contains(composeAction)) {
       return '';
     }
-    return account!.signatureHtml ?? getSignatureHtmlGlobal();
+    return account.signatureHtml ?? getSignatureHtmlGlobal();
   }
 
   /// Retrieves the global signature
@@ -45,7 +45,7 @@ class SettingsService {
   }
 
   /// Retrieves the plain text signature for the specified account
-  String getSignaturePlain(Account account, ComposeAction composeAction) {
+  String getSignaturePlain(RealAccount account, ComposeAction composeAction) {
     if (!settings.signatureActions.contains(composeAction)) {
       return '';
     }

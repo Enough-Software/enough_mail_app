@@ -3,7 +3,7 @@ import 'account.dart';
 
 class Sender {
   MailAddress address;
-  final Account account;
+  final RealAccount account;
   final bool isPlaceHolderForPlusAlias;
 
   Sender(this.address, this.account, {this.isPlaceHolderForPlusAlias = false});

@@ -72,7 +72,8 @@ class _SettingsFoldersScreenState extends State<SettingsReadReceiptsScreen> {
       _readReceiptDisplaySetting = value;
     });
     final service = locator<SettingsService>();
-    service.settings.readReceiptDisplaySetting = _readReceiptDisplaySetting;
+    service.settings = service.settings
+        .copyWith(readReceiptDisplaySetting: _readReceiptDisplaySetting);
     await service.save();
   }
 }

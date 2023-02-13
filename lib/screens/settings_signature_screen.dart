@@ -52,8 +52,11 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
     final theme = Theme.of(context);
     final localizations = AppLocalizations.of(context)!;
     final accounts = locator<MailService>().accounts;
-    final accountsWithSignature =
-        accounts.where((account) => (account.signatureHtml != null));
+    final accountsWithSignature = List<RealAccount>.from(
+      accounts.where(
+        (account) => (account is RealAccount && account.signatureHtml != null),
+      ),
+    );
     return Base.buildAppChrome(
       context,
       title: localizations.signatureSettingsTitle,
@@ -108,7 +111,7 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
 
 class SignatureWidget extends StatefulWidget {
   const SignatureWidget({Key? key, this.account}) : super(key: key);
-  final Account? account;
+  final RealAccount? account;
 
   @override
   State<SignatureWidget> createState() => _SignatureWidgetState();
@@ -186,7 +189,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
                 await locator<MailService>().saveAccounts();
               } else {
                 final service = locator<SettingsService>();
-                service.settings.signatureHtml = null;
+                service.settings = service.settings.withoutSignatures();
                 _signature = service.getSignatureHtmlGlobal();
                 await service.save();
               }
@@ -206,7 +209,8 @@ class _SignatureWidgetState extends State<SignatureWidget> {
       });
       if (widget.account == null) {
         final service = locator<SettingsService>();
-        service.settings.signatureHtml = newSignature;
+        service.settings =
+            service.settings.copyWith(signatureHtml: newSignature);
         await service.save();
       } else {
         widget.account!.signatureHtml = newSignature;

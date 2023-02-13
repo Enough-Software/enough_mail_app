@@ -26,7 +26,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
   ThemeModeSetting? _themeModeSetting;
   set themeModeSetting(ThemeModeSetting? value) {
     _themeModeSetting = value;
-    _themeSettings.themeModeSetting = value;
+    _themeSettings = _themeSettings.copyWith(themeModeSetting: value);
     locator<ThemeService>().checkForChangedTheme();
     locator<SettingsService>().save();
   }
@@ -46,7 +46,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
     final localizations = AppLocalizations.of(context)!;
     final darkThemeStartTime = _themeSettings.themeDarkStartTime;
     final darkThemeEndTime = _themeSettings.themeDarkEndTime;
-    final availableColors = _themeSettings.availableColors;
+    final availableColors = ThemeSettings.availableColors;
     final theme = Theme.of(context);
     return Base.buildAppChrome(
       context,
@@ -118,7 +118,8 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                               initialEntryMode: TimePickerEntryMode.dial,
                             );
                             if (pickedTime != null) {
-                              _themeSettings.themeDarkStartTime = pickedTime;
+                              _themeSettings = _themeSettings.copyWith(
+                                  themeDarkStartTime: pickedTime);
                               // indirectly set theme again:
                               themeModeSetting = ThemeModeSetting.custom;
                               setState(() {});
@@ -136,7 +137,8 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                               initialEntryMode: TimePickerEntryMode.dial,
                             );
                             if (pickedTime != null) {
-                              _themeSettings.themeDarkEndTime = pickedTime;
+                              _themeSettings = _themeSettings.copyWith(
+                                  themeDarkEndTime: pickedTime);
                               // indirectly set theme again:
                               themeModeSetting = ThemeModeSetting.custom;
                               setState(() {});
@@ -178,7 +180,8 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                           if (result == true) {
                             _colorSchemeSeed = selectedColor;
                             setState(() {});
-                            _themeSettings.colorSchemeSeed = selectedColor;
+                            _themeSettings = _themeSettings.copyWith(
+                                colorSchemeSeed: selectedColor);
                             locator<ThemeService>().checkForChangedTheme();
                             await locator<SettingsService>().save();
                           }
@@ -195,7 +198,8 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                           onTap: () async {
                             _colorSchemeSeed = color;
                             setState(() {});
-                            _themeSettings.colorSchemeSeed = color;
+                            _themeSettings =
+                                _themeSettings.copyWith(colorSchemeSeed: color);
                             locator<ThemeService>().checkForChangedTheme();
                             await locator<SettingsService>().save();
                           },

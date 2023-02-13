@@ -10,9 +10,10 @@ import '../locator.dart';
 
 /// A dedicated search field optimized for Cupertino
 class CupertinoSearch extends StatelessWidget {
-  final MessageSource messageSource;
   const CupertinoSearch({Key? key, required this.messageSource})
       : super(key: key);
+
+  final MessageSource messageSource;
 
   @override
   Widget build(BuildContext context) {

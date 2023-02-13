@@ -9,6 +9,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
+import '../models/account.dart';
 import '../routes.dart';
 
 class SettingsAccountsScreen extends StatefulWidget {
@@ -73,7 +74,9 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
   }
 
   Widget _buildReorderableListView(BuildContext context) {
-    final accounts = MailServiceWidget.of(context)?.accounts?.toList() ?? [];
+    final accounts = List<RealAccount>.from(
+        MailServiceWidget.of(context)?.accounts?.whereType<RealAccount>() ??
+            <RealAccount>[]);
     return WillPopScope(
       onWillPop: () {
         setState(() {

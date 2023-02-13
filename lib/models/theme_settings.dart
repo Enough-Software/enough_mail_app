@@ -1,61 +1,36 @@
-import 'package:enough_serialization/enough_serialization.dart';
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'theme_settings.g.dart';
 
 enum ThemeModeSetting { light, dark, system, custom }
 
-class ThemeSettings extends SerializableObject {
-  static const _keyColorSchemeSeed = 'colorSchemeSeed';
-  static const _keyPrimaryColorSwatchIndex = 'primarySwatchIndex';
-  static const _keyThemeModeSetting = 'themeModeSetting';
-  static const _keyThemeDarkStartTime = 'themeDarkEndTime';
-  static const _keyThemeDarkEndTime = 'themeDarkStartTime';
-  ThemeSettings() {
-    transformers[_keyThemeModeSetting] = (value) => value is ThemeModeSetting
-        ? value.index
-        : ThemeModeSetting.values[value];
-    transformers[_keyThemeDarkEndTime] = _convertTimeOfDay;
-    transformers[_keyThemeDarkStartTime] = _convertTimeOfDay;
-    transformers[_keyColorSchemeSeed] = _convertColor;
-  }
+@JsonSerializable()
+class ThemeSettings {
+  const ThemeSettings({
+    this.themeModeSetting = ThemeModeSetting.system,
+    this.themeDarkStartTime = const TimeOfDay(hour: 22, minute: 0),
+    this.themeDarkEndTime = const TimeOfDay(hour: 7, minute: 0),
+    this.colorSchemeSeed = Colors.green,
+  });
 
-  ThemeModeSetting get themeModeSetting =>
-      attributes[_keyThemeModeSetting] ?? ThemeModeSetting.system;
-  set themeModeSetting(ThemeModeSetting? value) =>
-      attributes[_keyThemeModeSetting] = value;
+  /// Creates settings from the given [json]
+  factory ThemeSettings.fromJson(Map<String, dynamic> json) =>
+      _$ThemeSettingsFromJson(json);
 
-  TimeOfDay get themeDarkStartTime =>
-      attributes[_keyThemeDarkEndTime] ?? const TimeOfDay(hour: 22, minute: 0);
-  set themeDarkStartTime(TimeOfDay value) =>
-      attributes[_keyThemeDarkEndTime] = value;
-  TimeOfDay get themeDarkEndTime =>
-      attributes[_keyThemeDarkStartTime] ?? const TimeOfDay(hour: 7, minute: 0);
-  set themeDarkEndTime(TimeOfDay value) =>
-      attributes[_keyThemeDarkStartTime] = value;
+  /// Converts these settings to JSON
+  Map<String, dynamic> toJson() => _$ThemeSettingsToJson(this);
 
-  Color get colorSchemeSeed {
-    Color? color = attributes[_keyColorSchemeSeed];
-    if (color == null) {
-      int? index = attributes[_keyPrimaryColorSwatchIndex];
-      if (index != null && index >= 0 && index < availableColors.length) {
-        color = availableColors[index];
-      }
-    }
-    return color ?? Colors.green;
-  }
+  final ThemeModeSetting themeModeSetting;
 
-  set colorSchemeSeed(Color value) {
-    if (value is MaterialColor) {
-      final index = availableColors.indexOf(value);
-      if (index != -1) {
-        attributes[_keyPrimaryColorSwatchIndex] = index;
-        attributes[_keyColorSchemeSeed] = null;
-        return;
-      }
-    }
-    attributes[_keyColorSchemeSeed] = value;
-  }
+  @JsonKey(fromJson: _timeOfDayFromJson, toJson: _timeOfDayToJson)
+  final TimeOfDay themeDarkStartTime;
+  @JsonKey(fromJson: _timeOfDayFromJson, toJson: _timeOfDayToJson)
+  final TimeOfDay themeDarkEndTime;
+  @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
+  final Color colorSchemeSeed;
 
-  List<Color> get availableColors => const [
+  static List<Color> get availableColors => const [
         Colors.red,
         Colors.green,
         Colors.yellow,
@@ -96,25 +71,50 @@ class ThemeSettings extends SerializableObject {
     }
   }
 
-  static dynamic _convertTimeOfDay(dynamic value) {
-    if (value == null) {
-      return null;
-    }
-    return value is TimeOfDay
-        ? _convertTimeOfDayToInt(value)
-        : _convertIntToTimeOfDay(value);
+  ThemeSettings copyWith({
+    Color? colorSchemeSeed,
+    TimeOfDay? themeDarkStartTime,
+    TimeOfDay? themeDarkEndTime,
+    ThemeModeSetting? themeModeSetting,
+  }) =>
+      ThemeSettings(
+        colorSchemeSeed: colorSchemeSeed ?? this.colorSchemeSeed,
+        themeDarkStartTime: themeDarkStartTime ?? this.themeDarkStartTime,
+        themeDarkEndTime: themeDarkEndTime ?? this.themeDarkEndTime,
+        themeModeSetting: themeModeSetting ?? this.themeModeSetting,
+      );
+}
+
+Map<String, dynamic> _timeOfDayToJson(TimeOfDay value) => {
+      'hour': value.hour,
+      'minute': value.minute,
+    };
+
+TimeOfDay _timeOfDayFromJson(Map<String, dynamic> json) => TimeOfDay(
+      hour: json['hour'],
+      minute: json['minute'],
+    );
+
+int _convertTimeOfDayToInt(TimeOfDay input) => input.hour * 100 + input.minute;
+
+Map<String, dynamic> _colorToJson(Color value) {
+  final index = ThemeSettings.availableColors.indexOf(value);
+  return {
+    'index': index,
+    'color': value.value,
+  };
+}
+
+Color _colorFromJson(Map<String, dynamic> json) {
+  final index = json['index'] as int?;
+  if (index != null &&
+      index > 0 &&
+      index < ThemeSettings.availableColors.length) {
+    return ThemeSettings.availableColors[index];
   }
-
-  static dynamic _convertColor(dynamic value) {
-    if (value == null) {
-      return null;
-    }
-    return value is Color ? value.value : Color(value);
+  final color = json['color'] as int?;
+  if (color != null) {
+    return Color(color);
   }
-
-  static int _convertTimeOfDayToInt(TimeOfDay input) =>
-      input.hour * 100 + input.minute;
-
-  static TimeOfDay _convertIntToTimeOfDay(int input) =>
-      TimeOfDay(hour: input ~/ 100, minute: input - ((input ~/ 100) * 100));
+  return Colors.green;
 }

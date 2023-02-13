@@ -17,11 +17,11 @@ class ExtensionActionTile extends StatelessWidget {
       : super(key: key);
 
   static Widget buildSideMenuForAccount(
-      BuildContext context, Account? currentAccount) {
+      BuildContext context, RealAccount? currentAccount) {
     if (currentAccount == null || currentAccount.isVirtual) {
       return Container();
     }
-    final actions = currentAccount.account.appExtensionsAccountSideMenu;
+    final actions = currentAccount.appExtensionsAccountSideMenu;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: buildActionWidgets(context, actions),

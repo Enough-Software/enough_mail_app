@@ -1,10 +1,12 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:background_fetch/background_fetch.dart';
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/models/async_mime_source_factory.dart';
 import 'package:enough_mail_app/models/background_update_info.dart';
+import 'package:enough_mail_app/models/offline_mime_storage_factory.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
-import 'package:enough_serialization/enough_serialization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -74,7 +76,7 @@ class BackgroundService {
       futures.add(addNextUidFor(client, info));
     }
     await Future.wait(futures);
-    final stringValue = Serializer().serialize(info);
+    final stringValue = jsonEncode(info.toJson());
     if (kDebugMode) {
       print('nextUids: $stringValue');
     }
@@ -113,15 +115,18 @@ class BackgroundService {
     final prefs = await SharedPreferences.getInstance();
 
     final prefsValue = prefs.getString(_keyInboxUids);
-    if (prefsValue == null) {
+    if (prefsValue == null || prefsValue.isEmpty) {
       if (kDebugMode) {
         print('WARNING: no previous UID infos found, exiting.');
       }
       return;
     }
-    final info = BackgroundUpdateInfo();
-    Serializer().deserialize(prefsValue, info);
-    final mailService = MailService();
+
+    final info = BackgroundUpdateInfo.fromJson(jsonDecode(prefsValue));
+    final mailService = MailService(
+      mimeSourceFactory:
+          const AsyncMimeSourceFactory(isOfflineModeSupported: false),
+    );
     final accounts = await mailService.loadMailAccounts();
     final notificationService = NotificationService();
     await notificationService.init(checkForLaunchDetails: false);
@@ -146,7 +151,7 @@ class BackgroundService {
     }
     await Future.wait(futures);
     if (info.isDirty) {
-      final serialized = Serializer().serialize(info);
+      final serialized = jsonEncode(info.toJson());
       await prefs.setString(_keyInboxUids, serialized);
     }
   }

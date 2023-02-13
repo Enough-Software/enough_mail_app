@@ -78,8 +78,10 @@ class _SettingsDefaultSenderScreenState
                       setState(() {
                         _selectedSender = value;
                       });
-                      locator<SettingsService>().settings.defaultSender = value;
-                      await locator<SettingsService>().save();
+                      final service = locator<SettingsService>();
+                      service.settings =
+                          service.settings.copyWith(defaultSender: value);
+                      await service.save();
                     },
                     selectedItemBuilder: (context) => _senders
                         .map(

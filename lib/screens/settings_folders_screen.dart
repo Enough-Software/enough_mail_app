@@ -108,7 +108,8 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
         title: localizations.folderNamesCustomTitle,
         defaultActions: DialogActions.okAndCancel);
     if (result == true) {
-      service.settings.customFolderNames = customNames;
+      service.settings =
+          service.settings.copyWith(customFolderNames: customNames);
       locator<MailService>().applyFolderNameSettings(service.settings);
       await service.save();
     }
@@ -119,7 +120,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
       folderNameSetting = value;
     });
     final service = locator<SettingsService>();
-    service.settings.folderNameSetting = value;
+    service.settings = service.settings.copyWith(folderNameSetting: value);
     locator<MailService>().applyFolderNameSettings(service.settings);
     await service.save();
   }
@@ -244,13 +245,15 @@ class FolderManagement extends StatefulWidget {
 }
 
 class _FolderManagementState extends State<FolderManagement> {
-  late Account _account;
+  late RealAccount _account;
   Mailbox? _mailbox;
   late TextEditingController _folderNameController;
 
   @override
   void initState() {
-    _account = locator<MailService>().accounts.first;
+    _account = locator<MailService>()
+        .accounts
+        .firstWhere((account) => account is RealAccount) as RealAccount;
     _folderNameController = TextEditingController();
     super.initState();
   }
@@ -311,7 +314,7 @@ class _FolderManagementState extends State<FolderManagement> {
 }
 
 class MailboxWidget extends StatelessWidget {
-  final Account account;
+  final RealAccount account;
   final Mailbox? mailbox;
   final void Function() onMailboxAdded;
   final void Function() onMailboxDeleted;

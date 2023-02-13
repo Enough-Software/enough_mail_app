@@ -1,6 +1,5 @@
-
-
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.g.dart';
 
 /// The translations for English (`en`).
@@ -148,86 +147,91 @@ class AppLocalizationsEn extends AppLocalizations {
   String get swipeActionFlag => 'Toggle flag';
 
   @override
-  String multipleMovedToJunk(num number) {
+  String multipleMovedToJunk(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: 'One message marked as junk',
       other: 'Marked $numberString messages as junk',
+      one: 'One message marked as junk',
     );
+    return '$_temp0';
   }
 
   @override
-  String multipleMovedToInbox(num number) {
+  String multipleMovedToInbox(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: 'Moved one message to inbox',
       other: 'Moved $numberString messages to inbox',
+      one: 'Moved one message to inbox',
     );
+    return '$_temp0';
   }
 
   @override
-  String multipleMovedToArchive(num number) {
+  String multipleMovedToArchive(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: 'Archived one message',
       other: 'Archived $numberString messages',
+      one: 'Archived one message',
     );
+    return '$_temp0';
   }
 
   @override
-  String multipleMovedToTrash(num number) {
+  String multipleMovedToTrash(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: 'Deleted one message',
       other: 'Deleted $numberString messages',
+      one: 'Deleted one message',
     );
+    return '$_temp0';
   }
 
   @override
   String get multipleSelectionNeededInfo => 'Please select messages first.';
 
   @override
-  String multipleMoveTitle(num number) {
+  String multipleMoveTitle(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: 'Move message',
       other: 'Move $numberString messages',
+      one: 'Move message',
     );
+    return '$_temp0';
   }
 
   @override
@@ -299,19 +303,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerEntrySettings => 'Settings';
 
   @override
-  String drawerAccountsSectionTitle(num number) {
+  String drawerAccountsSectionTitle(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: 'One account',
       other: '$numberString accounts',
+      one: 'One account',
     );
+    return '$_temp0';
   }
 
   @override
@@ -477,19 +482,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messageActionForwardAsAttachment => 'Forward as attachment';
 
   @override
-  String messageActionForwardAttachments(num number) {
+  String messageActionForwardAttachments(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: 'Forward attachment',
       other: 'Forward $numberString attachments',
+      one: 'Forward attachment',
     );
+    return '$_temp0';
   }
 
   @override
@@ -1183,7 +1189,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String composeSendErrorInfo(String details) {
-    return 'Sorry, your mail could not be send. We received the following error:\n${details}.';
+    return 'Sorry, your mail could not be send. We received the following error:\n$details.';
   }
 
   @override
@@ -1197,7 +1203,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String composeMessageSavedAsDraftErrorInfo(String details) {
-    return 'Your draft could not be saved with the following error:\n${details}';
+    return 'Your draft could not be saved with the following error:\n$details';
   }
 
   @override
@@ -1529,7 +1535,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String icalendarParticipantStatusSentFailure(String details) {
-    return 'Unable to send reply.\nThe server responded with the following details:\n${details}';
+    return 'Unable to send reply.\nThe server responded with the following details:\n$details';
   }
 
   @override
@@ -1671,99 +1677,105 @@ class AppLocalizationsEn extends AppLocalizations {
   String get composeAppointmentRecurrenceSecondLast => 'Second-last';
 
   @override
-  String durationYears(num number) {
+  String durationYears(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: '1 year',
       other: '$numberString years',
+      one: '1 year',
     );
+    return '$_temp0';
   }
 
   @override
-  String durationMonths(num number) {
+  String durationMonths(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: '1 month',
       other: '$numberString months',
+      one: '1 month',
     );
+    return '$_temp0';
   }
 
   @override
-  String durationWeeks(num number) {
+  String durationWeeks(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: '1 week',
       other: '$numberString weeks',
+      one: '1 week',
     );
+    return '$_temp0';
   }
 
   @override
-  String durationDays(num number) {
+  String durationDays(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: '1 day',
       other: '$numberString days',
+      one: '1 day',
     );
+    return '$_temp0';
   }
 
   @override
-  String durationHours(num number) {
+  String durationHours(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: '1 hour',
       other: '$numberString hours',
+      one: '1 hour',
     );
+    return '$_temp0';
   }
 
   @override
-  String durationMinutes(num number) {
+  String durationMinutes(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,
       
     );
     final String numberString = numberNumberFormat.format(number);
 
-    return intl.Intl.pluralLogic(
+    String _temp0 = intl.Intl.pluralLogic(
       number,
       locale: localeName,
-      one: '1 minute',
       other: '$numberString minutes',
+      one: '1 minute',
     );
+    return '$_temp0';
   }
 
   @override

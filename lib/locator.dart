@@ -1,3 +1,4 @@
+import 'package:enough_mail_app/models/async_mime_source_factory.dart';
 import 'package:enough_mail_app/services/biometrics_service.dart';
 import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/services/app_service.dart';
@@ -20,7 +21,12 @@ GetIt locator = GetIt.instance;
 
 void setupLocator() {
   locator.registerLazySingleton(() => NavigationService());
-  locator.registerLazySingleton(() => MailService());
+  locator.registerLazySingleton(
+    () => MailService(
+      mimeSourceFactory:
+          const AsyncMimeSourceFactory(isOfflineModeSupported: true),
+    ),
+  );
   locator.registerLazySingleton(() => I18nService());
   locator.registerLazySingleton(() => ScaffoldMessengerService());
   locator.registerLazySingleton(() => DateService());

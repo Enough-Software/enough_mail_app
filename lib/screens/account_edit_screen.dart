@@ -21,8 +21,9 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.g.dart';
 
 class AccountEditScreen extends StatefulWidget {
-  final Account account;
   const AccountEditScreen({Key? key, required this.account}) : super(key: key);
+
+  final RealAccount account;
 
   @override
   State<AccountEditScreen> createState() => _AccountEditScreenState();
@@ -57,7 +58,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
     return BasePage(
       title: localizations.editAccountTitle(widget.account.name),
       subtitle: widget.account.email,
@@ -95,7 +96,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                     children: [
                       Expanded(
                         child: PlatformTextButtonIcon(
-                          onPressed: _reconnect,
+                          onPressed: () => _reconnect(account.mailAccount),
                           icon: Icon(iconService.retry),
                           label: PlatformText(
                             localizations
@@ -146,14 +147,17 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                     widget.account.excludeFromUnified = exclude;
                     setState(() {});
                     await locator<MailService>().excludeAccountFromUnified(
-                        widget.account, exclude, context);
+                      widget.account,
+                      exclude,
+                      context,
+                    );
                   },
                   title: Text(localizations.editAccountIncludeInUnifiedLabel),
                 ),
               const Divider(),
               Text(
                 localizations.signatureSettingsTitle,
-                style: theme.textTheme.subtitle1,
+                style: theme.textTheme.titleMedium,
               ),
               SignatureWidget(
                 account: widget.account,
@@ -234,8 +238,9 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                     widget.account.supportsPlusAliases = result;
                     locator<MailService>()
                         .markAccountAsTestedForPlusAlias(widget.account);
-                    await locator<MailService>()
-                        .saveAccount(widget.account.account);
+                    await locator<MailService>().saveAccount(
+                      widget.account.mailAccount,
+                    );
                   }
                 },
               ),
@@ -249,8 +254,9 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                         final bccMyself = (value == true);
                         widget.account.bccMyself = bccMyself;
                         setState(() {});
-                        await locator<MailService>()
-                            .saveAccount(widget.account.account);
+                        await locator<MailService>().saveAccount(
+                          widget.account.mailAccount,
+                        );
                       },
                       title: Text(localizations.editAccountBccMyself),
                     ),
@@ -289,8 +295,8 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                     localizations.editAccountDeleteAccountAction,
                     style: Theme.of(context)
                         .textTheme
-                        .button!
-                        .copyWith(color: Colors.white),
+                        .labelLarge
+                        ?.copyWith(color: Colors.white),
                   ),
                   onPressed: () async {
                     final result =
@@ -304,6 +310,9 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
                             isDangerousAction: true);
                     if (result == true) {
                       final mailService = locator<MailService>();
+                      if (!mounted) {
+                        return;
+                      }
                       await mailService.removeAccount(widget.account, context);
                       if (mailService.accounts.isEmpty) {
                         locator<NavigationService>()
@@ -349,21 +358,41 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
   Future<void> _updateAuthentication() async {
     final mailService = locator<MailService>();
     mailService.disconnect(widget.account);
-    final authentication = widget.account.account.incoming?.authentication;
+    final authentication = widget.account.mailAccount.incoming.authentication;
     if (authentication is PlainAuthentication) {
       // simple case: password is directly given,
       // can be edited and account can be updated
+      final mutableAuth = _MutablePlainAuthentication(
+        password: authentication.password,
+        userName: authentication.userName,
+      );
       final result = await LocalizedDialogHelper.showWidgetDialog(
         context,
-        _PasswordUpdateDialog(authentication: authentication),
+        _PasswordUpdateDialog(
+          authentication: mutableAuth,
+        ),
         defaultActions: DialogActions.okAndCancel,
       );
       if (result == true) {
-        final outgoingAuth = widget.account.account.outgoing?.authentication;
+        final mailAccount = widget.account.mailAccount;
+        final outgoingAuth = mailAccount.outgoing.authentication;
+        var updatedMailAccount = mailAccount.copyWith(
+          incoming: mailAccount.incoming.copyWith(
+            authentication: authentication.copyWith(
+              password: mutableAuth.password,
+            ),
+          ),
+        );
         if (outgoingAuth is PlainAuthentication) {
-          outgoingAuth.password = authentication.password;
+          updatedMailAccount = mailAccount.copyWith(
+            outgoing: mailAccount.outgoing.copyWith(
+              authentication: outgoingAuth.copyWith(
+                password: mutableAuth.password,
+              ),
+            ),
+          );
         }
-        final result = await _reconnect();
+        final result = await _reconnect(updatedMailAccount);
         if (result) {
           await mailService.saveAccounts();
         }
@@ -372,45 +401,44 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
       // oauth case: restart oauth authentication,
       // save new token
       final provider = locator<ProviderService>()[
-          widget.account.account.incoming?.serverConfig?.hostname ?? ''];
+          widget.account.mailAccount.incoming.serverConfig.hostname ?? ''];
       final oauthClient = provider?.oauthClient;
       if (provider != null && oauthClient != null) {
         final token =
-            await oauthClient.authenticate(widget.account.account.email!);
-
-        print('acquired token $token');
+            await oauthClient.authenticate(widget.account.mailAccount.email);
         if (token != null) {
-          authentication.userName = widget.account.email;
-          authentication.token = token;
-          final outgoingAuth = widget.account.account.outgoing?.authentication;
+          final adaptedIncomingAuth = authentication.copyWith(
+            userName: widget.account.email,
+            token: token,
+          );
+          final outgoingAuth =
+              widget.account.mailAccount.outgoing.authentication;
+          var adaptedOutgoingAuth = outgoingAuth;
           if (outgoingAuth is OauthAuthentication) {
-            outgoingAuth.userName = widget.account.email;
-            outgoingAuth.token = token;
+            adaptedOutgoingAuth = outgoingAuth.copyWith(
+              userName: widget.account.email,
+              token: token,
+            );
           }
+          final mailAccount = widget.account.mailAccount;
+          final updatedMailAccount = mailAccount.copyWith(
+            incoming: mailAccount.incoming
+                .copyWith(authentication: adaptedIncomingAuth),
+            outgoing: mailAccount.outgoing
+                .copyWith(authentication: adaptedOutgoingAuth),
+          );
+          _reconnect(updatedMailAccount);
           await mailService.saveAccounts();
-          // final account = widget.account;
-          // final mailAccount = MailAccount.fromDiscoveredSettingsWithAuth(
-          //   'new.${account.name}',
-          //   account.email,
-          //   OauthAuthentication(account.email, token),
-          //   provider.clientConfig,
-          // );
-          // mailAccount.attributes[Account.attributeEnableLogging] = true;
-          // final mailClient =
-          //     await locator<MailService>().connectAccount(mailAccount);
-          // print('=++++++++++++++++=');
-          // print('CONNECTED=${mailClient?.isConnected ?? false}');
-          _reconnect();
         }
       }
     }
   }
 
-  Future<bool> _reconnect() async {
+  Future<bool> _reconnect(MailAccount mailAccount) async {
     setState(() {
       _isRetryingToConnect = true;
     });
-    final account = widget.account;
+    final account = widget.account.copyWith(mailAccount: mailAccount);
     final mailService = locator<MailService>();
     final result = await mailService.reconnect(account);
     if (mounted) {
@@ -418,7 +446,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
         _isRetryingToConnect = false;
       });
       if (result) {
-        final localizations = AppLocalizations.of(context)!;
+        final localizations = AppLocalizations.of(context);
         LocalizedDialogHelper.showTextDialog(
           context,
           localizations.editAccountFailureToConnectFixedTitle,
@@ -430,11 +458,22 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
   }
 }
 
-class _PasswordUpdateDialog extends StatefulWidget {
-  const _PasswordUpdateDialog({Key? key, required this.authentication})
-      : super(key: key);
+class _MutablePlainAuthentication {
+  _MutablePlainAuthentication({
+    required this.userName,
+    required this.password,
+  });
+  String userName;
+  String password;
+}
 
-  final PlainAuthentication authentication;
+class _PasswordUpdateDialog extends StatefulWidget {
+  const _PasswordUpdateDialog({
+    Key? key,
+    required this.authentication,
+  }) : super(key: key);
+
+  final _MutablePlainAuthentication authentication;
 
   @override
   _PasswordUpdateDialogState createState() => _PasswordUpdateDialogState();
@@ -459,7 +498,7 @@ class _PasswordUpdateDialogState extends State<_PasswordUpdateDialog> {
 }
 
 class _PlusAliasTestingDialog extends StatefulWidget {
-  final Account account;
+  final RealAccount account;
   const _PlusAliasTestingDialog({Key? key, required this.account})
       : super(key: key);
 
@@ -526,10 +565,11 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
     return PlatformAlertDialog(
       title: Text(
-          localizations.editAccountTestPlusAliasTitle(widget.account.name)),
+        localizations.editAccountTestPlusAliasTitle(widget.account.name),
+      ),
       content: SizedBox(
         width: double.maxFinite,
         child: PlatformStepper(
@@ -602,7 +642,7 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
 
 class _AliasEditDialog extends StatefulWidget {
   final MailAddress alias;
-  final Account account;
+  final RealAccount account;
   final bool isNewAlias;
   const _AliasEditDialog({
     Key? key,
@@ -632,7 +672,7 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
     return PlatformAlertDialog(
       title: Text(widget.isNewAlias
           ? localizations.editAccountAddAliasTitle
@@ -651,10 +691,14 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
                   setState(() {
                     _isSaving = true;
                   });
-                  widget.alias.email = _emailController.text;
-                  widget.alias.personalName = _nameController.text;
-                  await widget.account.addAlias(widget.alias);
-                  Navigator.of(context).pop();
+                  final alias = widget.alias.copyWith(
+                    email: _emailController.text,
+                    personalName: _nameController.text,
+                  );
+                  await widget.account.addAlias(alias);
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
                 }
               : null,
           child: ButtonText(widget.isNewAlias

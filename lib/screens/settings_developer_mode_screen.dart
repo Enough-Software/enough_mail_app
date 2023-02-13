@@ -57,7 +57,8 @@ class _SettingsDeveloperModeScreenState
                       isDeveloperModeEnabled = value;
                     });
                     final service = locator<SettingsService>();
-                    service.settings.enableDeveloperMode = value;
+                    service.settings =
+                        service.settings.copyWith(enableDeveloperMode: value);
                     await service.save();
                   },
                   title: Text(localizations.developerModeEnable),
@@ -138,20 +139,23 @@ class _SettingsDeveloperModeScreenState
         }
         final appExtension = await AppExtension.loadFromUrl(url!);
         if (appExtension != null) {
-          var account = locator<MailService>().currentAccount!;
-          if (account.isVirtual) {
-            account = locator<MailService>().accounts.first;
-          }
+          final currentAccount = locator<MailService>().currentAccount;
+          final account = (currentAccount is RealAccount
+                  ? currentAccount
+                  : locator<MailService>()
+                      .accounts
+                      .firstWhere((account) => account is RealAccount))
+              as RealAccount;
           account.appExtensions = [appExtension];
           _showExtensionDetails(url, appExtension);
-        } else {
+        } else if (mounted) {
           await LocalizedDialogHelper.showTextDialog(
             context,
             localizations.errorTitle,
             localizations.extensionsManualLoadingError(url!),
           );
         }
-      } else {
+      } else if (mounted) {
         await LocalizedDialogHelper.showTextDialog(
             context, localizations.errorTitle, 'Invalid URL "$url"');
       }
@@ -161,7 +165,9 @@ class _SettingsDeveloperModeScreenState
   void _deactivateAllExtensions() {
     final accounts = locator<MailService>().accounts;
     for (final account in accounts) {
-      account.appExtensions = [];
+      if (account is RealAccount) {
+        account.appExtensions = [];
+      }
     }
   }
 
@@ -170,12 +176,14 @@ class _SettingsDeveloperModeScreenState
     final accounts = locator<MailService>().accounts;
     final domains = <_AccountDomain>[];
     for (final account in accounts) {
-      account.appExtensions = [];
-      _addEmail(account, account.email, domains);
-      _addHostname(
-          account, account.account.incoming!.serverConfig!.hostname!, domains);
-      _addHostname(
-          account, account.account.outgoing!.serverConfig!.hostname!, domains);
+      if (account is RealAccount) {
+        account.appExtensions = [];
+        _addEmail(account, account.email, domains);
+        _addHostname(account,
+            account.mailAccount.incoming.serverConfig.hostname!, domains);
+        _addHostname(account,
+            account.mailAccount.outgoing.serverConfig.hostname!, domains);
+      }
     }
     LocalizedDialogHelper.showWidgetDialog(
       context,
@@ -190,7 +198,7 @@ class _SettingsDeveloperModeScreenState
                   future: domain.future,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      domain.account!.appExtensions!.add(snapshot.data);
+                      domain.account!.appExtensions!.add(snapshot.data!);
                       return PlatformIconButton(
                         icon: const Icon(Icons.check),
                         onPressed: () => _showExtensionDetails(
@@ -211,12 +219,13 @@ class _SettingsDeveloperModeScreenState
     );
   }
 
-  void _addEmail(Account? account, String email, List<_AccountDomain> domains) {
+  void _addEmail(
+      RealAccount? account, String email, List<_AccountDomain> domains) {
     _addDomain(account, email.substring(email.indexOf('@') + 1), domains);
   }
 
   void _addHostname(
-      Account? account, String hostname, List<_AccountDomain> domains) {
+      RealAccount? account, String hostname, List<_AccountDomain> domains) {
     final domainIndex = hostname.indexOf('.');
     if (domainIndex != -1) {
       _addDomain(account, hostname.substring(domainIndex + 1), domains);
@@ -224,7 +233,7 @@ class _SettingsDeveloperModeScreenState
   }
 
   void _addDomain(
-      Account? account, String domain, List<_AccountDomain> domains) {
+      RealAccount? account, String domain, List<_AccountDomain> domains) {
     if (!domains.any((k) => k.domain == domain)) {
       domains
           .add(_AccountDomain(account, domain, AppExtension.loadFrom(domain)));
@@ -263,7 +272,7 @@ class _SettingsDeveloperModeScreenState
 }
 
 class _AccountDomain {
-  final Account? account;
+  final RealAccount? account;
   final String domain;
   final Future<AppExtension?> future;
 

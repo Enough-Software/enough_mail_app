@@ -58,7 +58,8 @@ class _SettingsReplyScreenState extends State<SettingsReplyScreen> {
                           _preference = value;
                         });
                         final service = locator<SettingsService>();
-                        service.settings.replyFormatPreference = value;
+                        service.settings = service.settings
+                            .copyWith(replyFormatPreference: value);
                         await service.save();
                       }
                     },

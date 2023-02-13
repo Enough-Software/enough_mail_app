@@ -1,16 +1,20 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:enough_mail/enough_mail.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+import 'package:enough_mail_app/models/message.dart' as maily;
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_serialization/enough_serialization.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:enough_mail_app/models/message.dart' as maily;
-import 'package:enough_mail/enough_mail.dart';
 
 import '../locator.dart';
 import '../routes.dart';
+
+part 'notification_service.g.dart';
 
 enum NotificationServiceInitResult { appLaunchedByNotification, normal }
 
@@ -28,21 +32,27 @@ class NotificationService {
       return NotificationServiceInitResult.normal;
     }
     const android = AndroidInitializationSettings('ic_stat_notification');
-    final ios = IOSInitializationSettings(
-        onDidReceiveLocalNotification: _onDidReceiveLocalNotification);
-    const macos = MacOSInitializationSettings();
+    final ios = DarwinInitializationSettings(
+      onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
+    );
+    const macos = DarwinInitializationSettings();
     final initSettings =
         InitializationSettings(android: android, iOS: ios, macOS: macos);
-    await _flutterLocalNotificationsPlugin.initialize(initSettings,
-        onSelectNotification: _selectNotification);
+    await _flutterLocalNotificationsPlugin.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: _selectNotification,
+    );
     if (checkForLaunchDetails) {
       final launchDetails = await _flutterLocalNotificationsPlugin
           .getNotificationAppLaunchDetails();
-      if (launchDetails?.payload != null) {
-        // print(
-        //     'got notification launched details: $launchDetails with payload ${launchDetails?.payload}');
-        await _selectNotification(launchDetails!.payload);
-        return NotificationServiceInitResult.appLaunchedByNotification;
+      if (launchDetails != null && launchDetails.didNotificationLaunchApp) {
+        final response = launchDetails.notificationResponse;
+        if (response != null) {
+          // print(
+          //     'got notification launched details: $launchDetails with payload ${response.payload}');
+          await _selectNotification(response);
+          return NotificationServiceInitResult.appLaunchedByNotification;
+        }
       }
     }
 
@@ -50,7 +60,11 @@ class NotificationService {
   }
 
   Future _onDidReceiveLocalNotification(
-      int id, String? title, String? body, String? payload) async {
+    int id,
+    String? title,
+    String? body,
+    String? payload,
+  ) async {
     if (kDebugMode) {
       print('iOS onDidReceiveLocalNotification $id $title $body $payload');
     }
@@ -82,14 +96,12 @@ class NotificationService {
   }
 
   MailNotificationPayload _deserialize(String payloadText) {
-    final serializer = Serializer();
-    final payload = MailNotificationPayload();
-    serializer.deserialize(
-        payloadText.substring(_messagePayloadStart.length), payload);
-    return payload;
+    final json = jsonDecode(payloadText.substring(_messagePayloadStart.length));
+    return MailNotificationPayload.fromJson(json);
   }
 
-  Future _selectNotification(String? payloadText) async {
+  Future _selectNotification(NotificationResponse response) async {
+    final payloadText = response.payload;
     if (kDebugMode) {
       print('select notification: $payloadText');
     }
@@ -148,7 +160,7 @@ class NotificationService {
     }
     final subject = mimeMessage.decodeSubject();
     final payload = MailNotificationPayload.fromMail(mimeMessage, mailClient);
-    final payloadText = _messagePayloadStart + Serializer().serialize(payload);
+    final payloadText = _messagePayloadStart + jsonEncode(payload.toJson());
     return sendLocalNotification(notificationId, from!, subject,
         payloadText: payloadText, when: mimeMessage.decodeDate());
   }
@@ -170,7 +182,7 @@ class NotificationService {
     bool channelShowBadge = true,
   }) async {
     AndroidNotificationDetails? androidPlatformChannelSpecifics;
-    IOSNotificationDetails? iosPlatformChannelSpecifics;
+    DarwinNotificationDetails? iosPlatformChannelSpecifics;
     if (Platform.isAndroid) {
       androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'maily',
@@ -186,7 +198,7 @@ class NotificationService {
       );
     } else if (Platform.isIOS) {
       iosPlatformChannelSpecifics =
-          const IOSNotificationDetails(presentSound: true);
+          const DarwinNotificationDetails(presentSound: true);
     }
     final platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
@@ -218,29 +230,42 @@ class NotificationService {
   }
 }
 
-class MailNotificationPayload extends SerializableObject {
-  int? get guid => attributes['guid'];
-  set guid(int? value) => attributes['guid'] = value;
-  int? get uid => attributes['uid'];
-  set uid(int? value) => attributes['uid'] = value;
-  int? get sequenceId => attributes['id'];
-  set sequenceId(int? value) => attributes['id'] = value;
-  String? get accountEmail => attributes['account-email'];
-  set accountEmail(String? value) => attributes['account-email'] = value;
-  String? get subject => attributes['subject'];
-  set subject(String? value) => attributes['subject'] = value;
-  int? get size => attributes['size'];
-  set size(int? value) => attributes['size'] = value;
+/// Details to identify a mail message in a notification
+@JsonSerializable()
+class MailNotificationPayload {
+  /// Creates a new payload
+  const MailNotificationPayload({
+    required this.guid,
+    required this.uid,
+    required this.sequenceId,
+    required this.accountEmail,
+    required this.subject,
+    required this.size,
+  });
 
-  MailNotificationPayload();
-
+  /// Creates a new payload from the given [mimeMessage]
   MailNotificationPayload.fromMail(
-      MimeMessage mimeMessage, MailClient mailClient) {
-    uid = mimeMessage.uid;
-    guid = mimeMessage.guid;
-    sequenceId = mimeMessage.sequenceId;
-    subject = mimeMessage.decodeSubject();
-    size = mimeMessage.size;
-    accountEmail = mailClient.account.email;
-  }
+      MimeMessage mimeMessage, MailClient mailClient)
+      : uid = mimeMessage.uid!,
+        guid = mimeMessage.guid!,
+        sequenceId = mimeMessage.sequenceId!,
+        subject = mimeMessage.decodeSubject() ?? '',
+        size = mimeMessage.size!,
+        accountEmail = mailClient.account.email;
+
+  /// Creates a new payload from the given [json]
+  factory MailNotificationPayload.fromJson(Map<String, dynamic> json) =>
+      _$MailNotificationPayloadFromJson(json);
+
+  final int guid;
+  final int uid;
+  @JsonKey(name: 'id')
+  final int sequenceId;
+  @JsonKey(name: 'account-email')
+  final String accountEmail;
+  final String subject;
+  final int size;
+
+  /// Creates JSON from this payoad
+  Map<String, dynamic> toJson() => _$MailNotificationPayloadToJson(this);
 }

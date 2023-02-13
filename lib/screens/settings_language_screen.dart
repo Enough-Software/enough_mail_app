@@ -73,39 +73,45 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                         _selectedLocalizations = null;
                         _systemSettingApplied = true;
                       });
-                      locator<SettingsService>().settings.languageTag = null;
-                      await locator<SettingsService>().save();
+                      final service = locator<SettingsService>();
+                      service.settings = service.settings.removeLanguageTag();
+                      await service.save();
                       return;
                     }
                     final selectedLocalizations =
                         await AppLocalizations.delegate.load(value.locale!);
-                    final confirmed =
-                        await LocalizedDialogHelper.showTextDialog(
-                            context,
-                            selectedLocalizations
-                                .languageSettingConfirmationTitle,
-                            selectedLocalizations
-                                .languageSettingConfirmationQuery,
-                            actions: [
-                          PlatformTextButton(
-                            child:
-                                ButtonText(selectedLocalizations.actionCancel),
-                            onPressed: () => Navigator.of(context).pop(false),
-                          ),
-                          PlatformTextButton(
-                            child: ButtonText(selectedLocalizations.actionOk),
-                            onPressed: () => Navigator.of(context).pop(true),
-                          ),
-                        ]);
-                    if (confirmed) {
-                      setState(() {
-                        _selectedLanguage = value;
-                        _selectedLocalizations = selectedLocalizations;
-                        _systemSettingApplied = false;
-                      });
-                      locator<SettingsService>().settings.languageTag =
-                          _selectedLanguage?.locale?.toLanguageTag();
-                      await locator<SettingsService>().save();
+                    if (mounted) {
+                      final confirmed =
+                          await LocalizedDialogHelper.showTextDialog(
+                              context,
+                              selectedLocalizations
+                                  .languageSettingConfirmationTitle,
+                              selectedLocalizations
+                                  .languageSettingConfirmationQuery,
+                              actions: [
+                            PlatformTextButton(
+                              child: ButtonText(
+                                  selectedLocalizations.actionCancel),
+                              onPressed: () => Navigator.of(context).pop(false),
+                            ),
+                            PlatformTextButton(
+                              child: ButtonText(selectedLocalizations.actionOk),
+                              onPressed: () => Navigator.of(context).pop(true),
+                            ),
+                          ]);
+                      if (confirmed) {
+                        setState(() {
+                          _selectedLanguage = value;
+                          _selectedLocalizations = selectedLocalizations;
+                          _systemSettingApplied = false;
+                        });
+                        final service = locator<SettingsService>();
+                        service.settings = service.settings.copyWith(
+                          languageTag:
+                              _selectedLanguage?.locale?.toLanguageTag(),
+                        );
+                        await service.save();
+                      }
                     }
                   },
                   selectedItemBuilder: (context) => _languages

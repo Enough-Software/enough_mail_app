@@ -1,19 +1,17 @@
+import 'dart:convert';
+
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
-import 'package:enough_serialization/enough_serialization.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-extension MailAccountExtension on MailAccount {
-  void addExtensionSerializationConfiguration() {
-    objectCreators['extensions'] = (map) => <AppExtension>[];
-    objectCreators['extensions.value'] = (map) => AppExtension();
-  }
+import '../models/account.dart';
 
-  List<AppExtension>? get appExtensions => attributes['extensions'];
-  set appExtensions(List<AppExtension?>? value) =>
-      attributes['extensions'] = value;
+part 'extensions.g.dart';
 
+/// Server side mail account extensions
+extension MailAccountExtension on RealAccount {
   AppExtensionActionDescription? get appExtensionForgotPassword => appExtensions
       ?.firstWhereOrNull((ext) => ext.forgotPasswordAction != null)
       ?.forgotPasswordAction;
@@ -23,8 +21,9 @@ extension MailAccountExtension on MailAccount {
     final extensions = appExtensions;
     if (extensions != null) {
       for (final ext in extensions) {
-        if (ext.accountSideMenu != null) {
-          entries.addAll(ext.accountSideMenu!);
+        final accountSideMenu = ext.accountSideMenu;
+        if (accountSideMenu != null) {
+          entries.addAll(accountSideMenu);
         }
       }
     }
@@ -32,22 +31,25 @@ extension MailAccountExtension on MailAccount {
   }
 }
 
-class AppExtension extends SerializableObject {
-  AppExtension() {
-    objectCreators['forgotPassword'] = (map) => AppExtensionActionDescription();
-    objectCreators['accountSideMenu'] =
-        (map) => <AppExtensionActionDescription>[];
-    objectCreators['accountSideMenu.value'] =
-        (map) => AppExtensionActionDescription();
-    objectCreators['signatureHtml'] = (map) => <String, String>{};
-  }
+@JsonSerializable()
+class AppExtension {
+  const AppExtension({
+    this.version,
+    this.accountSideMenu,
+    this.forgotPasswordAction,
+    this.signatureHtml,
+  });
 
-  int? get version => attributes['version'];
-  List<AppExtensionActionDescription>? get accountSideMenu =>
-      attributes['accountSideMenu'];
-  AppExtensionActionDescription? get forgotPasswordAction =>
-      attributes['forgotPassword'];
-  Map<String, String>? get signatureHtml => attributes['signatureHtml'];
+  factory AppExtension.fromJson(Map<String, dynamic> json) =>
+      _$AppExtensionFromJson(json);
+
+  final int? version;
+  final List<AppExtensionActionDescription>? accountSideMenu;
+  @JsonKey(name: 'forgotPassword')
+  final AppExtensionActionDescription? forgotPasswordAction;
+  final Map<String, String>? signatureHtml;
+
+  static const attributeName = 'extensions';
 
   String? getSignatureHtml(String languageCode) {
     final map = signatureHtml;
@@ -61,15 +63,17 @@ class AppExtension extends SerializableObject {
     return sign;
   }
 
+  Map<String, dynamic> toJson() => _$AppExtensionToJson(this);
+
   static String urlFor(String domain) {
     return 'https://$domain/.maily.json';
   }
 
   static Future<List<AppExtension>> loadFor(MailAccount mailAccount) async {
     final domains = <String, Future<AppExtension?>>{};
-    _addEmail(mailAccount.email!, domains);
-    _addHostname(mailAccount.incoming!.serverConfig!.hostname!, domains);
-    _addHostname(mailAccount.outgoing!.serverConfig!.hostname!, domains);
+    _addEmail(mailAccount.email, domains);
+    _addHostname(mailAccount.incoming.serverConfig.hostname!, domains);
+    _addHostname(mailAccount.outgoing.serverConfig.hostname!, domains);
     final allExtensions = await Future.wait(domains.values);
     final appExtensions = <AppExtension>[];
     for (final ext in allExtensions) {
@@ -77,7 +81,6 @@ class AppExtension extends SerializableObject {
         appExtensions.add(ext);
       }
     }
-    mailAccount.appExtensions = appExtensions;
     return appExtensions;
   }
 
@@ -108,11 +111,12 @@ class AppExtension extends SerializableObject {
   static Future<AppExtension?> loadFromUrl(String url) async {
     try {
       final httpResult = await HttpHelper.httpGet(url);
-      if (httpResult.statusCode != 200) {
+      final text = httpResult.text;
+      if (httpResult.statusCode != 200 || text == null || text.isEmpty) {
         return null;
       }
-      final result = AppExtension();
-      Serializer().deserialize(httpResult.text!, result);
+
+      final result = AppExtension.fromJson(jsonDecode(text));
       if (result.version == 1) {
         return result;
       }
@@ -125,15 +129,19 @@ class AppExtension extends SerializableObject {
   }
 }
 
-class AppExtensionActionDescription extends SerializableObject {
-  AppExtensionActionDescription() {
-    objectCreators['label'] = (map) => <String, String>{};
-  }
+@JsonSerializable()
+class AppExtensionActionDescription {
+  const AppExtensionActionDescription(
+      {this.action, this.icon, this.labelByLanguage});
 
-  AppExtensionAction? get action =>
-      AppExtensionAction.parse(attributes['action']);
-  String? get icon => attributes['icon'];
-  Map<String, String>? get labelByLanguage => attributes['label'];
+  factory AppExtensionActionDescription.fromJson(Map<String, dynamic> json) =>
+      _$AppExtensionActionDescriptionFromJson(json);
+
+  final AppExtensionAction? action;
+  final String? icon;
+
+  @JsonKey(name: 'label')
+  final Map<String, String>? labelByLanguage;
 
   String? getLabel(String languageCode) {
     final map = labelByLanguage;
@@ -142,15 +150,26 @@ class AppExtensionActionDescription extends SerializableObject {
     }
     return map[languageCode] ?? map['en'];
   }
+
+  Map<String, dynamic> toJson() => _$AppExtensionActionDescriptionToJson(this);
 }
 
 enum AppExtensionActionMechanism { inapp, external }
 
+@JsonSerializable()
 class AppExtensionAction {
+  const AppExtensionAction({
+    required this.mechanism,
+    required this.url,
+  });
+
+  factory AppExtensionAction.fromJson(Map<String, dynamic> json) =>
+      _$AppExtensionActionFromJson(json);
+
   final AppExtensionActionMechanism mechanism;
   final String url;
 
-  AppExtensionAction(this.mechanism, this.url);
+  Map<String, dynamic> toJson() => _$AppExtensionActionToJson(this);
 
   static AppExtensionAction? parse(String? link) {
     if (link == null || link.isEmpty) {
@@ -165,6 +184,6 @@ class AppExtensionAction {
         ? AppExtensionActionMechanism.inapp
         : AppExtensionActionMechanism.external;
     final url = link.substring(splitIndex + 1);
-    return AppExtensionAction(mechanism, url);
+    return AppExtensionAction(mechanism: mechanism, url: url);
   }
 }

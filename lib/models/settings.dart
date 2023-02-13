@@ -2,8 +2,10 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/models/theme_settings.dart';
-import 'package:enough_serialization/enough_serialization.dart';
-import 'package:url_launcher/url_launcher.dart' as launcher;
+import 'package:json_annotation/json_annotation.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+part 'settings.g.dart';
 
 enum FolderNameSetting { server, localized, custom }
 
@@ -33,141 +35,170 @@ extension ExtensionLockTimePreference on LockTimePreference {
   }
 }
 
-class Settings extends SerializableObject {
-  static const _keyThemeSettings = 'themeSettings';
-  static const _keyCustomFolderNames = 'customFolderNames';
-  static const _keyDefaultSender = 'defaultSender';
-  static const _keySwipeLeftToRightAction = 'swipeLeftToRightAction';
-  static const _keySwipeRightToLeftAction = 'swipeRightToLeftAction';
-  static const _keyFolderNameSetting = 'folderNameSetting';
-  static const _keyReadReceiptDisplaySetting = 'readReceiptDisplaySetting';
-  static const _keySignatureActions = 'signatureActions';
-  static const _keyReplyFormatPreference = 'replyFormatPreference';
-  static const _keyEnableBiometricLock = 'enableBiometricLock';
-  static const _keyLockTimePreference = 'enableBiometricLockTime';
-  static const _keyUrlLaunchMode = 'urlLaunchMode';
+@JsonSerializable()
+class Settings {
+  /// Creates new settings
+  const Settings({
+    this.blockExternalImages = false,
+    this.preferredComposeMailAddress,
+    this.languageTag,
+    this.themeSettings = const ThemeSettings(),
+    this.swipeLeftToRightAction = SwipeAction.markRead,
+    this.swipeRightToLeftAction = SwipeAction.delete,
+    this.folderNameSetting = FolderNameSetting.localized,
+    this.customFolderNames,
+    this.enableDeveloperMode = false,
+    this.signatureHtml,
+    this.signaturePlain,
+    this.signatureActions = const [ComposeAction.newMessage],
+    this.readReceiptDisplaySetting = ReadReceiptDisplaySetting.always,
+    this.defaultSender,
+    this.preferPlainTextMessages = false,
+    this.urlLaunchMode = LaunchMode.externalApplication,
+    this.replyFormatPreference = ReplyFormatPreference.alwaysHtml,
+    this.enableBiometricLock = false,
+    this.lockTimePreference = LockTimePreference.immediately,
+  });
 
-  Settings() {
-    objectCreators[_keyThemeSettings] = (map) => ThemeSettings();
-    objectCreators[_keyCustomFolderNames] = (map) => <String>[];
-    objectCreators[_keyDefaultSender] = (map) => MailAddress.empty();
-    transformers[_keySwipeLeftToRightAction] = (value) =>
-        value is SwipeAction ? value.index : SwipeAction.values[value];
-    transformers[_keySwipeRightToLeftAction] = (value) =>
-        value is SwipeAction ? value.index : SwipeAction.values[value];
-    transformers[_keyFolderNameSetting] = (value) => value is FolderNameSetting
-        ? value.index
-        : FolderNameSetting.values[value];
-    transformers[_keyReadReceiptDisplaySetting] = (value) =>
-        value is ReadReceiptDisplaySetting
-            ? value.index
-            : ReadReceiptDisplaySetting.values[value];
-    transformers[_keySignatureActions] = (value) =>
-        value is ComposeAction ? value.index : ComposeAction.values[value];
-    transformers[_keyReplyFormatPreference] = (value) =>
-        value is ReplyFormatPreference
-            ? value.index
-            : ReplyFormatPreference.values[value];
-    transformers[_keyLockTimePreference] = (value) =>
-        value is LockTimePreference
-            ? value.index
-            : LockTimePreference.values[value];
-    transformers[_keyUrlLaunchMode] = (value) => value is launcher.LaunchMode
-        ? value.index
-        : launcher.LaunchMode.values[value];
-  }
+  /// Creates settings from the given [json]
+  factory Settings.fromJson(Map<String, dynamic> json) =>
+      _$SettingsFromJson(json);
 
-  bool get blockExternalImages => attributes['blockExternalImages'] ?? false;
-  set blockExternalImages(bool? value) =>
-      attributes['blockExternalImages'] = value;
+  /// Converts these settings to JSON
+  Map<String, dynamic> toJson() => _$SettingsToJson(this);
 
-  String? get preferredComposeMailAddress =>
-      attributes['preferredComposeMailAddress'];
-  set preferredComposeMailAddress(String? value) =>
-      attributes['preferredComposeMailAddress'] = value;
+  final bool blockExternalImages;
 
-  String? get languageTag => attributes['languageTag'];
-  set languageTag(String? value) => attributes['languageTag'] = value;
+  final String? preferredComposeMailAddress;
 
-  ThemeSettings get themeSettings {
-    var themeSettings = attributes[_keyThemeSettings];
-    if (themeSettings == null) {
-      themeSettings = ThemeSettings();
-      attributes[_keyThemeSettings] = themeSettings;
-    }
-    return themeSettings;
-  }
+  final String? languageTag;
 
-  set themeSettings(ThemeSettings value) =>
-      attributes[_keyThemeSettings] = value;
+  final ThemeSettings themeSettings;
 
-  SwipeAction get swipeLeftToRightAction =>
-      attributes[_keySwipeLeftToRightAction] ?? SwipeAction.markRead;
-  set swipeLeftToRightAction(SwipeAction value) =>
-      attributes[_keySwipeLeftToRightAction] = value;
+  final SwipeAction swipeLeftToRightAction;
 
-  SwipeAction get swipeRightToLeftAction =>
-      attributes[_keySwipeRightToLeftAction] ?? SwipeAction.delete;
-  set swipeRightToLeftAction(SwipeAction value) =>
-      attributes[_keySwipeRightToLeftAction] = value;
+  final SwipeAction swipeRightToLeftAction;
 
-  FolderNameSetting get folderNameSetting =>
-      attributes[_keyFolderNameSetting] ?? FolderNameSetting.localized;
-  set folderNameSetting(FolderNameSetting? value) =>
-      attributes[_keyFolderNameSetting] = value;
+  final FolderNameSetting folderNameSetting;
 
-  List<String>? get customFolderNames => attributes[_keyCustomFolderNames];
-  set customFolderNames(List<String>? value) =>
-      attributes[_keyCustomFolderNames] = value;
+  final List<String>? customFolderNames;
 
-  bool get enableDeveloperMode => attributes['enableDeveloperMode'] ?? false;
-  set enableDeveloperMode(bool? value) =>
-      attributes['enableDeveloperMode'] = value;
+  final bool enableDeveloperMode;
 
-  String? get signatureHtml => attributes['signatureHtml'];
-  set signatureHtml(String? value) => attributes['signatureHtml'] = value;
+  final String? signatureHtml;
 
-  String? get signaturePlain => attributes['signaturePlain'];
-  set signaturePlain(String? value) => attributes['signaturePlain'] = value;
+  final String? signaturePlain;
 
-  List<ComposeAction> get signatureActions =>
-      attributes[_keySignatureActions] ?? [ComposeAction.newMessage];
-  set signatureActions(List<ComposeAction> value) =>
-      attributes[_keySignatureActions] = value;
+  final List<ComposeAction> signatureActions;
 
-  ReadReceiptDisplaySetting get readReceiptDisplaySetting =>
-      attributes[_keyReadReceiptDisplaySetting] ??
-      ReadReceiptDisplaySetting.always;
-  set readReceiptDisplaySetting(ReadReceiptDisplaySetting? value) =>
-      attributes[_keyReadReceiptDisplaySetting] = value;
+  final ReadReceiptDisplaySetting readReceiptDisplaySetting;
 
-  MailAddress? get defaultSender => attributes[_keyDefaultSender];
-  set defaultSender(MailAddress? value) =>
-      attributes[_keyDefaultSender] = value;
+  final MailAddress? defaultSender;
 
-  bool get preferPlainTextMessages =>
-      attributes['preferPlainTextMessages'] ?? false;
-  set preferPlainTextMessages(bool value) =>
-      attributes['preferPlainTextMessages'] = value;
+  final bool preferPlainTextMessages;
 
   /// The launch mode for links - either "in app" or "external"
-  launcher.LaunchMode get urlLaunchMode =>
-      attributes[_keyUrlLaunchMode] ?? launcher.LaunchMode.externalApplication;
-  set urlLaunchMode(launcher.LaunchMode value) =>
-      attributes[_keyUrlLaunchMode] = value;
+  final LaunchMode urlLaunchMode;
 
-  ReplyFormatPreference get replyFormatPreference =>
-      attributes[_keyReplyFormatPreference] ?? ReplyFormatPreference.alwaysHtml;
-  set replyFormatPreference(ReplyFormatPreference value) =>
-      attributes[_keyReplyFormatPreference] = value;
+  final ReplyFormatPreference replyFormatPreference;
 
-  bool get enableBiometricLock => attributes[_keyEnableBiometricLock] ?? false;
-  set enableBiometricLock(bool value) =>
-      attributes[_keyEnableBiometricLock] = value;
+  final bool enableBiometricLock;
 
-  LockTimePreference get lockTimePreference =>
-      attributes[_keyLockTimePreference] ?? LockTimePreference.immediately;
+  @JsonKey(name: 'enableBiometricLockTime')
+  final LockTimePreference lockTimePreference;
 
-  set lockTimePreference(LockTimePreference value) =>
-      attributes[_keyLockTimePreference] = value;
+  /// Copies this settings with the given values
+  Settings copyWith({
+    bool? blockExternalImages,
+    String? preferredComposeMailAddress,
+    String? languageTag,
+    ThemeSettings? themeSettings,
+    SwipeAction? swipeLeftToRightAction,
+    SwipeAction? swipeRightToLeftAction,
+    FolderNameSetting? folderNameSetting,
+    List<String>? customFolderNames,
+    bool? enableDeveloperMode,
+    String? signatureHtml,
+    String? signaturePlain,
+    List<ComposeAction>? signatureActions,
+    ReadReceiptDisplaySetting? readReceiptDisplaySetting,
+    MailAddress? defaultSender,
+    bool? preferPlainTextMessages,
+    LaunchMode? urlLaunchMode,
+    ReplyFormatPreference? replyFormatPreference,
+    bool? enableBiometricLock,
+    LockTimePreference? lockTimePreference,
+  }) =>
+      Settings(
+        blockExternalImages: blockExternalImages ?? this.blockExternalImages,
+        preferredComposeMailAddress:
+            preferredComposeMailAddress ?? this.preferredComposeMailAddress,
+        languageTag: languageTag ?? this.languageTag,
+        themeSettings: themeSettings ?? this.themeSettings,
+        swipeLeftToRightAction:
+            swipeLeftToRightAction ?? this.swipeLeftToRightAction,
+        swipeRightToLeftAction:
+            swipeRightToLeftAction ?? this.swipeRightToLeftAction,
+        folderNameSetting: folderNameSetting ?? this.folderNameSetting,
+        customFolderNames: customFolderNames ?? this.customFolderNames,
+        enableDeveloperMode: enableDeveloperMode ?? this.enableDeveloperMode,
+        signatureHtml: signatureHtml ?? this.signatureHtml,
+        signaturePlain: signaturePlain ?? this.signaturePlain,
+        signatureActions: signatureActions ?? this.signatureActions,
+        readReceiptDisplaySetting:
+            readReceiptDisplaySetting ?? this.readReceiptDisplaySetting,
+        defaultSender: defaultSender ?? this.defaultSender,
+        preferPlainTextMessages:
+            preferPlainTextMessages ?? this.preferPlainTextMessages,
+        urlLaunchMode: urlLaunchMode ?? this.urlLaunchMode,
+        replyFormatPreference:
+            replyFormatPreference ?? this.replyFormatPreference,
+        enableBiometricLock: enableBiometricLock ?? this.enableBiometricLock,
+        lockTimePreference: lockTimePreference ?? this.lockTimePreference,
+      );
+
+  /// Copies the settings without the signatures
+  Settings withoutSignatures() => Settings(
+        blockExternalImages: blockExternalImages,
+        customFolderNames: customFolderNames,
+        defaultSender: defaultSender,
+        enableBiometricLock: enableBiometricLock,
+        enableDeveloperMode: enableDeveloperMode,
+        folderNameSetting: folderNameSetting,
+        languageTag: languageTag,
+        lockTimePreference: lockTimePreference,
+        preferPlainTextMessages: preferPlainTextMessages,
+        preferredComposeMailAddress: preferredComposeMailAddress,
+        readReceiptDisplaySetting: readReceiptDisplaySetting,
+        replyFormatPreference: replyFormatPreference,
+        signatureActions: signatureActions,
+        swipeLeftToRightAction: swipeLeftToRightAction,
+        swipeRightToLeftAction: swipeRightToLeftAction,
+        themeSettings: themeSettings,
+        urlLaunchMode: urlLaunchMode,
+        signaturePlain: null,
+        signatureHtml: null,
+      );
+
+  Settings removeLanguageTag() => Settings(
+        blockExternalImages: blockExternalImages,
+        customFolderNames: customFolderNames,
+        defaultSender: defaultSender,
+        enableBiometricLock: enableBiometricLock,
+        enableDeveloperMode: enableDeveloperMode,
+        folderNameSetting: folderNameSetting,
+        languageTag: null,
+        lockTimePreference: lockTimePreference,
+        preferPlainTextMessages: preferPlainTextMessages,
+        preferredComposeMailAddress: preferredComposeMailAddress,
+        readReceiptDisplaySetting: readReceiptDisplaySetting,
+        replyFormatPreference: replyFormatPreference,
+        signatureActions: signatureActions,
+        signatureHtml: signatureHtml,
+        signaturePlain: signaturePlain,
+        swipeLeftToRightAction: swipeLeftToRightAction,
+        swipeRightToLeftAction: swipeRightToLeftAction,
+        themeSettings: themeSettings,
+        urlLaunchMode: urlLaunchMode,
+      );
 }
