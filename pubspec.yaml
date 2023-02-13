@@ -82,8 +82,8 @@ dependency_overrides:
   collection: ^1.16.0
   intl: ^0.18.0
   xml: ^6.1.0
-  flutter_inappwebview:
-    git: https://github.com/CodeEagle/flutter_inappwebview
+  # flutter_inappwebview:
+  #   git: https://github.com/CodeEagle/flutter_inappwebview
   # out-comment the following to enable git-based development:
   # enough_mail:
   #   git:

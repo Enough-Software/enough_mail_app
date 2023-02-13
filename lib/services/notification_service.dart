@@ -36,10 +36,6 @@ class NotificationService {
       onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
     );
     const macos = DarwinInitializationSettings();
-    final ios = DarwinInitializationSettings(
-      onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
-    );
-    const macos = DarwinInitializationSettings();
     final initSettings =
         InitializationSettings(android: android, iOS: ios, macOS: macos);
     await _flutterLocalNotificationsPlugin.initialize(

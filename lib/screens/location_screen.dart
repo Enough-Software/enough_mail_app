@@ -21,43 +21,13 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  final repaintBoundaryKey = GlobalKey();
+  final _repaintBoundaryKey = GlobalKey();
 
-  LatLng defaultLocation = const LatLng(53.07516, 8.80777);
-  late MapController controller;
-  Future<LocationData?>? findLocation;
+  final _defaultLocation = const LatLng(53.07516, 8.80777);
+  late MapController _controller;
+  Future<LocationData?>? _findLocation;
   late Offset _dragStart;
   double _scaleStart = 1.0;
-
-  void _gotoDefault() {
-    controller.center = defaultLocation;
-  }
-
-  void _onDoubleTap() {
-    controller.zoom += 0.5;
-  }
-
-  void _onScaleStart(ScaleStartDetails details) {
-    _dragStart = details.focalPoint;
-    _scaleStart = 1.0;
-  }
-
-  void _onScaleUpdate(ScaleUpdateDetails details, MapTransformer transformer) {
-    final scaleDiff = details.scale - _scaleStart;
-    _scaleStart = details.scale;
-
-    if (scaleDiff > 0) {
-      controller.zoom += 0.02;
-    } else if (scaleDiff < 0) {
-      controller.zoom -= 0.02;
-    } else {
-      final now = details.focalPoint;
-      final diff = now - _dragStart;
-      _dragStart = now;
-      transformer.drag(diff.dx, diff.dy);
-    }
-    setState(() {});
-  }
 
   @override
   void initState() {
@@ -67,7 +37,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
 
     return Base.buildAppChrome(
       context,
@@ -114,7 +84,7 @@ class _LocationScreenState extends State<LocationScreen> {
   Widget _buildMap(BuildContext context, double latitude, double longitude) {
     final size = MediaQuery.of(context).size;
     return MapLayout(
-      controller: controller,
+      controller: _controller,
       builder: (context, transformer) => GestureDetector(
         onDoubleTap: _onDoubleTap,
         onScaleStart: _onScaleStart,
@@ -122,18 +92,18 @@ class _LocationScreenState extends State<LocationScreen> {
         onScaleEnd: (details) {
           if (kDebugMode) {
             print(
-                "Location: ${controller.center.latitude}, ${controller.center.longitude}");
+                "Location: ${_controller.center.latitude}, ${_controller.center.longitude}");
           }
         },
         child: SizedBox(
           width: size.width,
           height: size.height,
           child: RepaintBoundary(
-            key: repaintBoundaryKey,
+            key: _repaintBoundaryKey,
             child: Stack(
               children: [
                 Map(
-                  controller: controller,
+                  controller: _controller,
                   builder: (context, x, y, z) {
                     final url =
                         'https://www.google.com/maps/vt/pb=!1m4!1m3!1i$z!2i$x!3i$y!2m3!1e0!2sm!3i420120488!3m7!2sen!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0!5m1!1e0!23i4111425';
