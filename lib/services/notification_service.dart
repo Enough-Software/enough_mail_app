@@ -36,6 +36,10 @@ class NotificationService {
       onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
     );
     const macos = DarwinInitializationSettings();
+    final ios = DarwinInitializationSettings(
+      onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
+    );
+    const macos = DarwinInitializationSettings();
     final initSettings =
         InitializationSettings(android: android, iOS: ios, macOS: macos);
     await _flutterLocalNotificationsPlugin.initialize(
@@ -197,8 +201,10 @@ class NotificationService {
         sound: const RawResourceAndroidNotificationSound('pop'),
       );
     } else if (Platform.isIOS) {
-      iosPlatformChannelSpecifics =
-          const DarwinNotificationDetails(presentSound: true);
+      iosPlatformChannelSpecifics = const DarwinNotificationDetails(
+        presentSound: true,
+        presentBadge: true,
+      );
     }
     final platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,

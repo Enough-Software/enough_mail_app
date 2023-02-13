@@ -15,7 +15,7 @@ publish_to: "none"
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+83
+version: 1.0.0+84
 
 environment:
   sdk: '>=2.18.0 <3.0.0'
@@ -82,6 +82,8 @@ dependency_overrides:
   collection: ^1.16.0
   intl: ^0.18.0
   xml: ^6.1.0
+  flutter_inappwebview:
+    git: https://github.com/CodeEagle/flutter_inappwebview
   # out-comment the following to enable git-based development:
   # enough_mail:
   #   git:

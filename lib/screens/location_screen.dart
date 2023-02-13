@@ -61,9 +61,8 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   void initState() {
+    _findLocation = locator<LocationService>().getCurrentLocation();
     super.initState();
-    controller = MapController(location: defaultLocation);
-    findLocation = locator<LocationService>().getCurrentLocation();
   }
 
   @override
@@ -76,11 +75,11 @@ class _LocationScreenState extends State<LocationScreen> {
       appBarActions: [
         PlatformIconButton(
           icon: const Icon(Icons.check),
-          onPressed: onLocationSelected,
+          onPressed: _onLocationSelected,
         ),
       ],
       content: FutureBuilder<LocationData?>(
-        future: findLocation,
+        future: _findLocation,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -88,29 +87,31 @@ class _LocationScreenState extends State<LocationScreen> {
             case ConnectionState.active:
               return const Center(child: PlatformProgressIndicator());
             case ConnectionState.done:
-              if (snapshot.hasData) {
-                defaultLocation =
-                    LatLng(snapshot.data!.latitude!, snapshot.data!.longitude!);
-                controller.center = defaultLocation;
-                return buildMap();
+              final data = snapshot.data;
+              if (data != null) {
+                return _buildMap(context, data.latitude!, data.longitude!);
               }
           }
-          return buildMap();
+          return const Center(child: PlatformProgressIndicator());
         },
       ),
     );
   }
 
-  void onLocationSelected() async {
-    RenderRepaintBoundary boundary = repaintBoundaryKey.currentContext!
-        .findRenderObject() as RenderRepaintBoundary;
-    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+  void _onLocationSelected() async {
+    final context = _repaintBoundaryKey.currentContext;
+    if (context == null) {
+      locator<NavigationService>().pop();
+      return;
+    }
+    final boundary = context.findRenderObject() as RenderRepaintBoundary;
+    final image = await boundary.toImage(pixelRatio: 3.0);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     var pngBytes = byteData?.buffer.asUint8List();
     locator<NavigationService>().pop(pngBytes);
   }
 
-  Widget buildMap() {
+  Widget _buildMap(BuildContext context, double latitude, double longitude) {
     final size = MediaQuery.of(context).size;
     return MapLayout(
       controller: controller,
@@ -165,5 +166,38 @@ class _LocationScreenState extends State<LocationScreen> {
         ),
       ),
     );
+  }
+
+  void _gotoDefault() {
+    _controller.center = _defaultLocation;
+    setState(() {});
+  }
+
+  void _onDoubleTap() {
+    _controller.zoom += 0.5;
+    setState(() {});
+  }
+
+  void _onScaleStart(ScaleStartDetails details) {
+    _dragStart = details.focalPoint;
+    _scaleStart = 1.0;
+  }
+
+  void _onScaleUpdate(ScaleUpdateDetails details, MapTransformer transformer) {
+    final scaleDiff = details.scale - _scaleStart;
+    //print('on scale update: scaleDiff=$scaleDiff focal=${details.focalPoint}');
+    _scaleStart = details.scale;
+
+    if (scaleDiff > 0) {
+      _controller.zoom += 0.02;
+    } else if (scaleDiff < 0) {
+      _controller.zoom -= 0.02;
+    } else {
+      final now = details.focalPoint;
+      final diff = now - _dragStart;
+      _dragStart = now;
+      transformer.drag(diff.dx, diff.dy);
+    }
+    setState(() {});
   }
 }
