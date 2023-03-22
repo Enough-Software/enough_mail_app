@@ -1360,7 +1360,7 @@ class _MessageOverviewState extends State<MessageOverview> {
             ),
             onChanged: (value) => widget.onTap(widget.message),
           )
-        : PlatformListTile(
+        : SelectablePlatformListTile(
             visualDensity: VisualDensity.compact,
             title: MessageOverviewContent(
               message: widget.message,

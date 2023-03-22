@@ -177,7 +177,7 @@ class AppDrawer extends StatelessWidget {
             .drawerAccountsSectionTitle(mailService.accounts.length)),
         children: [
           for (final account in accounts)
-            PlatformListTile(
+            SelectablePlatformListTile(
               leading: mailService.hasError(account)
                   ? const Icon(Icons.error_outline)
                   : null,

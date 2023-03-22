@@ -675,7 +675,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         children: messages
-                            .map((message) => PlatformListTile(
+                            .map((message) => SelectablePlatformListTile(
                                   title: MessageOverviewContent(
                                     message: message,
                                     isSentMessage: isSentFolder,

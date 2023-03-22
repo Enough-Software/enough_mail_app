@@ -1,5 +1,4 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/material.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';

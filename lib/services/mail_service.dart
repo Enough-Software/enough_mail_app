@@ -112,8 +112,12 @@ class MailService implements MimeSourceSubscriber {
       return <MailAccount>[];
     }
     final accountsJson = jsonDecode(jsonText) as List;
-
-    return accountsJson.map((json) => MailAccount.fromJson(json)).toList();
+    try {
+      return accountsJson.map((json) => MailAccount.fromJson(json)).toList();
+    } catch (e, s) {
+      print('Unable to load accounts from json: $e $s');
+      return <MailAccount>[];
+    }
   }
 
   Future<MessageSource> search(MailSearch search) async {

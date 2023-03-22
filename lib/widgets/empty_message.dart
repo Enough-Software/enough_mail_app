@@ -7,7 +7,7 @@ class EmptyMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Padding(
         padding: EdgeInsets.all(8.0),
-        child: PlatformListTile(
+        child: SelectablePlatformListTile(
           visualDensity: VisualDensity.compact,
           title: Text('...'),
           subtitle: Text('-'),

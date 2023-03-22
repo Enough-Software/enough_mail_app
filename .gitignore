@@ -24,6 +24,7 @@
 # publishing related
 key.properties
 local.properties
+assets/keys.txt
 
 # Flutter/Dart/Pub related
 **/doc/api/
