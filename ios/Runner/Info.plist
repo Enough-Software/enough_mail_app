@@ -16,6 +16,8 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>Maily</string>
+	<key>CFBundleDisplayName</key>
+	<string>Maily</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -29,6 +31,8 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>Allows you to add appointment invitations</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allows you to attach your location to a message</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Allows you to attach your location to a message</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allows you to attach photos to a message</string>
@@ -61,6 +65,8 @@
 	<key>io.flutter.embedded_views_preview</key>
 	<string>yes</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>
 </plist>
