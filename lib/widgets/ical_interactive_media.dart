@@ -1,22 +1,24 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:enough_icalendar_export/enough_icalendar_export.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
+import 'package:enough_mail_app/locator.dart';
+import 'package:enough_mail_app/models/message.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_mail_app/widgets/text_with_links.dart';
-import 'package:enough_mail_icalendar/enough_mail_icalendar.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
+import 'package:enough_mail_icalendar/enough_mail_icalendar.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import '../l10n/app_localizations.g.dart';
-import 'package:collection/collection.dart' show IterableExtension;
 
 class IcalInteractiveMedia extends StatefulWidget {
   final MediaProvider mediaProvider;
@@ -66,7 +68,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final event = _calendar?.event;
     if (event == null) {
       if (_isPermanentError) {

@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/screens/base.dart';
@@ -10,7 +11,6 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../l10n/app_localizations.g.dart';
 
 class AccountServerDetailsScreen extends StatelessWidget {
   final RealAccount account;
@@ -127,7 +127,7 @@ class _AccountServerDetailsEditorState
     final outgoing = mailAccount.outgoing;
     final outgoingAuth =
         outgoing.authentication as UserNameBasedAuthentication?;
-    _emailController.text = mailAccount.email ?? '';
+    _emailController.text = mailAccount.email;
     _setupFields(incoming.serverConfig, outgoing.serverConfig, incomingAuth,
         outgoingAuth);
     super.initState();
@@ -186,7 +186,7 @@ class _AccountServerDetailsEditorState
   }
 
   Future<void> testConnection(BuildContext context) async {
-    final localizations = AppLocalizations.of(context);
+    final localizations = context.text;
     final mailAccount = widget.account.mailAccount;
     final userName = (_userNameController.text.isEmpty)
         ? mailAccount.email
@@ -245,8 +245,8 @@ class _AccountServerDetailsEditorState
       }
       return;
     } else {
-      final incoming = mailAccount.incoming!;
-      final outgoing = mailAccount.outgoing!;
+      final incoming = mailAccount.incoming;
+      final outgoing = mailAccount.outgoing;
       if (mounted) {
         setState(() {
           _incomingHostPortController.text =
@@ -282,7 +282,7 @@ class _AccountServerDetailsEditorState
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return SingleChildScrollView(
       child: Material(
         child: SafeArea(

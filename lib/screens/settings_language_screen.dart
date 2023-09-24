@@ -1,10 +1,12 @@
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+
 import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 import 'base.dart';
@@ -51,7 +53,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return Base.buildAppChrome(
       context,
       title: localizations.languageSettingTitle,
@@ -63,7 +65,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(localizations.languageSettingLabel,
-                    style: theme.textTheme.caption),
+                    style: theme.textTheme.bodySmall),
                 PlatformDropdownButton<_Language>(
                   value: _selectedLanguage,
                   onChanged: (value) async {
@@ -124,10 +126,10 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                 ),
                 if (_selectedLocalizations != null)
                   Text(_selectedLocalizations!.languageSetInfo,
-                      style: theme.textTheme.subtitle1)
+                      style: theme.textTheme.titleMedium)
                 else if (_systemSettingApplied)
                   Text(localizations.languageSystemSetInfo,
-                      style: theme.textTheme.subtitle1),
+                      style: theme.textTheme.titleMedium),
               ],
             ),
           ),

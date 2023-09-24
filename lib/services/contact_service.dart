@@ -16,7 +16,10 @@ class ContactService {
   }
 
   Future<ContactManager> init(RealAccount account) async {
-    final mailClient = await locator<MailService>().createClientFor(account);
+    final mailClient = await locator<MailService>().createClientFor(
+      account,
+      store: false,
+    );
     try {
       final mailbox = await mailClient.selectMailboxByFlag(MailboxFlag.sent);
       if (mailbox.messagesExists > 0) {

@@ -17,7 +17,7 @@ class TextWithLinks extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textStyle = style ??
-        theme.textTheme.bodyText2 ??
+        theme.textTheme.bodyMedium ??
         TextStyle(
             color: theme.brightness == Brightness.light
                 ? Colors.black
@@ -74,7 +74,7 @@ class TextWithNamedLinks extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textStyle = style ??
-        theme.textTheme.bodyText2 ??
+        theme.textTheme.bodyMedium ??
         TextStyle(
             color: theme.brightness == Brightness.light
                 ? Colors.black

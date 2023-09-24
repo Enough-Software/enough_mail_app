@@ -1,8 +1,8 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
-import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -48,8 +48,6 @@ class AppExtension {
   @JsonKey(name: 'forgotPassword')
   final AppExtensionActionDescription? forgotPasswordAction;
   final Map<String, String>? signatureHtml;
-
-  static const attributeName = 'extensions';
 
   String? getSignatureHtml(String languageCode) {
     final map = signatureHtml;
@@ -109,9 +107,10 @@ class AppExtension {
   }
 
   static Future<AppExtension?> loadFromUrl(String url) async {
+    String? text = '<>';
     try {
       final httpResult = await HttpHelper.httpGet(url);
-      final text = httpResult.text;
+      text = httpResult.text;
       if (httpResult.statusCode != 200 || text == null || text.isEmpty) {
         return null;
       }
@@ -122,7 +121,7 @@ class AppExtension {
       }
     } catch (e, s) {
       if (kDebugMode) {
-        print('Unable to load extension from $url: $e $s');
+        print('Unable to load extension from $url / text $text: $e $s');
       }
     }
     return null;
@@ -131,12 +130,19 @@ class AppExtension {
 
 @JsonSerializable()
 class AppExtensionActionDescription {
-  const AppExtensionActionDescription(
-      {this.action, this.icon, this.labelByLanguage});
+  const AppExtensionActionDescription({
+    this.action,
+    this.icon,
+    this.labelByLanguage,
+  });
 
   factory AppExtensionActionDescription.fromJson(Map<String, dynamic> json) =>
       _$AppExtensionActionDescriptionFromJson(json);
 
+  @JsonKey(
+    fromJson: AppExtensionAction._parse,
+    toJson: AppExtensionAction._toJson,
+  )
   final AppExtensionAction? action;
   final String? icon;
 
@@ -154,7 +160,7 @@ class AppExtensionActionDescription {
   Map<String, dynamic> toJson() => _$AppExtensionActionDescriptionToJson(this);
 }
 
-enum AppExtensionActionMechanism { inapp, external }
+enum AppExtensionActionMechanism { inApp, external }
 
 @JsonSerializable()
 class AppExtensionAction {
@@ -171,7 +177,7 @@ class AppExtensionAction {
 
   Map<String, dynamic> toJson() => _$AppExtensionActionToJson(this);
 
-  static AppExtensionAction? parse(String? link) {
+  static AppExtensionAction? _parse(String? link) {
     if (link == null || link.isEmpty) {
       return null;
     }
@@ -180,10 +186,19 @@ class AppExtensionAction {
       return null;
     }
     final mechanismText = link.substring(0, splitIndex);
-    final mechanism = (mechanismText == 'inapp')
-        ? AppExtensionActionMechanism.inapp
+    final mechanism = (mechanismText.toLowerCase() == 'inapp')
+        ? AppExtensionActionMechanism.inApp
         : AppExtensionActionMechanism.external;
     final url = link.substring(splitIndex + 1);
+
     return AppExtensionAction(mechanism: mechanism, url: url);
+  }
+
+  static String? _toJson(AppExtensionAction? action) {
+    if (action == null) {
+      return null;
+    }
+
+    return '${action.mechanism.toString()}:${action.url}';
   }
 }

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/screens/all_screens.dart';
 import 'package:enough_mail_app/services/app_service.dart';
@@ -15,11 +17,12 @@ import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'locator.dart';
+
 import '../l10n/app_localizations.g.dart';
+import 'locator.dart';
 // AppStyles appStyles = AppStyles.instance;
 
 void main() {
@@ -147,7 +150,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           locator<ScaffoldMessengerService>().scaffoldMessengerKey,
       builder: (context, child) {
         locator<I18nService>().init(
-            AppLocalizations.of(context)!, Localizations.localeOf(context));
+          context.text,
+          Localizations.localeOf(context),
+        );
         child ??= FutureBuilder<MailService>(
           future: _appInitialization,
           builder: (context, snapshot) {
@@ -174,7 +179,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       // home: Builder(
       //   builder: (context) {
       //     locator<I18nService>().init(
-      //         AppLocalizations.of(context)!, Localizations.localeOf(context));
+      //         context.text!, Localizations.localeOf(context));
       //     return FutureBuilder<MailService>(
       //       future: _appInitialization,
       //       builder: (context, snapshot) {

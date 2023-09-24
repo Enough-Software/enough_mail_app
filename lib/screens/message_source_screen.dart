@@ -2,10 +2,6 @@ import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/date_sectioned_message_source.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -32,6 +28,9 @@ import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_app/widgets/message_stack.dart';
 import 'package:enough_mail_app/widgets/search_text_field.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
@@ -144,7 +143,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   Widget build(BuildContext context) {
     // print('parent name: ${widget.messageSource.parentName}');
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final source = _sectionedMessageSource.messageSource;
     if (source is ErrorMessageSource) {
       return buildForLoadingError(context, localizations, source);
@@ -268,8 +267,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       );
     } else if (source.supportsDeleteAll) {
       final iconService = locator<IconService>();
-      final style = TextButton.styleFrom(primary: Colors.grey[600]);
-      final textStyle = Theme.of(context).textTheme.button;
+      final style = TextButton.styleFrom(foregroundColor: Colors.grey[600]);
+      final textStyle = Theme.of(context).textTheme.labelLarge;
       zeroPosWidget = Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Wrap(
@@ -458,8 +457,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 builder: (context, snapshot) {
                                   if (snapshot.hasError) {
                                     return PlatformListTile(
-                                      title: Row(
-                                        children: const [
+                                      title: const Row(
+                                        children: [
                                           Icon(Icons.replay),
                                           // TODO(RV): localize reload
                                           Text(' reload'),
@@ -1193,7 +1192,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   void _deleteAllMessages() async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     bool expunge = false;
     final confirmed = await LocalizedDialogHelper.showWidgetDialog(
       context,
@@ -1360,7 +1359,7 @@ class _MessageOverviewState extends State<MessageOverview> {
             ),
             onChanged: (value) => widget.onTap(widget.message),
           )
-        : PlatformListTile(
+        : SelectablePlatformListTile(
             visualDensity: VisualDensity.compact,
             title: MessageOverviewContent(
               message: widget.message,

@@ -5,7 +5,6 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/async_mime_source_factory.dart';
 import 'package:enough_mail_app/models/background_update_info.dart';
-import 'package:enough_mail_app/models/offline_mime_storage_factory.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -127,7 +126,7 @@ class BackgroundService {
       mimeSourceFactory:
           const AsyncMimeSourceFactory(isOfflineModeSupported: false),
     );
-    final accounts = await mailService.loadMailAccounts();
+    final accounts = await mailService.loadRealMailAccounts();
     final notificationService = NotificationService();
     await notificationService.init(checkForLaunchDetails: false);
     // final activeMailNotifications =
@@ -135,11 +134,12 @@ class BackgroundService {
     // print('background: got activeMailNotifications=$activeMailNotifications');
     final futures = <Future>[];
     for (final account in accounts) {
-      final previousUidNext = info.nextExpectedUidForAccount(account) ?? 0;
+      final previousUidNext =
+          info.nextExpectedUidForAccount(account.mailAccount) ?? 0;
       futures.add(
         loadNewMessage(
           mailService,
-          account,
+          account.mailAccount,
           previousUidNext,
           notificationService,
           info,

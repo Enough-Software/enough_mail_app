@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -9,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
-import '../l10n/app_localizations.g.dart';
+
 import '../locator.dart';
 import 'base.dart';
 
@@ -56,7 +57,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
 
     return Base.buildAppChrome(
       context,
@@ -71,7 +72,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(localizations.feedbackIntro,
-                      style: theme.textTheme.subtitle1),
+                      style: theme.textTheme.titleMedium),
                 ),
                 if (info == null)
                   const Padding(
@@ -83,7 +84,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       localizations.feedbackProvideInfoRequest,
-                      style: theme.textTheme.caption,
+                      style: theme.textTheme.bodySmall,
                     ),
                   ),
                   Padding(
@@ -95,7 +96,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                     child: PlatformIconButton(
                       icon: Icon(CommonPlatformIcons.copy),
                       onPressed: () {
-                        Clipboard.setData(ClipboardData(text: info));
+                        Clipboard.setData(ClipboardData(text: info ?? ''));
                         locator<ScaffoldMessengerService>().showTextSnackBar(
                             localizations.feedbackResultInfoCopied);
                       },

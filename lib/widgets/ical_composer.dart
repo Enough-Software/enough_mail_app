@@ -1,13 +1,15 @@
 import 'package:enough_icalendar/enough_icalendar.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
+import 'package:enough_mail_app/util/datetime.dart';
 import 'package:enough_mail_app/util/modal_bottom_sheet_helper.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:enough_mail_app/util/datetime.dart';
-import '../locator.dart';
+
 import '../l10n/app_localizations.g.dart';
+import '../locator.dart';
 
 class IcalComposer extends StatefulWidget {
   const IcalComposer({Key? key, required this.appointment}) : super(key: key);
@@ -17,7 +19,7 @@ class IcalComposer extends StatefulWidget {
 
   static Future<VCalendar?> createOrEditAppointment(BuildContext context,
       {VCalendar? appointment}) async {
-    final localizations = AppLocalizations.of(context);
+    final localizations = context.text;
     // final iconService = locator<IconService>();
     var account = locator<MailService>().currentAccount!;
     if (account.isVirtual) {
@@ -97,7 +99,7 @@ class _IcalComposerState extends State<IcalComposer> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     // final i18nService = locator<I18nService>();
     final end = _event.end;
     final start = _event.start!;
@@ -136,7 +138,7 @@ class _IcalComposerState extends State<IcalComposer> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
               child: Text(localizations.icalendarLabelStart,
-                  style: theme.textTheme.caption),
+                  style: theme.textTheme.bodySmall),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -158,7 +160,7 @@ class _IcalComposerState extends State<IcalComposer> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
                 child: Text(localizations.icalendarLabelEnd,
-                    style: theme.textTheme.caption),
+                    style: theme.textTheme.bodySmall),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -205,7 +207,7 @@ class _IcalComposerState extends State<IcalComposer> {
                         languageCode: localizations.localeName,
                         startDate: start,
                       ),
-                      style: theme.textTheme.caption,
+                      style: theme.textTheme.bodySmall,
                     ),
               onTap: () async {
                 final result = await RecurrenceComposer.createOrEditRecurrence(
@@ -305,7 +307,7 @@ class DateTimePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final i18nService = locator<I18nService>();
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final dt = dateTime;
     return Row(
       children: [
@@ -377,7 +379,7 @@ class RecurrenceComposer extends StatefulWidget {
 
   static Future<Recurrence?> createOrEditRecurrence(BuildContext context,
       Recurrence? recurrenceRule, DateTime startDate) async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     // final iconService = locator<IconService>();
 
     final result = await ModelBottomSheetHelper.showModalBottomSheet(
@@ -417,7 +419,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
   @override
   Widget build(BuildContext context) {
     final i18nService = locator<I18nService>();
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final rule = _recurrenceRule;
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -735,7 +737,7 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final rule = _byDayRule;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -858,7 +860,7 @@ class UntilComposer extends StatefulWidget {
 
   static Future<DateTime?> createOrEditUntil(BuildContext context,
       DateTime start, DateTime? until, IsoDuration? recommendation) async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     // final iconService = locator<IconService>();
     final result = await ModelBottomSheetHelper.showModalBottomSheet(
       context,
@@ -901,7 +903,7 @@ class _UntilComposerState extends State<UntilComposer> {
   @override
   Widget build(BuildContext context) {
     // final i18nService = locator<I18nService>();
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -922,7 +924,7 @@ class _UntilComposerState extends State<UntilComposer> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
               child: Text(localizations.composeAppointmentRecurrenceUntilLabel,
-                  style: theme.textTheme.caption),
+                  style: theme.textTheme.bodySmall),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),

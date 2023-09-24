@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/settings.dart';
@@ -18,7 +19,7 @@ import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
+
 import '../locator.dart';
 import 'button_text.dart';
 import 'mailbox_tree.dart';
@@ -74,7 +75,7 @@ class _MessageActionsState extends State<MessageActions> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = context.text;
     final attachments = widget.message.attachments;
     final iconService = locator<IconService>();
     return PlatformBottomBar(
@@ -124,7 +125,7 @@ class _MessageActionsState extends State<MessageActions> {
                   value: _OverflowMenuChoice.reply,
                   child: IconText(
                     icon: Icon(iconService.messageActionReply),
-                    label: Text(localizations!.messageActionReply),
+                    label: Text(localizations.messageActionReply),
                   ),
                 ),
                 PlatformPopupMenuItem(
@@ -350,7 +351,7 @@ class _MessageActionsState extends State<MessageActions> {
     }
 
     final List<MailAddress> recipients = [];
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final size = MediaQuery.of(context).size;
     final textEditingController = TextEditingController();
     final redirect = await LocalizedDialogHelper.showWidgetDialog(
@@ -363,7 +364,7 @@ class _MessageActionsState extends State<MessageActions> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(localizations.redirectInfo,
-                  style: Theme.of(context).textTheme.caption),
+                  style: Theme.of(context).textTheme.bodySmall),
               RecipientInputField(
                 addresses: recipients,
                 contactManager: account.contactManager,

@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
@@ -6,7 +7,7 @@ import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/widgets/text_with_links.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
+
 import '../locator.dart';
 import '../routes.dart';
 import 'base.dart';
@@ -44,7 +45,7 @@ class _SettingsDefaultSenderScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
 
     final aliasInfo = localizations.defaultSenderSettingsAliasInfo;
     final accountSettings =
@@ -70,7 +71,7 @@ class _SettingsDefaultSenderScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(localizations.defaultSenderSettingsLabel,
-                    style: theme.textTheme.caption),
+                    style: theme.textTheme.bodySmall),
                 FittedBox(
                   child: PlatformDropdownButton<MailAddress>(
                     value: _selectedSender,

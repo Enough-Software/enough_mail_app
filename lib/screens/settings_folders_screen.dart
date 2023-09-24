@@ -1,9 +1,10 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/models.dart';
+import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/account_selector.dart';
@@ -11,7 +12,7 @@ import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/mailbox_selector.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
+
 import '../locator.dart';
 import 'base.dart';
 
@@ -37,7 +38,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return Base.buildAppChrome(
       context,
       title: localizations.settingsFolders,
@@ -49,7 +50,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(localizations.folderNamesIntroduction,
-                    style: theme.textTheme.caption),
+                    style: theme.textTheme.bodySmall),
                 PlatformRadioListTile<FolderNameSetting>(
                   value: FolderNameSetting.localized,
                   groupValue: folderNameSetting,
@@ -89,7 +90,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
   }
 
   void _editFolderNames() async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final service = locator<SettingsService>();
     var customNames = service.settings.customFolderNames;
     if (customNames == null) {
@@ -170,7 +171,7 @@ class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final iconService = locator<IconService>();
     return SingleChildScrollView(
       child: SafeArea(
@@ -266,7 +267,7 @@ class _FolderManagementState extends State<FolderManagement> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return SingleChildScrollView(
       child: SafeArea(
         child: Column(
@@ -329,7 +330,7 @@ class MailboxWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -351,7 +352,7 @@ class MailboxWidget extends StatelessWidget {
               localizations.folderDeleteAction,
               style: Theme.of(context)
                   .textTheme
-                  .button!
+                  .labelLarge!
                   .copyWith(color: Colors.white),
             ),
           ),
@@ -360,7 +361,7 @@ class MailboxWidget extends StatelessWidget {
   }
 
   void _createFolder(context) async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final folderNameController = TextEditingController();
     final result = await LocalizedDialogHelper.showWidgetDialog(
       context,
@@ -396,7 +397,7 @@ class MailboxWidget extends StatelessWidget {
   }
 
   void _deleteFolder(BuildContext context) async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final confirmed = await LocalizedDialogHelper.askForConfirmation(
       context,
       title: localizations.folderDeleteConfirmTitle,

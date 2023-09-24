@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/events/app_event_bus.dart';
-import 'package:enough_mail_app/extensions/extensions.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/async_mime_source_factory.dart';
 import 'package:enough_mail_app/models/message_source.dart';
@@ -19,6 +18,7 @@ import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 import '../models/async_mime_source.dart';
@@ -32,7 +32,6 @@ class MailService implements MimeSourceSubscriber {
   MessageSource? messageSource;
   Account? _currentAccount;
   Account? get currentAccount => _currentAccount;
-  List<MailAccount> mailAccounts = <MailAccount>[];
   final accounts = <Account>[];
   UnifiedAccount? unifiedAccount;
 
@@ -99,21 +98,29 @@ class MailService implements MimeSourceSubscriber {
   }
 
   Future<void> _loadAccounts() async {
-    mailAccounts = await loadMailAccounts();
-    for (var mailAccount in mailAccounts) {
-      accounts.add(RealAccount(mailAccount));
+    final realAccounts = await loadRealMailAccounts();
+    for (var realAccount in realAccounts) {
+      accounts.add(realAccount);
     }
+
     _createUnifiedAccount();
   }
 
-  Future<List<MailAccount>> loadMailAccounts() async {
+  Future<List<RealAccount>> loadRealMailAccounts() async {
     final jsonText = await _storage.read(key: _keyAccounts);
     if (jsonText == null) {
-      return <MailAccount>[];
+      return <RealAccount>[];
     }
     final accountsJson = jsonDecode(jsonText) as List;
-
-    return accountsJson.map((json) => MailAccount.fromJson(json)).toList();
+    try {
+      return accountsJson.map((json) => RealAccount.fromJson(json)).toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Unable to parse accounts: $e');
+        print(jsonText);
+      }
+      return <RealAccount>[];
+    }
   }
 
   Future<MessageSource> search(MailSearch search) async {
@@ -265,43 +272,35 @@ class MailService implements MimeSourceSubscriber {
     }
   }
 
-  void _addGravatar(MailAccount account) {
+  void _addGravatar(RealAccount account) {
     final url = Gravatar.imageUrl(
       account.email,
       size: 400,
       defaultImage: GravatarImage.retro,
     );
-    account.attributes[RealAccount.attributeGravatarImageUrl] = url;
+    account.mailAccount.attributes[RealAccount.attributeGravatarImageUrl] = url;
   }
 
   Future<bool> addAccount(
-    MailAccount mailAccount,
+    RealAccount newAccount,
     MailClient mailClient,
     BuildContext context,
   ) async {
     // TODO(RV): remove BuildContext usage in service
     // TODO(RV): check if other account with the same name already exists
     final state = MailServiceWidget.of(context);
-    final existing = mailAccounts
-        .firstWhereOrNull((account) => account.email == mailAccount.email);
+    final existing = accounts.firstWhereOrNull((account) =>
+        account is RealAccount && account.email == newAccount.email);
     if (existing != null) {
-      final account = accounts.firstWhereOrNull(
-        (account) =>
-            account is RealAccount && account.email == mailAccount.email,
-      );
-      if (account is RealAccount) {
-        removeAccount(account, context);
-      }
+      removeAccount(existing as RealAccount, context);
     }
-    mailAccount = await _checkForAddingSentMessages(mailAccount);
-    final newAccount = RealAccount(mailAccount);
+    newAccount = await _checkForAddingSentMessages(newAccount);
     _currentAccount = newAccount;
     accounts.add(newAccount);
     await loadMailboxesFor(mailClient);
     _mailClientsPerAccount[newAccount] = mailClient;
-    _addGravatar(mailAccount);
-    mailAccounts.add(mailAccount);
-    if (!mailAccount.hasAttribute(RealAccount.attributeExcludeFromUnified)) {
+    _addGravatar(newAccount);
+    if (!newAccount.hasAttribute(RealAccount.attributeExcludeFromUnified)) {
       final unified = unifiedAccount;
       if (unified != null) {
         unified.accounts.add(newAccount);
@@ -355,12 +354,12 @@ class MailService implements MimeSourceSubscriber {
   Future<void> reorderAccounts(List<RealAccount> newOrder) {
     accounts.clear();
     accounts.addAll(newOrder);
-    mailAccounts = newOrder.map((a) => a.mailAccount).toList();
     return saveAccounts();
   }
 
   Future<void> saveAccounts() {
-    final accountsJson = mailAccounts.map((a) => a.toJson()).toList();
+    final accountsJson =
+        accounts.whereType<RealAccount>().map((a) => (a).toJson()).toList();
     final json = jsonEncode(accountsJson);
     return _storage.write(key: _keyAccounts, value: json);
   }
@@ -556,7 +555,6 @@ class MailService implements MimeSourceSubscriber {
 
   Future<void> removeAccount(RealAccount account, BuildContext context) async {
     accounts.remove(account);
-    mailAccounts.remove(account.mailAccount);
     _mailboxesPerAccount.remove(account);
     _mailClientsPerAccount.remove(account);
     final withErrors = _accountsWithErrors;
@@ -708,15 +706,19 @@ class MailService implements MimeSourceSubscriber {
     return oauthClient.refresh(expiredToken);
   }
 
-  Future<MailAccount> _checkForAddingSentMessages(MailAccount mailAccount) {
+  Future<RealAccount> _checkForAddingSentMessages(RealAccount account) {
+    final mailAccount = account.mailAccount;
     final addsSendMailAutomatically = [
       'outlook.office365.com',
       'imap.gmail.com'
     ].contains(mailAccount.incoming.serverConfig.hostname);
+
     return Future.value(
-      mailAccount.copyWithAttribute(
-        RealAccount.attributeSentMailAddedAutomatically,
-        addsSendMailAutomatically,
+      account.copyWith(
+        mailAccount: mailAccount.copyWithAttribute(
+          RealAccount.attributeSentMailAddedAutomatically,
+          addsSendMailAutomatically,
+        ),
       ),
     );
     //TODO later test sending of messages
@@ -725,12 +727,15 @@ class MailService implements MimeSourceSubscriber {
   List<MailClient> getMailClients() {
     final mailClients = <MailClient>[];
     final existingMailClients = _mailClientsPerAccount.values;
-    for (final mailAccount in mailAccounts) {
-      var client = existingMailClients
-          .firstWhereOrNull((client) => client.account == mailAccount);
-      client ??= createMailClient(mailAccount);
-      mailClients.add(client);
+    for (final account in accounts) {
+      if (account is RealAccount) {
+        var client = existingMailClients.firstWhereOrNull(
+            (client) => client.account.email == account.mailAccount.email);
+        client ??= createMailClient(account.mailAccount);
+        mailClients.add(client);
+      }
     }
+
     return mailClients;
   }
 

@@ -58,7 +58,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = context.text;
     return BasePage(
       title: localizations.editAccountTitle(widget.account.name),
       subtitle: widget.account.email,
@@ -446,7 +446,7 @@ class _AccountEditScreenState extends State<AccountEditScreen> {
         _isRetryingToConnect = false;
       });
       if (result) {
-        final localizations = AppLocalizations.of(context);
+        final localizations = context.text;
         LocalizedDialogHelper.showTextDialog(
           context,
           localizations.editAccountFailureToConnectFixedTitle,
@@ -565,7 +565,7 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = context.text;
     return PlatformAlertDialog(
       title: Text(
         localizations.editAccountTestPlusAliasTitle(widget.account.name),
@@ -672,7 +672,7 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = context.text;
     return PlatformAlertDialog(
       title: Text(widget.isNewAlias
           ? localizations.editAccountAddAliasTitle

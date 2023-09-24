@@ -1,4 +1,5 @@
 import 'package:enough_html_editor/enough_html_editor.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/routes.dart';
@@ -10,11 +11,12 @@ import 'package:enough_mail_app/util/modal_bottom_sheet_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
+
 import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 import 'base.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:url_launcher/url_launcher.dart' as launcher;
 
 class SettingsSignatureScreen extends StatefulWidget {
   const SettingsSignatureScreen({Key? key}) : super(key: key);
@@ -50,7 +52,7 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final accounts = locator<MailService>().accounts;
     final accountsWithSignature = List<RealAccount>.from(
       accounts.where(
@@ -85,7 +87,7 @@ class _SettingsSignatureScreenState extends State<SettingsSignatureScreen> {
                   const Divider(),
                   if (accountsWithSignature.isNotEmpty)
                     for (final account in accountsWithSignature) ...[
-                      Text(account.name, style: theme.textTheme.subtitle1),
+                      Text(account.name, style: theme.textTheme.titleMedium),
                       SignatureWidget(
                         account: account,
                       ),
@@ -131,7 +133,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     if (_signature == null) {
       return PlatformListTile(
         leading: const Icon(Icons.add),
@@ -162,7 +164,7 @@ class _SignatureWidgetState extends State<SignatureWidget> {
   }
 
   void _showEditor() async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final iconService = locator<IconService>();
     HtmlEditorApi? editorApi;
 

@@ -1,3 +1,4 @@
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/biometrics_service.dart';
@@ -5,6 +6,7 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import '../l10n/app_localizations.g.dart';
 
 class LockScreen extends StatelessWidget {
@@ -12,7 +14,7 @@ class LockScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
 
     return Base.buildAppChrome(
       context,

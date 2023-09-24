@@ -1,3 +1,4 @@
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/swipe.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
@@ -5,7 +6,7 @@ import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
+
 import '../locator.dart';
 import 'base.dart';
 
@@ -19,7 +20,7 @@ class SettingsSwipeScreen extends StatelessWidget {
     final rightToLeftAction = settings.swipeRightToLeftAction;
 
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return Base.buildAppChrome(
       context,
       title: localizations.swipeSettingTitle,
@@ -31,14 +32,14 @@ class SettingsSwipeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(localizations.swipeSettingLeftToRightLabel,
-                    style: theme.textTheme.caption),
+                    style: theme.textTheme.bodySmall),
                 _SwipeSetting(
                   swipeAction: leftToRightAction,
                   isLeftToRight: true,
                 ),
                 const Divider(),
                 Text(localizations.swipeSettingRightToLeftLabel,
-                    style: theme.textTheme.caption),
+                    style: theme.textTheme.bodySmall),
                 _SwipeSetting(
                   swipeAction: rightToLeftAction,
                   isLeftToRight: false,
@@ -75,7 +76,7 @@ class _SwipeSettingState extends State<_SwipeSetting> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
 
     return Row(
       children: [
@@ -113,7 +114,7 @@ class _SwipeSettingState extends State<_SwipeSetting> {
   }
 
   Future<SwipeAction?> selectSwipe(SwipeAction current) async {
-    final localizations = AppLocalizations.of(context);
+    final localizations = context.text;
 
     final action = await LocalizedDialogHelper.showWidgetDialog(
       context,
@@ -157,8 +158,8 @@ class _SwipeSettingState extends State<_SwipeSetting> {
         ),
       ),
       title: widget.isLeftToRight
-          ? localizations!.swipeSettingLeftToRightLabel
-          : localizations!.swipeSettingRightToLeftLabel,
+          ? localizations.swipeSettingLeftToRightLabel
+          : localizations.swipeSettingRightToLeftLabel,
       defaultActions: DialogActions.cancel,
     );
     if (action == false) {
@@ -177,7 +178,7 @@ class _SwipeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
 
     return Padding(
       padding: const EdgeInsets.all(4.0),

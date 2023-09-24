@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/routes.dart';
@@ -11,7 +12,6 @@ import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 
 import 'button_text.dart';
 
@@ -203,7 +203,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
   Widget _buildInteractiveFallback(
       BuildContext context, MediaProvider mediaProvider) {
     final sizeText = locator<I18nService>().formatMemory(mediaProvider.size);
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final iconData = locator<IconService>()
         .getForMediaType(MediaType.fromText(mediaProvider.mediaType));
 
@@ -219,7 +219,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
             ),
             Text(
               mediaProvider.name,
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             if (sizeText != null)
               Padding(

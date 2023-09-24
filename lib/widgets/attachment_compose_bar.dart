@@ -1,22 +1,24 @@
 import 'package:enough_giphy_flutter/enough_giphy_flutter.dart';
 import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
+import 'package:enough_mail_app/services/key_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
-import 'package:enough_mail_app/services/key_service.dart';
 import 'package:enough_mail_app/util/http_helper.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/ical_composer.dart';
 import 'package:enough_mail_app/widgets/icon_text.dart';
+import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:enough_media/enough_media.dart';
+
 import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 
@@ -48,7 +50,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
 
   @override
   Widget build(BuildContext context) {
-    // final localizations = AppLocalizations.of(context);
+    // final localizations = context.text;
     return Wrap(
       children: [
         for (final attachment in _attachments)
@@ -90,7 +92,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final iconService = locator<IconService>();
     final themeService = locator<ThemeService>();
     final brightness = themeService.brightness(context);
@@ -325,7 +327,7 @@ class ComposeAttachment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ClipRRect(

@@ -1,3 +1,4 @@
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
@@ -7,15 +8,16 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
-import '../locator.dart';
+
 import '../l10n/app_localizations.g.dart';
+import '../locator.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final pages = _buildPages(localizations);
     return Theme(
       data: ThemeData(

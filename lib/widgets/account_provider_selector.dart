@@ -1,8 +1,8 @@
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 
 class AccountProviderSelector extends StatelessWidget {
   final void Function(Provider? provider) onSelected;
@@ -11,7 +11,7 @@ class AccountProviderSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final providers = locator<ProviderService>().providers;
 
     return ListView.separated(

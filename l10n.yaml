@@ -8,4 +8,4 @@ output-class: AppLocalizations
 synthetic-package: false
 untranslated-messages-file: missing-translations.txt
 preferred-supported-locales: en
-nullable-getter: false
+nullable-getter: true

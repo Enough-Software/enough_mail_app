@@ -101,7 +101,7 @@ class _MessageStackState extends State<MessageStack> {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               dayName,
-              style: Theme.of(context).textTheme.caption,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
         ),

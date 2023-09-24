@@ -1,10 +1,11 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 
+import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 
 class MessageOverviewContent extends StatelessWidget {
@@ -21,7 +22,7 @@ class MessageOverviewContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final msg = message;
     final mime = msg.mimeMessage;
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final threadLength =
         mime.threadSequence != null ? mime.threadSequence!.toList().length : 0;
     final subject = mime.decodeSubject() ?? localizations.subjectUndefined;

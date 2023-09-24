@@ -1,47 +1,51 @@
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/legalese.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
-import '../l10n/app_localizations.g.dart';
 
 class LocalizedDialogHelper {
   LocalizedDialogHelper._();
 
   static void showAbout(BuildContext context) async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final packageInfo = await PackageInfo.fromPlatform();
     var version = 'v${packageInfo.version}+${packageInfo.buildNumber}';
-    showAboutDialog(
-      context: context,
-      applicationName: 'Maily',
-      applicationVersion: version,
-      applicationIcon: Icon(CommonPlatformIcons.mailRead),
-      applicationLegalese: localizations.aboutApplicationLegalese,
-      children: [
-        TextButton(
-          child: ButtonText(localizations.feedbackActionSuggestFeature),
-          onPressed: () async {
-            await launcher.launchUrl(Uri.parse('https://maily.userecho.com/'));
-          },
-        ),
-        TextButton(
-          child: ButtonText(localizations.feedbackActionReportProblem),
-          onPressed: () async {
-            await launcher.launchUrl(Uri.parse('https://maily.userecho.com/'));
-          },
-        ),
-        TextButton(
-          child: ButtonText(localizations.feedbackActionHelpDeveloping),
-          onPressed: () async {
-            await launcher.launchUrl(Uri.parse(
-                'https://github.com/Enough-Software/enough_mail_app'));
-          },
-        ),
-        const Legalese(),
-      ],
-    );
+    if (context.mounted) {
+      showAboutDialog(
+        context: context,
+        applicationName: 'Maily',
+        applicationVersion: version,
+        applicationIcon: Icon(CommonPlatformIcons.mailRead),
+        applicationLegalese: localizations.aboutApplicationLegalese,
+        children: [
+          TextButton(
+            child: ButtonText(localizations.feedbackActionSuggestFeature),
+            onPressed: () async {
+              await launcher
+                  .launchUrl(Uri.parse('https://maily.userecho.com/'));
+            },
+          ),
+          TextButton(
+            child: ButtonText(localizations.feedbackActionReportProblem),
+            onPressed: () async {
+              await launcher
+                  .launchUrl(Uri.parse('https://maily.userecho.com/'));
+            },
+          ),
+          TextButton(
+            child: ButtonText(localizations.feedbackActionHelpDeveloping),
+            onPressed: () async {
+              await launcher.launchUrl(Uri.parse(
+                  'https://github.com/Enough-Software/enough_mail_app'));
+            },
+          ),
+          const Legalese(),
+        ],
+      );
+    }
   }
 
   /// Asks the user for confirmation with the given [title] and [query].
@@ -55,7 +59,7 @@ class LocalizedDialogHelper {
     String? action,
     bool isDangerousAction = false,
   }) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return DialogHelper.askForConfirmation(
       context,
       title: title,
@@ -75,7 +79,7 @@ class LocalizedDialogHelper {
     String text, {
     List<Widget>? actions,
   }) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return DialogHelper.showTextDialog(
       context,
       title,
@@ -98,7 +102,7 @@ class LocalizedDialogHelper {
     List<Widget>? actions,
     DialogActions defaultActions = DialogActions.ok,
   }) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return DialogHelper.showWidgetDialog(
       context,
       content,

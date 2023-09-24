@@ -4,8 +4,11 @@ import 'package:enough_mail_app/models/contact.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import '../locator.dart';
+
+part 'account.g.dart';
 
 /// Common functionality for accounts
 abstract class Account extends ChangeNotifier {
@@ -14,6 +17,7 @@ abstract class Account extends ChangeNotifier {
 
   ///  The name of the account
   String get name;
+
   set name(String value);
 
   /// The from address for this account
@@ -21,9 +25,22 @@ abstract class Account extends ChangeNotifier {
 }
 
 /// Allows to listen to mail account changes
+@JsonSerializable()
 class RealAccount extends Account {
   /// Creates a new [Account]
-  RealAccount(MailAccount account) : _account = account;
+  RealAccount(
+    MailAccount mailAccount, {
+    this.appExtensions,
+    this.contactManager,
+  })  : _account = mailAccount,
+        _key = mailAccount.email.toLowerCase();
+
+  /// Creates a new [RealAccount] from JSON
+  factory RealAccount.fromJson(Map<String, dynamic> json) =>
+      _$RealAccountFromJson(json);
+
+  /// Generates JSON from this [MailAccount]
+  Map<String, dynamic> toJson() => _$RealAccountToJson(this);
 
   static const String attributeGravatarImageUrl = 'gravatar.img';
   static const String attributeExcludeFromUnified = 'excludeUnified';
@@ -35,6 +52,7 @@ class RealAccount extends Account {
   static const String attributeEnableLogging = 'enableLogging';
 
   /// The underlying actual account
+  @JsonKey(name: 'mailAccount', required: true)
   MailAccount _account;
 
   /// Retrieves the mail account
@@ -43,6 +61,7 @@ class RealAccount extends Account {
   @override
   bool get isVirtual => false;
 
+  @JsonKey(includeToJson: false, includeFromJson: false)
   @override
   String get name => _account.name;
 
@@ -65,6 +84,7 @@ class RealAccount extends Account {
   }
 
   /// Developer mode option: should logging be enabled for this account?
+  @JsonKey(includeToJson: false, includeFromJson: false)
   bool get enableLogging => getAttribute(attributeEnableLogging) ?? false;
   set enableLogging(bool value) => setAttribute(attributeEnableLogging, value);
 
@@ -79,10 +99,11 @@ class RealAccount extends Account {
   }
 
   /// Checks is this account has the [key] attribute
-  bool hasAttribute(String key) => _account.hasAttribute(name);
+  bool hasAttribute(String key) => _account.hasAttribute(key);
 
   /// Retrieves the account specific signature for HTML messages
   /// Compare [signaturePlain]
+  @JsonKey(includeToJson: false, includeFromJson: false)
   String? get signatureHtml {
     var signature = _account.attributes[attributeSignatureHtml];
     if (signature == null) {
@@ -111,6 +132,7 @@ class RealAccount extends Account {
   /// Account-specific signature for plain text messages
   ///
   /// Compare [signatureHtml]
+  @JsonKey(includeToJson: false, includeFromJson: false)
   String? get signaturePlain => _account.attributes[attributeSignaturePlain];
   set signaturePlain(String? value) {
     if (value == null) {
@@ -121,6 +143,7 @@ class RealAccount extends Account {
   }
 
   /// The name used for sending
+  @JsonKey(includeToJson: false, includeFromJson: false)
   String? get userName => _account.userName;
   set userName(String? value) {
     _account = _account.copyWith(userName: value);
@@ -128,6 +151,7 @@ class RealAccount extends Account {
   }
 
   /// The email associated with this account
+  @JsonKey(includeToJson: false, includeFromJson: false)
   String get email => _account.email;
   set email(String value) {
     _account = _account.copyWith(email: value);
@@ -138,6 +162,7 @@ class RealAccount extends Account {
   MailAddress get fromAddress => _account.fromAddress;
 
   /// Does this account support + aliases like name+alias@domain.com?
+  @JsonKey(includeToJson: false, includeFromJson: false)
   bool get supportsPlusAliases => _account.supportsPlusAliases;
   set supportsPlusAliases(bool value) {
     _account = _account.copyWith(supportsPlusAliases: value);
@@ -145,6 +170,7 @@ class RealAccount extends Account {
   }
 
   /// Should all outgoing messages be sent to the user as well?
+  @JsonKey(includeToJson: false, includeFromJson: false)
   bool get bccMyself => _account.hasAttribute(attributeBccMyself);
   set bccMyself(bool value) {
     if (value) {
@@ -155,6 +181,7 @@ class RealAccount extends Account {
   }
 
   /// Allows to access the [ContactManager]
+  @JsonKey(includeFromJson: false, includeToJson: false)
   ContactManager? contactManager;
 
   /// Adds the [alias]
@@ -190,25 +217,15 @@ class RealAccount extends Account {
       _account.attributes[attributeSentMailAddedAutomatically] ?? false;
 
   /// Retrieves the key for comparing this account
-  String get key {
-    var k = _key;
-    if (k == null) {
-      k = email.toLowerCase();
-      _key = k;
-    }
-    return k;
-  }
+  String get key => _key;
 
-  String? _key;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final String _key;
 
   /// [AppExtension]s are account specific additional setting retrieved
   /// from the server during initial setup
   /// Retrieves the app extensions
-  List<AppExtension>? get appExtensions =>
-      _account.attributes[AppExtension.attributeName];
-  set appExtensions(List<AppExtension?>? value) {
-    setAttribute(AppExtension.attributeName, value);
-  }
+  List<AppExtension>? appExtensions;
 
   @override
   operator ==(Object other) => other is RealAccount && other.key == key;
@@ -217,8 +234,11 @@ class RealAccount extends Account {
   int get hashCode => key.hashCode;
 
   /// Copies this account with the given [mailAccount]
-  RealAccount copyWith({required MailAccount mailAccount}) =>
-      RealAccount(mailAccount);
+  RealAccount copyWith({required MailAccount mailAccount}) => RealAccount(
+        mailAccount,
+        appExtensions: appExtensions,
+        contactManager: contactManager,
+      );
 }
 
 /// A unified account bundles folders of several accounts

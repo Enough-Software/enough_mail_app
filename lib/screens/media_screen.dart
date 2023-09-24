@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -18,9 +18,9 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart' as pathprovider;
-import '../l10n/app_localizations.g.dart';
+import 'package:share_plus/share_plus.dart';
+
 import '../locator.dart';
 import '../routes.dart';
 
@@ -36,7 +36,7 @@ class InteractiveMediaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final iconService = locator<IconService>();
     return Base.buildAppChrome(
       context,

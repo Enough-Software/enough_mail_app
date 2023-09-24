@@ -1,7 +1,6 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/async_mime_source.dart';
 import 'package:enough_mail_app/models/offline_mime_source.dart';
-import 'package:enough_mail_app/models/offline_mime_storage.dart';
 import 'package:enough_mail_app/models/offline_mime_storage_factory.dart';
 
 /// Creates [AsyncMimeSource] instances

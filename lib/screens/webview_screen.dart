@@ -14,7 +14,7 @@ class WebViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final localizations = AppLocalizations.of(context);
+    // final localizations = context.text;
 
     return Base.buildAppChrome(
       context,

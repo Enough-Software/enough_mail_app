@@ -1,8 +1,7 @@
 import 'package:enough_mail_app/models/async_mime_source_factory.dart';
-import 'package:enough_mail_app/services/biometrics_service.dart';
-import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/background_service.dart';
+import 'package:enough_mail_app/services/biometrics_service.dart';
 import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/date_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
@@ -12,6 +11,7 @@ import 'package:enough_mail_app/services/location_service.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
+import 'package:enough_mail_app/services/providers.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
@@ -24,7 +24,7 @@ void setupLocator() {
   locator.registerLazySingleton(
     () => MailService(
       mimeSourceFactory:
-          const AsyncMimeSourceFactory(isOfflineModeSupported: true),
+          const AsyncMimeSourceFactory(isOfflineModeSupported: false),
     ),
   );
   locator.registerLazySingleton(() => I18nService());

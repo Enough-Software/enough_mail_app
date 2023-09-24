@@ -1,13 +1,14 @@
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/theme_settings.dart';
+import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import '../l10n/app_localizations.g.dart';
+
 import '../locator.dart';
 import 'base.dart';
 
@@ -43,7 +44,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final darkThemeStartTime = _themeSettings.themeDarkStartTime;
     final darkThemeEndTime = _themeSettings.themeDarkEndTime;
     final availableColors = ThemeSettings.availableColors;
@@ -60,7 +61,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(localizations.designSectionThemeTitle,
-                      style: theme.textTheme.subtitle1),
+                      style: theme.textTheme.titleMedium),
                   PlatformRadioListTile<ThemeModeSetting>(
                     title: Text(localizations.designThemeOptionLight),
                     value: ThemeModeSetting.light,
@@ -103,7 +104,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                   ),
                   if (_themeModeSetting == ThemeModeSetting.custom) ...[
                     Text(localizations.designSectionCustomTitle,
-                        style: theme.textTheme.subtitle1),
+                        style: theme.textTheme.titleMedium),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -152,7 +153,7 @@ class _SettingsThemeScreenState extends State<SettingsThemeScreen> {
                   const Divider(),
                   Text(
                     localizations.designSectionColorTitle,
-                    style: theme.textTheme.subtitle1,
+                    style: theme.textTheme.titleMedium,
                   ),
                   GridView.count(
                     crossAxisCount: 4,

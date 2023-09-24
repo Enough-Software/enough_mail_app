@@ -41,7 +41,7 @@ class MailboxTree extends StatelessWidget {
     if (element.children == null) {
       final isCurrent = (mailbox == current);
       final iconData = locator<IconService>().getForMailbox(mailbox);
-      return PlatformListTile(
+      return SelectablePlatformListTile(
         leading: Icon(iconData),
         title: title,
         onTap: isCurrent ? null : () => onSelected(mailbox),
@@ -52,9 +52,8 @@ class MailboxTree extends StatelessWidget {
       child: ExpansionTile(
         title: title,
         children: [
-          for (final childElement in element.children!) 
+          for (final childElement in element.children!)
             buildMailboxElement(childElement, level + 1),
-          
         ],
       ),
     );

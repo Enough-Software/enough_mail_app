@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/settings.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../locator.dart';
@@ -18,7 +19,14 @@ class SettingsService {
     _storage ??= const FlutterSecureStorage();
     final json = await _storage!.read(key: _keySettings);
     if (json != null) {
-      settings = Settings.fromJson(jsonDecode(json));
+      try {
+        settings = Settings.fromJson(jsonDecode(json));
+      } catch (e) {
+        if (kDebugMode) {
+          print('error loading settings: $e');
+        }
+        settings = const Settings();
+      }
     } else {
       settings = const Settings();
     }

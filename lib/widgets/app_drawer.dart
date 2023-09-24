@@ -3,18 +3,19 @@ import 'dart:io';
 import 'package:badges/badges.dart' as badges;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/extensions/extension_action_tile.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/account.dart';
 import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 
+import '../l10n/app_localizations.g.dart';
 import '../routes.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -24,7 +25,7 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final mailService = locator<MailService>();
     final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final iconService = locator<IconService>();
     final mailState = MailServiceWidget.of(context)!;
     final currentAccount = mailState.account ?? mailService.currentAccount;
@@ -104,7 +105,9 @@ class AppDrawer extends StatelessWidget {
     }
     final avatarAccount = currentAccount is RealAccount
         ? currentAccount
-        : accounts.first as RealAccount;
+        : accounts.isNotEmpty
+            ? accounts.first as RealAccount
+            : null;
     final userName =
         currentAccount is RealAccount ? currentAccount.userName : null;
     final accountName = Text(
@@ -125,42 +128,46 @@ class AppDrawer extends StatelessWidget {
               arguments: currentAccount, fade: true);
         }
       },
-      title: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: theme.secondaryHeaderColor,
-            backgroundImage: NetworkImage(
-              avatarAccount.imageUrlGravatar!,
-            ),
-            radius: 30,
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 8),
-          ),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      title: avatarAccount == null
+          ? const SizedBox.shrink()
+          : Row(
               children: [
-                accountNameWithBadge,
-                if (userName != null)
-                  Text(
-                    userName,
-                    style: const TextStyle(
-                        fontStyle: FontStyle.italic, fontSize: 14),
+                CircleAvatar(
+                  backgroundColor: theme.secondaryHeaderColor,
+                  backgroundImage: NetworkImage(
+                    avatarAccount.imageUrlGravatar!,
                   ),
-                Text(
-                  currentAccount is UnifiedAccount
-                      ? currentAccount.accounts.map((a) => a.name).join(', ')
-                      : (currentAccount as RealAccount).email,
-                  style: const TextStyle(
-                      fontStyle: FontStyle.italic, fontSize: 14),
+                  radius: 30,
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 8),
+                ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      accountNameWithBadge,
+                      if (userName != null)
+                        Text(
+                          userName,
+                          style: const TextStyle(
+                              fontStyle: FontStyle.italic, fontSize: 14),
+                        ),
+                      Text(
+                        currentAccount is UnifiedAccount
+                            ? currentAccount.accounts
+                                .map((a) => a.name)
+                                .join(', ')
+                            : (currentAccount as RealAccount).email,
+                        style: const TextStyle(
+                            fontStyle: FontStyle.italic, fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -172,12 +179,12 @@ class AppDrawer extends StatelessWidget {
       AppLocalizations localizations) {
     if (accounts.length > 1) {
       return ExpansionTile(
-        leading: mailService.hasAccountsWithErrors() ? Badge() : null,
+        leading: mailService.hasAccountsWithErrors() ? const Badge() : null,
         title: Text(localizations
             .drawerAccountsSectionTitle(mailService.accounts.length)),
         children: [
           for (final account in accounts)
-            PlatformListTile(
+            SelectablePlatformListTile(
               leading: mailService.hasError(account)
                   ? const Icon(Icons.error_outline)
                   : null,

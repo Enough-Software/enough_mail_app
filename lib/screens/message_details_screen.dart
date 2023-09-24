@@ -1,15 +1,7 @@
 import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/widgets/empty_message.dart';
-import 'package:enough_mail_flutter/enough_mail_flutter.dart';
-import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../l10n/app_localizations.g.dart';
-import 'package:url_launcher/url_launcher.dart' as launcher;
-
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/locator.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/models/message.dart';
@@ -26,12 +18,21 @@ import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/attachment_chip.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
+import 'package:enough_mail_app/widgets/empty_message.dart';
 import 'package:enough_mail_app/widgets/expansion_wrap.dart';
 import 'package:enough_mail_app/widgets/ical_interactive_media.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_mail_app/widgets/message_actions.dart';
 import 'package:enough_mail_app/widgets/message_overview_content.dart';
+import 'package:enough_mail_flutter/enough_mail_flutter.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
+
+import '../l10n/app_localizations.g.dart';
 
 class MessageDetailsScreen extends StatefulWidget {
   final Message message;
@@ -88,7 +89,7 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return BasePage(
       title: _current.mimeMessage.decodeSubject() ??
           localizations.subjectUndefined,
@@ -195,7 +196,7 @@ class _MessageContentState extends State<_MessageContent> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return MessageWidget(
       message: widget.message,
       child: _buildMailDetails(localizations),
@@ -531,8 +532,8 @@ class MessageContentsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Base.buildAppChrome(
       context,
-      title: message.mimeMessage.decodeSubject() ??
-          AppLocalizations.of(context)!.subjectUndefined,
+      title:
+          message.mimeMessage.decodeSubject() ?? context.text.subjectUndefined,
       content: SafeArea(
         child: MimeMessageViewer(
           mimeMessage: message.mimeMessage,
@@ -618,7 +619,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
             _removeOverlay();
           } else {
             _overlayEntry = _buildThreadsOverlay();
-            Overlay.of(context)!.insert(_overlayEntry!);
+            Overlay.of(context).insert(_overlayEntry!);
           }
         },
       ),
@@ -675,7 +676,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         children: messages
-                            .map((message) => PlatformListTile(
+                            .map((message) => SelectablePlatformListTile(
                                   title: MessageOverviewContent(
                                     message: message,
                                     isSentMessage: isSentFolder,
@@ -717,10 +718,10 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
   Widget build(BuildContext context) {
     final message = Message.of(context)!;
     final mime = message.mimeMessage;
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     if (mime.isReadReceiptSent) {
       return Text(localizations.detailsReadReceiptSentStatus,
-          style: Theme.of(context).textTheme.caption);
+          style: Theme.of(context).textTheme.bodySmall);
     } else if (_isSendingReadReceipt) {
       return const PlatformProgressIndicator();
     } else {
@@ -764,7 +765,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
     if (_isActive) {
       return const PlatformProgressIndicator();
     }
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     if (widget.message.isNewsletterUnsubscribed) {
       return widget.message.isNewsLetterSubscribable
           ? PlatformElevatedButton(
@@ -785,7 +786,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
   }
 
   void _resubscribe() async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName()!;
     final confirmation = await LocalizedDialogHelper.askForConfirmation(context,
@@ -825,7 +826,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
   }
 
   void _unsubscribe() async {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName()!;
     final confirmation = await LocalizedDialogHelper.askForConfirmation(

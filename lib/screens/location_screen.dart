@@ -1,4 +1,7 @@
+import 'dart:ui' as ui;
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/location_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
@@ -6,11 +9,10 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import '../l10n/app_localizations.g.dart';
 import 'package:latlng/latlng.dart';
 import 'package:location/location.dart';
 import 'package:map/map.dart';
-import 'dart:ui' as ui;
+
 import '../locator.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -37,7 +39,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = context.text;
 
     return Base.buildAppChrome(
       context,

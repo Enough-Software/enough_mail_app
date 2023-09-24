@@ -1,9 +1,10 @@
+import 'package:enough_mail_app/l10n/extension.dart';
+import 'package:enough_mail_app/services/navigation_service.dart';
+import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/material.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import '../l10n/app_localizations.g.dart';
+
 import '../locator.dart';
 import '../routes.dart';
 import 'base.dart';
@@ -13,7 +14,7 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     return Base.buildAppChrome(
       context,
       title: localizations.settingsTitle,

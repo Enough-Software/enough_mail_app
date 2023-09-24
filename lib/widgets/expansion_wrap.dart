@@ -202,6 +202,16 @@ class ExpansionWrapElement extends RenderObjectElement {
     assert(child is RenderBox);
     _updateRenderObject(null, slot);
   }
+
+  @override
+  void moveRenderObjectChild(
+    covariant RenderObject child,
+    covariant Object? oldSlot,
+    covariant Object? newSlot,
+  ) {
+    // TODO(RV): implement moveRenderObjectChild
+    _updateRenderObject(child as RenderBox, 0);
+  }
 }
 
 class _WrapParentData extends BoxParentData {

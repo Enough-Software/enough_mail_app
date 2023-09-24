@@ -1,9 +1,9 @@
 import 'package:enough_mail/discover.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/oauth/oauth.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProviderService {
@@ -107,7 +107,7 @@ class Provider {
     required Function() onPressed,
     bool isSignInButton = false,
   }) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final providerName = displayName ?? '<unknown>';
     final buttonText = isSignInButton
         ? localizations.addAccountOauthSignIn(providerName)
@@ -188,7 +188,7 @@ class GmailProvider extends Provider {
     required Function() onPressed,
     bool isSignInButton = false,
   }) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     const googleBlue = Color(0xff4285F4);
     const googleText = Color(0x89000000);
     return Theme(

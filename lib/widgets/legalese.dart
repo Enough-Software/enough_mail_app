@@ -1,6 +1,6 @@
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/widgets/text_with_links.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 
 class Legalese extends StatelessWidget {
   static const String urlPrivacyPolicy =
@@ -11,7 +11,7 @@ class Legalese extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final legaleseUsage = localizations.legaleseUsage;
     final privacyPolicy = localizations.legalesePrivacyPolicy;
     final termsAndConditions = localizations.legaleseTermsAndConditions;

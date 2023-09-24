@@ -32,9 +32,7 @@ Map<String, dynamic> _$AppExtensionToJson(AppExtension instance) =>
 AppExtensionActionDescription _$AppExtensionActionDescriptionFromJson(
         Map<String, dynamic> json) =>
     AppExtensionActionDescription(
-      action: json['action'] == null
-          ? null
-          : AppExtensionAction.fromJson(json['action'] as Map<String, dynamic>),
+      action: AppExtensionAction._parse(json['action'] as String?),
       icon: json['icon'] as String?,
       labelByLanguage: (json['label'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, e as String),
@@ -44,7 +42,7 @@ AppExtensionActionDescription _$AppExtensionActionDescriptionFromJson(
 Map<String, dynamic> _$AppExtensionActionDescriptionToJson(
         AppExtensionActionDescription instance) =>
     <String, dynamic>{
-      'action': instance.action,
+      'action': AppExtensionAction._toJson(instance.action),
       'icon': instance.icon,
       'label': instance.labelByLanguage,
     };
@@ -63,6 +61,6 @@ Map<String, dynamic> _$AppExtensionActionToJson(AppExtensionAction instance) =>
     };
 
 const _$AppExtensionActionMechanismEnumMap = {
-  AppExtensionActionMechanism.inapp: 'inapp',
+  AppExtensionActionMechanism.inApp: 'inApp',
   AppExtensionActionMechanism.external: 'external',
 };

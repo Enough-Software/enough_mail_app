@@ -1,12 +1,12 @@
 import 'package:community_material_icon/community_material_icon.dart';
+import 'package:enough_ascii_art/enough_ascii_art.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
-import 'package:enough_ascii_art/enough_ascii_art.dart';
 
 import '../locator.dart';
 
@@ -25,7 +25,7 @@ class EditorArtExtensionButton extends StatelessWidget {
 
   static void showArtExtensionDialog(
       BuildContext context, HtmlEditorApi editorApi) {
-    //final localizations = AppLocalizations.of(context);
+    //final localizations = context.text;
     LocalizedDialogHelper.showWidgetDialog(
       context,
       EditorArtExtensionWidget(editorApi: editorApi),
@@ -59,7 +59,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final captions = {
       UnicodeFont.serifBold: localizations.fontSerifBold,
       UnicodeFont.serifItalic: localizations.fontSerifItalic,
@@ -82,7 +82,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
       UnicodeFont.underlinedDouble: localizations.fontUnderlinedDouble,
       UnicodeFont.strikethroughSingle: localizations.fontStrikethroughSingle,
     };
-    final captionStyle = Theme.of(context).textTheme.caption;
+    final captionStyle = Theme.of(context).textTheme.bodySmall;
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -60,7 +60,7 @@ class ExtensionActionTile extends StatelessWidget {
       onTap: () {
         final url = actionDescription.action!.url;
         switch (actionDescription.action!.mechanism) {
-          case AppExtensionActionMechanism.inapp:
+          case AppExtensionActionMechanism.inApp:
             final navService = locator<NavigationService>();
             if (!(Platform.isIOS || Platform.isMacOS)) {
               // close app drawer:

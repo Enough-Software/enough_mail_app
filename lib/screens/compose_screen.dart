@@ -1,30 +1,32 @@
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_html_editor/enough_html_editor.dart';
+import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/account.dart';
+import 'package:enough_mail_app/models/compose_data.dart';
+import 'package:enough_mail_app/models/sender.dart';
 import 'package:enough_mail_app/models/shared_data.dart';
 import 'package:enough_mail_app/services/app_service.dart';
 import 'package:enough_mail_app/services/contact_service.dart';
 import 'package:enough_mail_app/services/i18n_service.dart';
+import 'package:enough_mail_app/services/mail_service.dart';
+import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/services/settings_service.dart';
 import 'package:enough_mail_app/util/localized_dialog_helper.dart';
+import 'package:enough_mail_app/widgets/app_drawer.dart';
+import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
 import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/editor_extensions.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
-import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/compose_data.dart';
-import 'package:enough_mail_app/models/sender.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/widgets/app_drawer.dart';
-import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:enough_text_editor/enough_text_editor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import '../l10n/app_localizations.g.dart';
-import 'package:collection/collection.dart' show IterableExtension;
 import '../locator.dart';
 import '../routes.dart';
 
@@ -384,7 +386,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final titleText = widget.data.action == ComposeAction.answer
         ? localizations.composeTitleReply
         : widget.data.action == ComposeAction.forward

@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/models/compose_data.dart';
 import 'package:enough_mail_app/routes.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
@@ -6,7 +7,6 @@ import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 import 'package:flutter/services.dart';
 
 import '../locator.dart';
@@ -24,14 +24,14 @@ class MailAddressChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
     final theme = Theme.of(context);
     return PlatformPopupMenuButton<_AddressAction>(
       cupertinoButtonPadding: EdgeInsets.zero,
       icon: icon,
       title:
           mailAddress.hasPersonalName ? Text(mailAddress.personalName!) : null,
-      message: Text(mailAddress.email, style: theme.textTheme.caption),
+      message: Text(mailAddress.email, style: theme.textTheme.bodySmall),
       itemBuilder: (context) => [
         PlatformPopupMenuItem(
           value: _AddressAction.copy,

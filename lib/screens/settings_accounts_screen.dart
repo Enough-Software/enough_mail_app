@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:enough_mail_app/l10n/extension.dart';
 import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_mail_app/services/navigation_service.dart';
@@ -7,6 +8,7 @@ import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+
 import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 import '../models/account.dart';
@@ -24,7 +26,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
+    final localizations = context.text;
 
     return Base.buildAppChrome(
       context,
