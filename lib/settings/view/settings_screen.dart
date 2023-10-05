@@ -1,26 +1,27 @@
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
-import '../locator.dart';
-import '../routes.dart';
-import 'base.dart';
+import '../../l10n/extension.dart';
+import '../../locator.dart';
+import '../../routes.dart';
+import '../../screens/base.dart';
+import '../../services/navigation_service.dart';
+import '../../util/localized_dialog_helper.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
+
     return Base.buildAppChrome(
       context,
       title: localizations.settingsTitle,
       content: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

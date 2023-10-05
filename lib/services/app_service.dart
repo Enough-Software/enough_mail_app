@@ -2,27 +2,32 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/compose_data.dart';
-import 'package:enough_mail_app/models/settings.dart';
-import 'package:enough_mail_app/models/shared_data.dart';
-import 'package:enough_mail_app/services/biometrics_service.dart';
-import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/services/theme_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../locator.dart';
+import '../models/compose_data.dart';
+import '../models/shared_data.dart';
 import '../routes.dart';
+import '../settings/model.dart';
 import 'background_service.dart';
+import 'biometrics_service.dart';
 import 'mail_service.dart';
 import 'navigation_service.dart';
+import 'theme_service.dart';
 
+/// Handles app life cycle events
 class AppService {
+  /// Creates a new [AppService]
+  AppService();
+
   static const _platform = MethodChannel('app.channel.shared.data');
+
+  /// The current [AppLifecycleState]
   AppLifecycleState appLifecycleState = AppLifecycleState.resumed;
 
-  bool _ignoreBiometricsCheckAtNextResume = false;
-  DateTime _ignoreBiometricsCheckAtNextResumeTS = DateTime.now();
+  var _ignoreBiometricsCheckAtNextResume = false;
+  var _ignoreBiometricsCheckAtNextResumeTS = DateTime.now();
   set ignoreBiometricsCheckAtNextResume(bool value) {
     _ignoreBiometricsCheckAtNextResume = value;
     if (value) {
@@ -30,11 +35,15 @@ class AppService {
     }
   }
 
-  bool get isInBackground => (appLifecycleState != AppLifecycleState.resumed);
+  bool get isInBackground => appLifecycleState != AppLifecycleState.resumed;
   Future Function(List<SharedData> sharedData)? onSharedData;
   DateTime? _lastPausedTimeStamp;
 
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
+  /// Handles when app life cycle has changed
+  Future<void> didChangeAppLifecycleState(
+    AppLifecycleState state,
+    Settings settings,
+  ) async {
     if (kDebugMode) {
       print('AppLifecycleState = $state');
     }
@@ -43,7 +52,6 @@ class AppService {
       case AppLifecycleState.resumed:
         locator<ThemeService>().checkForChangedTheme();
         final futures = [checkForShare(), locator<MailService>().resume()];
-        final Settings settings = locator<SettingsService>().settings;
         if (settings.enableBiometricLock) {
           if (_ignoreBiometricsCheckAtNextResume) {
             _ignoreBiometricsCheckAtNextResume = false;
@@ -58,14 +66,14 @@ class AppService {
               .requiresAuthorization(_lastPausedTimeStamp)) {
             final navService = locator<NavigationService>();
             if (navService.currentRouteName != Routes.lockScreen) {
-              navService.push(Routes.lockScreen);
+              await navService.push(Routes.lockScreen);
             }
-            bool didAuthenticate =
+            final bool didAuthenticate =
                 await locator<BiometricsService>().authenticate();
             if (!didAuthenticate) {
               await Future.wait(futures);
               if (navService.currentRouteName != Routes.lockScreen) {
-                navService.push(Routes.lockScreen);
+                await navService.push(Routes.lockScreen);
               }
               return;
             } else if (navService.currentRouteName == Routes.lockScreen) {
@@ -88,12 +96,13 @@ class AppService {
     }
   }
 
+  /// Checks if the app has been started by a shared data
   Future checkForShare() async {
     if (Platform.isAndroid) {
-      final shared = await _platform.invokeMethod("getSharedData");
+      final shared = await _platform.invokeMethod('getSharedData');
       //print('checkForShare: received data: $shared');
       if (shared != null) {
-        composeWithSharedData(shared);
+        await composeWithSharedData(shared);
       }
     }
   }
@@ -135,6 +144,7 @@ class AppService {
     return sharedData;
   }
 
+  /// Composes a new message with shared data
   Future composeWithSharedData(Map<dynamic, dynamic> shared) async {
     final sharedData = await _collectSharedData(shared);
     if (sharedData.isEmpty) {
@@ -152,7 +162,7 @@ class AppService {
       } else {
         builder = MessageBuilder();
         for (final data in sharedData) {
-          data.addToMessageBuilder(builder);
+          await data.addToMessageBuilder(builder);
         }
       }
       final composeData = ComposeData(null, builder, ComposeAction.newMessage);

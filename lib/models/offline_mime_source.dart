@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/offline_mime_storage.dart';
 
 import 'async_mime_source.dart';
+import 'offline_mime_storage.dart';
 
 /// Provides access to messages that have been stored offline
 class OfflineMailboxMimeSource extends PagedCachedMimeSource {
@@ -78,7 +78,7 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
   @override
   Future<void> handleOnMessagesVanished(List<MimeMessage> messages) =>
       Future.wait(
-        messages.map((msg) => _storage.deleteMessage(msg)),
+        messages.map(_storage.deleteMessage),
       );
 
   @override
@@ -103,7 +103,7 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
       return messages;
     }
     final onlineMessages = await _onlineMimeSource.loadMessages(sequence);
-    _storage.saveMessageEnvelopes(onlineMessages);
+    await _storage.saveMessageEnvelopes(onlineMessages);
     return onlineMessages;
   }
 
@@ -174,18 +174,17 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
     List<MimeMessage> messages,
     List<String> flags, {
     StoreAction action = StoreAction.add,
-  }) {
-    return Future.wait(
-      [
-        _storage.saveMessageEnvelopes(messages),
-        _onlineMimeSource.store(
-          messages,
-          flags,
-          action: action,
-        ),
-      ],
-    );
-  }
+  }) =>
+      Future.wait(
+        [
+          _storage.saveMessageEnvelopes(messages),
+          _onlineMimeSource.store(
+            messages,
+            flags,
+            action: action,
+          ),
+        ],
+      );
 
   @override
   Future<void> storeAll(
@@ -220,11 +219,11 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
       }
     });
     _mailUpdatedEventSubscription =
-        mailClient.eventBus.on<MailUpdateEvent>().listen(((event) {
+        mailClient.eventBus.on<MailUpdateEvent>().listen((event) {
       if (event.mailClient == mailClient) {
         onMessageFlagsUpdated(event.message);
       }
-    }));
+    });
     // _mailReconnectedEventSubscription = mailClient.eventBus
     //     .on<MailConnectionReEstablishedEvent>()
     //     .listen(_onMailReconnected);

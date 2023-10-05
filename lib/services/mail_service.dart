@@ -2,26 +2,25 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/events/app_event_bus.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/models/async_mime_source_factory.dart';
-import 'package:enough_mail_app/models/message_source.dart';
-import 'package:enough_mail_app/models/sender.dart';
-import 'package:enough_mail_app/models/settings.dart';
-import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/notification_service.dart';
-import 'package:enough_mail_app/services/providers.dart';
-import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/util/gravatar.dart';
-import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../events/app_event_bus.dart';
 import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
+import '../models/account.dart';
 import '../models/async_mime_source.dart';
+import '../models/async_mime_source_factory.dart';
+import '../models/message_source.dart';
+import '../models/sender.dart';
+import '../routes.dart';
+import '../settings/model.dart';
+import '../util/gravatar.dart';
+import '../widgets/inherited_widgets.dart';
+import 'navigation_service.dart';
+import 'notification_service.dart';
+import 'providers.dart';
 
 class MailService implements MimeSourceSubscriber {
   MailService({required AsyncMimeSourceFactory mimeSourceFactory})
@@ -36,7 +35,7 @@ class MailService implements MimeSourceSubscriber {
   UnifiedAccount? unifiedAccount;
 
   List<Account>? _accountsWithErrors;
-  bool get hasUnifiedAccount => (unifiedAccount != null);
+  bool get hasUnifiedAccount => unifiedAccount != null;
 
   static const String _keyAccounts = 'accts';
   final _storage = const FlutterSecureStorage();
@@ -44,6 +43,7 @@ class MailService implements MimeSourceSubscriber {
   final _mailboxesPerAccount = <Account, Tree<Mailbox?>>{};
   late AppLocalizations _localizations;
   AppLocalizations get localizations => _localizations;
+  late Settings _settings;
 
   List<Account> get accountsWithoutErrors {
     final withErrors = _accountsWithErrors;
@@ -90,7 +90,8 @@ class MailService implements MimeSourceSubscriber {
     }
   }
 
-  Future<void> init(AppLocalizations localizations) async {
+  Future<void> init(AppLocalizations localizations, Settings settings) async {
+    _settings = settings;
     _localizations = localizations;
     await _mimeSourceFactory.init();
     await _loadAccounts();
@@ -99,7 +100,7 @@ class MailService implements MimeSourceSubscriber {
 
   Future<void> _loadAccounts() async {
     final realAccounts = await loadRealMailAccounts();
-    for (var realAccount in realAccounts) {
+    for (final realAccount in realAccounts) {
       accounts.add(realAccount);
     }
 
@@ -113,6 +114,7 @@ class MailService implements MimeSourceSubscriber {
     }
     final accountsJson = jsonDecode(jsonText) as List;
     try {
+      // ignore: unnecessary_lambdas
       return accountsJson.map((json) => RealAccount.fromJson(json)).toList();
     } catch (e) {
       if (kDebugMode) {
@@ -136,8 +138,8 @@ class MailService implements MimeSourceSubscriber {
 
   void _createUnifiedAccount() {
     final mailAccountsForUnified = accounts.where((account) =>
-        (account is RealAccount &&
-            !account.hasAttribute(RealAccount.attributeExcludeFromUnified)));
+        account is RealAccount &&
+        !account.hasAttribute(RealAccount.attributeExcludeFromUnified));
     if (mailAccountsForUnified.length > 1) {
       unifiedAccount = UnifiedAccount(
         List<RealAccount>.from(mailAccountsForUnified),
@@ -292,12 +294,12 @@ class MailService implements MimeSourceSubscriber {
     final existing = accounts.firstWhereOrNull((account) =>
         account is RealAccount && account.email == newAccount.email);
     if (existing != null) {
-      removeAccount(existing as RealAccount, context);
+      await removeAccount(existing as RealAccount, context);
     }
     newAccount = await _checkForAddingSentMessages(newAccount);
     _currentAccount = newAccount;
     accounts.add(newAccount);
-    await loadMailboxesFor(mailClient);
+    await _loadMailboxesFor(mailClient);
     _mailClientsPerAccount[newAccount] = mailClient;
     _addGravatar(newAccount);
     if (!newAccount.hasAttribute(RealAccount.attributeExcludeFromUnified)) {
@@ -333,7 +335,11 @@ class MailService implements MimeSourceSubscriber {
     return senders;
   }
 
-  MessageBuilder mailto(Uri mailto, MimeMessage originatingMessage) {
+  MessageBuilder mailto(
+    Uri mailto,
+    MimeMessage originatingMessage,
+    Settings settings,
+  ) {
     final senders = getSenders();
     final searchFor = senders.map((s) => s.address).toList();
     final searchIn = originatingMessage.recipientAddresses
@@ -341,13 +347,14 @@ class MailService implements MimeSourceSubscriber {
         .toList();
     var fromAddress = MailAddress.getMatch(searchFor, searchIn);
     if (fromAddress == null) {
-      final settings = locator<SettingsService>().settings;
       if (settings.preferredComposeMailAddress != null) {
         fromAddress = searchFor.firstWhereOrNull(
-            (address) => address.email == settings.preferredComposeMailAddress);
+          (address) => address.email == settings.preferredComposeMailAddress,
+        );
       }
       fromAddress ??= searchFor.first;
     }
+
     return MessageBuilder.prepareMailtoBasedMessage(mailto, fromAddress);
   }
 
@@ -359,7 +366,7 @@ class MailService implements MimeSourceSubscriber {
 
   Future<void> saveAccounts() {
     final accountsJson =
-        accounts.whereType<RealAccount>().map((a) => (a).toJson()).toList();
+        accounts.whereType<RealAccount>().map((a) => a.toJson()).toList();
     final json = jsonEncode(accountsJson);
     return _storage.write(key: _keyAccounts, value: json);
   }
@@ -378,7 +385,7 @@ class MailService implements MimeSourceSubscriber {
       _mailClientsPerAccount[account] = client;
     }
     await _connect(client);
-    await loadMailboxesFor(client);
+    await _loadMailboxesFor(client);
 
     return client;
   }
@@ -393,7 +400,7 @@ class MailService implements MimeSourceSubscriber {
     Mailbox? mailbox,
     bool switchToAccount = false,
   }) async {
-    var source = await _createMessageSource(mailbox, account);
+    final source = await _createMessageSource(mailbox, account);
     if (switchToAccount) {
       messageSource = source;
       _currentAccount = account;
@@ -401,17 +408,15 @@ class MailService implements MimeSourceSubscriber {
     return source;
   }
 
-  RealAccount? getAccountFor(MailAccount mailAccount) {
-    return accounts.firstWhereOrNull(
-      (a) => a is RealAccount && a.mailAccount == mailAccount,
-    ) as RealAccount?;
-  }
+  RealAccount? getAccountFor(MailAccount mailAccount) =>
+      accounts.firstWhereOrNull(
+        (a) => a is RealAccount && a.mailAccount == mailAccount,
+      ) as RealAccount?;
 
-  RealAccount? getAccountForEmail(String? accountEmail) {
-    return accounts.firstWhereOrNull(
-      (a) => a is RealAccount && a.email == accountEmail,
-    ) as RealAccount;
-  }
+  RealAccount? getAccountForEmail(String? accountEmail) =>
+      accounts.firstWhereOrNull(
+        (a) => a is RealAccount && a.email == accountEmail,
+      )! as RealAccount;
 
   void applyFolderNameSettings(Settings settings) {
     for (final client in _mailClientsPerAccount.values) {
@@ -462,17 +467,18 @@ class MailService implements MimeSourceSubscriber {
     }
   }
 
-  Future<void> loadMailboxesFor(MailClient client) async {
+  Future<void> _loadMailboxesFor(MailClient client) async {
     final account = getAccountFor(client.account);
     if (account == null) {
       if (kDebugMode) {
         print('Unable to find account for ${client.account}');
       }
+
       return;
     }
     final mailboxTree =
         await client.listMailboxesAsTree(createIntermediate: false);
-    final settings = locator<SettingsService>().settings;
+    final settings = _settings;
     if (settings.folderNameSetting != FolderNameSetting.server) {
       _setMailboxNames(settings, client);
     }
@@ -480,21 +486,23 @@ class MailService implements MimeSourceSubscriber {
     _mailboxesPerAccount[account] = mailboxTree;
   }
 
-  Tree<Mailbox?>? getMailboxTreeFor(Account account) {
-    return _mailboxesPerAccount[account];
-  }
+  Tree<Mailbox?>? getMailboxTreeFor(Account account) =>
+      _mailboxesPerAccount[account];
 
   Future<void> createMailbox(
-      RealAccount account, String mailboxName, Mailbox? parentMailbox) async {
+    RealAccount account,
+    String mailboxName,
+    Mailbox? parentMailbox,
+  ) async {
     final mailClient = await getClientFor(account);
     await mailClient.createMailbox(mailboxName, parentMailbox: parentMailbox);
-    await loadMailboxesFor(mailClient);
+    await _loadMailboxesFor(mailClient);
   }
 
   Future<void> deleteMailbox(RealAccount account, Mailbox mailbox) async {
     final mailClient = await getClientFor(account);
     await mailClient.deleteMailbox(mailbox);
-    await loadMailboxesFor(mailClient);
+    await _loadMailboxesFor(mailClient);
   }
 
   Future<void> saveAccount(MailAccount? account) {
@@ -541,7 +549,7 @@ class MailService implements MimeSourceSubscriber {
         messageSource = await _createMessageSource(null, nextAccount);
       } else {
         messageSource = null;
-        locator<NavigationService>().push(Routes.welcome, clear: true);
+        await locator<NavigationService>().push(Routes.welcome, clear: true);
       }
       if (state != null) {
         state.messageSource = messageSource;
@@ -573,7 +581,7 @@ class MailService implements MimeSourceSubscriber {
     final state = MailServiceWidget.of(context);
     if (!account.excludeFromUnified) {
       // updates the unified account
-      excludeAccountFromUnified(
+      await excludeAccountFromUnified(
         account,
         true,
         context,
@@ -591,7 +599,7 @@ class MailService implements MimeSourceSubscriber {
         messageSource = await _createMessageSource(null, nextAccount);
       } else {
         messageSource = null;
-        locator<NavigationService>().push(Routes.welcome, clear: true);
+        await locator<NavigationService>().push(Routes.welcome, clear: true);
       }
       if (state != null) {
         state.messageSource = messageSource;
@@ -633,12 +641,12 @@ class MailService implements MimeSourceSubscriber {
         preferredUserName = usedMailAccount.email.substring(0, atIndex);
         usedMailAccount =
             usedMailAccount.copyWithAuthenticationUserName(preferredUserName);
-        mailClient.disconnect();
+        await mailClient.disconnect();
         mailClient = createMailClient(usedMailAccount);
         try {
           await _connect(mailClient);
         } on MailException {
-          mailClient.disconnect();
+          await mailClient.disconnect();
           return null;
         }
       }
@@ -668,7 +676,7 @@ class MailService implements MimeSourceSubscriber {
   }
 
   MailClient createMailClient(MailAccount mailAccount) {
-    bool isLogEnabled = kDebugMode ||
+    final bool isLogEnabled = kDebugMode ||
         (mailAccount.attributes[RealAccount.attributeEnableLogging] ?? false);
     return MailClient(
       mailAccount,
@@ -682,9 +690,7 @@ class MailService implements MimeSourceSubscriber {
     );
   }
 
-  Future<void> _connect(MailClient client) {
-    return client.connect();
-  }
+  Future<void> _connect(MailClient client) => client.connect();
 
   Future<OauthToken?> _refreshToken(
       MailClient mailClient, OauthToken expiredToken) {

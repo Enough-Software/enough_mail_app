@@ -1,44 +1,37 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/models/models.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
-import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/account_selector.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
-import 'package:enough_mail_app/widgets/mailbox_selector.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../locator.dart';
-import 'base.dart';
+import '../../l10n/extension.dart';
+import '../../locator.dart';
+import '../../models/models.dart';
+import '../../screens/base.dart';
+import '../../services/i18n_service.dart';
+import '../../services/icon_service.dart';
+import '../../services/mail_service.dart';
+import '../../services/scaffold_messenger_service.dart';
+import '../../util/localized_dialog_helper.dart';
+import '../../widgets/account_selector.dart';
+import '../../widgets/button_text.dart';
+import '../../widgets/mailbox_selector.dart';
+import '../model.dart';
+import '../provider.dart';
 
-class SettingsFoldersScreen extends StatefulWidget {
-  const SettingsFoldersScreen({Key? key}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() {
-    return _SettingsFoldersScreenState();
-  }
-}
-
-class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
-  FolderNameSetting? folderNameSetting;
-
-  @override
-  void initState() {
-    final settings = locator<SettingsService>().settings;
-    folderNameSetting = settings.folderNameSetting;
-    super.initState();
-  }
+class SettingsFoldersScreen extends ConsumerWidget {
+  const SettingsFoldersScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final localizations = context.text;
+    final settings = ref.watch(settingsProvider);
+    final folderNameSetting = settings.folderNameSetting;
+
+    void onFolderNameSettingChanged(FolderNameSetting? value) =>
+        _onFolderNameSettingChanged(context, value, ref);
+
     return Base.buildAppChrome(
       context,
       title: localizations.settingsFolders,
@@ -54,19 +47,19 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
                 PlatformRadioListTile<FolderNameSetting>(
                   value: FolderNameSetting.localized,
                   groupValue: folderNameSetting,
-                  onChanged: _onFolderNameSettingChanged,
+                  onChanged: onFolderNameSettingChanged,
                   title: Text(localizations.folderNamesSettingLocalized),
                 ),
                 PlatformRadioListTile<FolderNameSetting>(
                   value: FolderNameSetting.server,
                   groupValue: folderNameSetting,
-                  onChanged: _onFolderNameSettingChanged,
+                  onChanged: onFolderNameSettingChanged,
                   title: Text(localizations.folderNamesSettingServer),
                 ),
                 PlatformRadioListTile<FolderNameSetting>(
                   value: FolderNameSetting.custom,
                   groupValue: folderNameSetting,
-                  onChanged: _onFolderNameSettingChanged,
+                  onChanged: onFolderNameSettingChanged,
                   title: Text(localizations.folderNamesSettingCustom),
                 ),
                 if (folderNameSetting == FolderNameSetting.custom) ...[
@@ -74,7 +67,7 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
                   PlatformTextButtonIcon(
                     icon: Icon(CommonPlatformIcons.edit),
                     label: ButtonText(localizations.folderNamesEditAction),
-                    onPressed: _editFolderNames,
+                    onPressed: () => _editFolderNames(context, settings, ref),
                   ),
                 ],
                 const Divider(
@@ -89,10 +82,13 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
     );
   }
 
-  void _editFolderNames() async {
+  void _editFolderNames(
+    BuildContext context,
+    Settings settings,
+    WidgetRef ref,
+  ) async {
     final localizations = context.text;
-    final service = locator<SettingsService>();
-    var customNames = service.settings.customFolderNames;
+    var customNames = settings.customFolderNames;
     if (customNames == null) {
       final l = locator<I18nService>().localizations;
       customNames = [
@@ -109,126 +105,102 @@ class _SettingsFoldersScreenState extends State<SettingsFoldersScreen> {
         title: localizations.folderNamesCustomTitle,
         defaultActions: DialogActions.okAndCancel);
     if (result == true) {
-      service.settings =
-          service.settings.copyWith(customFolderNames: customNames);
-      locator<MailService>().applyFolderNameSettings(service.settings);
-      await service.save();
+      settings = settings.copyWith(customFolderNames: customNames);
+      locator<MailService>().applyFolderNameSettings(settings);
+      ref.read(settingsProvider.notifier).update(settings);
     }
   }
 
-  void _onFolderNameSettingChanged(FolderNameSetting? value) async {
-    setState(() {
-      folderNameSetting = value;
-    });
-    final service = locator<SettingsService>();
-    service.settings = service.settings.copyWith(folderNameSetting: value);
-    locator<MailService>().applyFolderNameSettings(service.settings);
-    await service.save();
+  void _onFolderNameSettingChanged(
+    BuildContext context,
+    FolderNameSetting? value,
+    WidgetRef ref,
+  ) async {
+    final settings = ref.read(settingsProvider);
+
+    ref.read(settingsProvider.notifier).update(
+          settings.copyWith(folderNameSetting: value),
+        );
+    locator<MailService>().applyFolderNameSettings(settings);
   }
 }
 
-class CustomFolderNamesEditor extends StatefulWidget {
+class CustomFolderNamesEditor extends HookConsumerWidget {
   const CustomFolderNamesEditor({Key? key, required this.customNames})
       : super(key: key);
 
   final List<String> customNames;
 
   @override
-  State<CustomFolderNamesEditor> createState() =>
-      _CustomFolderNamesEditorState();
-}
-
-class _CustomFolderNamesEditorState extends State<CustomFolderNamesEditor> {
-  TextEditingController? _inboxController;
-  TextEditingController? _draftsController;
-  TextEditingController? _sentController;
-  TextEditingController? _trashController;
-  TextEditingController? _archiveController;
-  TextEditingController? _junkController;
-
-  @override
-  void initState() {
-    super.initState();
-    final customNames = widget.customNames;
-    _inboxController = TextEditingController(text: customNames[0]);
-    _draftsController = TextEditingController(text: customNames[1]);
-    _sentController = TextEditingController(text: customNames[2]);
-    _trashController = TextEditingController(text: customNames[3]);
-    _archiveController = TextEditingController(text: customNames[4]);
-    _junkController = TextEditingController(text: customNames[5]);
-  }
-
-  @override
-  void dispose() {
-    _inboxController!.dispose();
-    _draftsController!.dispose();
-    _sentController!.dispose();
-    _trashController!.dispose();
-    _archiveController!.dispose();
-    _junkController!.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final localizations = context.text;
     final iconService = locator<IconService>();
+
+    final inboxController = useTextEditingController(text: customNames[0]);
+    final draftsController = useTextEditingController(text: customNames[1]);
+    final sentController = useTextEditingController(text: customNames[2]);
+    final trashController = useTextEditingController(text: customNames[3]);
+    final archiveController = useTextEditingController(text: customNames[4]);
+    final junkController = useTextEditingController(text: customNames[5]);
+
+    //TODO support to save these values
+
     return SingleChildScrollView(
       child: SafeArea(
         child: Column(
           children: [
             DecoratedPlatformTextField(
-              controller: _inboxController,
+              controller: inboxController,
               decoration: InputDecoration(
                 labelText: localizations.folderInbox,
                 prefixIcon: Icon(iconService.folderInbox),
               ),
-              onChanged: (value) => widget.customNames[0] = value,
+              onChanged: (value) => customNames[0] = value,
               cupertinoAlignLabelOnTop: true,
             ),
             DecoratedPlatformTextField(
-              controller: _draftsController,
+              controller: draftsController,
               decoration: InputDecoration(
                 labelText: localizations.folderDrafts,
                 prefixIcon: Icon(iconService.folderDrafts),
               ),
-              onChanged: (value) => widget.customNames[1] = value,
+              onChanged: (value) => customNames[1] = value,
               cupertinoAlignLabelOnTop: true,
             ),
             DecoratedPlatformTextField(
-              controller: _sentController,
+              controller: sentController,
               decoration: InputDecoration(
                 labelText: localizations.folderSent,
                 prefixIcon: Icon(iconService.folderSent),
               ),
-              onChanged: (value) => widget.customNames[2] = value,
+              onChanged: (value) => customNames[2] = value,
               cupertinoAlignLabelOnTop: true,
             ),
             DecoratedPlatformTextField(
-              controller: _trashController,
+              controller: trashController,
               decoration: InputDecoration(
                 labelText: localizations.folderTrash,
                 prefixIcon: Icon(iconService.folderTrash),
               ),
-              onChanged: (value) => widget.customNames[3] = value,
+              onChanged: (value) => customNames[3] = value,
               cupertinoAlignLabelOnTop: true,
             ),
             DecoratedPlatformTextField(
-              controller: _archiveController,
+              controller: archiveController,
               decoration: InputDecoration(
                 labelText: localizations.folderArchive,
                 prefixIcon: Icon(iconService.folderArchive),
               ),
-              onChanged: (value) => widget.customNames[4] = value,
+              onChanged: (value) => customNames[4] = value,
               cupertinoAlignLabelOnTop: true,
             ),
             DecoratedPlatformTextField(
-              controller: _junkController,
+              controller: junkController,
               decoration: InputDecoration(
                 labelText: localizations.folderJunk,
                 prefixIcon: Icon(iconService.folderJunk),
               ),
-              onChanged: (value) => widget.customNames[5] = value,
+              onChanged: (value) => customNames[5] = value,
               cupertinoAlignLabelOnTop: true,
             ),
           ],
@@ -410,11 +382,13 @@ class MailboxWidget extends StatelessWidget {
             .showTextSnackBar(localizations.folderDeleteResultSuccess);
         onMailboxDeleted();
       } on MailException catch (e) {
-        await LocalizedDialogHelper.showTextDialog(
-          context,
-          localizations.errorTitle,
-          localizations.folderDeleteResultFailure(e.message!),
-        );
+        if (context.mounted) {
+          await LocalizedDialogHelper.showTextDialog(
+            context,
+            localizations.errorTitle,
+            localizations.folderDeleteResultFailure(e.message!),
+          );
+        }
       }
     }
   }

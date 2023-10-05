@@ -1,12 +1,12 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/extensions/extensions.dart';
-import 'package:enough_mail_app/models/contact.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../extensions/extensions.dart';
 import '../locator.dart';
+import '../services/i18n_service.dart';
+import '../services/mail_service.dart';
+import 'contact.dart';
 
 part 'account.g.dart';
 
@@ -68,20 +68,14 @@ class RealAccount extends Account {
   @override
   set name(String value) {
     _account = _account.copyWith(name: value);
-    // TODO(RV): now this account is de-coupled from account manager aka MailService
     notifyListeners();
   }
 
   /// Should this account be excluded from the unified account?
   bool get excludeFromUnified =>
       _account.hasAttribute(attributeExcludeFromUnified);
-  set excludeFromUnified(bool value) {
-    if (value) {
-      _account = _account.copyWithAttribute(attributeExcludeFromUnified, value);
-    } else {
-      _account.attributes.remove(attributeExcludeFromUnified);
-    }
-  }
+  set excludeFromUnified(bool value) =>
+      setAttribute(attributeExcludeFromUnified, value);
 
   /// Developer mode option: should logging be enabled for this account?
   @JsonKey(includeToJson: false, includeFromJson: false)
@@ -89,13 +83,16 @@ class RealAccount extends Account {
   set enableLogging(bool value) => setAttribute(attributeEnableLogging, value);
 
   /// Retrieves the attribute with the given [key] name
-  dynamic getAttribute(String key) {
-    return _account.attributes[key];
-  }
+  dynamic getAttribute(String key) => _account.attributes[key];
 
   /// Sets the attribute [key] to [value]
   void setAttribute(String key, dynamic value) {
-    _account = _account.copyWithAttribute(key, value);
+    if (value == null) {
+      _account.attributes.remove(key);
+    } else {
+      _account = _account.copyWithAttribute(key, value);
+    }
+    notifyListeners();
   }
 
   /// Checks is this account has the [key] attribute
@@ -105,7 +102,7 @@ class RealAccount extends Account {
   /// Compare [signaturePlain]
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? get signatureHtml {
-    var signature = _account.attributes[attributeSignatureHtml];
+    final signature = _account.attributes[attributeSignatureHtml];
     if (signature == null) {
       final extensions = appExtensions;
       if (extensions != null) {
@@ -121,26 +118,16 @@ class RealAccount extends Account {
     return signature;
   }
 
-  set signatureHtml(String? value) {
-    if (value == null) {
-      _account.attributes.remove(attributeSignatureHtml);
-    } else {
-      _account = _account.copyWithAttribute(attributeSignatureHtml, value);
-    }
-  }
+  set signatureHtml(String? value) =>
+      setAttribute(attributeSignatureHtml, value);
 
   /// Account-specific signature for plain text messages
   ///
   /// Compare [signatureHtml]
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? get signaturePlain => _account.attributes[attributeSignaturePlain];
-  set signaturePlain(String? value) {
-    if (value == null) {
-      _account.attributes.remove(attributeSignaturePlain);
-    } else {
-      _account = _account.copyWithAttribute(attributeSignaturePlain, value);
-    }
-  }
+  set signaturePlain(String? value) =>
+      setAttribute(attributeSignaturePlain, value);
 
   /// The name used for sending
   @JsonKey(includeToJson: false, includeFromJson: false)
@@ -178,6 +165,7 @@ class RealAccount extends Account {
     } else {
       _account.attributes.remove(attributeBccMyself);
     }
+    notifyListeners();
   }
 
   /// Allows to access the [ContactManager]
@@ -228,7 +216,7 @@ class RealAccount extends Account {
   List<AppExtension>? appExtensions;
 
   @override
-  operator ==(Object other) => other is RealAccount && other.key == key;
+  bool operator ==(Object other) => other is RealAccount && other.key == key;
 
   @override
   int get hashCode => key.hashCode;
@@ -282,7 +270,7 @@ class UnifiedAccount extends Account {
 /// A account with an active [MailClient]
 class ConnectedAccount extends RealAccount {
   /// Creates a new [ConnectedAccount]
-  ConnectedAccount(MailAccount account, this.mailClient) : super(account);
+  ConnectedAccount(super.account, this.mailClient);
 
   /// The client
   final MailClient mailClient;

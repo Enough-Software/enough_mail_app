@@ -2,25 +2,23 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
-import '../locator.dart';
-import 'base.dart';
+import '../../l10n/extension.dart';
+import '../../locator.dart';
+import '../../screens/base.dart';
+import '../../services/scaffold_messenger_service.dart';
+import '../../widgets/button_text.dart';
 
 class SettingsFeedbackScreen extends StatefulWidget {
-  const SettingsFeedbackScreen({Key? key}) : super(key: key);
+  const SettingsFeedbackScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() {
-    return _SettingsFeedbackScreenState();
-  }
+  State<StatefulWidget> createState() => _SettingsFeedbackScreenState();
 }
 
 class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
@@ -65,34 +63,34 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
       content: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: Text(localizations.feedbackIntro,
                       style: theme.textTheme.titleMedium),
                 ),
                 if (info == null)
                   const Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8),
                     child: PlatformProgressIndicator(),
                   )
                 else ...[
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8),
                     child: Text(
                       localizations.feedbackProvideInfoRequest,
                       style: theme.textTheme.bodySmall,
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8),
                     child: Text(info!),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8),
                     child: PlatformIconButton(
                       icon: Icon(CommonPlatformIcons.copy),
                       onPressed: () {
@@ -104,7 +102,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                   ),
                 ],
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: PlatformTextButton(
                     child:
                         ButtonText(localizations.feedbackActionSuggestFeature),
@@ -115,7 +113,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: PlatformTextButton(
                     child:
                         ButtonText(localizations.feedbackActionReportProblem),
@@ -126,7 +124,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: PlatformTextButton(
                     child:
                         ButtonText(localizations.feedbackActionHelpDeveloping),

@@ -1,6 +1,7 @@
-import 'package:enough_mail_app/models/settings.dart';
-import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:flutter/material.dart';
+
+import '../models/theme_settings.dart';
+import '../settings/model.dart';
 
 class ThemeService with ChangeNotifier {
   late ThemeSettings _themeSettings;

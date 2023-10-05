@@ -1,42 +1,43 @@
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/models/compose_data.dart';
-import 'package:enough_mail_app/models/sender.dart';
-import 'package:enough_mail_app/models/shared_data.dart';
-import 'package:enough_mail_app/services/app_service.dart';
-import 'package:enough_mail_app/services/contact_service.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
-import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/app_drawer.dart';
-import 'package:enough_mail_app/widgets/attachment_compose_bar.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
-import 'package:enough_mail_app/widgets/editor_extensions.dart';
-import 'package:enough_mail_app/widgets/inherited_widgets.dart';
-import 'package:enough_mail_app/widgets/recipient_input_field.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:enough_text_editor/enough_text_editor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../l10n/app_localizations.g.dart';
+import '../l10n/extension.dart';
 import '../locator.dart';
+import '../models/account.dart';
+import '../models/compose_data.dart';
+import '../models/sender.dart';
+import '../models/shared_data.dart';
 import '../routes.dart';
+import '../services/app_service.dart';
+import '../services/contact_service.dart';
+import '../services/i18n_service.dart';
+import '../services/mail_service.dart';
+import '../services/navigation_service.dart';
+import '../services/scaffold_messenger_service.dart';
+import '../settings/provider.dart';
+import '../util/localized_dialog_helper.dart';
+import '../widgets/app_drawer.dart';
+import '../widgets/attachment_compose_bar.dart';
+import '../widgets/button_text.dart';
+import '../widgets/editor_extensions.dart';
+import '../widgets/inherited_widgets.dart';
+import '../widgets/recipient_input_field.dart';
 
-class ComposeScreen extends StatefulWidget {
+class ComposeScreen extends ConsumerStatefulWidget {
   const ComposeScreen({super.key, required this.data});
 
   final ComposeData data;
 
   @override
-  State<ComposeScreen> createState() => _ComposeScreenState();
+  ConsumerState<ComposeScreen> createState() => _ComposeScreenState();
 }
 
 enum _OverflowMenuChoice {
@@ -49,7 +50,7 @@ enum _OverflowMenuChoice {
 
 enum _Autofocus { to, subject, text }
 
-class _ComposeScreenState extends State<ComposeScreen> {
+class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   late List<MailAddress> _toRecipients;
   late List<MailAddress> _ccRecipients;
   late List<MailAddress> _bccRecipients;
@@ -88,8 +89,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
         ? locator<MailService>().currentAccount
         : locator<MailService>()
             .accounts
-            .firstWhere((account) => account is RealAccount)) as RealAccount;
-    final defaultSender = locator<SettingsService>().settings.defaultSender;
+            .firstWhere((account) => account is RealAccount))! as RealAccount;
+    final defaultSender = ref.read(settingsProvider).defaultSender;
     mb.from ??= [defaultSender ?? currentAccount.fromAddress];
     Sender? from;
     if (mb.from?.first == defaultSender) {
@@ -131,22 +132,23 @@ class _ComposeScreenState extends State<ComposeScreen> {
     super.dispose();
   }
 
-  Future<String> _loadMailTextFromComposeData() {
-    return Future.value(widget.data.resumeText);
-  }
+  Future<String> _loadMailTextFromComposeData() =>
+      Future.value(widget.data.resumeText);
 
-  String get _signature => locator<SettingsService>()
+  String get _signature => ref
+      .read(settingsProvider.notifier)
       .getSignatureHtml(_from.account, widget.data.action);
 
   Future<String> _loadMailTextFromMessage() async {
+    final signature = _signature;
     // find out signature:
     final mb = widget.data.messageBuilder;
     if (mb.originalMessage == null) {
       if (_composeMode == ComposeMode.html) {
-        final html = '<p>${mb.text ?? '&nbsp;'}</p>$_signature';
+        final html = '<p>${mb.text ?? '&nbsp;'}</p>$signature';
         return html;
       } else {
-        return '${mb.text ?? ''}\n$_signature';
+        return '${mb.text ?? ''}\n$signature';
       }
     } else {
       const blockExternalImages = false;
@@ -158,11 +160,12 @@ class _ComposeScreenState extends State<ComposeScreen> {
         if (_composeMode == ComposeMode.html) {
           final args = _HtmlGenerationArguments(null, mb.originalMessage,
               blockExternalImages, emptyMessageText, maxImageWidth);
-          final html = await compute(_generateDraftHtmlImpl, args) + _signature;
+          final html = await compute(_generateDraftHtmlImpl, args) + signature;
           return html;
         } else {
           final text =
-              '${mb.originalMessage?.decodeTextPlainPart() ?? emptyMessageText}\n$_signature';
+              '${mb.originalMessage?.decodeTextPlainPart() ?? emptyMessageText}'
+              '\n$signature';
           return text;
         }
       }
@@ -176,7 +179,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
       if (_composeMode == ComposeMode.html) {
         final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
             blockExternalImages, emptyMessageText, maxImageWidth);
-        final html = await compute(_generateQuoteHtmlImpl, args) + _signature;
+        final html = await compute(_generateQuoteHtmlImpl, args) + signature;
         return html;
       } else {
         final original = mb.originalMessage;
@@ -184,9 +187,9 @@ class _ComposeScreenState extends State<ComposeScreen> {
           final header = MessageBuilder.fillTemplate(quoteTemplate, original);
           final plainText = original.decodeTextPlainPart() ?? emptyMessageText;
           final text = MessageBuilder.quotePlainText(header, plainText);
-          return '$text\n$_signature';
+          return '$text\n$signature';
         } else {
-          return '\n$_signature';
+          return '\n$signature';
         }
       }
     }
@@ -290,9 +293,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
     return mimeMessage;
   }
 
-  Future<MailClient> _getMailClient() {
-    return locator<MailService>().getClientFor(_from.account);
-  }
+  Future<MailClient> _getMailClient() =>
+      locator<MailService>().getClientFor(_from.account);
 
   Future<void> _send(AppLocalizations localizations) async {
     final subject = _subjectController.text.trim();
@@ -316,7 +318,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
         mimeMessage,
         from: _from.account.fromAddress,
         appendToSent: append,
-        use8BitEncoding: false,
       );
       locator<ScaffoldMessengerService>()
           .showTextSnackBar(localizations.composeMailSendSuccess);
@@ -327,7 +328,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
       // this state's context is now invalid because this widget is not mounted anymore
       final currentContext = locator<NavigationService>().currentContext!;
       final message = (e is MailException) ? e.message! : e.toString();
-      LocalizedDialogHelper.showTextDialog(
+      await LocalizedDialogHelper.showTextDialog(
         currentContext,
         localizations.errorTitle,
         localizations.composeSendErrorInfo(message),
@@ -411,7 +412,6 @@ class _ComposeScreenState extends State<ComposeScreen> {
             slivers: [
               PlatformSliverAppBar(
                 title: Text(titleText),
-                floating: false,
                 pinned: true,
                 stretch: true,
                 actions: [
@@ -465,9 +465,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           child: Text(
                               localizations.composeConvertToHtmlEditorAction),
                         ),
-                      if (locator<SettingsService>()
-                          .settings
-                          .enableDeveloperMode)
+                      if (ref.read(settingsProvider).enableDeveloperMode)
                         PlatformPopupMenuItem<_OverflowMenuChoice>(
                           value: _OverflowMenuChoice.showSourceCode,
                           child: Text(localizations.viewSourceAction),
@@ -507,7 +505,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           _from = s;
                           final newSignature = _signature;
                           if (newSignature != lastSignature) {
-                            _htmlEditorApi!
+                            await _htmlEditorApi!
                                 .replaceAll(lastSignature, newSignature);
                           }
                           if (_isReadReceiptRequested) {
@@ -560,11 +558,11 @@ class _ComposeScreenState extends State<ComposeScreen> {
                       if (widget.data.messageBuilder.attachments.isNotEmpty ||
                           (_downloadAttachmentsFuture != null)) ...[
                         Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
+                          padding: const EdgeInsets.only(top: 8),
                           child: AttachmentComposeBar(
                               composeData: widget.data,
                               isDownloading:
-                                  (_downloadAttachmentsFuture != null)),
+                                  _downloadAttachmentsFuture != null),
                         ),
                         const Divider(
                           color: Colors.grey,
@@ -621,7 +619,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
                           // compose mode is plainText
                           _plainTextController.text = snapshot.data ?? '';
                           return Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(8),
                             child: TextEditor(
                               controller: _plainTextController,
                               minLines: 10,
@@ -645,10 +643,10 @@ class _ComposeScreenState extends State<ComposeScreen> {
     );
   }
 
-  void _showSourceCode() async {
+  Future<void> _showSourceCode() async {
     final mailClient = await locator<MailService>().getClientFor(_from.account);
     final mime = await _buildMimeMessage(mailClient);
-    locator<NavigationService>().push(Routes.sourceCode, arguments: mime);
+    await locator<NavigationService>().push(Routes.sourceCode, arguments: mime);
   }
 
   Future<void> _saveAsDraft() async {
@@ -681,7 +679,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
         print('unable to save draft message $e $s');
       }
       final currentContext = locator<NavigationService>().currentContext!;
-      LocalizedDialogHelper.showTextDialog(
+      await LocalizedDialogHelper.showTextDialog(
         currentContext,
         localizations.errorTitle,
         localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),
@@ -712,7 +710,7 @@ class _ComposeScreenState extends State<ComposeScreen> {
   void _convertToPlainTextEditor() {
     final future = _htmlEditorApi!.getText();
     setState(() {
-      _loadMailTextFuture = future.then((value) => _convertToPlainText(value));
+      _loadMailTextFuture = future.then(_convertToPlainText);
       _composeMode = ComposeMode.plainText;
     });
   }
@@ -761,16 +759,16 @@ class _ComposeScreenState extends State<ComposeScreen> {
     return Future.value();
   }
 
-  _convertToPlainText(String htmlText) =>
+  String _convertToPlainText(String htmlText) =>
       HtmlToPlainTextConverter.convert(htmlText);
 }
 
 class _HtmlGenerationArguments {
+  _HtmlGenerationArguments(this.quoteTemplate, this.mimeMessage,
+      this.blockExternalImages, this.emptyMessageText, this.maxImageWidth);
   final String? quoteTemplate;
   final MimeMessage? mimeMessage;
   final bool blockExternalImages;
   final String emptyMessageText;
   final int maxImageWidth;
-  _HtmlGenerationArguments(this.quoteTemplate, this.mimeMessage,
-      this.blockExternalImages, this.emptyMessageText, this.maxImageWidth);
 }

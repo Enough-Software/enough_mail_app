@@ -1,11 +1,10 @@
+import 'package:enough_mail_app/services/mail_service.dart';
+import 'package:enough_mail_app/widgets/app_drawer.dart';
+import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/widgets/app_drawer.dart';
-import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 
 import '../locator.dart';
 
@@ -82,6 +81,7 @@ class BaseAppBar extends StatelessWidget {
 }
 
 class Base {
+  @Deprecated('Use BasePage instead')
   static Widget buildAppChrome(
     BuildContext context, {
     required String? title,

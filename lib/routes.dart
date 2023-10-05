@@ -9,6 +9,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'settings/view/view.dart';
+
 class Routes {
   static const String home = '/';
   static const String accountAdd = '/accountAdd';

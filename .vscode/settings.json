@@ -6,6 +6,8 @@
         "icalendar",
         "Imap",
         "LTRB",
-        "Maily"
+        "Maily",
+        "riverpod",
+        "unawaited"
     ]
 }

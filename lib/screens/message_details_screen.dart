@@ -1,53 +1,56 @@
 import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/compose_data.dart';
-import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/models/message_source.dart';
-import 'package:enough_mail_app/models/settings.dart';
-import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/notification_service.dart';
-import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/attachment_chip.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
-import 'package:enough_mail_app/widgets/empty_message.dart';
-import 'package:enough_mail_app/widgets/expansion_wrap.dart';
-import 'package:enough_mail_app/widgets/ical_interactive_media.dart';
-import 'package:enough_mail_app/widgets/inherited_widgets.dart';
-import 'package:enough_mail_app/widgets/mail_address_chip.dart';
-import 'package:enough_mail_app/widgets/message_actions.dart';
-import 'package:enough_mail_app/widgets/message_overview_content.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../l10n/app_localizations.g.dart';
+import '../l10n/extension.dart';
+import '../locator.dart';
+import '../models/compose_data.dart';
+import '../models/message.dart';
+import '../models/message_source.dart';
+import '../routes.dart';
+import '../services/i18n_service.dart';
+import '../services/icon_service.dart';
+import '../services/mail_service.dart';
+import '../services/navigation_service.dart';
+import '../services/notification_service.dart';
+import '../settings/model.dart';
+import '../settings/provider.dart';
+import '../util/localized_dialog_helper.dart';
+import '../widgets/attachment_chip.dart';
+import '../widgets/button_text.dart';
+import '../widgets/empty_message.dart';
+import '../widgets/expansion_wrap.dart';
+import '../widgets/ical_interactive_media.dart';
+import '../widgets/inherited_widgets.dart';
+import '../widgets/mail_address_chip.dart';
+import '../widgets/message_actions.dart';
+import '../widgets/message_overview_content.dart';
+import 'base.dart';
 
-class MessageDetailsScreen extends StatefulWidget {
+class MessageDetailsScreen extends ConsumerStatefulWidget {
+  const MessageDetailsScreen({
+    super.key,
+    required this.message,
+    this.blockExternalContents = false,
+  });
   final Message message;
   final bool blockExternalContents;
-  const MessageDetailsScreen(
-      {Key? key, required this.message, this.blockExternalContents = false})
-      : super(key: key);
 
   @override
-  State<MessageDetailsScreen> createState() => _DetailsScreenState();
+  ConsumerState<MessageDetailsScreen> createState() => _DetailsScreenState();
 }
 
 enum _OverflowMenuChoice { showContents, showSourceCode }
 
-class _DetailsScreenState extends State<MessageDetailsScreen> {
+class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
   late PageController _pageController;
   late MessageSource _source;
   late Message _current;
@@ -112,7 +115,7 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
               value: _OverflowMenuChoice.showContents,
               child: Text(localizations.viewContentsAction),
             ),
-            if (locator<SettingsService>().settings.enableDeveloperMode)
+            if (ref.read(settingsProvider).enableDeveloperMode)
               PlatformPopupMenuItem<_OverflowMenuChoice>(
                 value: _OverflowMenuChoice.showSourceCode,
                 child: Text(localizations.viewSourceAction),
@@ -155,18 +158,16 @@ class _DetailsScreenState extends State<MessageDetailsScreen> {
   }
 }
 
-class _MessageContent extends StatefulWidget {
+class _MessageContent extends ConsumerStatefulWidget {
+  const _MessageContent(this.message, {this.blockExternalContents = false});
   final Message message;
   final bool blockExternalContents;
-  const _MessageContent(this.message,
-      {Key? key, this.blockExternalContents = false})
-      : super(key: key);
 
   @override
-  _MessageContentState createState() => _MessageContentState();
+  ConsumerState<_MessageContent> createState() => _MessageContentState();
 }
 
-class _MessageContentState extends State<_MessageContent> {
+class _MessageContentState extends ConsumerState<_MessageContent> {
   late bool _blockExternalImages;
   bool _messageDownloadError = false;
   bool _messageRequiresRefresh = false;
@@ -203,22 +204,21 @@ class _MessageContentState extends State<_MessageContent> {
     );
   }
 
-  Widget _buildMailDetails(AppLocalizations localizations) {
-    return SingleChildScrollView(
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _buildHeader(localizations),
-            ),
-            _buildContent(localizations),
-          ],
+  Widget _buildMailDetails(AppLocalizations localizations) =>
+      SingleChildScrollView(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: _buildHeader(localizations),
+              ),
+              _buildContent(localizations),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 
   Widget _buildHeader(AppLocalizations localizations) {
     final mime = widget.message.mimeMessage;
@@ -278,7 +278,7 @@ class _MessageContentState extends State<_MessageContent> {
         ),
         _buildAttachments(attachments),
         const Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8),
           child: Divider(height: 2),
         ),
         if (_blockExternalImages ||
@@ -321,7 +321,8 @@ class _MessageContentState extends State<_MessageContent> {
                 Container(),
             ],
           ),
-        if (ReadReceiptButton.shouldBeShown(mime)) const ReadReceiptButton(),
+        if (ReadReceiptButton.shouldBeShown(mime, ref.read(settingsProvider)))
+          const ReadReceiptButton(),
       ],
     );
   }
@@ -333,14 +334,12 @@ class _MessageContentState extends State<_MessageContent> {
     return MailAddressList(mailAddresses: addresses!);
   }
 
-  Widget _buildAttachments(List<ContentInfo> attachments) {
-    return Wrap(
-      children: [
-        for (var attachment in attachments)
-          AttachmentChip(info: attachment, message: widget.message),
-      ],
-    );
-  }
+  Widget _buildAttachments(List<ContentInfo> attachments) => Wrap(
+        children: [
+          for (final attachment in attachments)
+            AttachmentChip(info: attachment, message: widget.message),
+        ],
+      );
 
   Widget _buildContent(AppLocalizations localizations) {
     if (_messageDownloadError) {
@@ -349,7 +348,7 @@ class _MessageContentState extends State<_MessageContent> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Text(localizations.detailsErrorDownloadInfo),
           ),
           TextButton.icon(
@@ -361,7 +360,7 @@ class _MessageContentState extends State<_MessageContent> {
               });
             },
           ),
-          if (locator<SettingsService>().settings.enableDeveloperMode) ...[
+          if (ref.read(settingsProvider).enableDeveloperMode) ...[
             const Text('Details:'),
             SelectableText(errorObject?.toString() ?? '<unknown error>'),
             SelectableText(errorStackTrace?.toString() ?? '<no stacktrace>'),
@@ -381,6 +380,7 @@ class _MessageContentState extends State<_MessageContent> {
       );
     }
     final message = widget.message;
+
     return MimeMessageDownloader(
       mimeMessage: message.mimeMessage,
       mailClient: message.mailClient,
@@ -402,8 +402,7 @@ class _MessageContentState extends State<_MessageContent> {
       onDownloaded: _onMimeMessageDownloaded,
       onError: _onMimeMessageError,
       blockExternalImages: _blockExternalImages,
-      preferPlainText:
-          locator<SettingsService>().settings.preferPlainTextMessages,
+      preferPlainText: ref.read(settingsProvider).preferPlainTextMessages,
       enableDarkMode: Theme.of(context).brightness == Brightness.dark,
       mailtoDelegate: _handleMailto,
       maxImageWidth: 320,
@@ -420,7 +419,7 @@ class _MessageContentState extends State<_MessageContent> {
 
         launcher.launchUrl(
           uri,
-          mode: locator<SettingsService>().settings.urlLaunchMode,
+          mode: ref.read(settingsProvider).urlLaunchMode,
         );
         return Future.value(true);
       },
@@ -451,7 +450,7 @@ class _MessageContentState extends State<_MessageContent> {
 
   bool _shouldImagesBeBlocked(MimeMessage mimeMessage) {
     var blockExternalImages = widget.blockExternalContents ||
-        locator<SettingsService>().settings.blockExternalImages ||
+        ref.read(settingsProvider).blockExternalImages ||
         widget.message.source.shouldBlockImages;
     if (blockExternalImages) {
       final html = mimeMessage.decodeTextHtmlPart();
@@ -495,17 +494,22 @@ class _MessageContentState extends State<_MessageContent> {
   }
 
   Future _handleMailto(Uri mailto, MimeMessage mimeMessage) {
-    final messageBuilder = locator<MailService>().mailto(mailto, mimeMessage);
+    final settings = ref.read(settingsProvider);
+    final messageBuilder = locator<MailService>().mailto(
+      mailto,
+      mimeMessage,
+      settings,
+    );
     final composeData =
         ComposeData([widget.message], messageBuilder, ComposeAction.newMessage);
+
     return locator<NavigationService>()
         .push(Routes.mailCompose, arguments: composeData);
   }
 
-  Future _navigateToMedia(InteractiveMediaWidget mediaWidget) async {
-    return locator<NavigationService>()
-        .push(Routes.interactiveMedia, arguments: mediaWidget);
-  }
+  Future _navigateToMedia(InteractiveMediaWidget mediaWidget) async =>
+      locator<NavigationService>()
+          .push(Routes.interactiveMedia, arguments: mediaWidget);
 
   // void _next() {
   //   _navigateToMessage(widget.message.next);
@@ -523,47 +527,52 @@ class _MessageContentState extends State<_MessageContent> {
   // }
 }
 
-class MessageContentsScreen extends StatelessWidget {
+class MessageContentsScreen extends ConsumerWidget {
+  const MessageContentsScreen({super.key, required this.message});
   final Message message;
-  const MessageContentsScreen({Key? key, required this.message})
-      : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Base.buildAppChrome(
-      context,
-      title:
-          message.mimeMessage.decodeSubject() ?? context.text.subjectUndefined,
-      content: SafeArea(
-        child: MimeMessageViewer(
-          mimeMessage: message.mimeMessage,
-          adjustHeight: false,
-          mailtoDelegate: _handleMailto,
-          showMediaDelegate: _navigateToMedia,
-          enableDarkMode: (Theme.of(context).brightness == Brightness.dark),
+  Widget build(BuildContext context, WidgetRef ref) => Base.buildAppChrome(
+        context,
+        title: message.mimeMessage.decodeSubject() ??
+            context.text.subjectUndefined,
+        content: SafeArea(
+          child: MimeMessageViewer(
+            mimeMessage: message.mimeMessage,
+            adjustHeight: false,
+            mailtoDelegate: (uri, mime) =>
+                _handleMailto(uri, mime, ref.read(settingsProvider)),
+            showMediaDelegate: _navigateToMedia,
+            enableDarkMode: Theme.of(context).brightness == Brightness.dark,
+          ),
         ),
-      ),
-    );
-  }
+      );
 
-  Future _handleMailto(Uri mailto, MimeMessage mimeMessage) {
-    final messageBuilder = locator<MailService>().mailto(mailto, mimeMessage);
+  Future _handleMailto(
+    Uri mailto,
+    MimeMessage mimeMessage,
+    Settings settings,
+  ) {
+    final messageBuilder = locator<MailService>().mailto(
+      mailto,
+      mimeMessage,
+      settings,
+    );
     final composeData =
         ComposeData([message], messageBuilder, ComposeAction.newMessage);
+
     return locator<NavigationService>()
         .push(Routes.mailCompose, arguments: composeData);
   }
 
-  Future _navigateToMedia(InteractiveMediaWidget mediaWidget) {
-    return locator<NavigationService>()
-        .push(Routes.interactiveMedia, arguments: mediaWidget);
-  }
+  Future _navigateToMedia(InteractiveMediaWidget mediaWidget) =>
+      locator<NavigationService>()
+          .push(Routes.interactiveMedia, arguments: mediaWidget);
 }
 
 class ThreadSequenceButton extends StatefulWidget {
+  const ThreadSequenceButton({super.key, required this.message});
   final Message message;
-  const ThreadSequenceButton({Key? key, required this.message})
-      : super(key: key);
 
   @override
   State<ThreadSequenceButton> createState() => _ThreadSequenceButtonState();
@@ -633,12 +642,11 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
 
   void _select(Message message) {
     _removeOverlay();
-    locator<NavigationService>()
-        .push(Routes.mailDetails, arguments: message, replace: false);
+    locator<NavigationService>().push(Routes.mailDetails, arguments: message);
   }
 
   OverlayEntry _buildThreadsOverlay() {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final RenderBox renderBox = context.findRenderObject()! as RenderBox;
     final offset = renderBox.localToGlobal(Offset.zero);
     final renderSize = renderBox.size;
     final size = MediaQuery.of(context).size;
@@ -648,9 +656,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
 
     return OverlayEntry(
       builder: (context) => GestureDetector(
-        onTap: () {
-          _removeOverlay();
-        },
+        onTap: _removeOverlay,
         child: Stack(
           children: [
             Positioned.fill(child: Container(color: const Color(0x09000000))),
@@ -659,7 +665,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
               top: top,
               width: size.width - offset.dx - 16,
               child: Material(
-                elevation: 4.0,
+                elevation: 4,
                 child: FutureBuilder<List<Message>?>(
                   future: _loadingFuture,
                   builder: (context, snapshot) {
@@ -683,7 +689,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                                   ),
                                   onTap: () => _select(message),
                                   selected:
-                                      (message.mimeMessage.uid == currentUid),
+                                      message.mimeMessage.uid == currentUid,
                                 ))
                             .toList(),
                       ),
@@ -700,15 +706,14 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
 }
 
 class ReadReceiptButton extends StatefulWidget {
-  const ReadReceiptButton({Key? key}) : super(key: key);
+  const ReadReceiptButton({super.key});
 
   @override
   State<ReadReceiptButton> createState() => _ReadReceiptButtonState();
 
-  static bool shouldBeShown(MimeMessage mime) =>
+  static bool shouldBeShown(MimeMessage mime, Settings settings) =>
       (mime.isReadReceiptSent || mime.isReadReceiptRequested) &&
-      (locator<SettingsService>().settings.readReceiptDisplaySetting !=
-          ReadReceiptDisplaySetting.never);
+      (settings.readReceiptDisplaySetting != ReadReceiptDisplaySetting.never);
 }
 
 class _ReadReceiptButtonState extends State<ReadReceiptButton> {
@@ -750,8 +755,8 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
 }
 
 class UnsubscribeButton extends StatefulWidget {
+  const UnsubscribeButton({super.key, required this.message});
   final Message message;
-  const UnsubscribeButton({Key? key, required this.message}) : super(key: key);
 
   @override
   State<UnsubscribeButton> createState() => _UnsubscribeButtonState();
@@ -785,7 +790,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
     }
   }
 
-  void _resubscribe() async {
+  Future<void> _resubscribe() async {
     final localizations = context.text;
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName()!;
@@ -825,7 +830,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
     }
   }
 
-  void _unsubscribe() async {
+  Future<void> _unsubscribe() async {
     final localizations = context.text;
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName()!;
@@ -858,8 +863,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
         //TODO store flag only when server/mailbox supports arbitrary flags?
         try {
           await mailClient.store(MessageSequence.fromMessage(mime),
-              [Message.keywordFlagUnsubscribed],
-              action: StoreAction.add);
+              [Message.keywordFlagUnsubscribed]);
         } catch (e, s) {
           if (kDebugMode) {
             print('error during unsubscribe flag store operation: $e $s');
@@ -881,8 +885,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
 }
 
 class MailAddressList extends StatefulWidget {
-  const MailAddressList({Key? key, required this.mailAddresses})
-      : super(key: key);
+  const MailAddressList({super.key, required this.mailAddresses});
   final List<MailAddress> mailAddresses;
 
   @override
@@ -893,32 +896,29 @@ class _MailAddressListState extends State<MailAddressList> {
   bool _isExpanded = false;
 
   @override
-  Widget build(BuildContext context) {
-    return ExpansionWrap(
-      spacing: 4.0,
-      runSpacing: 0.0,
-      expandIndicator: DensePlatformIconButton(
-        icon: const Icon(Icons.keyboard_arrow_down),
-        onPressed: () {
-          setState(() {
-            _isExpanded = true;
-          });
-        },
-      ),
-      compressIndicator: DensePlatformIconButton(
-        icon: const Icon(Icons.keyboard_arrow_up),
-        onPressed: () {
-          setState(() {
-            _isExpanded = false;
-          });
-        },
-      ),
-      isExpanded: _isExpanded,
-      maxRuns: 2,
-      children: [
-        for (var address in widget.mailAddresses)
-          MailAddressChip(mailAddress: address),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => ExpansionWrap(
+        spacing: 4,
+        expandIndicator: DensePlatformIconButton(
+          icon: const Icon(Icons.keyboard_arrow_down),
+          onPressed: () {
+            setState(() {
+              _isExpanded = true;
+            });
+          },
+        ),
+        compressIndicator: DensePlatformIconButton(
+          icon: const Icon(Icons.keyboard_arrow_up),
+          onPressed: () {
+            setState(() {
+              _isExpanded = false;
+            });
+          },
+        ),
+        isExpanded: _isExpanded,
+        maxRuns: 2,
+        children: [
+          for (final address in widget.mailAddresses)
+            MailAddressChip(mailAddress: address),
+        ],
+      );
 }

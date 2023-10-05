@@ -1,49 +1,42 @@
-import 'package:enough_mail_app/extensions/extensions.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../locator.dart';
-import 'base.dart';
+import '../../extensions/extensions.dart';
+import '../../l10n/extension.dart';
+import '../../locator.dart';
+import '../../models/account.dart';
+import '../../screens/base.dart';
+import '../../services/mail_service.dart';
+import '../../services/navigation_service.dart';
+import '../../util/localized_dialog_helper.dart';
+import '../../widgets/button_text.dart';
+import '../provider.dart';
 
-class SettingsDeveloperModeScreen extends StatefulWidget {
-  const SettingsDeveloperModeScreen({Key? key}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() {
-    return _SettingsDeveloperModeScreenState();
-  }
-}
-
-class _SettingsDeveloperModeScreenState
-    extends State<SettingsDeveloperModeScreen> {
-  bool? isDeveloperModeEnabled = false;
+class SettingsDeveloperModeScreen extends HookConsumerWidget {
+  const SettingsDeveloperModeScreen({super.key});
 
   @override
-  void initState() {
-    isDeveloperModeEnabled =
-        locator<SettingsService>().settings.enableDeveloperMode;
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final localizations = context.text;
+    final isDeveloperModeEnabled = ref.watch(
+      settingsProvider.select(
+        (value) => value.enableDeveloperMode,
+      ),
+    );
+
+    final developerModeState = useState(isDeveloperModeEnabled);
+
     return Base.buildAppChrome(
       context,
       title: localizations.settingsDevelopment,
       content: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -54,13 +47,12 @@ class _SettingsDeveloperModeScreenState
                 PlatformCheckboxListTile(
                   value: isDeveloperModeEnabled,
                   onChanged: (value) async {
-                    setState(() {
-                      isDeveloperModeEnabled = value;
-                    });
-                    final service = locator<SettingsService>();
-                    service.settings =
-                        service.settings.copyWith(enableDeveloperMode: value);
-                    await service.save();
+                    developerModeState.value = value ?? false;
+                    final settings = ref.read(settingsProvider);
+                    await ref.read(settingsProvider.notifier).update(
+                          settings.copyWith(
+                              enableDeveloperMode: value ?? false),
+                        );
                   },
                   title: Text(localizations.developerModeEnable),
                 ),
@@ -73,12 +65,13 @@ class _SettingsDeveloperModeScreenState
                   child: ButtonText(localizations.extensionsLearnMoreAction),
                   onPressed: () => launchUrl(
                     Uri.parse(
-                        'https://github.com/Enough-Software/enough_mail_app/wiki/Extensions'),
+                      'https://github.com/Enough-Software/enough_mail_app/wiki/Extensions',
+                    ),
                   ),
                 ),
                 PlatformListTile(
                   title: Text(localizations.extensionsReloadAction),
-                  onTap: _reloadExtensions,
+                  onTap: () => _reloadExtensions(context),
                 ),
                 PlatformListTile(
                   title: Text(localizations.extensionDeactivateAllAction),
@@ -86,7 +79,7 @@ class _SettingsDeveloperModeScreenState
                 ),
                 PlatformListTile(
                   title: Text(localizations.extensionsManualAction),
-                  onTap: _loadExtensionManually,
+                  onTap: () => _loadExtensionManually(context),
                 ),
               ],
             ),
@@ -96,7 +89,7 @@ class _SettingsDeveloperModeScreenState
     );
   }
 
-  void _loadExtensionManually() async {
+  Future<void> _loadExtensionManually(BuildContext context) async {
     final localizations = context.text;
     final controller = TextEditingController();
     String? url;
@@ -148,15 +141,17 @@ class _SettingsDeveloperModeScreenState
                       .firstWhere((account) => account is RealAccount))
               as RealAccount;
           account.appExtensions = [appExtension];
-          _showExtensionDetails(url, appExtension);
-        } else if (mounted) {
+          if (context.mounted) {
+            _showExtensionDetails(context, url, appExtension);
+          }
+        } else if (context.mounted) {
           await LocalizedDialogHelper.showTextDialog(
             context,
             localizations.errorTitle,
             localizations.extensionsManualLoadingError(url!),
           );
         }
-      } else if (mounted) {
+      } else if (context.mounted) {
         await LocalizedDialogHelper.showTextDialog(
             context, localizations.errorTitle, 'Invalid URL "$url"');
       }
@@ -172,7 +167,7 @@ class _SettingsDeveloperModeScreenState
     }
   }
 
-  void _reloadExtensions() async {
+  Future<void> _reloadExtensions(BuildContext context) async {
     final localizations = context.text;
     final accounts = locator<MailService>().accounts;
     final domains = <_AccountDomain>[];
@@ -186,7 +181,7 @@ class _SettingsDeveloperModeScreenState
             account.mailAccount.outgoing.serverConfig.hostname!, domains);
       }
     }
-    LocalizedDialogHelper.showWidgetDialog(
+    await LocalizedDialogHelper.showWidgetDialog(
       context,
       SingleChildScrollView(
         child: Column(
@@ -203,7 +198,10 @@ class _SettingsDeveloperModeScreenState
                       return PlatformIconButton(
                         icon: const Icon(Icons.check),
                         onPressed: () => _showExtensionDetails(
-                            domain.domain, snapshot.data!),
+                          context,
+                          domain.domain,
+                          snapshot.data!,
+                        ),
                       );
                     } else if (snapshot.connectionState ==
                         ConnectionState.done) {
@@ -241,7 +239,11 @@ class _SettingsDeveloperModeScreenState
     }
   }
 
-  void _showExtensionDetails(String? domainOrUrl, AppExtension data) {
+  void _showExtensionDetails(
+    BuildContext context,
+    String? domainOrUrl,
+    AppExtension data,
+  ) {
     LocalizedDialogHelper.showWidgetDialog(
       context,
       Column(
@@ -273,9 +275,8 @@ class _SettingsDeveloperModeScreenState
 }
 
 class _AccountDomain {
+  _AccountDomain(this.account, this.domain, this.future);
   final RealAccount? account;
   final String domain;
   final Future<AppExtension?> future;
-
-  _AccountDomain(this.account, this.domain, this.future);
 }

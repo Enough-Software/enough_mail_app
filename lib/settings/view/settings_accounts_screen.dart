@@ -1,21 +1,21 @@
 import 'dart:async';
 
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
-import 'package:enough_mail_app/widgets/inherited_widgets.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
-import '../l10n/app_localizations.g.dart';
-import '../locator.dart';
-import '../models/account.dart';
-import '../routes.dart';
+import '../../l10n/app_localizations.g.dart';
+import '../../l10n/extension.dart';
+import '../../locator.dart';
+import '../../models/account.dart';
+import '../../routes.dart';
+import '../../screens/base.dart';
+import '../../services/mail_service.dart';
+import '../../services/navigation_service.dart';
+import '../../widgets/button_text.dart';
+import '../../widgets/inherited_widgets.dart';
 
 class SettingsAccountsScreen extends StatefulWidget {
-  const SettingsAccountsScreen({Key? key}) : super(key: key);
+  const SettingsAccountsScreen({super.key});
 
   @override
   State<SettingsAccountsScreen> createState() => _SettingsAccountsScreenState();
@@ -28,8 +28,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
   Widget build(BuildContext context) {
     final localizations = context.text;
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.accountsTitle,
       content: _reorderAccounts
           ? _buildReorderableListView(context)
@@ -59,7 +58,7 @@ class _SettingsAccountsScreenState extends State<SettingsAccountsScreen> {
             ),
             if (accounts.length > 1)
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 child: PlatformElevatedButton(
                   onPressed: () {
                     setState(() {

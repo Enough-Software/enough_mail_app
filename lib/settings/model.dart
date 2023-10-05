@@ -5,24 +5,63 @@ import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-part 'settings.g.dart';
+part 'model.g.dart';
 
-enum FolderNameSetting { server, localized, custom }
+/// The shown name for folders
+enum FolderNameSetting {
+  /// Show the name as defined by the server
+  server,
 
-enum ReadReceiptDisplaySetting {
-  always,
-  never, // forContacts
+  /// Show localized names
+  localized,
+
+  /// Show the names as defined by the user
+  custom,
 }
 
-enum ReplyFormatPreference { alwaysHtml, sameFormat, alwaysPlainText }
+/// The display setting for read receipts
+enum ReadReceiptDisplaySetting {
+  /// Always show read receipt requests
+  always,
 
-enum LockTimePreference { immediately, after5minutes, after30minutes }
+  /// Never show read receipt requests
+  never,
 
+  // forContacts,
+}
+
+/// The format preference for replies
+enum ReplyFormatPreference {
+  /// Always reply in HTML format
+  alwaysHtml,
+
+  /// Reply in the same format as the original message
+  sameFormat,
+
+  /// Always reply in plain text format
+  alwaysPlainText,
+}
+
+/// The app lock time preference
+enum LockTimePreference {
+  /// Lock the app immediately when bringing it to the background
+  immediately,
+
+  /// Lock the app after 5 minutes
+  after5minutes,
+
+  /// Lock the app after 30 minutes
+  after30minutes,
+}
+
+/// Provides more information about [LockTimePreference]
 extension ExtensionLockTimePreference on LockTimePreference {
+  /// Returns true if the app requires authorization
   bool requiresAuthorization(DateTime? lastPausedTimeStamp) =>
       lastPausedTimeStamp == null ||
       lastPausedTimeStamp.isBefore(DateTime.now().subtract(duration));
 
+  /// Returns the duration for this lock time preference
   Duration get duration {
     switch (this) {
       case LockTimePreference.immediately:
@@ -67,42 +106,61 @@ class Settings {
   /// Converts these settings to JSON
   Map<String, dynamic> toJson() => _$SettingsToJson(this);
 
+  /// Should external images being blocked?
   final bool blockExternalImages;
 
+  /// The preferred email address for sending new messages
   final String? preferredComposeMailAddress;
 
+  /// The language of the app
   final String? languageTag;
 
+  /// The theme settings
   final ThemeSettings themeSettings;
 
+  /// The action for swiping from left to right
   final SwipeAction swipeLeftToRightAction;
 
+  /// The action for swiping from right to left
   final SwipeAction swipeRightToLeftAction;
 
+  /// The folder name setting
   final FolderNameSetting folderNameSetting;
 
+  /// The custom folder names
   final List<String>? customFolderNames;
 
+  /// Should the developer mode of the app be active?
   final bool enableDeveloperMode;
 
+  /// The default, global HTML signature
   final String? signatureHtml;
 
+  /// The default, global plain text signature
   final String? signaturePlain;
 
+  /// The  signature actions
   final List<ComposeAction> signatureActions;
 
+  /// Should read receipt requests been shown?
   final ReadReceiptDisplaySetting readReceiptDisplaySetting;
 
+  /// The default sender
   final MailAddress? defaultSender;
 
+  /// Should messages been shown in plain text when possible?
   final bool preferPlainTextMessages;
 
   /// The launch mode for links - either "in app" or "external"
   final LaunchMode urlLaunchMode;
 
+  /// The default reply format
   final ReplyFormatPreference replyFormatPreference;
 
+  /// Should the app be locked with biometric authentication?
   final bool enableBiometricLock;
+
+  /// The lock time preference
 
   @JsonKey(name: 'enableBiometricLockTime')
   final LockTimePreference lockTimePreference;

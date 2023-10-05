@@ -1,48 +1,49 @@
 import 'dart:async';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/models/compose_data.dart';
-import 'package:enough_mail_app/models/date_sectioned_message_source.dart';
-import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/models/message_source.dart';
-import 'package:enough_mail_app/models/swipe.dart';
-import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/notification_service.dart';
-import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
-import 'package:enough_mail_app/services/settings_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/util/string_helper.dart';
-import 'package:enough_mail_app/widgets/app_drawer.dart';
-import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
-import 'package:enough_mail_app/widgets/empty_message.dart';
-import 'package:enough_mail_app/widgets/icon_text.dart';
-import 'package:enough_mail_app/widgets/inherited_widgets.dart';
-import 'package:enough_mail_app/widgets/mailbox_tree.dart';
-import 'package:enough_mail_app/widgets/menu_with_badge.dart';
-import 'package:enough_mail_app/widgets/message_overview_content.dart';
-import 'package:enough_mail_app/widgets/message_stack.dart';
-import 'package:enough_mail_app/widgets/search_text_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../l10n/app_localizations.g.dart';
+import '../l10n/extension.dart';
 import '../locator.dart';
+import '../models/compose_data.dart';
+import '../models/date_sectioned_message_source.dart';
+import '../models/message.dart';
+import '../models/message_source.dart';
+import '../models/swipe.dart';
+import '../routes.dart';
+import '../services/i18n_service.dart';
+import '../services/icon_service.dart';
+import '../services/mail_service.dart';
+import '../services/navigation_service.dart';
+import '../services/notification_service.dart';
+import '../services/scaffold_messenger_service.dart';
+import '../settings/provider.dart';
+import '../util/localized_dialog_helper.dart';
+import '../util/string_helper.dart';
+import '../widgets/app_drawer.dart';
+import '../widgets/cupertino_status_bar.dart';
+import '../widgets/empty_message.dart';
+import '../widgets/icon_text.dart';
+import '../widgets/inherited_widgets.dart';
+import '../widgets/mailbox_tree.dart';
+import '../widgets/menu_with_badge.dart';
+import '../widgets/message_overview_content.dart';
+import '../widgets/message_stack.dart';
+import '../widgets/search_text_field.dart';
+import 'base.dart';
 
 enum _Visualization { stack, list }
 
 /// Loads a message source future
 class AsyncMessageSourceScreen extends StatelessWidget {
   const AsyncMessageSourceScreen({
-    Key? key,
+    super.key,
     required this.messageSourceFuture,
-  }) : super(key: key);
+  });
   final Future<MessageSource> messageSourceFuture;
 
   @override
@@ -72,19 +73,19 @@ class AsyncMessageSourceScreen extends StatelessWidget {
 }
 
 /// Displays a list of mails
-class MessageSourceScreen extends StatefulWidget {
+class MessageSourceScreen extends ConsumerStatefulWidget {
+  const MessageSourceScreen({
+    super.key,
+    required this.messageSource,
+  });
   final MessageSource messageSource;
 
-  const MessageSourceScreen({
-    Key? key,
-    required this.messageSource,
-  }) : super(key: key);
-
   @override
-  State<MessageSourceScreen> createState() => _MessageSourceScreenState();
+  ConsumerState<MessageSourceScreen> createState() =>
+      _MessageSourceScreenState();
 }
 
-class _MessageSourceScreenState extends State<MessageSourceScreen>
+class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     with TickerProviderStateMixin {
   late Future<void> _messageLoader;
   _Visualization _visualization = _Visualization.list;
@@ -304,6 +305,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     final isSentFolder = source.isSent;
     final showSearchTextField =
         PlatformInfo.isCupertino && source.supportsSearching;
+
     return PlatformPageScaffold(
       bottomBar: _isInSelectionMode
           ? buildSelectionModeBottomBar(localizations)
@@ -338,7 +340,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   ),
                 ),
                 tooltip: localizations.homeFabTooltip,
-                elevation: 2.0,
+                elevation: 2,
                 child: const Icon(Icons.add),
               ),
       ),
@@ -365,12 +367,12 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                   child: Row(
                     children: [
                       const Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8),
                         child: PlatformProgressIndicator(),
                       ),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(8),
                           child: Text(
                             localizations.homeLoading(
                                 source.name ?? source.description ?? ''),
@@ -390,9 +392,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                     child: MessageStack(messageSource: source),
                   );
                 }
-                final settings = locator<SettingsService>().settings;
+                final settings = ref.read(settingsProvider);
                 final swipeLeftToRightAction = settings.swipeLeftToRightAction;
                 final swipeRightToLeftAction = settings.swipeRightToLeftAction;
+
                 return WillPopScope(
                   onWillPop: () {
                     if (_isInSelectionMode) {
@@ -433,8 +436,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                 if (index == 0) {
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0,
-                                      vertical: 4.0,
+                                      horizontal: 8,
+                                      vertical: 4,
                                     ),
                                     child: CupertinoSearch(
                                       messageSource: source,
@@ -484,7 +487,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                         _selectedMessages =
                                             await _sectionedMessageSource
                                                 .getMessagesForSection(section);
-                                        for (var m in _selectedMessages) {
+                                        for (final m in _selectedMessages) {
                                           m.isSelected = true;
                                         }
                                         setState(() {
@@ -523,10 +526,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                              left: 16.0,
-                                              right: 8.0,
-                                              bottom: 4.0,
-                                              top: 16.0,
+                                              left: 16,
+                                              right: 8,
+                                              bottom: 4,
+                                              top: 16,
                                             ),
                                             child: Text(
                                               text,
@@ -558,14 +561,14 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                       color: swipeLeftToRightAction
                                           .colorBackground,
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
+                                          horizontal: 8),
                                       alignment:
                                           AlignmentDirectional.centerStart,
                                       child: Row(
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 8.0),
+                                                horizontal: 8),
                                             child: Text(
                                               swipeLeftToRightAction
                                                   .name(localizations),
@@ -584,7 +587,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                       color: swipeRightToLeftAction
                                           .colorBackground,
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
+                                          horizontal: 8),
                                       alignment: AlignmentDirectional.centerEnd,
                                       child: Row(
                                         mainAxisAlignment:
@@ -597,7 +600,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 8.0),
+                                                horizontal: 8),
                                             child: Text(
                                               swipeRightToLeftAction
                                                   .name(localizations),
@@ -667,7 +670,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         child: Row(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Text('${_selectedMessages.length}'),
             ),
             if (isAnyUnseen)
@@ -852,7 +855,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     );
   }
 
-  void handleMultipleChoice(_MultipleChoice choice) async {
+  Future<void> handleMultipleChoice(_MultipleChoice choice) async {
     final source = _sectionedMessageSource.messageSource;
     final localizations = locator<I18nService>().localizations;
     if (_selectedMessages.isEmpty) {
@@ -863,7 +866,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     var endSelectionMode = true;
     switch (choice) {
       case _MultipleChoice.forwardAsAttachment:
-        forwardAsAttachments();
+        await forwardAsAttachments();
         break;
       case _MultipleChoice.forwardAttachments:
         forwardAttachments();
@@ -917,7 +920,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         break;
       case _MultipleChoice.viewInSafeMode:
         if (_selectedMessages.isNotEmpty) {
-          locator<NavigationService>().push(Routes.mailDetails,
+          await locator<NavigationService>().push(Routes.mailDetails,
               arguments:
                   DisplayMessageArguments(_selectedMessages.first, true));
         }
@@ -928,7 +931,8 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         endSelectionMode = false;
         final notificationService = locator<NotificationService>();
         for (final message in _selectedMessages) {
-          notificationService.sendLocalNotificationForMailMessage(message);
+          await notificationService
+              .sendLocalNotificationForMailMessage(message);
         }
         leaveSelectionMode();
         break;
@@ -940,15 +944,15 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     }
   }
 
-  void forwardAsAttachments() async {
-    forwardAttachmentsLike(addMessageAttachment);
+  Future<void> forwardAsAttachments() async {
+    await forwardAttachmentsLike(addMessageAttachment);
   }
 
   void forwardAttachments() {
     forwardAttachmentsLike(addAttachments);
   }
 
-  void forwardAttachmentsLike(
+  Future<void> forwardAttachmentsLike(
       Future? Function(Message, MessageBuilder) loader) async {
     final builder = MessageBuilder();
     final fromAddresses = <MailAddress>[];
@@ -961,7 +965,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
       if (!fromAddresses.contains(from)) {
         fromAddresses.add(from);
       }
-      var mime = message.mimeMessage;
+      final mime = message.mimeMessage;
       final subject = mime.decodeSubject();
       if (subject?.isNotEmpty ?? false) {
         subjects.add(subject!.replaceAll('\r\n ', '').replaceAll('\n', ''));
@@ -983,7 +987,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     final composeData = ComposeData(
         _selectedMessages, builder, ComposeAction.forward,
         future: composeFuture);
-    locator<NavigationService>()
+    await locator<NavigationService>()
         .push(Routes.mailCompose, arguments: composeData, fade: true);
   }
 
@@ -1002,13 +1006,13 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 
   Future? addAttachments(Message message, MessageBuilder builder) {
     final mailClient = message.mailClient;
-    var mime = message.mimeMessage;
+    final mime = message.mimeMessage;
     Future? composeFuture;
     if (mime.mimeData == null) {
       composeFuture = mailClient.fetchMessageContents(mime).then((value) {
         message.updateMime(value);
         for (final attachment in message.attachments) {
-          var part = value.getPart(attachment.fetchId);
+          final part = value.getPart(attachment.fetchId);
           builder.addPart(mimePart: part);
         }
       });
@@ -1066,7 +1070,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     );
   }
 
-  void moveTo(Mailbox mailbox) async {
+  Future<void> moveTo(Mailbox mailbox) async {
     setState(() {
       _isInSelectionMode = false;
     });
@@ -1089,7 +1093,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     });
   }
 
-  void onMessageTap(Message message) async {
+  Future<void> onMessageTap(Message message) async {
     if (_isInSelectionMode) {
       message.toggleSelected();
       if (message.isSelected) {
@@ -1107,10 +1111,11 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         //message.updateMime(mime);
         final builder = MessageBuilder.prepareFromDraft(mime);
         final data = ComposeData([message], builder, ComposeAction.newMessage);
-        locator<NavigationService>().push(Routes.mailCompose, arguments: data);
+        await locator<NavigationService>()
+            .push(Routes.mailCompose, arguments: data);
       } else {
         // move to mail details:
-        locator<NavigationService>()
+        await locator<NavigationService>()
             .push(Routes.mailDetails, arguments: message);
       }
     }
@@ -1125,7 +1130,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
   }
 
   void leaveSelectionMode() {
-    for (var m in _selectedMessages) {
+    for (final m in _selectedMessages) {
       m.isSelected = false;
     }
     _selectedMessages = [];
@@ -1168,7 +1173,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Text(localizations.accountLoadError(account.name)),
           ),
           PlatformTextButton(
@@ -1191,7 +1196,7 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
     );
   }
 
-  void _deleteAllMessages() async {
+  Future<void> _deleteAllMessages() async {
     final localizations = context.text;
     bool expunge = false;
     final confirmed = await LocalizedDialogHelper.showWidgetDialog(
@@ -1246,11 +1251,10 @@ class _MessageSourceScreenState extends State<MessageSourceScreen>
 
 class CheckboxText extends StatefulWidget {
   const CheckboxText(
-      {Key? key,
+      {super.key,
       required this.initialValue,
       required this.onChanged,
-      required this.text})
-      : super(key: key);
+      required this.text});
   final bool initialValue;
   final Function(bool value) onChanged;
   final String text;
@@ -1269,18 +1273,16 @@ class _CheckboxTextState extends State<CheckboxText> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return PlatformCheckboxListTile(
-      title: Text(widget.text),
-      value: _value,
-      onChanged: (value) {
-        widget.onChanged(value == true);
-        setState(() {
-          _value = (value == true);
-        });
-      },
-    );
-  }
+  Widget build(BuildContext context) => PlatformCheckboxListTile(
+        title: Text(widget.text),
+        value: _value,
+        onChanged: (value) {
+          widget.onChanged(value == true);
+          setState(() {
+            _value = (value == true);
+          });
+        },
+      );
 }
 
 enum _MultipleChoice {
@@ -1300,17 +1302,16 @@ enum _MultipleChoice {
 }
 
 class MessageOverview extends StatefulWidget {
+  MessageOverview(
+      this.message, this.isInSelectionMode, this.onTap, this.onLongPress,
+      {this.animationController, required this.isSentMessage})
+      : super(key: ValueKey(message.sourceIndex));
   final Message message;
   final bool isInSelectionMode;
   final void Function(Message message) onTap;
   final void Function(Message message) onLongPress;
   final AnimationController? animationController;
   final bool isSentMessage;
-
-  MessageOverview(
-      this.message, this.isInSelectionMode, this.onTap, this.onLongPress,
-      {this.animationController, required this.isSentMessage})
-      : super(key: ValueKey(message.sourceIndex));
 
   @override
   State<MessageOverview> createState() => _MessageOverviewState();
@@ -1336,37 +1337,33 @@ class _MessageOverviewState extends State<MessageOverview> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return (widget.animationController != null)
-        ? SizeTransition(
-            sizeFactor: CurvedAnimation(
-              parent: widget.animationController!,
-              curve: Curves.easeOut,
-            ),
-            child: buildMessageOverview(),
-          )
-        : buildMessageOverview();
-  }
+  Widget build(BuildContext context) => (widget.animationController != null)
+      ? SizeTransition(
+          sizeFactor: CurvedAnimation(
+            parent: widget.animationController!,
+            curve: Curves.easeOut,
+          ),
+          child: buildMessageOverview(),
+        )
+      : buildMessageOverview();
 
-  Widget buildMessageOverview() {
-    return widget.isInSelectionMode
-        ? PlatformCheckboxListTile(
-            value: widget.message.isSelected,
-            selected: widget.message.isSelected,
-            title: MessageOverviewContent(
-              message: widget.message,
-              isSentMessage: widget.isSentMessage,
-            ),
-            onChanged: (value) => widget.onTap(widget.message),
-          )
-        : SelectablePlatformListTile(
-            visualDensity: VisualDensity.compact,
-            title: MessageOverviewContent(
-              message: widget.message,
-              isSentMessage: widget.isSentMessage,
-            ),
-            onTap: () => widget.onTap(widget.message),
-            onLongPress: () => widget.onLongPress(widget.message),
-          );
-  }
+  Widget buildMessageOverview() => widget.isInSelectionMode
+      ? PlatformCheckboxListTile(
+          value: widget.message.isSelected,
+          selected: widget.message.isSelected,
+          title: MessageOverviewContent(
+            message: widget.message,
+            isSentMessage: widget.isSentMessage,
+          ),
+          onChanged: (value) => widget.onTap(widget.message),
+        )
+      : SelectablePlatformListTile(
+          visualDensity: VisualDensity.compact,
+          title: MessageOverviewContent(
+            message: widget.message,
+            isSentMessage: widget.isSentMessage,
+          ),
+          onTap: () => widget.onTap(widget.message),
+          onLongPress: () => widget.onLongPress(widget.message),
+        );
 }
