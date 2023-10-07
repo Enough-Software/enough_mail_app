@@ -5,13 +5,11 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../l10n/extension.dart';
-import '../../locator.dart';
-import '../../models/theme_settings.dart';
 import '../../screens/base.dart';
-import '../../services/theme_service.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../../widgets/button_text.dart';
 import '../provider.dart';
+import '../theme/model.dart';
 
 class SettingsThemeScreen extends HookConsumerWidget {
   const SettingsThemeScreen({super.key});
@@ -37,7 +35,6 @@ class SettingsThemeScreen extends HookConsumerWidget {
               themeSettings: value,
             ),
           );
-      locator<ThemeService>().checkForChangedTheme();
     }
 
     void updateThemeModeSettings(ThemeModeSetting? value) =>

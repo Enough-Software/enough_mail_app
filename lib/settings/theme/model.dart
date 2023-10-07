@@ -1,12 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'theme_settings.g.dart';
+part 'model.g.dart';
 
-enum ThemeModeSetting { light, dark, system, custom }
+/// Defines the current theme mode
+enum ThemeModeSetting {
+  /// always use a light theme
+  light,
 
+  /// always use a dark theme
+  dark,
+
+  /// use the system theme
+  system,
+
+  /// use a custom theme in which you switch between dark and light depending
+  /// on the time of day
+  custom,
+}
+
+//// Contains the settings for the theme
 @JsonSerializable()
 class ThemeSettings {
+  /// Creates settings for the theme
   const ThemeSettings({
     this.themeModeSetting = ThemeModeSetting.system,
     this.themeDarkStartTime = const TimeOfDay(hour: 22, minute: 0),
@@ -21,15 +37,22 @@ class ThemeSettings {
   /// Converts these settings to JSON
   Map<String, dynamic> toJson() => _$ThemeSettingsToJson(this);
 
+  /// The current theme mode
   final ThemeModeSetting themeModeSetting;
 
+  /// The time of day when the dark theme should be active
   @JsonKey(fromJson: _timeOfDayFromJson, toJson: _timeOfDayToJson)
   final TimeOfDay themeDarkStartTime;
+
+  /// The time of day when the dark theme should be inactive
   @JsonKey(fromJson: _timeOfDayFromJson, toJson: _timeOfDayToJson)
   final TimeOfDay themeDarkEndTime;
+
+  /// The color scheme seed
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
   final Color colorSchemeSeed;
 
+  /// Standard colors
   static List<Color> get availableColors => const [
         Colors.red,
         Colors.green,
@@ -52,6 +75,7 @@ class ThemeSettings {
         Colors.pink,
       ];
 
+  /// Returns the current theme mode
   ThemeMode getCurrentThemeMode() {
     switch (themeModeSetting) {
       case ThemeModeSetting.light:
@@ -62,15 +86,14 @@ class ThemeSettings {
         return ThemeMode.system;
       case ThemeModeSetting.custom:
         final now = _convertTimeOfDayToInt(TimeOfDay.now());
-        if (now > _convertTimeOfDayToInt(themeDarkStartTime) ||
-            now < _convertTimeOfDayToInt(themeDarkEndTime)) {
-          return ThemeMode.dark;
-        } else {
-          return ThemeMode.light;
-        }
+        return now > _convertTimeOfDayToInt(themeDarkStartTime) ||
+                now < _convertTimeOfDayToInt(themeDarkEndTime)
+            ? ThemeMode.dark
+            : ThemeMode.light;
     }
   }
 
+  /// Returns a copy of these settings with the given properties
   ThemeSettings copyWith({
     Color? colorSchemeSeed,
     TimeOfDay? themeDarkStartTime,
@@ -99,6 +122,7 @@ int _convertTimeOfDayToInt(TimeOfDay input) => input.hour * 100 + input.minute;
 
 Map<String, dynamic> _colorToJson(Color value) {
   final index = ThemeSettings.availableColors.indexOf(value);
+
   return {
     'index': index,
     'color': value.value,
@@ -116,5 +140,29 @@ Color _colorFromJson(Map<String, dynamic> json) {
   if (color != null) {
     return Color(color);
   }
+
   return Colors.green;
+}
+
+//// The actually applied theme data
+class ThemeSettingsData {
+  /// Creates the theme data
+  const ThemeSettingsData({
+    required this.brightness,
+    required this.darkTheme,
+    required this.lightTheme,
+    required this.themeMode,
+  });
+
+  /// The current brightness
+  final Brightness brightness;
+
+  /// The current dark theme data
+  final ThemeData darkTheme;
+
+  /// The current bright theme data
+  final ThemeData lightTheme;
+
+  /// The (material) theme mode
+  final ThemeMode themeMode;
 }

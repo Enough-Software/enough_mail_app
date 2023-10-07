@@ -115,6 +115,7 @@ class RealAccount extends Account {
         }
       }
     }
+
     return signature;
   }
 

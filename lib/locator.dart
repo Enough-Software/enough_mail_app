@@ -15,7 +15,6 @@ import 'services/navigation_service.dart';
 import 'services/notification_service.dart';
 import 'services/providers.dart';
 import 'services/scaffold_messenger_service.dart';
-import 'services/theme_service.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -35,7 +34,6 @@ void setupLocator() {
     ..registerLazySingleton(NotificationService.new)
     ..registerLazySingleton(BackgroundService.new)
     ..registerLazySingleton(AppService.new)
-    ..registerLazySingleton(ThemeService.new)
     ..registerLazySingleton(LocationService.new)
     ..registerLazySingleton(ContactService.new)
     ..registerLazySingleton(KeyService.new)

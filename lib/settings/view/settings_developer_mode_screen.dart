@@ -40,10 +40,14 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(localizations.developerModeTitle,
-                    style: theme.textTheme.titleMedium),
-                Text(localizations.developerModeIntroduction,
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  localizations.developerModeTitle,
+                  style: theme.textTheme.titleMedium,
+                ),
+                Text(
+                  localizations.developerModeIntroduction,
+                  style: theme.textTheme.bodySmall,
+                ),
                 PlatformCheckboxListTile(
                   value: isDeveloperModeEnabled,
                   onChanged: (value) async {
@@ -51,16 +55,21 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
                     final settings = ref.read(settingsProvider);
                     await ref.read(settingsProvider.notifier).update(
                           settings.copyWith(
-                              enableDeveloperMode: value ?? false),
+                            enableDeveloperMode: value ?? false,
+                          ),
                         );
                   },
                   title: Text(localizations.developerModeEnable),
                 ),
                 const Divider(),
-                Text(localizations.extensionsTitle,
-                    style: theme.textTheme.titleMedium),
-                Text(localizations.extensionsIntro,
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  localizations.extensionsTitle,
+                  style: theme.textTheme.titleMedium,
+                ),
+                Text(
+                  localizations.extensionsIntro,
+                  style: theme.textTheme.bodySmall,
+                ),
                 PlatformTextButton(
                   child: ButtonText(localizations.extensionsLearnMoreAction),
                   onPressed: () => launchUrl(

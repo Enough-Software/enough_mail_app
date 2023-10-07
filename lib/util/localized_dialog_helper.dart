@@ -1,18 +1,21 @@
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
-import 'package:enough_mail_app/widgets/legalese.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
+import '../l10n/extension.dart';
+import '../widgets/button_text.dart';
+import '../widgets/legalese.dart';
+
+/// Helps to display localized dialogs
 class LocalizedDialogHelper {
   LocalizedDialogHelper._();
 
-  static void showAbout(BuildContext context) async {
+  /// Shows the about dialog
+  static Future<void> showAbout(BuildContext context) async {
     final localizations = context.text;
     final packageInfo = await PackageInfo.fromPlatform();
-    var version = 'v${packageInfo.version}+${packageInfo.buildNumber}';
+    final version = 'v${packageInfo.version}+${packageInfo.buildNumber}';
     if (context.mounted) {
       showAboutDialog(
         context: context,
@@ -60,6 +63,7 @@ class LocalizedDialogHelper {
     bool isDangerousAction = false,
   }) {
     final localizations = context.text;
+
     return DialogHelper.askForConfirmation(
       context,
       title: title,
@@ -73,14 +77,15 @@ class LocalizedDialogHelper {
   /// Shows a simple text dialog with the given [title] and [text].
   ///
   /// Compare [showWidgetDialog] for parameter details.
-  static Future showTextDialog(
+  static Future<T?> showTextDialog<T>(
     BuildContext context,
     String title,
     String text, {
     List<Widget>? actions,
   }) {
     final localizations = context.text;
-    return DialogHelper.showTextDialog(
+
+    return DialogHelper.showTextDialog<T>(
       context,
       title,
       text,
@@ -93,9 +98,15 @@ class LocalizedDialogHelper {
   /// Shows a dialog with the given [content].
   ///
   /// Set the [title] to display the title on top
-  /// Specify custom [actions] to provide dialog specific actions, alternatively specify the [defaultActions]. Without [actions] or [defaultActions] only and OK button is shown.
-  /// When default actions are used, this method will return `true` when the user pressed `ok` and `false` after selecting `cancel`.
-  static Future showWidgetDialog(
+  ///
+  /// Specify custom [actions] to provide dialog specific actions, alternatively
+  ///
+  /// specify the [defaultActions]. Without [actions] or [defaultActions] only
+  /// and OK button is shown.
+  ///
+  /// When default actions are used, this method will return `true` when the
+  /// user pressed `ok` and `false` after selecting `cancel`.
+  static Future<T?> showWidgetDialog<T>(
     BuildContext context,
     Widget content, {
     String? title,
@@ -103,7 +114,8 @@ class LocalizedDialogHelper {
     DialogActions defaultActions = DialogActions.ok,
   }) {
     final localizations = context.text;
-    return DialogHelper.showWidgetDialog(
+
+    return DialogHelper.showWidgetDialog<T>(
       context,
       content,
       title: title,

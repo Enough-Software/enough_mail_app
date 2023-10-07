@@ -1,37 +1,34 @@
 import 'package:enough_giphy_flutter/enough_giphy_flutter.dart';
 import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/models/compose_data.dart';
-import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/services/key_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/theme_service.dart';
-import 'package:enough_mail_app/util/http_helper.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/ical_composer.dart';
-import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.g.dart';
+import '../l10n/extension.dart';
 import '../locator.dart';
+import '../models/compose_data.dart';
+import '../models/message.dart';
+import '../routes.dart';
+import '../services/i18n_service.dart';
+import '../services/icon_service.dart';
+import '../services/key_service.dart';
+import '../services/navigation_service.dart';
+import '../util/http_helper.dart';
+import '../util/localized_dialog_helper.dart';
+import 'ical_composer.dart';
+import 'icon_text.dart';
 
 class AttachmentMediaProviderFactory {
-  static MediaProvider fromAttachmentInfo(AttachmentInfo info) {
-    return MemoryMediaProvider(info.name!, info.mediaType.text, info.data!);
-  }
+  static MediaProvider fromAttachmentInfo(AttachmentInfo info) =>
+      MemoryMediaProvider(info.name!, info.mediaType.text, info.data!);
 }
 
 class AttachmentComposeBar extends StatefulWidget {
   const AttachmentComposeBar(
-      {Key? key, required this.composeData, this.isDownloading = false})
-      : super(key: key);
+      {super.key, required this.composeData, this.isDownloading = false});
   final ComposeData composeData;
   final bool isDownloading;
 
@@ -84,18 +81,19 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
 }
 
 class AddAttachmentPopupButton extends StatelessWidget {
+  const AddAttachmentPopupButton(
+      {super.key, required this.composeData, required this.update});
   final ComposeData composeData;
   final Function() update;
-  const AddAttachmentPopupButton(
-      {Key? key, required this.composeData, required this.update})
-      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
     final iconService = locator<IconService>();
-    final themeService = locator<ThemeService>();
-    final brightness = themeService.brightness(context);
+    const brightness = Brightness.light;
+    // TODO(RV): implement brightness access
+    // themeService.brightness(context);
+
     return PlatformPopupMenuButton<int>(
       icon: Icon(CommonPlatformIcons.add),
       itemBuilder: (context) => [
@@ -178,7 +176,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
             if (result != null) {
               composeData.messageBuilder.addBinary(
                   result, MediaSubtype.imagePng.mediaType,
-                  filename: "location.jpg");
+                  filename: 'location.jpg');
               changed = true;
             }
             break;
@@ -223,7 +221,9 @@ class AddAttachmentPopupButton extends StatelessWidget {
   ) async {
     final giphy = locator<KeyService>().giphy;
     if (giphy == null) {
-      LocalizedDialogHelper.showTextDialog(context, localizations.errorTitle,
+      await LocalizedDialogHelper.showTextDialog(
+          context,
+          localizations.errorTitle,
           'No GIPHY API key found. Please check set up instructions.');
       return false;
     }
@@ -280,10 +280,9 @@ class AddAttachmentPopupButton extends StatelessWidget {
 }
 
 class _AppointmentFinalizer {
+  _AppointmentFinalizer(this.appointment, this.attachmentBuilder);
   final VCalendar appointment;
   final PartBuilder attachmentBuilder;
-
-  _AppointmentFinalizer(this.appointment, this.attachmentBuilder);
 
   void finalize(MessageBuilder messageBuilder) {
     final event = appointment.event!;
@@ -318,20 +317,18 @@ class _AppointmentFinalizer {
 }
 
 class ComposeAttachment extends StatelessWidget {
+  const ComposeAttachment(
+      {super.key, required this.attachment, required this.onRemove});
   final AttachmentInfo attachment;
   final void Function(AttachmentInfo attachment) onRemove;
-
-  const ComposeAttachment(
-      {Key? key, required this.attachment, required this.onRemove})
-      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: const EdgeInsets.only(right: 8),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(8),
         child: PreviewMediaWidget(
           mediaProvider:
               AttachmentMediaProviderFactory.fromAttachmentInfo(attachment),

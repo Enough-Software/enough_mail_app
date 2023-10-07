@@ -4,12 +4,13 @@ import 'dart:io';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../l10n/app_localizations.g.dart';
+import 'app_lifecycle/provider.dart';
 import 'l10n/extension.dart';
 import 'locator.dart';
+import 'logger.dart';
 import 'routes.dart';
 import 'screens/all_screens.dart';
 import 'services/app_service.dart';
@@ -21,8 +22,8 @@ import 'services/mail_service.dart';
 import 'services/navigation_service.dart';
 import 'services/notification_service.dart';
 import 'services/scaffold_messenger_service.dart';
-import 'services/theme_service.dart';
 import 'settings/provider.dart';
+import 'settings/theme/provider.dart';
 import 'widgets/inherited_widgets.dart';
 // AppStyles appStyles = AppStyles.instance;
 
@@ -44,8 +45,6 @@ class MyApp extends ConsumerStatefulWidget {
 
 class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   late Future<MailService> _appInitialization;
-  ThemeMode _themeMode = ThemeMode.system;
-  ThemeService? _themeService;
   Locale? _locale;
   bool _isInitialized = false;
 
@@ -67,18 +66,16 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     if (_isInitialized) {
       final settings = ref.read(settingsProvider);
       locator<AppService>().didChangeAppLifecycleState(state, settings);
+      ref.read(appLifecycleStateProvider.notifier).state = state;
     }
   }
 
   Future<MailService> _initApp() async {
     await ref.read(settingsProvider.notifier).init();
+    if (context.mounted) {
+      ref.read(themeProvider.notifier).init(context);
+    }
     final settings = ref.read(settingsProvider);
-    final themeService = locator<ThemeService>();
-    _themeService = themeService;
-    themeService.addListener(() => setState(() {
-          _themeMode = themeService.themeMode;
-        }));
-    themeService.init(settings);
     final i18nService = locator<I18nService>();
     final languageTag = settings.languageTag;
     if (languageTag != null) {
@@ -101,8 +98,9 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     if (mailService.messageSource != null) {
       final state = MailServiceWidget.of(context);
       if (state != null) {
-        state.account = mailService.currentAccount;
-        state.accounts = mailService.accounts;
+        state
+          ..account = mailService.currentAccount
+          ..accounts = mailService.accounts;
       }
       // on ios show the app drawer:
       if (Platform.isIOS) {
@@ -111,10 +109,12 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       }
 
       /// the app has at least one configured account
-      await locator<NavigationService>().push(Routes.messageSource,
-          arguments: mailService.messageSource,
-          fade: true,
-          replace: !Platform.isIOS);
+      unawaited(locator<NavigationService>().push(
+        Routes.messageSource,
+        arguments: mailService.messageSource,
+        fade: true,
+        replace: !Platform.isIOS,
+      ));
       // check for a tapped notification that started the app:
       final notificationInitResult =
           await locator<NotificationService>().init();
@@ -124,7 +124,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         await locator<AppService>().checkForShare();
       }
       if (settings.enableBiometricLock) {
-        await locator<NavigationService>().push(Routes.lockScreen);
+        unawaited(locator<NavigationService>().push(Routes.lockScreen));
         final didAuthenticate =
             await locator<BiometricsService>().authenticate();
         if (didAuthenticate) {
@@ -133,85 +133,92 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       }
     } else {
       // this app has no mail accounts yet, so switch to welcome screen:
-      await locator<NavigationService>()
-          .push(Routes.welcome, fade: true, replace: true);
+      unawaited(locator<NavigationService>()
+          .push(Routes.welcome, fade: true, replace: true));
     }
     if (BackgroundService.isSupported) {
       await locator<BackgroundService>().init();
     }
+    logger.d('App initialized');
     _isInitialized = true;
+
     return mailService;
   }
 
   @override
-  Widget build(BuildContext context) => PlatformSnackApp(
-        supportedLocales: AppLocalizations.supportedLocales,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        locale: _locale,
-        debugShowCheckedModeBanner: false,
-        title: 'Maily',
-        onGenerateRoute: AppRouter.generateRoute,
-        initialRoute: Routes.splash,
-        navigatorKey: locator<NavigationService>().navigatorKey,
-        scaffoldMessengerKey:
-            locator<ScaffoldMessengerService>().scaffoldMessengerKey,
-        builder: (context, child) {
-          locator<I18nService>().init(
-            context.text,
-            Localizations.localeOf(context),
-          );
-          child ??= FutureBuilder<MailService>(
-            future: _appInitialization,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.waiting:
-                case ConnectionState.active:
-                  return const SplashScreen();
-                case ConnectionState.done:
-                  // in the meantime the app has navigated away
-                  break;
-              }
-              return Container();
-            },
-          );
-          final mailService = locator<MailService>();
-          return MailServiceWidget(
-            account: mailService.currentAccount,
-            accounts: mailService.accounts,
-            messageSource: mailService.messageSource,
-            child: child,
-          );
-        },
-        // home: Builder(
-        //   builder: (context) {
-        //     locator<I18nService>().init(
-        //         context.text!, Localizations.localeOf(context));
-        //     return FutureBuilder<MailService>(
-        //       future: _appInitialization,
-        //       builder: (context, snapshot) {
-        //         switch (snapshot.connectionState) {
-        //           case ConnectionState.none:
-        //           case ConnectionState.waiting:
-        //           case ConnectionState.active:
-        //             return SplashScreen();
-        //           case ConnectionState.done:
-        //             // in the meantime the app has navigated away
-        //             break;
-        //         }
-        //         return Container();
-        //       },
-        //     );
-        //   },
-        // ),
-        materialTheme:
-            _themeService?.lightTheme ?? ThemeService.defaultLightTheme,
-        materialDarkTheme:
-            _themeService?.darkTheme ?? ThemeService.defaultDarkTheme,
-        materialThemeMode: _themeMode,
-        cupertinoTheme: const CupertinoThemeData(
-          brightness: Brightness.light,
-          //TODO support theming on Cupertino
-        ),
-      );
+  Widget build(BuildContext context) {
+    final themeSettingsData = ref.watch(themeProvider);
+
+    return PlatformSnackApp(
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      locale: _locale,
+      debugShowCheckedModeBanner: false,
+      title: 'Maily',
+      onGenerateRoute: AppRouter.generateRoute,
+      initialRoute: Routes.splash,
+      navigatorKey: locator<NavigationService>().navigatorKey,
+      scaffoldMessengerKey:
+          locator<ScaffoldMessengerService>().scaffoldMessengerKey,
+      builder: (context, child) {
+        locator<I18nService>().init(
+          context.text,
+          Localizations.localeOf(context),
+        );
+        child ??= FutureBuilder<MailService>(
+          future: _appInitialization,
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return const SplashScreen();
+              case ConnectionState.done:
+                // in the meantime the app has navigated away
+                break;
+            }
+
+            return const SizedBox.shrink();
+          },
+        );
+
+        final mailService = locator<MailService>();
+
+        return MailServiceWidget(
+          account: mailService.currentAccount,
+          accounts: mailService.accounts,
+          messageSource: mailService.messageSource,
+          child: child,
+        );
+      },
+      // home: Builder(
+      //   builder: (context) {
+      //     locator<I18nService>().init(
+      //         context.text!, Localizations.localeOf(context));
+      //     return FutureBuilder<MailService>(
+      //       future: _appInitialization,
+      //       builder: (context, snapshot) {
+      //         switch (snapshot.connectionState) {
+      //           case ConnectionState.none:
+      //           case ConnectionState.waiting:
+      //           case ConnectionState.active:
+      //             return SplashScreen();
+      //           case ConnectionState.done:
+      //             // in the meantime the app has navigated away
+      //             break;
+      //         }
+      //         return Container();
+      //       },
+      //     );
+      //   },
+      // ),
+      materialTheme: themeSettingsData.lightTheme,
+      materialDarkTheme: themeSettingsData.darkTheme,
+      materialThemeMode: themeSettingsData.themeMode,
+      cupertinoTheme: CupertinoThemeData(
+        brightness: themeSettingsData.brightness,
+        //TODO support theming on Cupertino
+      ),
+    );
+  }
 }

@@ -1,9 +1,10 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/compose_data.dart';
-import 'package:enough_mail_app/models/swipe.dart';
-import 'package:enough_mail_app/models/theme_settings.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../models/compose_data.dart';
+import '../models/swipe.dart';
+import 'theme/model.dart';
 
 part 'model.g.dart';
 
@@ -65,7 +66,7 @@ extension ExtensionLockTimePreference on LockTimePreference {
   Duration get duration {
     switch (this) {
       case LockTimePreference.immediately:
-        return const Duration();
+        return Duration.zero;
       case LockTimePreference.after5minutes:
         return const Duration(minutes: 5);
       case LockTimePreference.after30minutes:
@@ -74,6 +75,7 @@ extension ExtensionLockTimePreference on LockTimePreference {
   }
 }
 
+/// Contains the settings of the app
 @JsonSerializable()
 class Settings {
   /// Creates new settings
@@ -234,8 +236,6 @@ class Settings {
         swipeRightToLeftAction: swipeRightToLeftAction,
         themeSettings: themeSettings,
         urlLaunchMode: urlLaunchMode,
-        signaturePlain: null,
-        signatureHtml: null,
       );
 
   Settings removeLanguageTag() => Settings(
@@ -245,7 +245,6 @@ class Settings {
         enableBiometricLock: enableBiometricLock,
         enableDeveloperMode: enableDeveloperMode,
         folderNameSetting: folderNameSetting,
-        languageTag: null,
         lockTimePreference: lockTimePreference,
         preferPlainTextMessages: preferPlainTextMessages,
         preferredComposeMailAddress: preferredComposeMailAddress,

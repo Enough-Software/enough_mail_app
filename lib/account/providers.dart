@@ -1,5 +1,6 @@
-import 'package:enough_mail_app/models/account.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../models/account.dart';
 
 part 'providers.g.dart';
 

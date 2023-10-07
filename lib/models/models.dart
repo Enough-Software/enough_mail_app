@@ -11,5 +11,4 @@ export 'search.dart';
 export 'sender.dart';
 export 'shared_data.dart';
 export 'swipe.dart';
-export 'theme_settings.dart';
 export 'web_view_configuration.dart';

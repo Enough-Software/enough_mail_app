@@ -8,8 +8,6 @@ import '../services/i18n_service.dart';
 import 'model.dart';
 import 'storage.dart';
 
-part 'provider.g.dart';
-
 /// Provides the settings
 final settingsProvider =
     NotifierProvider<SettingsNotifier, Settings>(SettingsNotifier.new);
@@ -39,6 +37,7 @@ class SettingsNotifier extends Notifier<Settings> {
     }
   }
 
+  /// Updates and saves the given [value] settings
   Future<void> update(Settings value) async {
     state = value;
     try {
@@ -53,26 +52,26 @@ class SettingsNotifier extends Notifier<Settings> {
     if (!state.signatureActions.contains(composeAction)) {
       return '';
     }
+
     return account.signatureHtml ?? getSignatureHtmlGlobal();
   }
 
   /// Retrieves the global signature
-  String getSignatureHtmlGlobal() {
-    return state.signatureHtml ?? '<p>---<br/>$_fallbackSignature</p>';
-  }
+  String getSignatureHtmlGlobal() =>
+      state.signatureHtml ?? '<p>---<br/>$_fallbackSignature</p>';
 
   /// Retrieves the plain text signature for the specified account
   String getSignaturePlain(RealAccount account, ComposeAction composeAction) {
     if (!state.signatureActions.contains(composeAction)) {
       return '';
     }
+
     return account.signaturePlain ?? getSignaturePlainGlobal();
   }
 
   /// Retrieves the global plain text signature
-  String getSignaturePlainGlobal() {
-    return state.signaturePlain ?? '\n---\n$_fallbackSignature';
-  }
+  String getSignaturePlainGlobal() =>
+      state.signaturePlain ?? '\n---\n$_fallbackSignature';
 
   String get _fallbackSignature =>
       locator<I18nService>().localizations.signature;

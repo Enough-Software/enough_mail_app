@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../locator.dart';
+import '../logger.dart';
 import '../models/compose_data.dart';
 import '../models/shared_data.dart';
 import '../routes.dart';
@@ -14,7 +15,6 @@ import 'background_service.dart';
 import 'biometrics_service.dart';
 import 'mail_service.dart';
 import 'navigation_service.dart';
-import 'theme_service.dart';
 
 /// Handles app life cycle events
 class AppService {
@@ -44,21 +44,21 @@ class AppService {
     AppLifecycleState state,
     Settings settings,
   ) async {
-    if (kDebugMode) {
-      print('AppLifecycleState = $state');
-    }
+    logger.d('didChangeAppLifecycleState: $state');
     appLifecycleState = state;
     switch (state) {
       case AppLifecycleState.resumed:
-        locator<ThemeService>().checkForChangedTheme();
+        //locator<ThemeService>().checkForChangedTheme();
         final futures = [checkForShare(), locator<MailService>().resume()];
         if (settings.enableBiometricLock) {
           if (_ignoreBiometricsCheckAtNextResume) {
             _ignoreBiometricsCheckAtNextResume = false;
-            // double check time stamp, everything more than a minute requires a check
+            // double check time stamp,
+            // everything more than a minute requires a check
             if (_ignoreBiometricsCheckAtNextResumeTS
                 .isAfter(DateTime.now().subtract(const Duration(minutes: 1)))) {
               await Future.wait(futures);
+
               return;
             }
           }
@@ -75,6 +75,7 @@ class AppService {
               if (navService.currentRouteName != Routes.lockScreen) {
                 await navService.push(Routes.lockScreen);
               }
+
               return;
             } else if (navService.currentRouteName == Routes.lockScreen) {
               navService.pop();
@@ -92,6 +93,9 @@ class AppService {
         break;
       case AppLifecycleState.detached:
         // TODO: Check if AppLifecycleState.detached needs to be handled
+        break;
+      case AppLifecycleState.hidden:
+        // TODO: Handle this case.
         break;
     }
   }
