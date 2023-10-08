@@ -178,6 +178,7 @@ class MailService implements MimeSourceSubscriber {
     if (account is UnifiedAccount) {
       final mimeSources = await _getUnifiedMimeSources(mailbox, account);
       return MultipleMessageSource(
+        account: account,
         mimeSources,
         mailbox == null ? _localizations.unifiedFolderInbox : mailbox.name,
         mailbox?.flags.first ?? MailboxFlag.inbox,
@@ -197,6 +198,7 @@ class MailService implements MimeSourceSubscriber {
           source,
           mailClient.account.email,
           mailbox.name,
+          account: account,
         );
       }
     }

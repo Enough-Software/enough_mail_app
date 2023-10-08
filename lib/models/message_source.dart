@@ -39,6 +39,7 @@ abstract class MessageSource extends ChangeNotifier
 
   /// the description of this source
   String? get description => _description;
+
   set description(String? value) {
     _description = value;
     notifyListeners();
@@ -52,6 +53,9 @@ abstract class MessageSource extends ChangeNotifier
     _name = value;
     notifyListeners();
   }
+
+  /// The account associated with this source
+  Account get account;
 
   bool _supportsDeleteAll = false;
 
@@ -569,6 +573,7 @@ class MailboxMessageSource extends MessageSource {
     this._mimeSource,
     String description,
     String name, {
+    required this.account,
     super.parent,
     super.isSearch,
   }) {
@@ -576,6 +581,9 @@ class MailboxMessageSource extends MessageSource {
     _name = name;
     _mimeSource.addSubscriber(this);
   }
+
+  @override
+  final RealAccount account;
 
   @override
   int get size => _mimeSource.size;
@@ -660,6 +668,7 @@ class MailboxMessageSource extends MessageSource {
       searchSource,
       localizations.searchQueryDescription(name!),
       localizations.searchQueryTitle(search.query),
+      account: account,
       parent: this,
       isSearch: true,
     );
@@ -695,6 +704,7 @@ class MultipleMessageSource extends MessageSource {
     this.mimeSources,
     String name,
     MailboxFlag? flag, {
+    required this.account,
     super.parent,
     super.isSearch,
   }) {
@@ -706,6 +716,9 @@ class MultipleMessageSource extends MessageSource {
     _flag = flag;
     _description = mimeSources.map((s) => s.mailClient.account.name).join(', ');
   }
+
+  @override
+  final UnifiedAccount account;
 
   @override
   Future<void> init() async {
@@ -880,6 +893,7 @@ class MultipleMessageSource extends MessageSource {
       searchMimeSources,
       localizations.searchQueryTitle(search.query),
       _flag,
+      account: account,
       parent: this,
       isSearch: true,
     );
@@ -1013,8 +1027,12 @@ class _MultipleMimeSource {
 }
 
 class SingleMessageSource extends MessageSource {
-  SingleMessageSource(MessageSource? parent) : super(parent: parent);
+  SingleMessageSource(MessageSource? parent, {required this.account})
+      : super(parent: parent);
   Message? singleMessage;
+
+  @override
+  final Account account;
 
   @override
   Future<Message> loadMessage(int index) => Future.value(singleMessage);
@@ -1076,8 +1094,15 @@ class SingleMessageSource extends MessageSource {
 }
 
 class ListMessageSource extends MessageSource {
-  ListMessageSource(MessageSource parent) : super(parent: parent);
+  ListMessageSource(
+    MessageSource parent,
+  )   : account = parent.account,
+        super(parent: parent);
+
   late List<Message> messages;
+
+  @override
+  final Account account;
 
   void initWithMimeMessages(
       List<MimeMessage> mimeMessages, MailClient mailClient,
@@ -1151,6 +1176,7 @@ class ListMessageSource extends MessageSource {
 
 class ErrorMessageSource extends MessageSource {
   ErrorMessageSource(this.account);
+  @override
   final Account account;
 
   @override

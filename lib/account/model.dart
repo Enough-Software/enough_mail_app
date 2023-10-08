@@ -74,7 +74,7 @@ class RealAccount extends Account {
 
   /// Should this account be excluded from the unified account?
   bool get excludeFromUnified =>
-      _account.hasAttribute(attributeExcludeFromUnified);
+      getAttribute(attributeExcludeFromUnified) ?? false;
   set excludeFromUnified(bool value) =>
       setAttribute(attributeExcludeFromUnified, value);
 
@@ -84,7 +84,7 @@ class RealAccount extends Account {
   set enableLogging(bool value) => setAttribute(attributeEnableLogging, value);
 
   /// Retrieves the attribute with the given [key] name
-  dynamic getAttribute(String key) => _account.attributes[key];
+  T? getAttribute<T>(String key) => _account.attributes[key] as T?;
 
   /// Sets the attribute [key] to [value]
   void setAttribute(String key, dynamic value) {

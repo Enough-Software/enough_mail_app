@@ -23,25 +23,7 @@ final unifiedAccountProvider = Provider<UnifiedAccount?>.internal(
 );
 
 typedef UnifiedAccountRef = ProviderRef<UnifiedAccount?>;
-String _$currentAccountHash() => r'247e43dde286f389677a2b1b299ddbf7099a9577';
-
-/// Retrieves the current account
-///
-/// Copied from [CurrentAccount].
-@ProviderFor(CurrentAccount)
-final currentAccountProvider =
-    AutoDisposeNotifierProvider<CurrentAccount, Account?>.internal(
-  CurrentAccount.new,
-  name: r'currentAccountProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$currentAccountHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$CurrentAccount = AutoDisposeNotifier<Account?>;
-String _$realAccountsHash() => r'af80cd3883b4dae338d70ab5a8b8c00b94bc6024';
+String _$realAccountsHash() => r'3ff51534497e5e36a7b0e0f19dc0e5fb09cfdcfe';
 
 /// Provides all real email accounts
 ///

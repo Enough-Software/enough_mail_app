@@ -5,20 +5,6 @@ import 'storage.dart';
 
 part 'providers.g.dart';
 
-/// Retrieves the current account
-@riverpod
-class CurrentAccount extends _$CurrentAccount {
-  @override
-  Raw<Account>? build() {
-    final accounts = ref.watch(allAccountsProvider);
-    if (accounts.isEmpty) {
-      return null;
-    }
-
-    return accounts.first;
-  }
-}
-
 /// Provides all real email accounts
 @Riverpod(keepAlive: true)
 class RealAccounts extends _$RealAccounts {

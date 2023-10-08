@@ -8,6 +8,7 @@
         "Imap",
         "LTRB",
         "Maily",
+        "mocktail",
         "riverpod",
         "unawaited"
     ]

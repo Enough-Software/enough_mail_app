@@ -42,7 +42,10 @@ class AppDrawer extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: _buildAccountHeader(
-                    currentAccount, mailService.accounts, theme),
+                  currentAccount,
+                  mailService.accounts,
+                  theme,
+                ),
               ),
             ),
             Expanded(
@@ -107,6 +110,8 @@ class AppDrawer extends ConsumerWidget {
         : accounts.isNotEmpty
             ? accounts.first as RealAccount
             : null;
+    final avatarImageUrl = avatarAccount?.imageUrlGravatar;
+
     final userName =
         currentAccount is RealAccount ? currentAccount.userName : null;
     final accountName = Text(
@@ -133,9 +138,9 @@ class AppDrawer extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   backgroundColor: theme.secondaryHeaderColor,
-                  backgroundImage: NetworkImage(
-                    avatarAccount.imageUrlGravatar!,
-                  ),
+                  backgroundImage: avatarImageUrl == null
+                      ? null
+                      : NetworkImage(avatarImageUrl),
                   radius: 30,
                 ),
                 const Padding(
@@ -151,7 +156,9 @@ class AppDrawer extends ConsumerWidget {
                         Text(
                           userName,
                           style: const TextStyle(
-                              fontStyle: FontStyle.italic, fontSize: 14),
+                            fontStyle: FontStyle.italic,
+                            fontSize: 14,
+                          ),
                         ),
                       Text(
                         currentAccount is UnifiedAccount
@@ -160,7 +167,9 @@ class AppDrawer extends ConsumerWidget {
                                 .join(', ')
                             : (currentAccount as RealAccount).email,
                         style: const TextStyle(
-                            fontStyle: FontStyle.italic, fontSize: 14),
+                          fontStyle: FontStyle.italic,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -181,8 +190,9 @@ class AppDrawer extends ConsumerWidget {
           ? ExpansionTile(
               leading:
                   mailService.hasAccountsWithErrors() ? const Badge() : null,
-              title: Text(localizations
-                  .drawerAccountsSectionTitle(mailService.accounts.length)),
+              title: Text(
+                localizations.drawerAccountsSectionTitle(accounts.length),
+              ),
               children: [
                 for (final account in accounts)
                   SelectablePlatformListTile(
@@ -191,7 +201,11 @@ class AppDrawer extends ConsumerWidget {
                         : null,
                     tileColor:
                         mailService.hasError(account) ? Colors.red : null,
-                    title: Text(account.name),
+                    title: Text(
+                      account is UnifiedAccount
+                          ? localizations.unifiedAccountName
+                          : account.name,
+                    ),
                     selected: account == currentAccount,
                     onTap: () async {
                       final navService = locator<NavigationService>();
@@ -222,8 +236,11 @@ class AppDrawer extends ConsumerWidget {
                       if (account is UnifiedAccount) {
                         navService.push(Routes.settingsAccounts, fade: true);
                       } else {
-                        navService.push(Routes.accountEdit,
-                            arguments: account, fade: true);
+                        navService.push(
+                          Routes.accountEdit,
+                          arguments: account,
+                          fade: true,
+                        );
                       }
                     },
                   ),

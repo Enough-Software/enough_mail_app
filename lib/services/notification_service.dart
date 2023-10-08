@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../account/model.dart';
 import '../locator.dart';
 import '../models/message.dart' as maily;
 import '../models/message_source.dart';
@@ -104,7 +105,7 @@ class NotificationService {
     if (kDebugMode) {
       print('select notification: $payloadText');
     }
-    if (payloadText!.startsWith(_messagePayloadStart)) {
+    if (payloadText != null && payloadText.startsWith(_messagePayloadStart)) {
       try {
         final payload = _deserialize(payloadText);
 
@@ -119,7 +120,11 @@ class NotificationService {
           ..uid = payload.uid
           ..size = payload.size;
         final currentMessageSource = locator<MailService>().messageSource;
-        final messageSource = SingleMessageSource(currentMessageSource);
+        final messageSource = SingleMessageSource(
+          currentMessageSource,
+          account:
+              currentMessageSource?.account ?? RealAccount(mailClient.account),
+        );
         final message =
             maily.Message(mimeMessage, mailClient, messageSource, 0);
         messageSource.singleMessage = message;
@@ -133,10 +138,11 @@ class NotificationService {
     }
   }
 
-  Future sendLocalNotificationForMailLoadEvent(MailLoadEvent event) => sendLocalNotificationForMail(event.message, event.mailClient);
+  Future sendLocalNotificationForMailLoadEvent(MailLoadEvent event) =>
+      sendLocalNotificationForMail(event.message, event.mailClient);
 
-  Future sendLocalNotificationForMailMessage(maily.Message message) => sendLocalNotificationForMail(
-        message.mimeMessage, message.mailClient);
+  Future sendLocalNotificationForMailMessage(maily.Message message) =>
+      sendLocalNotificationForMail(message.mimeMessage, message.mailClient);
 
   Future sendLocalNotificationForMail(
       MimeMessage mimeMessage, MailClient mailClient) {

@@ -1,4 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail_app/account/model.dart';
 import 'package:enough_mail_app/models/async_mime_source.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
@@ -9,8 +10,11 @@ import 'package:flutter/src/material/scaffold.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'fake_mime_source.dart';
+
+class MockUnifiedAccount extends Mock implements UnifiedAccount {}
 
 void main() async {
   final notificationService = TestNotificationService();
@@ -40,7 +44,11 @@ void main() async {
       differencePerMessage: secondMimeSourceDifferencePerMessage,
     );
     source = MultipleMessageSource(
-        [firstMimeSource, secondMimeSource], 'multiple', MailboxFlag.inbox);
+      [firstMimeSource, secondMimeSource],
+      'multiple',
+      MailboxFlag.inbox,
+      account: MockUnifiedAccount(),
+    );
   });
 
   Future<void> _expectMessagesOrderedByDate({int numberToTest = 20}) async {
@@ -927,7 +935,11 @@ void main() async {
         differencePerMessage: secondMimeSourceDifferencePerMessage,
       );
       source = MultipleMessageSource(
-          [firstMimeSource, secondMimeSource], 'multiple', MailboxFlag.inbox);
+        [firstMimeSource, secondMimeSource],
+        'multiple',
+        MailboxFlag.inbox,
+        account: MockUnifiedAccount(),
+      );
 
       var notifyCounter = 0;
       source.addListener(() {

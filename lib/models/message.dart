@@ -13,7 +13,10 @@ class Message extends ChangeNotifier {
 
   Message.embedded(this.mimeMessage, Message parent)
       : mailClient = parent.mailClient,
-        source = SingleMessageSource(parent.source),
+        source = SingleMessageSource(
+          parent.source,
+          account: parent.source.account,
+        ),
         sourceIndex = 0 {
     (source as SingleMessageSource).singleMessage = this;
     isEmbedded = true;

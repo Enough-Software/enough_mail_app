@@ -48,12 +48,13 @@ class Source extends _$Source {
       mailClient,
       mailbox,
     ); //..addSubscriber(this);
-    // TODO(RV): add subscriber
+    // TODO(RV): add subscriber to send notification for unseen inbox mails
 
     return MailboxMessageSource.fromMimeSource(
       source,
       mailClient.account.email,
       mailbox.name,
+      account: account,
     );
   }
 

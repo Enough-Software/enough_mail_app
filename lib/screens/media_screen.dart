@@ -70,8 +70,9 @@ class InteractiveMediaScreen extends ConsumerWidget {
                       final account = mailService.currentAccount;
                       if (account is RealAccount) {
                         final client = await mailService.getClientFor(account);
-                        final source =
-                            SingleMessageSource(mailService.messageSource);
+                        final source = SingleMessageSource(
+                            mailService.messageSource,
+                            account: account);
                         final message = Message(mime, client, source, 0);
                         message.isEmbedded = true;
                         source.singleMessage = message;

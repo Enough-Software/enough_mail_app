@@ -19,6 +19,7 @@ export 'menu_with_badge.dart';
 export 'message_actions.dart';
 export 'message_overview_content.dart';
 export 'message_stack.dart';
+export 'new_mail_message_button.dart';
 export 'password_field.dart';
 export 'recipient_input_field.dart';
 export 'signature.dart';

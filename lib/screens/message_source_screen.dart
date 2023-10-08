@@ -24,15 +24,8 @@ import '../services/scaffold_messenger_service.dart';
 import '../settings/provider.dart';
 import '../util/localized_dialog_helper.dart';
 import '../util/string_helper.dart';
-import '../widgets/app_drawer.dart';
-import '../widgets/cupertino_status_bar.dart';
-import '../widgets/empty_message.dart';
-import '../widgets/icon_text.dart';
-import '../widgets/mailbox_tree.dart';
-import '../widgets/menu_with_badge.dart';
-import '../widgets/message_overview_content.dart';
-import '../widgets/message_stack.dart';
 import '../widgets/search_text_field.dart';
+import '../widgets/widgets.dart';
 import 'base.dart';
 
 enum _Visualization { stack, list }
@@ -330,22 +323,12 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                 )
               : null,
       material: (context, platform) => MaterialScaffoldData(
-        drawer: const AppDrawer(),
+        drawer: AppDrawer(
+          currentAccount: widget.messageSource.account,
+        ),
         floatingActionButton: _visualization == _Visualization.stack
             ? null
-            : FloatingActionButton(
-                onPressed: () => locator<NavigationService>().push(
-                  Routes.mailCompose,
-                  arguments: ComposeData(
-                    null,
-                    MessageBuilder(),
-                    ComposeAction.newMessage,
-                  ),
-                ),
-                tooltip: localizations.homeFabTooltip,
-                elevation: 2,
-                child: const Icon(Icons.add),
-              ),
+            : const NewMailMessageButton(),
       ),
       // cupertino: (context, platform) => CupertinoPageScaffoldData(),
       appBar: (_visualization == _Visualization.stack)

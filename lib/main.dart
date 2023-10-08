@@ -96,7 +96,6 @@ class InitializationScreen extends ConsumerStatefulWidget {
 
 class _InitializationScreen extends ConsumerState<InitializationScreen> {
   late Future<void> _appInitialization;
-  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -171,7 +170,6 @@ class _InitializationScreen extends ConsumerState<InitializationScreen> {
     // }
 
     logger.d('App initialized');
-    _isInitialized = true;
   }
 
   @override
