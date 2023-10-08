@@ -1,35 +1,34 @@
 import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/extensions/extensions.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/services/providers.dart';
-import 'package:enough_mail_app/util/modal_bottom_sheet_helper.dart';
-import 'package:enough_mail_app/util/validator.dart';
-import 'package:enough_mail_app/widgets/account_provider_selector.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
-import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
+import '../account/model.dart';
+import '../extensions/extensions.dart';
 import '../l10n/app_localizations.g.dart';
+import '../l10n/extension.dart';
+import '../locator.dart';
+import '../routes.dart';
+import '../services/i18n_service.dart';
+import '../services/mail_service.dart';
+import '../services/navigation_service.dart';
+import '../services/providers.dart';
+import '../util/modal_bottom_sheet_helper.dart';
+import '../util/validator.dart';
+import '../widgets/account_provider_selector.dart';
+import '../widgets/button_text.dart';
+import '../widgets/password_field.dart';
+import 'base.dart';
 
 class AccountAddScreen extends StatefulWidget {
-  final bool launchedFromWelcome;
-
   const AccountAddScreen({
-    Key? key,
+    super.key,
     required this.launchedFromWelcome,
-  }) : super(key: key);
+  });
+  final bool launchedFromWelcome;
 
   @override
   State<AccountAddScreen> createState() => _AccountAddScreenState();
@@ -133,17 +132,16 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         children: [
           Expanded(
             child: PlatformStepper(
-              type: StepperType.vertical,
               onStepContinue: _isContinueAvailable
                   ? () async {
-                      var step = _currentStep + 1;
+                      final step = _currentStep + 1;
                       if (step < _availableSteps) {
                         setState(() {
                           _currentStep = step;
                           _isContinueAvailable = false;
                         });
                       }
-                      _onStepProgressed(step);
+                      await _onStepProgressed(step);
                     }
                   : null,
               onStepCancel: () => Navigator.pop(context),
@@ -238,7 +236,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
       });
     } else {
       final domainName = email.substring(email.lastIndexOf('@') + 1);
-      var mailAccount = MailAccount.fromDiscoveredSettingsWithAuth(
+      final mailAccount = MailAccount.fromDiscoveredSettingsWithAuth(
         name: domainName,
         email: email,
         auth: OauthAuthentication(email, token),
@@ -268,7 +266,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     setState(() {
       _isAccountVerifying = true;
     });
-    var mailAccount = MailAccount.fromDiscoveredSettings(
+    final mailAccount = MailAccount.fromDiscoveredSettings(
       name: _emailController.text,
       userName: _emailController.text,
       email: _emailController.text,
@@ -306,12 +304,12 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     account.name = _accountNameController.text;
     account.userName = _userNameController.text;
     final service = locator<MailService>();
-    final added = await service.addAccount(account, mailClient, context);
+    final added = await service.addAccount(account, mailClient);
     if (added) {
       if (Platform.isIOS && widget.launchedFromWelcome) {
-        locator<NavigationService>().push(Routes.appDrawer, clear: true);
+        await locator<NavigationService>().push(Routes.appDrawer, clear: true);
       }
-      locator<NavigationService>().push(
+      await locator<NavigationService>().push(
         Routes.messageSource,
         arguments: service.messageSource,
         clear: !Platform.isIOS && widget.launchedFromWelcome,
@@ -321,54 +319,52 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     }
   }
 
-  Step _buildEmailStep(BuildContext context, AppLocalizations localizations) {
-    return Step(
-      title: _currentStep == 0
-          ? Text(localizations.addAccountEmailLabel)
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(localizations.addAccountEmailLabel),
-                Text(
-                  _emailController.text,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+  Step _buildEmailStep(BuildContext context, AppLocalizations localizations) =>
+      Step(
+        title: _currentStep == 0
+            ? Text(localizations.addAccountEmailLabel)
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(localizations.addAccountEmailLabel),
+                  Text(
+                    _emailController.text,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+        content: Column(
+          children: [
+            DecoratedPlatformTextField(
+              autocorrect: false,
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              cupertinoShowLabel: false,
+              onChanged: (value) {
+                final isValid = Validator.validateEmail(value);
+                final account = _realAccount;
+                if (isValid && account != null) {
+                  account.email = value;
+                }
+                if (isValid != _isContinueAvailable) {
+                  setState(() {
+                    _isContinueAvailable = isValid;
+                  });
+                }
+              },
+              decoration: InputDecoration(
+                labelText: localizations.addAccountEmailLabel,
+                hintText: localizations.addAccountEmailHint,
+                icon: const Icon(Icons.email),
+              ),
+              autofocus: true,
             ),
-      content: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          DecoratedPlatformTextField(
-            autocorrect: false,
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            cupertinoShowLabel: false,
-            onChanged: (value) {
-              final isValid = Validator.validateEmail(value);
-              final account = _realAccount;
-              if (isValid && account != null) {
-                account.email = value;
-              }
-              if (isValid != _isContinueAvailable) {
-                setState(() {
-                  _isContinueAvailable = isValid;
-                });
-              }
-            },
-            decoration: InputDecoration(
-              labelText: localizations.addAccountEmailLabel,
-              hintText: localizations.addAccountEmailHint,
-              icon: const Icon(Icons.email),
-            ),
-            autofocus: true,
-          ),
-        ],
-      ),
-      //state: StepState.editing,
-      isActive: true,
-    );
-  }
+          ],
+        ),
+        //state: StepState.editing,
+        isActive: true,
+      );
 
   Step _buildPasswordStep(
       BuildContext context, AppLocalizations localizations) {
@@ -379,7 +375,6 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
       //state: StepState.complete,
       isActive: _currentStep >= 1,
       content: Column(
-        mainAxisSize: MainAxisSize.max,
         children: [
           if (_isProviderResolving)
             Row(
@@ -415,7 +410,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                   ),
                   if (appSpecificPasswordSetupUrl != null) ...[
                     Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                      padding: const EdgeInsets.only(top: 8),
                       child: Text(
                           localizations.addAccountOauthSignInWithAppPassword),
                     ),
@@ -459,7 +454,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                     controller: _passwordController,
                     cupertinoShowLabel: false,
                     onChanged: (value) {
-                      bool isValid = value.isNotEmpty &&
+                      final bool isValid = value.isNotEmpty &&
                           (_provider?.clientConfig != null ||
                               _isManualSettings);
                       if (isValid != _isContinueAvailable) {
@@ -521,103 +516,101 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   Step _buildAccountSetupStep(
     BuildContext context,
     AppLocalizations localizations,
-  ) {
-    return Step(
-      title: Text(_isAccountVerified
-          ? localizations.addAccountSetupAccountStep
-          : localizations.addAccountVerificationStep),
-      content: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          if (_isAccountVerifying)
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  child: const PlatformProgressIndicator(),
-                ),
-                Expanded(
-                  child: Text(
-                    localizations.addAccountVerifyingSettingsLabel(
-                      _emailController.text,
+  ) =>
+      Step(
+        title: Text(_isAccountVerified
+            ? localizations.addAccountSetupAccountStep
+            : localizations.addAccountVerificationStep),
+        content: Column(
+          children: [
+            if (_isAccountVerifying)
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    child: const PlatformProgressIndicator(),
+                  ),
+                  Expanded(
+                    child: Text(
+                      localizations.addAccountVerifyingSettingsLabel(
+                        _emailController.text,
+                      ),
                     ),
+                  ),
+                ],
+              )
+            else if (_isAccountVerified) ...[
+              Text(
+                localizations.addAccountVerifyingSuccessInfo(
+                  _emailController.text,
+                ),
+              ),
+              DecoratedPlatformTextField(
+                controller: _userNameController,
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.words,
+                onChanged: (value) {
+                  final bool isValid = value.isNotEmpty &&
+                      _accountNameController.text.isNotEmpty;
+                  if (isValid != _isContinueAvailable) {
+                    setState(() {
+                      _isContinueAvailable = isValid;
+                    });
+                  }
+                },
+                decoration: InputDecoration(
+                  labelText: localizations.addAccountNameOfUserLabel,
+                  hintText: localizations.addAccountNameOfUserHint,
+                  icon: const Icon(Icons.account_circle),
+                ),
+                autofocus: true,
+                cupertinoAlignLabelOnTop: true,
+              ),
+              DecoratedPlatformTextField(
+                controller: _accountNameController,
+                keyboardType: TextInputType.text,
+                onChanged: (value) {
+                  final bool isValid =
+                      value.isNotEmpty && _userNameController.text.isNotEmpty;
+                  if (isValid != _isContinueAvailable) {
+                    setState(() {
+                      _isContinueAvailable = isValid;
+                    });
+                  }
+                },
+                decoration: InputDecoration(
+                  labelText: localizations.addAccountNameOfAccountLabel,
+                  hintText: localizations.addAccountNameOfAccountHint,
+                  icon: const Icon(Icons.email),
+                ),
+                cupertinoAlignLabelOnTop: true,
+              ),
+            ] else ...[
+              Text(
+                localizations.addAccountVerifyingFailedInfo(
+                  _emailController.text,
+                ),
+              ),
+              if (_provider?.manualImapAccessSetupUrl != null) ...[
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+                  child: Text(
+                    localizations.accountAddImapAccessSetupMightBeRequired,
+                  ),
+                ),
+                PlatformTextButton(
+                  child: ButtonText(
+                    localizations.addAccountSetupImapAccessButtonLabel,
+                  ),
+                  onPressed: () => launcher.launchUrl(
+                    Uri.parse(_provider!.manualImapAccessSetupUrl!),
                   ),
                 ),
               ],
-            )
-          else if (_isAccountVerified) ...[
-            Text(
-              localizations.addAccountVerifyingSuccessInfo(
-                _emailController.text,
-              ),
-            ),
-            DecoratedPlatformTextField(
-              controller: _userNameController,
-              keyboardType: TextInputType.text,
-              textCapitalization: TextCapitalization.words,
-              onChanged: (value) {
-                bool isValid =
-                    value.isNotEmpty && _accountNameController.text.isNotEmpty;
-                if (isValid != _isContinueAvailable) {
-                  setState(() {
-                    _isContinueAvailable = isValid;
-                  });
-                }
-              },
-              decoration: InputDecoration(
-                labelText: localizations.addAccountNameOfUserLabel,
-                hintText: localizations.addAccountNameOfUserHint,
-                icon: const Icon(Icons.account_circle),
-              ),
-              autofocus: true,
-              cupertinoAlignLabelOnTop: true,
-            ),
-            DecoratedPlatformTextField(
-              controller: _accountNameController,
-              keyboardType: TextInputType.text,
-              onChanged: (value) {
-                bool isValid =
-                    value.isNotEmpty && _userNameController.text.isNotEmpty;
-                if (isValid != _isContinueAvailable) {
-                  setState(() {
-                    _isContinueAvailable = isValid;
-                  });
-                }
-              },
-              decoration: InputDecoration(
-                labelText: localizations.addAccountNameOfAccountLabel,
-                hintText: localizations.addAccountNameOfAccountHint,
-                icon: const Icon(Icons.email),
-              ),
-              cupertinoAlignLabelOnTop: true,
-            ),
-          ] else ...[
-            Text(
-              localizations.addAccountVerifyingFailedInfo(
-                _emailController.text,
-              ),
-            ),
-            if (_provider?.manualImapAccessSetupUrl != null) ...[
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                child: Text(
-                  localizations.accountAddImapAccessSetupMightBeRequired,
-                ),
-              ),
-              PlatformTextButton(
-                child: ButtonText(
-                  localizations.addAccountSetupImapAccessButtonLabel,
-                ),
-                onPressed: () => launcher.launchUrl(
-                  Uri.parse(_provider!.manualImapAccessSetupUrl!),
-                ),
-              ),
             ],
           ],
-        ],
-      ),
-    );
-  }
+        ),
+      );
 
   void _onProviderChanged(Provider provider, String email) {
     final mailAccount = MailAccount.fromDiscoveredSettings(

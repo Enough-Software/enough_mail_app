@@ -158,7 +158,7 @@ class IconService {
       case 6:
         return Icon(Icons.looks_6_outlined, size: size);
       default:
-        final style = size == null ? null : TextStyle(fontSize: (size * 0.8));
+        final style = size == null ? null : TextStyle(fontSize: size * 0.8);
         final borderColor = (Theme.of(context).brightness == Brightness.dark)
             ? const Color(0xffeeeeee)
             : const Color(0xff000000);

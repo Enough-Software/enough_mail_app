@@ -1,23 +1,23 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
+import '../account/model.dart';
 import '../locator.dart';
+import '../services/mail_service.dart';
 
 class MailboxSelector extends StatelessWidget {
-  final Account account;
-  final bool showRoot;
-  final Mailbox? mailbox;
-  final void Function(Mailbox? mailbox) onChanged;
   const MailboxSelector({
-    Key? key,
+    super.key,
     required this.account,
     this.showRoot = true,
     this.mailbox,
     required this.onChanged,
-  }) : super(key: key);
+  });
+  final Account account;
+  final bool showRoot;
+  final Mailbox? mailbox;
+  final void Function(Mailbox? mailbox) onChanged;
 
   @override
   Widget build(BuildContext context) {

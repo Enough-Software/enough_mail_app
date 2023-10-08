@@ -1,9 +1,9 @@
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
-import 'package:enough_mail_app/widgets/legalese.dart';
+import '../l10n/extension.dart';
+import '../routes.dart';
+import '../services/icon_service.dart';
+import '../services/navigation_service.dart';
+import '../widgets/button_text.dart';
+import '../widgets/legalese.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
@@ -13,7 +13,7 @@ import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +32,7 @@ class WelcomeScreen extends StatelessWidget {
             locator<NavigationService>()
                 .push(Routes.accountAdd, arguments: true);
           },
-          showDoneButton: true,
           next: ButtonText(localizations.actionNext),
-          showNextButton: true,
           skip: ButtonText(localizations.actionSkip),
           showSkipButton: true,
         ),
@@ -42,8 +40,7 @@ class WelcomeScreen extends StatelessWidget {
     ); //Material App
   }
 
-  List<PageViewModel> _buildPages(AppLocalizations localizations) {
-    return [
+  List<PageViewModel> _buildPages(AppLocalizations localizations) => [
       PageViewModel(
         title: localizations.welcomePanel1Title,
         body: localizations.welcomePanel1Text,
@@ -88,13 +85,11 @@ class WelcomeScreen extends StatelessWidget {
         footer: _buildFooter(localizations),
       ),
     ];
-  }
 
-  Widget _buildFooter(AppLocalizations localizations) {
-    return Column(
+  Widget _buildFooter(AppLocalizations localizations) => Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Shimmer(
             duration: const Duration(seconds: 4),
             interval: const Duration(seconds: 6),
@@ -111,10 +106,9 @@ class WelcomeScreen extends StatelessWidget {
           ),
         ),
         const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: Legalese(),
         ),
       ],
     );
-  }
 }

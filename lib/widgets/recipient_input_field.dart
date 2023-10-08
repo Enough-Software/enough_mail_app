@@ -1,17 +1,18 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/models/contact.dart';
-import 'package:enough_mail_app/util/validator.dart';
-import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 
+import '../l10n/extension.dart';
+import '../models/contact.dart';
+import '../util/validator.dart';
+import 'icon_text.dart';
+
 class RecipientInputField extends StatefulWidget {
   const RecipientInputField({
-    Key? key,
+    super.key,
     this.labelText,
     this.hintText,
     this.controller,
@@ -19,7 +20,7 @@ class RecipientInputField extends StatefulWidget {
     this.autofocus = false,
     required this.addresses,
     required this.contactManager,
-  }) : super(key: key);
+  });
 
   final String? labelText;
   final String? hintText;
@@ -75,7 +76,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
             children: [
               if (widget.addresses.isNotEmpty && labelText != null)
                 Padding(
-                  padding: const EdgeInsets.only(top: 8.0, right: 8.0),
+                  padding: const EdgeInsets.only(top: 8, right: 8),
                   child: Text(
                     labelText,
                     style: TextStyle(
@@ -96,7 +97,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                       ),
                     ),
                   ),
-                  feedbackOffset: const Offset(10.0, 10.0),
+                  feedbackOffset: const Offset(10, 10),
                   childWhenDragging: Opacity(
                     opacity: 0.6,
                     child: _AddressChip(
@@ -141,8 +142,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
     );
   }
 
-  Widget buildInput(ThemeData theme, BuildContext context) {
-    return RawAutocomplete<MailAddress>(
+  Widget buildInput(ThemeData theme, BuildContext context) => RawAutocomplete<MailAddress>(
       focusNode: _focusNode,
       textEditingController: _controller,
       optionsBuilder: (textEditingValue) {
@@ -170,8 +170,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
       },
       displayStringForOption: (option) => option.toString(),
       fieldViewBuilder:
-          (context, textEditingController, focusNode, onFieldSubmitted) {
-        return DecoratedPlatformTextField(
+          (context, textEditingController, focusNode, onFieldSubmitted) => DecoratedPlatformTextField(
           controller: textEditingController,
           focusNode: focusNode,
           autofocus: widget.autofocus,
@@ -199,17 +198,15 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                     ],
                   ),
           ),
-        );
-      },
-      optionsViewBuilder: (context, onSelected, options) {
-        return Material(
+        ),
+      optionsViewBuilder: (context, onSelected, options) => Material(
           child: Align(
             alignment: Alignment.topLeft,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 200),
               child: ListView.builder(
                 shrinkWrap: true,
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 itemCount: options.length,
                 itemBuilder: (BuildContext context, int index) {
                   final MailAddress option = options.elementAt(index);
@@ -240,10 +237,8 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
               ),
             ),
           ),
-        );
-      },
+        ),
     );
-  }
 
   void checkEmail(String input) {
     if (Validator.validateEmail(input)) {
@@ -254,10 +249,10 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
     }
   }
 
-  void _pickContact(TextEditingController controller) async {
+  Future<void> _pickContact(TextEditingController controller) async {
     try {
       final contact =
-          await FlutterContactPicker.pickEmailContact(askForPermission: true);
+          await FlutterContactPicker.pickEmailContact();
       widget.addresses.add(
         MailAddress(
           contact.fullName,
@@ -288,12 +283,12 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
 
 class _AddressChip<T> extends StatelessWidget {
   const _AddressChip({
-    Key? key,
+    super.key,
     required this.address,
     this.onDeleted,
     this.menuItems,
     this.onMenuItemSelected,
-  }) : super(key: key);
+  });
   final MailAddress address;
   final VoidCallback? onDeleted;
 

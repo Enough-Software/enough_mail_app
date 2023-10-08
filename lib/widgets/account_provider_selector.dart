@@ -1,13 +1,12 @@
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/services/providers.dart';
+import '../l10n/extension.dart';
+import '../locator.dart';
+import '../services/providers.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
 class AccountProviderSelector extends StatelessWidget {
+  const AccountProviderSelector({super.key, required this.onSelected});
   final void Function(Provider? provider) onSelected;
-  const AccountProviderSelector({Key? key, required this.onSelected})
-      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

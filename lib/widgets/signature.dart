@@ -6,9 +6,9 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
+import '../account/model.dart';
 import '../l10n/extension.dart';
 import '../locator.dart';
-import '../models/account.dart';
 import '../services/icon_service.dart';
 import '../services/mail_service.dart';
 import '../settings/provider.dart';

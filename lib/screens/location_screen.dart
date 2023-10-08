@@ -1,10 +1,6 @@
 import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/location_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,10 +9,14 @@ import 'package:latlng/latlng.dart';
 import 'package:location/location.dart';
 import 'package:map/map.dart';
 
+import '../l10n/extension.dart';
 import '../locator.dart';
+import '../services/location_service.dart';
+import '../services/navigation_service.dart';
+import 'base.dart';
 
 class LocationScreen extends StatefulWidget {
-  const LocationScreen({Key? key}) : super(key: key);
+  const LocationScreen({super.key});
 
   @override
   State<LocationScreen> createState() => _LocationScreenState();
@@ -29,7 +29,7 @@ class _LocationScreenState extends State<LocationScreen> {
   late MapController _controller;
   Future<LocationData?>? _findLocation;
   late Offset _dragStart;
-  double _scaleStart = 1.0;
+  double _scaleStart = 1;
 
   @override
   void initState() {
@@ -70,16 +70,16 @@ class _LocationScreenState extends State<LocationScreen> {
     );
   }
 
-  void _onLocationSelected() async {
+  Future<void> _onLocationSelected() async {
     final context = _repaintBoundaryKey.currentContext;
     if (context == null) {
       locator<NavigationService>().pop();
       return;
     }
-    final boundary = context.findRenderObject() as RenderRepaintBoundary;
-    final image = await boundary.toImage(pixelRatio: 3.0);
+    final boundary = context.findRenderObject()! as RenderRepaintBoundary;
+    final image = await boundary.toImage(pixelRatio: 3);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    var pngBytes = byteData?.buffer.asUint8List();
+    final pngBytes = byteData?.buffer.asUint8List();
     locator<NavigationService>().pop(pngBytes);
   }
 
@@ -94,7 +94,7 @@ class _LocationScreenState extends State<LocationScreen> {
         onScaleEnd: (details) {
           if (kDebugMode) {
             print(
-                "Location: ${_controller.center.latitude}, ${_controller.center.longitude}");
+                'Location: ${_controller.center.latitude}, ${_controller.center.longitude}');
           }
         },
         child: SizedBox(
@@ -122,7 +122,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 Align(
                   alignment: Alignment.bottomRight,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8),
                     child: PlatformIconButton(
                       icon: const Icon(
                         Icons.location_searching,

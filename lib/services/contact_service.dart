@@ -1,9 +1,10 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/models/contact.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:flutter/foundation.dart';
+
+import '../account/model.dart';
+import '../locator.dart';
+import '../models/contact.dart';
+import 'mail_service.dart';
 
 class ContactService {
   Future<ContactManager> getForAccount(RealAccount account) async {

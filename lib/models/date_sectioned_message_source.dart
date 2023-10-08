@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/message_source.dart';
-import 'package:enough_mail_app/services/date_service.dart';
+import '../locator.dart';
+import 'message_source.dart';
+import '../services/date_service.dart';
 import 'package:flutter/foundation.dart';
 
 import '../services/i18n_service.dart';
@@ -10,6 +10,10 @@ import 'message.dart';
 import 'message_date_section.dart';
 
 class DateSectionedMessageSource extends ChangeNotifier {
+
+  DateSectionedMessageSource(this.messageSource) {
+    messageSource.addListener(_update);
+  }
   final MessageSource messageSource;
   int _numberOfSections = 0;
   int get size {
@@ -22,10 +26,6 @@ class DateSectionedMessageSource extends ChangeNotifier {
 
   late List<MessageDateSection> _sections;
   bool isInitialized = false;
-
-  DateSectionedMessageSource(this.messageSource) {
-    messageSource.addListener(_update);
-  }
 
   Future<void> init() async {
     try {
@@ -182,8 +182,8 @@ class DateSectionedMessageSource extends ChangeNotifier {
 }
 
 class SectionElement {
-  final MessageDateSection? section;
-  final Message? message;
 
   SectionElement(this.section, this.message);
+  final MessageDateSection? section;
+  final Message? message;
 }

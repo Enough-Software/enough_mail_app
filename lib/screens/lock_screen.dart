@@ -1,16 +1,16 @@
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/biometrics_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.g.dart';
+import '../l10n/extension.dart';
+import '../locator.dart';
+import '../services/biometrics_service.dart';
+import '../services/navigation_service.dart';
+import 'base.dart';
 
 class LockScreen extends StatelessWidget {
-  const LockScreen({Key? key}) : super(key: key);
+  const LockScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +24,7 @@ class LockScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, AppLocalizations localizations) {
-    return WillPopScope(
+  Widget _buildContent(BuildContext context, AppLocalizations localizations) => WillPopScope(
       onWillPop: () => Future.value(false),
       child: Center(
         child: Column(
@@ -33,7 +32,7 @@ class LockScreen extends StatelessWidget {
           children: [
             Icon(PlatformInfo.isCupertino ? CupertinoIcons.lock : Icons.lock),
             Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(32),
               child: Text(localizations.lockScreenIntro),
             ),
             PlatformTextButton(
@@ -44,9 +43,8 @@ class LockScreen extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  void _authenticate(BuildContext context) async {
+  Future<void> _authenticate(BuildContext context) async {
     final didAuthencate = await locator<BiometricsService>().authenticate();
     if (didAuthencate) {
       locator<NavigationService>().pop();

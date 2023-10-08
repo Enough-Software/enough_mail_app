@@ -1,16 +1,16 @@
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/widgets/app_drawer.dart';
-import 'package:enough_mail_app/widgets/menu_with_badge.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import '../locator.dart';
+import '../services/mail_service.dart';
+import '../widgets/app_drawer.dart';
+import '../widgets/menu_with_badge.dart';
 
 class BasePage extends StatelessWidget {
   const BasePage({
-    Key? key,
+    super.key,
     this.title,
     this.subtitle,
     this.content,
@@ -21,7 +21,7 @@ class BasePage extends StatelessWidget {
     this.bottom,
     this.includeDrawer = true,
     this.isRoot = false,
-  }) : super(key: key);
+  });
 
   final String? title;
   final String? subtitle;
@@ -35,8 +35,7 @@ class BasePage extends StatelessWidget {
   final bool isRoot;
 
   @override
-  Widget build(BuildContext context) {
-    return Base.buildAppChrome(
+  Widget build(BuildContext context) => Base.buildAppChrome(
       context,
       title: title,
       subtitle: subtitle,
@@ -49,18 +48,17 @@ class BasePage extends StatelessWidget {
       includeDrawer: includeDrawer,
       isRoot: isRoot,
     );
-  }
 }
 
 class BaseAppBar extends StatelessWidget {
   const BaseAppBar({
-    Key? key,
+    super.key,
     this.title,
     this.actions,
     this.subtitle,
     this.floatingActionButton,
     this.includeDrawer = true,
-  }) : super(key: key);
+  });
 
   final String? title;
   final List<Widget>? actions;
@@ -69,15 +67,13 @@ class BaseAppBar extends StatelessWidget {
   final bool includeDrawer;
 
   @override
-  Widget build(BuildContext context) {
-    return Base.buildAppBar(
+  Widget build(BuildContext context) => Base.buildAppBar(
       context,
       title,
       subtitle: subtitle,
       floatingActionButton: floatingActionButton,
       includeDrawer: includeDrawer,
     );
-  }
 }
 
 class Base {
@@ -130,8 +126,7 @@ class Base {
     FloatingActionButton? floatingActionButton,
     bool includeDrawer = true,
     bool isRoot = false,
-  }) {
-    return PlatformAppBar(
+  }) => PlatformAppBar(
       material: (context, platform) => MaterialAppBarData(
         elevation: 0,
       ),
@@ -151,7 +146,6 @@ class Base {
       automaticallyImplyLeading: true,
       trailingActions: actions ?? [],
     );
-  }
 
   static Widget? buildTitle(String? title, String? subtitle) {
     if (subtitle == null) {
@@ -171,7 +165,7 @@ class Base {
             overflow: TextOverflow.fade,
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 4.0),
+            padding: const EdgeInsets.only(top: 4),
             child: Text(
               subtitle,
               overflow: TextOverflow.fade,
@@ -183,17 +177,10 @@ class Base {
     }
   }
 
-  static Widget buildDrawer(BuildContext context) {
-    return const AppDrawer();
-  }
+  static Widget buildDrawer(BuildContext context) => const AppDrawer();
 }
 
 class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double maxHeight;
-  final double minHeight;
-  final double? elevation;
-  final Widget child;
-  final Widget? background;
 
   SliverSingleChildHeaderDelegate(
       {required this.maxHeight,
@@ -201,20 +188,24 @@ class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
       required this.child,
       this.elevation,
       this.background});
+  final double maxHeight;
+  final double minHeight;
+  final double? elevation;
+  final Widget child;
+  final Widget? background;
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Material(
+      BuildContext context, double shrinkOffset, bool overlapsContent) => Material(
       elevation: elevation ?? 0,
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: maxHeight),
         child: Stack(
           children: [
             Positioned(
-              bottom: 0.0,
-              left: 0.0,
-              right: 0.0,
+              bottom: 0,
+              left: 0,
+              right: 0,
               top: 0,
               child: background!,
             ),
@@ -223,7 +214,6 @@ class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
         ),
       ),
     );
-  }
 
   @override
   double get maxExtent => kToolbarHeight + maxHeight;
@@ -232,19 +222,12 @@ class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get minExtent => kToolbarHeight + minHeight;
 
   @override
-  bool shouldRebuild(SliverSingleChildHeaderDelegate oldDelegate) {
-    return maxHeight != oldDelegate.maxHeight ||
+  bool shouldRebuild(SliverSingleChildHeaderDelegate oldDelegate) => maxHeight != oldDelegate.maxHeight ||
         minHeight != oldDelegate.minHeight ||
         child != oldDelegate.child;
-  }
 }
 
 class CustomApBarSliverDelegate extends SliverPersistentHeaderDelegate {
-  final Widget? child;
-  final Widget? title;
-  final Widget? background;
-  final double minHeight;
-  final double maxHeight;
 
   CustomApBarSliverDelegate({
     this.title,
@@ -253,6 +236,11 @@ class CustomApBarSliverDelegate extends SliverPersistentHeaderDelegate {
     this.background,
     this.minHeight = 0,
   });
+  final Widget? child;
+  final Widget? title;
+  final Widget? background;
+  final double minHeight;
+  final double maxHeight;
 
   @override
   Widget build(
@@ -265,22 +253,22 @@ class CustomApBarSliverDelegate extends SliverPersistentHeaderDelegate {
       child: Stack(
         children: [
           Positioned(
-            bottom: 0.0,
-            left: 0.0,
-            right: 0.0,
+            bottom: 0,
+            left: 0,
+            right: 0,
             top: 0,
             child: background!,
           ),
           Positioned(
-            bottom: 0.0,
-            left: 0.0,
-            right: 0.0,
+            bottom: 0,
+            left: 0,
+            right: 0,
             child: Opacity(opacity: percent, child: child),
           ),
           Positioned(
-            top: 0.0,
-            left: 0.0,
-            right: 0.0,
+            top: 0,
+            left: 0,
+            right: 0,
             child: AppBar(
               title: Opacity(opacity: 1 - percent, child: title),
               backgroundColor: Colors.transparent,
@@ -303,7 +291,5 @@ class CustomApBarSliverDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => kToolbarHeight + maxHeight;
 
   @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
-  }
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;
 }

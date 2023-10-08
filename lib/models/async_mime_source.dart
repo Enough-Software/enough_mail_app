@@ -190,6 +190,7 @@ abstract class AsyncMimeSource {
 
 /// Keeps messages in a temporary cache
 abstract class CachedMimeSource extends AsyncMimeSource {
+  /// Creates a new cached mime source
   CachedMimeSource({int maxCacheSize = IndexedCache.defaultMaxCacheSize})
       : cache = IndexedCache<MimeMessage>(maxCacheSize: maxCacheSize);
   final IndexedCache<MimeMessage> cache;
@@ -200,6 +201,7 @@ abstract class CachedMimeSource extends AsyncMimeSource {
     if (existingMessage != null) {
       return Future.value(existingMessage);
     }
+
     return loadMessage(index);
   }
 
@@ -210,6 +212,7 @@ abstract class CachedMimeSource extends AsyncMimeSource {
   Future<void> onMessageArrived(MimeMessage message, {int? index}) async {
     final usedIndex = await addMessage(message, index: index);
     notifySubscriberOnMessageArrived(message);
+
     return handleOnMessageArrived(usedIndex, message);
   }
 
@@ -225,11 +228,13 @@ abstract class CachedMimeSource extends AsyncMimeSource {
           (cache[i]?.decodeDate() ?? now).isAfter(messageDate)) {
         i++;
       }
+
       return i;
     }
 
     final usedIndex = index ?? findIndex(message.decodeDate());
     cache.insert(usedIndex, message);
+
     return Future.value(usedIndex);
   }
 
@@ -267,6 +272,7 @@ abstract class CachedMimeSource extends AsyncMimeSource {
         messages.add(mime);
       }
     }
+
     return handleOnMessagesVanished(messages);
   }
 
@@ -295,6 +301,7 @@ abstract class CachedMimeSource extends AsyncMimeSource {
       existing.flags = message.flags;
     }
     notifySubscribersOnMessageFlagsUpdated(existing ?? message);
+
     return Future.value();
   }
 
@@ -324,34 +331,37 @@ abstract class CachedMimeSource extends AsyncMimeSource {
       // TODO(RV): Should a reload also be triggered when other messages are not cached?
       cache.clear();
       notifySubscribersOnCacheInvalidated();
+
       return init();
     }
     // ensure not to change the underlying set of messages in case overrides
     // want to handle the messages as well:
-    messages = [...messages];
+    final messagesCopy = [...messages];
 
     // detect new messages:
-    final newMessages = messages
+    final newMessages = messagesCopy
         .where((message) => (message.uid ?? 0) > firstCachedUid)
         .toList();
 
     for (var i = newMessages.length; --i >= 0;) {
       final message = newMessages.elementAt(i);
-      onMessageArrived(message);
-      messages.remove(message);
+      await onMessageArrived(message);
+      messagesCopy.remove(message);
     }
-    if (messages.isEmpty) {
+    if (messagesCopy.isEmpty) {
       // only new messages have appeared... probably a sign to reload completely
       return;
     }
     final cachedMessages = List.generate(
-        messages.length, (index) => cache[index + newMessages.length]);
+      messagesCopy.length,
+      (index) => cache[index + newMessages.length],
+    );
 
     // detect removed messages:
     final removedMessages = List<MimeMessage>.from(
       cachedMessages.where((cached) =>
           cached != null &&
-          messages.firstWhereOrNull((m) => m.guid == cached.guid) == null),
+          messagesCopy.firstWhereOrNull((m) => m.guid == cached.guid) == null),
     );
     if (removedMessages.isNotEmpty) {
       final sequence = MessageSequence(isUidSequence: true);
@@ -363,7 +373,7 @@ abstract class CachedMimeSource extends AsyncMimeSource {
         cachedMessages.remove(removed);
       }
       if (sequence.isNotEmpty) {
-        onMessagesVanished(sequence);
+        await onMessagesVanished(sequence);
       }
     }
 
@@ -372,10 +382,10 @@ abstract class CachedMimeSource extends AsyncMimeSource {
     for (final cached in cachedMessages) {
       if (cached != null) {
         final newMessage =
-            messages.firstWhereOrNull((m) => m.guid == cached.guid);
+            messagesCopy.firstWhereOrNull((m) => m.guid == cached.guid);
         if (newMessage != null &&
             !areListsEqual(newMessage.flags, cached.flags)) {
-          onMessageFlagsUpdated(newMessage);
+          await onMessageFlagsUpdated(newMessage);
         }
       }
     }
@@ -384,10 +394,11 @@ abstract class CachedMimeSource extends AsyncMimeSource {
 
 /// Keeps messages in a temporary cache and accesses them page-wise
 abstract class PagedCachedMimeSource extends CachedMimeSource {
+  /// Creates a new paged cached mime source
   PagedCachedMimeSource({
     this.pageSize = 30,
-    int maxCacheSize = IndexedCache.defaultMaxCacheSize,
-  }) : super(maxCacheSize: maxCacheSize);
+    super.maxCacheSize,
+  });
 
   /// The size of a single page
   final int pageSize;
@@ -400,6 +411,7 @@ abstract class PagedCachedMimeSource extends CachedMimeSource {
       final sequence = MessageSequence.fromPage(pageIndex + 1, pageSize, size);
       final future = loadMessages(sequence);
       _pageLoadersByPageIndex[pageIndex] = future;
+
       return future;
     }
 
@@ -407,22 +419,23 @@ abstract class PagedCachedMimeSource extends CachedMimeSource {
     final completer = _pageLoadersByPageIndex[pageIndex] ?? queue(pageIndex);
     try {
       final messages = await completer;
-      int pageEndIndex = pageIndex * pageSize + messages.length - 1;
+      final int pageEndIndex = pageIndex * pageSize + messages.length - 1;
       if (cache[pageEndIndex] == null) {
         // messages have not been added by another thread yet:
         final receivingDate = DateTime.now();
         messages.sort((m1, m2) => (m1.decodeDate() ?? receivingDate)
             .compareTo(m2.decodeDate() ?? receivingDate));
-        _pageLoadersByPageIndex.remove(pageIndex);
+        await _pageLoadersByPageIndex.remove(pageIndex);
         for (int i = 0; i < messages.length; i++) {
           final cacheIndex = pageEndIndex - i;
           final message = messages[i];
           cache[cacheIndex] = message;
         }
       }
+
       return messages[pageEndIndex - index];
     } on MailException {
-      _pageLoadersByPageIndex.remove(pageIndex);
+      await _pageLoadersByPageIndex.remove(pageIndex);
       rethrow;
     }
   }
@@ -474,11 +487,11 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
       }
     });
     _mailUpdatedEventSubscription =
-        mailClient.eventBus.on<MailUpdateEvent>().listen(((event) {
+        mailClient.eventBus.on<MailUpdateEvent>().listen((event) {
       if (event.mailClient == mailClient) {
         onMessageFlagsUpdated(event.message);
       }
-    }));
+    });
     _mailReconnectedEventSubscription = mailClient.eventBus
         .on<MailConnectionReEstablishedEvent>()
         .listen(_onMailReconnected);
@@ -506,7 +519,7 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
         // and resync will be aborted, therefore.
         return;
       }
-      resyncMessagesManually(messages);
+      await resyncMessagesManually(messages);
     }
   }
 
@@ -630,14 +643,12 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
       );
 
   @override
-  Future<void> handleOnMessageArrived(int index, MimeMessage message) {
-    return Future.value();
-  }
+  Future<void> handleOnMessageArrived(int index, MimeMessage message) =>
+      Future.value();
 
   @override
-  Future<void> handleOnMessagesVanished(List<MimeMessage> messages) {
-    return Future.value();
-  }
+  Future<void> handleOnMessagesVanished(List<MimeMessage> messages) =>
+      Future.value();
 
   @override
   Future<MimeMessage> fetchMessageContents(

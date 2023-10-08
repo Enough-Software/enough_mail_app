@@ -8,15 +8,6 @@ enum ComposeMode { plainText, html }
 typedef MessageFinalizer = void Function(MessageBuilder messageBuilder);
 
 class ComposeData {
-  Message? get originalMessage =>
-      (originalMessages?.isNotEmpty ?? false) ? originalMessages!.first : null;
-  final List<Message?>? originalMessages;
-  final MessageBuilder messageBuilder;
-  final ComposeAction action;
-  final String? resumeText;
-  final Future? future;
-  final ComposeMode composeMode;
-  List<MessageFinalizer>? finalizers;
 
   ComposeData(
     this.originalMessages,
@@ -27,13 +18,20 @@ class ComposeData {
     this.finalizers,
     this.composeMode = ComposeMode.html,
   });
+  Message? get originalMessage =>
+      (originalMessages?.isNotEmpty ?? false) ? originalMessages!.first : null;
+  final List<Message?>? originalMessages;
+  final MessageBuilder messageBuilder;
+  final ComposeAction action;
+  final String? resumeText;
+  final Future? future;
+  final ComposeMode composeMode;
+  List<MessageFinalizer>? finalizers;
 
-  ComposeData resume(String text, {ComposeMode? composeMode}) {
-    return ComposeData(originalMessages, messageBuilder, action,
+  ComposeData resume(String text, {ComposeMode? composeMode}) => ComposeData(originalMessages, messageBuilder, action,
         resumeText: text,
         finalizers: finalizers,
         composeMode: composeMode ?? this.composeMode);
-  }
 
   /// Adds a finalizer
   ///

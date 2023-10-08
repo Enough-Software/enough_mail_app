@@ -4,11 +4,11 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../extensions/extensions.dart';
 import '../locator.dart';
+import '../models/contact.dart';
 import '../services/i18n_service.dart';
 import '../services/mail_service.dart';
-import 'contact.dart';
 
-part 'account.g.dart';
+part 'model.g.dart';
 
 /// Common functionality for accounts
 abstract class Account extends ChangeNotifier {
@@ -17,6 +17,9 @@ abstract class Account extends ChangeNotifier {
 
   ///  The name of the account
   String get name;
+
+  /// Retrieves the email or emails associated with this account
+  String get email;
 
   set name(String value);
 
@@ -106,7 +109,8 @@ class RealAccount extends Account {
     if (signature == null) {
       final extensions = appExtensions;
       if (extensions != null) {
-        final languageCode = locator<I18nService>().locale!.languageCode;
+        final languageCode =
+            locator<I18nService>().locale?.languageCode ?? 'en';
         for (final ext in extensions) {
           final signature = ext.getSignatureHtml(languageCode);
           if (signature != null) {
@@ -139,6 +143,7 @@ class RealAccount extends Account {
   }
 
   /// The email associated with this account
+  @override
   @JsonKey(includeToJson: false, includeFromJson: false)
   String get email => _account.email;
   set email(String value) {
@@ -177,6 +182,7 @@ class RealAccount extends Account {
   Future<void> addAlias(MailAddress alias) {
     _account = _account.copyWithAlias(alias);
     notifyListeners();
+
     return locator<MailService>().saveAccount(_account);
   }
 
@@ -184,6 +190,7 @@ class RealAccount extends Account {
   Future<void> removeAlias(MailAddress alias) {
     _account.aliases.remove(alias);
     notifyListeners();
+
     return locator<MailService>().saveAccount(_account);
   }
 
@@ -233,21 +240,20 @@ class RealAccount extends Account {
 /// A unified account bundles folders of several accounts
 class UnifiedAccount extends Account {
   /// Creates a new [UnifiedAccount]
-  UnifiedAccount(this.accounts, String name) : _name = name;
+  UnifiedAccount(this.accounts);
 
   /// The accounts
   final List<RealAccount> accounts;
-  String _name;
 
   @override
   bool get isVirtual => true;
 
   @override
-  String get name => _name;
+  String get name => '';
 
   @override
   set name(String value) {
-    _name = value;
+    //_name = value;
     notifyListeners();
   }
 
@@ -255,6 +261,7 @@ class UnifiedAccount extends Account {
   MailAddress get fromAddress => accounts.first.fromAddress;
 
   /// The emails of this account
+  @override
   String get email => accounts.map((a) => a.email).join(';');
 
   /// Removes the given [account]

@@ -29,7 +29,6 @@ import '../widgets/button_text.dart';
 import '../widgets/empty_message.dart';
 import '../widgets/expansion_wrap.dart';
 import '../widgets/ical_interactive_media.dart';
-import '../widgets/inherited_widgets.dart';
 import '../widgets/mail_address_chip.dart';
 import '../widgets/message_actions.dart';
 import '../widgets/message_overview_content.dart';
@@ -198,10 +197,8 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
-    return MessageWidget(
-      message: widget.message,
-      child: _buildMailDetails(localizations),
-    );
+
+    return _buildMailDetails(localizations);
   }
 
   Widget _buildMailDetails(AppLocalizations localizations) =>
@@ -322,7 +319,9 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
             ],
           ),
         if (ReadReceiptButton.shouldBeShown(mime, ref.read(settingsProvider)))
-          const ReadReceiptButton(),
+          ReadReceiptButton(
+            message: widget.message,
+          ),
       ],
     );
   }
@@ -706,7 +705,8 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
 }
 
 class ReadReceiptButton extends StatefulWidget {
-  const ReadReceiptButton({super.key});
+  const ReadReceiptButton({super.key, required this.message});
+  final Message message;
 
   @override
   State<ReadReceiptButton> createState() => _ReadReceiptButtonState();
@@ -721,12 +721,14 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
 
   @override
   Widget build(BuildContext context) {
-    final message = Message.of(context)!;
+    final message = widget.message;
     final mime = message.mimeMessage;
     final localizations = context.text;
     if (mime.isReadReceiptSent) {
-      return Text(localizations.detailsReadReceiptSentStatus,
-          style: Theme.of(context).textTheme.bodySmall);
+      return Text(
+        localizations.detailsReadReceiptSentStatus,
+        style: Theme.of(context).textTheme.bodySmall,
+      );
     } else if (_isSendingReadReceipt) {
       return const PlatformProgressIndicator();
     } else {

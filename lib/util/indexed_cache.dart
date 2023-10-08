@@ -2,11 +2,11 @@ import 'package:collection/collection.dart';
 
 /// Temporarily stores values that can be accessed by an integer index.
 class IndexedCache<T> {
-  /// default maximum cache size is 200
-  static const int defaultMaxCacheSize = 200;
 
   /// Creates a new cache
   IndexedCache({this.maxCacheSize = defaultMaxCacheSize});
+  /// default maximum cache size is 200
+  static const int defaultMaxCacheSize = 200;
 
   /// The maximum size of the cache
   final int maxCacheSize;

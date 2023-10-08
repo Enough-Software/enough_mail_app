@@ -4,9 +4,9 @@ import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/services/notification_service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/material/scaffold.dart';
 import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
+import 'package:flutter/src/material/scaffold.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 
@@ -16,9 +16,9 @@ void main() async {
   final notificationService = TestNotificationService();
   GetIt.instance.registerSingleton<NotificationService>(notificationService);
   GetIt.instance.registerLazySingleton<ScaffoldMessengerService>(
-      () => TestScaffoldMessengerService());
+      TestScaffoldMessengerService.new);
 
-  final firstMimeSourceStartDate = DateTime.utc(2022, 04, 16, 09, 00);
+  final firstMimeSourceStartDate = DateTime.utc(2022, 04, 16, 09);
   const firstMimeSourceDifferencePerMessage = Duration(minutes: 5);
   final secondMimeSourceStartDate = DateTime.utc(2022, 04, 16, 09, 01);
   const secondMimeSourceDifferencePerMessage = Duration(minutes: 10);
@@ -133,7 +133,7 @@ void main() async {
 
   group('incoming messages', () {
     test('simple onMessageArrived x 1', () async {
-      (firstMimeSource as FakeMimeSource).addFakeMessage(101);
+      await (firstMimeSource as FakeMimeSource).addFakeMessage(101);
       final message = await source.getMessageAt(0);
       expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
@@ -157,7 +157,7 @@ void main() async {
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
       // add new message:
-      (firstMimeSource as FakeMimeSource).addFakeMessage(101);
+      await (firstMimeSource as FakeMimeSource).addFakeMessage(101);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 101);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
@@ -189,7 +189,7 @@ void main() async {
       expect(
           message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
       // add new message:
-      (firstMimeSource as FakeMimeSource).addFakeMessage(101);
+      await (firstMimeSource as FakeMimeSource).addFakeMessage(101);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 101);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
@@ -221,10 +221,10 @@ void main() async {
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
       // add new message:
-      (firstMimeSource as FakeMimeSource).addFakeMessage(101);
+      await (firstMimeSource as FakeMimeSource).addFakeMessage(101);
       expect(notifyCounter, 1);
       // add new message:
-      (secondMimeSource as FakeMimeSource).addFakeMessage(21);
+      await (secondMimeSource as FakeMimeSource).addFakeMessage(21);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 21);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 21');
@@ -245,8 +245,8 @@ void main() async {
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
-      (firstMimeSource as FakeMimeSource).addFakeMessage(101);
-      (secondMimeSource as FakeMimeSource).addFakeMessage(21);
+      await (firstMimeSource as FakeMimeSource).addFakeMessage(101);
+      await (secondMimeSource as FakeMimeSource).addFakeMessage(21);
       expect(notifyCounter, 2);
       expect(source.size, 122);
       message = await source.getMessageAt(0);
@@ -273,8 +273,8 @@ void main() async {
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
-      (secondMimeSource as FakeMimeSource).addFakeMessage(21);
-      (firstMimeSource as FakeMimeSource).addFakeMessage(101);
+      await (secondMimeSource as FakeMimeSource).addFakeMessage(21);
+      await (firstMimeSource as FakeMimeSource).addFakeMessage(101);
       expect(notifyCounter, 2);
       expect(source.size, 122);
       message = await source.getMessageAt(0);
@@ -467,7 +467,7 @@ void main() async {
       final updatedMime = (secondMimeSource as FakeMimeSource)
           .createMessage(firstMime.sequenceId!);
       updatedMime.setFlag(MessageFlags.seen, true);
-      secondMimeSource.onMessageFlagsUpdated(updatedMime);
+      await secondMimeSource.onMessageFlagsUpdated(updatedMime);
       expect(notifyCounter, 1);
       expect(firstMessage.isSeen, isTrue);
     });
@@ -488,7 +488,7 @@ void main() async {
       final updatedMime = (secondMimeSource as FakeMimeSource)
           .createMessage(firstMime.sequenceId!);
       updatedMime.setFlag(MessageFlags.seen, false);
-      secondMimeSource.onMessageFlagsUpdated(updatedMime);
+      await secondMimeSource.onMessageFlagsUpdated(updatedMime);
       expect(notifyCounter, 1);
       expect(firstMessage.isSeen, isFalse);
     });

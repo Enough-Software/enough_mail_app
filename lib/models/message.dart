@@ -1,14 +1,11 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
 
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/widgets/inherited_widgets.dart';
-
-import 'account.dart';
+import '../account/model.dart';
+import '../locator.dart';
+import '../services/mail_service.dart';
 import 'message_source.dart';
 
 class Message extends ChangeNotifier {
@@ -48,6 +45,7 @@ class Message extends ChangeNotifier {
       infos.addAll(inlineAttachments);
       _attachments = infos;
     }
+
     return infos;
   }
 
@@ -65,7 +63,7 @@ class Message extends ChangeNotifier {
 
   bool get hasNext => sourceIndex < source.size;
   Future<Message?> get next => source.next(this);
-  bool get hasPrevious => (sourceIndex > 0);
+  bool get hasPrevious => sourceIndex > 0;
   Future<Message?> get previous => source.previous(this);
 
   bool get isSeen => mimeMessage.isSeen;
@@ -153,17 +151,12 @@ class Message extends ChangeNotifier {
     isSelected = !_isSelected;
   }
 
-  static Message? of(BuildContext context) =>
-      MessageWidget.of(context)?.message;
-
   @override
-  String toString() {
-    return '${mailClient.account.name}[$sourceIndex]=$mimeMessage';
-  }
+  String toString() => '${mailClient.account.name}[$sourceIndex]=$mimeMessage';
 }
 
 extension NewsLetter on MimeMessage {
-  bool get isEmpty => (mimeData == null && envelope == null && body == null);
+  bool get isEmpty => mimeData == null && envelope == null && body == null;
 
   /// Checks if this is a newsletter with a `list-unsubscribe` header.
   bool get isNewsletter => hasHeader('list-unsubscribe');
@@ -172,13 +165,9 @@ extension NewsLetter on MimeMessage {
   bool get isNewsLetterSubscribable => hasHeader('list-subscribe');
 
   /// Retrieves the List-Unsubscribe URIs, if present
-  List<Uri?>? decodeListUnsubscribeUris() {
-    return _decodeUris('list-unsubscribe');
-  }
+  List<Uri?>? decodeListUnsubscribeUris() => _decodeUris('list-unsubscribe');
 
-  List<Uri?>? decodeListSubscribeUris() {
-    return _decodeUris('list-subscribe');
-  }
+  List<Uri?>? decodeListSubscribeUris() => _decodeUris('list-subscribe');
 
   String? decodeListName() {
     final listPost = decodeHeaderValue('list-post');
@@ -233,9 +222,7 @@ extension NewsLetter on MimeMessage {
     return uris;
   }
 
-  bool hasListUnsubscribePostHeader() {
-    return hasHeader('list-unsubscribe-post');
-  }
+  bool hasListUnsubscribePostHeader() => hasHeader('list-unsubscribe-post');
 
   Future<bool> unsubscribe(MailClient client) async {
     final uris = decodeListUnsubscribeUris();
@@ -249,7 +236,7 @@ extension NewsLetter on MimeMessage {
             orElse: () => null));
     // unsubscribe via one click POST request: https://tools.ietf.org/html/rfc8058
     if (hasListUnsubscribePostHeader() && httpUri != null) {
-      var response = await unsubscribeWithOneClick(httpUri);
+      final response = await unsubscribeWithOneClick(httpUri);
       if (response.statusCode == 200) {
         return true;
       }
@@ -295,7 +282,7 @@ extension NewsLetter on MimeMessage {
   }
 
   Future<http.StreamedResponse> unsubscribeWithOneClick(Uri uri) {
-    var request = http.MultipartRequest('POST', uri)
+    final request = http.MultipartRequest('POST', uri)
       ..fields['List-Unsubscribe'] = 'One-Click';
     return request.send();
   }
@@ -316,8 +303,7 @@ extension NewsLetter on MimeMessage {
 }
 
 class DisplayMessageArguments {
+  const DisplayMessageArguments(this.message, this.blockExternalContent);
   final Message message;
   final bool blockExternalContent;
-
-  const DisplayMessageArguments(this.message, this.blockExternalContent);
 }

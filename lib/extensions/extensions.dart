@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/util/http_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../models/account.dart';
+import '../account/model.dart';
+import '../util/http_helper.dart';
 
 part 'extensions.g.dart';
 
@@ -63,9 +63,7 @@ class AppExtension {
 
   Map<String, dynamic> toJson() => _$AppExtensionToJson(this);
 
-  static String urlFor(String domain) {
-    return 'https://$domain/.maily.json';
-  }
+  static String urlFor(String domain) => 'https://$domain/.maily.json';
 
   static Future<List<AppExtension>> loadFor(MailAccount mailAccount) async {
     final domains = <String, Future<AppExtension?>>{};
@@ -102,9 +100,8 @@ class AppExtension {
     }
   }
 
-  static Future<AppExtension?> loadFrom(String domain) async {
-    return loadFromUrl(urlFor(domain));
-  }
+  static Future<AppExtension?> loadFrom(String domain) async =>
+      loadFromUrl(urlFor(domain));
 
   static Future<AppExtension?> loadFromUrl(String url) async {
     String? text = '<>';

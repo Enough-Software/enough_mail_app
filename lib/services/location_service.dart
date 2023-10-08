@@ -1,24 +1,28 @@
 import 'package:location/location.dart';
 
+/// Allows to query the current location
 class LocationService {
   Location? _location;
   bool _serviceEnabled = false;
   PermissionStatus _permissionStatus = PermissionStatus.denied;
 
+  /// Retrieves the current location
   Future<LocationData?> getCurrentLocation() async {
-    _location ??= Location();
+    final location = _location ?? Location();
+    _location = location;
     if (!_serviceEnabled) {
-      _serviceEnabled = await _location!.requestService();
+      _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
         return null;
       }
     }
     if (_permissionStatus == PermissionStatus.denied) {
-      _permissionStatus = await _location!.requestPermission();
+      _permissionStatus = await location.requestPermission();
       if (_permissionStatus != PermissionStatus.granted) {
         return null;
       }
     }
-    return await _location!.getLocation();
+
+    return location.getLocation();
   }
 }

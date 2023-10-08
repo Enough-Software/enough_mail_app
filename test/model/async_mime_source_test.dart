@@ -248,7 +248,7 @@ void main() async {
     await source.onMessagesVanished(MessageSequence.fromIds([100]));
     expect(source.size, 100);
     await expectMessage(
-        0, 100, 'first message\'s sequence ID should be adapted');
+        0, 100, "first message's sequence ID should be adapted");
     await expectMessage(1, 99);
 
     await source.onMessagesVanished(MessageSequence.fromIds([100]));
@@ -645,7 +645,7 @@ void main() async {
       final seenMessage = await source.getMessage(1);
       seenMessage.isSeen = true;
       final deleteMessage = await source.getMessage(2);
-      source.deleteMessages([deleteMessage]);
+      await source.deleteMessages([deleteMessage]);
       expect(source.size, 99);
       final firstMessage = await source.getMessage(0);
       expect(firstMessage.sequenceId, 99);

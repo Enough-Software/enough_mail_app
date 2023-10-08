@@ -377,7 +377,7 @@ class StorageMessageEnvelope {
 
   Envelope toEnvelope() {
     List<MailAddress>? parseAddresses(List<String>? input) =>
-        input?.map((s) => MailAddress.parse(s)).toList();
+        input?.map(MailAddress.parse).toList();
     MailAddress? parse(String? input) {
       if (input == null) {
         return null;

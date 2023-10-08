@@ -1,9 +1,9 @@
-import 'package:enough_mail_app/events/app_event_bus.dart';
+import 'events/app_event_bus.dart';
 import 'package:flutter/material.dart';
 
 class LifecycleManager extends StatefulWidget {
+  const LifecycleManager({super.key, required this.child});
   final Widget child;
-  const LifecycleManager({Key? key, required this.child}) : super(key: key);
 
   @override
   State<LifecycleManager> createState() => _LifecycleManagerState();
@@ -29,7 +29,5 @@ class _LifecycleManagerState extends State<LifecycleManager>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return widget.child;
-  }
+  Widget build(BuildContext context) => widget.child;
 }

@@ -78,8 +78,8 @@ class StringHelper {
 }
 
 class _StringSequence {
-  final int startIndex;
-  final int length;
 
   _StringSequence(this.startIndex, this.length);
+  final int startIndex;
+  final int length;
 }

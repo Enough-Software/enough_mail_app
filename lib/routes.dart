@@ -1,18 +1,23 @@
 import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/models.dart';
-import 'package:enough_mail_app/screens/all_screens.dart';
-import 'package:enough_mail_app/widgets/app_drawer.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import 'account/model.dart';
+import 'main.dart';
+import 'models/models.dart';
+import 'screens/screens.dart';
 import 'settings/view/view.dart';
+import 'widgets/app_drawer.dart';
 
 class Routes {
-  static const String home = '/';
+  Routes._();
+  static const String _root = '/';
+  static const String home = '/home';
   static const String accountAdd = '/accountAdd';
   static const String accountEdit = '/accountEdit';
   static const String accountServerDetails = '/accountServerDetails';
@@ -35,13 +40,38 @@ class Routes {
   static const String mailContents = '/mailContents';
   static const String mailCompose = '/mailCompose';
   static const String welcome = '/welcome';
-  static const String splash = '/';
+  static const String splash = '/splash';
   static const String interactiveMedia = '/interactiveMedia';
   static const String locationPicker = '/locationPicker';
   static const String sourceCode = '/sourceCode';
   static const String webview = '/webview';
   static const String appDrawer = '/appDrawer';
   static const String lockScreen = '/lock';
+
+  static final navigatorKey = GlobalKey<NavigatorState>();
+
+  /// The routing configuration
+  static GoRouter routerConfig = GoRouter(
+    navigatorKey: navigatorKey,
+    routes: [
+      GoRoute(
+        path: _root,
+        builder: (context, state) => const InitializationScreen(),
+      ),
+      GoRoute(
+        path: splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: home,
+        builder: (context, state) => const HomeScreen(),
+      ),
+    ],
+  );
 }
 
 class AppRouter {
@@ -50,14 +80,14 @@ class AppRouter {
     switch (name) {
       case Routes.accountAdd:
         page = AccountAddScreen(
-          launchedFromWelcome: (arguments == true),
+          launchedFromWelcome: arguments == true,
         );
         break;
       case Routes.accountServerDetails:
-        page = AccountServerDetailsScreen(account: arguments as RealAccount);
+        page = AccountServerDetailsScreen(account: arguments! as RealAccount);
         break;
       case Routes.accountEdit:
-        page = AccountEditScreen(account: arguments as RealAccount);
+        page = AccountEditScreen(account: arguments! as RealAccount);
         break;
       case Routes.settings:
         page = const SettingsScreen();
@@ -100,10 +130,10 @@ class AppRouter {
         break;
       case Routes.messageSourceFuture:
         page = AsyncMessageSourceScreen(
-            messageSourceFuture: arguments as Future<MessageSource>);
+            messageSourceFuture: arguments! as Future<MessageSource>);
         break;
       case Routes.messageSource:
-        page = MessageSourceScreen(messageSource: arguments as MessageSource);
+        page = MessageSourceScreen(messageSource: arguments! as MessageSource);
         break;
       case Routes.mailDetails:
         if (arguments is Message) {
@@ -118,14 +148,14 @@ class AppRouter {
         }
         break;
       case Routes.mailContents:
-        page = MessageContentsScreen(message: arguments as Message);
+        page = MessageContentsScreen(message: arguments! as Message);
         break;
       case Routes.mailCompose:
-        page = ComposeScreen(data: arguments as ComposeData);
+        page = ComposeScreen(data: arguments! as ComposeData);
         break;
       case Routes.interactiveMedia:
         page = InteractiveMediaScreen(
-            mediaWidget: arguments as InteractiveMediaWidget);
+            mediaWidget: arguments! as InteractiveMediaWidget);
         break;
       case Routes.locationPicker:
         page = const LocationScreen();
@@ -137,10 +167,10 @@ class AppRouter {
         page = const WelcomeScreen();
         break;
       case Routes.sourceCode:
-        page = SourceCodeScreen(mimeMessage: arguments as MimeMessage);
+        page = SourceCodeScreen(mimeMessage: arguments! as MimeMessage);
         break;
       case Routes.webview:
-        page = WebViewScreen(configuration: arguments as WebViewConfiguration);
+        page = WebViewScreen(configuration: arguments! as WebViewConfiguration);
         break;
       case Routes.appDrawer:
         page = const AppDrawer();
@@ -156,11 +186,13 @@ class AppRouter {
           body: Center(child: Text('No route defined for $name')),
         );
     }
+
     return page;
   }
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final page = generatePage(settings.name, settings.arguments);
+
     return Platform.isAndroid
         ? MaterialPageRoute(builder: (_) => page)
         : CupertinoPageRoute(builder: (_) => page);

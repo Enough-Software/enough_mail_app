@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 
 class ButtonText extends StatelessWidget {
-  final String? data;
-  final TextStyle? style;
 
   const ButtonText(
     this.data, {
     this.style,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
+  final String? data;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {

@@ -1,20 +1,21 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
+import '../account/model.dart';
 import '../locator.dart';
+import '../services/icon_service.dart';
+import '../services/mail_service.dart';
 
 class MailboxTree extends StatelessWidget {
+  const MailboxTree(
+      {super.key,
+      required this.account,
+      required this.onSelected,
+      this.current});
   final Account account;
   final void Function(Mailbox mailbox) onSelected;
   final Mailbox? current;
-
-  const MailboxTree(
-      {Key? key, required this.account, required this.onSelected, this.current})
-      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -7,27 +7,27 @@ import 'package:enough_mail/enough_mail.dart';
 enum SharedDataAddState { added, notAdded }
 
 class SharedDataAddResult {
+
+  const SharedDataAddResult(this.state, [this.details]);
   static const added = SharedDataAddResult(SharedDataAddState.added);
   static const notAdded = SharedDataAddResult(SharedDataAddState.notAdded);
   final SharedDataAddState state;
   final dynamic details;
-
-  const SharedDataAddResult(this.state, [this.details]);
 }
 
 abstract class SharedData {
-  final MediaType mediaType;
 
   SharedData(this.mediaType);
+  final MediaType mediaType;
 
   Future<SharedDataAddResult> addToMessageBuilder(MessageBuilder builder);
   Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi);
 }
 
 class SharedFile extends SharedData {
-  final File file;
   SharedFile(this.file, MediaType? mediaType)
       : super(mediaType ?? MediaType.guessFromFileName(file.path));
+  final File file;
 
   @override
   Future<SharedDataAddResult> addToMessageBuilder(
@@ -48,10 +48,10 @@ class SharedFile extends SharedData {
 }
 
 class SharedBinary extends SharedData {
-  final Uint8List? data;
-  final String? filename;
   SharedBinary(this.data, this.filename, MediaType mediaType)
       : super(mediaType);
+  final Uint8List? data;
+  final String? filename;
 
   @override
   Future<SharedDataAddResult> addToMessageBuilder(
@@ -72,10 +72,10 @@ class SharedBinary extends SharedData {
 }
 
 class SharedText extends SharedData {
-  final String text;
-  final String? subject;
   SharedText(this.text, MediaType? mediaType, {this.subject})
       : super(mediaType ?? MediaType.textPlain);
+  final String text;
+  final String? subject;
 
   @override
   Future<SharedDataAddResult> addToMessageBuilder(MessageBuilder builder) {
@@ -94,9 +94,9 @@ class SharedText extends SharedData {
 }
 
 class SharedMailto extends SharedData {
-  final Uri mailto;
   SharedMailto(this.mailto)
       : super(MediaType.fromSubtype(MediaSubtype.textHtml));
+  final Uri mailto;
 
   @override
   Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi) {

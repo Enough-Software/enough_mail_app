@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../account/model.dart';
 import '../l10n/app_localizations.g.dart';
 import '../l10n/extension.dart';
 import '../locator.dart';
-import '../models/account.dart';
 import '../routes.dart';
 import '../services/icon_service.dart';
 import '../services/mail_service.dart';
@@ -136,7 +136,6 @@ class AccountEditScreen extends HookConsumerWidget {
                               .excludeAccountFromUnified(
                             account,
                             exclude,
-                            context,
                           );
                         },
                         title: Text(
@@ -305,7 +304,7 @@ class AccountEditScreen extends HookConsumerWidget {
                             if (!context.mounted) {
                               return;
                             }
-                            await mailService.removeAccount(account, context);
+                            await mailService.removeAccount(account);
                             if (mailService.accounts.isEmpty) {
                               await locator<NavigationService>().push(
                                 Routes.welcome,

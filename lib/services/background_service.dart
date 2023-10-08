@@ -3,9 +3,9 @@ import 'dart:math';
 
 import 'package:background_fetch/background_fetch.dart';
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/async_mime_source_factory.dart';
-import 'package:enough_mail_app/models/background_update_info.dart';
-import 'package:enough_mail_app/services/notification_service.dart';
+import '../models/async_mime_source_factory.dart';
+import '../models/background_update_info.dart';
+import 'notification_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -40,13 +40,11 @@ class BackgroundService {
         }
       }
       BackgroundFetch.finish(taskId);
-    }, (String taskId) {
-      BackgroundFetch.finish(taskId);
-    });
+    }, BackgroundFetch.finish);
     await BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   }
 
-  static void backgroundFetchHeadlessTask(HeadlessTask task) async {
+  static Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {
     final taskId = task.taskId;
     if (kDebugMode) {
       print(
@@ -221,7 +219,7 @@ class BackgroundService {
             fetchPreference: FetchPreference.envelope);
         for (final mimeMessage in mimeMessages) {
           if (!mimeMessage.isSeen) {
-            notificationService.sendLocalNotificationForMail(
+            await notificationService.sendLocalNotificationForMail(
               mimeMessage,
               mailClient,
             );

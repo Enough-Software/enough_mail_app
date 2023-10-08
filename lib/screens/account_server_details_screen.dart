@@ -1,27 +1,28 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../account/model.dart';
+import '../l10n/extension.dart';
+import '../locator.dart';
+import '../services/mail_service.dart';
+import '../services/navigation_service.dart';
+import '../util/localized_dialog_helper.dart';
+import '../widgets/password_field.dart';
+import 'base.dart';
+
 class AccountServerDetailsScreen extends StatelessWidget {
-  final RealAccount account;
-  final String? title;
-  final bool includeDrawer;
   const AccountServerDetailsScreen({
-    Key? key,
+    super.key,
     required this.account,
     this.title,
     this.includeDrawer = true,
-  }) : super(key: key);
+  });
+  final RealAccount account;
+  final String? title;
+  final bool includeDrawer;
 
   @override
   Widget build(BuildContext context) {
@@ -39,25 +40,24 @@ class AccountServerDetailsScreen extends StatelessWidget {
 }
 
 class AccountServerDetailsEditor extends StatefulWidget {
-  final RealAccount account;
-
   const AccountServerDetailsEditor({
-    Key? key,
+    super.key,
     required this.account,
-  }) : super(key: key);
+  });
+  final RealAccount account;
 
   @override
   State<AccountServerDetailsEditor> createState() =>
       _AccountServerDetailsEditorState();
 
-  void testConnection(BuildContext context) async {
+  Future<void> testConnection(BuildContext context) async {
     await _AccountServerDetailsEditorState._currentState
         ?.testConnection(context);
   }
 }
 
 class _SaveButton extends StatefulWidget {
-  const _SaveButton({Key? key}) : super(key: key);
+  const _SaveButton();
 
   @override
   _SaveButtonState createState() => _SaveButtonState();
@@ -287,7 +287,7 @@ class _AccountServerDetailsEditorState
       child: Material(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Column(
               children: [
                 DecoratedPlatformTextField(
@@ -338,10 +338,9 @@ class _AccountServerDetailsEditorState
                       localizations.accountDetailsAdvancedIncomingSectionTitle),
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
+                          padding: const EdgeInsets.only(right: 8),
                           child: Text(localizations
                               .accountDetailsIncomingServerTypeLabel),
                         ),
@@ -365,10 +364,9 @@ class _AccountServerDetailsEditorState
                       ],
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
+                          padding: const EdgeInsets.only(right: 8),
                           child: Text(localizations
                               .accountDetailsIncomingSecurityLabel),
                         ),
@@ -430,10 +428,9 @@ class _AccountServerDetailsEditorState
                       localizations.accountDetailsAdvancedOutgoingSectionTitle),
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
+                          padding: const EdgeInsets.only(right: 8),
                           child: Text(localizations
                               .accountDetailsOutgoingServerTypeLabel),
                         ),
@@ -453,10 +450,9 @@ class _AccountServerDetailsEditorState
                       ],
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
+                          padding: const EdgeInsets.only(right: 8),
                           child: Text(localizations
                               .accountDetailsOutgoingSecurityLabel),
                         ),

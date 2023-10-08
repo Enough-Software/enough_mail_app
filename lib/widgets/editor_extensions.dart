@@ -1,27 +1,24 @@
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:enough_ascii_art/enough_ascii_art.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
+import '../l10n/extension.dart';
+import '../services/navigation_service.dart';
+import '../util/localized_dialog_helper.dart';
+import 'button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
 import '../locator.dart';
 
 class EditorArtExtensionButton extends StatelessWidget {
-  const EditorArtExtensionButton({Key? key, required this.editorApi})
-      : super(key: key);
+  const EditorArtExtensionButton({super.key, required this.editorApi});
   final HtmlEditorApi editorApi;
 
   @override
-  Widget build(BuildContext context) {
-    return PlatformIconButton(
+  Widget build(BuildContext context) => PlatformIconButton(
       icon: const Icon(CommunityMaterialIcons.format_font),
       onPressed: () => showArtExtensionDialog(context, editorApi),
     );
-  }
 
   static void showArtExtensionDialog(
       BuildContext context, HtmlEditorApi editorApi) {
@@ -35,9 +32,8 @@ class EditorArtExtensionButton extends StatelessWidget {
 }
 
 class EditorArtExtensionWidget extends StatefulWidget {
+  const EditorArtExtensionWidget({super.key, required this.editorApi});
   final HtmlEditorApi editorApi;
-  const EditorArtExtensionWidget({Key? key, required this.editorApi})
-      : super(key: key);
 
   @override
   State<EditorArtExtensionWidget> createState() =>
@@ -88,10 +84,10 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
+            padding: const EdgeInsets.only(bottom: 8),
             child: DecoratedPlatformTextField(
               controller: _inputController,
-              onChanged: (value) => _updateTexts(value),
+              onChanged: _updateTexts,
               decoration: InputDecoration(
                 labelText: localizations.editorArtInputLabel,
                 hintText: localizations.editorArtInputHint,

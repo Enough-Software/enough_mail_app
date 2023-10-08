@@ -1,8 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../account/model.dart';
 import '../locator.dart';
 import '../logger.dart';
-import '../models/account.dart';
 import '../models/compose_data.dart';
 import '../services/i18n_service.dart';
 import 'model.dart';

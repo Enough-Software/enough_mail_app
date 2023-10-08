@@ -4,10 +4,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../account/model.dart';
 import '../../extensions/extensions.dart';
 import '../../l10n/extension.dart';
 import '../../locator.dart';
-import '../../models/account.dart';
 import '../../screens/base.dart';
 import '../../services/mail_service.dart';
 import '../../services/navigation_service.dart';

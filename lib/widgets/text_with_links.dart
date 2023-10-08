@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TextWithLinks extends StatelessWidget {
+  const TextWithLinks({super.key, required this.text, this.style});
   final String text;
   final TextStyle? style;
-  const TextWithLinks({Key? key, required this.text, this.style})
-      : super(key: key);
-  static final RegExp schemeRegEx = RegExp(r'[a-z]{3,6}://');
+  static final RegExp schemeRegEx = RegExp('[a-z]{3,6}://');
   // not a perfect but good enough regular expression to match URLs in text. It also matches a space at the beginning and a dot at the end,
   // so this is filtered out manually in the found matches
   static final RegExp linkRegEx = RegExp(
@@ -64,11 +63,10 @@ class TextWithLinks extends StatelessWidget {
 }
 
 class TextWithNamedLinks extends StatelessWidget {
+
+  const TextWithNamedLinks({super.key, required this.parts, this.style});
   final List<TextLink> parts;
   final TextStyle? style;
-
-  const TextWithNamedLinks({Key? key, required this.parts, this.style})
-      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -113,10 +111,10 @@ class TextWithNamedLinks extends StatelessWidget {
 }
 
 class TextLink {
-  final String text;
-  final String? url;
-  final void Function()? callback;
 
   const TextLink(this.text, [this.url]) : callback = null;
   const TextLink.callback(this.text, this.callback) : url = null;
+  final String text;
+  final String? url;
+  final void Function()? callback;
 }

@@ -1,5 +1,4 @@
 export '../settings/model.dart';
-export 'account.dart';
 export 'async_mime_source.dart';
 export 'compose_data.dart';
 export 'contact.dart';

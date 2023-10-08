@@ -5,6 +5,7 @@ import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../l10n/app_localizations.g.dart';
 import '../l10n/extension.dart';
@@ -27,8 +28,12 @@ class AttachmentMediaProviderFactory {
 }
 
 class AttachmentComposeBar extends StatefulWidget {
-  const AttachmentComposeBar(
-      {super.key, required this.composeData, this.isDownloading = false});
+  const AttachmentComposeBar({
+    super.key,
+    required this.composeData,
+    this.isDownloading = false,
+  });
+
   final ComposeData composeData;
   final bool isDownloading;
 
@@ -46,31 +51,21 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    // final localizations = context.text;
-    return Wrap(
-      children: [
-        for (final attachment in _attachments)
-          ComposeAttachment(
-            attachment: attachment,
-            onRemove: removeAttachment,
+  Widget build(BuildContext context) => Wrap(
+        children: [
+          for (final attachment in _attachments)
+            ComposeAttachment(
+              parentMessage: widget.composeData.originalMessage,
+              attachment: attachment,
+              onRemove: removeAttachment,
+            ),
+          if (widget.isDownloading) const PlatformProgressIndicator(),
+          AddAttachmentPopupButton(
+            composeData: widget.composeData,
+            update: () => setState(() {}),
           ),
-
-        if (widget.isDownloading) const PlatformProgressIndicator(),
-
-        AddAttachmentPopupButton(
-          composeData: widget.composeData,
-          update: () => setState(() {}),
-        ),
-        // ActionChip(
-        //   avatar: Icon(Icons.add),
-        //   visualDensity: VisualDensity.compact,
-        //   label: Text(localizations.composeAddAttachmentAction),
-        //   onPressed: addAttachment,
-        // ),
-      ],
-    );
-  }
+        ],
+      );
 
   void removeAttachment(AttachmentInfo attachment) {
     widget.composeData.messageBuilder.removeAttachment(attachment);
@@ -81,8 +76,11 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
 }
 
 class AddAttachmentPopupButton extends StatelessWidget {
-  const AddAttachmentPopupButton(
-      {super.key, required this.composeData, required this.update});
+  const AddAttachmentPopupButton({
+    super.key,
+    required this.composeData,
+    required this.update,
+  });
   final ComposeData composeData;
   final Function() update;
 
@@ -222,9 +220,11 @@ class AddAttachmentPopupButton extends StatelessWidget {
     final giphy = locator<KeyService>().giphy;
     if (giphy == null) {
       await LocalizedDialogHelper.showTextDialog(
-          context,
-          localizations.errorTitle,
-          'No GIPHY API key found. Please check set up instructions.');
+        context,
+        localizations.errorTitle,
+        'No GIPHY API key found. Please check set up instructions.',
+      );
+
       return false;
     }
 
@@ -275,6 +275,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
       final finalizer = _AppointmentFinalizer(appointment, attachmentBuilder);
       composeData.addFinalizer(finalizer.finalize);
     }
+
     return (appointment != null);
   }
 }
@@ -316,15 +317,23 @@ class _AppointmentFinalizer {
   }
 }
 
-class ComposeAttachment extends StatelessWidget {
-  const ComposeAttachment(
-      {super.key, required this.attachment, required this.onRemove});
+class ComposeAttachment extends ConsumerWidget {
+  const ComposeAttachment({
+    super.key,
+    required this.parentMessage,
+    required this.attachment,
+    required this.onRemove,
+  });
+
+  final Message? parentMessage;
   final AttachmentInfo attachment;
   final void Function(AttachmentInfo attachment) onRemove;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final localizations = context.text;
+    final parentMessage = this.parentMessage;
+
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: ClipRRect(
@@ -335,32 +344,42 @@ class ComposeAttachment extends StatelessWidget {
           width: 60,
           height: 60,
           showInteractiveDelegate: (interactiveMedia) async {
-            if (attachment.mediaType.sub == MediaSubtype.messageRfc822) {
+            if (attachment.mediaType.sub == MediaSubtype.messageRfc822 &&
+                parentMessage != null) {
               final mime = MimeMessage.parseFromData(attachment.data!);
-              final message = Message.embedded(mime, Message.of(context)!);
-              return locator<NavigationService>()
-                  .push(Routes.mailDetails, arguments: message);
+              final message = Message.embedded(mime, parentMessage);
+
+              return locator<NavigationService>().push(
+                Routes.mailDetails,
+                arguments: message,
+              );
             }
             if (attachment.mediaType.sub == MediaSubtype.applicationIcs ||
                 attachment.mediaType.sub == MediaSubtype.textCalendar) {
               final text = attachment.part.text!;
               final appointment = VComponent.parse(text) as VCalendar;
-              final update = await IcalComposer.createOrEditAppointment(context,
-                  appointment: appointment);
+              final update = await IcalComposer.createOrEditAppointment(
+                context,
+                appointment: appointment,
+              );
               if (update != null) {
                 attachment.part.text = update.toString();
               }
+
               return;
             }
 
-            return locator<NavigationService>()
-                .push(Routes.interactiveMedia, arguments: interactiveMedia);
+            return locator<NavigationService>().push(
+              Routes.interactiveMedia,
+              arguments: interactiveMedia,
+            );
           },
           contextMenuEntries: [
             PopupMenuItem<String>(
               value: 'remove',
-              child: Text(localizations
-                  .composeRemoveAttachmentAction(attachment.name!)),
+              child: Text(
+                localizations.composeRemoveAttachmentAction(attachment.name!),
+              ),
             ),
           ],
           onContextMenuSelected: (provider, value) => onRemove(attachment),

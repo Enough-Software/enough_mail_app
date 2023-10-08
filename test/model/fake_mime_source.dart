@@ -2,16 +2,15 @@ import 'dart:math';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/async_mime_source.dart';
-import 'package:enough_mail_app/util/indexed_cache.dart';
 
 class FakeMimeSource extends PagedCachedMimeSource {
   FakeMimeSource({
     required int size,
-    int maxCacheSize = IndexedCache.defaultMaxCacheSize,
+    super.maxCacheSize,
     this.name = '',
     DateTime? startDate,
     Duration? differencePerMessage,
-  })  : _startDate = startDate ?? DateTime(2022, 04, 16, 08, 00),
+  })  : _startDate = startDate ?? DateTime(2022, 04, 16, 08),
         _differencePerMessage =
             differencePerMessage ?? const Duration(minutes: 5),
         mailClient = MailClient(
@@ -22,8 +21,7 @@ class FakeMimeSource extends PagedCachedMimeSource {
             outgoingHost: 'smtp.domain.com',
             password: 'password',
           ),
-        ),
-        super(maxCacheSize: maxCacheSize) {
+        ) {
     messages = generateMessages(
       size: size,
       name: name,
@@ -48,7 +46,7 @@ class FakeMimeSource extends PagedCachedMimeSource {
           size - i,
           size,
           name,
-          startDate ?? DateTime(2022, 04, 16, 08, 00),
+          startDate ?? DateTime(2022, 04, 16, 08),
           differencePerMessage ?? const Duration(minutes: 5),
         ),
       );

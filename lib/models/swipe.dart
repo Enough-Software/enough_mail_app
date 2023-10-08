@@ -1,4 +1,4 @@
-import 'package:enough_mail_app/services/icon_service.dart';
+import '../services/icon_service.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.g.dart';
 

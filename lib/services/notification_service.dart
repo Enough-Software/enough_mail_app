@@ -6,13 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:enough_mail_app/models/message.dart' as maily;
-import 'package:enough_mail_app/models/message_source.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-
 import '../locator.dart';
+import '../models/message.dart' as maily;
+import '../models/message_source.dart';
 import '../routes.dart';
+import 'mail_service.dart';
+import 'navigation_service.dart';
 
 part 'notification_service.g.dart';
 
@@ -124,7 +123,7 @@ class NotificationService {
         final message =
             maily.Message(mimeMessage, mailClient, messageSource, 0);
         messageSource.singleMessage = message;
-        locator<NavigationService>()
+        await locator<NavigationService>()
             .push(Routes.mailDetails, arguments: message);
       } on MailException catch (e, s) {
         if (kDebugMode) {
@@ -134,14 +133,10 @@ class NotificationService {
     }
   }
 
-  Future sendLocalNotificationForMailLoadEvent(MailLoadEvent event) {
-    return sendLocalNotificationForMail(event.message, event.mailClient);
-  }
+  Future sendLocalNotificationForMailLoadEvent(MailLoadEvent event) => sendLocalNotificationForMail(event.message, event.mailClient);
 
-  Future sendLocalNotificationForMailMessage(maily.Message message) {
-    return sendLocalNotificationForMail(
+  Future sendLocalNotificationForMailMessage(maily.Message message) => sendLocalNotificationForMail(
         message.mimeMessage, message.mailClient);
-  }
 
   Future sendLocalNotificationForMail(
       MimeMessage mimeMessage, MailClient mailClient) {
@@ -191,9 +186,8 @@ class NotificationService {
         importance: Importance.max,
         priority: Priority.high,
         channelShowBadge: channelShowBadge,
-        showWhen: (when != null),
+        showWhen: when != null,
         when: when?.millisecondsSinceEpoch,
-        playSound: true,
         sound: const RawResourceAndroidNotificationSound('pop'),
       );
     } else if (Platform.isIOS) {

@@ -27,12 +27,10 @@ class Contact {
 }
 
 class ContactManager {
-  final List<MailAddress> addresses;
   ContactManager(this.addresses);
+  final List<MailAddress> addresses;
 
-  Iterable<MailAddress> find(String search) {
-    return addresses.where((address) =>
+  Iterable<MailAddress> find(String search) => addresses.where((address) =>
         address.email.contains(search) ||
         (address.hasPersonalName && address.personalName!.contains(search)));
-  }
 }

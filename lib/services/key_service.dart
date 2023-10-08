@@ -1,13 +1,17 @@
 /// contains rate limited beta keys,
 /// production keys are stored locally only
-import 'package:enough_mail_app/oauth/oauth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../logger.dart';
+import '../oauth/oauth.dart';
+
+/// Allows to load the keys from assets/keys.txt
 class KeyService {
+  /// Creates a new [KeyService]
   KeyService();
 
-  Future init() async {
+  /// Loads the key data
+  Future<void> init() async {
     try {
       final text = await rootBundle.loadString('assets/keys.txt');
       final lines =
@@ -26,26 +30,27 @@ class KeyService {
           if (valueIndex == -1) {
             oauth[key] = OauthClientId(value, null);
           } else {
-            oauth[key] = OauthClientId(value.substring(0, valueIndex),
-                value.substring(valueIndex + 1));
+            oauth[key] = OauthClientId(
+              value.substring(0, valueIndex),
+              value.substring(valueIndex + 1),
+            );
           }
         }
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(
-            'no assets/keys.txt found. Ensure to specify it in the pubspec.yaml and add the relevant keys there.');
-      }
+      logger.e(
+        'no assets/keys.txt found. '
+        'Ensure to specify it in the pubspec.yaml and '
+        'add the relevant keys there.',
+      );
     }
   }
 
   String? _giphy;
   String? get giphy => _giphy;
-  bool get hasGiphy => (_giphy != null);
+  bool get hasGiphy => _giphy != null;
 
   final oauth = <String, OauthClientId>{};
 
-  bool hasOauthFor(String incomingHostname) {
-    return (oauth[incomingHostname] != null);
-  }
+  bool hasOauthFor(String incomingHostname) => oauth[incomingHostname] != null;
 }

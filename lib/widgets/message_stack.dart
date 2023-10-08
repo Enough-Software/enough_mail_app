@@ -1,19 +1,21 @@
 import 'dart:math';
+
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/models/message_source.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
-import 'package:enough_mail_app/widgets/mail_address_chip.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../locator.dart';
+import '../models/message.dart';
+import '../models/message_source.dart';
+import '../services/i18n_service.dart';
+import '../services/scaffold_messenger_service.dart';
+import 'mail_address_chip.dart';
+
 enum DragAction { noted, later, delete, reply }
 
 class MessageStack extends StatefulWidget {
-  const MessageStack({Key? key, required this.messageSource}) : super(key: key);
+  const MessageStack({super.key, required this.messageSource});
 
   final MessageSource? messageSource;
   @override
@@ -28,9 +30,7 @@ class _MessageStackState extends State<MessageStack> {
   final List<Message?> _nextMessages = [];
   final List<double> _nextAngles = [];
 
-  double createAngle() {
-    return (_random.nextInt(200) - 100.0) / 4000;
-  }
+  double createAngle() => (_random.nextInt(200) - 100.0) / 4000;
 
   @override
   void initState() {
@@ -98,7 +98,7 @@ class _MessageStackState extends State<MessageStack> {
         Align(
           alignment: Alignment.topRight,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Text(
               dayName,
               style: Theme.of(context).textTheme.bodySmall,
@@ -154,7 +154,7 @@ class _MessageStackState extends State<MessageStack> {
         Align(
           alignment: Alignment.bottomLeft,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: PlatformIconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed:
@@ -229,13 +229,12 @@ class _MessageStackState extends State<MessageStack> {
 
 class MessageDragTarget extends StatefulWidget {
   const MessageDragTarget(
-      {Key? key,
+      {super.key,
       required this.action,
       required this.onComplete,
       this.data,
       this.width,
-      this.height})
-      : super(key: key);
+      this.height});
   final DragAction action;
   final Object? data;
   final Function(Message message, DragAction action, {Object? data}) onComplete;
@@ -303,11 +302,9 @@ class _MessageDragTargetState extends State<MessageDragTarget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return DragTarget<Message>(
-      builder: (context, candidateData, rejectedData) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
+  Widget build(BuildContext context) => DragTarget<Message>(
+        builder: (context, candidateData, rejectedData) => Padding(
+          padding: const EdgeInsets.all(8),
           child: AnimatedContainer(
             decoration: BoxDecoration(
               color: color,
@@ -320,27 +317,23 @@ class _MessageDragTargetState extends State<MessageDragTarget> {
             curve: Curves.bounceOut,
             child: Center(child: Text(text)),
           ),
-        );
-      },
-      onWillAccept: (data) {
-        startAccepting();
-        return true;
-      },
-      onAccept: (data) async {
-        endAccepting();
-        widget.onComplete(data, widget.action, data: widget.data);
-      },
-      onLeave: (data) => endAccepting(),
-    );
-  }
+        ),
+        onWillAccept: (data) {
+          startAccepting();
+          return true;
+        },
+        onAccept: (data) async {
+          endAccepting();
+          widget.onComplete(data, widget.action, data: widget.data);
+        },
+        onLeave: (data) => endAccepting(),
+      );
 }
 
 class MessageDraggable extends StatefulWidget {
+  const MessageDraggable({super.key, this.message, this.angle});
   final Message? message;
   final double? angle;
-
-  const MessageDraggable({Key? key, this.message, this.angle})
-      : super(key: key);
 
   @override
   State<MessageDraggable> createState() => _MessageDraggableState();
@@ -348,60 +341,62 @@ class MessageDraggable extends StatefulWidget {
 
 class _MessageDraggableState extends State<MessageDraggable>
     with TickerProviderStateMixin {
-  late AnimationController animationController;
-  late Animation scaleAnimation;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
-    animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 400));
-    scaleAnimation = CurvedAnimation(
-        curve: Curves.easeInOut,
-        parent: Tween(begin: 1.0, end: 0.5).animate(animationController));
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _scaleAnimation = CurvedAnimation(
+      curve: Curves.easeInOut,
+      parent: Tween<double>(begin: 1, end: 0.5).animate(_animationController),
+    );
     super.initState();
   }
 
   @override
   void dispose() {
-    animationController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return Draggable<Message>(
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) =>
+            Draggable<Message>(
           data: widget.message,
           feedback: ConstrainedBox(
-              constraints: constraints,
-              child: ScaleTransition(
-                scale: scaleAnimation as Animation<double>,
-                child: FadeTransition(
-                  opacity: scaleAnimation as Animation<double>,
-                  child:
-                      MessageCard(message: widget.message, angle: widget.angle),
+            constraints: constraints,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: FadeTransition(
+                opacity: _scaleAnimation,
+                child: MessageCard(
+                  message: widget.message,
+                  angle: widget.angle,
                 ),
-              )),
+              ),
+            ),
+          ),
           childWhenDragging: Container(),
           maxSimultaneousDrags: 1,
           onDragStarted: () {
-            animationController.reset();
-            animationController.forward();
+            _animationController
+              ..reset()
+              ..forward();
           },
-          dragAnchorStrategy: childDragAnchorStrategy,
           child: MessageCard(message: widget.message, angle: widget.angle),
-        );
-      },
-    );
-  }
+        ),
+      );
 }
 
 class MessageCard extends StatefulWidget {
+  const MessageCard({super.key, required this.message, this.angle});
   final Message? message;
   final double? angle;
-  const MessageCard({Key? key, required this.message, this.angle})
-      : super(key: key);
 
   @override
   State<MessageCard> createState() => _MessageCardState();
@@ -425,32 +420,28 @@ class _MessageCardState extends State<MessageCard> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: widget.angle!,
-      child: Card(
-        elevation: 18,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: widget.message!.mimeMessage.isEmpty
-                ? const Text('...')
-                : buildMessageContents(),
+  Widget build(BuildContext context) => Transform.rotate(
+        angle: widget.angle!,
+        child: Card(
+          elevation: 18,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: widget.message!.mimeMessage.isEmpty
+                  ? const Text('...')
+                  : buildMessageContents(),
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   Widget buildMessageContents() {
     final mime = widget.message!.mimeMessage;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(mime.decodeSubject()!),
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const Text('From '),
             for (final address in mime.from!)
@@ -544,7 +535,7 @@ class _MessageCardState extends State<MessageCard> {
     //     onLinkTap: (url) => urlLauncher.launch(url),
     //   );
     // }
-    var text = widget.message?.mimeMessage.decodeTextPlainPart();
+    final text = widget.message?.mimeMessage.decodeTextPlainPart();
     if (text != null) {
       return SelectableText(text);
     }

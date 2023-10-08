@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../account/model.dart';
 import '../../l10n/extension.dart';
 import '../../locator.dart';
-import '../../models/account.dart';
 import '../../models/compose_data.dart';
 import '../../routes.dart';
 import '../../screens/base.dart';

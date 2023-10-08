@@ -3,13 +3,12 @@ import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../account/model.dart';
 import '../events/app_event_bus.dart';
 import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
-import '../models/account.dart';
 import '../models/async_mime_source.dart';
 import '../models/async_mime_source_factory.dart';
 import '../models/message_source.dart';
@@ -17,7 +16,6 @@ import '../models/sender.dart';
 import '../routes.dart';
 import '../settings/model.dart';
 import '../util/gravatar.dart';
-import '../widgets/inherited_widgets.dart';
 import 'navigation_service.dart';
 import 'notification_service.dart';
 import 'providers.dart';
@@ -39,7 +37,7 @@ class MailService implements MimeSourceSubscriber {
 
   static const String _keyAccounts = 'accts';
   final _storage = const FlutterSecureStorage();
-  final _mailClientsPerAccount = <Account, MailClient>{};
+  final _mailClientsPerAccount = <RealAccount, MailClient>{};
   final _mailboxesPerAccount = <Account, Tree<Mailbox?>>{};
   late AppLocalizations _localizations;
   AppLocalizations get localizations => _localizations;
@@ -50,11 +48,13 @@ class MailService implements MimeSourceSubscriber {
     if (withErrors == null) {
       return accounts;
     }
+
     return accounts.where((account) => !withErrors.contains(account)).toList();
   }
 
   List<Account> get accountsWithErrors {
     final withErrors = _accountsWithErrors;
+
     return withErrors ?? [];
   }
 
@@ -133,6 +133,7 @@ class MailService implements MimeSourceSubscriber {
     final Account account = currentAccount ?? unifiedAccount ?? accounts.first;
     final source = await _createMessageSource(null, account);
     messageSource = source;
+
     return source.search(search);
   }
 
@@ -143,7 +144,6 @@ class MailService implements MimeSourceSubscriber {
     if (mailAccountsForUnified.length > 1) {
       unifiedAccount = UnifiedAccount(
         List<RealAccount>.from(mailAccountsForUnified),
-        _localizations.unifiedAccountName,
       );
       final mailboxes = [
         Mailbox.virtual(_localizations.unifiedFolderInbox, [MailboxFlag.inbox]),
@@ -286,15 +286,12 @@ class MailService implements MimeSourceSubscriber {
   Future<bool> addAccount(
     RealAccount newAccount,
     MailClient mailClient,
-    BuildContext context,
   ) async {
-    // TODO(RV): remove BuildContext usage in service
     // TODO(RV): check if other account with the same name already exists
-    final state = MailServiceWidget.of(context);
     final existing = accounts.firstWhereOrNull((account) =>
         account is RealAccount && account.email == newAccount.email);
     if (existing != null) {
-      await removeAccount(existing as RealAccount, context);
+      await removeAccount(existing as RealAccount);
     }
     newAccount = await _checkForAddingSentMessages(newAccount);
     _currentAccount = newAccount;
@@ -312,12 +309,8 @@ class MailService implements MimeSourceSubscriber {
     }
     final source = await getMessageSourceFor(newAccount);
     messageSource = source;
-    if (state != null) {
-      state.account = newAccount;
-      state.accounts = accounts;
-      state.messageSource = source;
-    }
     await saveAccounts();
+
     return true;
   }
 
@@ -534,10 +527,7 @@ class MailService implements MimeSourceSubscriber {
     return Sender(MailAddress(null, email), sender.account);
   }
 
-  Future<void> testRemoveAccount(Account account, BuildContext context) async {
-    // as the original context may belong to a widget that is now disposed, use the navigator's context:
-    context = locator<NavigationService>().currentContext!;
-    final state = MailServiceWidget.of(context);
+  Future<void> testRemoveAccount(Account account) async {
     if (account == currentAccount) {
       final nextAccount = hasUnifiedAccount
           ? unifiedAccount
@@ -551,17 +541,10 @@ class MailService implements MimeSourceSubscriber {
         messageSource = null;
         await locator<NavigationService>().push(Routes.welcome, clear: true);
       }
-      if (state != null) {
-        state.messageSource = messageSource;
-        state.account = _currentAccount;
-        state.accounts = accounts;
-      }
-    } else if (state != null) {
-      state.accounts = accounts;
     }
   }
 
-  Future<void> removeAccount(RealAccount account, BuildContext context) async {
+  Future<void> removeAccount(RealAccount account) async {
     accounts.remove(account);
     _mailboxesPerAccount.remove(account);
     _mailClientsPerAccount.remove(account);
@@ -575,17 +558,11 @@ class MailService implements MimeSourceSubscriber {
     } catch (e) {
       // ignore
     }
-    // TODO(RV): remove usage of BuildContext
-    // as the original context may belong to a widget that is now disposed, use the navigator's context:
-    context = locator<NavigationService>().currentContext!;
-    final state = MailServiceWidget.of(context);
     if (!account.excludeFromUnified) {
       // updates the unified account
       await excludeAccountFromUnified(
         account,
         true,
-        context,
-        updateContext: false,
       );
     }
     if (account == currentAccount) {
@@ -601,13 +578,6 @@ class MailService implements MimeSourceSubscriber {
         messageSource = null;
         await locator<NavigationService>().push(Routes.welcome, clear: true);
       }
-      if (state != null) {
-        state.messageSource = messageSource;
-        state.account = _currentAccount;
-        state.accounts = accounts;
-      }
-    } else if (state != null) {
-      state.accounts = accounts;
     }
 
     await saveAccounts();
@@ -754,15 +724,14 @@ class MailService implements MimeSourceSubscriber {
     if (futures.isEmpty) {
       return Future.value();
     }
+
     return Future.wait(futures);
   }
 
   Future excludeAccountFromUnified(
     RealAccount account,
     bool exclude,
-    BuildContext context, {
-    bool updateContext = true,
-  }) async {
+  ) async {
     account.excludeFromUnified = exclude;
     final unified = unifiedAccount;
     if (exclude) {
@@ -778,13 +747,8 @@ class MailService implements MimeSourceSubscriber {
     }
     if (currentAccount == unified && unified != null) {
       messageSource = await _createMessageSource(null, unified);
-      if (updateContext) {
-        final state = MailServiceWidget.of(context);
-        if (state != null) {
-          state.messageSource = messageSource;
-        }
-      }
     }
+
     return saveAccounts();
   }
 

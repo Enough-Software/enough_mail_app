@@ -1,15 +1,20 @@
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/services/app_service.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
+import 'dart:async';
+
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:local_auth/local_auth.dart';
 
+import '../locator.dart';
+import 'app_service.dart';
+import 'i18n_service.dart';
+
+/// Handles biometrics
 class BiometricsService {
   bool _isResolved = false;
   bool _isSupported = false;
   final _localAuth = LocalAuthentication();
 
+  /// Checks if the device supports biometrics
   Future<bool> isDeviceSupported() async {
     if (_isResolved) {
       return _isSupported;
@@ -25,9 +30,11 @@ class BiometricsService {
       }
     }
     _isResolved = true;
+
     return _isSupported;
   }
 
+  /// Authenticates the user with biometrics
   Future<bool> authenticate({String? reason}) async {
     if (!_isResolved) {
       await isDeviceSupported();
@@ -41,20 +48,20 @@ class BiometricsService {
       final result = await _localAuth.authenticate(
         localizedReason: reason,
         options: const AuthenticationOptions(
-          stickyAuth: false,
           sensitiveTransaction: false,
         ),
       );
-      Future.delayed(const Duration(seconds: 2)).then(
-        (value) =>
-            locator<AppService>().ignoreBiometricsCheckAtNextResume = false,
-      );
+      unawaited(Future.delayed(const Duration(seconds: 2)).then(
+        (_) => locator<AppService>().ignoreBiometricsCheckAtNextResume = false,
+      ));
+
       return result;
     } catch (e, s) {
       if (kDebugMode) {
         print('Authentication failed with $e $s');
       }
     }
+
     return false;
   }
 
@@ -68,6 +75,7 @@ class BiometricsService {
         return localizations.securityUnlockWithTouchId;
       }
     }
+
     return localizations.securityUnlockReason;
   }
 }

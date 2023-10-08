@@ -19,7 +19,7 @@ class ExpansionWrap2 extends MultiChildRenderObjectWidget {
   /// disambiguate `start` or `end` values for the main or cross axis
   /// directions, the [textDirection] must not be null.
   ExpansionWrap2({
-    Key? key,
+    super.key,
     this.direction = Axis.horizontal,
     this.alignment = WrapAlignment.start,
     this.spacing = 0.0,
@@ -32,7 +32,7 @@ class ExpansionWrap2 extends MultiChildRenderObjectWidget {
     List<Widget> children = const <Widget>[],
     this.maxRuns,
     required this.overflow,
-  }) : super(key: key, children: [...children, overflow]);
+  }) : super(children: [...children, overflow]);
 
   final Widget overflow;
 
@@ -176,8 +176,7 @@ class ExpansionWrap2 extends MultiChildRenderObjectWidget {
   final int? maxRuns;
 
   @override
-  RenderExpansionWrap createRenderObject(BuildContext context) {
-    return RenderExpansionWrap(
+  RenderExpansionWrap createRenderObject(BuildContext context) => RenderExpansionWrap(
       direction: direction,
       alignment: alignment,
       spacing: spacing,
@@ -189,7 +188,6 @@ class ExpansionWrap2 extends MultiChildRenderObjectWidget {
       clipBehavior: clipBehavior,
       maxRuns: maxRuns,
     );
-  }
 
   @override
   void updateRenderObject(
@@ -545,7 +543,7 @@ class RenderExpansionWrap extends RenderBox
   double computeMinIntrinsicWidth(double height) {
     switch (direction) {
       case Axis.horizontal:
-        double width = 0.0;
+        double width = 0;
         RenderBox? child = firstChild;
         while (child != null) {
           width = math.max(width, child.getMinIntrinsicWidth(double.infinity));
@@ -561,7 +559,7 @@ class RenderExpansionWrap extends RenderBox
   double computeMaxIntrinsicWidth(double height) {
     switch (direction) {
       case Axis.horizontal:
-        double width = 0.0;
+        double width = 0;
         RenderBox? child = firstChild;
         while (child != null) {
           width += child.getMaxIntrinsicWidth(double.infinity);
@@ -579,7 +577,7 @@ class RenderExpansionWrap extends RenderBox
       case Axis.horizontal:
         return computeDryLayout(BoxConstraints(maxWidth: width)).height;
       case Axis.vertical:
-        double height = 0.0;
+        double height = 0;
         RenderBox? child = firstChild;
         while (child != null) {
           height =
@@ -596,7 +594,7 @@ class RenderExpansionWrap extends RenderBox
       case Axis.horizontal:
         return computeDryLayout(BoxConstraints(maxWidth: width)).height;
       case Axis.vertical:
-        double height = 0.0;
+        double height = 0;
         RenderBox? child = firstChild;
         while (child != null) {
           height += child.getMaxIntrinsicHeight(double.infinity);
@@ -607,9 +605,7 @@ class RenderExpansionWrap extends RenderBox
   }
 
   @override
-  double? computeDistanceToActualBaseline(TextBaseline baseline) {
-    return defaultComputeDistanceToHighestActualBaseline(baseline);
-  }
+  double? computeDistanceToActualBaseline(TextBaseline baseline) => defaultComputeDistanceToHighestActualBaseline(baseline);
 
   double _getMainAxisExtent(Size childSize) {
     switch (direction) {
@@ -652,14 +648,12 @@ class RenderExpansionWrap extends RenderBox
   }
 
   @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    return _computeDryLayout(constraints);
-  }
+  Size computeDryLayout(BoxConstraints constraints) => _computeDryLayout(constraints);
 
   Size _computeDryLayout(BoxConstraints constraints,
       [ChildLayouter layoutChild = ChildLayoutHelper.dryLayoutChild]) {
     final BoxConstraints childConstraints;
-    double mainAxisLimit = 0.0;
+    double mainAxisLimit = 0;
     switch (direction) {
       case Axis.horizontal:
         childConstraints = BoxConstraints(maxWidth: constraints.maxWidth);
@@ -671,20 +665,20 @@ class RenderExpansionWrap extends RenderBox
         break;
     }
 
-    double mainAxisExtent = 0.0;
-    double crossAxisExtent = 0.0;
-    double runMainAxisExtent = 0.0;
-    double runCrossAxisExtent = 0.0;
+    double mainAxisExtent = 0;
+    double crossAxisExtent = 0;
+    double runMainAxisExtent = 0;
+    double runCrossAxisExtent = 0;
     int childCount = 0;
-    RenderBox overflow = lastChild!;
+    final RenderBox overflow = lastChild!;
     final overflowSize = layoutChild(overflow, childConstraints);
     final double overflowMainAxisExtent = _getMainAxisExtent(overflowSize);
     // final double overflowCrossAxisExtent = _getCrossAxisExtent(overflowSize);
-    int numberOfRuns = 1;
+    const int numberOfRuns = 1;
     final runsMax = _maxRuns ?? 1000;
     RenderBox? child = firstChild;
     while (child != null) {
-      RenderBox? nextChild = childAfter(child);
+      final RenderBox? nextChild = childAfter(child);
       if (nextChild == null) {
         // the last child is the overflow widget, abort:
         break;
@@ -741,13 +735,13 @@ class RenderExpansionWrap extends RenderBox
     final BoxConstraints constraints = this.constraints;
     assert(_debugHasNecessaryDirections);
     RenderBox? child = firstChild;
-    RenderBox overflow = lastChild!;
+    final RenderBox overflow = lastChild!;
     if (child == null || child == overflow) {
       size = constraints.smallest;
       return;
     }
     final BoxConstraints childConstraints;
-    double mainAxisLimit = 0.0;
+    double mainAxisLimit = 0;
     bool flipMainAxis = false;
     bool flipCrossAxis = false;
     switch (direction) {
@@ -772,13 +766,13 @@ class RenderExpansionWrap extends RenderBox
     final double spacing = this.spacing;
     final double runSpacing = this.runSpacing;
     final List<_RunMetrics> runMetrics = <_RunMetrics>[];
-    double mainAxisExtent = 0.0;
-    double crossAxisExtent = 0.0;
-    double runMainAxisExtent = 0.0;
-    double runCrossAxisExtent = 0.0;
+    double mainAxisExtent = 0;
+    double crossAxisExtent = 0;
+    double runMainAxisExtent = 0;
+    double runCrossAxisExtent = 0;
     int childCount = 0;
     while (child != null) {
-      RenderBox? nextChild = childAfter(child);
+      final RenderBox? nextChild = childAfter(child);
       if (nextChild == null) {
         // the last child is the overflow widget, abort:
         break;
@@ -845,8 +839,8 @@ class RenderExpansionWrap extends RenderBox
     final int runCount = runMetrics.length;
     assert(runCount > 0);
 
-    double containerMainAxisExtent = 0.0;
-    double containerCrossAxisExtent = 0.0;
+    double containerMainAxisExtent = 0;
+    double containerCrossAxisExtent = 0;
 
     switch (direction) {
       case Axis.horizontal:
@@ -862,9 +856,9 @@ class RenderExpansionWrap extends RenderBox
     }
 
     final double crossAxisFreeSpace =
-        math.max(0.0, containerCrossAxisExtent - crossAxisExtent);
-    double runLeadingSpace = 0.0;
-    double runBetweenSpace = 0.0;
+        math.max(0, containerCrossAxisExtent - crossAxisExtent);
+    double runLeadingSpace = 0;
+    double runBetweenSpace = 0;
     switch (runAlignment) {
       case WrapAlignment.start:
         break;
@@ -901,9 +895,9 @@ class RenderExpansionWrap extends RenderBox
       final int childCount = metrics.childCount;
 
       final double mainAxisFreeSpace =
-          math.max(0.0, containerMainAxisExtent - runMainAxisExtent);
-      double childLeadingSpace = 0.0;
-      double childBetweenSpace = 0.0;
+          math.max(0, containerMainAxisExtent - runMainAxisExtent);
+      double childLeadingSpace = 0;
+      double childBetweenSpace = 0;
 
       switch (alignment) {
         case WrapAlignment.start:
@@ -963,9 +957,7 @@ class RenderExpansionWrap extends RenderBox
   }
 
   @override
-  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
-    return defaultHitTestChildren(result, position: position);
-  }
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) => defaultHitTestChildren(result, position: position);
 
   @override
   void paint(PaintingContext context, Offset offset) {

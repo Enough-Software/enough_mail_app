@@ -1,7 +1,8 @@
-import 'package:enough_mail_app/screens/base.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
+import '../screens/base.dart';
 
 class ModelBottomSheetHelper {
   ModelBottomSheetHelper._();
@@ -18,7 +19,7 @@ class ModelBottomSheetHelper {
     final bottomSheetContent = SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.only(top: 32.0),
+        padding: const EdgeInsets.only(top: 32),
         child: Base.buildAppChrome(
           context,
           title: title,
@@ -40,7 +41,7 @@ class ModelBottomSheetHelper {
       result = await showCupertinoModalBottomSheet(
         context: context,
         builder: (context) => bottomSheetContent,
-        elevation: 8.0,
+        elevation: 8,
         expand: true,
         isDismissible: true,
       );
@@ -48,7 +49,7 @@ class ModelBottomSheetHelper {
       result = await showMaterialModalBottomSheet(
         context: context,
         builder: (context) => bottomSheetContent,
-        elevation: 8.0,
+        elevation: 8,
         expand: true,
         backgroundColor: Colors.transparent,
       );

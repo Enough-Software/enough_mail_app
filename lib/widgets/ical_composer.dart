@@ -1,18 +1,18 @@
 import 'package:enough_icalendar/enough_icalendar.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/util/datetime.dart';
-import 'package:enough_mail_app/util/modal_bottom_sheet_helper.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
+import '../account/model.dart';
 import '../l10n/app_localizations.g.dart';
+import '../l10n/extension.dart';
 import '../locator.dart';
+import '../services/i18n_service.dart';
+import '../services/mail_service.dart';
+import '../util/datetime.dart';
+import '../util/modal_bottom_sheet_helper.dart';
 
 class IcalComposer extends StatefulWidget {
-  const IcalComposer({Key? key, required this.appointment}) : super(key: key);
+  const IcalComposer({super.key, required this.appointment});
   final VCalendar appointment;
   @override
   State<IcalComposer> createState() => _IcalComposerState();
@@ -108,7 +108,7 @@ class _IcalComposerState extends State<IcalComposer> {
     final theme = Theme.of(context);
     return Material(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8),
         child: Column(
           children: [
             DecoratedPlatformTextField(
@@ -136,12 +136,12 @@ class _IcalComposerState extends State<IcalComposer> {
               cupertinoAlignLabelOnTop: true,
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
+              padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
               child: Text(localizations.icalendarLabelStart,
                   style: theme.textTheme.bodySmall),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: DateTimePicker(
                 dateTime: start,
                 onlyDate: isAllday,
@@ -158,12 +158,12 @@ class _IcalComposerState extends State<IcalComposer> {
             ),
             if (!isAllday) ...[
               Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
+                padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
                 child: Text(localizations.icalendarLabelEnd,
                     style: theme.textTheme.bodySmall),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: DateTimePicker(
                   dateTime: end,
                   onChanged: (dateTime) {
@@ -294,15 +294,15 @@ extension _ExtensionRecurrenceFrequency on RecurrenceFrequency {
 }
 
 class DateTimePicker extends StatelessWidget {
-  final DateTime? dateTime;
-  final void Function(DateTime newDateTime) onChanged;
-  final bool onlyDate;
   const DateTimePicker({
-    Key? key,
+    super.key,
     required this.dateTime,
     required this.onChanged,
     this.onlyDate = false,
-  }) : super(key: key);
+  });
+  final DateTime? dateTime;
+  final void Function(DateTime newDateTime) onChanged;
+  final bool onlyDate;
 
   @override
   Widget build(BuildContext context) {
@@ -368,11 +368,10 @@ class DateTimePicker extends StatelessWidget {
 }
 
 class RecurrenceComposer extends StatefulWidget {
+  const RecurrenceComposer(
+      {super.key, this.recurrenceRule, required this.startDate});
   final Recurrence? recurrenceRule;
   final DateTime startDate;
-  const RecurrenceComposer(
-      {Key? key, this.recurrenceRule, required this.startDate})
-      : super(key: key);
 
   @override
   State<RecurrenceComposer> createState() => _RecurrenceComposerState();
@@ -422,14 +421,14 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
     final localizations = context.text;
     final rule = _recurrenceRule;
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 child: Text(
                     localizations.composeAppointmentRecurrenceFrequencyLabel),
               ),
@@ -487,7 +486,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
             Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: Text(
                       localizations.composeAppointmentRecurrenceIntervalLabel),
                 ),
@@ -510,7 +509,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
             ),
             if (rule.frequency == RecurrenceFrequency.weekly) ...[
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 child:
                     Text(localizations.composeAppointmentRecurrenceDaysLabel),
               ),
@@ -531,7 +530,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
               ),
             ] else if (rule.frequency == RecurrenceFrequency.monthly) ...[
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 child:
                     Text(localizations.composeAppointmentRecurrenceDaysLabel),
               ),
@@ -574,7 +573,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
             ),
             const Divider(),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8),
               child: Text(rule.toHumanReadableText(
                 languageCode: localizations.localeName,
                 startDate: widget.startDate,
@@ -588,15 +587,15 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
 }
 
 class WeekDaySelector extends StatefulWidget {
-  final Recurrence recurrence;
-  final DateTime startDate;
-  final void Function(List<ByDayRule>? rules) onChanged;
   const WeekDaySelector({
-    Key? key,
+    super.key,
     required this.recurrence,
     required this.onChanged,
     required this.startDate,
-  }) : super(key: key);
+  });
+  final Recurrence recurrence;
+  final DateTime startDate;
+  final void Function(List<ByDayRule>? rules) onChanged;
 
   @override
   State<WeekDaySelector> createState() => _WeekDaySelectorState();
@@ -612,12 +611,12 @@ class _WeekDaySelectorState extends State<WeekDaySelector> {
     _weekdays = i18nService.formatWeekDays(abbreviate: true);
     final byWeekDays = widget.recurrence.byWeekDay;
     if (byWeekDays != null) {
-      int firstDayOfWeek = i18nService.firstDayOfWeek;
+      final int firstDayOfWeek = i18nService.firstDayOfWeek;
       for (int i = 0; i < 7; i++) {
         final day = ((firstDayOfWeek + i) <= 7)
             ? (firstDayOfWeek + i)
             : ((firstDayOfWeek + i) - 7);
-        bool isSelected = byWeekDays.any((dayRule) => dayRule.weekday == day);
+        final bool isSelected = byWeekDays.any((dayRule) => dayRule.weekday == day);
         _selectedDays[i] = isSelected;
       }
     }
@@ -659,34 +658,31 @@ class _WeekDaySelectorState extends State<WeekDaySelector> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FittedBox(
+  Widget build(BuildContext context) => FittedBox(
       child: PlatformToggleButtons(
         isSelected: _selectedDays,
         onPressed: _toggle,
         children: _weekdays
             .map((day) => Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: Text(day.name),
                 ))
             .toList(),
       ),
     );
-  }
 }
 
 enum _DayOfMonthOption { dayOfMonth, dayInNumberedWeek }
 
 class DayOfMonthSelector extends StatefulWidget {
+  const DayOfMonthSelector(
+      {super.key,
+      required this.recurrence,
+      required this.startDate,
+      required this.onChanged});
   final Recurrence recurrence;
   final DateTime startDate;
   final void Function(Recurrence recurrence) onChanged;
-  const DayOfMonthSelector(
-      {Key? key,
-      required this.recurrence,
-      required this.startDate,
-      required this.onChanged})
-      : super(key: key);
 
   @override
   State<DayOfMonthSelector> createState() => _DayOfMonthSelectorState();
@@ -779,7 +775,7 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
         ),
         if (_option == _DayOfMonthOption.dayInNumberedWeek && rule != null) ...[
           Padding(
-            padding: const EdgeInsets.fromLTRB(32.0, 8.0, 8.0, 32.0),
+            padding: const EdgeInsets.fromLTRB(32, 8, 8, 32),
             child: Row(
               children: [
                 PlatformDropdownButton<int>(
@@ -820,7 +816,7 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
                   },
                 ),
                 const Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8),
                 ),
                 PlatformDropdownButton<WeekDay>(
                   items: _weekdays
@@ -848,12 +844,11 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
 }
 
 class UntilComposer extends StatefulWidget {
+  const UntilComposer(
+      {super.key, required this.start, this.until, this.recommendation});
   final DateTime start;
   final DateTime? until;
   final IsoDuration? recommendation;
-  const UntilComposer(
-      {Key? key, required this.start, this.until, this.recommendation})
-      : super(key: key);
 
   @override
   State<UntilComposer> createState() => _UntilComposerState();
@@ -906,7 +901,7 @@ class _UntilComposerState extends State<UntilComposer> {
     final localizations = context.text;
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -922,12 +917,12 @@ class _UntilComposerState extends State<UntilComposer> {
               ),
           if (_option == _UntilOption.date) ...[
             Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
+              padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
               child: Text(localizations.composeAppointmentRecurrenceUntilLabel,
                   style: theme.textTheme.bodySmall),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: DateTimePicker(
                 dateTime: _until,
                 onlyDate: true,

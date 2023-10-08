@@ -1,15 +1,12 @@
 import 'package:enough_mail/discover.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/oauth/oauth.dart';
+import '../l10n/extension.dart';
+import '../oauth/oauth.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProviderService {
-  final _providersByDomains = <String, Provider>{};
-  final _providers = <Provider>[];
-  List<Provider> get providers => _providers;
 
   ProviderService() {
     addAll([
@@ -22,6 +19,9 @@ class ProviderService {
       MailboxOrgProvider(),
     ]);
   }
+  final _providersByDomains = <String, Provider>{};
+  final _providers = <Provider>[];
+  List<Provider> get providers => _providers;
 
   /// Retrieves the provider for the given [incomingHostName]
   Provider? operator [](String incomingHostName) =>
@@ -56,7 +56,7 @@ class ProviderService {
   }
 
   void addAll(Iterable<Provider> providers) {
-    for (var p in providers) {
+    for (final p in providers) {
       add(p);
     }
   }
@@ -74,20 +74,6 @@ class ProviderService {
 }
 
 class Provider {
-  /// The key of the provider, help to resolves image resources and possibly other settings like branding guidelines
-  final String key;
-  final String incomingHostName;
-  final ClientConfig clientConfig;
-  final OauthClient? oauthClient;
-  bool get hasOAuthClient => (oauthClient != null && oauthClient!.isEnabled);
-  final String? appSpecificPasswordSetupUrl;
-  final String? manualImapAccessSetupUrl;
-  final List<String>? domains;
-
-  String? get displayName => (clientConfig.emailProviders == null ||
-          clientConfig.emailProviders!.isEmpty)
-      ? null
-      : clientConfig.emailProviders!.first.displayName;
 
   const Provider(
     this.key,
@@ -98,6 +84,20 @@ class Provider {
     this.manualImapAccessSetupUrl,
     this.domains,
   });
+  /// The key of the provider, help to resolves image resources and possibly other settings like branding guidelines
+  final String key;
+  final String incomingHostName;
+  final ClientConfig clientConfig;
+  final OauthClient? oauthClient;
+  bool get hasOAuthClient => oauthClient != null && oauthClient!.isEnabled;
+  final String? appSpecificPasswordSetupUrl;
+  final String? manualImapAccessSetupUrl;
+  final List<String>? domains;
+
+  String? get displayName => (clientConfig.emailProviders == null ||
+          clientConfig.emailProviders!.isEmpty)
+      ? null
+      : clientConfig.emailProviders!.first.displayName;
 
   /// Builds the sign in button for this provider
   ///
@@ -121,7 +121,7 @@ class Provider {
             color: Colors.white,
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -132,7 +132,7 @@ class Provider {
                   errorBuilder: (context, error, stacktrace) => Container(),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: PlatformText(buttonText),
                 ),
               ],
@@ -213,7 +213,7 @@ class GmailProvider extends Provider {
                 errorBuilder: (context, error, stacktrace) => Container(),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 16.0),
+                padding: const EdgeInsets.only(left: 8, right: 16),
                 child: PlatformText(
                   localizations.addAccountOauthSignInGoogle,
                   style: GoogleFonts.roboto(

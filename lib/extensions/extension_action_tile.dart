@@ -1,20 +1,20 @@
 import 'dart:io';
 
-import 'package:enough_mail_app/extensions/extensions.dart';
-import 'package:enough_mail_app/models/models.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' hide WebViewConfiguration;
 
+import '../account/model.dart';
 import '../locator.dart';
+import '../models/models.dart';
 import '../routes.dart';
+import '../services/i18n_service.dart';
+import '../services/navigation_service.dart';
+import 'extensions.dart';
 
 class ExtensionActionTile extends StatelessWidget {
+  const ExtensionActionTile({super.key, required this.actionDescription});
   final AppExtensionActionDescription actionDescription;
-  const ExtensionActionTile({Key? key, required this.actionDescription})
-      : super(key: key);
 
   static Widget buildSideMenuForAccount(
       BuildContext context, RealAccount? currentAccount) {

@@ -2,38 +2,37 @@ import 'dart:io';
 
 import 'package:badges/badges.dart' as badges;
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/extensions/extension_action_tile.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/inherited_widgets.dart';
-import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../account/model.dart';
+import '../account/providers.dart';
+import '../extensions/extension_action_tile.dart';
 import '../l10n/app_localizations.g.dart';
+import '../l10n/extension.dart';
+import '../locator.dart';
 import '../routes.dart';
+import '../services/icon_service.dart';
+import '../services/mail_service.dart';
+import '../services/navigation_service.dart';
+import '../util/localized_dialog_helper.dart';
+import 'mailbox_tree.dart';
 
-class AppDrawer extends StatelessWidget {
-  const AppDrawer({Key? key}) : super(key: key);
+class AppDrawer extends ConsumerWidget {
+  const AppDrawer({super.key, this.currentAccount});
+
+  final Account? currentAccount;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final accounts = ref.watch(allAccountsProvider);
     final mailService = locator<MailService>();
     final theme = Theme.of(context);
     final localizations = context.text;
     final iconService = locator<IconService>();
-    final mailState = MailServiceWidget.of(context)!;
-    final currentAccount = mailState.account ?? mailService.currentAccount;
-    var accounts = mailState.accounts ?? mailService.accounts;
-    if (mailService.hasUnifiedAccount) {
-      accounts = accounts.toList();
-      accounts.insert(0, mailService.unifiedAccount!);
-    }
+    final currentAccount = this.currentAccount;
+
     return PlatformDrawer(
       child: SafeArea(
         child: Column(
@@ -41,7 +40,7 @@ class AppDrawer extends StatelessWidget {
             Material(
               elevation: 18,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 child: _buildAccountHeader(
                     currentAccount, mailService.accounts, theme),
               ),
@@ -88,7 +87,7 @@ class AppDrawer extends StatelessWidget {
                   navService.push(Routes.settings);
                 },
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -172,91 +171,94 @@ class AppDrawer extends StatelessWidget {
   }
 
   Widget _buildAccountSelection(
-      BuildContext context,
-      MailService mailService,
-      List<Account> accounts,
-      Account? currentAccount,
-      AppLocalizations localizations) {
-    if (accounts.length > 1) {
-      return ExpansionTile(
-        leading: mailService.hasAccountsWithErrors() ? const Badge() : null,
-        title: Text(localizations
-            .drawerAccountsSectionTitle(mailService.accounts.length)),
-        children: [
-          for (final account in accounts)
-            SelectablePlatformListTile(
-              leading: mailService.hasError(account)
-                  ? const Icon(Icons.error_outline)
-                  : null,
-              tileColor: mailService.hasError(account) ? Colors.red : null,
-              title: Text(account.name),
-              selected: account == currentAccount,
-              onTap: () async {
-                final navService = locator<NavigationService>();
-                if (!Platform.isIOS) {
-                  // close drawer
-                  navService.pop();
-                }
-                if (mailService.hasError(account)) {
-                  navService.push(Routes.accountEdit, arguments: account);
-                } else {
-                  final accountWidgetState = MailServiceWidget.of(context);
-                  if (accountWidgetState != null) {
-                    accountWidgetState.account = account;
-                  }
-                  final messageSource = locator<MailService>()
-                      .getMessageSourceFor(account, switchToAccount: true);
-                  navService.push(Routes.messageSourceFuture,
-                      arguments: messageSource,
-                      replace: !Platform.isIOS,
-                      fade: true);
-                }
-              },
-              onLongPress: () {
-                final navService = locator<NavigationService>();
-                if (account is UnifiedAccount) {
-                  navService.push(Routes.settingsAccounts, fade: true);
-                } else {
-                  navService.push(Routes.accountEdit,
-                      arguments: account, fade: true);
-                }
-              },
-            ),
-          _buildAddAccountTile(localizations),
-        ],
-      );
-    } else {
-      return _buildAddAccountTile(localizations);
-    }
-  }
+    BuildContext context,
+    MailService mailService,
+    List<Account> accounts,
+    Account? currentAccount,
+    AppLocalizations localizations,
+  ) =>
+      accounts.length > 1
+          ? ExpansionTile(
+              leading:
+                  mailService.hasAccountsWithErrors() ? const Badge() : null,
+              title: Text(localizations
+                  .drawerAccountsSectionTitle(mailService.accounts.length)),
+              children: [
+                for (final account in accounts)
+                  SelectablePlatformListTile(
+                    leading: mailService.hasError(account)
+                        ? const Icon(Icons.error_outline)
+                        : null,
+                    tileColor:
+                        mailService.hasError(account) ? Colors.red : null,
+                    title: Text(account.name),
+                    selected: account == currentAccount,
+                    onTap: () async {
+                      final navService = locator<NavigationService>();
+                      if (!Platform.isIOS) {
+                        navService.pop();
+                      }
+                      if (mailService.hasError(account)) {
+                        await navService.push(
+                          Routes.accountEdit,
+                          arguments: account,
+                        );
+                      } else {
+                        final messageSource =
+                            locator<MailService>().getMessageSourceFor(
+                          account,
+                          switchToAccount: true,
+                        );
+                        await navService.push(
+                          Routes.messageSourceFuture,
+                          arguments: messageSource,
+                          replace: !Platform.isIOS,
+                          fade: true,
+                        );
+                      }
+                    },
+                    onLongPress: () {
+                      final navService = locator<NavigationService>();
+                      if (account is UnifiedAccount) {
+                        navService.push(Routes.settingsAccounts, fade: true);
+                      } else {
+                        navService.push(Routes.accountEdit,
+                            arguments: account, fade: true);
+                      }
+                    },
+                  ),
+                _buildAddAccountTile(localizations),
+              ],
+            )
+          : _buildAddAccountTile(localizations);
 
-  Widget _buildAddAccountTile(AppLocalizations localizations) {
-    return PlatformListTile(
-      leading: const Icon(Icons.add),
-      title: Text(localizations.drawerEntryAddAccount),
-      onTap: () {
-        final navService = locator<NavigationService>();
-        if (!Platform.isIOS) {
-          navService.pop();
-        }
-        navService.push(Routes.accountAdd);
-      },
-    );
-  }
+  Widget _buildAddAccountTile(AppLocalizations localizations) =>
+      PlatformListTile(
+        leading: const Icon(Icons.add),
+        title: Text(localizations.drawerEntryAddAccount),
+        onTap: () {
+          final navService = locator<NavigationService>();
+          if (!Platform.isIOS) {
+            navService.pop();
+          }
+          navService.push(Routes.accountAdd);
+        },
+      );
 
   Widget _buildFolderTree(Account? account) {
     if (account == null) {
-      return Container();
+      return const SizedBox.shrink();
     }
+
     return MailboxTree(account: account, onSelected: _navigateToMailbox);
   }
 
-  void _navigateToMailbox(Mailbox mailbox) async {
+  Future<void> _navigateToMailbox(Mailbox mailbox) async {
     final mailService = locator<MailService>();
     final account = mailService.currentAccount!;
     final messageSourceFuture =
         mailService.getMessageSourceFor(account, mailbox: mailbox);
-    locator<NavigationService>().push(
+    await locator<NavigationService>().push(
       Routes.messageSourceFuture,
       arguments: messageSourceFuture,
       replace: !Platform.isIOS,

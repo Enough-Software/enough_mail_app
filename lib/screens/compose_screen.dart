@@ -8,10 +8,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../account/model.dart';
 import '../l10n/app_localizations.g.dart';
 import '../l10n/extension.dart';
 import '../locator.dart';
-import '../models/account.dart';
 import '../models/compose_data.dart';
 import '../models/sender.dart';
 import '../models/shared_data.dart';
@@ -28,7 +28,6 @@ import '../widgets/app_drawer.dart';
 import '../widgets/attachment_compose_bar.dart';
 import '../widgets/button_text.dart';
 import '../widgets/editor_extensions.dart';
-import '../widgets/inherited_widgets.dart';
 import '../widgets/recipient_input_field.dart';
 
 class ComposeScreen extends ConsumerStatefulWidget {
@@ -393,6 +392,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         : widget.data.action == ComposeAction.forward
             ? localizations.composeTitleForward
             : localizations.composeTitleNew;
+
     return WillPopScope(
       onWillPop: () async {
         // let it pop but show snackbar to return:
@@ -401,243 +401,241 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
           localizations.composeLeftByMistake,
           undo: _returnToCompose,
         );
+
         return true;
       },
-      child: MessageWidget(
-        message: widget.data.originalMessage,
-        child: PlatformScaffold(
-          material: (context, platform) =>
-              MaterialScaffoldData(drawer: const AppDrawer()),
-          body: CustomScrollView(
-            slivers: [
-              PlatformSliverAppBar(
-                title: Text(titleText),
-                pinned: true,
-                stretch: true,
-                actions: [
-                  AddAttachmentPopupButton(
-                    composeData: widget.data,
-                    update: () => setState(() {}),
-                  ),
-                  PlatformIconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () => _send(localizations),
-                  ),
-                  PlatformPopupMenuButton<_OverflowMenuChoice>(
-                    onSelected: (result) {
-                      switch (result) {
-                        case _OverflowMenuChoice.showSourceCode:
-                          _showSourceCode();
-                          break;
-                        case _OverflowMenuChoice.saveAsDraft:
-                          _saveAsDraft();
-                          break;
-                        case _OverflowMenuChoice.requestReadReceipt:
-                          _requestReadReceipt();
-                          break;
-                        case _OverflowMenuChoice.convertToPlainTextEditor:
-                          _convertToPlainTextEditor();
-                          break;
-                        case _OverflowMenuChoice.convertToHtmlEditor:
-                          _convertToHtmlEditor();
-                          break;
-                      }
-                    },
-                    itemBuilder: (context) => [
+      child: PlatformScaffold(
+        material: (context, platform) =>
+            MaterialScaffoldData(drawer: const AppDrawer()),
+        body: CustomScrollView(
+          slivers: [
+            PlatformSliverAppBar(
+              title: Text(titleText),
+              pinned: true,
+              stretch: true,
+              actions: [
+                AddAttachmentPopupButton(
+                  composeData: widget.data,
+                  update: () => setState(() {}),
+                ),
+                PlatformIconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: () => _send(localizations),
+                ),
+                PlatformPopupMenuButton<_OverflowMenuChoice>(
+                  onSelected: (result) {
+                    switch (result) {
+                      case _OverflowMenuChoice.showSourceCode:
+                        _showSourceCode();
+                        break;
+                      case _OverflowMenuChoice.saveAsDraft:
+                        _saveAsDraft();
+                        break;
+                      case _OverflowMenuChoice.requestReadReceipt:
+                        _requestReadReceipt();
+                        break;
+                      case _OverflowMenuChoice.convertToPlainTextEditor:
+                        _convertToPlainTextEditor();
+                        break;
+                      case _OverflowMenuChoice.convertToHtmlEditor:
+                        _convertToHtmlEditor();
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PlatformPopupMenuItem<_OverflowMenuChoice>(
+                      value: _OverflowMenuChoice.saveAsDraft,
+                      child: Text(localizations.composeSaveDraftAction),
+                    ),
+                    PlatformPopupMenuItem<_OverflowMenuChoice>(
+                      value: _OverflowMenuChoice.requestReadReceipt,
+                      child:
+                          Text(localizations.composeRequestReadReceiptAction),
+                    ),
+                    if (_composeMode == ComposeMode.html)
                       PlatformPopupMenuItem<_OverflowMenuChoice>(
-                        value: _OverflowMenuChoice.saveAsDraft,
-                        child: Text(localizations.composeSaveDraftAction),
-                      ),
+                        value: _OverflowMenuChoice.convertToPlainTextEditor,
+                        child: Text(localizations
+                            .composeConvertToPlainTextEditorAction),
+                      )
+                    else
                       PlatformPopupMenuItem<_OverflowMenuChoice>(
-                        value: _OverflowMenuChoice.requestReadReceipt,
-                        child:
-                            Text(localizations.composeRequestReadReceiptAction),
-                      ),
-                      if (_composeMode == ComposeMode.html)
-                        PlatformPopupMenuItem<_OverflowMenuChoice>(
-                          value: _OverflowMenuChoice.convertToPlainTextEditor,
-                          child: Text(localizations
-                              .composeConvertToPlainTextEditorAction),
-                        )
-                      else
-                        PlatformPopupMenuItem<_OverflowMenuChoice>(
-                          value: _OverflowMenuChoice.convertToHtmlEditor,
-                          child: Text(
-                              localizations.composeConvertToHtmlEditorAction),
+                        value: _OverflowMenuChoice.convertToHtmlEditor,
+                        child: Text(
+                          localizations.composeConvertToHtmlEditorAction,
                         ),
-                      if (ref.read(settingsProvider).enableDeveloperMode)
-                        PlatformPopupMenuItem<_OverflowMenuChoice>(
-                          value: _OverflowMenuChoice.showSourceCode,
-                          child: Text(localizations.viewSourceAction),
-                        ),
-                    ],
-                  ),
-                ], // actions
-              ),
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        localizations.detailsHeaderFrom,
-                        style: Theme.of(context).textTheme.bodySmall,
                       ),
-                      PlatformDropdownButton<Sender>(
-                        //isExpanded: true,
-                        items: _senders
-                            .map(
-                              (s) => DropdownMenuItem<Sender>(
-                                value: s,
-                                child: Text(
-                                  s.toString(),
-                                  overflow: TextOverflow.fade,
-                                ),
+                    if (ref.read(settingsProvider).enableDeveloperMode)
+                      PlatformPopupMenuItem<_OverflowMenuChoice>(
+                        value: _OverflowMenuChoice.showSourceCode,
+                        child: Text(localizations.viewSourceAction),
+                      ),
+                  ],
+                ),
+              ], // actions
+            ),
+            SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      localizations.detailsHeaderFrom,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    PlatformDropdownButton<Sender>(
+                      //isExpanded: true,
+                      items: _senders
+                          .map(
+                            (s) => DropdownMenuItem<Sender>(
+                              value: s,
+                              child: Text(
+                                s.toString(),
+                                overflow: TextOverflow.fade,
                               ),
-                            )
-                            .toList(),
-                        onChanged: (s) async {
-                          final builder = widget.data.messageBuilder;
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (s) async {
+                        final builder = widget.data.messageBuilder;
 
-                          builder.from = [s!.address];
-                          final lastSignature = _signature;
-                          _from = s;
-                          final newSignature = _signature;
-                          if (newSignature != lastSignature) {
-                            await _htmlEditorApi!
-                                .replaceAll(lastSignature, newSignature);
-                          }
-                          if (_isReadReceiptRequested) {
-                            builder.requestReadReceipt(
-                                recipient: _from.address);
-                          }
-                          setState(() {});
+                        builder.from = [s!.address];
+                        final lastSignature = _signature;
+                        _from = s;
+                        final newSignature = _signature;
+                        if (newSignature != lastSignature) {
+                          await _htmlEditorApi!
+                              .replaceAll(lastSignature, newSignature);
+                        }
+                        if (_isReadReceiptRequested) {
+                          builder.requestReadReceipt(recipient: _from.address);
+                        }
+                        setState(() {});
 
-                          _checkAccountContactManager(_from.account);
-                        },
-                        value: _from,
-                        hint: Text(localizations.composeSenderHint),
+                        _checkAccountContactManager(_from.account);
+                      },
+                      value: _from,
+                      hint: Text(localizations.composeSenderHint),
+                    ),
+                    RecipientInputField(
+                      contactManager: _from.account.contactManager,
+                      addresses: _toRecipients,
+                      autofocus: _focus == _Autofocus.to,
+                      labelText: localizations.detailsHeaderTo,
+                      hintText: localizations.composeRecipientHint,
+                      additionalSuffixIcon: PlatformTextButton(
+                        child: ButtonText(localizations.detailsHeaderCc),
+                        onPressed: () => setState(
+                          () => _isCcBccVisible = !_isCcBccVisible,
+                        ),
+                      ),
+                    ),
+                    if (_isCcBccVisible) ...[
+                      RecipientInputField(
+                        addresses: _ccRecipients,
+                        contactManager: _from.account.contactManager,
+                        labelText: localizations.detailsHeaderCc,
+                        hintText: localizations.composeRecipientHint,
                       ),
                       RecipientInputField(
+                        addresses: _bccRecipients,
                         contactManager: _from.account.contactManager,
-                        addresses: _toRecipients,
-                        autofocus: _focus == _Autofocus.to,
-                        labelText: localizations.detailsHeaderTo,
+                        labelText: localizations.detailsHeaderBcc,
                         hintText: localizations.composeRecipientHint,
-                        additionalSuffixIcon: PlatformTextButton(
-                          child: ButtonText(localizations.detailsHeaderCc),
-                          onPressed: () => setState(
-                            () => _isCcBccVisible = !_isCcBccVisible,
-                          ),
-                        ),
                       ),
-                      if (_isCcBccVisible) ...[
-                        RecipientInputField(
-                          addresses: _ccRecipients,
-                          contactManager: _from.account.contactManager,
-                          labelText: localizations.detailsHeaderCc,
-                          hintText: localizations.composeRecipientHint,
-                        ),
-                        RecipientInputField(
-                          addresses: _bccRecipients,
-                          contactManager: _from.account.contactManager,
-                          labelText: localizations.detailsHeaderBcc,
-                          hintText: localizations.composeRecipientHint,
-                        ),
-                      ],
-                      TextEditor(
-                        controller: _subjectController,
-                        autofocus: _focus == _Autofocus.subject,
-                        decoration: InputDecoration(
-                          labelText: localizations.composeSubjectLabel,
-                          hintText: localizations.composeSubjectHint,
-                        ),
-                        cupertinoShowLabel: false,
-                      ),
-                      if (widget.data.messageBuilder.attachments.isNotEmpty ||
-                          (_downloadAttachmentsFuture != null)) ...[
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: AttachmentComposeBar(
-                              composeData: widget.data,
-                              isDownloading:
-                                  _downloadAttachmentsFuture != null),
-                        ),
-                        const Divider(
-                          color: Colors.grey,
-                        )
-                      ],
                     ],
-                  ),
+                    TextEditor(
+                      controller: _subjectController,
+                      autofocus: _focus == _Autofocus.subject,
+                      decoration: InputDecoration(
+                        labelText: localizations.composeSubjectLabel,
+                        hintText: localizations.composeSubjectHint,
+                      ),
+                      cupertinoShowLabel: false,
+                    ),
+                    if (widget.data.messageBuilder.attachments.isNotEmpty ||
+                        (_downloadAttachmentsFuture != null)) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: AttachmentComposeBar(
+                          composeData: widget.data,
+                          isDownloading: _downloadAttachmentsFuture != null,
+                        ),
+                      ),
+                      const Divider(
+                        color: Colors.grey,
+                      )
+                    ],
+                  ],
                 ),
               ),
-              if (_isReadReceiptRequested)
-                SliverToBoxAdapter(
-                  child: PlatformCheckboxListTile(
-                    value: true,
-                    title: Text(localizations.composeRequestReadReceiptAction),
-                    onChanged: (value) {
-                      _removeReadReceiptRequest();
-                    },
-                  ),
-                ),
-              if (_composeMode == ComposeMode.html && _htmlEditorApi != null)
-                SliverHeaderHtmlEditorControls(
-                  editorApi: _htmlEditorApi,
-                  suffix: EditorArtExtensionButton(editorApi: _htmlEditorApi!),
-                )
-              else if (_composeMode == ComposeMode.plainText &&
-                  _plainTextEditorApi != null)
-                SliverHeaderTextEditorControls(
-                  editorApi: _plainTextEditorApi,
-                ),
+            ),
+            if (_isReadReceiptRequested)
               SliverToBoxAdapter(
-                child: FutureBuilder<String>(
-                  future: _loadMailTextFuture,
-                  builder: (widget, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.none:
-                      case ConnectionState.waiting:
-                      case ConnectionState.active:
-                        return const Center(child: PlatformProgressIndicator());
-                      case ConnectionState.done:
-                        if (_composeMode == ComposeMode.html) {
-                          final text = snapshot.data ?? '<p></p>';
-                          return HtmlEditor(
-                            onCreated: (api) {
-                              setState(() {
-                                _htmlEditorApi = api;
-                              });
-                            },
-                            enableDarkMode:
-                                Theme.of(context).brightness == Brightness.dark,
-                            initialContent: text,
-                            minHeight: 400,
-                          );
-                        } else {
-                          // compose mode is plainText
-                          _plainTextController.text = snapshot.data ?? '';
-                          return Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: TextEditor(
-                              controller: _plainTextController,
-                              minLines: 10,
-                              maxLines: null,
-                              onCreated: (api) {
-                                setState(() {
-                                  _plainTextEditorApi = api;
-                                });
-                              },
-                            ),
-                          );
-                        }
-                    }
+                child: PlatformCheckboxListTile(
+                  value: true,
+                  title: Text(localizations.composeRequestReadReceiptAction),
+                  onChanged: (value) {
+                    _removeReadReceiptRequest();
                   },
                 ),
               ),
-            ],
-          ),
+            if (_composeMode == ComposeMode.html && _htmlEditorApi != null)
+              SliverHeaderHtmlEditorControls(
+                editorApi: _htmlEditorApi,
+                suffix: EditorArtExtensionButton(editorApi: _htmlEditorApi!),
+              )
+            else if (_composeMode == ComposeMode.plainText &&
+                _plainTextEditorApi != null)
+              SliverHeaderTextEditorControls(
+                editorApi: _plainTextEditorApi,
+              ),
+            SliverToBoxAdapter(
+              child: FutureBuilder<String>(
+                future: _loadMailTextFuture,
+                builder: (widget, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      return const Center(child: PlatformProgressIndicator());
+                    case ConnectionState.done:
+                      if (_composeMode == ComposeMode.html) {
+                        final text = snapshot.data ?? '<p></p>';
+                        return HtmlEditor(
+                          onCreated: (api) {
+                            setState(() {
+                              _htmlEditorApi = api;
+                            });
+                          },
+                          enableDarkMode:
+                              Theme.of(context).brightness == Brightness.dark,
+                          initialContent: text,
+                          minHeight: 400,
+                        );
+                      } else {
+                        // compose mode is plainText
+                        _plainTextController.text = snapshot.data ?? '';
+                        return Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: TextEditor(
+                            controller: _plainTextController,
+                            minLines: 10,
+                            maxLines: null,
+                            onCreated: (api) {
+                              setState(() {
+                                _plainTextEditorApi = api;
+                              });
+                            },
+                          ),
+                        );
+                      }
+                  }
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

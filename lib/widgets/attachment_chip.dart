@@ -1,23 +1,22 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/screens/media_screen.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/widgets/ical_interactive_media.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/extension.dart';
+import '../locator.dart';
+import '../models/message.dart';
+import '../routes.dart';
+import '../screens/media_screen.dart';
+import '../services/i18n_service.dart';
+import '../services/icon_service.dart';
+import '../services/navigation_service.dart';
 import 'button_text.dart';
+import 'ical_interactive_media.dart';
 
 class AttachmentChip extends StatefulWidget {
-  const AttachmentChip({Key? key, required this.info, required this.message})
-      : super(key: key);
+  const AttachmentChip({super.key, required this.info, required this.message});
   final ContentInfo info;
   final Message message;
 
@@ -52,18 +51,18 @@ class _AttachmentChipState extends State<AttachmentChip> {
       return PlatformTextButton(
         onPressed: _isDownloading ? null : _download,
         child: Padding(
-          padding: const EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(4),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(8),
             child: _buildPreviewWidget(true, fallbackIcon, name),
           ),
         ),
       );
     } else {
       return Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(4),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(8),
           child: PreviewMediaWidget(
             mediaProvider: _mediaProvider!,
             width: _width,
@@ -110,7 +109,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(4.0),
+                  padding: const EdgeInsets.all(4),
                   child: Text(
                     name,
                     overflow: TextOverflow.fade,
@@ -132,7 +131,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
                   ),
                 ),
                 child: const Padding(
-                  padding: EdgeInsets.all(4.0),
+                  padding: EdgeInsets.all(4),
                   child: Icon(Icons.download_rounded, color: Colors.white),
                 ),
               ),
@@ -172,7 +171,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
         builder: _buildInteractiveMedia,
         fallbackBuilder: _buildInteractiveFallback,
       );
-      _showAttachment(media);
+      await _showAttachment(media);
     } on MailException catch (e) {
       if (kDebugMode) {
         print(
@@ -209,12 +208,12 @@ class _AttachmentChipState extends State<AttachmentChip> {
 
     return Material(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8),
               child: Icon(iconData),
             ),
             Text(
@@ -223,7 +222,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
             ),
             if (sizeText != null)
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 child: Text(sizeText),
               ),
             PlatformTextButton(

@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 
 class PasswordField extends StatefulWidget {
   const PasswordField({
-    Key? key,
+    super.key,
     required this.controller,
     this.labelText,
     this.hintText,
     this.onChanged,
     this.autofocus = false,
     this.cupertinoShowLabel = true,
-  }) : super(key: key);
+  });
 
   final TextEditingController? controller;
   final String? labelText;
@@ -28,8 +28,7 @@ class _PasswordFieldState extends State<PasswordField> {
   bool _obscureText = true;
 
   @override
-  Widget build(BuildContext context) {
-    return DecoratedPlatformTextField(
+  Widget build(BuildContext context) => DecoratedPlatformTextField(
       controller: widget.controller,
       obscureText: _obscureText,
       onChanged: widget.onChanged,
@@ -50,11 +49,10 @@ class _PasswordFieldState extends State<PasswordField> {
             icon: Icon(
               _obscureText ? Icons.lock_open : Icons.lock,
               color: CupertinoColors.secondaryLabel,
-              size: 20.0,
+              size: 20,
             ),
           ),
         ),
       ),
     );
-  }
 }

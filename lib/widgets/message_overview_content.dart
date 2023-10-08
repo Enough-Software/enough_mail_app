@@ -1,22 +1,22 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
+import '../l10n/extension.dart';
+import '../models/message.dart';
+import '../services/i18n_service.dart';
+import '../services/icon_service.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.g.dart';
 import '../locator.dart';
 
 class MessageOverviewContent extends StatelessWidget {
-  final Message message;
-  final bool isSentMessage;
 
   const MessageOverviewContent({
-    Key? key,
+    super.key,
     required this.message,
     required this.isSentMessage,
-  }) : super(key: key);
+  });
+  final Message message;
+  final bool isSentMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class MessageOverviewContent extends StatelessWidget {
     final date = locator<I18nService>().formatDateTime(mime.decodeDate());
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       color: msg.isFlagged ? theme.colorScheme.secondary : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +42,7 @@ class MessageOverviewContent extends StatelessWidget {
             children: [
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
+                  padding: const EdgeInsets.only(right: 8),
                   child: Text(
                     senderOrRecipients,
                     overflow: TextOverflow.fade,
@@ -60,7 +60,7 @@ class MessageOverviewContent extends StatelessWidget {
                   msg.isFlagged ||
                   threadLength != 0)
                 Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
+                  padding: const EdgeInsets.only(left: 8),
                   child: Row(
                     children: [
                       if (msg.isFlagged)
@@ -71,7 +71,7 @@ class MessageOverviewContent extends StatelessWidget {
                       if (msg.isForwarded) const Icon(Icons.forward, size: 12),
                       if (threadLength != 0)
                         IconService.buildNumericIcon(context, threadLength,
-                            size: 12.0),
+                            size: 12),
                     ],
                   ),
                 ),

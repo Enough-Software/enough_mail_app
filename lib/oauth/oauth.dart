@@ -1,23 +1,23 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/services/key_service.dart';
-import 'package:enough_mail_app/util/http_helper.dart';
+import '../locator.dart';
+import '../services/key_service.dart';
+import '../util/http_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 
 class OauthClientId {
-  final String id;
-  final String? secret;
 
   const OauthClientId(this.id, this.secret);
+  final String id;
+  final String? secret;
 }
 
 abstract class OauthClient {
+  OauthClient(this.incomingHostName);
   final String incomingHostName;
-  bool get isEnabled => (oauthClientId != null);
+  bool get isEnabled => oauthClientId != null;
   OauthClientId? get oauthClientId =>
       locator<KeyService>().oauth[incomingHostName];
-  OauthClient(this.incomingHostName);
 
   Future<OauthToken?> authenticate(String email) async {
     try {
@@ -114,10 +114,10 @@ class GmailOAuthClient extends OauthClient {
 }
 
 class OutlookOAuthClient extends OauthClient {
+  OutlookOAuthClient() : super('outlook.office365.com');
   // source: https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
   static const String _scope =
       'https://outlook.office.com/IMAP.AccessAsUser.All https://outlook.office.com/SMTP.Send offline_access';
-  OutlookOAuthClient() : super('outlook.office365.com');
 
   @override
   Future<OauthToken> _authenticate(String email, String provider) async {

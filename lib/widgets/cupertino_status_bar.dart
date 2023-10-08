@@ -1,8 +1,8 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import '../services/i18n_service.dart';
+import '../services/scaffold_messenger_service.dart';
 
 import '../locator.dart';
 
@@ -11,13 +11,13 @@ import '../locator.dart';
 /// Contains compose action and can display snackbar notifications on ios.
 class CupertinoStatusBar extends StatefulWidget {
   const CupertinoStatusBar({
-    Key? key,
+    super.key,
     this.leftAction,
     this.rightAction,
     this.info,
-  }) : super(key: key);
+  });
 
-  static const _statusTextStyle = TextStyle(fontSize: 10.0);
+  static const _statusTextStyle = TextStyle(fontSize: 10);
   final Widget? leftAction;
   final Widget? rightAction;
   final Widget? info;
@@ -25,14 +25,12 @@ class CupertinoStatusBar extends StatefulWidget {
   @override
   CupertinoStatusBarState createState() => CupertinoStatusBarState();
 
-  static Widget? createInfo(String? text) {
-    return (text == null)
+  static Widget? createInfo(String? text) => (text == null)
         ? null
         : Text(
             text,
             style: _statusTextStyle,
           );
-  }
 }
 
 class CupertinoStatusBarState extends State<CupertinoStatusBar> {
@@ -82,14 +80,13 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 44.0,
+          height: 44,
           child: Stack(
             fit: StackFit.passthrough,
             children: [
               Align(
-                alignment: Alignment.center,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: middle,
                 ),
               ),
@@ -115,17 +112,17 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
     );
   }
 
-  void showTextStatus(String text, {Function()? undo}) async {
+  Future<void> showTextStatus(String text, {Function()? undo}) async {
     final notification = Text(
       text,
       style: CupertinoStatusBar._statusTextStyle,
     );
     if (undo != null) {
       _statusAction = Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        padding: const EdgeInsets.symmetric(horizontal: 4),
         child: CupertinoButton.filled(
-          padding: const EdgeInsets.all(8.0),
-          minSize: 20.0,
+          padding: const EdgeInsets.all(8),
+          minSize: 20,
           child: Text(
             locator<I18nService>().localizations.actionUndo,
             style: CupertinoStatusBar._statusTextStyle,

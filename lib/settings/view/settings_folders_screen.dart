@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../account/model.dart';
 import '../../l10n/extension.dart';
 import '../../locator.dart';
 import '../../models/models.dart';
@@ -38,7 +39,7 @@ class SettingsFoldersScreen extends ConsumerWidget {
       content: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -71,7 +72,7 @@ class SettingsFoldersScreen extends ConsumerWidget {
                   ),
                 ],
                 const Divider(
-                  height: 8.0,
+                  height: 8,
                 ),
                 const FolderManagement(),
               ],
@@ -82,7 +83,7 @@ class SettingsFoldersScreen extends ConsumerWidget {
     );
   }
 
-  void _editFolderNames(
+  Future<void> _editFolderNames(
     BuildContext context,
     Settings settings,
     WidgetRef ref,
@@ -107,18 +108,18 @@ class SettingsFoldersScreen extends ConsumerWidget {
     if (result == true) {
       settings = settings.copyWith(customFolderNames: customNames);
       locator<MailService>().applyFolderNameSettings(settings);
-      ref.read(settingsProvider.notifier).update(settings);
+      await ref.read(settingsProvider.notifier).update(settings);
     }
   }
 
-  void _onFolderNameSettingChanged(
+  Future<void> _onFolderNameSettingChanged(
     BuildContext context,
     FolderNameSetting? value,
     WidgetRef ref,
   ) async {
     final settings = ref.read(settingsProvider);
 
-    ref.read(settingsProvider.notifier).update(
+    await ref.read(settingsProvider.notifier).update(
           settings.copyWith(folderNameSetting: value),
         );
     locator<MailService>().applyFolderNameSettings(settings);
@@ -126,8 +127,7 @@ class SettingsFoldersScreen extends ConsumerWidget {
 }
 
 class CustomFolderNamesEditor extends HookConsumerWidget {
-  const CustomFolderNamesEditor({Key? key, required this.customNames})
-      : super(key: key);
+  const CustomFolderNamesEditor({super.key, required this.customNames});
 
   final List<String> customNames;
 
@@ -211,7 +211,7 @@ class CustomFolderNamesEditor extends HookConsumerWidget {
 }
 
 class FolderManagement extends StatefulWidget {
-  const FolderManagement({Key? key}) : super(key: key);
+  const FolderManagement({super.key});
 
   @override
   State<FolderManagement> createState() => _FolderManagementState();
@@ -249,10 +249,12 @@ class _FolderManagementState extends State<FolderManagement> {
             AccountSelector(
               account: _account,
               onChanged: (account) {
-                setState(() {
-                  _mailbox = null;
-                  _account = account!;
-                });
+                if (account != null) {
+                  setState(() {
+                    _mailbox = null;
+                    _account = account;
+                  });
+                }
               },
             ),
             const Divider(),
@@ -287,18 +289,17 @@ class _FolderManagementState extends State<FolderManagement> {
 }
 
 class MailboxWidget extends StatelessWidget {
+
+  const MailboxWidget(
+      {super.key,
+      required this.mailbox,
+      required this.account,
+      required this.onMailboxAdded,
+      required this.onMailboxDeleted});
   final RealAccount account;
   final Mailbox? mailbox;
   final void Function() onMailboxAdded;
   final void Function() onMailboxDeleted;
-
-  const MailboxWidget(
-      {Key? key,
-      required this.mailbox,
-      required this.account,
-      required this.onMailboxAdded,
-      required this.onMailboxDeleted})
-      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -332,7 +333,7 @@ class MailboxWidget extends StatelessWidget {
     );
   }
 
-  void _createFolder(context) async {
+  Future<void> _createFolder(context) async {
     final localizations = context.text;
     final folderNameController = TextEditingController();
     final result = await LocalizedDialogHelper.showWidgetDialog(
@@ -368,7 +369,7 @@ class MailboxWidget extends StatelessWidget {
     }
   }
 
-  void _deleteFolder(BuildContext context) async {
+  Future<void> _deleteFolder(BuildContext context) async {
     final localizations = context.text;
     final confirmed = await LocalizedDialogHelper.askForConfirmation(
       context,

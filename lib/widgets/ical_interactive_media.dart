@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:enough_icalendar_export/enough_icalendar_export.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/mail_address_chip.dart';
-import 'package:enough_mail_app/widgets/text_with_links.dart';
+import '../l10n/extension.dart';
+import '../locator.dart';
+import '../models/message.dart';
+import '../services/i18n_service.dart';
+import '../services/scaffold_messenger_service.dart';
+import '../util/localized_dialog_helper.dart';
+import 'mail_address_chip.dart';
+import 'text_with_links.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_mail_icalendar/enough_mail_icalendar.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -21,11 +21,10 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.g.dart';
 
 class IcalInteractiveMedia extends StatefulWidget {
+  const IcalInteractiveMedia(
+      {super.key, required this.mediaProvider, required this.message});
   final MediaProvider mediaProvider;
   final Message message;
-  const IcalInteractiveMedia(
-      {Key? key, required this.mediaProvider, required this.message})
-      : super(key: key);
 
   @override
   State<IcalInteractiveMedia> createState() => _IcalInteractiveMediaState();
@@ -73,7 +72,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
     if (event == null) {
       if (_isPermanentError) {
         return Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Text(localizations.errorTitle),
         );
       }
@@ -84,21 +83,20 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
     final i18nService = locator<I18nService>();
     final userEmail = widget.message.account.email.toLowerCase();
     final recurrenceRule = event.recurrenceRule;
-    var end = event.end;
-    var start = event.start;
+    final end = event.end;
+    final start = event.start;
     return Material(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8),
         child: Column(
           children: [
             if (isReply)
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 child: _buildReply(context, localizations, event),
               )
             else if (_canReply && _participantStatus == null)
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   PlatformTextButton(
                     child: PlatformText(localizations.actionAccept),
@@ -120,10 +118,9 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
               )
             else if (_participantStatus != null)
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8),
                     child: Text(
                         _participantStatus?.localization(localizations) ?? ''),
                   ),
@@ -142,11 +139,11 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
               children: [
                 TableRow(children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8),
                     child: Text(localizations.icalendarLabelSummary),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8),
                     child: TextWithLinks(
                         text: event.summary ??
                             localizations.icalendarNoSummaryInfo),
@@ -156,11 +153,11 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                   TableRow(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(localizations.icalendarLabelStart),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(
                           i18nService.formatDateTime(start.toLocal(),
                               alwaysUseAbsoluteFormat: true,
@@ -173,11 +170,11 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                   TableRow(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(localizations.icalendarLabelEnd),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(
                           i18nService.formatDateTime(end.toLocal(),
                               alwaysUseAbsoluteFormat: true,
@@ -190,11 +187,11 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                   TableRow(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(localizations.icalendarLabelDuration),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(
                             i18nService.formatIsoDuration(event.duration!)),
                       )
@@ -204,11 +201,11 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                   TableRow(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(localizations.icalendarLabelRecurrenceRule),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(recurrenceRule.toHumanReadableText(
                           languageCode: localizations.localeName,
                         )),
@@ -219,11 +216,11 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                   TableRow(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(localizations.icalendarLabelDescription),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: TextWithLinks(
                           text: event.description!,
                         ),
@@ -234,11 +231,11 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                   TableRow(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(localizations.icalendarLabelLocation),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: TextWithLinks(text: event.location!),
                       )
                     ],
@@ -247,11 +244,11 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                   TableRow(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(localizations.icalendarLabelTeamsUrl),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: TextWithLinks(
                             text: event.microsoftTeamsMeetingUrl!),
                       )
@@ -261,7 +258,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                   TableRow(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(localizations.icalendarLabelParticipants),
                       ),
                       Column(
@@ -272,7 +269,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                           final address = isMe
                               ? widget.message.account.fromAddress
                               : attendee.mailAddress;
-                          final participantStatus = (isMe)
+                          final participantStatus = isMe
                               ? _participantStatus ?? attendee.participantStatus
                               : attendee.participantStatus;
                           final icon = participantStatus?.icon;
@@ -285,14 +282,12 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                             children: [
                               if (icon != null)
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(8),
                                   child: icon,
                                 ),
-                              address != null
-                                  ? MailAddressChip(mailAddress: address)
-                                  : Expanded(
+                              if (address != null) MailAddressChip(mailAddress: address) else Expanded(
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(8),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -305,7 +300,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                                             Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      vertical: 4.0),
+                                                      vertical: 4),
                                               child: Text(
                                                 attendee.email ??
                                                     attendee.uri.toString(),
@@ -357,7 +352,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
       _participantStatus = status;
     });
     try {
-      widget.message.mailClient.sendCalendarReply(
+      await widget.message.mailClient.sendCalendarReply(
         _calendar!,
         status,
         originatingMessage: widget.message.mimeMessage,
@@ -369,12 +364,12 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
       if (kDebugMode) {
         print('Unable to send status update: $e $s');
       }
-      LocalizedDialogHelper.showTextDialog(context, localizations.errorTitle,
+      await LocalizedDialogHelper.showTextDialog(context, localizations.errorTitle,
           localizations.icalendarParticipantStatusSentFailure(e.toString()));
     }
   }
 
-  void _queryParticipantStatus(AppLocalizations localizations) async {
+  Future<void> _queryParticipantStatus(AppLocalizations localizations) async {
     final status = await LocalizedDialogHelper.showTextDialog(
         context,
         localizations.icalendarParticipantStatusChangeTitle,
@@ -401,7 +396,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
           ),
         ]);
     if (status != null && status != _participantStatus) {
-      _changeParticipantStatus(status, localizations);
+      await _changeParticipantStatus(status, localizations);
     }
   }
 
