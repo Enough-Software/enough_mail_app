@@ -1,13 +1,13 @@
 import 'package:enough_mail/enough_mail.dart';
-import '../l10n/extension.dart';
-import '../models/message_source.dart';
-import '../routes.dart';
-import '../services/navigation_service.dart';
 import 'package:enough_platform_widgets/cupertino.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../localization/extension.dart';
 import '../locator.dart';
+import '../models/message_source.dart';
+import '../routes.dart';
+import '../services/navigation_service.dart';
 
 /// A dedicated search field optimized for Cupertino
 class CupertinoSearch extends StatelessWidget {

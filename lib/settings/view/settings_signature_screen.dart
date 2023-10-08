@@ -4,7 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../account/model.dart';
-import '../../l10n/extension.dart';
+import '../../localization/extension.dart';
 import '../../locator.dart';
 import '../../models/compose_data.dart';
 import '../../routes.dart';
@@ -39,7 +39,9 @@ class SettingsSignatureScreen extends HookConsumerWidget {
     final accounts = locator<MailService>().accounts;
     final accountsWithSignature = List<RealAccount>.from(
       accounts.where(
-        (account) => account is RealAccount && account.signatureHtml != null,
+        (account) =>
+            account is RealAccount &&
+            account.getSignatureHtml(localizations.localeName) != null,
       ),
     );
     String getActionName(ComposeAction action) {

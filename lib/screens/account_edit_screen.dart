@@ -8,8 +8,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
-import '../l10n/app_localizations.g.dart';
-import '../l10n/extension.dart';
+import '../localization/app_localizations.g.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../routes.dart';
 import '../services/icon_service.dart';

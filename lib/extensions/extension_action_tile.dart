@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' hide WebViewConfiguration;
 
 import '../account/model.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/models.dart';
 import '../routes.dart';
-import '../services/i18n_service.dart';
 import '../services/navigation_service.dart';
 import 'extensions.dart';
 
@@ -29,8 +29,10 @@ class ExtensionActionTile extends StatelessWidget {
   }
 
   static List<Widget> buildActionWidgets(
-      BuildContext context, List<AppExtensionActionDescription> actions,
-      {bool withDivider = true}) {
+    BuildContext context,
+    List<AppExtensionActionDescription> actions, {
+    bool withDivider = true,
+  }) {
     if (actions.isEmpty) {
       return [];
     }
@@ -41,12 +43,13 @@ class ExtensionActionTile extends StatelessWidget {
     for (final action in actions) {
       widgets.add(ExtensionActionTile(actionDescription: action));
     }
+
     return widgets;
   }
 
   @override
   Widget build(BuildContext context) {
-    final languageCode = locator<I18nService>().locale!.languageCode;
+    final languageCode = context.text.localeName;
 
     return PlatformListTile(
       leading: actionDescription.icon == null

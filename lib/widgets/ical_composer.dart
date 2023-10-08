@@ -3,8 +3,8 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
 import '../account/model.dart';
-import '../l10n/app_localizations.g.dart';
-import '../l10n/extension.dart';
+import '../localization/app_localizations.g.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../services/i18n_service.dart';
 import '../services/mail_service.dart';
@@ -616,7 +616,8 @@ class _WeekDaySelectorState extends State<WeekDaySelector> {
         final day = ((firstDayOfWeek + i) <= 7)
             ? (firstDayOfWeek + i)
             : ((firstDayOfWeek + i) - 7);
-        final bool isSelected = byWeekDays.any((dayRule) => dayRule.weekday == day);
+        final bool isSelected =
+            byWeekDays.any((dayRule) => dayRule.weekday == day);
         _selectedDays[i] = isSelected;
       }
     }
@@ -659,17 +660,17 @@ class _WeekDaySelectorState extends State<WeekDaySelector> {
 
   @override
   Widget build(BuildContext context) => FittedBox(
-      child: PlatformToggleButtons(
-        isSelected: _selectedDays,
-        onPressed: _toggle,
-        children: _weekdays
-            .map((day) => Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(day.name),
-                ))
-            .toList(),
-      ),
-    );
+        child: PlatformToggleButtons(
+          isSelected: _selectedDays,
+          onPressed: _toggle,
+          children: _weekdays
+              .map((day) => Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(day.name),
+                  ))
+              .toList(),
+        ),
+      );
 }
 
 enum _DayOfMonthOption { dayOfMonth, dayInNumberedWeek }

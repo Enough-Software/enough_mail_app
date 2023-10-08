@@ -7,7 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../account/model.dart';
 import '../events/app_event_bus.dart';
-import '../l10n/app_localizations.g.dart';
+import '../localization/app_localizations.g.dart';
 import '../locator.dart';
 import '../models/async_mime_source.dart';
 import '../models/async_mime_source_factory.dart';

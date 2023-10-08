@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../account/model.dart';
-import '../l10n/extension.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../services/mail_service.dart';
 import '../services/navigation_service.dart';

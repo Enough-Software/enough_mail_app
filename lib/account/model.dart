@@ -5,7 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
 import '../extensions/extensions.dart';
 import '../locator.dart';
 import '../models/contact.dart';
-import '../services/i18n_service.dart';
 import '../services/mail_service.dart';
 
 part 'model.g.dart';
@@ -17,11 +16,10 @@ abstract class Account extends ChangeNotifier {
 
   ///  The name of the account
   String get name;
+  set name(String value);
 
   /// Retrieves the email or emails associated with this account
   String get email;
-
-  set name(String value);
 
   /// The from address for this account
   MailAddress get fromAddress;
@@ -103,16 +101,13 @@ class RealAccount extends Account {
 
   /// Retrieves the account specific signature for HTML messages
   /// Compare [signaturePlain]
-  @JsonKey(includeToJson: false, includeFromJson: false)
-  String? get signatureHtml {
+  String? getSignatureHtml([String? languageCode]) {
     final signature = _account.attributes[attributeSignatureHtml];
     if (signature == null) {
       final extensions = appExtensions;
       if (extensions != null) {
-        final languageCode =
-            locator<I18nService>().locale?.languageCode ?? 'en';
         for (final ext in extensions) {
-          final signature = ext.getSignatureHtml(languageCode);
+          final signature = ext.getSignatureHtml(languageCode ?? 'en');
           if (signature != null) {
             return signature;
           }
@@ -123,19 +118,19 @@ class RealAccount extends Account {
     return signature;
   }
 
+  /// Sets the account specific signature for HTML messages
+  // ignore: avoid_setters_without_getters
   set signatureHtml(String? value) =>
       setAttribute(attributeSignatureHtml, value);
 
   /// Account-specific signature for plain text messages
   ///
   /// Compare [signatureHtml]
-  @JsonKey(includeToJson: false, includeFromJson: false)
   String? get signaturePlain => _account.attributes[attributeSignaturePlain];
   set signaturePlain(String? value) =>
       setAttribute(attributeSignaturePlain, value);
 
   /// The name used for sending
-  @JsonKey(includeToJson: false, includeFromJson: false)
   String? get userName => _account.userName;
   set userName(String? value) {
     _account = _account.copyWith(userName: value);

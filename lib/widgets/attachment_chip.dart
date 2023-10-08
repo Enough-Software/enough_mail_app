@@ -4,7 +4,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../l10n/extension.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/message.dart';
 import '../routes.dart';

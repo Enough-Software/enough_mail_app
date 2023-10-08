@@ -5,7 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../account/model.dart';
-import '../../l10n/extension.dart';
+import '../../localization/extension.dart';
 import '../../locator.dart';
 import '../../models/models.dart';
 import '../../screens/base.dart';
@@ -289,7 +289,6 @@ class _FolderManagementState extends State<FolderManagement> {
 }
 
 class MailboxWidget extends StatelessWidget {
-
   const MailboxWidget(
       {super.key,
       required this.mailbox,

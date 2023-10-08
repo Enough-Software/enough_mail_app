@@ -9,7 +9,7 @@ import 'package:latlng/latlng.dart';
 import 'package:location/location.dart';
 import 'package:map/map.dart';
 
-import '../l10n/extension.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../services/location_service.dart';
 import '../services/navigation_service.dart';

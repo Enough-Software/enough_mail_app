@@ -7,7 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../account/model.dart';
-import '../l10n/extension.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../services/icon_service.dart';
 import '../services/mail_service.dart';
@@ -22,7 +22,7 @@ class SignatureWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final account = this.account;
     final signatureState = useState<String?>(
-      account?.signatureHtml ??
+      account?.getSignatureHtml(context.text.localeName) ??
           ref.read(settingsProvider.notifier).getSignatureHtmlGlobal(),
     );
     final signature = signatureState.value;
@@ -68,9 +68,9 @@ class SignatureWidget extends HookConsumerWidget {
           ),
         ],
       );
-
-      if (result && editorApi != null) {
-        final newSignature = await editorApi!.getText();
+      final usedEditorApi = editorApi;
+      if (result && usedEditorApi != null) {
+        final newSignature = await usedEditorApi.getText();
         signatureState.value = newSignature;
         if (account == null) {
           final settings = ref.read(settingsProvider);

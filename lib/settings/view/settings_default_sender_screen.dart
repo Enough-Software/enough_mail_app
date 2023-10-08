@@ -3,7 +3,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../l10n/extension.dart';
+import '../../localization/extension.dart';
 import '../../locator.dart';
 import '../../routes.dart';
 import '../../screens/base.dart';

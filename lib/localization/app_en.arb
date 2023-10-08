@@ -1,4 +1,5 @@
 {
+  "@@locale": "en",
   "signature": "Sent with Maily",
   "@signature": {
     "description": "Default signature text"

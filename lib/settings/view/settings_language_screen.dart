@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../l10n/app_localizations.g.dart';
-import '../../l10n/extension.dart';
+import '../../localization/app_localizations.g.dart';
+import '../../localization/extension.dart';
 import '../../locator.dart';
 import '../../screens/base.dart';
 import '../../services/i18n_service.dart';

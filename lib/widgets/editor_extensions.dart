@@ -1,14 +1,14 @@
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:enough_ascii_art/enough_ascii_art.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
-import '../l10n/extension.dart';
-import '../services/navigation_service.dart';
-import '../util/localized_dialog_helper.dart';
-import 'button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
+import '../localization/extension.dart';
 import '../locator.dart';
+import '../services/navigation_service.dart';
+import '../util/localized_dialog_helper.dart';
+import 'button_text.dart';
 
 class EditorArtExtensionButton extends StatelessWidget {
   const EditorArtExtensionButton({super.key, required this.editorApi});
@@ -16,9 +16,9 @@ class EditorArtExtensionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PlatformIconButton(
-      icon: const Icon(CommunityMaterialIcons.format_font),
-      onPressed: () => showArtExtensionDialog(context, editorApi),
-    );
+        icon: const Icon(CommunityMaterialIcons.format_font),
+        onPressed: () => showArtExtensionDialog(context, editorApi),
+      );
 
   static void showArtExtensionDialog(
       BuildContext context, HtmlEditorApi editorApi) {

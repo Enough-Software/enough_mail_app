@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
-import '../l10n/app_localizations.g.dart';
-import '../l10n/extension.dart';
+import '../localization/app_localizations.g.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/compose_data.dart';
 import '../models/sender.dart';
@@ -134,9 +134,11 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   Future<String> _loadMailTextFromComposeData() =>
       Future.value(widget.data.resumeText);
 
-  String get _signature => ref
-      .read(settingsProvider.notifier)
-      .getSignatureHtml(_from.account, widget.data.action);
+  String get _signature => ref.read(settingsProvider.notifier).getSignatureHtml(
+        _from.account,
+        widget.data.action,
+        context.text.localeName,
+      );
 
   Future<String> _loadMailTextFromMessage() async {
     final signature = _signature;
@@ -145,6 +147,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     if (mb.originalMessage == null) {
       if (_composeMode == ComposeMode.html) {
         final html = '<p>${mb.text ?? '&nbsp;'}</p>$signature';
+
         return html;
       } else {
         return '${mb.text ?? ''}\n$signature';
@@ -157,14 +160,21 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       if (widget.data.action == ComposeAction.newMessage) {
         // continue with draft:
         if (_composeMode == ComposeMode.html) {
-          final args = _HtmlGenerationArguments(null, mb.originalMessage,
-              blockExternalImages, emptyMessageText, maxImageWidth);
+          final args = _HtmlGenerationArguments(
+            null,
+            mb.originalMessage,
+            blockExternalImages,
+            emptyMessageText,
+            maxImageWidth,
+          );
           final html = await compute(_generateDraftHtmlImpl, args) + signature;
+
           return html;
         } else {
           final text =
               '${mb.originalMessage?.decodeTextPlainPart() ?? emptyMessageText}'
               '\n$signature';
+
           return text;
         }
       }
@@ -179,6 +189,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
             blockExternalImages, emptyMessageText, maxImageWidth);
         final html = await compute(_generateQuoteHtmlImpl, args) + signature;
+
         return html;
       } else {
         final original = mb.originalMessage;
@@ -186,6 +197,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
           final header = MessageBuilder.fillTemplate(quoteTemplate, original);
           final plainText = original.decodeTextPlainPart() ?? emptyMessageText;
           final text = MessageBuilder.quotePlainText(header, plainText);
+
           return '$text\n$signature';
         } else {
           return '\n$signature';
@@ -201,19 +213,23 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       emptyMessageText: args.emptyMessageText,
       maxImageWidth: args.maxImageWidth,
     );
+
     return html;
   }
 
   static String _generateDraftHtmlImpl(_HtmlGenerationArguments args) {
     final html = args.mimeMessage!.transformToHtml(
-        emptyMessageText: args.emptyMessageText,
-        maxImageWidth: args.maxImageWidth,
-        blockExternalImages: args.blockExternalImages);
+      emptyMessageText: args.emptyMessageText,
+      maxImageWidth: args.maxImageWidth,
+      blockExternalImages: args.blockExternalImages,
+    );
+
     return html;
   }
 
-  Future<void> _populateMessageBuilder(
-      {bool storeComposeDataForResume = false}) async {
+  Future<void> _populateMessageBuilder({
+    bool storeComposeDataForResume = false,
+  }) async {
     final mb = widget.data.messageBuilder;
     mb.to = _toRecipients;
     mb.cc = _ccRecipients;
@@ -289,6 +305,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       }
     }
     final mimeMessage = mb.buildMimeMessage();
+
     return mimeMessage;
   }
 

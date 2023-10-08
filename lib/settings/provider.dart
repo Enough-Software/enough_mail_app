@@ -47,13 +47,18 @@ class SettingsNotifier extends Notifier<Settings> {
     }
   }
 
-  /// Retrieves the HTML signature for the specified [account] and [composeAction]
-  String getSignatureHtml(RealAccount account, ComposeAction composeAction) {
+  /// Retrieves the HTML signature for the specified [account]
+  /// and [composeAction]
+  String getSignatureHtml(
+    RealAccount account,
+    ComposeAction composeAction,
+    String? languageCode,
+  ) {
     if (!state.signatureActions.contains(composeAction)) {
       return '';
     }
 
-    return account.signatureHtml ?? getSignatureHtmlGlobal();
+    return account.getSignatureHtml(languageCode) ?? getSignatureHtmlGlobal();
   }
 
   /// Retrieves the global signature

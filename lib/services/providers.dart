@@ -1,13 +1,13 @@
 import 'package:enough_mail/discover.dart';
-import '../l10n/extension.dart';
-import '../oauth/oauth.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ProviderService {
+import '../localization/extension.dart';
+import '../oauth/oauth.dart';
 
+class ProviderService {
   ProviderService() {
     addAll([
       GmailProvider(),
@@ -74,7 +74,6 @@ class ProviderService {
 }
 
 class Provider {
-
   const Provider(
     this.key,
     this.incomingHostName,
@@ -84,6 +83,7 @@ class Provider {
     this.manualImapAccessSetupUrl,
     this.domains,
   });
+
   /// The key of the provider, help to resolves image resources and possibly other settings like branding guidelines
   final String key;
   final String incomingHostName;

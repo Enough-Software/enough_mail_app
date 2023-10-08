@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
-import '../../l10n/extension.dart';
+import '../../localization/extension.dart';
 import '../../locator.dart';
 import '../../screens/base.dart';
 import '../../services/scaffold_messenger_service.dart';

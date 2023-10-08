@@ -4,7 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
-import '../../l10n/extension.dart';
+import '../../localization/extension.dart';
 import '../../locator.dart';
 import '../../screens/base.dart';
 import '../../services/biometrics_service.dart';

@@ -1,15 +1,15 @@
 import 'package:enough_mail/enough_mail.dart';
-import '../l10n/extension.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../localization/extension.dart';
+import '../locator.dart';
 import '../models/compose_data.dart';
 import '../routes.dart';
 import '../services/mail_service.dart';
 import '../services/navigation_service.dart';
 import '../services/scaffold_messenger_service.dart';
-import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import '../locator.dart';
 import 'icon_text.dart';
 
 class MailAddressChip extends StatelessWidget {

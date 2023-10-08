@@ -1,6 +1,7 @@
-import '../l10n/extension.dart';
-import 'text_with_links.dart';
 import 'package:flutter/material.dart';
+
+import '../localization/extension.dart';
+import 'text_with_links.dart';
 
 class Legalese extends StatelessWidget {
   const Legalese({super.key});

@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart' as pathprovider;
 import 'package:share_plus/share_plus.dart';
 
 import '../account/model.dart';
-import '../l10n/extension.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';

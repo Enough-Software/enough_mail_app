@@ -3,14 +3,6 @@ import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:enough_icalendar_export/enough_icalendar_export.dart';
-import '../l10n/extension.dart';
-import '../locator.dart';
-import '../models/message.dart';
-import '../services/i18n_service.dart';
-import '../services/scaffold_messenger_service.dart';
-import '../util/localized_dialog_helper.dart';
-import 'mail_address_chip.dart';
-import 'text_with_links.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_mail_icalendar/enough_mail_icalendar.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -18,7 +10,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../l10n/app_localizations.g.dart';
+import '../localization/app_localizations.g.dart';
+import '../localization/extension.dart';
+import '../locator.dart';
+import '../models/message.dart';
+import '../services/i18n_service.dart';
+import '../services/scaffold_messenger_service.dart';
+import '../util/localized_dialog_helper.dart';
+import 'mail_address_chip.dart';
+import 'text_with_links.dart';
 
 class IcalInteractiveMedia extends StatefulWidget {
   const IcalInteractiveMedia(
@@ -285,32 +285,34 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                                   padding: const EdgeInsets.all(8),
                                   child: icon,
                                 ),
-                              if (address != null) MailAddressChip(mailAddress: address) else Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            if (name != null)
-                                              Text(
-                                                name,
-                                                style: textStyle,
-                                              ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 4),
-                                              child: Text(
-                                                attendee.email ??
-                                                    attendee.uri.toString(),
-                                                style: textStyle,
-                                              ),
-                                            ),
-                                          ],
+                              if (address != null)
+                                MailAddressChip(mailAddress: address)
+                              else
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (name != null)
+                                          Text(
+                                            name,
+                                            style: textStyle,
+                                          ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 4),
+                                          child: Text(
+                                            attendee.email ??
+                                                attendee.uri.toString(),
+                                            style: textStyle,
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ),
+                                  ),
+                                ),
                             ],
                           );
                         }).toList(),
@@ -364,7 +366,9 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
       if (kDebugMode) {
         print('Unable to send status update: $e $s');
       }
-      await LocalizedDialogHelper.showTextDialog(context, localizations.errorTitle,
+      await LocalizedDialogHelper.showTextDialog(
+          context,
+          localizations.errorTitle,
           localizations.icalendarParticipantStatusSentFailure(e.toString()));
     }
   }

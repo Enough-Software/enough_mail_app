@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 
-import '../l10n/extension.dart';
+import '../localization/extension.dart';
 import '../models/contact.dart';
 import '../util/validator.dart';
 import 'icon_text.dart';
@@ -142,35 +142,37 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
     );
   }
 
-  Widget buildInput(ThemeData theme, BuildContext context) => RawAutocomplete<MailAddress>(
-      focusNode: _focusNode,
-      textEditingController: _controller,
-      optionsBuilder: (textEditingValue) {
-        final search = textEditingValue.text.toLowerCase();
-        if (search.length < 2) {
-          return [];
-        }
-        if (search.endsWith(' ') ||
-            search.endsWith(';') ||
-            search.endsWith(';')) {
-          // check if this is a complete email address
-          final email = textEditingValue.text.substring(0, search.length - 1);
-          checkEmail(email);
-        }
-        final contactManager = widget.contactManager;
-        if (contactManager == null) {
-          return [];
-        }
-        final matches = contactManager.find(search).toList();
-        // do not suggest recipients that are already added:
-        for (final existing in widget.addresses) {
-          matches.remove(existing);
-        }
-        return matches;
-      },
-      displayStringForOption: (option) => option.toString(),
-      fieldViewBuilder:
-          (context, textEditingController, focusNode, onFieldSubmitted) => DecoratedPlatformTextField(
+  Widget buildInput(ThemeData theme, BuildContext context) =>
+      RawAutocomplete<MailAddress>(
+        focusNode: _focusNode,
+        textEditingController: _controller,
+        optionsBuilder: (textEditingValue) {
+          final search = textEditingValue.text.toLowerCase();
+          if (search.length < 2) {
+            return [];
+          }
+          if (search.endsWith(' ') ||
+              search.endsWith(';') ||
+              search.endsWith(';')) {
+            // check if this is a complete email address
+            final email = textEditingValue.text.substring(0, search.length - 1);
+            checkEmail(email);
+          }
+          final contactManager = widget.contactManager;
+          if (contactManager == null) {
+            return [];
+          }
+          final matches = contactManager.find(search).toList();
+          // do not suggest recipients that are already added:
+          for (final existing in widget.addresses) {
+            matches.remove(existing);
+          }
+          return matches;
+        },
+        displayStringForOption: (option) => option.toString(),
+        fieldViewBuilder:
+            (context, textEditingController, focusNode, onFieldSubmitted) =>
+                DecoratedPlatformTextField(
           controller: textEditingController,
           focusNode: focusNode,
           autofocus: widget.autofocus,
@@ -199,7 +201,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                   ),
           ),
         ),
-      optionsViewBuilder: (context, onSelected, options) => Material(
+        optionsViewBuilder: (context, onSelected, options) => Material(
           child: Align(
             alignment: Alignment.topLeft,
             child: ConstrainedBox(
@@ -238,7 +240,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
             ),
           ),
         ),
-    );
+      );
 
   void checkEmail(String input) {
     if (Validator.validateEmail(input)) {
@@ -251,8 +253,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
 
   Future<void> _pickContact(TextEditingController controller) async {
     try {
-      final contact =
-          await FlutterContactPicker.pickEmailContact();
+      final contact = await FlutterContactPicker.pickEmailContact();
       widget.addresses.add(
         MailAddress(
           contact.fullName,

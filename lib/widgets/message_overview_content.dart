@@ -1,15 +1,14 @@
 import 'package:enough_mail/enough_mail.dart';
-import '../l10n/extension.dart';
+import 'package:flutter/material.dart';
+
+import '../localization/app_localizations.g.dart';
+import '../localization/extension.dart';
+import '../locator.dart';
 import '../models/message.dart';
 import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
-import 'package:flutter/material.dart';
-
-import '../l10n/app_localizations.g.dart';
-import '../locator.dart';
 
 class MessageOverviewContent extends StatelessWidget {
-
   const MessageOverviewContent({
     super.key,
     required this.message,

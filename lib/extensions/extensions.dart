@@ -151,6 +151,7 @@ class AppExtensionActionDescription {
     if (map == null) {
       return null;
     }
+
     return map[languageCode] ?? map['en'];
   }
 

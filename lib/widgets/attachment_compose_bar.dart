@@ -7,13 +7,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../l10n/app_localizations.g.dart';
-import '../l10n/extension.dart';
+import '../localization/app_localizations.g.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../routes.dart';
-import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
 import '../services/key_service.dart';
 import '../services/navigation_service.dart';
@@ -210,6 +209,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
       composeData.messageBuilder
           .addBinary(file.bytes!, mediaType, filename: file.name);
     }
+
     return true;
   }
 
@@ -234,7 +234,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
       // searchLabelText: searchSticker
       //     ? localizations.attachTypeStickerSearch
       //     : localizations.attachTypeGifSearch,
-      lang: locator<I18nService>().locale!.languageCode,
+      lang: localizations.localeName,
       keepState: true,
       showPreview: true,
       // sticker: searchSticker,
@@ -287,7 +287,7 @@ class _AppointmentFinalizer {
 
   void finalize(MessageBuilder messageBuilder) {
     final event = appointment.event!;
-    if (messageBuilder.from?.isNotEmpty == true) {
+    if (messageBuilder.from?.isNotEmpty ?? false) {
       final organizer = messageBuilder.from!.first;
       event.organizer = OrganizerProperty.create(
         email: organizer.email,

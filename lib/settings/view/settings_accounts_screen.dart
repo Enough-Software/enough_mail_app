@@ -7,8 +7,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../account/model.dart';
 import '../../account/providers.dart';
-import '../../l10n/app_localizations.g.dart';
-import '../../l10n/extension.dart';
+import '../../localization/app_localizations.g.dart';
+import '../../localization/extension.dart';
 import '../../locator.dart';
 import '../../routes.dart';
 import '../../screens/base.dart';

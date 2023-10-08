@@ -8,11 +8,10 @@ import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../account/model.dart';
 import '../extensions/extensions.dart';
-import '../l10n/app_localizations.g.dart';
-import '../l10n/extension.dart';
+import '../localization/app_localizations.g.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../routes.dart';
-import '../services/i18n_service.dart';
 import '../services/mail_service.dart';
 import '../services/navigation_service.dart';
 import '../services/providers.dart';
@@ -478,16 +477,16 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
                 if (_extensionForgotPassword != null) ...[
                   PlatformTextButton(
                     onPressed: () {
-                      final languageCode =
-                          locator<I18nService>().locale!.languageCode;
-                      var url = _extensionForgotPassword!.action!.url;
-                      url = url
-                        ..replaceAll('{user.email}', _emailController.text)
-                        ..replaceAll('{language}', languageCode);
+                      final languageCode = localizations.localeName;
+                      final url = (_extensionForgotPassword?.action?.url ?? '')
+                          .replaceAll('{user.email}', _emailController.text)
+                          .replaceAll('{language}', languageCode);
                       launcher.launchUrl(Uri.parse(url));
                     },
-                    child: ButtonText(_extensionForgotPassword!
-                        .getLabel(locator<I18nService>().locale!.languageCode)),
+                    child: ButtonText(
+                      _extensionForgotPassword!
+                          .getLabel(localizations.localeName),
+                    ),
                   ),
                 ],
               ],

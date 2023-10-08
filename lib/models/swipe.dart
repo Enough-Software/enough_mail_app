@@ -1,8 +1,8 @@
-import '../services/icon_service.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 
+import '../localization/app_localizations.g.dart';
 import '../locator.dart';
+import '../services/icon_service.dart';
 
 enum SwipeAction {
   markRead,

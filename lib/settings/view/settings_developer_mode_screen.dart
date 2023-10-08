@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../account/model.dart';
 import '../../extensions/extensions.dart';
-import '../../l10n/extension.dart';
+import '../../localization/extension.dart';
 import '../../locator.dart';
 import '../../screens/base.dart';
 import '../../services/mail_service.dart';

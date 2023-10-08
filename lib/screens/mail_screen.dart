@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
-import '../l10n/extension.dart';
+import '../localization/extension.dart';
 import '../mail/provider.dart';
 import 'base.dart';
 import 'message_source_screen.dart';

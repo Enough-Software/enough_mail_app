@@ -5,7 +5,7 @@ import 'package:intl/date_symbols.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:intl/intl.dart';
 
-import '../l10n/app_localizations.g.dart';
+import '../localization/app_localizations.g.dart';
 import 'date_service.dart';
 
 class I18nService {
@@ -62,7 +62,6 @@ class I18nService {
   };
   int firstDayOfWeek = DateTime.monday;
   Locale? _locale;
-  Locale? get locale => _locale;
 
   late AppLocalizations _localizations;
   AppLocalizations get localizations => _localizations;

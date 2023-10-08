@@ -1,8 +1,9 @@
 import 'dart:math';
 
-import '../l10n/extension.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+
+import '../localization/extension.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});

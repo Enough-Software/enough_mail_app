@@ -1,8 +1,9 @@
-import '../l10n/extension.dart';
-import '../locator.dart';
-import '../services/providers.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+
+import '../localization/extension.dart';
+import '../locator.dart';
+import '../services/providers.dart';
 
 class AccountProviderSelector extends StatelessWidget {
   const AccountProviderSelector({super.key, required this.onSelected});
