@@ -250,4 +250,22 @@ class FakeMimeSource extends PagedCachedMimeSource {
   @override
   // TODO: implement isInbox
   bool get isInbox => throw UnimplementedError();
+
+  @override
+  Future<MimePart> fetchMessagePart(MimeMessage message,
+      {required String fetchId, Duration? responseTimeout}) {
+    // TODO: implement fetchMessagePart
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> sendMessage(MimeMessage message,
+      {MailAddress? from,
+      bool appendToSent = true,
+      Mailbox? sentMailbox,
+      bool use8BitEncoding = false,
+      List<MailAddress>? recipients}) {
+    // TODO: implement sendMessage
+    throw UnimplementedError();
+  }
 }

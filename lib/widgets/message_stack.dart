@@ -189,8 +189,7 @@ class _MessageStackState extends State<MessageStack> {
     switch (action) {
       case DragAction.noted:
         if (!message.isSeen) {
-          await message.mailClient
-              .flagMessage(message.mimeMessage, isSeen: true);
+          await message.source.markAsSeen(message, true);
           snack = 'mark as read';
         }
         break;
@@ -199,11 +198,16 @@ class _MessageStackState extends State<MessageStack> {
         break;
       case DragAction.delete:
         //TODO remove from message source
-        await message.mailClient
-            .flagMessage(message.mimeMessage, isDeleted: true);
+        await message.source.storeMessageFlags(
+          [message],
+          [MessageFlags.deleted],
+        );
         snack = 'deleted';
-        undo = () => message.mailClient.flagMessage(message.mimeMessage,
-            isDeleted: false); //TODO add re-integration into message source
+        undo = () => message.source.storeMessageFlags(
+              [message],
+              [MessageFlags.deleted],
+              action: StoreAction.remove,
+            ); //TODO add re-integration into message source
         break;
       case DragAction.reply:
         //TODO implement quick reply
@@ -495,9 +499,7 @@ class _MessageCardState extends State<MessageCard> {
 
   Future<Message> downloadMessageContents(Message message) async {
     try {
-      final mime =
-          await message.mailClient.fetchMessageContents(message.mimeMessage);
-      message.updateMime(mime);
+      final mime = await message.source.fetchMessageContents(message);
       if (mime.isNewsletter || mime.hasAttachments()) {
         setState(() {});
       }
@@ -506,6 +508,7 @@ class _MessageCardState extends State<MessageCard> {
         print('unable to download message contents: $e');
       }
     }
+
     return message;
   }
 

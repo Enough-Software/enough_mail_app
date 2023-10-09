@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../account/model.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/compose_data.dart';
@@ -12,7 +13,6 @@ import '../routes.dart';
 import '../services/contact_service.dart';
 import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
-import '../services/mail_service.dart';
 import '../services/navigation_service.dart';
 import '../services/notification_service.dart';
 import '../services/scaffold_messenger_service.dart';
@@ -309,23 +309,24 @@ class MessageActions extends HookConsumerWidget {
   }
 
   void _reply(WidgetRef ref, {all = false}) {
-    final account = message.mailClient.account;
+    final account = message.account;
 
     final builder = MessageBuilder.prepareReplyToMessage(
       message.mimeMessage,
       account.fromAddress,
-      aliases: account.aliases,
-      handlePlusAliases: account.supportsPlusAliases,
+      aliases: account is RealAccount ? account.aliases : null,
+      handlePlusAliases: account is RealAccount && account.supportsPlusAliases,
       replyAll: all,
     );
     _navigateToCompose(ref, message, builder, ComposeAction.answer);
   }
 
   Future<void> _redirectMessage(BuildContext context) async {
-    final mailClient = message.mailClient;
-    final account = locator<MailService>().getAccountFor(mailClient.account)!;
-    if (account.contactManager == null) {
-      await locator<ContactService>().getForAccount(account);
+    final account = message.account;
+    if (account is RealAccount) {
+      if (account.contactManager == null) {
+        await locator<ContactService>().getForAccount(account);
+      }
     }
 
     if (!context.mounted) {
@@ -343,11 +344,14 @@ class MessageActions extends HookConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(localizations.redirectInfo,
-                  style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                localizations.redirectInfo,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
               RecipientInputField(
                 addresses: recipients,
-                contactManager: account.contactManager,
+                contactManager:
+                    account is RealAccount ? account.contactManager : null,
                 labelText: localizations.detailsHeaderTo,
                 hintText: localizations.composeRecipientHint,
                 controller: textEditingController,
@@ -378,17 +382,23 @@ class MessageActions extends HookConsumerWidget {
     }
     if (redirect == true) {
       if (recipients.isEmpty) {
-        await LocalizedDialogHelper.showTextDialog(context,
-            localizations.errorTitle, localizations.redirectEmailInputRequired);
+        await LocalizedDialogHelper.showTextDialog(
+          context,
+          localizations.errorTitle,
+          localizations.redirectEmailInputRequired,
+        );
       } else {
         final mime = message.mimeMessage;
         if (mime.mimeData == null) {
           // download complete message first
-          await mailClient.fetchMessageContents(mime);
+          await message.source.fetchMessageContents(message);
         }
         try {
-          await mailClient.sendMessage(mime,
-              recipients: recipients, appendToSent: false);
+          await message.source.getMimeSource(message)?.sendMessage(
+                mime,
+                recipients: recipients,
+                appendToSent: false,
+              );
           locator<ScaffoldMessengerService>()
               .showTextSnackBar(localizations.resultRedirectedSuccess);
         } on MailException catch (e, s) {
@@ -424,7 +434,8 @@ class MessageActions extends HookConsumerWidget {
         child: MailboxTree(
           account: message.account,
           onSelected: _moveTo,
-          current: message.mailClient.selectedMailbox,
+          // TODO(RV): retrieve the current selected mailbox in a different way
+          // current:  message.mailClient.selectedMailbox,
         ),
       ),
       title: localizations.moveTitle,
@@ -474,7 +485,7 @@ class MessageActions extends HookConsumerWidget {
   }
 
   void _forward(WidgetRef ref) {
-    final from = message.mailClient.account.fromAddress;
+    final from = message.account.fromAddress;
     final builder = MessageBuilder.prepareForwardMessage(
       message.mimeMessage,
       from: from,
@@ -493,18 +504,18 @@ class MessageActions extends HookConsumerWidget {
 
   Future<void> _forwardAsAttachment(WidgetRef ref) async {
     final message = this.message;
-    final mailClient = message.mailClient;
-    final from = mailClient.account.fromAddress;
+    final from = message.account.fromAddress;
     final mime = message.mimeMessage;
     final builder = MessageBuilder()
       ..from = [from]
-      ..subject = MessageBuilder.createForwardSubject(mime.decodeSubject()!);
+      ..subject = MessageBuilder.createForwardSubject(
+        mime.decodeSubject() ?? '',
+      );
     Future? composeFuture;
     if (mime.mimeData == null) {
-      composeFuture = mailClient.fetchMessageContents(mime).then((value) {
-        message.updateMime(value);
-        builder.addMessagePart(value);
-      });
+      composeFuture = message.source.fetchMessageContents(message).then(
+            builder.addMessagePart,
+          );
     } else {
       builder.addMessagePart(mime);
     }
@@ -519,12 +530,13 @@ class MessageActions extends HookConsumerWidget {
 
   Future<void> _forwardAttachments(WidgetRef ref) async {
     final message = this.message;
-    final mailClient = message.mailClient;
-    final from = mailClient.account.fromAddress;
+    final from = message.account.fromAddress;
     final mime = message.mimeMessage;
     final builder = MessageBuilder()
       ..from = [from]
-      ..subject = MessageBuilder.createForwardSubject(mime.decodeSubject()!);
+      ..subject = MessageBuilder.createForwardSubject(
+        mime.decodeSubject() ?? '',
+      );
     final composeFuture = _addAttachments(message, builder);
     _navigateToCompose(
       ref,
@@ -537,17 +549,17 @@ class MessageActions extends HookConsumerWidget {
 
   Future? _addAttachments(Message message, MessageBuilder builder) {
     final attachments = message.attachments;
-    final mailClient = message.mailClient;
     final mime = message.mimeMessage;
     Future? composeFuture;
     if (mime.mimeData == null && attachments.length > 1) {
-      composeFuture = mailClient.fetchMessageContents(mime).then((value) {
-        message.updateMime(value);
-        for (final attachment in attachments) {
-          final part = value.getPart(attachment.fetchId);
-          builder.addPart(mimePart: part);
-        }
-      });
+      composeFuture = message.source.fetchMessageContents(message).then(
+        (value) {
+          for (final attachment in attachments) {
+            final part = value.getPart(attachment.fetchId);
+            builder.addPart(mimePart: part);
+          }
+        },
+      );
     } else {
       final futures = <Future>[];
       for (final attachment in message.attachments) {
@@ -555,11 +567,15 @@ class MessageActions extends HookConsumerWidget {
         if (part != null) {
           builder.addPart(mimePart: part);
         } else {
-          futures.add(mailClient
-              .fetchMessagePart(mime, attachment.fetchId)
-              .then((value) {
-            builder.addPart(mimePart: value);
-          }));
+          futures.add(
+            message.source
+                .fetchMessagePart(message, fetchId: attachment.fetchId)
+                .then(
+              (value) {
+                builder.addPart(mimePart: value);
+              },
+            ),
+          );
         }
         composeFuture = futures.isEmpty ? null : Future.wait(futures);
       }

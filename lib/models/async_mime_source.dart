@@ -120,6 +120,15 @@ abstract class AsyncMimeSource {
     Duration? responseTimeout,
   });
 
+  /// Fetches a message part / attachment for the partial [mimeMessage].
+  ///
+  /// Compare [MailClient]'s `fetchMessagePart()` call.
+  Future<MimePart> fetchMessagePart(
+    MimeMessage message, {
+    required String fetchId,
+    Duration? responseTimeout,
+  });
+
   /// Informs this source about a new incoming [message] at the optional [index].
   ///
   /// Note this message does not necessarily match to this sources.
@@ -186,6 +195,36 @@ abstract class AsyncMimeSource {
       subscriber.onMailCacheInvalidated(this);
     }
   }
+
+  /// Sends the specified [message].
+  ///
+  /// Use [MessageBuilder] to create new messages.
+  ///
+  /// Specify [from] as the originator in case it differs from the `From`
+  /// header of the message.
+  ///
+  /// Optionally set [appendToSent] to `false` in case the message should NOT
+  /// be appended to the SENT folder.
+  /// By default the message is appended. Note that some mail providers
+  /// automatically append sent messages to
+  /// the SENT folder, this is not detected by this API.
+  ///
+  /// You can also specify if the message should be sent using 8 bit encoding
+  /// with [use8BitEncoding], which default to `false`.
+  ///
+  /// Optionally specify the [recipients], in which case the recipients
+  /// defined in the message are ignored.
+  ///
+  /// Optionally specify the [sentMailbox] when the mail system does not
+  /// support mailbox flags.
+  Future<void> sendMessage(
+    MimeMessage message, {
+    MailAddress? from,
+    bool appendToSent = true,
+    Mailbox? sentMailbox,
+    bool use8BitEncoding = false,
+    List<MailAddress>? recipients,
+  });
 }
 
 /// Keeps messages in a temporary cache
@@ -464,6 +503,7 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   @override
   Future<void> init() {
     _registerEvents();
+
     return mailClient.startPolling();
   }
 
@@ -505,7 +545,8 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   }
 
   Future<void> _onMailReconnected(
-      MailConnectionReEstablishedEvent event) async {
+    MailConnectionReEstablishedEvent event,
+  ) async {
     if (event.mailClient == mailClient &&
         event.isManualSynchronizationRequired) {
       final messages = await event.mailClient
@@ -513,10 +554,13 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
       if (messages.isEmpty) {
         if (kDebugMode) {
           print(
-              'MESSAGES ARE EMPTY FOR ${event.mailClient.lowLevelOutgoingMailClient.logName}');
+            'MESSAGES ARE EMPTY FOR '
+            '${event.mailClient.lowLevelOutgoingMailClient.logName}',
+          );
         }
-        // since this is an unlikely outcome, the assumption is that this an error
-        // and resync will be aborted, therefore.
+        // since this is an unlikely outcome, the assumption is that this
+        // an error and resync will be aborted, therefore.
+
         return;
       }
       await resyncMessagesManually(messages);
@@ -527,6 +571,7 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   Future<DeleteResult> deleteMessages(List<MimeMessage> messages) {
     removeFromCache(messages);
     final sequence = MessageSequence.fromMessages(messages);
+
     return mailClient.deleteMessages(sequence, messages: messages);
   }
 
@@ -534,6 +579,7 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   Future<DeleteResult> undoDeleteMessages(DeleteResult deleteResult) async {
     final result = await mailClient.undoDeleteMessages(deleteResult);
     await _reAddMessages(result);
+
     return result;
   }
 
@@ -542,6 +588,7 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
     clear();
     final result =
         await mailClient.deleteAllMessages(mailbox, expunge: expunge);
+
     return [result];
   }
 
@@ -552,6 +599,7 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   ) {
     removeFromCache(messages);
     final sequence = MessageSequence.fromMessages(messages);
+
     return mailClient.moveMessages(sequence, targetMailbox, messages: messages);
   }
 
@@ -562,14 +610,19 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   ) {
     removeFromCache(messages);
     final sequence = MessageSequence.fromMessages(messages);
-    return mailClient.moveMessagesToFlag(sequence, targetMailboxFlag,
-        messages: messages);
+
+    return mailClient.moveMessagesToFlag(
+      sequence,
+      targetMailboxFlag,
+      messages: messages,
+    );
   }
 
   @override
   Future<MoveResult> undoMoveMessages(MoveResult moveResult) async {
     final result = await mailClient.undoMoveMessages(moveResult);
     await _reAddMessages(result);
+
     return result;
   }
 
@@ -589,6 +642,7 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
     StoreAction action = StoreAction.add,
   }) {
     final sequence = MessageSequence.fromMessages(messages);
+
     return mailClient.store(sequence, flags, action: action);
   }
 
@@ -598,6 +652,7 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
     StoreAction action = StoreAction.add,
   }) {
     final sequence = MessageSequence.fromAll();
+
     return mailClient.store(sequence, flags, action: action);
   }
 
@@ -658,11 +713,43 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
     List<MediaToptype>? includedInlineTypes,
     Duration? responseTimeout,
   }) =>
-      mailClient.fetchMessageContents(message,
-          maxSize: maxSize,
-          markAsSeen: markAsSeen,
-          includedInlineTypes: includedInlineTypes,
-          responseTimeout: responseTimeout);
+      mailClient.fetchMessageContents(
+        message,
+        maxSize: maxSize,
+        markAsSeen: markAsSeen,
+        includedInlineTypes: includedInlineTypes,
+        responseTimeout: responseTimeout,
+      );
+
+  @override
+  Future<MimePart> fetchMessagePart(
+    MimeMessage message, {
+    required String fetchId,
+    Duration? responseTimeout,
+  }) =>
+      mailClient.fetchMessagePart(
+        message,
+        fetchId,
+        responseTimeout: responseTimeout,
+      );
+
+  @override
+  Future<void> sendMessage(
+    MimeMessage message, {
+    MailAddress? from,
+    bool appendToSent = true,
+    Mailbox? sentMailbox,
+    bool use8BitEncoding = false,
+    List<MailAddress>? recipients,
+  }) =>
+      mailClient.sendMessage(
+        message,
+        from: from,
+        appendToSent: appendToSent,
+        sentMailbox: sentMailbox,
+        use8BitEncoding: use8BitEncoding,
+        recipients: recipients,
+      );
 }
 
 /// Accesses search results
@@ -713,6 +800,7 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
     final sequence = searchResult.pagedSequence.sequence;
     clear();
     final deleteResult = await mailClient.deleteMessages(sequence);
+
     return [deleteResult];
   }
 
@@ -752,6 +840,7 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
   Future<DeleteResult> deleteMessages(List<MimeMessage> messages) async {
     final sequence = MessageSequence.fromMessages(messages);
     searchResult.removeMessageSequence(sequence);
+
     return parent.deleteMessages(messages);
   }
 
@@ -760,6 +849,7 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
     // TODO(RV): add sequence back to search result - or rather
     // the sequence after undoing it
     //searchResult.addMessageSequence(deleteResult.originalSequence);
+
     return parent.undoDeleteMessages(deleteResult);
   }
 
@@ -778,6 +868,7 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
       searchResult.addMessage(message);
       notifySubscriberOnMessageArrived(message);
     }
+
     return Future.value();
   }
 
@@ -790,6 +881,7 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
       existing.flags = message.flags;
       notifySubscribersOnMessageFlagsUpdated(existing);
     }
+
     return Future.value();
   }
 
@@ -805,13 +897,18 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
   }
 
   @override
-  Future<void> store(List<MimeMessage> messages, List<String> flags,
-          {StoreAction action = StoreAction.add}) =>
+  Future<void> store(
+    List<MimeMessage> messages,
+    List<String> flags, {
+    StoreAction action = StoreAction.add,
+  }) =>
       parent.store(messages, flags, action: action);
 
   @override
-  Future<void> storeAll(List<String> flags,
-      {StoreAction action = StoreAction.add}) async {
+  Future<void> storeAll(
+    List<String> flags, {
+    StoreAction action = StoreAction.add,
+  }) async {
     final sequence = searchResult.pagedSequence.sequence;
     if (sequence.isEmpty) {
       return Future.value();
@@ -826,6 +923,7 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
   Future<void> resyncMessagesManually(List<MimeMessage> messages) {
     // just redo the full search for now.
     notifySubscribersOnCacheInvalidated();
+
     return init();
   }
 
@@ -862,9 +960,41 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
     List<MediaToptype>? includedInlineTypes,
     Duration? responseTimeout,
   }) =>
-      mailClient.fetchMessageContents(message,
-          maxSize: maxSize,
-          markAsSeen: markAsSeen,
-          includedInlineTypes: includedInlineTypes,
-          responseTimeout: responseTimeout);
+      mailClient.fetchMessageContents(
+        message,
+        maxSize: maxSize,
+        markAsSeen: markAsSeen,
+        includedInlineTypes: includedInlineTypes,
+        responseTimeout: responseTimeout,
+      );
+
+  @override
+  Future<MimePart> fetchMessagePart(
+    MimeMessage message, {
+    required String fetchId,
+    Duration? responseTimeout,
+  }) =>
+      mailClient.fetchMessagePart(
+        message,
+        fetchId,
+        responseTimeout: responseTimeout,
+      );
+
+  @override
+  Future<void> sendMessage(
+    MimeMessage message, {
+    MailAddress? from,
+    bool appendToSent = true,
+    Mailbox? sentMailbox,
+    bool use8BitEncoding = false,
+    List<MailAddress>? recipients,
+  }) =>
+      mailClient.sendMessage(
+        message,
+        from: from,
+        appendToSent: appendToSent,
+        sentMailbox: sentMailbox,
+        use8BitEncoding: use8BitEncoding,
+        recipients: recipients,
+      );
 }

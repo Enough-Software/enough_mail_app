@@ -65,8 +65,36 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
       responseTimeout: responseTimeout,
     );
     await _storage.saveMessageContents(onlineContents);
+
     return onlineContents;
   }
+
+  @override
+  Future<MimePart> fetchMessagePart(MimeMessage message,
+          {required String fetchId, Duration? responseTimeout}) =>
+      _onlineMimeSource.fetchMessagePart(
+        message,
+        fetchId: fetchId,
+        responseTimeout: responseTimeout,
+      );
+
+  @override
+  Future<void> sendMessage(
+    MimeMessage message, {
+    MailAddress? from,
+    bool appendToSent = true,
+    Mailbox? sentMailbox,
+    bool use8BitEncoding = false,
+    List<MailAddress>? recipients,
+  }) =>
+      _onlineMimeSource.sendMessage(
+        message,
+        from: from,
+        appendToSent: appendToSent,
+        sentMailbox: sentMailbox,
+        use8BitEncoding: use8BitEncoding,
+        recipients: recipients,
+      );
 
   @override
   Future<void> handleOnMessageArrived(int index, MimeMessage message) =>
@@ -104,6 +132,7 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
     }
     final onlineMessages = await _onlineMimeSource.loadMessages(sequence);
     await _storage.saveMessageEnvelopes(onlineMessages);
+
     return onlineMessages;
   }
 

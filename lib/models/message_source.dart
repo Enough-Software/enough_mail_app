@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../account/model.dart';
 import '../locator.dart';
+import '../logger.dart';
 import '../services/i18n_service.dart';
 import '../services/notification_service.dart';
 import '../services/scaffold_messenger_service.dart';
@@ -142,7 +143,7 @@ abstract class MessageSource extends ChangeNotifier
     final parent = _parentMessageSource;
     if (parent != null) {
       final mime = message.mimeMessage;
-      parent.removeMime(mime, message.mailClient);
+      parent.removeMime(mime);
     }
     if (removed && notify) {
       notifyListeners();
@@ -153,7 +154,7 @@ abstract class MessageSource extends ChangeNotifier
 
   @override
   void onMailFlagsUpdated(MimeMessage mime, AsyncMimeSource source) {
-    final message = cache.getWithMime(mime, source.mailClient);
+    final message = cache.getWithMime(mime);
     if (message != null) {
       message.updateFlags(mime.flags);
     }
@@ -161,7 +162,7 @@ abstract class MessageSource extends ChangeNotifier
 
   @override
   void onMailVanished(MimeMessage mime, AsyncMimeSource source) {
-    final message = cache.getWithMime(mime, source.mailClient);
+    final message = cache.getWithMime(mime);
 
     if (message != null) {
       removeFromCache(message);
@@ -175,7 +176,7 @@ abstract class MessageSource extends ChangeNotifier
     int index = 0,
   }) {
     // the source index is 0 since this is the new first message:
-    final message = Message(mime, source.mailClient, this, index);
+    final message = Message(mime, this, index);
     insertIntoCache(index, message);
     notifyListeners();
   }
@@ -258,7 +259,16 @@ abstract class MessageSource extends ChangeNotifier
   ) =>
       moveMessage(
         message,
-        message.mailClient.getMailbox(targetMailboxFlag)!,
+        message.source
+                .getMimeSource(message)
+                ?.mailClient
+                .getMailbox(targetMailboxFlag) ??
+            Mailbox(
+              encodedName: 'inbox',
+              encodedPath: 'inbox',
+              flags: [],
+              pathSeparator: '/',
+            ),
         notification,
       );
 
@@ -272,14 +282,18 @@ abstract class MessageSource extends ChangeNotifier
       locator<NotificationService>(),
       notify: false,
     );
-    final moveResult = await message.mailClient
-        .moveMessage(message.mimeMessage, targetMailbox);
+    final mailClient = message.source.getMimeSource(message)?.mailClient;
+    if (mailClient == null) {
+      throw Exception('Unable to retrieve mime source for $message');
+    }
+    final moveResult =
+        await mailClient.moveMessage(message.mimeMessage, targetMailbox);
     notifyListeners();
     if (moveResult.canUndo) {
       locator<ScaffoldMessengerService>().showTextSnackBar(
         notification,
         undo: () async {
-          await message.mailClient.undoMoveMessages(moveResult);
+          await mailClient.undoMoveMessages(moveResult);
           insertIntoCache(message.sourceIndex, message);
           notifyListeners();
         },
@@ -399,21 +413,23 @@ abstract class MessageSource extends ChangeNotifier
     }
     msg.isSeen = isSeen;
     final parent = _parentMessageSource;
-    final parentMsg =
-        parent?.cache.getWithMime(msg.mimeMessage, msg.mailClient);
+    final parentMsg = parent?.cache.getWithMime(msg.mimeMessage);
     if (parent != null && parentMsg != null) {
       return parent.markAsSeen(parentMsg, isSeen);
     }
 
-    return msg.mailClient.flagMessage(msg.mimeMessage, isSeen: isSeen);
+    return msg.source.storeMessageFlags(
+      [msg],
+      [MessageFlags.seen],
+      action: isSeen ? StoreAction.add : StoreAction.remove,
+    );
   }
 
   void onMarkedAsSeen(Message msg, bool isSeen) {
     msg.isSeen = isSeen;
     final parent = _parentMessageSource;
     if (parent != null) {
-      final parentMsg =
-          parent.cache.getWithMime(msg.mimeMessage, msg.mailClient);
+      final parentMsg = parent.cache.getWithMime(msg.mimeMessage);
       if (parentMsg != null) {
         parent.onMarkedAsSeen(parentMsg, isSeen);
       }
@@ -423,15 +439,18 @@ abstract class MessageSource extends ChangeNotifier
   Future<void> markAsFlagged(Message msg, bool isFlagged) {
     onMarkedAsFlagged(msg, isFlagged);
 
-    return msg.mailClient.flagMessage(msg.mimeMessage, isFlagged: isFlagged);
+    return msg.source.storeMessageFlags(
+      [msg],
+      [MessageFlags.flagged],
+      action: isFlagged ? StoreAction.add : StoreAction.remove,
+    );
   }
 
   void onMarkedAsFlagged(Message msg, bool isFlagged) {
     msg.isFlagged = isFlagged;
     final parent = _parentMessageSource;
     if (parent != null) {
-      final parentMsg =
-          parent.cache.getWithMime(msg.mimeMessage, msg.mailClient);
+      final parentMsg = parent.cache.getWithMime(msg.mimeMessage);
       if (parentMsg != null) {
         parent.onMarkedAsFlagged(parentMsg, isFlagged);
       }
@@ -520,8 +539,8 @@ abstract class MessageSource extends ChangeNotifier
 
   MessageSource search(MailSearch search);
 
-  void removeMime(MimeMessage mimeMessage, MailClient mailClient) {
-    final existingMessage = cache.getWithMime(mimeMessage, mailClient);
+  void removeMime(MimeMessage mimeMessage) {
+    final existingMessage = cache.getWithMime(mimeMessage);
     if (existingMessage != null) {
       removeFromCache(existingMessage);
     }
@@ -545,17 +564,40 @@ abstract class MessageSource extends ChangeNotifier
     bool markAsSeen = false,
     List<MediaToptype>? includedInlineTypes,
     Duration? responseTimeout,
+  }) async {
+    final mimeSource = getMimeSource(message);
+    if (mimeSource == null) {
+      throw Exception('Unable to detect mime source from $message');
+    }
+
+    final mimeMessage = await mimeSource.fetchMessageContents(
+      message.mimeMessage,
+      maxSize: maxSize,
+      markAsSeen: markAsSeen,
+      includedInlineTypes: includedInlineTypes,
+      responseTimeout: responseTimeout,
+    );
+    message.updateMime(mimeMessage);
+
+    return mimeMessage;
+  }
+
+  /// Fetches the message contents for the partial [message].
+  ///
+  /// Compare [MailClient]'s `fetchMessagePart()` call.
+  Future<MimePart> fetchMessagePart(
+    Message message, {
+    required String fetchId,
+    Duration? responseTimeout,
   }) {
     final mimeSource = getMimeSource(message);
     if (mimeSource == null) {
       throw Exception('Unable to detect mime source from $message');
     }
 
-    return mimeSource.fetchMessageContents(
+    return mimeSource.fetchMessagePart(
       message.mimeMessage,
-      maxSize: maxSize,
-      markAsSeen: markAsSeen,
-      includedInlineTypes: includedInlineTypes,
+      fetchId: fetchId,
       responseTimeout: responseTimeout,
     );
   }
@@ -602,7 +644,7 @@ class MailboxMessageSource extends MessageSource {
     //print('get uncached $index');
     final mime = await _mimeSource.getMessage(index);
 
-    return Message(mime, _mimeSource.mailClient, this, index);
+    return Message(mime, this, index);
   }
 
   @override
@@ -624,7 +666,7 @@ class MailboxMessageSource extends MessageSource {
     if (parent != null) {
       for (final removedMessage in removedMessages) {
         final mime = removedMessage.mimeMessage;
-        parent.removeMime(mime, removedMessage.mailClient);
+        parent.removeMime(mime);
       }
     }
 
@@ -634,7 +676,11 @@ class MailboxMessageSource extends MessageSource {
   @override
   Future<bool> markAllMessagesSeen(bool seen) async {
     cache.markAllMessageSeen(seen);
-    await _mimeSource.storeAll([MessageFlags.seen]);
+    await _mimeSource.storeAll(
+      [MessageFlags.seen],
+      action: seen ? StoreAction.add : StoreAction.remove,
+    );
+
     return true;
   }
 
@@ -727,6 +773,7 @@ class MultipleMessageSource extends MessageSource {
     supportsDeleteAll = mimeSources.any((s) => s.supportsDeleteAll);
   }
 
+  /// The integrated mime sources
   final List<AsyncMimeSource> mimeSources;
   final _multipleMimeSources = <_MultipleMimeSource>[];
   MailboxFlag? _flag;
@@ -785,10 +832,20 @@ class MultipleMessageSource extends MessageSource {
     }
     newestMessage.source.pop();
     // newestSource._currentIndex could have changed in the meantime
-    _indicesCache.add(_MultipleMessageSourceId(
-        newestMessage.source.mimeSource, newestMessage.index));
-    final message = Message(newestMessage.mimeMessage,
-        newestMessage.source.mimeSource.mailClient, this, index);
+    _indicesCache.add(
+      _MultipleMessageSourceId(
+        newestMessage.source.mimeSource,
+        newestMessage.index,
+      ),
+    );
+
+    final message = _UnifiedMessage(
+      newestMessage.mimeMessage,
+      this,
+      index,
+      newestMessage.source.mimeSource,
+    );
+
     return message;
   }
 
@@ -798,7 +855,7 @@ class MultipleMessageSource extends MessageSource {
       final id = _indicesCache[index];
       final mime = await id.source.getMessage(id.index);
 
-      return Message(mime, id.source.mailClient, this, index);
+      return _UnifiedMessage(mime, this, index, id.source);
     }
     // print(
     //     'get uncached $index with lastUncachedIndex=$_lastUncachedIndex and size $size');
@@ -841,22 +898,26 @@ class MultipleMessageSource extends MessageSource {
     final parent = _parentMessageSource;
     if (parent != null) {
       for (final removedMessage in removedMessages) {
-        parent.removeMime(
-            removedMessage.mimeMessage, removedMessage.mailClient);
+        parent.removeMime(removedMessage.mimeMessage);
       }
     }
     final futureResults = await Future.wait(futures);
     final results = <DeleteResult>[];
 
-    for (final result in futureResults) {
-      results.addAll(result);
-    }
+    futureResults.forEach(results.addAll);
+
     return results;
   }
 
   @override
-  AsyncMimeSource getMimeSource(Message message) => mimeSources
-      .firstWhere((source) => source.mailClient == message.mailClient);
+  AsyncMimeSource getMimeSource(Message message) {
+    if (message is _UnifiedMessage) {
+      return message.mimeSource;
+    }
+    logger.e('Unable to retrieve mime source for $message');
+
+    return mimeSources.first;
+  }
 
   @override
   bool get shouldBlockImages =>
@@ -965,6 +1026,17 @@ class MultipleMessageSource extends MessageSource {
       multipleSource.clear();
     }
   }
+}
+
+class _UnifiedMessage extends Message {
+  _UnifiedMessage(
+    super.mimeMessage,
+    super.source,
+    super.sourceIndex,
+    this.mimeSource,
+  );
+
+  final AsyncMimeSource mimeSource;
 }
 
 class _MultipleMimeSourceMessage {
@@ -1105,10 +1177,11 @@ class ListMessageSource extends MessageSource {
   final Account account;
 
   void initWithMimeMessages(
-      List<MimeMessage> mimeMessages, MailClient mailClient,
-      {bool reverse = true}) {
+    List<MimeMessage> mimeMessages, {
+    bool reverse = true,
+  }) {
     var result = mimeMessages
-        .mapIndexed((index, mime) => Message(mime, mailClient, this, index))
+        .mapIndexed((index, mime) => Message(mime, this, index))
         .toList();
     if (reverse) {
       result = result.reversed.toList();
@@ -1249,16 +1322,15 @@ class ErrorMessageSource extends MessageSource {
 // }
 
 extension _ExtensionsOnMessageIndexedCache on IndexedCache<Message> {
-  Message? getWithMime(MimeMessage mime, MailClient mailClient) {
-    final uid = mime.uid;
-    if (uid != null) {
+  Message? getWithMime(MimeMessage mime) {
+    final guid = mime.guid;
+    if (guid != null) {
       return firstWhereOrNull(
-          (msg) => msg.mailClient == mailClient && msg.mimeMessage.uid == uid);
+        (msg) => msg.mimeMessage.guid == guid,
+      );
     }
-    final sequenceId = mime.sequenceId;
-    return firstWhereOrNull((msg) =>
-        msg.mailClient == mailClient &&
-        msg.mimeMessage.sequenceId == sequenceId);
+
+    return null;
   }
 
   // Message? getWithSourceIndex(int sourceIndex, MailClient mailClient) =>

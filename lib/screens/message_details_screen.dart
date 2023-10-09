@@ -382,7 +382,6 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
 
     return MimeMessageDownloader(
       mimeMessage: message.mimeMessage,
-      mailClient: message.mailClient,
       fetchMessageContents: (
         mimeMessage, {
         int? maxSize,
@@ -420,6 +419,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
           uri,
           mode: ref.read(settingsProvider).urlLaunchMode,
         );
+
         return Future.value(true);
       },
       onZoomed: (controller, factor) {
@@ -438,8 +438,11 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
           if (calendarText != null) {
             final mediaProvider =
                 TextMediaProvider('invite.ics', 'text/calendar', calendarText);
+
             return IcalInteractiveMedia(
-                mediaProvider: mediaProvider, message: widget.message);
+              mediaProvider: mediaProvider,
+              message: widget.message,
+            );
           }
         }
         return null;
@@ -600,24 +603,37 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
     if (existingSource is ListMessageSource) {
       return existingSource.messages;
     }
-    final mailClient = widget.message.mailClient;
+    final threadSequence = widget.message.mimeMessage.threadSequence;
+    if (threadSequence == null || threadSequence.isEmpty) {
+      return [];
+    }
+    final mailClient =
+        widget.message.source.getMimeSource(widget.message)?.mailClient;
+    if (mailClient == null) {
+      return [];
+    }
+
     final mimeMessages = await mailClient.fetchMessageSequence(
-        widget.message.mimeMessage.threadSequence!,
-        fetchPreference: FetchPreference.envelope);
+      threadSequence,
+      fetchPreference: FetchPreference.envelope,
+    );
     final source = ListMessageSource(widget.message.source)
-      ..initWithMimeMessages(mimeMessages, mailClient);
+      ..initWithMimeMessages(mimeMessages);
+
     return source.messages;
   }
 
   @override
   Widget build(BuildContext context) {
     final length = widget.message.mimeMessage.threadSequence?.length ?? 0;
+
     return WillPopScope(
       onWillPop: () {
         if (_overlayEntry == null) {
           return Future.value(true);
         }
         _removeOverlay();
+
         return Future.value(false);
       },
       child: PlatformIconButton(
@@ -626,8 +642,9 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
           if (_overlayEntry != null) {
             _removeOverlay();
           } else {
-            _overlayEntry = _buildThreadsOverlay();
-            Overlay.of(context).insert(_overlayEntry!);
+            final overlayEntry = _buildThreadsOverlay();
+            _overlayEntry = overlayEntry;
+            Overlay.of(context).insert(overlayEntry);
           }
         },
       ),
@@ -635,8 +652,11 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
   }
 
   void _removeOverlay() {
-    _overlayEntry!.remove();
-    _overlayEntry = null;
+    final overlayEntry = _overlayEntry;
+    if (overlayEntry != null) {
+      overlayEntry.remove();
+      _overlayEntry = null;
+    }
   }
 
   void _select(Message message) {
@@ -645,9 +665,9 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
   }
 
   OverlayEntry _buildThreadsOverlay() {
-    final RenderBox renderBox = context.findRenderObject()! as RenderBox;
-    final offset = renderBox.localToGlobal(Offset.zero);
-    final renderSize = renderBox.size;
+    final renderBox = context.findRenderObject() as RenderBox?;
+    final offset = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
+    final renderSize = renderBox?.size ?? const Size(120, 400);
     final size = MediaQuery.of(context).size;
     final currentUid = widget.message.mimeMessage.uid;
     final top = offset.dy + renderSize.height + 5.0;
@@ -668,13 +688,15 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                 child: FutureBuilder<List<Message>?>(
                   future: _loadingFuture,
                   builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
+                    final data = snapshot.data;
+                    if (data == null) {
                       return const Center(
                         child: PlatformProgressIndicator(),
                       );
                     }
-                    final messages = snapshot.data!;
+                    final messages = data;
                     final isSentFolder = widget.message.source.isSent;
+
                     return ConstrainedBox(
                       constraints: BoxConstraints(maxHeight: height),
                       child: ListView(
@@ -738,15 +760,19 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
           setState(() {
             _isSendingReadReceipt = true;
           });
+          final mailClient = message.source.getMimeSource(message)?.mailClient;
+          if (mailClient == null) {
+            return;
+          }
           final readReceipt = MessageBuilder.buildReadReceipt(
             mime,
             message.account.fromAddress,
             reportingUa: 'Maily 1.0',
             subject: localizations.detailsReadReceiptSubject,
           );
-          await message.mailClient
-              .sendMessage(readReceipt, appendToSent: false);
-          await message.mailClient.flagMessage(mime, isReadReceiptSent: true);
+
+          await mailClient.sendMessage(readReceipt, appendToSent: false);
+          await mailClient.flagMessage(mime, isReadReceiptSent: true);
           setState(() {
             _isSendingReadReceipt = false;
           });
@@ -795,18 +821,20 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
   Future<void> _resubscribe() async {
     final localizations = context.text;
     final mime = widget.message.mimeMessage;
-    final listName = mime.decodeListName()!;
-    final confirmation = await LocalizedDialogHelper.askForConfirmation(context,
-        title: localizations.detailsNewsletterResubscribeDialogTitle,
-        action: localizations.detailsNewsletterResubscribeDialogAction,
-        query:
-            localizations.detailsNewsletterResubscribeDialogQuestion(listName));
-    if (confirmation == true) {
+    final listName = mime.decodeListName() ?? '<>';
+    final confirmation = await LocalizedDialogHelper.askForConfirmation(
+      context,
+      title: localizations.detailsNewsletterResubscribeDialogTitle,
+      action: localizations.detailsNewsletterResubscribeDialogAction,
+      query: localizations.detailsNewsletterResubscribeDialogQuestion(listName),
+    );
+    if (confirmation ?? false) {
       setState(() {
         _isActive = true;
       });
-      final mailClient = widget.message.mailClient;
-      final subscribed = await mime.subscribe(mailClient);
+      final mailClient =
+          widget.message.source.getMimeSource(widget.message)?.mailClient;
+      final subscribed = mailClient != null && await mime.subscribe(mailClient);
       setState(() {
         _isActive = false;
       });
@@ -815,11 +843,14 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
           widget.message.isNewsletterUnsubscribed = false;
         });
         //TODO store flag only when server/mailbox supports arbitrary flags?
-        await mailClient.store(MessageSequence.fromMessage(mime),
-            [Message.keywordFlagUnsubscribed],
-            action: StoreAction.remove);
+        await mailClient.store(
+          MessageSequence.fromMessage(mime),
+          [Message.keywordFlagUnsubscribed],
+          action: StoreAction.remove,
+        );
       }
-      await LocalizedDialogHelper.showTextDialog(
+      if (context.mounted) {
+        await LocalizedDialogHelper.showTextDialog(
           context,
           subscribed
               ? localizations.detailsNewsletterResubscribeSuccessTitle
@@ -828,14 +859,16 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
               ? localizations
                   .detailsNewsletterResubscribeSuccessMessage(listName)
               : localizations
-                  .detailsNewsletterResubscribeFailureMessage(listName));
+                  .detailsNewsletterResubscribeFailureMessage(listName),
+        );
+      }
     }
   }
 
   Future<void> _unsubscribe() async {
     final localizations = context.text;
     final mime = widget.message.mimeMessage;
-    final listName = mime.decodeListName()!;
+    final listName = mime.decodeListName() ?? '<>';
     final confirmation = await LocalizedDialogHelper.askForConfirmation(
       context,
       title: localizations.detailsNewsletterUnsubscribeDialogTitle,
@@ -846,10 +879,11 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
       setState(() {
         _isActive = true;
       });
-      final mailClient = widget.message.mailClient;
+      final mailClient =
+          widget.message.source.getMimeSource(widget.message)?.mailClient;
       var unsubscribed = false;
       try {
-        unsubscribed = await mime.unsubscribe(mailClient);
+        unsubscribed = mailClient != null && await mime.unsubscribe(mailClient);
       } catch (e, s) {
         if (kDebugMode) {
           print('error during unsubscribe: $e $s');
@@ -864,24 +898,29 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
         });
         //TODO store flag only when server/mailbox supports arbitrary flags?
         try {
-          await mailClient.store(MessageSequence.fromMessage(mime),
-              [Message.keywordFlagUnsubscribed]);
+          await mailClient?.store(
+            MessageSequence.fromMessage(mime),
+            [Message.keywordFlagUnsubscribed],
+          );
         } catch (e, s) {
           if (kDebugMode) {
             print('error during unsubscribe flag store operation: $e $s');
           }
         }
       }
-      await LocalizedDialogHelper.showTextDialog(
-        context,
-        unsubscribed
-            ? localizations.detailsNewsletterUnsubscribeSuccessTitle
-            : localizations.detailsNewsletterUnsubscribeFailureTitle,
-        unsubscribed
-            ? localizations.detailsNewsletterUnsubscribeSuccessMessage(listName)
-            : localizations
-                .detailsNewsletterUnsubscribeFailureMessage(listName),
-      );
+      if (context.mounted) {
+        await LocalizedDialogHelper.showTextDialog(
+          context,
+          unsubscribed
+              ? localizations.detailsNewsletterUnsubscribeSuccessTitle
+              : localizations.detailsNewsletterUnsubscribeFailureTitle,
+          unsubscribed
+              ? localizations
+                  .detailsNewsletterUnsubscribeSuccessMessage(listName)
+              : localizations
+                  .detailsNewsletterUnsubscribeFailureMessage(listName),
+        );
+      }
     }
   }
 }

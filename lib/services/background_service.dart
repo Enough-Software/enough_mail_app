@@ -3,14 +3,14 @@ import 'dart:math';
 
 import 'package:background_fetch/background_fetch.dart';
 import 'package:enough_mail/enough_mail.dart';
-import '../models/async_mime_source_factory.dart';
-import '../models/background_update_info.dart';
-import 'notification_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../locator.dart';
+import '../models/async_mime_source_factory.dart';
+import '../models/background_update_info.dart';
 import 'mail_service.dart';
+import 'notification_service.dart';
 
 class BackgroundService {
   static const String _keyInboxUids = 'nextUidsInfo';
@@ -21,26 +21,29 @@ class BackgroundService {
 
   Future init() async {
     await BackgroundFetch.configure(
-        BackgroundFetchConfig(
-          minimumFetchInterval: 15,
-          startOnBoot: true,
-          stopOnTerminate: false,
-          enableHeadless: true,
-          requiresBatteryNotLow: false,
-          requiresCharging: false,
-          requiresStorageNotLow: false,
-          requiresDeviceIdle: false,
-          requiredNetworkType: NetworkType.ANY,
-        ), (String taskId) async {
-      try {
-        await locator<MailService>().resume();
-      } catch (e, s) {
-        if (kDebugMode) {
-          print('Error: Unable to finish foreground background fetch: $e $s');
+      BackgroundFetchConfig(
+        minimumFetchInterval: 15,
+        startOnBoot: true,
+        stopOnTerminate: false,
+        enableHeadless: true,
+        requiresBatteryNotLow: false,
+        requiresCharging: false,
+        requiresStorageNotLow: false,
+        requiresDeviceIdle: false,
+        requiredNetworkType: NetworkType.ANY,
+      ),
+      (String taskId) async {
+        try {
+          await locator<MailService>().resume();
+        } catch (e, s) {
+          if (kDebugMode) {
+            print('Error: Unable to finish foreground background fetch: $e $s');
+          }
         }
-      }
-      BackgroundFetch.finish(taskId);
-    }, BackgroundFetch.finish);
+        BackgroundFetch.finish(taskId);
+      },
+      BackgroundFetch.finish,
+    );
     await BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   }
 
@@ -221,7 +224,7 @@ class BackgroundService {
           if (!mimeMessage.isSeen) {
             await notificationService.sendLocalNotificationForMail(
               mimeMessage,
-              mailClient,
+              mailClient.account.email,
             );
           }
         }
@@ -231,7 +234,9 @@ class BackgroundService {
     } catch (e, s) {
       if (kDebugMode) {
         print(
-            'Unable to process background operation for ${account.name}: $e $s');
+          'Unable to process background operation '
+          'for ${account.name}: $e $s',
+        );
       }
     }
   }

@@ -765,13 +765,16 @@ class MailService implements MimeSourceSubscriber {
   }
 
   @override
-  void onMailArrived(MimeMessage mime, AsyncMimeSource source,
-      {int index = 0}) {
+  void onMailArrived(
+    MimeMessage mime,
+    AsyncMimeSource source, {
+    int index = 0,
+  }) {
     source.mailClient.lowLevelIncomingMailClient
         .logApp('new message: ${mime.decodeSubject()}');
     if (!mime.isSeen && source.isInbox) {
       locator<NotificationService>()
-          .sendLocalNotificationForMail(mime, source.mailClient);
+          .sendLocalNotificationForMail(mime, source.mailClient.account.email);
     }
   }
 

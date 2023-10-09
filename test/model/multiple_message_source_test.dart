@@ -83,16 +83,16 @@ void main() async {
     test('load first message', () async {
       final message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
     });
 
     test('load second message', () async {
       final message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
           message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
@@ -101,25 +101,25 @@ void main() async {
     test('load third message', () async {
       final message = await source.getMessageAt(2);
       expect(message.mimeMessage.sequenceId, 99);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 99');
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .subtract(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .subtract(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
     });
 
     test('load fourth message', () async {
       final message = await source.getMessageAt(3);
       expect(message.mimeMessage.sequenceId, 19);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
-          message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate
-              .subtract(secondMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate
+            .subtract(secondMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
     });
 
     test('ensure dates are strictly ordered', () async {
@@ -143,13 +143,13 @@ void main() async {
     test('simple onMessageArrived x 1', () async {
       await (firstMimeSource as FakeMimeSource).addFakeMessage(101);
       final message = await source.getMessageAt(0);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .add(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .add(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
       await _expectMessagesOrderedByDate();
     });
 
@@ -161,20 +161,21 @@ void main() async {
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mailClient, secondMimeSource.mailClient);
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
       // add new message:
       await (firstMimeSource as FakeMimeSource).addFakeMessage(101);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 101);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .add(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .add(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
       expect(hasBeenNotified, isTrue);
     });
 
@@ -186,35 +187,38 @@ void main() async {
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mailClient, secondMimeSource.mailClient);
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
       // add new message:
       await (firstMimeSource as FakeMimeSource).addFakeMessage(101);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 101);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .add(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .add(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
       expect(hasBeenNotified, isTrue);
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mailClient, secondMimeSource.mailClient);
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
     });
 
     test('onMessageArrived x 2', () async {
@@ -225,9 +229,10 @@ void main() async {
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mailClient, secondMimeSource.mailClient);
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
       // add new message:
       await (firstMimeSource as FakeMimeSource).addFakeMessage(101);
       expect(notifyCounter, 1);
@@ -236,12 +241,12 @@ void main() async {
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 21);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 21');
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(
-          message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate
-              .add(secondMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate
+            .add(secondMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
       expect(notifyCounter, 2);
       await _expectMessagesOrderedByDate();
     });
@@ -260,17 +265,19 @@ void main() async {
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 21');
       expect(
-          message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate
-              .add(secondMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate
+            .add(secondMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .add(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .add(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
       await _expectMessagesOrderedByDate();
     });
 
@@ -288,17 +295,19 @@ void main() async {
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 21');
       expect(
-          message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate
-              .add(secondMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate
+            .add(secondMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .add(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .add(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
       await _expectMessagesOrderedByDate();
     });
   });
@@ -312,18 +321,20 @@ void main() async {
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mailClient, secondMimeSource.mailClient);
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
       // remove message:
       await secondMimeSource.onMessagesVanished(MessageSequence.fromIds([20]));
       expect(notifyCounter, 1);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
     });
 
     test('onMessagesVanished - second sequence ID', () async {
@@ -367,19 +378,21 @@ void main() async {
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mailClient, secondMimeSource.mailClient);
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
       // remove message:
       await secondMimeSource
           .onMessagesVanished(MessageSequence.fromIds([20], isUid: true));
       expect(notifyCounter, 1);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
     });
 
     test('onMessagesVanished - second UID', () async {
@@ -542,17 +555,17 @@ void main() async {
       });
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
 
       final messages = <MimeMessage>[];
       for (int i = 0; i < 20; i++) {
@@ -567,21 +580,22 @@ void main() async {
       expect(notifyCounter, 1);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 101);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .add(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .add(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
 
       // previous first message should now be at the second position:
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
     });
 
     test('1 removed message after resync', () async {
@@ -591,17 +605,19 @@ void main() async {
       });
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
 
       final messages = <MimeMessage>[];
       for (int i = 1; i < 21; i++) {
@@ -616,16 +632,16 @@ void main() async {
       expect(notifyCounter, 1);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
 
       // previous first message should now be at the second position:
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 19);
       expect(message.mimeMessage.guid, 19);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
           message.mimeMessage.decodeDate(),
@@ -715,14 +731,12 @@ void main() async {
       });
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
           message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
@@ -750,7 +764,6 @@ void main() async {
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.guid, 101,
           reason: 'first message should be the 101');
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
       expect(message.isSeen, isFalse);
       expect(
@@ -762,7 +775,6 @@ void main() async {
       // previous first message should now be at the second position:
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
@@ -792,14 +804,12 @@ void main() async {
       });
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
           message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
@@ -824,7 +834,6 @@ void main() async {
       expect(notifyCounter, 2);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 21);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 21');
       expect(
           message.mimeMessage.decodeDate(),
@@ -836,7 +845,6 @@ void main() async {
       // previous first message should now be at the second position:
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 101);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
       expect(
           message.mimeMessage.decodeDate(),
@@ -859,14 +867,12 @@ void main() async {
       });
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
           message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
@@ -891,7 +897,6 @@ void main() async {
       expect(notifyCounter, 2);
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 21);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 21');
       expect(
           message.mimeMessage.decodeDate(),
@@ -903,7 +908,6 @@ void main() async {
       // previous first message should now be at the second position:
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 101);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
       expect(
           message.mimeMessage.decodeDate(),
@@ -1002,7 +1006,6 @@ void main() async {
       // previous first message should now be at the second position:
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
@@ -1027,21 +1030,18 @@ void main() async {
 
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
           message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
 
       message = await source.getMessageAt(2);
       expect(message.mimeMessage.sequenceId, 99);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 99');
       expect(
           message.mimeMessage.decodeDate(),
@@ -1051,7 +1051,6 @@ void main() async {
 
       message = await source.getMessageAt(3);
       expect(message.mimeMessage.sequenceId, 19);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
           message.mimeMessage.decodeDate(),
@@ -1069,7 +1068,6 @@ void main() async {
 
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
@@ -1077,14 +1075,12 @@ void main() async {
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 99);
       expect(message.mimeMessage.guid, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
           message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
 
       message = await source.getMessageAt(2);
       expect(message.mimeMessage.sequenceId, 19);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
           message.mimeMessage.decodeDate(),
@@ -1103,21 +1099,18 @@ void main() async {
 
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
           message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
 
       message = await source.getMessageAt(2);
       expect(message.mimeMessage.sequenceId, 99);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 99');
       expect(
           message.mimeMessage.decodeDate(),
@@ -1127,7 +1120,6 @@ void main() async {
 
       message = await source.getMessageAt(3);
       expect(message.mimeMessage.sequenceId, 19);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
           message.mimeMessage.decodeDate(),
@@ -1146,7 +1138,6 @@ void main() async {
 
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
@@ -1154,14 +1145,12 @@ void main() async {
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 99);
       expect(message.mimeMessage.guid, 100);
-      expect(message.mailClient, firstMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
           message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
 
       message = await source.getMessageAt(2);
       expect(message.mimeMessage.sequenceId, 19);
-      expect(message.mailClient, secondMimeSource.mailClient);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
           message.mimeMessage.decodeDate(),
@@ -1243,14 +1232,18 @@ class TestNotificationService implements NotificationService {
 
   @override
   Future sendLocalNotificationForMail(
-      MimeMessage mimeMessage, MailClient mailClient) {
+    MimeMessage mimeMessage,
+    String accountEmail,
+  ) {
     _sendNotifications++;
+
     return Future.value();
   }
 
   @override
   Future sendLocalNotificationForMailLoadEvent(MailLoadEvent event) =>
-      sendLocalNotificationForMail(event.message, event.mailClient);
+      sendLocalNotificationForMail(
+          event.message, event.mailClient.account.email);
 
   @override
   Future sendLocalNotificationForMailMessage(Message message) {

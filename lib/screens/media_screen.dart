@@ -37,6 +37,7 @@ class InteractiveMediaScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final localizations = context.text;
     final iconService = locator<IconService>();
+
     return Base.buildAppChrome(
       context,
       title: mediaWidget.mediaProvider.name,
@@ -69,11 +70,11 @@ class InteractiveMediaScreen extends ConsumerWidget {
                       final mailService = locator<MailService>();
                       final account = mailService.currentAccount;
                       if (account is RealAccount) {
-                        final client = await mailService.getClientFor(account);
                         final source = SingleMessageSource(
-                            mailService.messageSource,
-                            account: account);
-                        final message = Message(mime, client, source, 0);
+                          mailService.messageSource,
+                          account: account,
+                        );
+                        final message = Message(mime, source, 0);
                         message.isEmbedded = true;
                         source.singleMessage = message;
                         showErrorMessage = false;

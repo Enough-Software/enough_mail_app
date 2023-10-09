@@ -8,6 +8,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../account/model.dart';
 import '../locator.dart';
+import '../logger.dart';
 import '../models/message.dart' as maily;
 import '../models/message_source.dart';
 import '../routes.dart';
@@ -97,6 +98,7 @@ class NotificationService {
 
   MailNotificationPayload _deserialize(String payloadText) {
     final json = jsonDecode(payloadText.substring(_messagePayloadStart.length));
+
     return MailNotificationPayload.fromJson(json);
   }
 
@@ -125,8 +127,7 @@ class NotificationService {
           account:
               currentMessageSource?.account ?? RealAccount(mailClient.account),
         );
-        final message =
-            maily.Message(mimeMessage, mailClient, messageSource, 0);
+        final message = maily.Message(mimeMessage, messageSource, 0);
         messageSource.singleMessage = message;
         await locator<NavigationService>()
             .push(Routes.mailDetails, arguments: message);
@@ -139,16 +140,23 @@ class NotificationService {
   }
 
   Future sendLocalNotificationForMailLoadEvent(MailLoadEvent event) =>
-      sendLocalNotificationForMail(event.message, event.mailClient);
+      sendLocalNotificationForMail(
+        event.message,
+        event.mailClient.account.email,
+      );
 
   Future sendLocalNotificationForMailMessage(maily.Message message) =>
-      sendLocalNotificationForMail(message.mimeMessage, message.mailClient);
+      sendLocalNotificationForMail(message.mimeMessage, message.account.email);
 
   Future sendLocalNotificationForMail(
-      MimeMessage mimeMessage, MailClient mailClient) {
+    MimeMessage mimeMessage,
+    String accountEmail,
+  ) {
     if (kDebugMode) {
-      print(
-          'sending notification for mime ${mimeMessage.decodeSubject()} with GUID ${mimeMessage.guid}');
+      logger.d(
+        'sending notification for mime ${mimeMessage.decodeSubject()}'
+        ' with GUID ${mimeMessage.guid}',
+      );
     }
     final notificationId = mimeMessage.guid!;
     var from = mimeMessage.from?.isNotEmpty ?? false
@@ -160,10 +168,16 @@ class NotificationService {
           : mimeMessage.sender?.email;
     }
     final subject = mimeMessage.decodeSubject();
-    final payload = MailNotificationPayload.fromMail(mimeMessage, mailClient);
+    final payload = MailNotificationPayload.fromMail(mimeMessage, accountEmail);
     final payloadText = _messagePayloadStart + jsonEncode(payload.toJson());
-    return sendLocalNotification(notificationId, from!, subject,
-        payloadText: payloadText, when: mimeMessage.decodeDate());
+
+    return sendLocalNotification(
+      notificationId,
+      from!,
+      subject,
+      payloadText: payloadText,
+      when: mimeMessage.decodeDate(),
+    );
   }
 
   // int getNotificationIdForMail(MimeMessage mimeMessage, MailClient mailClient) {
@@ -247,13 +261,13 @@ class MailNotificationPayload {
 
   /// Creates a new payload from the given [mimeMessage]
   MailNotificationPayload.fromMail(
-      MimeMessage mimeMessage, MailClient mailClient)
-      : uid = mimeMessage.uid!,
-        guid = mimeMessage.guid!,
-        sequenceId = mimeMessage.sequenceId!,
+    MimeMessage mimeMessage,
+    this.accountEmail,
+  )   : uid = mimeMessage.uid ?? 0,
+        guid = mimeMessage.guid ?? 0,
+        sequenceId = mimeMessage.sequenceId ?? 0,
         subject = mimeMessage.decodeSubject() ?? '',
-        size = mimeMessage.size!,
-        accountEmail = mailClient.account.email;
+        size = mimeMessage.size ?? 0;
 
   /// Creates a new payload from the given [json]
   factory MailNotificationPayload.fromJson(Map<String, dynamic> json) =>

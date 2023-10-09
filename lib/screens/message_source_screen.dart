@@ -838,6 +838,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     if (_selectedMessages.isEmpty) {
       locator<ScaffoldMessengerService>()
           .showTextSnackBar(localizations.multipleSelectionNeededInfo);
+
       return;
     }
     var endSelectionMode = true;
@@ -937,15 +938,18 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     final futures = <Future>[];
     for (final message in _selectedMessages) {
       message.isSelected = false;
-      final mailClient = message.mailClient;
+      final mailClient = message.source.getMimeSource(message)?.mailClient;
+      if (mailClient == null) {
+        continue;
+      }
       final from = mailClient.account.fromAddress;
       if (!fromAddresses.contains(from)) {
         fromAddresses.add(from);
       }
       final mime = message.mimeMessage;
       final subject = mime.decodeSubject();
-      if (subject?.isNotEmpty ?? false) {
-        subjects.add(subject!.replaceAll('\r\n ', '').replaceAll('\n', ''));
+      if (subject != null && subject.isNotEmpty) {
+        subjects.add(subject.replaceAll('\r\n ', '').replaceAll('\n', ''));
       }
       final composeFuture = loader(message, builder);
       if (composeFuture != null) {
@@ -971,8 +975,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   Future? addMessageAttachment(Message message, MessageBuilder builder) {
     final mime = message.mimeMessage;
     if (mime.mimeData == null) {
-      return message.mailClient.fetchMessageContents(mime).then((value) {
-        message.updateMime(value);
+      return message.source.fetchMessageContents(message).then((value) {
         builder.addMessagePart(value);
       });
     } else {
@@ -982,12 +985,11 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   }
 
   Future? addAttachments(Message message, MessageBuilder builder) {
-    final mailClient = message.mailClient;
     final mime = message.mimeMessage;
     Future? composeFuture;
     if (mime.mimeData == null) {
-      composeFuture = mailClient.fetchMessageContents(mime).then((value) {
-        message.updateMime(value);
+      composeFuture =
+          message.source.fetchMessageContents(message).then((value) {
         for (final attachment in message.attachments) {
           final part = value.getPart(attachment.fetchId);
           builder.addPart(mimePart: part);
@@ -1000,8 +1002,8 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         if (part != null) {
           builder.addPart(mimePart: part);
         } else {
-          futures.add(mailClient
-              .fetchMessagePart(mime, attachment.fetchId)
+          futures.add(message.source
+              .fetchMessagePart(message, fetchId: attachment.fetchId)
               .then((value) {
             builder.addPart(mimePart: value);
           }));
@@ -1009,6 +1011,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         composeFuture = futures.isEmpty ? null : Future.wait(futures);
       }
     }
+
     return composeFuture;
   }
 
@@ -1020,8 +1023,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       // or of the real account
       final mailClients = <MailClient>[];
       for (final message in _selectedMessages) {
-        if (!mailClients.contains(message.mailClient)) {
-          mailClients.add(message.mailClient);
+        final mailClient = message.source.getMimeSource(message)?.mailClient;
+        if (mailClient != null && !mailClients.contains(mailClient)) {
+          mailClients.add(mailClient);
         }
       }
       if (mailClients.length == 1) {
@@ -1032,7 +1036,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     }
     final mailbox = account.isVirtual
         ? null // //TODO set current mailbox, e.g.  current: widget.messageSource.currentMailbox,
-        : _selectedMessages.first.mailClient.selectedMailbox;
+        : _selectedMessages.first.source
+            .getMimeSource(_selectedMessages.first)
+            ?.mailClient
+            .selectedMailbox;
     LocalizedDialogHelper.showWidgetDialog(
       context,
       SingleChildScrollView(
@@ -1083,8 +1090,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       if (message.mimeMessage.hasFlag(MessageFlags.draft)) {
         // continue to edit message:
         // first download message:
-        final mime =
-            await message.mailClient.fetchMessageContents(message.mimeMessage);
+        final mime = await message.source.fetchMessageContents(message);
         //message.updateMime(mime);
         final builder = MessageBuilder.prepareFromDraft(mime);
         final data = ComposeData([message], builder, ComposeAction.newMessage);
