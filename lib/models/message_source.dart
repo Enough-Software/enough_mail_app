@@ -176,7 +176,7 @@ abstract class MessageSource extends ChangeNotifier
     int index = 0,
   }) {
     // the source index is 0 since this is the new first message:
-    final message = Message(mime, this, index);
+    final message = createMessage(mime, source, index);
     insertIntoCache(index, message);
     notifyListeners();
   }
@@ -602,6 +602,16 @@ abstract class MessageSource extends ChangeNotifier
     );
   }
 
+  /// Creates a new message
+  ///
+  /// Can be overridden by subclasses to create a custom message type
+  Message createMessage(
+    MimeMessage mime,
+    AsyncMimeSource mimeSource,
+    int index,
+  ) =>
+      Message(mime, this, index);
+
   // void replaceMime(Message message, MimeMessage mime) {
   //   final mimeSource = getMimeSource(message);
   //   remove(message);
@@ -915,10 +925,20 @@ class MultipleMessageSource extends MessageSource {
     if (message is _UnifiedMessage) {
       return message.mimeSource;
     }
-    logger.e('Unable to retrieve mime source for $message');
+    logger.e(
+      'Unable to retrieve mime source for ${message.runtimeType} / $message',
+    );
 
     return mimeSources.first;
   }
+
+  @override
+  Message createMessage(
+    MimeMessage mime,
+    AsyncMimeSource mimeSource,
+    int index,
+  ) =>
+      _UnifiedMessage(mime, this, index, mimeSource);
 
   @override
   bool get shouldBlockImages =>
@@ -958,9 +978,7 @@ class MultipleMessageSource extends MessageSource {
       account: account,
       parent: this,
       isSearch: true,
-    );
-    searchMessageSource._description =
-        localizations.searchQueryDescription(name ?? '');
+    ).._description = localizations.searchQueryDescription(name ?? '');
 
     return searchMessageSource;
   }
