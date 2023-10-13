@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../account/model.dart';
 import '../account/providers.dart';
 import '../settings/provider.dart';
 import 'screens.dart';
@@ -24,7 +23,7 @@ class HomeScreen extends ConsumerWidget {
     }
 
     return MailScreen(
-      account: accounts.firstWhere((a) => a is RealAccount),
+      account: accounts.first,
     );
   }
 }

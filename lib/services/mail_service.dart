@@ -177,6 +177,7 @@ class MailService implements MimeSourceSubscriber {
   ) async {
     if (account is UnifiedAccount) {
       final mimeSources = await _getUnifiedMimeSources(mailbox, account);
+
       return MultipleMessageSource(
         account: account,
         mimeSources,
@@ -192,8 +193,10 @@ class MailService implements MimeSourceSubscriber {
           await mailClient.selectMailbox(mailbox);
         }
         final source = _mimeSourceFactory.createMailboxMimeSource(
-            mailClient, mailbox)
-          ..addSubscriber(this);
+          mailClient,
+          mailbox,
+        )..addSubscriber(this);
+
         return MailboxMessageSource.fromMimeSource(
           source,
           mailClient.account.email,
@@ -201,13 +204,10 @@ class MailService implements MimeSourceSubscriber {
           account: account,
         );
       }
+      throw StateError('Unable to login for : ${account.key}');
+    } else {
+      throw StateError('Unknown account type: ${account.runtimeType}');
     }
-    final accountWithErrors = _accountsWithErrors ?? <Account>[];
-    if (!accountWithErrors.contains(account)) {
-      accountWithErrors.add(account);
-      _accountsWithErrors ??= accountsWithErrors;
-    }
-    return ErrorMessageSource(account);
   }
 
   Future<List<AsyncMimeSource>> _getUnifiedMimeSources(
@@ -628,17 +628,19 @@ class MailService implements MimeSourceSubscriber {
 
   Future<bool> reconnect(RealAccount account) async {
     _mailClientsPerAccount.remove(account);
-    final source = await getMessageSourceFor(account);
-    final connected = source is! ErrorMessageSource;
-    if (connected) {
+    try {
+      final source = await getMessageSourceFor(account);
       final accountsWithErrors = _accountsWithErrors;
       if (accountsWithErrors != null) {
         accountsWithErrors.remove(account);
       }
       accountsWithoutErrors.add(account);
       //TODO update unified account message source after connecting account
+
+      return true;
+    } catch (e) {
+      return false;
     }
-    return connected;
   }
 
   /// Disconnects the mail client belonging to [account].

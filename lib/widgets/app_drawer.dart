@@ -4,6 +4,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
@@ -61,7 +62,7 @@ class AppDrawer extends ConsumerWidget {
                         currentAccount,
                         localizations,
                       ),
-                      _buildFolderTree(currentAccount),
+                      _buildFolderTree(context, currentAccount),
                       if (currentAccount is RealAccount)
                         ExtensionActionTile.buildSideMenuForAccount(
                           context,
@@ -128,8 +129,11 @@ class AppDrawer extends ConsumerWidget {
         if (currentAccount is UnifiedAccount) {
           navService.push(Routes.settingsAccounts, fade: true);
         } else {
-          navService.push(Routes.accountEdit,
-              arguments: currentAccount, fade: true);
+          navService.push(
+            Routes.accountEdit,
+            arguments: currentAccount,
+            fade: true,
+          );
         }
       },
       title: avatarAccount == null
@@ -262,24 +266,28 @@ class AppDrawer extends ConsumerWidget {
         },
       );
 
-  Widget _buildFolderTree(Account? account) {
+  Widget _buildFolderTree(BuildContext context, Account? account) {
     if (account == null) {
       return const SizedBox.shrink();
     }
 
-    return MailboxTree(account: account, onSelected: _navigateToMailbox);
+    return MailboxTree(
+      account: account,
+      onSelected: (mailbox) => _navigateToMailbox(context, mailbox),
+    );
   }
 
-  Future<void> _navigateToMailbox(Mailbox mailbox) async {
-    final mailService = locator<MailService>();
-    final account = mailService.currentAccount!;
-    final messageSourceFuture =
-        mailService.getMessageSourceFor(account, mailbox: mailbox);
-    await locator<NavigationService>().push(
-      Routes.messageSourceFuture,
-      arguments: messageSourceFuture,
-      replace: !Platform.isIOS,
-      fade: true,
+  Future<void> _navigateToMailbox(BuildContext context, Mailbox mailbox) async {
+    final account = currentAccount;
+    if (account == null) {
+      return;
+    }
+    await context.pushNamed(
+      Routes.mail,
+      pathParameters: {
+        Routes.pathParameterEmail: account.email,
+        Routes.pathParameterEncodedMailboxPath: mailbox.encodedPath,
+      },
     );
   }
 }

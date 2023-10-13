@@ -4,9 +4,12 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../account/model.dart';
+import '../account/providers.dart';
 import '../extensions/extensions.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
@@ -14,7 +17,7 @@ import '../locator.dart';
 import '../routes.dart';
 import '../services/mail_service.dart';
 import '../services/navigation_service.dart';
-import '../services/providers.dart';
+import '../services/providers.dart' as mailProviders;
 import '../util/modal_bottom_sheet_helper.dart';
 import '../util/validator.dart';
 import '../widgets/account_provider_selector.dart';
@@ -22,7 +25,7 @@ import '../widgets/button_text.dart';
 import '../widgets/password_field.dart';
 import 'base.dart';
 
-class AccountAddScreen extends StatefulWidget {
+class AccountAddScreen extends ConsumerStatefulWidget {
   const AccountAddScreen({
     super.key,
     required this.launchedFromWelcome,
@@ -30,10 +33,10 @@ class AccountAddScreen extends StatefulWidget {
   final bool launchedFromWelcome;
 
   @override
-  State<AccountAddScreen> createState() => _AccountAddScreenState();
+  ConsumerState<AccountAddScreen> createState() => _AccountAddScreenState();
 }
 
-class _AccountAddScreenState extends State<AccountAddScreen> {
+class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
   static const int _stepEmail = 0;
   static const int _stepPassword = 1;
   static const int _stepAccountSetup = 2;
@@ -49,7 +52,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   final TextEditingController _userNameController = TextEditingController();
 
   bool _isProviderResolving = false;
-  Provider? _provider;
+  mailProviders.Provider? _provider;
   final bool _isManualSettings = false;
   bool _isAccountVerifying = false;
   bool _isAccountVerified = false;
@@ -59,8 +62,10 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   RealAccount? _realAccount;
 
   Future<void> _navigateToManualSettings(
-      BuildContext context, AppLocalizations localizations) async {
-    Provider? selectedProvider;
+    BuildContext context,
+    AppLocalizations localizations,
+  ) async {
+    mailProviders.Provider? selectedProvider;
     final result = await ModelBottomSheetHelper.showModalBottomSheet(
       context,
       localizations.accountProviderStepTitle,
@@ -113,9 +118,9 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   @override
   void initState() {
     _availableSteps = 3;
-    final accounts = locator<MailService>().accounts;
+    final accounts = ref.read(realAccountsProvider);
     if (accounts.isNotEmpty) {
-      _userNameController.text = (accounts.first as RealAccount).userName ?? '';
+      _userNameController.text = accounts.first.userName ?? '';
     }
     super.initState();
   }
@@ -124,6 +129,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
   Widget build(BuildContext context) {
     // print('build: current step=$_currentStep');
     final localizations = context.text;
+
     return Base.buildAppChrome(
       context,
       title: localizations.addAccountTitle,
@@ -190,7 +196,8 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     if (kDebugMode) {
       print('discover settings for $email');
     }
-    final provider = await locator<ProviderService>().discover(email);
+    final provider =
+        await locator<mailProviders.ProviderService>().discover(email);
     if (!mounted) {
       // ignore if user has cancelled operation
       return;
@@ -216,7 +223,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
     });
   }
 
-  Future _loginWithOAuth(Provider provider, String email) async {
+  Future _loginWithOAuth(mailProviders.Provider provider, String email) async {
     setState(() {
       _isAccountVerifying = true;
       _currentStep = _stepAccountSetup;
@@ -297,25 +304,30 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
       if (kDebugMode) {
         print('No account or mail client available');
       }
+
       return;
     }
     // Account name has been specified
-    account.name = _accountNameController.text;
-    account.userName = _userNameController.text;
-    final service = locator<MailService>();
-    final added = await service.addAccount(account, mailClient);
-    if (added) {
-      if (Platform.isIOS && widget.launchedFromWelcome) {
-        await locator<NavigationService>().push(Routes.appDrawer, clear: true);
-      }
-      await locator<NavigationService>().push(
-        Routes.messageSource,
-        arguments: service.messageSource,
-        clear: !Platform.isIOS && widget.launchedFromWelcome,
-        replace: !widget.launchedFromWelcome,
-        fade: true,
-      );
+    account
+      ..name = _accountNameController.text
+      ..userName = _userNameController.text;
+    ref.read(realAccountsProvider.notifier).addAccount(account);
+    final bool goToAppDrawer = Platform.isIOS && widget.launchedFromWelcome;
+    if (goToAppDrawer) {
+      context.goNamed(Routes.appDrawer);
+      // await locator<NavigationService>().push(Routes.appDrawer, clear: true);
     }
+    context.goNamed(
+      Routes.mail,
+      pathParameters: {Routes.pathParameterEmail: account.key},
+    );
+    // locator<NavigationService>().push(
+    //   Routes.messageSource,
+    //   arguments: service.messageSource,
+    //   clear: !Platform.isIOS && widget.launchedFromWelcome,
+    //   replace: !widget.launchedFromWelcome,
+    //   fade: true,
+    // );
   }
 
   Step _buildEmailStep(BuildContext context, AppLocalizations localizations) =>
@@ -611,7 +623,7 @@ class _AccountAddScreenState extends State<AccountAddScreen> {
         ),
       );
 
-  void _onProviderChanged(Provider provider, String email) {
+  void _onProviderChanged(mailProviders.Provider provider, String email) {
     final mailAccount = MailAccount.fromDiscoveredSettings(
       name: _emailController.text,
       email: _emailController.text,

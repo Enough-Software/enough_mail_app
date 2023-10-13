@@ -2,6 +2,7 @@ export 'account_add_screen.dart';
 export 'account_edit_screen.dart';
 export 'account_server_details_screen.dart';
 export 'compose_screen.dart';
+export 'email_screen.dart';
 export 'home_screen.dart';
 export 'location_screen.dart';
 export 'lock_screen.dart';

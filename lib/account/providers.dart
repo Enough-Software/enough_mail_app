@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'model.dart';
@@ -72,4 +73,45 @@ class AllAccounts extends _$AllAccounts {
       ...realAccounts,
     ];
   }
+}
+
+//// Finds an account by its email
+@Riverpod(keepAlive: true)
+Account findAccountByEmail(
+  FindAccountByEmailRef ref, {
+  required String email,
+}) {
+  final key = email.toLowerCase();
+  final realAccounts = ref.watch(realAccountsProvider);
+  final unifiedAccount = ref.watch(unifiedAccountProvider);
+
+  final account = realAccounts.firstWhereOrNull((a) => a.key == key) ??
+      ((unifiedAccount?.key == key) ? unifiedAccount : null);
+  if (account == null) {
+    throw StateError('account not found for $email');
+  }
+
+  return account;
+}
+
+//// Finds a real account by its email
+@Riverpod(keepAlive: true)
+RealAccount findRealAccountByEmail(
+  FindRealAccountByEmailRef ref, {
+  required String email,
+}) {
+  final key = email.toLowerCase();
+  final realAccounts = ref.watch(realAccountsProvider);
+
+  return realAccounts.firstWhere((a) => a.key == key);
+}
+
+//// Checks if there is at least one real account with a login error
+@Riverpod(keepAlive: true)
+bool hasAccountWithError(
+  HasAccountWithErrorRef ref,
+) {
+  final realAccounts = ref.watch(realAccountsProvider);
+
+  return realAccounts.any((a) => a.hasError);
 }

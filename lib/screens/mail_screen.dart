@@ -1,3 +1,4 @@
+import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,15 +12,23 @@ import 'message_source_screen.dart';
 /// Displays the mail for a given account
 class MailScreen extends ConsumerWidget {
   /// Creates a [MailScreen]
-  const MailScreen({super.key, required this.account});
+  const MailScreen({super.key, required this.account, this.mailbox});
 
   /// The account to display
   final Account account;
 
+  /// The optional mailbox
+  final Mailbox? mailbox;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final text = context.text;
-    final sourceFuture = ref.watch(sourceProvider(account: account));
+    final sourceFuture = ref.watch(
+      sourceProvider(
+        account: account,
+        mailbox: mailbox,
+      ),
+    );
     final title =
         account is UnifiedAccount ? text.unifiedAccountName : account.name;
     final subtitle = account.fromAddress.email;

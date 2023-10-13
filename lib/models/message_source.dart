@@ -612,7 +612,7 @@ abstract class MessageSource extends ChangeNotifier
 
 class MailboxMessageSource extends MessageSource {
   MailboxMessageSource.fromMimeSource(
-    this._mimeSource,
+    this.mimeSource,
     String description,
     String name, {
     required this.account,
@@ -621,44 +621,45 @@ class MailboxMessageSource extends MessageSource {
   }) {
     _description = description;
     _name = name;
-    _mimeSource.addSubscriber(this);
+    mimeSource.addSubscriber(this);
   }
 
   @override
   final RealAccount account;
 
   @override
-  int get size => _mimeSource.size;
+  int get size => mimeSource.size;
 
-  final AsyncMimeSource _mimeSource;
+  final AsyncMimeSource mimeSource;
 
   @override
   void dispose() {
-    _mimeSource.removeSubscriber(this);
-    _mimeSource.dispose();
+    mimeSource
+      ..removeSubscriber(this)
+      ..dispose();
     super.dispose();
   }
 
   @override
   Future<Message> loadMessage(int index) async {
     //print('get uncached $index');
-    final mime = await _mimeSource.getMessage(index);
+    final mime = await mimeSource.getMessage(index);
 
     return Message(mime, this, index);
   }
 
   @override
   Future<void> init() async {
-    await _mimeSource.init();
-    name ??= _mimeSource.name;
-    supportsDeleteAll = _mimeSource.supportsDeleteAll;
+    await mimeSource.init();
+    name ??= mimeSource.name;
+    supportsDeleteAll = mimeSource.supportsDeleteAll;
   }
 
   @override
   Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) async {
     final removedMessages = cache.getAllCachedEntries();
     cache.clear();
-    final futureResults = _mimeSource.deleteAllMessages(expunge: expunge);
+    final futureResults = mimeSource.deleteAllMessages(expunge: expunge);
     clear();
     notifyListeners();
     final results = await futureResults;
@@ -676,7 +677,7 @@ class MailboxMessageSource extends MessageSource {
   @override
   Future<bool> markAllMessagesSeen(bool seen) async {
     cache.markAllMessageSeen(seen);
-    await _mimeSource.storeAll(
+    await mimeSource.storeAll(
       [MessageFlags.seen],
       action: seen ? StoreAction.add : StoreAction.remove,
     );
@@ -685,29 +686,29 @@ class MailboxMessageSource extends MessageSource {
   }
 
   @override
-  bool get shouldBlockImages => _mimeSource.shouldBlockImages;
+  bool get shouldBlockImages => mimeSource.shouldBlockImages;
 
   @override
-  bool get isJunk => _mimeSource.isJunk;
+  bool get isJunk => mimeSource.isJunk;
 
   @override
-  bool get isArchive => _mimeSource.isArchive;
+  bool get isArchive => mimeSource.isArchive;
 
   @override
-  bool get isTrash => _mimeSource.isTrash;
+  bool get isTrash => mimeSource.isTrash;
 
   @override
-  bool get isSent => _mimeSource.isSent;
+  bool get isSent => mimeSource.isSent;
 
   @override
-  bool get supportsMessageFolders => _mimeSource.supportsMessageFolders;
+  bool get supportsMessageFolders => mimeSource.supportsMessageFolders;
 
   @override
-  bool get supportsSearching => _mimeSource.supportsSearching;
+  bool get supportsSearching => mimeSource.supportsSearching;
 
   @override
   MessageSource search(MailSearch search) {
-    final searchSource = _mimeSource.search(search);
+    final searchSource = mimeSource.search(search);
     final localizations = locator<I18nService>().localizations;
 
     return MailboxMessageSource.fromMimeSource(
@@ -721,12 +722,12 @@ class MailboxMessageSource extends MessageSource {
   }
 
   @override
-  AsyncMimeSource? getMimeSource(Message message) => _mimeSource;
+  AsyncMimeSource? getMimeSource(Message message) => mimeSource;
 
   @override
   void clear() {
     cache.clear();
-    _mimeSource.clear();
+    mimeSource.clear();
   }
 
   @override
@@ -1240,72 +1241,6 @@ class ListMessageSource extends MessageSource {
   void clear() {
     messages.clear();
   }
-
-  @override
-  void onMailCacheInvalidated(AsyncMimeSource source) {
-    // TODO: implement onMailCacheInvalidated
-  }
-}
-
-class ErrorMessageSource extends MessageSource {
-  ErrorMessageSource(this.account);
-  @override
-  final Account account;
-
-  @override
-  Future<Message> loadMessage(int index) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void clear() {}
-
-  @override
-  Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  AsyncMimeSource getMimeSource(Message message) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> init() => Future.value();
-
-  @override
-  bool get isArchive => false;
-
-  @override
-  bool get isJunk => false;
-
-  @override
-  bool get isTrash => false;
-
-  @override
-  bool get isSent => false;
-
-  @override
-  Future<void> markAllMessagesSeen(bool seen) {
-    throw UnimplementedError();
-  }
-
-  @override
-  MessageSource search(MailSearch search) {
-    throw UnimplementedError();
-  }
-
-  @override
-  bool get shouldBlockImages => false;
-
-  @override
-  int get size => 0;
-
-  @override
-  bool get supportsMessageFolders => false;
-
-  @override
-  bool get supportsSearching => false;
 
   @override
   void onMailCacheInvalidated(AsyncMimeSource source) {

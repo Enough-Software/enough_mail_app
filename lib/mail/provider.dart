@@ -6,6 +6,7 @@ import '../account/model.dart';
 import '../account/providers.dart';
 import '../events/app_event_bus.dart';
 import '../locator.dart';
+import '../models/async_mime_source.dart';
 import '../models/async_mime_source_factory.dart';
 import '../models/message_source.dart';
 import '../services/providers.dart';
@@ -15,26 +16,84 @@ part 'provider.g.dart';
 /// Provides the message source for the given account
 @Riverpod(keepAlive: true)
 class Source extends _$Source {
+  @override
+  Future<MessageSource> build({
+    required Account account,
+    Mailbox? mailbox,
+  }) {
+    if (account is RealAccount) {
+      return ref.watch(
+        realSourceProvider(account: account, mailbox: mailbox).future,
+      );
+    }
+    if (account is UnifiedAccount) {
+      return ref.watch(
+        unifiedSourceProvider(account: account, mailbox: mailbox).future,
+      );
+    }
+    throw UnimplementedError('for account $account');
+  }
+}
+
+/// Provides the message source for the given account
+@Riverpod(keepAlive: true)
+class UnifiedSource extends _$UnifiedSource {
+  @override
+  Future<MultipleMessageSource> build({
+    required UnifiedAccount account,
+    Mailbox? mailbox,
+  }) async {
+    Future<AsyncMimeSource> resolve(
+      RealAccount realAccount,
+      Mailbox? mailbox,
+    ) async {
+      var usedMailbox = mailbox;
+      final flag = mailbox?.identityFlag;
+
+      if (mailbox != null && mailbox.isVirtual && flag != null) {
+        final mailboxTree = await ref.watch(
+          mailboxTreeProvider(account: realAccount).future,
+        );
+        usedMailbox = mailboxTree.firstWhereOrNull(
+          (m) => m?.flags.contains(flag) ?? false,
+        );
+      }
+
+      final source = await ref.watch(
+        realSourceProvider(account: realAccount, mailbox: usedMailbox).future,
+      );
+
+      return source.mimeSource;
+    }
+
+    final accounts = account.accounts;
+    final futureSources = accounts.map(
+      (a) => resolve(a, mailbox),
+    );
+    final mimeSources = await Future.wait(futureSources);
+
+    return MultipleMessageSource(
+      mimeSources,
+      account.name,
+      mailbox?.identityFlag ?? MailboxFlag.inbox,
+      account: account,
+    );
+  }
+}
+
+/// Provides the message source for the given account
+@Riverpod(keepAlive: true)
+class RealSource extends _$RealSource {
   static const _clientId = Id(name: 'Maily', version: '1.0');
   final _mailClientsPerAccount = <RealAccount, MailClient>{};
   final _mimeSourceFactory =
       const AsyncMimeSourceFactory(isOfflineModeSupported: false);
 
   @override
-  Future<MessageSource> build({required Account account, Mailbox? mailbox}) {
-    if (account is RealAccount) {
-      return _buildRealAccount(account, mailbox);
-    } else if (account is UnifiedAccount) {
-      return _buildUnifiedAccount(account, mailbox);
-    } else {
-      throw UnimplementedError();
-    }
-  }
-
-  Future<MessageSource> _buildRealAccount(
-    RealAccount account, [
+  Future<MailboxMessageSource> build({
+    required RealAccount account,
     Mailbox? mailbox,
-  ]) async {
+  }) async {
     final mailClient = await _getClientAndStopPolling(account);
     if (mailClient == null) {
       throw Exception('Unable to connect to server');
@@ -58,15 +117,8 @@ class Source extends _$Source {
     );
   }
 
-  Future<MessageSource> _buildUnifiedAccount(
-    UnifiedAccount account, [
-    Mailbox? mailbox,
-  ]) {
-    throw UnimplementedError();
-  }
-
   Future<MailClient?> _getClientAndStopPolling(RealAccount account) async {
-    final client = await getClientFor(account);
+    final client = await _getClientFor(account);
     await client.stopPollingIfNeeded();
     if (!client.isConnected) {
       await client.connect();
@@ -75,26 +127,25 @@ class Source extends _$Source {
     return client;
   }
 
-  Future<MailClient> getClientFor(
+  Future<MailClient> _getClientFor(
     RealAccount account,
   ) async =>
-      _mailClientsPerAccount[account] ?? await createClientFor(account);
+      _mailClientsPerAccount[account] ?? await _createClientFor(account);
 
-  Future<MailClient> createClientFor(
+  Future<MailClient> _createClientFor(
     RealAccount account, {
     bool store = true,
   }) async {
-    final client = createMailClient(account.mailAccount);
+    final client = _createMailClient(account.mailAccount);
     if (store) {
       _mailClientsPerAccount[account] = client;
     }
     await client.connect();
-    await _loadMailboxesFor(client);
 
     return client;
   }
 
-  MailClient createMailClient(MailAccount mailAccount) {
+  MailClient _createMailClient(MailAccount mailAccount) {
     final bool isLogEnabled = kDebugMode ||
         (mailAccount.attributes[RealAccount.attributeEnableLogging] ?? false);
 
@@ -139,23 +190,47 @@ class Source extends _$Source {
 
     return oauthClient.refresh(expiredToken);
   }
+}
 
-  Future<void> _loadMailboxesFor(MailClient client) async {
-    //final account = getAccountFor(client.account);
-    // if (account == null) {
-    //   if (kDebugMode) {
-    //     print('Unable to find account for ${client.account}');
-    //   }
+//// Loads the mailbox tree for the given account
+@Riverpod(keepAlive: true)
+Future<Tree<Mailbox?>> mailboxTree(
+  MailboxTreeRef ref, {
+  required Account account,
+}) async {
+  if (account is RealAccount) {
+    final source = await ref.watch(realSourceProvider(account: account).future);
 
-    //   return;
-    // }
-    final mailboxTree =
-        await client.listMailboxesAsTree(createIntermediate: false);
-    // final settings = _settings;
-    // if (settings.folderNameSetting != FolderNameSetting.server) {
-    //   _setMailboxNames(settings, client);
-    // }
+    return source.mimeSource.mailClient
+        .listMailboxesAsTree(createIntermediate: false);
+  } else if (account is UnifiedAccount) {
+    final mailboxes = [
+      MailboxFlag.inbox,
+      MailboxFlag.drafts,
+      MailboxFlag.sent,
+      MailboxFlag.trash,
+      MailboxFlag.archive,
+      MailboxFlag.junk,
+    ].map((f) => Mailbox.virtual(f.name, [f])).toList();
 
-    // _mailboxesPerAccount[account] = mailboxTree;
+    return Tree<Mailbox?>(Mailbox.virtual('', []))
+      ..populateFromList(mailboxes, (child) => null);
+  } else {
+    throw UnimplementedError('for account $account');
   }
+}
+
+//// Loads the mailbox tree for the given account
+@Riverpod(keepAlive: true)
+Future<Mailbox?> findMailbox(
+  FindMailboxRef ref, {
+  required Account account,
+  required String encodedMailboxPath,
+}) async {
+  final tree = await ref.watch(mailboxTreeProvider(account: account).future);
+
+  final mailbox =
+      tree.firstWhereOrNull((m) => m?.encodedPath == encodedMailboxPath);
+
+  return mailbox;
 }

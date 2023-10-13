@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../account/providers.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
@@ -17,7 +18,6 @@ import '../models/swipe.dart';
 import '../routes.dart';
 import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
-import '../services/mail_service.dart';
 import '../services/navigation_service.dart';
 import '../services/notification_service.dart';
 import '../services/scaffold_messenger_service.dart';
@@ -92,7 +92,6 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   bool _isInSearchMode = false;
   bool _hasSearchInput = false;
   late TextEditingController _searchEditingController;
-  bool _updateMessageSource = false;
 
   @override
   void initState() {
@@ -126,6 +125,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       setState(() {
         _isInSearchMode = false;
       });
+
       return;
     }
     final search = MailSearch(query, SearchQueryType.allTextHeaders);
@@ -143,25 +143,6 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     final theme = Theme.of(context);
     final localizations = context.text;
     final source = _sectionedMessageSource.messageSource;
-    if (source is ErrorMessageSource) {
-      return buildForLoadingError(context, localizations, source);
-    }
-    if (source == locator<MailService>().messageSource) {
-      // listen to changes:
-      _updateMessageSource = true;
-    } else if (_updateMessageSource) {
-      _updateMessageSource = false;
-      // final state = MailServiceWidget.of(context);
-      // if (state != null) {
-      //   final source = state.messageSource;
-      //   if (source != null) {
-      //     _sectionedMessageSource.removeListener(_update);
-      //     _sectionedMessageSource = DateSectionedMessageSource(source);
-      //     _sectionedMessageSource.addListener(_update);
-      //     _messageLoader = initMessageSource();
-      //   }
-      // }
-    }
     final searchColor = theme.brightness == Brightness.light
         ? theme.colorScheme.onSecondary
         : theme.colorScheme.onPrimary;
@@ -301,6 +282,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     final isSentFolder = source.isSent;
     final showSearchTextField =
         PlatformInfo.isCupertino && source.supportsSearching;
+    final hasAccountWithError = ref.watch(hasAccountWithErrorProvider);
 
     return PlatformPageScaffold(
       bottomBar: _isInSelectionMode
@@ -335,9 +317,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
           ? PlatformAppBar(
               title: appBarTitle,
               trailingActions: appBarActions,
-              leading: (locator<MailService>().hasAccountsWithErrors())
-                  ? const MenuWithBadge()
-                  : null,
+              leading: hasAccountWithError ? const MenuWithBadge() : null,
             )
           : null,
       body: FutureBuilder<void>(
@@ -398,13 +378,12 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                       PlatformSliverAppBar(
                         stretch: true,
                         title: appBarTitle,
-                        leading:
-                            (locator<MailService>().hasAccountsWithErrors())
-                                ? MenuWithBadge(
-                                    iOSText:
-                                        '\u2329 ${localizations.accountsTitle}',
-                                  )
-                                : null,
+                        leading: hasAccountWithError
+                            ? MenuWithBadge(
+                                iOSText:
+                                    '\u2329 ${localizations.accountsTitle}',
+                              )
+                            : null,
                         previousPageTitle:
                             source.parentName ?? localizations.accountsTitle,
                         floating: !_isInSearchMode,
@@ -1017,9 +996,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
 
   void move() {
     final localizations = locator<I18nService>().localizations;
-    var account = locator<MailService>().currentAccount!;
+    var account = widget.messageSource.account;
     if (account.isVirtual) {
-      // check how many mailclient are involved in the current selection to either show the mailboxes of the unified account
+      // check how many mail-clients are involved in the current selection
+      // to either show the mailboxes of the unified account
       // or of the real account
       final mailClients = <MailClient>[];
       for (final message in _selectedMessages) {
@@ -1030,8 +1010,11 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       }
       if (mailClients.length == 1) {
         // ok, all messages belong to one account:
-        account =
-            locator<MailService>().getAccountFor(mailClients.first.account)!;
+        account = ref.read(
+          findRealAccountByEmailProvider(
+            email: mailClients.first.account.email,
+          ),
+        );
       }
     }
     final mailbox = account.isVirtual
@@ -1061,13 +1044,19 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     locator<NavigationService>().pop(); // alert
     final source = _sectionedMessageSource.messageSource;
     final localizations = locator<I18nService>().localizations;
-    final account = locator<MailService>().currentAccount!;
+    final account = widget.messageSource.account;
     if (account.isVirtual) {
-      await source.moveMessagesToFlag(_selectedMessages, mailbox.flags.first,
-          localizations.moveSuccess(mailbox.name));
+      await source.moveMessagesToFlag(
+        _selectedMessages,
+        mailbox.flags.first,
+        localizations.moveSuccess(mailbox.name),
+      );
     } else {
       await source.moveMessages(
-          _selectedMessages, mailbox, localizations.moveSuccess(mailbox.name));
+        _selectedMessages,
+        mailbox,
+        localizations.moveSuccess(mailbox.name),
+      );
     }
   }
 
@@ -1146,39 +1135,6 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     }
   }
 
-  Widget buildForLoadingError(BuildContext context,
-      AppLocalizations localizations, ErrorMessageSource errorSource) {
-    final account = errorSource.account;
-    return Base.buildAppChrome(
-      context,
-      title: localizations.errorTitle,
-      content: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Text(localizations.accountLoadError(account.name)),
-          ),
-          PlatformTextButton(
-            child: Text(localizations.accountLoadErrorEditAction),
-            onPressed: () => locator<NavigationService>()
-                .push(Routes.accountEdit, arguments: account),
-          ),
-          // this does not currently work, as no new login is done
-          // PlatformTextButton(
-          //   child: Text(localizations.detailsErrorDownloadRetry),
-          //   onPressed: () async {
-          //     final messageSource = await locator<MailService>()
-          //         .getMessageSourceFor(account, switchToAccount: true);
-          //     locator<NavigationService>().push(Routes.messageSource,
-          //         arguments: messageSource, replace: true, fade: true);
-          //   },
-          // ),
-        ],
-      ),
-    );
-  }
-
   Future<void> _deleteAllMessages() async {
     final localizations = context.text;
     bool expunge = false;
@@ -1233,11 +1189,13 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
 }
 
 class CheckboxText extends StatefulWidget {
-  const CheckboxText(
-      {super.key,
-      required this.initialValue,
-      required this.onChanged,
-      required this.text});
+  const CheckboxText({
+    super.key,
+    required this.initialValue,
+    required this.onChanged,
+    required this.text,
+  });
+
   final bool initialValue;
   final Function(bool value) onChanged;
   final String text;

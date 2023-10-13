@@ -1,47 +1,66 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
 import '../locator.dart';
+import '../mail/provider.dart';
 import '../services/icon_service.dart';
-import '../services/mail_service.dart';
 
-class MailboxTree extends StatelessWidget {
-  const MailboxTree(
-      {super.key,
-      required this.account,
-      required this.onSelected,
-      this.current});
+class MailboxTree extends ConsumerWidget {
+  const MailboxTree({
+    super.key,
+    required this.account,
+    required this.onSelected,
+    this.current,
+  });
+
   final Account account;
   final void Function(Mailbox mailbox) onSelected;
   final Mailbox? current;
 
   @override
-  Widget build(BuildContext context) {
-    final mailboxTreeData = locator<MailService>().getMailboxTreeFor(account);
-    if (mailboxTreeData == null) {
-      return Container();
-    }
-    final mailboxTreeElements = mailboxTreeData.root.children!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (final element in mailboxTreeElements)
-          buildMailboxElement(element, 0),
-      ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mailboxTreeValue = ref.watch(mailboxTreeProvider(account: account));
+
+    return mailboxTreeValue.when(
+      loading: () => Center(
+        child: PlatformCircularProgressIndicator(),
+      ),
+      error: (error, stacktrace) => Center(child: Text('$error')),
+      data: (tree) {
+        final mailboxTreeElements = tree.root.children;
+        if (mailboxTreeElements == null) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final element in mailboxTreeElements)
+              _buildMailboxElement(element, 0),
+          ],
+        );
+      },
     );
   }
 
-  Widget buildMailboxElement(TreeElement<Mailbox?> element, final int level) {
-    final mailbox = element.value!;
+  Widget _buildMailboxElement(TreeElement<Mailbox?> element, final int level) {
+    final mailbox = element.value;
+    if (mailbox == null) {
+      return const SizedBox.shrink();
+    }
+
     final title = Padding(
       padding: EdgeInsets.only(left: level * 8.0),
       child: Text(mailbox.name),
     );
-    if (element.children == null) {
+    final children = element.children;
+    if (children == null) {
       final isCurrent = (mailbox == current);
       final iconData = locator<IconService>().getForMailbox(mailbox);
+
       return SelectablePlatformListTile(
         leading: Icon(iconData),
         title: title,
@@ -49,12 +68,13 @@ class MailboxTree extends StatelessWidget {
         selected: isCurrent,
       );
     }
+
     return Material(
       child: ExpansionTile(
         title: title,
         children: [
-          for (final childElement in element.children!)
-            buildMailboxElement(childElement, level + 1),
+          for (final childElement in children)
+            _buildMailboxElement(childElement, level + 1),
         ],
       ),
     );

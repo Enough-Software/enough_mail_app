@@ -21,6 +21,7 @@ class Routes {
   static const String accountAdd = '/accountAdd';
   static const String accountEdit = '/accountEdit';
   static const String accountServerDetails = '/accountServerDetails';
+  static const String mail = '/mail';
   static const String settings = '/settings';
   static const String settingsSecurity = '/settings/security';
   static const String settingsAccounts = '/settings/accounts';
@@ -48,6 +49,12 @@ class Routes {
   static const String appDrawer = '/appDrawer';
   static const String lockScreen = '/lock';
 
+  /// Path parameter name for an email address
+  static const String pathParameterEmail = 'email';
+
+  /// Path parameter name for an encoded mailbox path
+  static const String pathParameterEncodedMailboxPath = 'mailbox';
+
   static final navigatorKey = GlobalKey<NavigatorState>();
 
   /// The routing configuration
@@ -63,12 +70,17 @@ class Routes {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
-        path: splash,
-        builder: (context, state) => const SplashScreen(),
-      ),
-      GoRoute(
         path: home,
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        name: mail,
+        path: '$mail/:$pathParameterEmail/:$pathParameterEncodedMailboxPath',
+        builder: (context, state) => EMailScreen(
+          email: state.pathParameters[pathParameterEmail] ?? '',
+          encodedMailboxPath:
+              state.pathParameters[pathParameterEncodedMailboxPath],
+        ),
       ),
     ],
   );

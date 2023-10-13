@@ -23,6 +23,22 @@ abstract class Account extends ChangeNotifier {
 
   /// The from address for this account
   MailAddress get fromAddress;
+
+  /// The key for comparing accounts
+  String get key {
+    final value = _key ?? email.toLowerCase();
+    _key = value;
+
+    return value;
+  }
+
+  String? _key;
+
+  @override
+  int get hashCode => key.hashCode;
+
+  @override
+  bool operator ==(Object other) => other is Account && other.key == key;
 }
 
 /// Allows to listen to mail account changes
@@ -33,8 +49,7 @@ class RealAccount extends Account {
     MailAccount mailAccount, {
     this.appExtensions,
     this.contactManager,
-  })  : _account = mailAccount,
-        _key = mailAccount.email.toLowerCase();
+  }) : _account = mailAccount;
 
   /// Creates a new [RealAccount] from JSON
   factory RealAccount.fromJson(Map<String, dynamic> json) =>
@@ -58,6 +73,9 @@ class RealAccount extends Account {
 
   /// Retrieves the mail account
   MailAccount get mailAccount => _account;
+
+  /// Does this account have a login error?
+  bool hasError = false;
 
   @override
   bool get isVirtual => false;
@@ -207,22 +225,10 @@ class RealAccount extends Account {
   bool get addsSentMailAutomatically =>
       _account.attributes[attributeSentMailAddedAutomatically] ?? false;
 
-  /// Retrieves the key for comparing this account
-  String get key => _key;
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final String _key;
-
   /// [AppExtension]s are account specific additional setting retrieved
   /// from the server during initial setup
   /// Retrieves the app extensions
   List<AppExtension>? appExtensions;
-
-  @override
-  bool operator ==(Object other) => other is RealAccount && other.key == key;
-
-  @override
-  int get hashCode => key.hashCode;
 
   /// Copies this account with the given [mailAccount]
   RealAccount copyWith({required MailAccount mailAccount}) => RealAccount(
