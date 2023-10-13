@@ -8,6 +8,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
+import '../account/providers.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
@@ -28,13 +29,16 @@ import 'base.dart';
 /// The account edit screen
 class AccountEditScreen extends HookConsumerWidget {
   /// Creates a new account edit screen
-  const AccountEditScreen({super.key, required this.account});
+  const AccountEditScreen({super.key, required this.accountEmail});
 
   /// The account to edit
-  final RealAccount account;
+  final String accountEmail;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final account = ref.watch(
+      findRealAccountByEmailProvider(email: accountEmail),
+    );
     final localizations = context.text;
     final accountNameController = useTextEditingController(text: account.name);
     final userNameController = useTextEditingController(text: account.userName);
@@ -78,6 +82,7 @@ class AccountEditScreen extends HookConsumerWidget {
                               child: PlatformTextButtonIcon(
                                 onPressed: () => _reconnect(
                                   context,
+                                  account,
                                   account.mailAccount,
                                   isRetryingToConnectState,
                                 ),
@@ -92,6 +97,7 @@ class AccountEditScreen extends HookConsumerWidget {
                               child: PlatformTextButton(
                                 onPressed: () => _updateAuthentication(
                                   context,
+                                  account,
                                   isRetryingToConnectState,
                                 ),
                                 child: PlatformText(
@@ -354,6 +360,7 @@ class AccountEditScreen extends HookConsumerWidget {
 
   Future<void> _updateAuthentication(
     BuildContext context,
+    RealAccount account,
     ValueNotifier<bool> isRetryingToConnectState,
   ) async {
     final mailService = locator<MailService>();
@@ -394,6 +401,7 @@ class AccountEditScreen extends HookConsumerWidget {
         }
         final result = await _reconnect(
           context,
+          account,
           updatedMailAccount,
           isRetryingToConnectState,
         );
@@ -431,6 +439,7 @@ class AccountEditScreen extends HookConsumerWidget {
           );
           await _reconnect(
             context,
+            account,
             updatedMailAccount,
             isRetryingToConnectState,
           );
@@ -442,13 +451,14 @@ class AccountEditScreen extends HookConsumerWidget {
 
   Future<bool> _reconnect(
     BuildContext context,
+    RealAccount account,
     MailAccount mailAccount,
     ValueNotifier<bool> isRetryingToConnectState,
   ) async {
     isRetryingToConnectState.value = true;
-    final account = this.account.copyWith(mailAccount: mailAccount);
+    final accountCopy = account.copyWith(mailAccount: mailAccount);
     final mailService = locator<MailService>();
-    final result = await mailService.reconnect(account);
+    final result = await mailService.reconnect(accountCopy);
     isRetryingToConnectState.value = false;
     if (context.mounted) {
       if (result) {
@@ -460,6 +470,7 @@ class AccountEditScreen extends HookConsumerWidget {
         );
       }
     }
+
     return result;
   }
 }

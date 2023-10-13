@@ -1,16 +1,15 @@
 import 'dart:math';
 
-import '../locator.dart';
-import 'message_source.dart';
-import '../services/date_service.dart';
 import 'package:flutter/foundation.dart';
 
+import '../locator.dart';
+import '../services/date_service.dart';
 import '../services/i18n_service.dart';
 import 'message.dart';
 import 'message_date_section.dart';
+import 'message_source.dart';
 
 class DateSectionedMessageSource extends ChangeNotifier {
-
   DateSectionedMessageSource(this.messageSource) {
     messageSource.addListener(_update);
   }
@@ -59,12 +58,12 @@ class DateSectionedMessageSource extends ChangeNotifier {
   @override
   void dispose() {
     messageSource.removeListener(_update);
-    messageSource.dispose();
     super.dispose();
   }
 
-  Future<List<MessageDateSection>> downloadDateSections(
-      {int numberOfMessagesToBeConsidered = 40}) async {
+  Future<List<MessageDateSection>> downloadDateSections({
+    int numberOfMessagesToBeConsidered = 40,
+  }) async {
     final max = messageSource.size;
     if (numberOfMessagesToBeConsidered > max) {
       numberOfMessagesToBeConsidered = max;
@@ -74,6 +73,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
       final message = await messageSource.getMessageAt(i);
       messages.add(message);
     }
+
     return getDateSections(messages);
   }
 
@@ -182,7 +182,6 @@ class DateSectionedMessageSource extends ChangeNotifier {
 }
 
 class SectionElement {
-
   SectionElement(this.section, this.message);
   final MessageDateSection? section;
   final Message? message;

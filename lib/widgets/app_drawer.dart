@@ -16,7 +16,6 @@ import '../locator.dart';
 import '../routes.dart';
 import '../services/icon_service.dart';
 import '../services/mail_service.dart';
-import '../services/navigation_service.dart';
 import '../util/localized_dialog_helper.dart';
 import 'mailbox_tree.dart';
 
@@ -43,6 +42,7 @@ class AppDrawer extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: _buildAccountHeader(
+                  context,
                   currentAccount,
                   mailService.accounts,
                   theme,
@@ -87,8 +87,7 @@ class AppDrawer extends ConsumerWidget {
                 leading: Icon(iconService.settings),
                 title: Text(localizations.drawerEntrySettings),
                 onTap: () {
-                  final navService = locator<NavigationService>();
-                  navService.push(Routes.settings);
+                  context.pushNamed(Routes.settings);
                 },
               ),
             ),
@@ -99,6 +98,7 @@ class AppDrawer extends ConsumerWidget {
   }
 
   Widget _buildAccountHeader(
+    BuildContext context,
     Account? currentAccount,
     List<Account> accounts,
     ThemeData theme,
@@ -125,14 +125,14 @@ class AppDrawer extends ConsumerWidget {
 
     return PlatformListTile(
       onTap: () {
-        final NavigationService navService = locator<NavigationService>();
         if (currentAccount is UnifiedAccount) {
-          navService.push(Routes.settingsAccounts, fade: true);
+          context.pushNamed(Routes.settingsAccounts);
         } else {
-          navService.push(
+          context.pushNamed(
             Routes.accountEdit,
-            arguments: currentAccount,
-            fade: true,
+            pathParameters: {
+              Routes.pathParameterEmail: currentAccount.email,
+            },
           );
         }
       },
@@ -211,58 +211,61 @@ class AppDrawer extends ConsumerWidget {
                           : account.name,
                     ),
                     selected: account == currentAccount,
-                    onTap: () async {
-                      final navService = locator<NavigationService>();
+                    onTap: () {
                       if (!Platform.isIOS) {
-                        navService.pop();
+                        context.pop();
                       }
                       if (mailService.hasError(account)) {
-                        await navService.push(
+                        context.pushNamed(
                           Routes.accountEdit,
-                          arguments: account,
+                          pathParameters: {
+                            Routes.pathParameterEmail: account.email,
+                          },
                         );
                       } else {
-                        final messageSource =
-                            locator<MailService>().getMessageSourceFor(
-                          account,
-                          switchToAccount: true,
-                        );
-                        await navService.push(
-                          Routes.messageSourceFuture,
-                          arguments: messageSource,
-                          replace: !Platform.isIOS,
-                          fade: true,
+                        context.pushNamed(
+                          Routes.mail,
+                          pathParameters: {
+                            Routes.pathParameterEmail: account.email,
+                          },
                         );
                       }
                     },
                     onLongPress: () {
-                      final navService = locator<NavigationService>();
                       if (account is UnifiedAccount) {
-                        navService.push(Routes.settingsAccounts, fade: true);
+                        context.pushNamed(
+                          Routes.settingsAccounts,
+                          pathParameters: {
+                            Routes.pathParameterEmail: account.email,
+                          },
+                        );
                       } else {
-                        navService.push(
+                        context.pushNamed(
                           Routes.accountEdit,
-                          arguments: account,
-                          fade: true,
+                          pathParameters: {
+                            Routes.pathParameterEmail: account.email,
+                          },
                         );
                       }
                     },
                   ),
-                _buildAddAccountTile(localizations),
+                _buildAddAccountTile(context, localizations),
               ],
             )
-          : _buildAddAccountTile(localizations);
+          : _buildAddAccountTile(context, localizations);
 
-  Widget _buildAddAccountTile(AppLocalizations localizations) =>
+  Widget _buildAddAccountTile(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) =>
       PlatformListTile(
         leading: const Icon(Icons.add),
         title: Text(localizations.drawerEntryAddAccount),
         onTap: () {
-          final navService = locator<NavigationService>();
           if (!Platform.isIOS) {
-            navService.pop();
+            context.pop();
           }
-          navService.push(Routes.accountAdd);
+          context.pushNamed(Routes.accountAdd);
         },
       );
 
@@ -286,7 +289,9 @@ class AppDrawer extends ConsumerWidget {
       Routes.mail,
       pathParameters: {
         Routes.pathParameterEmail: account.email,
-        Routes.pathParameterEncodedMailboxPath: mailbox.encodedPath,
+      },
+      queryParameters: {
+        Routes.queryParameterEncodedMailboxPath: mailbox.encodedPath,
       },
     );
   }

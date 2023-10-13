@@ -53,7 +53,7 @@ class Routes {
   static const String pathParameterEmail = 'email';
 
   /// Path parameter name for an encoded mailbox path
-  static const String pathParameterEncodedMailboxPath = 'mailbox';
+  static const String queryParameterEncodedMailboxPath = 'mailbox';
 
   static final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -75,12 +75,29 @@ class Routes {
       ),
       GoRoute(
         name: mail,
-        path: '$mail/:$pathParameterEmail/:$pathParameterEncodedMailboxPath',
+        path: '$mail/:$pathParameterEmail',
         builder: (context, state) => EMailScreen(
           email: state.pathParameters[pathParameterEmail] ?? '',
           encodedMailboxPath:
-              state.pathParameters[pathParameterEncodedMailboxPath],
+              state.uri.queryParameters[queryParameterEncodedMailboxPath],
         ),
+      ),
+      GoRoute(
+        name: accountEdit,
+        path: '$accountEdit/:$pathParameterEmail',
+        builder: (context, state) => AccountEditScreen(
+          accountEmail: state.pathParameters[pathParameterEmail] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: settings,
+        name: settings,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        name: settingsAccounts,
+        path: settingsAccounts,
+        builder: (context, state) => const SettingsAccountsScreen(),
       ),
     ],
   );
@@ -99,7 +116,8 @@ class AppRouter {
         page = AccountServerDetailsScreen(account: arguments! as RealAccount);
         break;
       case Routes.accountEdit:
-        page = AccountEditScreen(account: arguments! as RealAccount);
+        page =
+            AccountEditScreen(accountEmail: (arguments! as RealAccount).email);
         break;
       case Routes.settings:
         page = const SettingsScreen();
