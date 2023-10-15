@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:badges/badges.dart' as badges;
+import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
@@ -8,30 +9,29 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
-import '../account/providers.dart';
+import '../account/provider.dart';
 import '../extensions/extension_action_tile.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
 import '../routes.dart';
 import '../services/icon_service.dart';
-import '../services/mail_service.dart';
 import '../util/localized_dialog_helper.dart';
 import 'mailbox_tree.dart';
 
+/// Displays the base navigation drawer with all accounts
 class AppDrawer extends ConsumerWidget {
-  const AppDrawer({super.key, this.currentAccount});
-
-  final Account? currentAccount;
+  /// Creates a new [AppDrawer]
+  const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final accounts = ref.watch(allAccountsProvider);
-    final mailService = locator<MailService>();
     final theme = Theme.of(context);
     final localizations = context.text;
     final iconService = locator<IconService>();
-    final currentAccount = this.currentAccount;
+    final currentAccount = ref.watch(currentAccountProvider);
+    final hasAccountsWithErrors = ref.watch(hasAccountWithErrorProvider);
 
     return PlatformDrawer(
       child: SafeArea(
@@ -44,7 +44,7 @@ class AppDrawer extends ConsumerWidget {
                 child: _buildAccountHeader(
                   context,
                   currentAccount,
-                  mailService.accounts,
+                  accounts,
                   theme,
                 ),
               ),
@@ -57,10 +57,10 @@ class AppDrawer extends ConsumerWidget {
                     children: [
                       _buildAccountSelection(
                         context,
-                        mailService,
                         accounts,
                         currentAccount,
                         localizations,
+                        hasAccountsWithErrors: hasAccountsWithErrors,
                       ),
                       _buildFolderTree(context, currentAccount),
                       if (currentAccount is RealAccount)
@@ -104,14 +104,16 @@ class AppDrawer extends ConsumerWidget {
     ThemeData theme,
   ) {
     if (currentAccount == null) {
-      return Container();
+      return const SizedBox.shrink();
     }
     final avatarAccount = currentAccount is RealAccount
         ? currentAccount
-        : accounts.isNotEmpty
-            ? accounts.first as RealAccount
-            : null;
+        : (currentAccount is UnifiedAccount
+            ? currentAccount.accounts.first
+            : accounts.firstWhereOrNull((a) => a is RealAccount)
+                as RealAccount?);
     final avatarImageUrl = avatarAccount?.imageUrlGravatar;
+    final hasError = currentAccount is RealAccount && currentAccount.hasError;
 
     final userName =
         currentAccount is RealAccount ? currentAccount.userName : null;
@@ -119,9 +121,8 @@ class AppDrawer extends ConsumerWidget {
       currentAccount.name,
       style: const TextStyle(fontWeight: FontWeight.bold),
     );
-    final accountNameWithBadge = locator<MailService>().hasError(currentAccount)
-        ? badges.Badge(child: accountName)
-        : accountName;
+    final accountNameWithBadge =
+        hasError ? badges.Badge(child: accountName) : accountName;
 
     return PlatformListTile(
       onTap: () {
@@ -185,70 +186,20 @@ class AppDrawer extends ConsumerWidget {
 
   Widget _buildAccountSelection(
     BuildContext context,
-    MailService mailService,
     List<Account> accounts,
     Account? currentAccount,
-    AppLocalizations localizations,
-  ) =>
+    AppLocalizations localizations, {
+    required bool hasAccountsWithErrors,
+  }) =>
       accounts.length > 1
           ? ExpansionTile(
-              leading:
-                  mailService.hasAccountsWithErrors() ? const Badge() : null,
+              leading: hasAccountsWithErrors ? const Badge() : null,
               title: Text(
                 localizations.drawerAccountsSectionTitle(accounts.length),
               ),
               children: [
                 for (final account in accounts)
-                  SelectablePlatformListTile(
-                    leading: mailService.hasError(account)
-                        ? const Icon(Icons.error_outline)
-                        : null,
-                    tileColor:
-                        mailService.hasError(account) ? Colors.red : null,
-                    title: Text(
-                      account is UnifiedAccount
-                          ? localizations.unifiedAccountName
-                          : account.name,
-                    ),
-                    selected: account == currentAccount,
-                    onTap: () {
-                      if (!Platform.isIOS) {
-                        context.pop();
-                      }
-                      if (mailService.hasError(account)) {
-                        context.pushNamed(
-                          Routes.accountEdit,
-                          pathParameters: {
-                            Routes.pathParameterEmail: account.email,
-                          },
-                        );
-                      } else {
-                        context.pushNamed(
-                          Routes.mail,
-                          pathParameters: {
-                            Routes.pathParameterEmail: account.email,
-                          },
-                        );
-                      }
-                    },
-                    onLongPress: () {
-                      if (account is UnifiedAccount) {
-                        context.pushNamed(
-                          Routes.settingsAccounts,
-                          pathParameters: {
-                            Routes.pathParameterEmail: account.email,
-                          },
-                        );
-                      } else {
-                        context.pushNamed(
-                          Routes.accountEdit,
-                          pathParameters: {
-                            Routes.pathParameterEmail: account.email,
-                          },
-                        );
-                      }
-                    },
-                  ),
+                  _SelectableAccountTile(account: account),
                 _buildAddAccountTile(context, localizations),
               ],
             )
@@ -269,22 +220,25 @@ class AppDrawer extends ConsumerWidget {
         },
       );
 
-  Widget _buildFolderTree(BuildContext context, Account? account) {
+  Widget _buildFolderTree(
+    BuildContext context,
+    Account? account,
+  ) {
     if (account == null) {
       return const SizedBox.shrink();
     }
 
     return MailboxTree(
       account: account,
-      onSelected: (mailbox) => _navigateToMailbox(context, mailbox),
+      onSelected: (mailbox) => _navigateToMailbox(context, account, mailbox),
     );
   }
 
-  Future<void> _navigateToMailbox(BuildContext context, Mailbox mailbox) async {
-    final account = currentAccount;
-    if (account == null) {
-      return;
-    }
+  Future<void> _navigateToMailbox(
+    BuildContext context,
+    Account account,
+    Mailbox mailbox,
+  ) async {
     await context.pushNamed(
       Routes.mail,
       pathParameters: {
@@ -292,6 +246,67 @@ class AppDrawer extends ConsumerWidget {
       },
       queryParameters: {
         Routes.queryParameterEncodedMailboxPath: mailbox.encodedPath,
+      },
+    );
+  }
+}
+
+class _SelectableAccountTile extends StatelessWidget {
+  const _SelectableAccountTile({required this.account});
+
+  final Account account;
+
+  @override
+  Widget build(BuildContext context) {
+    final account = this.account;
+    final hasError = account is RealAccount && account.hasError;
+    final localizations = context.text;
+
+    return SelectablePlatformListTile(
+      leading: hasError ? const Icon(Icons.error_outline) : null,
+      tileColor: hasError ? Colors.red : null,
+      title: Text(
+        account is UnifiedAccount
+            ? localizations.unifiedAccountName
+            : account.name,
+      ),
+      selected: account == currentAccount,
+      onTap: () {
+        if (!Platform.isIOS) {
+          context.pop();
+        }
+        if (hasError) {
+          context.pushNamed(
+            Routes.accountEdit,
+            pathParameters: {
+              Routes.pathParameterEmail: account.email,
+            },
+          );
+        } else {
+          context.pushNamed(
+            Routes.mail,
+            pathParameters: {
+              Routes.pathParameterEmail: account.email,
+            },
+          );
+        }
+      },
+      onLongPress: () {
+        if (account is UnifiedAccount) {
+          context.pushNamed(
+            Routes.settingsAccounts,
+            pathParameters: {
+              Routes.pathParameterEmail: account.email,
+            },
+          );
+        } else {
+          context.pushNamed(
+            Routes.accountEdit,
+            pathParameters: {
+              Routes.pathParameterEmail: account.email,
+            },
+          );
+        }
       },
     );
   }

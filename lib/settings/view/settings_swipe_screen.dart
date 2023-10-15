@@ -24,8 +24,7 @@ class SettingsSwipeScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final localizations = context.text;
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.swipeSettingTitle,
       content: SingleChildScrollView(
         child: SafeArea(
@@ -34,15 +33,19 @@ class SettingsSwipeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(localizations.swipeSettingLeftToRightLabel,
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  localizations.swipeSettingLeftToRightLabel,
+                  style: theme.textTheme.bodySmall,
+                ),
                 _SwipeSetting(
                   swipeAction: leftToRightAction,
                   isLeftToRight: true,
                 ),
                 const Divider(),
-                Text(localizations.swipeSettingRightToLeftLabel,
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  localizations.swipeSettingRightToLeftLabel,
+                  style: theme.textTheme.bodySmall,
+                ),
                 _SwipeSetting(
                   swipeAction: rightToLeftAction,
                   isLeftToRight: false,
@@ -120,6 +123,7 @@ class _SwipeSetting extends HookConsumerWidget {
       if (action == false) {
         return null;
       }
+
       return action;
     }
 

@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
+import '../contact/provider.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../routes.dart';
-import '../services/contact_service.dart';
 import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
 import '../services/navigation_service.dart';
@@ -91,7 +91,7 @@ class MessageActions extends HookConsumerWidget {
           _moveArchive();
           break;
         case _OverflowMenuChoice.redirect:
-          _redirectMessage(context);
+          _redirectMessage(context, ref);
           break;
         case _OverflowMenuChoice.addNotification:
           _addNotification();
@@ -321,12 +321,11 @@ class MessageActions extends HookConsumerWidget {
     _navigateToCompose(ref, message, builder, ComposeAction.answer);
   }
 
-  Future<void> _redirectMessage(BuildContext context) async {
+  Future<void> _redirectMessage(BuildContext context, WidgetRef ref) async {
     final account = message.account;
     if (account is RealAccount) {
-      if (account.contactManager == null) {
-        await locator<ContactService>().getForAccount(account);
-      }
+      account.contactManager ??=
+          await ref.read(contactsLoaderProvider(account: account).future);
     }
 
     if (!context.mounted) {

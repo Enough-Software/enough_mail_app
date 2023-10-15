@@ -492,10 +492,10 @@ abstract class MessageSource extends ChangeNotifier
     for (final message in messages) {
       final source = getMimeSource(message);
       if (source == null) {
-        if (kDebugMode) {
-          print(
-              'unable to locate mime-source for message ${message.mimeMessage}');
-        }
+        logger.w(
+          'unable to locate mime-source for '
+          'message ${message.mimeMessage}',
+        );
         continue;
       }
       final existingMessages = mimesBySource[source];
@@ -534,6 +534,7 @@ abstract class MessageSource extends ChangeNotifier
       final future = source.store(messages, flags, action: action);
       futures.add(future);
     }
+
     return Future.wait(futures);
   }
 
@@ -612,6 +613,11 @@ abstract class MessageSource extends ChangeNotifier
   ) =>
       Message(mime, this, index);
 
+  /// Loads the message source for the given [payload]
+  Future<Message> loadSingleMessage(MailNotificationPayload payload) {
+    throw UnimplementedError();
+  }
+
   // void replaceMime(Message message, MimeMessage mime) {
   //   final mimeSource = getMimeSource(message);
   //   remove(message);
@@ -640,6 +646,7 @@ class MailboxMessageSource extends MessageSource {
   @override
   int get size => mimeSource.size;
 
+  /// The mime source for this message source
   final AsyncMimeSource mimeSource;
 
   @override
@@ -744,6 +751,22 @@ class MailboxMessageSource extends MessageSource {
   void onMailCacheInvalidated(AsyncMimeSource source) {
     cache.clear();
     notifyListeners();
+  }
+
+  @override
+  Future<Message> loadSingleMessage(
+    MailNotificationPayload payload,
+  ) async {
+    final payloadMime = MimeMessage()
+      ..sequenceId = payload.sequenceId
+      ..uid = payload.uid;
+    final mime = await mimeSource.mailClient.fetchMessageContents(payloadMime);
+
+    final source = SingleMessageSource(this, account: account);
+    final message = Message(mime, source, 0);
+    source.singleMessage = message;
+
+    return message;
   }
 }
 

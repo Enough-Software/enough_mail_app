@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
+import '../account/provider.dart';
 import '../localization/extension.dart';
 import '../mail/provider.dart';
 import 'base.dart';
@@ -33,20 +34,26 @@ class MailScreen extends ConsumerWidget {
         account is UnifiedAccount ? text.unifiedAccountName : account.name;
     final subtitle = account.fromAddress.email;
 
-    return sourceFuture.when(
-      loading: () => BasePage(
-        title: title,
-        subtitle: subtitle,
-        content: const Center(
-          child: PlatformProgressIndicator(),
+    return ProviderScope(
+      overrides: [
+        currentAccountProvider.overrideWithValue(account),
+        currentMailboxProvider.overrideWithValue(mailbox),
+      ],
+      child: sourceFuture.when(
+        loading: () => BasePage(
+          title: title,
+          subtitle: subtitle,
+          content: const Center(
+            child: PlatformProgressIndicator(),
+          ),
         ),
+        error: (error, stack) => BasePage(
+          title: title,
+          subtitle: subtitle,
+          content: Center(child: Text('$error')),
+        ),
+        data: (source) => MessageSourceScreen(messageSource: source),
       ),
-      error: (error, stack) => BasePage(
-        title: title,
-        subtitle: subtitle,
-        content: Center(child: Text('$error')),
-      ),
-      data: (source) => MessageSourceScreen(messageSource: source),
     );
   }
 }

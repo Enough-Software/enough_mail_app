@@ -2,7 +2,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../account/providers.dart';
+import '../account/provider.dart';
 import '../mail/provider.dart';
 import 'mail_screen.dart';
 

@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 
+import '../contact/model.dart';
 import '../localization/extension.dart';
-import '../models/contact.dart';
 import '../util/validator.dart';
 import 'icon_text.dart';
 

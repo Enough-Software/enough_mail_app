@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../account/providers.dart';
+import '../account/provider.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
@@ -111,8 +111,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   @override
   void dispose() {
     _searchEditingController.dispose();
-    _sectionedMessageSource.removeListener(_update);
-    _sectionedMessageSource.dispose();
+    _sectionedMessageSource
+      ..removeListener(_update)
+      ..dispose();
     super.dispose();
   }
 
@@ -173,7 +174,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
           )
         : (PlatformInfo.isCupertino)
             ? Text(source.name ?? '')
-            : Base.buildTitle(source.name ?? '', source.description ?? '');
+            : BaseTitle(title: source.name ?? '', subtitle: source.description);
 
     final appBarActions = [
       if (_isInSearchMode && _hasSearchInput)
@@ -305,9 +306,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                 )
               : null,
       material: (context, platform) => MaterialScaffoldData(
-        drawer: AppDrawer(
-          currentAccount: widget.messageSource.account,
-        ),
+        drawer: const AppDrawer(),
         floatingActionButton: _visualization == _Visualization.stack
             ? null
             : const NewMailMessageButton(),
@@ -1017,19 +1016,13 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         );
       }
     }
-    final mailbox = account.isVirtual
-        ? null // //TODO set current mailbox, e.g.  current: widget.messageSource.currentMailbox,
-        : _selectedMessages.first.source
-            .getMimeSource(_selectedMessages.first)
-            ?.mailClient
-            .selectedMailbox;
+
     LocalizedDialogHelper.showWidgetDialog(
       context,
       SingleChildScrollView(
         child: MailboxTree(
           account: account,
           onSelected: moveTo,
-          current: mailbox,
         ),
       ),
       title: localizations.multipleMoveTitle(_selectedMessages.length),

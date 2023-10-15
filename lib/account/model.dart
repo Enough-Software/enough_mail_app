@@ -2,10 +2,8 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../contact/model.dart';
 import '../extensions/extensions.dart';
-import '../locator.dart';
-import '../models/contact.dart';
-import '../services/mail_service.dart';
 
 part 'model.g.dart';
 
@@ -73,6 +71,12 @@ class RealAccount extends Account {
 
   /// Retrieves the mail account
   MailAccount get mailAccount => _account;
+
+  /// Updates the account with the given [mailAccount]
+  set mailAccount(MailAccount mailAccount) {
+    _account = mailAccount;
+    notifyListeners();
+  }
 
   /// Does this account have a login error?
   bool hasError = false;
@@ -192,19 +196,15 @@ class RealAccount extends Account {
   ContactManager? contactManager;
 
   /// Adds the [alias]
-  Future<void> addAlias(MailAddress alias) {
+  void addAlias(MailAddress alias) {
     _account = _account.copyWithAlias(alias);
     notifyListeners();
-
-    return locator<MailService>().saveAccount(_account);
   }
 
   /// Removes the [alias]
-  Future<void> removeAlias(MailAddress alias) {
+  void removeAlias(MailAddress alias) {
     _account.aliases.remove(alias);
     notifyListeners();
-
-    return locator<MailService>().saveAccount(_account);
   }
 
   /// Retrieves the known alias addresses
@@ -230,11 +230,16 @@ class RealAccount extends Account {
   /// Retrieves the app extensions
   List<AppExtension>? appExtensions;
 
-  /// Copies this account with the given [mailAccount]
-  RealAccount copyWith({required MailAccount mailAccount}) => RealAccount(
-        mailAccount,
-        appExtensions: appExtensions,
-        contactManager: contactManager,
+  /// Copies this account with the given data
+  RealAccount copyWith({
+    MailAccount? mailAccount,
+    List<AppExtension>? appExtensions,
+    ContactManager? contactManager,
+  }) =>
+      RealAccount(
+        mailAccount ?? _account,
+        appExtensions: appExtensions ?? this.appExtensions,
+        contactManager: contactManager ?? this.contactManager,
       );
 }
 

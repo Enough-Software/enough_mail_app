@@ -1,16 +1,15 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../account/model.dart';
+import '../../account/provider.dart';
 import '../../extensions/extensions.dart';
 import '../../localization/extension.dart';
-import '../../locator.dart';
 import '../../screens/base.dart';
-import '../../services/mail_service.dart';
-import '../../services/navigation_service.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../../widgets/button_text.dart';
 import '../provider.dart';
@@ -30,8 +29,7 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
 
     final developerModeState = useState(isDeveloperModeEnabled);
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.settingsDevelopment,
       content: SingleChildScrollView(
         child: SafeArea(
@@ -80,15 +78,15 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
                 ),
                 PlatformListTile(
                   title: Text(localizations.extensionsReloadAction),
-                  onTap: () => _reloadExtensions(context),
+                  onTap: () => _reloadExtensions(context, ref),
                 ),
                 PlatformListTile(
                   title: Text(localizations.extensionDeactivateAllAction),
-                  onTap: _deactivateAllExtensions,
+                  onTap: () => _deactivateAllExtensions(ref),
                 ),
                 PlatformListTile(
                   title: Text(localizations.extensionsManualAction),
-                  onTap: () => _loadExtensionManually(context),
+                  onTap: () => _loadExtensionManually(context, ref),
                 ),
               ],
             ),
@@ -98,12 +96,13 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
     );
   }
 
-  Future<void> _loadExtensionManually(BuildContext context) async {
+  Future<void> _loadExtensionManually(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final localizations = context.text;
     final controller = TextEditingController();
-    String? url;
-    final NavigationService navService = locator<NavigationService>();
-    final result = await LocalizedDialogHelper.showWidgetDialog(
+    final url = await LocalizedDialogHelper.showWidgetDialog<String>(
       context,
       DecoratedPlatformTextField(
         controller: controller,
@@ -116,79 +115,84 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
       actions: [
         PlatformTextButton(
           child: ButtonText(localizations.actionCancel),
-          onPressed: () => navService.pop(false),
+          onPressed: () => context.pop(),
         ),
         PlatformTextButton(
           child: ButtonText(localizations.actionOk),
           onPressed: () {
-            url = controller.text.trim();
-            navService.pop(true);
+            final urlText = controller.text.trim();
+            context.pop(urlText);
           },
         ),
       ],
     );
     // controller.dispose();
-    if (result == true && url != null) {
-      if (url!.length > 4) {
-        if (!url!.contains(':')) {
-          url = 'https://$url';
+    if (url != null) {
+      var usedUrl = url;
+      if (url.length > 4) {
+        if (!url.contains(':')) {
+          usedUrl = 'https://$url';
         }
-        if (!url!.endsWith('json')) {
-          if (url!.endsWith('/')) {
-            url = '$url.maily.json';
+        if (!url.endsWith('json')) {
+          if (url.endsWith('/')) {
+            usedUrl = '$url.maily.json';
           } else {
-            url = '$url/.maily.json';
+            usedUrl = '$url/.maily.json';
           }
         }
-        final appExtension = await AppExtension.loadFromUrl(url!);
+        final appExtension = await AppExtension.loadFromUrl(usedUrl);
         if (appExtension != null) {
-          final currentAccount = locator<MailService>().currentAccount;
-          final account = (currentAccount is RealAccount
+          final currentAccount = ref.read(currentAccountProvider);
+          ((currentAccount is RealAccount)
                   ? currentAccount
-                  : locator<MailService>()
-                      .accounts
-                      .firstWhere((account) => account is RealAccount))
-              as RealAccount;
-          account.appExtensions = [appExtension];
+                  : ref.read(realAccountsProvider).first)
+              .appExtensions = [appExtension];
           if (context.mounted) {
             _showExtensionDetails(context, url, appExtension);
           }
+          await ref.read(realAccountsProvider.notifier).save();
         } else if (context.mounted) {
           await LocalizedDialogHelper.showTextDialog(
             context,
             localizations.errorTitle,
-            localizations.extensionsManualLoadingError(url!),
+            localizations.extensionsManualLoadingError(url),
           );
         }
       } else if (context.mounted) {
         await LocalizedDialogHelper.showTextDialog(
-            context, localizations.errorTitle, 'Invalid URL "$url"');
+          context,
+          localizations.errorTitle,
+          'Invalid URL "$url"',
+        );
       }
     }
   }
 
-  void _deactivateAllExtensions() {
-    final accounts = locator<MailService>().accounts;
+  void _deactivateAllExtensions(WidgetRef ref) {
+    final accounts = ref.read(realAccountsProvider);
     for (final account in accounts) {
-      if (account is RealAccount) {
-        account.appExtensions = [];
-      }
+      account.appExtensions = [];
     }
+    ref.read(realAccountsProvider.notifier).save();
   }
 
-  Future<void> _reloadExtensions(BuildContext context) async {
+  Future<void> _reloadExtensions(BuildContext context, WidgetRef ref) async {
     final localizations = context.text;
-    final accounts = locator<MailService>().accounts;
+    final accounts = ref.read(realAccountsProvider);
     final domains = <_AccountDomain>[];
     for (final account in accounts) {
-      if (account is RealAccount) {
-        account.appExtensions = [];
-        _addEmail(account, account.email, domains);
-        _addHostname(account,
-            account.mailAccount.incoming.serverConfig.hostname!, domains);
-        _addHostname(account,
-            account.mailAccount.outgoing.serverConfig.hostname!, domains);
-      }
+      account.appExtensions = [];
+      _addEmail(account, account.email, domains);
+      _addHostname(
+        account,
+        account.mailAccount.incoming.serverConfig.hostname ?? '',
+        domains,
+      );
+      _addHostname(
+        account,
+        account.mailAccount.outgoing.serverConfig.hostname ?? '',
+        domains,
+      );
     }
     await LocalizedDialogHelper.showWidgetDialog(
       context,
@@ -202,20 +206,23 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
                 trailing: FutureBuilder<AppExtension?>(
                   future: domain.future,
                   builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      domain.account!.appExtensions!.add(snapshot.data!);
+                    final data = snapshot.data;
+                    if (data != null) {
+                      domain.account?.appExtensions?.add(data);
+
                       return PlatformIconButton(
                         icon: const Icon(Icons.check),
                         onPressed: () => _showExtensionDetails(
                           context,
                           domain.domain,
-                          snapshot.data!,
+                          data,
                         ),
                       );
                     } else if (snapshot.connectionState ==
                         ConnectionState.done) {
                       return const Icon(Icons.cancel_outlined);
                     }
+
                     return const PlatformProgressIndicator();
                   },
                 ),
@@ -228,12 +235,18 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
   }
 
   void _addEmail(
-      RealAccount? account, String email, List<_AccountDomain> domains) {
+    RealAccount? account,
+    String email,
+    List<_AccountDomain> domains,
+  ) {
     _addDomain(account, email.substring(email.indexOf('@') + 1), domains);
   }
 
   void _addHostname(
-      RealAccount? account, String hostname, List<_AccountDomain> domains) {
+    RealAccount? account,
+    String hostname,
+    List<_AccountDomain> domains,
+  ) {
     final domainIndex = hostname.indexOf('.');
     if (domainIndex != -1) {
       _addDomain(account, hostname.substring(domainIndex + 1), domains);
@@ -241,7 +254,10 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
   }
 
   void _addDomain(
-      RealAccount? account, String domain, List<_AccountDomain> domains) {
+    RealAccount? account,
+    String domain,
+    List<_AccountDomain> domains,
+  ) {
     if (!domains.any((k) => k.domain == domain)) {
       domains
           .add(_AccountDomain(account, domain, AppExtension.loadFrom(domain)));
@@ -253,23 +269,28 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
     String? domainOrUrl,
     AppExtension data,
   ) {
+    final accountSideMenu = data.accountSideMenu;
+    final forgotPasswordAction = data.forgotPasswordAction;
+
     LocalizedDialogHelper.showWidgetDialog(
       context,
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Version: ${data.version}'),
-          if (data.accountSideMenu != null) ...[
+          if (accountSideMenu != null) ...[
             const Divider(),
             const Text('Account side menus:'),
-            for (final entry in data.accountSideMenu!)
-              Text('"${entry.getLabel('en')}": ${entry.action!.url}'),
+            for (final entry in accountSideMenu)
+              Text('"${entry.getLabel('en')}": ${entry.action?.url}'),
           ],
-          if (data.forgotPasswordAction != null) ...[
+          if (forgotPasswordAction != null) ...[
             const Divider(),
             const Text('Forgot password:'),
             Text(
-                '"${data.forgotPasswordAction!.getLabel('en')}": ${data.forgotPasswordAction!.action!.url}'),
+              '"${forgotPasswordAction.getLabel('en')}": '
+              '${forgotPasswordAction.action?.url}',
+            ),
           ],
           if (data.signatureHtml != null) ...[
             const Divider(),

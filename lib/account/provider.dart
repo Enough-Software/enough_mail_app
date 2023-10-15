@@ -1,10 +1,12 @@
 import 'package:collection/collection.dart';
+import 'package:enough_mail/enough_mail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../models/sender.dart';
 import 'model.dart';
 import 'storage.dart';
 
-part 'providers.g.dart';
+part 'provider.g.dart';
 
 /// Provides all real email accounts
 @Riverpod(keepAlive: true)
@@ -34,10 +36,34 @@ class RealAccounts extends _$RealAccounts {
     _saveAccounts();
   }
 
+  /// Updates the given [oldAccount] with the given [newAccount]
+  void replaceAccount({
+    required RealAccount oldAccount,
+    required RealAccount newAccount,
+    bool save = true,
+  }) {
+    final index = state.indexWhere((a) => a.key == oldAccount.key);
+    if (index == -1) {
+      throw StateError('account not found for ${oldAccount.key}');
+    }
+    final newState = state.toList()..[index] = newAccount;
+    state = newState;
+    if (save) {
+      _saveAccounts();
+    }
+  }
+
   /// Changes the order of the accounts
   void reorderAccounts(List<RealAccount> accounts) {
     state = accounts;
     _saveAccounts();
+  }
+
+  /// Saves all data
+  Future<void> updateMailAccount(RealAccount account, MailAccount mailAccount) {
+    account.mailAccount = mailAccount;
+
+    return _saveAccounts();
   }
 
   /// Saves all data
@@ -46,6 +72,21 @@ class RealAccounts extends _$RealAccounts {
   Future<void> _saveAccounts() async {
     await _storage.saveAccounts(state);
   }
+}
+
+/// Generates a list of senders for composing a new message
+@riverpod
+List<Sender> Senders(SendersRef ref) {
+  final accounts = ref.watch(realAccountsProvider);
+  final senders = <Sender>[];
+  for (final account in accounts) {
+    senders.add(Sender(account.fromAddress, account));
+    for (final alias in account.aliases) {
+      senders.add(Sender(alias, account));
+    }
+  }
+
+  return senders;
 }
 
 /// Provides the unified account, if any
@@ -115,3 +156,7 @@ bool hasAccountWithError(
 
   return realAccounts.any((a) => a.hasError);
 }
+
+/// Provides the locally current active account
+@riverpod
+Account? currentAccount(CurrentAccountRef ref) => null;

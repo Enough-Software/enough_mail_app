@@ -9,15 +9,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../account/model.dart';
-import '../account/providers.dart';
+import '../account/provider.dart';
 import '../extensions/extensions.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
+import '../mail/provider.dart';
 import '../routes.dart';
-import '../services/mail_service.dart';
-import '../services/navigation_service.dart';
-import '../services/providers.dart' as mailProviders;
+import '../services/providers.dart' as mail_providers;
 import '../util/modal_bottom_sheet_helper.dart';
 import '../util/validator.dart';
 import '../widgets/account_provider_selector.dart';
@@ -52,7 +51,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
   final TextEditingController _userNameController = TextEditingController();
 
   bool _isProviderResolving = false;
-  mailProviders.Provider? _provider;
+  mail_providers.Provider? _provider;
   final bool _isManualSettings = false;
   bool _isAccountVerifying = false;
   bool _isAccountVerified = false;
@@ -65,7 +64,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     BuildContext context,
     AppLocalizations localizations,
   ) async {
-    mailProviders.Provider? selectedProvider;
+    mail_providers.Provider? selectedProvider;
     final result = await ModelBottomSheetHelper.showModalBottomSheet(
       context,
       localizations.accountProviderStepTitle,
@@ -81,7 +80,6 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     if (!result) {
       return;
     }
-
     if (selectedProvider != null) {
       // a standard provider has been chosen, now query the password or start the oauth process:
       setState(() {
@@ -101,16 +99,19 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
           serverConfig: ServerConfig(),
         ),
       );
-
-      final editResult = await locator<NavigationService>()
-          .push(Routes.accountServerDetails, arguments: RealAccount(account));
-      if (editResult is ConnectedAccount) {
-        setState(() {
-          _realAccount = RealAccount(editResult.mailAccount);
-          _mailClient = editResult.mailClient;
-          _currentStep = 2;
-          _isAccountVerified = true;
-        });
+      if (context.mounted) {
+        final editResult = await context.pushNamed<ConnectedAccount>(
+          Routes.accountServerDetails,
+          extra: RealAccount(account),
+        );
+        if (editResult is ConnectedAccount) {
+          setState(() {
+            _realAccount = RealAccount(editResult.mailAccount);
+            _mailClient = editResult.mailClient;
+            _currentStep = 2;
+            _isAccountVerified = true;
+          });
+        }
       }
     }
   }
@@ -130,8 +131,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     // print('build: current step=$_currentStep');
     final localizations = context.text;
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.addAccountTitle,
       content: Column(
         children: [
@@ -165,7 +165,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                 _buildAccountSetupStep(context, localizations),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -197,7 +197,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       print('discover settings for $email');
     }
     final provider =
-        await locator<mailProviders.ProviderService>().discover(email);
+        await locator<mail_providers.ProviderService>().discover(email);
     if (!mounted) {
       // ignore if user has cancelled operation
       return;
@@ -223,7 +223,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     });
   }
 
-  Future _loginWithOAuth(mailProviders.Provider provider, String email) async {
+  Future _loginWithOAuth(mail_providers.Provider provider, String email) async {
     setState(() {
       _isAccountVerifying = true;
       _currentStep = _stepAccountSetup;
@@ -248,13 +248,16 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
         auth: OauthAuthentication(email, token),
         config: provider.clientConfig,
       );
-      final connectedAccount =
-          await locator<MailService>().connectFirstTime(mailAccount);
+      final connectedAccount = await ref.read(
+        firstTimeMailClientSourceProvider(
+          account: RealAccount(mailAccount),
+        ).future,
+      );
       _mailClient = connectedAccount?.mailClient;
       final isVerified = _mailClient?.isConnected ?? false;
-      if (isVerified) {
+      if (connectedAccount != null && isVerified) {
         final extensions = await AppExtension.loadFor(mailAccount);
-        _realAccount = RealAccount(mailAccount, appExtensions: extensions);
+        _realAccount = connectedAccount.copyWith(appExtensions: extensions);
       } else {
         FocusManager.instance.primaryFocus?.unfocus();
       }
@@ -279,14 +282,17 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       password: _passwordController.text,
       config: _provider!.clientConfig,
     );
-    final connectedAccount =
-        await locator<MailService>().connectFirstTime(mailAccount);
+    final connectedAccount = await ref.read(
+      firstTimeMailClientSourceProvider(
+        account: RealAccount(mailAccount),
+      ).future,
+    );
     _mailClient = connectedAccount?.mailClient;
 
     final isVerified = _mailClient?.isConnected ?? false;
-    if (isVerified) {
+    if (connectedAccount != null && isVerified) {
       final extensions = await AppExtension.loadFor(mailAccount);
-      _realAccount = RealAccount(mailAccount, appExtensions: extensions);
+      _realAccount = connectedAccount.copyWith(appExtensions: extensions);
     } else {
       FocusManager.instance.primaryFocus?.unfocus();
     }
@@ -378,9 +384,12 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       );
 
   Step _buildPasswordStep(
-      BuildContext context, AppLocalizations localizations) {
+    BuildContext context,
+    AppLocalizations localizations,
+  ) {
     final provider = _provider;
     final appSpecificPasswordSetupUrl = provider?.appSpecificPasswordSetupUrl;
+
     return Step(
       title: Text(localizations.addAccountPasswordLabel),
       //state: StepState.complete,
@@ -623,7 +632,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
         ),
       );
 
-  void _onProviderChanged(mailProviders.Provider provider, String email) {
+  void _onProviderChanged(mail_providers.Provider provider, String email) {
     final mailAccount = MailAccount.fromDiscoveredSettings(
       name: _emailController.text,
       email: _emailController.text,

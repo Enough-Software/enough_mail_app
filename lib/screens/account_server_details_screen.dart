@@ -3,43 +3,58 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
+import '../account/provider.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
-import '../services/mail_service.dart';
-import '../services/navigation_service.dart';
+import '../mail/provider.dart';
 import '../util/localized_dialog_helper.dart';
 import '../widgets/password_field.dart';
 import 'base.dart';
+import 'home_screen.dart';
 
-class AccountServerDetailsScreen extends StatelessWidget {
+class AccountServerDetailsScreen extends ConsumerWidget {
   const AccountServerDetailsScreen({
     super.key,
-    required this.account,
+    this.accountEmail,
+    this.account,
     this.title,
     this.includeDrawer = true,
   });
-  final RealAccount account;
+
+  final String? accountEmail;
+  final RealAccount? account;
   final String? title;
   final bool includeDrawer;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final accountEmail = this.accountEmail;
+    final account = this.account ??
+        (accountEmail != null
+            ? ref.watch(
+                findRealAccountByEmailProvider(email: accountEmail),
+              )
+            : null);
+    if (account == null) {
+      return const HomeScreen();
+    }
     final editor = AccountServerDetailsEditor(account: account);
-    return Base.buildAppChrome(
-      context,
+
+    return BasePage(
       title: title ?? account.name,
       content: editor,
       includeDrawer: includeDrawer,
-      appBarActions: [
-        const _SaveButton(),
+      appBarActions: const [
+        _SaveButton(),
       ],
     );
   }
 }
 
-class AccountServerDetailsEditor extends StatefulWidget {
+class AccountServerDetailsEditor extends StatefulHookConsumerWidget {
   const AccountServerDetailsEditor({
     super.key,
     required this.account,
@@ -47,7 +62,7 @@ class AccountServerDetailsEditor extends StatefulWidget {
   final RealAccount account;
 
   @override
-  State<AccountServerDetailsEditor> createState() =>
+  ConsumerState<AccountServerDetailsEditor> createState() =>
       _AccountServerDetailsEditorState();
 
   Future<void> testConnection(BuildContext context) async {
@@ -70,6 +85,7 @@ class _SaveButtonState extends State<_SaveButton> {
     if (_isSaving) {
       return const PlatformProgressIndicator();
     }
+
     return PlatformIconButton(
       icon: Icon(PlatformInfo.isCupertino
           ? CupertinoIcons.check_mark_circled
@@ -91,7 +107,7 @@ class _SaveButtonState extends State<_SaveButton> {
 }
 
 class _AccountServerDetailsEditorState
-    extends State<AccountServerDetailsEditor> {
+    extends ConsumerState<AccountServerDetailsEditor> {
   static _AccountServerDetailsEditorState? _currentState;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _userNameController = TextEditingController();
@@ -243,6 +259,7 @@ class _AccountServerDetailsEditorState
           ),
         );
       }
+
       return;
     } else {
       final incoming = mailAccount.incoming;
@@ -263,11 +280,17 @@ class _AccountServerDetailsEditorState
       }
     }
     // now try to sign in:
-    final connectedAccount =
-        await locator<MailService>().connectFirstTime(mailAccount);
+    final connectedAccount = await ref.read(
+      firstTimeMailClientSourceProvider(
+        account: RealAccount(mailAccount),
+      ).future,
+    );
+
     final mailClient = connectedAccount?.mailClient;
     if (mailClient != null && mailClient.isConnected) {
-      locator<NavigationService>().pop(connectedAccount);
+      if (context.mounted) {
+        context.pop(connectedAccount);
+      }
     } else if (mounted) {
       await LocalizedDialogHelper.showTextDialog(
         context,
@@ -283,6 +306,7 @@ class _AccountServerDetailsEditorState
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
+
     return SingleChildScrollView(
       child: Material(
         child: SafeArea(

@@ -74,7 +74,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
   }
 }
 
-class AddAttachmentPopupButton extends StatelessWidget {
+class AddAttachmentPopupButton extends ConsumerWidget {
   const AddAttachmentPopupButton({
     super.key,
     required this.composeData,
@@ -84,7 +84,7 @@ class AddAttachmentPopupButton extends StatelessWidget {
   final Function() update;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final localizations = context.text;
     final iconService = locator<IconService>();
     const brightness = Brightness.light;
@@ -172,8 +172,10 @@ class AddAttachmentPopupButton extends StatelessWidget {
                 await locator<NavigationService>().push(Routes.locationPicker);
             if (result != null) {
               composeData.messageBuilder.addBinary(
-                  result, MediaSubtype.imagePng.mediaType,
-                  filename: 'location.jpg');
+                result,
+                MediaSubtype.imagePng.mediaType,
+                filename: 'location.jpg',
+              );
               changed = true;
             }
             break;
@@ -181,7 +183,8 @@ class AddAttachmentPopupButton extends StatelessWidget {
             changed = await addAttachmentGif(context, localizations);
             break;
           case 6: // appointment
-            changed = await addAttachmentAppointment(context, localizations);
+            changed =
+                await addAttachmentAppointment(context, ref, localizations);
             break;
         }
         if (changed) {
@@ -250,15 +253,21 @@ class AddAttachmentPopupButton extends StatelessWidget {
       return false;
     }
     composeData.messageBuilder.addBinary(
-        data, MediaType.fromSubtype(MediaSubtype.imageGif),
-        filename: '${gif.title}.gif');
+      data,
+      MediaType.fromSubtype(MediaSubtype.imageGif),
+      filename: '${gif.title}.gif',
+    );
 
     return true;
   }
 
   Future<bool> addAttachmentAppointment(
-      BuildContext context, AppLocalizations localizations) async {
-    final appointment = await IcalComposer.createOrEditAppointment(context);
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations localizations,
+  ) async {
+    final appointment =
+        await IcalComposer.createOrEditAppointment(context, ref);
     if (appointment != null) {
       // idea: add some sort of finalizer that updates the appointment at the end
       // to set the organizer and the attendees
@@ -293,11 +302,13 @@ class _AppointmentFinalizer {
         email: organizer.email,
         commonName: organizer.personalName,
       );
-      event.addAttendee(AttendeeProperty.create(
-        attendeeEmail: organizer.email,
-        commonName: organizer.personalName,
-        participantStatus: ParticipantStatus.accepted,
-      )!);
+      event.addAttendee(
+        AttendeeProperty.create(
+          attendeeEmail: organizer.email,
+          commonName: organizer.personalName,
+          participantStatus: ParticipantStatus.accepted,
+        )!,
+      );
     }
     final recipients = <MailAddress>[];
     if (messageBuilder.to != null) {
@@ -307,11 +318,13 @@ class _AppointmentFinalizer {
       recipients.addAll(messageBuilder.cc!);
     }
     for (final mailAddress in recipients) {
-      event.addAttendee(AttendeeProperty.create(
-        attendeeEmail: mailAddress.email,
-        commonName: mailAddress.personalName,
-        rsvp: true,
-      )!);
+      event.addAttendee(
+        AttendeeProperty.create(
+          attendeeEmail: mailAddress.email,
+          commonName: mailAddress.personalName,
+          rsvp: true,
+        )!,
+      );
     }
     attachmentBuilder.text = appointment.toString();
   }
@@ -360,6 +373,7 @@ class ComposeAttachment extends ConsumerWidget {
               final appointment = VComponent.parse(text) as VCalendar;
               final update = await IcalComposer.createOrEditAppointment(
                 context,
+                ref,
                 appointment: appointment,
               );
               if (update != null) {

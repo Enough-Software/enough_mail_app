@@ -4,7 +4,6 @@ import 'models/async_mime_source_factory.dart';
 import 'services/app_service.dart';
 import 'services/background_service.dart';
 import 'services/biometrics_service.dart';
-import 'services/contact_service.dart';
 import 'services/date_service.dart';
 import 'services/i18n_service.dart';
 import 'services/icon_service.dart';
@@ -35,7 +34,6 @@ void setupLocator() {
     ..registerLazySingleton(BackgroundService.new)
     ..registerLazySingleton(AppService.new)
     ..registerLazySingleton(LocationService.new)
-    ..registerLazySingleton(ContactService.new)
     ..registerLazySingleton(KeyService.new)
     ..registerLazySingleton(ProviderService.new)
     ..registerLazySingleton(BiometricsService.new);

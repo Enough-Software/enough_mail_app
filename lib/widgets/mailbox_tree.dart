@@ -13,16 +13,15 @@ class MailboxTree extends ConsumerWidget {
     super.key,
     required this.account,
     required this.onSelected,
-    this.current,
   });
 
   final Account account;
   final void Function(Mailbox mailbox) onSelected;
-  final Mailbox? current;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mailboxTreeValue = ref.watch(mailboxTreeProvider(account: account));
+    final currentMailbox = ref.watch(currentMailboxProvider);
 
     return mailboxTreeValue.when(
       loading: () => Center(
@@ -39,14 +38,18 @@ class MailboxTree extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (final element in mailboxTreeElements)
-              _buildMailboxElement(element, 0),
+              _buildMailboxElement(element, 0, currentMailbox),
           ],
         );
       },
     );
   }
 
-  Widget _buildMailboxElement(TreeElement<Mailbox?> element, final int level) {
+  Widget _buildMailboxElement(
+    TreeElement<Mailbox?> element,
+    final int level,
+    Mailbox? current,
+  ) {
     final mailbox = element.value;
     if (mailbox == null) {
       return const SizedBox.shrink();
@@ -74,7 +77,7 @@ class MailboxTree extends ConsumerWidget {
         title: title,
         children: [
           for (final childElement in children)
-            _buildMailboxElement(childElement, level + 1),
+            _buildMailboxElement(childElement, level + 1, current),
         ],
       ),
     );

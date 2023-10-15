@@ -2,13 +2,15 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../locator.dart';
-import '../services/mail_service.dart';
+import '../account/provider.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/menu_with_badge.dart';
 
-class BasePage extends StatelessWidget {
+/// Provides a basic page layout with an app bar and a drawer.
+class BasePage extends ConsumerWidget {
+  /// Creates a new [BasePage].
   const BasePage({
     super.key,
     this.title,
@@ -20,174 +22,135 @@ class BasePage extends StatelessWidget {
     this.drawer,
     this.bottom,
     this.includeDrawer = true,
-    this.isRoot = false,
   });
 
+  /// The title of the page.
   final String? title;
+
+  /// The subtitle of the page.
   final String? subtitle;
+
+  /// The content of the page.
   final Widget? content;
+
+  /// The floating action button of the page.
   final FloatingActionButton? floatingActionButton;
+
+  /// The actions of the app bar.
   final List<Widget>? appBarActions;
+
+  /// The app bar.
   final PlatformAppBar? appBar;
+
+  /// The drawer.
   final Widget? drawer;
+
+  /// The bottom widget.
   final Widget? bottom;
-  final bool includeDrawer;
-  final bool isRoot;
 
-  @override
-  Widget build(BuildContext context) => Base.buildAppChrome(
-      context,
-      title: title,
-      subtitle: subtitle,
-      content: content,
-      floatingActionButton: floatingActionButton,
-      appBarActions: appBarActions,
-      appBar: appBar,
-      drawer: drawer,
-      bottom: bottom,
-      includeDrawer: includeDrawer,
-      isRoot: isRoot,
-    );
-}
-
-class BaseAppBar extends StatelessWidget {
-  const BaseAppBar({
-    super.key,
-    this.title,
-    this.actions,
-    this.subtitle,
-    this.floatingActionButton,
-    this.includeDrawer = true,
-  });
-
-  final String? title;
-  final List<Widget>? actions;
-  final String? subtitle;
-  final FloatingActionButton? floatingActionButton;
+  /// Whether to include the drawer.
   final bool includeDrawer;
 
   @override
-  Widget build(BuildContext context) => Base.buildAppBar(
-      context,
-      title,
-      subtitle: subtitle,
-      floatingActionButton: floatingActionButton,
-      includeDrawer: includeDrawer,
-    );
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    PlatformAppBar? buildAppBar() {
+      final title = this.title;
 
-class Base {
-  @Deprecated('Use BasePage instead')
-  static Widget buildAppChrome(
-    BuildContext context, {
-    required String? title,
-    required Widget? content,
-    FloatingActionButton? floatingActionButton,
-    List<Widget>? appBarActions,
-    PlatformAppBar? appBar,
-    Widget? drawer,
-    String? subtitle,
-    Widget? bottom,
-    bool includeDrawer = true,
-    bool isRoot = false,
-  }) {
-    appBar ??= (title == null && subtitle == null && appBarActions == null)
-        ? null
-        : buildAppBar(
-            context,
-            title,
-            actions: appBarActions,
-            subtitle: subtitle,
-            floatingActionButton: floatingActionButton,
-            includeDrawer: includeDrawer,
-            isRoot: isRoot,
-          );
-    if (includeDrawer) {
-      drawer ??= buildDrawer(context);
+      if (title == null && subtitle == null && appBarActions == null) {
+        return null;
+      }
+      final floatingActionButton = this.floatingActionButton;
+
+      return PlatformAppBar(
+        material: (context, platform) => MaterialAppBarData(
+          elevation: 0,
+        ),
+        cupertino: (context, platform) => CupertinoNavigationBarData(
+          transitionBetweenRoutes: false,
+          trailing: floatingActionButton == null
+              ? null
+              : CupertinoButton(
+                  onPressed: floatingActionButton.onPressed,
+                  child: floatingActionButton.child ?? const SizedBox.shrink(),
+                ),
+        ),
+        leading: (includeDrawer && ref.watch(hasAccountWithErrorProvider))
+            ? const MenuWithBadge()
+            : null,
+        title: (title == null && subtitle == null)
+            ? null
+            : BaseTitle(
+                title: title ?? '',
+                subtitle: subtitle,
+              ),
+        automaticallyImplyLeading: true,
+        trailingActions: appBarActions ?? [],
+      );
     }
 
     return PlatformPageScaffold(
-      appBar: appBar,
+      appBar: buildAppBar(),
       body: content,
       bottomBar: bottom,
       material: (context, platform) => MaterialScaffoldData(
-        drawer: drawer,
+        drawer: drawer ?? (includeDrawer ? const AppDrawer() : null),
         floatingActionButton: floatingActionButton,
         // bottomNavBar: bottom,
       ),
     );
   }
+}
 
-  static PlatformAppBar buildAppBar(
-    BuildContext context,
-    String? title, {
-    List<Widget>? actions,
-    String? subtitle,
-    FloatingActionButton? floatingActionButton,
-    bool includeDrawer = true,
-    bool isRoot = false,
-  }) => PlatformAppBar(
-      material: (context, platform) => MaterialAppBarData(
-        elevation: 0,
-      ),
-      cupertino: (context, platform) => CupertinoNavigationBarData(
-        transitionBetweenRoutes: false,
-        trailing: floatingActionButton == null
-            ? null
-            : CupertinoButton(
-                onPressed: floatingActionButton.onPressed,
-                child: floatingActionButton.child!,
+/// Renders a title consisting of a title and an optional subtitle.
+class BaseTitle extends StatelessWidget {
+  /// Creates a new [BaseTitle].
+  const BaseTitle({
+    super.key,
+    required this.title,
+    this.subtitle,
+  });
+
+  /// The title of the app bar.
+  final String title;
+
+  /// The subtitle of the app bar.
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final subtitle = this.subtitle;
+
+    return subtitle == null
+        ? Text(title, overflow: TextOverflow.fade)
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, overflow: TextOverflow.fade),
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  subtitle,
+                  overflow: TextOverflow.fade,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
               ),
-      ),
-      leading: (includeDrawer && locator<MailService>().hasAccountsWithErrors())
-          ? const MenuWithBadge()
-          : null,
-      title: buildTitle(title, subtitle),
-      automaticallyImplyLeading: true,
-      trailingActions: actions ?? [],
-    );
-
-  static Widget? buildTitle(String? title, String? subtitle) {
-    if (subtitle == null) {
-      if (title == null) {
-        return null;
-      }
-      return Text(
-        title,
-        overflow: TextOverflow.fade,
-      );
-    } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title!,
-            overflow: TextOverflow.fade,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Text(
-              subtitle,
-              overflow: TextOverflow.fade,
-              style: const TextStyle(fontSize: 10, fontStyle: FontStyle.italic),
-            ),
-          ),
-        ],
-      );
-    }
+            ],
+          );
   }
-
-  static Widget buildDrawer(BuildContext context) => const AppDrawer();
 }
 
 class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
+  SliverSingleChildHeaderDelegate({
+    required this.maxHeight,
+    required this.minHeight,
+    required this.child,
+    this.elevation,
+    this.background,
+  });
 
-  SliverSingleChildHeaderDelegate(
-      {required this.maxHeight,
-      required this.minHeight,
-      required this.child,
-      this.elevation,
-      this.background});
   final double maxHeight;
   final double minHeight;
   final double? elevation;
@@ -196,24 +159,25 @@ class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) => Material(
-      elevation: elevation ?? 0,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: maxHeight),
-        child: Stack(
-          children: [
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              top: 0,
-              child: background!,
-            ),
-            child
-          ],
+          BuildContext context, double shrinkOffset, bool overlapsContent) =>
+      Material(
+        elevation: elevation ?? 0,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: maxHeight),
+          child: Stack(
+            children: [
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                top: 0,
+                child: background ?? const SizedBox.shrink(),
+              ),
+              child,
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
   @override
   double get maxExtent => kToolbarHeight + maxHeight;
@@ -222,13 +186,13 @@ class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get minExtent => kToolbarHeight + minHeight;
 
   @override
-  bool shouldRebuild(SliverSingleChildHeaderDelegate oldDelegate) => maxHeight != oldDelegate.maxHeight ||
-        minHeight != oldDelegate.minHeight ||
-        child != oldDelegate.child;
+  bool shouldRebuild(SliverSingleChildHeaderDelegate oldDelegate) =>
+      maxHeight != oldDelegate.maxHeight ||
+      minHeight != oldDelegate.minHeight ||
+      child != oldDelegate.child;
 }
 
 class CustomApBarSliverDelegate extends SliverPersistentHeaderDelegate {
-
   CustomApBarSliverDelegate({
     this.title,
     this.child,
@@ -244,10 +208,14 @@ class CustomApBarSliverDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     final appBarSize = maxExtent - shrinkOffset;
     final proportion = 2 - (maxExtent / appBarSize);
     final percent = proportion < 0 || proportion > 1 ? 0.0 : proportion;
+
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: maxHeight),
       child: Stack(
@@ -257,7 +225,7 @@ class CustomApBarSliverDelegate extends SliverPersistentHeaderDelegate {
             left: 0,
             right: 0,
             top: 0,
-            child: background!,
+            child: background ?? const SizedBox.shrink(),
           ),
           Positioned(
             bottom: 0,

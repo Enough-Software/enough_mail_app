@@ -57,8 +57,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
     final theme = Theme.of(context);
     final localizations = context.text;
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.feedbackTitle,
       content: SingleChildScrollView(
         child: SafeArea(
@@ -69,8 +68,10 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8),
-                  child: Text(localizations.feedbackIntro,
-                      style: theme.textTheme.titleMedium),
+                  child: Text(
+                    localizations.feedbackIntro,
+                    style: theme.textTheme.titleMedium,
+                  ),
                 ),
                 if (info == null)
                   const Padding(
@@ -87,7 +88,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Text(info!),
+                    child: Text(info ?? ''),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8),
@@ -96,7 +97,8 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: info ?? ''));
                         locator<ScaffoldMessengerService>().showTextSnackBar(
-                            localizations.feedbackResultInfoCopied);
+                          localizations.feedbackResultInfoCopied,
+                        );
                       },
                     ),
                   ),
@@ -129,8 +131,11 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                     child:
                         ButtonText(localizations.feedbackActionHelpDeveloping),
                     onPressed: () async {
-                      await launcher.launchUrl(Uri.parse(
-                          'https://github.com/Enough-Software/enough_mail_app'));
+                      await launcher.launchUrl(
+                        Uri.parse(
+                          'https://github.com/Enough-Software/enough_mail_app',
+                        ),
+                      );
                     },
                   ),
                 ),

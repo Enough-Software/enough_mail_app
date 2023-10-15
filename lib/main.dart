@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'account/providers.dart';
+import 'account/provider.dart';
 import 'app_lifecycle/provider.dart';
 import 'localization/app_localizations.g.dart';
 import 'locator.dart';

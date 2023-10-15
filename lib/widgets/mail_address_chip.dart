@@ -1,14 +1,15 @@
+import 'dart:async';
+
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/compose_data.dart';
 import '../routes.dart';
-import '../services/mail_service.dart';
-import '../services/navigation_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import 'icon_text.dart';
 
@@ -17,19 +18,19 @@ class MailAddressChip extends StatelessWidget {
   final MailAddress mailAddress;
   final Widget? icon;
 
-  String get text => (mailAddress.hasPersonalName)
-      ? mailAddress.personalName!
+  String get nameOrEmail => (mailAddress.hasPersonalName)
+      ? mailAddress.personalName ?? mailAddress.email
       : mailAddress.email;
 
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
     final theme = Theme.of(context);
+
     return PlatformPopupMenuButton<_AddressAction>(
       cupertinoButtonPadding: EdgeInsets.zero,
       icon: icon,
-      title:
-          mailAddress.hasPersonalName ? Text(mailAddress.personalName!) : null,
+      title: mailAddress.hasPersonalName ? Text(nameOrEmail) : null,
       message: Text(mailAddress.email, style: theme.textTheme.bodySmall),
       itemBuilder: (context) => [
         PlatformPopupMenuItem(
@@ -67,19 +68,26 @@ class MailAddressChip extends StatelessWidget {
             final messageBuilder = MessageBuilder()..to = [mailAddress];
             final composeData =
                 ComposeData(null, messageBuilder, ComposeAction.newMessage);
-            await locator<NavigationService>()
-                .push(Routes.mailCompose, arguments: composeData);
+            if (context.mounted) {
+              unawaited(
+                context.pushNamed(Routes.mailCompose, extra: composeData),
+              );
+            }
             break;
           case _AddressAction.search:
-            final search =
-                MailSearch(mailAddress.email, SearchQueryType.fromOrTo);
-            final source = await locator<MailService>().search(search);
-            await locator<NavigationService>()
-                .push(Routes.messageSource, arguments: source);
+            final search = MailSearch(
+              mailAddress.email,
+              SearchQueryType.fromOrTo,
+            );
+            if (context.mounted) {
+              unawaited(
+                context.pushNamed(Routes.mailSearch, extra: search),
+              );
+            }
             break;
         }
       },
-      child: PlatformChip(label: Text(text)),
+      child: PlatformChip(label: Text(nameOrEmail)),
     );
   }
 }

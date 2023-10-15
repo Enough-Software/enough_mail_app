@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail/enough_mail.dart';
@@ -6,21 +8,22 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:enough_text_editor/enough_text_editor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
+import '../account/provider.dart';
+import '../contact/provider.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
+import '../mail/provider.dart';
 import '../models/compose_data.dart';
 import '../models/sender.dart';
 import '../models/shared_data.dart';
 import '../routes.dart';
 import '../services/app_service.dart';
-import '../services/contact_service.dart';
 import '../services/i18n_service.dart';
-import '../services/mail_service.dart';
-import '../services/navigation_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../settings/provider.dart';
 import '../util/localized_dialog_helper.dart';
@@ -65,6 +68,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   ComposeData? _resumeComposeData;
   bool _isReadReceiptRequested = false;
   late ComposeMode _composeMode;
+  late RealAccount _realAccount;
 
   TextEditorApi? _plainTextEditorApi;
 
@@ -83,12 +87,16 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         : (_subjectController.text.isEmpty)
             ? _Autofocus.subject
             : _Autofocus.text;
-    _senders = locator<MailService>().getSenders();
-    final currentAccount = (locator<MailService>().currentAccount is RealAccount
-        ? locator<MailService>().currentAccount
-        : locator<MailService>()
-            .accounts
-            .firstWhere((account) => account is RealAccount))! as RealAccount;
+    _senders = ref.watch(sendersProvider);
+    final realAccounts = ref.watch(realAccountsProvider);
+    final providedCurrentAccount = ref.watch(currentAccountProvider);
+
+    final currentAccount = providedCurrentAccount is RealAccount
+        ? providedCurrentAccount
+        : (providedCurrentAccount is UnifiedAccount
+            ? providedCurrentAccount.accounts.first
+            : realAccounts.first);
+    _realAccount = currentAccount;
     final defaultSender = ref.read(settingsProvider).defaultSender;
     mb.from ??= [defaultSender ?? currentAccount.fromAddress];
     Sender? from;
@@ -98,7 +106,8 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     } else {
       final senderEmail = mb.from?.first.email.toLowerCase();
       from = _senders.firstWhereOrNull(
-          (s) => s.address.email.toLowerCase() == senderEmail);
+        (s) => s.address.email.toLowerCase() == senderEmail,
+      );
     }
     if (from == null) {
       from = Sender(mb.from!.first, currentAccount);
@@ -106,11 +115,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     }
     _from = from;
     _checkAccountContactManager(_from.account);
-    if (widget.data.resumeText != null) {
-      _loadMailTextFuture = _loadMailTextFromComposeData();
-    } else {
-      _loadMailTextFuture = _loadMailTextFromMessage();
-    }
+    _loadMailTextFuture = widget.data.resumeText != null
+        ? _loadMailTextFromComposeData()
+        : _loadMailTextFromMessage();
     final future = widget.data.future;
     if (future != null) {
       _downloadAttachmentsFuture = future;
@@ -309,8 +316,8 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     return mimeMessage;
   }
 
-  Future<MailClient> _getMailClient() =>
-      locator<MailService>().getClientFor(_from.account);
+  MailClient _getMailClient() =>
+      ref.read(mailClientSourceProvider(account: _realAccount));
 
   Future<void> _send(AppLocalizations localizations) async {
     final subject = _subjectController.text.trim();
@@ -325,8 +332,10 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         return;
       }
     }
-    locator<NavigationService>().pop();
-    final mailClient = await _getMailClient();
+    if (context.mounted) {
+      context.pop();
+    }
+    final mailClient = _getMailClient();
     final mimeMessage = await _buildMimeMessage(mailClient);
     try {
       final append = !_from.account.addsSentMailAutomatically;
@@ -342,26 +351,30 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         print('Unable to send or append mail: $e $s');
       }
       // this state's context is now invalid because this widget is not mounted anymore
-      final currentContext = locator<NavigationService>().currentContext!;
-      final message = (e is MailException) ? e.message! : e.toString();
-      await LocalizedDialogHelper.showTextDialog(
-        currentContext,
-        localizations.errorTitle,
-        localizations.composeSendErrorInfo(message),
-        actions: [
-          PlatformTextButton(
-            child: ButtonText(localizations.actionCancel),
-            onPressed: () => Navigator.of(currentContext).pop(),
-          ),
-          PlatformTextButton(
-            child: ButtonText(localizations.composeContinueEditingAction),
-            onPressed: () {
-              Navigator.of(currentContext).pop();
-              _returnToCompose();
-            },
-          ),
-        ],
-      );
+      final currentContext = Routes.navigatorKey.currentContext;
+      if (currentContext != null && currentContext.mounted) {
+        final message =
+            (e is MailException) ? e.message ?? e.toString() : e.toString();
+        await LocalizedDialogHelper.showTextDialog(
+          currentContext,
+          localizations.errorTitle,
+          localizations.composeSendErrorInfo(message),
+          actions: [
+            PlatformTextButton(
+              child: ButtonText(localizations.actionCancel),
+              onPressed: () => Navigator.of(currentContext).pop(),
+            ),
+            PlatformTextButton(
+              child: ButtonText(localizations.composeContinueEditingAction),
+              onPressed: () {
+                Navigator.of(currentContext).pop();
+                _returnToCompose();
+              },
+            ),
+          ],
+        );
+      }
+
       return;
     }
     final action = widget.data.action;
@@ -515,22 +528,29 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                           )
                           .toList(),
                       onChanged: (s) async {
-                        final builder = widget.data.messageBuilder;
+                        if (s != null) {
+                          final builder = widget.data.messageBuilder
+                            ..from = [s.address];
+                          final lastSignature = _signature;
+                          _from = s;
+                          final newSignature = _signature;
+                          if (newSignature != lastSignature) {
+                            await _htmlEditorApi?.replaceAll(
+                              lastSignature,
+                              newSignature,
+                            );
+                          }
+                          if (_isReadReceiptRequested) {
+                            builder.requestReadReceipt(
+                              recipient: _from.address,
+                            );
+                          }
+                          setState(() {
+                            _realAccount = s.account;
+                          });
 
-                        builder.from = [s!.address];
-                        final lastSignature = _signature;
-                        _from = s;
-                        final newSignature = _signature;
-                        if (newSignature != lastSignature) {
-                          await _htmlEditorApi!
-                              .replaceAll(lastSignature, newSignature);
+                          await _checkAccountContactManager(_from.account);
                         }
-                        if (_isReadReceiptRequested) {
-                          builder.requestReadReceipt(recipient: _from.address);
-                        }
-                        setState(() {});
-
-                        _checkAccountContactManager(_from.account);
                       },
                       value: _from,
                       hint: Text(localizations.composeSenderHint),
@@ -620,6 +640,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                     case ConnectionState.done:
                       if (_composeMode == ComposeMode.html) {
                         final text = snapshot.data ?? '<p></p>';
+
                         return HtmlEditor(
                           onCreated: (api) {
                             setState(() {
@@ -634,6 +655,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                       } else {
                         // compose mode is plainText
                         _plainTextController.text = snapshot.data ?? '';
+
                         return Padding(
                           padding: const EdgeInsets.all(8),
                           child: TextEditor(
@@ -659,15 +681,17 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   }
 
   Future<void> _showSourceCode() async {
-    final mailClient = await locator<MailService>().getClientFor(_from.account);
+    final mailClient = _getMailClient();
     final mime = await _buildMimeMessage(mailClient);
-    await locator<NavigationService>().push(Routes.sourceCode, arguments: mime);
+    if (context.mounted) {
+      unawaited(context.pushNamed(Routes.sourceCode, extra: mime));
+    }
   }
 
   Future<void> _saveAsDraft() async {
-    locator<NavigationService>().pop();
+    context.pop();
     final localizations = locator<I18nService>().localizations;
-    final mailClient = await locator<MailService>().getClientFor(_from.account);
+    final mailClient = _getMailClient();
     final mime = await _buildMimeMessage(mailClient);
     try {
       await mailClient.saveDraftMessage(mime);
@@ -693,25 +717,27 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       if (kDebugMode) {
         print('unable to save draft message $e $s');
       }
-      final currentContext = locator<NavigationService>().currentContext!;
-      await LocalizedDialogHelper.showTextDialog(
-        currentContext,
-        localizations.errorTitle,
-        localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),
-        actions: [
-          PlatformTextButton(
-            child: ButtonText(localizations.actionCancel),
-            onPressed: () => Navigator.of(currentContext).pop(),
-          ),
-          PlatformTextButton(
-            child: ButtonText(localizations.composeContinueEditingAction),
-            onPressed: () {
-              Navigator.of(currentContext).pop();
-              _returnToCompose();
-            },
-          ),
-        ],
-      );
+      final currentContext = Routes.navigatorKey.currentContext;
+      if (currentContext != null && currentContext.mounted) {
+        await LocalizedDialogHelper.showTextDialog(
+          currentContext,
+          localizations.errorTitle,
+          localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),
+          actions: [
+            PlatformTextButton(
+              onPressed: currentContext.pop,
+              child: ButtonText(localizations.actionCancel),
+            ),
+            PlatformTextButton(
+              child: ButtonText(localizations.composeContinueEditingAction),
+              onPressed: () {
+                currentContext.pop();
+                _returnToCompose();
+              },
+            ),
+          ],
+        );
+      }
     }
   }
 
@@ -746,16 +772,18 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   }
 
   void _returnToCompose() {
-    locator<NavigationService>()
-        .push(Routes.mailCompose, arguments: _resumeComposeData);
+    final currentContext = Routes.navigatorKey.currentContext;
+    if (currentContext != null && currentContext.mounted) {
+      context.pushNamed(
+        Routes.mailCompose,
+        extra: _resumeComposeData,
+      );
+    }
   }
 
-  void _checkAccountContactManager(RealAccount account) {
-    if (account.contactManager == null) {
-      locator<ContactService>().getForAccount(account).then((value) {
-        setState(() {});
-      });
-    }
+  Future<void> _checkAccountContactManager(RealAccount account) async {
+    account.contactManager ??=
+        await ref.read(contactsLoaderProvider(account: account).future);
   }
 
   Future _onSharedData(List<SharedData> sharedData) {
@@ -766,11 +794,13 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       final api = _htmlEditorApi;
       if (api != null) {
         for (final data in sharedData) {
-          data.addToMessageBuilder(widget.data.messageBuilder);
-          data.addToEditor(api);
+          data
+            ..addToMessageBuilder(widget.data.messageBuilder)
+            ..addToEditor(api);
         }
       }
     }
+
     return Future.value();
   }
 
@@ -779,8 +809,13 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
 }
 
 class _HtmlGenerationArguments {
-  _HtmlGenerationArguments(this.quoteTemplate, this.mimeMessage,
-      this.blockExternalImages, this.emptyMessageText, this.maxImageWidth);
+  _HtmlGenerationArguments(
+    this.quoteTemplate,
+    this.mimeMessage,
+    this.blockExternalImages,
+    this.emptyMessageText,
+    this.maxImageWidth,
+  );
   final String? quoteTemplate;
   final MimeMessage? mimeMessage;
   final bool blockExternalImages;

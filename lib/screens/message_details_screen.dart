@@ -6,20 +6,20 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
+import '../mail/provider.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
 import '../routes.dart';
 import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
-import '../services/mail_service.dart';
-import '../services/navigation_service.dart';
 import '../services/notification_service.dart';
 import '../settings/model.dart';
 import '../settings/provider.dart';
@@ -38,10 +38,10 @@ class MessageDetailsScreen extends ConsumerStatefulWidget {
   const MessageDetailsScreen({
     super.key,
     required this.message,
-    this.blockExternalContents = false,
+    this.blockExternalContent = false,
   });
   final Message message;
-  final bool blockExternalContents;
+  final bool blockExternalContent;
 
   @override
   ConsumerState<MessageDetailsScreen> createState() => _DetailsScreenState();
@@ -78,20 +78,17 @@ class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
     if (_current.sourceIndex == index) {
       return Future.value(_current);
     }
+
     return _source.getMessageAt(index);
   }
 
-  bool _blockExternalContents(int index) {
-    if (_current.sourceIndex == index) {
-      return widget.blockExternalContents;
-    } else {
-      return false;
-    }
-  }
+  bool _blockExternalContents(int index) =>
+      _current.sourceIndex == index && widget.blockExternalContent;
 
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
+
     return BasePage(
       title: _current.mimeMessage.decodeSubject() ??
           localizations.subjectUndefined,
@@ -101,8 +98,7 @@ class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
           onSelected: (_OverflowMenuChoice result) {
             switch (result) {
               case _OverflowMenuChoice.showContents:
-                locator<NavigationService>()
-                    .push(Routes.mailContents, arguments: _current);
+                context.pushNamed(Routes.mailContents, extra: _current);
                 break;
               case _OverflowMenuChoice.showSourceCode:
                 _showSourceCode();
@@ -133,6 +129,7 @@ class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
             if (data == null) {
               return const EmptyMessage();
             }
+
             return _MessageContent(
               data,
               blockExternalContents: _blockExternalContents(index),
@@ -151,10 +148,8 @@ class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
     );
   }
 
-  void _showSourceCode() {
-    locator<NavigationService>()
-        .push(Routes.sourceCode, arguments: _current.mimeMessage);
-  }
+  void _showSourceCode() =>
+      context.pushNamed(Routes.sourceCode, extra: _current.mimeMessage);
 }
 
 class _MessageContent extends ConsumerStatefulWidget {
@@ -222,6 +217,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
     final attachments = widget.message.attachments;
     final date = locator<I18nService>().formatDateTime(mime.decodeDate());
     final subject = mime.decodeSubject();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -292,10 +288,10 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
               if (_isWebViewZoomedOut)
                 PlatformIconButton(
                   icon: const Icon(Icons.zoom_in),
-                  onPressed: () {
-                    locator<NavigationService>()
-                        .push(Routes.mailContents, arguments: widget.message);
-                  },
+                  onPressed: () => context.pushNamed(
+                    Routes.mailContents,
+                    extra: widget.message,
+                  ),
                 )
               else
                 Container(),
@@ -496,22 +492,20 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
   }
 
   Future _handleMailto(Uri mailto, MimeMessage mimeMessage) {
-    final settings = ref.read(settingsProvider);
-    final messageBuilder = locator<MailService>().mailto(
-      mailto,
-      mimeMessage,
-      settings,
+    final messageBuilder = ref.read(
+      mailtoProvider(
+        mailtoUri: mailto,
+        originatingMessage: mimeMessage,
+      ),
     );
     final composeData =
         ComposeData([widget.message], messageBuilder, ComposeAction.newMessage);
 
-    return locator<NavigationService>()
-        .push(Routes.mailCompose, arguments: composeData);
+    return context.pushNamed(Routes.mailCompose, extra: composeData);
   }
 
-  Future _navigateToMedia(InteractiveMediaWidget mediaWidget) async =>
-      locator<NavigationService>()
-          .push(Routes.interactiveMedia, arguments: mediaWidget);
+  Future _navigateToMedia(InteractiveMediaWidget mediaWidget) =>
+      context.pushNamed(Routes.interactiveMedia, extra: mediaWidget);
 
   // void _next() {
   //   _navigateToMessage(widget.message.next);
@@ -534,8 +528,7 @@ class MessageContentsScreen extends ConsumerWidget {
   final Message message;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Base.buildAppChrome(
-        context,
+  Widget build(BuildContext context, WidgetRef ref) => BasePage(
         title: message.mimeMessage.decodeSubject() ??
             context.text.subjectUndefined,
         content: SafeArea(
@@ -543,33 +536,37 @@ class MessageContentsScreen extends ConsumerWidget {
             mimeMessage: message.mimeMessage,
             adjustHeight: false,
             mailtoDelegate: (uri, mime) =>
-                _handleMailto(uri, mime, ref.read(settingsProvider)),
-            showMediaDelegate: _navigateToMedia,
+                _handleMailto(context, ref, uri, mime),
+            showMediaDelegate: (mediaViewer) =>
+                _navigateToMedia(context, mediaViewer),
             enableDarkMode: Theme.of(context).brightness == Brightness.dark,
           ),
         ),
       );
 
   Future _handleMailto(
+    BuildContext context,
+    WidgetRef ref,
     Uri mailto,
     MimeMessage mimeMessage,
-    Settings settings,
   ) {
-    final messageBuilder = locator<MailService>().mailto(
-      mailto,
-      mimeMessage,
-      settings,
+    final messageBuilder = ref.read(
+      mailtoProvider(
+        mailtoUri: mailto,
+        originatingMessage: mimeMessage,
+      ),
     );
     final composeData =
         ComposeData([message], messageBuilder, ComposeAction.newMessage);
 
-    return locator<NavigationService>()
-        .push(Routes.mailCompose, arguments: composeData);
+    return context.pushNamed(Routes.mailCompose, extra: composeData);
   }
 
-  Future _navigateToMedia(InteractiveMediaWidget mediaWidget) =>
-      locator<NavigationService>()
-          .push(Routes.interactiveMedia, arguments: mediaWidget);
+  Future _navigateToMedia(
+    BuildContext context,
+    InteractiveMediaWidget mediaWidget,
+  ) =>
+      context.pushNamed(Routes.interactiveMedia, extra: mediaWidget);
 }
 
 class ThreadSequenceButton extends StatefulWidget {
@@ -661,7 +658,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
 
   void _select(Message message) {
     _removeOverlay();
-    locator<NavigationService>().push(Routes.mailDetails, arguments: message);
+    context.pushNamed(Routes.mailDetails, extra: message);
   }
 
   OverlayEntry _buildThreadsOverlay() {

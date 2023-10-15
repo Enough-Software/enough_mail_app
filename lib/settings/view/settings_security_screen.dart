@@ -37,8 +37,7 @@ class SettingsSecurityScreen extends HookConsumerWidget {
       }
     }
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.securitySettingsTitle,
       content: SingleChildScrollView(
         child: SafeArea(

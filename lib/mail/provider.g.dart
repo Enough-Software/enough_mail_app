@@ -167,7 +167,7 @@ class _MailboxTreeProviderElement extends FutureProviderElement<Tree<Mailbox?>>
   Account get account => (origin as MailboxTreeProvider).account;
 }
 
-String _$findMailboxHash() => r'cf69ac27d256f03c561fcc130eacc4348974ac09';
+String _$findMailboxHash() => r'af999b6d27a50cab3b97f91bc09b8a5641deea76';
 
 //// Loads the mailbox tree for the given account
 ///
@@ -325,6 +325,463 @@ class _FindMailboxProviderElement extends FutureProviderElement<Mailbox?>
       (origin as FindMailboxProvider).encodedMailboxPath;
 }
 
+String _$mailSearchHash() => r'166028850f57246adf47921d461b1ff3b5bc3230';
+
+/// Carries out a search for mail messages
+///
+/// Copied from [mailSearch].
+@ProviderFor(mailSearch)
+const mailSearchProvider = MailSearchFamily();
+
+/// Carries out a search for mail messages
+///
+/// Copied from [mailSearch].
+class MailSearchFamily extends Family<AsyncValue<MessageSource>> {
+  /// Carries out a search for mail messages
+  ///
+  /// Copied from [mailSearch].
+  const MailSearchFamily();
+
+  /// Carries out a search for mail messages
+  ///
+  /// Copied from [mailSearch].
+  MailSearchProvider call({
+    required MailSearch search,
+  }) {
+    return MailSearchProvider(
+      search: search,
+    );
+  }
+
+  @override
+  MailSearchProvider getProviderOverride(
+    covariant MailSearchProvider provider,
+  ) {
+    return call(
+      search: provider.search,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'mailSearchProvider';
+}
+
+/// Carries out a search for mail messages
+///
+/// Copied from [mailSearch].
+class MailSearchProvider extends AutoDisposeFutureProvider<MessageSource> {
+  /// Carries out a search for mail messages
+  ///
+  /// Copied from [mailSearch].
+  MailSearchProvider({
+    required MailSearch search,
+  }) : this._internal(
+          (ref) => mailSearch(
+            ref as MailSearchRef,
+            search: search,
+          ),
+          from: mailSearchProvider,
+          name: r'mailSearchProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$mailSearchHash,
+          dependencies: MailSearchFamily._dependencies,
+          allTransitiveDependencies:
+              MailSearchFamily._allTransitiveDependencies,
+          search: search,
+        );
+
+  MailSearchProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.search,
+  }) : super.internal();
+
+  final MailSearch search;
+
+  @override
+  Override overrideWith(
+    FutureOr<MessageSource> Function(MailSearchRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: MailSearchProvider._internal(
+        (ref) => create(ref as MailSearchRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        search: search,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<MessageSource> createElement() {
+    return _MailSearchProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MailSearchProvider && other.search == search;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, search.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin MailSearchRef on AutoDisposeFutureProviderRef<MessageSource> {
+  /// The parameter `search` of this provider.
+  MailSearch get search;
+}
+
+class _MailSearchProviderElement
+    extends AutoDisposeFutureProviderElement<MessageSource> with MailSearchRef {
+  _MailSearchProviderElement(super.provider);
+
+  @override
+  MailSearch get search => (origin as MailSearchProvider).search;
+}
+
+String _$singleMessageLoaderHash() =>
+    r'2f1eccab1f4f817417d5036ec0bef4bd393e02b3';
+
+/// Loads the message source for the given payload
+///
+/// Copied from [singleMessageLoader].
+@ProviderFor(singleMessageLoader)
+const singleMessageLoaderProvider = SingleMessageLoaderFamily();
+
+/// Loads the message source for the given payload
+///
+/// Copied from [singleMessageLoader].
+class SingleMessageLoaderFamily extends Family<AsyncValue<Message>> {
+  /// Loads the message source for the given payload
+  ///
+  /// Copied from [singleMessageLoader].
+  const SingleMessageLoaderFamily();
+
+  /// Loads the message source for the given payload
+  ///
+  /// Copied from [singleMessageLoader].
+  SingleMessageLoaderProvider call({
+    required MailNotificationPayload payload,
+  }) {
+    return SingleMessageLoaderProvider(
+      payload: payload,
+    );
+  }
+
+  @override
+  SingleMessageLoaderProvider getProviderOverride(
+    covariant SingleMessageLoaderProvider provider,
+  ) {
+    return call(
+      payload: provider.payload,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'singleMessageLoaderProvider';
+}
+
+/// Loads the message source for the given payload
+///
+/// Copied from [singleMessageLoader].
+class SingleMessageLoaderProvider extends AutoDisposeFutureProvider<Message> {
+  /// Loads the message source for the given payload
+  ///
+  /// Copied from [singleMessageLoader].
+  SingleMessageLoaderProvider({
+    required MailNotificationPayload payload,
+  }) : this._internal(
+          (ref) => singleMessageLoader(
+            ref as SingleMessageLoaderRef,
+            payload: payload,
+          ),
+          from: singleMessageLoaderProvider,
+          name: r'singleMessageLoaderProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$singleMessageLoaderHash,
+          dependencies: SingleMessageLoaderFamily._dependencies,
+          allTransitiveDependencies:
+              SingleMessageLoaderFamily._allTransitiveDependencies,
+          payload: payload,
+        );
+
+  SingleMessageLoaderProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.payload,
+  }) : super.internal();
+
+  final MailNotificationPayload payload;
+
+  @override
+  Override overrideWith(
+    FutureOr<Message> Function(SingleMessageLoaderRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SingleMessageLoaderProvider._internal(
+        (ref) => create(ref as SingleMessageLoaderRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        payload: payload,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Message> createElement() {
+    return _SingleMessageLoaderProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SingleMessageLoaderProvider && other.payload == payload;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, payload.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin SingleMessageLoaderRef on AutoDisposeFutureProviderRef<Message> {
+  /// The parameter `payload` of this provider.
+  MailNotificationPayload get payload;
+}
+
+class _SingleMessageLoaderProviderElement
+    extends AutoDisposeFutureProviderElement<Message>
+    with SingleMessageLoaderRef {
+  _SingleMessageLoaderProviderElement(super.provider);
+
+  @override
+  MailNotificationPayload get payload =>
+      (origin as SingleMessageLoaderProvider).payload;
+}
+
+String _$mailtoHash() => r'392c1cf4d13bff03113b564193f1f1b21099cdac';
+
+/// Creates a new [MessageBuilder] based on the given [mailtoUri] uri
+///
+/// Copied from [mailto].
+@ProviderFor(mailto)
+const mailtoProvider = MailtoFamily();
+
+/// Creates a new [MessageBuilder] based on the given [mailtoUri] uri
+///
+/// Copied from [mailto].
+class MailtoFamily extends Family<MessageBuilder> {
+  /// Creates a new [MessageBuilder] based on the given [mailtoUri] uri
+  ///
+  /// Copied from [mailto].
+  const MailtoFamily();
+
+  /// Creates a new [MessageBuilder] based on the given [mailtoUri] uri
+  ///
+  /// Copied from [mailto].
+  MailtoProvider call({
+    required Uri mailtoUri,
+    required MimeMessage originatingMessage,
+  }) {
+    return MailtoProvider(
+      mailtoUri: mailtoUri,
+      originatingMessage: originatingMessage,
+    );
+  }
+
+  @override
+  MailtoProvider getProviderOverride(
+    covariant MailtoProvider provider,
+  ) {
+    return call(
+      mailtoUri: provider.mailtoUri,
+      originatingMessage: provider.originatingMessage,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'mailtoProvider';
+}
+
+/// Creates a new [MessageBuilder] based on the given [mailtoUri] uri
+///
+/// Copied from [mailto].
+class MailtoProvider extends AutoDisposeProvider<MessageBuilder> {
+  /// Creates a new [MessageBuilder] based on the given [mailtoUri] uri
+  ///
+  /// Copied from [mailto].
+  MailtoProvider({
+    required Uri mailtoUri,
+    required MimeMessage originatingMessage,
+  }) : this._internal(
+          (ref) => mailto(
+            ref as MailtoRef,
+            mailtoUri: mailtoUri,
+            originatingMessage: originatingMessage,
+          ),
+          from: mailtoProvider,
+          name: r'mailtoProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$mailtoHash,
+          dependencies: MailtoFamily._dependencies,
+          allTransitiveDependencies: MailtoFamily._allTransitiveDependencies,
+          mailtoUri: mailtoUri,
+          originatingMessage: originatingMessage,
+        );
+
+  MailtoProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.mailtoUri,
+    required this.originatingMessage,
+  }) : super.internal();
+
+  final Uri mailtoUri;
+  final MimeMessage originatingMessage;
+
+  @override
+  Override overrideWith(
+    MessageBuilder Function(MailtoRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: MailtoProvider._internal(
+        (ref) => create(ref as MailtoRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        mailtoUri: mailtoUri,
+        originatingMessage: originatingMessage,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeProviderElement<MessageBuilder> createElement() {
+    return _MailtoProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MailtoProvider &&
+        other.mailtoUri == mailtoUri &&
+        other.originatingMessage == originatingMessage;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, mailtoUri.hashCode);
+    hash = _SystemHash.combine(hash, originatingMessage.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin MailtoRef on AutoDisposeProviderRef<MessageBuilder> {
+  /// The parameter `mailtoUri` of this provider.
+  Uri get mailtoUri;
+
+  /// The parameter `originatingMessage` of this provider.
+  MimeMessage get originatingMessage;
+}
+
+class _MailtoProviderElement extends AutoDisposeProviderElement<MessageBuilder>
+    with MailtoRef {
+  _MailtoProviderElement(super.provider);
+
+  @override
+  Uri get mailtoUri => (origin as MailtoProvider).mailtoUri;
+  @override
+  MimeMessage get originatingMessage =>
+      (origin as MailtoProvider).originatingMessage;
+}
+
+String _$currentMailboxHash() => r'b11103d25c249597f26cf9342d17fa7e5e192359';
+
+/// Provides the locally current active mailbox
+///
+/// Copied from [currentMailbox].
+@ProviderFor(currentMailbox)
+final currentMailboxProvider = AutoDisposeProvider<Mailbox?>.internal(
+  currentMailbox,
+  name: r'currentMailboxProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentMailboxHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef CurrentMailboxRef = AutoDisposeProviderRef<Mailbox?>;
 String _$sourceHash() => r'ed4bfa87f9547328583d2c849f27a43200a6df1f';
 
 abstract class _$Source extends BuildlessAsyncNotifier<MessageSource> {
@@ -499,7 +956,7 @@ class _SourceProviderElement
   Mailbox? get mailbox => (origin as SourceProvider).mailbox;
 }
 
-String _$unifiedSourceHash() => r'de509cae0ff4f5d7d917b94a192edc45cd7fc398';
+String _$unifiedSourceHash() => r'99774ff4963680842bdf0e538d5c4b8554bac75c';
 
 abstract class _$UnifiedSource
     extends BuildlessAsyncNotifier<MultipleMessageSource> {
@@ -678,7 +1135,7 @@ class _UnifiedSourceProviderElement
   Mailbox? get mailbox => (origin as UnifiedSourceProvider).mailbox;
 }
 
-String _$realSourceHash() => r'463138cc3fd08bab9e850e7591385610bf33bfb2';
+String _$realSourceHash() => r'073627644194316dbd304481cad3a0f9306fcb8f';
 
 abstract class _$RealSource
     extends BuildlessAsyncNotifier<MailboxMessageSource> {
@@ -855,6 +1312,546 @@ class _RealSourceProviderElement
   RealAccount get account => (origin as RealSourceProvider).account;
   @override
   Mailbox? get mailbox => (origin as RealSourceProvider).mailbox;
+}
+
+String _$realMimeSourceHash() => r'a0faaeb48c887fc8a93351f1b8efb0d01c8fd366';
+
+abstract class _$RealMimeSource
+    extends BuildlessAsyncNotifier<AsyncMimeSource> {
+  late final RealAccount account;
+  late final Mailbox? mailbox;
+
+  Future<AsyncMimeSource> build({
+    required RealAccount account,
+    Mailbox? mailbox,
+  });
+}
+
+/// Provides the message source for the given account
+///
+/// Copied from [RealMimeSource].
+@ProviderFor(RealMimeSource)
+const realMimeSourceProvider = RealMimeSourceFamily();
+
+/// Provides the message source for the given account
+///
+/// Copied from [RealMimeSource].
+class RealMimeSourceFamily extends Family<AsyncValue<AsyncMimeSource>> {
+  /// Provides the message source for the given account
+  ///
+  /// Copied from [RealMimeSource].
+  const RealMimeSourceFamily();
+
+  /// Provides the message source for the given account
+  ///
+  /// Copied from [RealMimeSource].
+  RealMimeSourceProvider call({
+    required RealAccount account,
+    Mailbox? mailbox,
+  }) {
+    return RealMimeSourceProvider(
+      account: account,
+      mailbox: mailbox,
+    );
+  }
+
+  @override
+  RealMimeSourceProvider getProviderOverride(
+    covariant RealMimeSourceProvider provider,
+  ) {
+    return call(
+      account: provider.account,
+      mailbox: provider.mailbox,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'realMimeSourceProvider';
+}
+
+/// Provides the message source for the given account
+///
+/// Copied from [RealMimeSource].
+class RealMimeSourceProvider
+    extends AsyncNotifierProviderImpl<RealMimeSource, AsyncMimeSource> {
+  /// Provides the message source for the given account
+  ///
+  /// Copied from [RealMimeSource].
+  RealMimeSourceProvider({
+    required RealAccount account,
+    Mailbox? mailbox,
+  }) : this._internal(
+          () => RealMimeSource()
+            ..account = account
+            ..mailbox = mailbox,
+          from: realMimeSourceProvider,
+          name: r'realMimeSourceProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$realMimeSourceHash,
+          dependencies: RealMimeSourceFamily._dependencies,
+          allTransitiveDependencies:
+              RealMimeSourceFamily._allTransitiveDependencies,
+          account: account,
+          mailbox: mailbox,
+        );
+
+  RealMimeSourceProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.account,
+    required this.mailbox,
+  }) : super.internal();
+
+  final RealAccount account;
+  final Mailbox? mailbox;
+
+  @override
+  Future<AsyncMimeSource> runNotifierBuild(
+    covariant RealMimeSource notifier,
+  ) {
+    return notifier.build(
+      account: account,
+      mailbox: mailbox,
+    );
+  }
+
+  @override
+  Override overrideWith(RealMimeSource Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: RealMimeSourceProvider._internal(
+        () => create()
+          ..account = account
+          ..mailbox = mailbox,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        account: account,
+        mailbox: mailbox,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<RealMimeSource, AsyncMimeSource>
+      createElement() {
+    return _RealMimeSourceProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RealMimeSourceProvider &&
+        other.account == account &&
+        other.mailbox == mailbox;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, account.hashCode);
+    hash = _SystemHash.combine(hash, mailbox.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin RealMimeSourceRef on AsyncNotifierProviderRef<AsyncMimeSource> {
+  /// The parameter `account` of this provider.
+  RealAccount get account;
+
+  /// The parameter `mailbox` of this provider.
+  Mailbox? get mailbox;
+}
+
+class _RealMimeSourceProviderElement
+    extends AsyncNotifierProviderElement<RealMimeSource, AsyncMimeSource>
+    with RealMimeSourceRef {
+  _RealMimeSourceProviderElement(super.provider);
+
+  @override
+  RealAccount get account => (origin as RealMimeSourceProvider).account;
+  @override
+  Mailbox? get mailbox => (origin as RealMimeSourceProvider).mailbox;
+}
+
+String _$mailClientSourceHash() => r'd9c97325207816d3dadefe6e6afee06707af88b5';
+
+abstract class _$MailClientSource extends BuildlessNotifier<MailClient> {
+  late final RealAccount account;
+  late final Mailbox? mailbox;
+
+  MailClient build({
+    required RealAccount account,
+    Mailbox? mailbox,
+  });
+}
+
+/// Provides mail clients
+///
+/// Copied from [MailClientSource].
+@ProviderFor(MailClientSource)
+const mailClientSourceProvider = MailClientSourceFamily();
+
+/// Provides mail clients
+///
+/// Copied from [MailClientSource].
+class MailClientSourceFamily extends Family<MailClient> {
+  /// Provides mail clients
+  ///
+  /// Copied from [MailClientSource].
+  const MailClientSourceFamily();
+
+  /// Provides mail clients
+  ///
+  /// Copied from [MailClientSource].
+  MailClientSourceProvider call({
+    required RealAccount account,
+    Mailbox? mailbox,
+  }) {
+    return MailClientSourceProvider(
+      account: account,
+      mailbox: mailbox,
+    );
+  }
+
+  @override
+  MailClientSourceProvider getProviderOverride(
+    covariant MailClientSourceProvider provider,
+  ) {
+    return call(
+      account: provider.account,
+      mailbox: provider.mailbox,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'mailClientSourceProvider';
+}
+
+/// Provides mail clients
+///
+/// Copied from [MailClientSource].
+class MailClientSourceProvider
+    extends NotifierProviderImpl<MailClientSource, MailClient> {
+  /// Provides mail clients
+  ///
+  /// Copied from [MailClientSource].
+  MailClientSourceProvider({
+    required RealAccount account,
+    Mailbox? mailbox,
+  }) : this._internal(
+          () => MailClientSource()
+            ..account = account
+            ..mailbox = mailbox,
+          from: mailClientSourceProvider,
+          name: r'mailClientSourceProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$mailClientSourceHash,
+          dependencies: MailClientSourceFamily._dependencies,
+          allTransitiveDependencies:
+              MailClientSourceFamily._allTransitiveDependencies,
+          account: account,
+          mailbox: mailbox,
+        );
+
+  MailClientSourceProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.account,
+    required this.mailbox,
+  }) : super.internal();
+
+  final RealAccount account;
+  final Mailbox? mailbox;
+
+  @override
+  MailClient runNotifierBuild(
+    covariant MailClientSource notifier,
+  ) {
+    return notifier.build(
+      account: account,
+      mailbox: mailbox,
+    );
+  }
+
+  @override
+  Override overrideWith(MailClientSource Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: MailClientSourceProvider._internal(
+        () => create()
+          ..account = account
+          ..mailbox = mailbox,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        account: account,
+        mailbox: mailbox,
+      ),
+    );
+  }
+
+  @override
+  NotifierProviderElement<MailClientSource, MailClient> createElement() {
+    return _MailClientSourceProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MailClientSourceProvider &&
+        other.account == account &&
+        other.mailbox == mailbox;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, account.hashCode);
+    hash = _SystemHash.combine(hash, mailbox.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin MailClientSourceRef on NotifierProviderRef<MailClient> {
+  /// The parameter `account` of this provider.
+  RealAccount get account;
+
+  /// The parameter `mailbox` of this provider.
+  Mailbox? get mailbox;
+}
+
+class _MailClientSourceProviderElement
+    extends NotifierProviderElement<MailClientSource, MailClient>
+    with MailClientSourceRef {
+  _MailClientSourceProviderElement(super.provider);
+
+  @override
+  RealAccount get account => (origin as MailClientSourceProvider).account;
+  @override
+  Mailbox? get mailbox => (origin as MailClientSourceProvider).mailbox;
+}
+
+String _$firstTimeMailClientSourceHash() =>
+    r'b0c0d4b9bf0d46a2f8bd4d2fd272dace35e279cf';
+
+abstract class _$FirstTimeMailClientSource
+    extends BuildlessAutoDisposeAsyncNotifier<ConnectedAccount?> {
+  late final RealAccount account;
+  late final Mailbox? mailbox;
+
+  Future<ConnectedAccount?> build({
+    required RealAccount account,
+    Mailbox? mailbox,
+  });
+}
+
+/// Provides mail clients
+///
+/// Copied from [FirstTimeMailClientSource].
+@ProviderFor(FirstTimeMailClientSource)
+const firstTimeMailClientSourceProvider = FirstTimeMailClientSourceFamily();
+
+/// Provides mail clients
+///
+/// Copied from [FirstTimeMailClientSource].
+class FirstTimeMailClientSourceFamily
+    extends Family<AsyncValue<ConnectedAccount?>> {
+  /// Provides mail clients
+  ///
+  /// Copied from [FirstTimeMailClientSource].
+  const FirstTimeMailClientSourceFamily();
+
+  /// Provides mail clients
+  ///
+  /// Copied from [FirstTimeMailClientSource].
+  FirstTimeMailClientSourceProvider call({
+    required RealAccount account,
+    Mailbox? mailbox,
+  }) {
+    return FirstTimeMailClientSourceProvider(
+      account: account,
+      mailbox: mailbox,
+    );
+  }
+
+  @override
+  FirstTimeMailClientSourceProvider getProviderOverride(
+    covariant FirstTimeMailClientSourceProvider provider,
+  ) {
+    return call(
+      account: provider.account,
+      mailbox: provider.mailbox,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'firstTimeMailClientSourceProvider';
+}
+
+/// Provides mail clients
+///
+/// Copied from [FirstTimeMailClientSource].
+class FirstTimeMailClientSourceProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<FirstTimeMailClientSource,
+        ConnectedAccount?> {
+  /// Provides mail clients
+  ///
+  /// Copied from [FirstTimeMailClientSource].
+  FirstTimeMailClientSourceProvider({
+    required RealAccount account,
+    Mailbox? mailbox,
+  }) : this._internal(
+          () => FirstTimeMailClientSource()
+            ..account = account
+            ..mailbox = mailbox,
+          from: firstTimeMailClientSourceProvider,
+          name: r'firstTimeMailClientSourceProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$firstTimeMailClientSourceHash,
+          dependencies: FirstTimeMailClientSourceFamily._dependencies,
+          allTransitiveDependencies:
+              FirstTimeMailClientSourceFamily._allTransitiveDependencies,
+          account: account,
+          mailbox: mailbox,
+        );
+
+  FirstTimeMailClientSourceProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.account,
+    required this.mailbox,
+  }) : super.internal();
+
+  final RealAccount account;
+  final Mailbox? mailbox;
+
+  @override
+  Future<ConnectedAccount?> runNotifierBuild(
+    covariant FirstTimeMailClientSource notifier,
+  ) {
+    return notifier.build(
+      account: account,
+      mailbox: mailbox,
+    );
+  }
+
+  @override
+  Override overrideWith(FirstTimeMailClientSource Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: FirstTimeMailClientSourceProvider._internal(
+        () => create()
+          ..account = account
+          ..mailbox = mailbox,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        account: account,
+        mailbox: mailbox,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeAsyncNotifierProviderElement<FirstTimeMailClientSource,
+      ConnectedAccount?> createElement() {
+    return _FirstTimeMailClientSourceProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FirstTimeMailClientSourceProvider &&
+        other.account == account &&
+        other.mailbox == mailbox;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, account.hashCode);
+    hash = _SystemHash.combine(hash, mailbox.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin FirstTimeMailClientSourceRef
+    on AutoDisposeAsyncNotifierProviderRef<ConnectedAccount?> {
+  /// The parameter `account` of this provider.
+  RealAccount get account;
+
+  /// The parameter `mailbox` of this provider.
+  Mailbox? get mailbox;
+}
+
+class _FirstTimeMailClientSourceProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<FirstTimeMailClientSource,
+        ConnectedAccount?> with FirstTimeMailClientSourceRef {
+  _FirstTimeMailClientSourceProviderElement(super.provider);
+
+  @override
+  RealAccount get account =>
+      (origin as FirstTimeMailClientSourceProvider).account;
+  @override
+  Mailbox? get mailbox => (origin as FirstTimeMailClientSourceProvider).mailbox;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

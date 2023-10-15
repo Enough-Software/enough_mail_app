@@ -16,8 +16,7 @@ class LockScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = context.text;
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       includeDrawer: false,
       title: localizations.lockScreenTitle,
       content: _buildContent(context, localizations),
@@ -39,7 +38,7 @@ class LockScreen extends StatelessWidget {
               PlatformTextButton(
                 child: PlatformText(localizations.lockScreenUnlockAction),
                 onPressed: () => _authenticate(context),
-              )
+              ),
             ],
           ),
         ),

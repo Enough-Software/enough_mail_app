@@ -1,29 +1,33 @@
 import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
+import '../account/provider.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
 import '../services/i18n_service.dart';
-import '../services/mail_service.dart';
 import '../util/datetime.dart';
 import '../util/modal_bottom_sheet_helper.dart';
 
-class IcalComposer extends StatefulWidget {
+class IcalComposer extends StatefulHookConsumerWidget {
   const IcalComposer({super.key, required this.appointment});
   final VCalendar appointment;
   @override
-  State<IcalComposer> createState() => _IcalComposerState();
+  ConsumerState<IcalComposer> createState() => _IcalComposerState();
 
-  static Future<VCalendar?> createOrEditAppointment(BuildContext context,
-      {VCalendar? appointment}) async {
+  static Future<VCalendar?> createOrEditAppointment(
+    BuildContext context,
+    WidgetRef ref, {
+    VCalendar? appointment,
+  }) async {
     final localizations = context.text;
     // final iconService = locator<IconService>();
-    var account = locator<MailService>().currentAccount!;
-    if (account.isVirtual) {
-      account = locator<MailService>().accounts.first;
+    var account = ref.read(currentAccountProvider);
+    if (account is UnifiedAccount) {
+      account = account.accounts.first;
     }
     if (account is! RealAccount) {
       return null;
@@ -47,11 +51,12 @@ class IcalComposer extends StatefulWidget {
       _IcalComposerState._current.apply();
       appointment = editAppointment;
     }
+
     return appointment;
   }
 }
 
-class _IcalComposerState extends State<IcalComposer> {
+class _IcalComposerState extends ConsumerState<IcalComposer> {
   static late _IcalComposerState _current;
   final TextEditingController _summaryController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -419,6 +424,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
   Widget build(BuildContext context) {
     final i18nService = locator<I18nService>();
     final localizations = context.text;
+
     final rule = _recurrenceRule;
     return Padding(
       padding: const EdgeInsets.all(8),
@@ -546,16 +552,22 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
             ],
             PlatformListTile(
               title: Text(localizations.composeAppointmentRecurrenceUntilLabel),
-              trailing: Text(rule.until == null
-                  ? localizations
-                      .composeAppointmentRecurrenceUntilOptionUnlimited
-                  : rule.until == _recommendationDate
-                      ? localizations
-                          .composeAppointmentRecurrenceUntilOptionRecommended(
-                              i18nService.formatIsoDuration(
-                                  rule.frequency.recommendedUntil!))
-                      : i18nService.formatDate(rule.until,
-                          useLongFormat: true)),
+              trailing: Text(
+                rule.until == null
+                    ? localizations
+                        .composeAppointmentRecurrenceUntilOptionUnlimited
+                    : rule.until == _recommendationDate
+                        ? localizations
+                            .composeAppointmentRecurrenceUntilOptionRecommended(
+                            i18nService.formatIsoDuration(
+                              rule.frequency.recommendedUntil!,
+                            ),
+                          )
+                        : i18nService.formatDate(
+                            rule.until,
+                            useLongFormat: true,
+                          ),
+              ),
               onTap: () async {
                 final until = await UntilComposer.createOrEditUntil(
                   context,

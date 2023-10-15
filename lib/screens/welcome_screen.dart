@@ -1,5 +1,6 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
@@ -8,7 +9,6 @@ import '../localization/extension.dart';
 import '../locator.dart';
 import '../routes.dart';
 import '../services/icon_service.dart';
-import '../services/navigation_service.dart';
 import '../widgets/button_text.dart';
 import '../widgets/legalese.dart';
 
@@ -18,29 +18,38 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
-    final pages = _buildPages(localizations);
+    final pages = _buildPages(context, localizations);
+
     return Theme(
       data: ThemeData(
         brightness: Brightness.dark,
         primarySwatch: Colors.green,
       ),
-      child: PlatformScaffold(
-        body: IntroductionScreen(
-          pages: pages,
-          done: ButtonText(localizations.actionDone),
-          onDone: () {
-            locator<NavigationService>()
-                .push(Routes.accountAdd, arguments: true);
-          },
-          next: ButtonText(localizations.actionNext),
-          skip: ButtonText(localizations.actionSkip),
-          showSkipButton: true,
+      child: SafeArea(
+        child: PlatformScaffold(
+          body: IntroductionScreen(
+            pages: pages,
+            done: ButtonText(localizations.actionDone),
+            onDone: () {
+              context.goNamed(
+                Routes.accountAdd,
+                queryParameters: {'welcome': 'true'},
+              );
+            },
+            next: ButtonText(localizations.actionNext),
+            skip: ButtonText(localizations.actionSkip),
+            showSkipButton: true,
+          ),
         ),
       ),
     ); //Material App
   }
 
-  List<PageViewModel> _buildPages(AppLocalizations localizations) => [
+  List<PageViewModel> _buildPages(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) =>
+      [
         PageViewModel(
           title: localizations.welcomePanel1Title,
           body: localizations.welcomePanel1Text,
@@ -50,7 +59,7 @@ class WelcomeScreen extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           decoration: PageDecoration(pageColor: Colors.green[700]),
-          footer: _buildFooter(localizations),
+          footer: _buildFooter(context, localizations),
         ),
         PageViewModel(
           title: localizations.welcomePanel2Title,
@@ -61,7 +70,7 @@ class WelcomeScreen extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           decoration: const PageDecoration(pageColor: Color(0xff543226)),
-          footer: _buildFooter(localizations),
+          footer: _buildFooter(context, localizations),
         ),
         PageViewModel(
           title: localizations.welcomePanel3Title,
@@ -72,7 +81,7 @@ class WelcomeScreen extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           decoration: const PageDecoration(pageColor: Color(0xff761711)),
-          footer: _buildFooter(localizations),
+          footer: _buildFooter(context, localizations),
         ),
         PageViewModel(
           title: localizations.welcomePanel4Title,
@@ -82,11 +91,12 @@ class WelcomeScreen extends StatelessWidget {
             height: 200,
             fit: BoxFit.cover,
           ),
-          footer: _buildFooter(localizations),
+          footer: _buildFooter(context, localizations),
         ),
       ];
 
-  Widget _buildFooter(AppLocalizations localizations) => Column(
+  Widget _buildFooter(BuildContext context, AppLocalizations localizations) =>
+      Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
@@ -99,8 +109,10 @@ class WelcomeScreen extends StatelessWidget {
                   child: PlatformText(localizations.welcomeActionSignIn),
                 ),
                 onPressed: () {
-                  locator<NavigationService>()
-                      .push(Routes.accountAdd, arguments: true);
+                  context.goNamed(
+                    Routes.accountAdd,
+                    queryParameters: {'welcome': 'true'},
+                  );
                 },
               ),
             ),

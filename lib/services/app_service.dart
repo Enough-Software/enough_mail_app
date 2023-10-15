@@ -112,7 +112,8 @@ class AppService {
   }
 
   Future<List<SharedData>> _collectSharedData(
-      Map<dynamic, dynamic> shared) async {
+    Map<dynamic, dynamic> shared,
+  ) async {
     final sharedData = <SharedData>[];
     final String? mimeTypeText = shared['mimeType'];
     final mediaType = (mimeTypeText == null || mimeTypeText.contains('*'))
@@ -145,6 +146,7 @@ class AppService {
         sharedData.add(SharedText(text, mediaType, subject: shared['subject']));
       }
     }
+
     return sharedData;
   }
 
@@ -161,8 +163,10 @@ class AppService {
       MessageBuilder builder;
       final firstData = sharedData.first;
       if (firstData is SharedMailto) {
-        builder = MessageBuilder.prepareMailtoBasedMessage(firstData.mailto,
-            locator<MailService>().currentAccount!.fromAddress);
+        builder = MessageBuilder.prepareMailtoBasedMessage(
+          firstData.mailto,
+          locator<MailService>().currentAccount!.fromAddress,
+        );
       } else {
         builder = MessageBuilder();
         for (final data in sharedData) {
@@ -170,6 +174,7 @@ class AppService {
         }
       }
       final composeData = ComposeData(null, builder, ComposeAction.newMessage);
+
       return locator<NavigationService>()
           .push(Routes.mailCompose, arguments: composeData, fade: true);
     }

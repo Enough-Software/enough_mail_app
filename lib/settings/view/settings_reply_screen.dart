@@ -28,8 +28,7 @@ class SettingsReplyScreen extends ConsumerWidget {
       settingsProvider.select((value) => value.replyFormatPreference),
     );
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.replySettingsTitle,
       content: SingleChildScrollView(
         child: SafeArea(

@@ -596,6 +596,7 @@ class MailService implements MimeSourceSubscriber {
   Future<MailClient?> connectAccount(MailAccount mailAccount) async {
     final mailClient = createMailClient(mailAccount);
     await _connect(mailClient);
+
     return mailClient;
   }
 
@@ -619,10 +620,12 @@ class MailService implements MimeSourceSubscriber {
           await _connect(mailClient);
         } on MailException {
           await mailClient.disconnect();
+
           return null;
         }
       }
     }
+
     return ConnectedAccount(usedMailAccount, mailClient);
   }
 

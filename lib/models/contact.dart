@@ -25,12 +25,3 @@ class Contact {
   //phone numbers, profile photo(s),
   //TODO consider full vCard support
 }
-
-class ContactManager {
-  ContactManager(this.addresses);
-  final List<MailAddress> addresses;
-
-  Iterable<MailAddress> find(String search) => addresses.where((address) =>
-        address.email.contains(search) ||
-        (address.hasPersonalName && address.personalName!.contains(search)));
-}

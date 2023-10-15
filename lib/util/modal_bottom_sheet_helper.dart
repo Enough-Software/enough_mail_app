@@ -8,8 +8,12 @@ class ModelBottomSheetHelper {
   ModelBottomSheetHelper._();
 
   static Future<bool> showModalBottomSheet(
-      BuildContext context, String title, Widget child,
-      {List<Widget>? appBarActions, bool useScrollView = true}) async {
+    BuildContext context,
+    String title,
+    Widget child, {
+    List<Widget>? appBarActions,
+    bool useScrollView = true,
+  }) async {
     appBarActions ??= [
       DensePlatformIconButton(
         icon: Icon(CommonPlatformIcons.ok),
@@ -20,8 +24,7 @@ class ModelBottomSheetHelper {
       bottom: false,
       child: Padding(
         padding: const EdgeInsets.only(top: 32),
-        child: Base.buildAppChrome(
-          context,
+        child: BasePage(
           title: title,
           includeDrawer: false,
           appBarActions: appBarActions,
@@ -37,23 +40,22 @@ class ModelBottomSheetHelper {
     );
 
     dynamic result;
-    if (PlatformInfo.isCupertino) {
-      result = await showCupertinoModalBottomSheet(
-        context: context,
-        builder: (context) => bottomSheetContent,
-        elevation: 8,
-        expand: true,
-        isDismissible: true,
-      );
-    } else {
-      result = await showMaterialModalBottomSheet(
-        context: context,
-        builder: (context) => bottomSheetContent,
-        elevation: 8,
-        expand: true,
-        backgroundColor: Colors.transparent,
-      );
-    }
+    result = PlatformInfo.isCupertino
+        ? await showCupertinoModalBottomSheet(
+            context: context,
+            builder: (context) => bottomSheetContent,
+            elevation: 8,
+            expand: true,
+            isDismissible: true,
+          )
+        : await showMaterialModalBottomSheet(
+            context: context,
+            builder: (context) => bottomSheetContent,
+            elevation: 8,
+            expand: true,
+            backgroundColor: Colors.transparent,
+          );
+
     return (result == true);
   }
 }

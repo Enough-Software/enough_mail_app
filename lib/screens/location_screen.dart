@@ -41,8 +41,7 @@ class _LocationScreenState extends State<LocationScreen> {
   Widget build(BuildContext context) {
     final localizations = context.text;
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.attachTypeLocation,
       appBarActions: [
         PlatformIconButton(
@@ -59,11 +58,13 @@ class _LocationScreenState extends State<LocationScreen> {
             case ConnectionState.active:
               return const Center(child: PlatformProgressIndicator());
             case ConnectionState.done:
-              final data = snapshot.data;
-              if (data != null) {
-                return _buildMap(context, data.latitude!, data.longitude!);
+              final latitude = snapshot.data?.latitude;
+              final longitude = snapshot.data?.longitude;
+              if (latitude != null && longitude != null) {
+                return _buildMap(context, latitude, longitude);
               }
           }
+
           return const Center(child: PlatformProgressIndicator());
         },
       ),

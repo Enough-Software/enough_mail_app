@@ -5,17 +5,18 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
-import '../account/providers.dart';
+import '../account/provider.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
+import '../logger.dart';
+import '../mail/provider.dart';
 import '../routes.dart';
 import '../services/icon_service.dart';
-import '../services/mail_service.dart';
-import '../services/navigation_service.dart';
 import '../services/providers.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../settings/provider.dart';
@@ -39,18 +40,21 @@ class AccountEditScreen extends HookConsumerWidget {
     final account = ref.watch(
       findRealAccountByEmailProvider(email: accountEmail),
     );
+    final unifiedAccount = ref.watch(unifiedAccountProvider);
     final localizations = context.text;
     final accountNameController = useTextEditingController(text: account.name);
     final userNameController = useTextEditingController(text: account.userName);
     final theme = Theme.of(context);
     final iconService = locator<IconService>();
-    final mailService = locator<MailService>();
 
     final enableDeveloperMode = ref.watch(
       settingsProvider.select((value) => value.enableDeveloperMode),
     );
 
     final isRetryingToConnectState = useState(false);
+
+    Future<void> saveAccounts() =>
+        ref.read(realAccountsProvider.notifier).save();
 
     Widget buildEditContent() => SingleChildScrollView(
           child: Padding(
@@ -61,7 +65,7 @@ class AccountEditScreen extends HookConsumerWidget {
                 builder: (context, child) => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (mailService.hasError(account)) ...[
+                    if (account.hasError) ...[
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
@@ -82,6 +86,7 @@ class AccountEditScreen extends HookConsumerWidget {
                               child: PlatformTextButtonIcon(
                                 onPressed: () => _reconnect(
                                   context,
+                                  ref,
                                   account,
                                   account.mailAccount,
                                   isRetryingToConnectState,
@@ -97,6 +102,7 @@ class AccountEditScreen extends HookConsumerWidget {
                               child: PlatformTextButton(
                                 onPressed: () => _updateAuthentication(
                                   context,
+                                  ref,
                                   account,
                                   isRetryingToConnectState,
                                 ),
@@ -118,7 +124,7 @@ class AccountEditScreen extends HookConsumerWidget {
                       ),
                       onChanged: (value) async {
                         account.name = value;
-                        await locator<MailService>().saveAccounts();
+                        await saveAccounts();
                       },
                     ),
                     DecoratedPlatformTextField(
@@ -129,23 +135,21 @@ class AccountEditScreen extends HookConsumerWidget {
                       ),
                       onChanged: (value) async {
                         account.userName = value;
-                        await locator<MailService>().saveAccounts();
+                        await saveAccounts();
                       },
                     ),
-                    if (locator<MailService>().hasUnifiedAccount)
+                    if (unifiedAccount != null)
                       PlatformCheckboxListTile(
                         value: !account.excludeFromUnified,
                         onChanged: (value) async {
                           final exclude = (value == false);
                           account.excludeFromUnified = exclude;
-                          await locator<MailService>()
-                              .excludeAccountFromUnified(
-                            account,
-                            exclude,
-                          );
+                          ref.refresh(unifiedAccountProvider);
+                          await saveAccounts();
                         },
                         title: Text(
-                            localizations.editAccountIncludeInUnifiedLabel),
+                          localizations.editAccountIncludeInUnifiedLabel,
+                        ),
                       ),
                     const Divider(),
                     Text(
@@ -177,11 +181,14 @@ class AccountEditScreen extends HookConsumerWidget {
                           color: Colors.red,
                           child: Icon(iconService.messageActionDelete),
                         ),
-                        onDismissed: (direction) async {
-                          await account.removeAlias(alias);
+                        onDismissed: (direction) {
+                          account.removeAlias(alias);
                           locator<ScaffoldMessengerService>().showTextSnackBar(
-                              localizations
-                                  .editAccountAliasRemoved(alias.email));
+                            localizations.editAccountAliasRemoved(
+                              alias.email,
+                            ),
+                          );
+                          ref.read(realAccountsProvider.notifier).save();
                         },
                         child: PlatformListTile(
                           title: Text(alias.toString()),
@@ -232,11 +239,9 @@ class AccountEditScreen extends HookConsumerWidget {
                         );
                         if (result != null) {
                           account.supportsPlusAliases = result;
-                          locator<MailService>()
-                              .markAccountAsTestedForPlusAlias(account);
-                          await locator<MailService>().saveAccount(
-                            account.mailAccount,
-                          );
+                          account.setAttribute(
+                              RealAccount.attributePlusAliasTested, true);
+                          await saveAccounts();
                         }
                       },
                     ),
@@ -249,9 +254,7 @@ class AccountEditScreen extends HookConsumerWidget {
                             onChanged: (value) async {
                               final bccMyself = value ?? false;
                               account.bccMyself = bccMyself;
-                              await locator<MailService>().saveAccount(
-                                account.mailAccount,
-                              );
+                              await saveAccounts();
                             },
                             title: Text(localizations.editAccountBccMyself),
                           ),
@@ -269,9 +272,12 @@ class AccountEditScreen extends HookConsumerWidget {
 
                     const Divider(),
                     PlatformTextButtonIcon(
-                      onPressed: () => locator<NavigationService>().push(
-                          Routes.accountServerDetails,
-                          arguments: account),
+                      onPressed: () => context.pushNamed(
+                        Routes.accountServerDetails,
+                        pathParameters: {
+                          Routes.pathParameterEmail: account.email
+                        },
+                      ),
                       icon: const Icon(Icons.edit),
                       label: ButtonText(
                           localizations.editAccountServerSettingsAction),
@@ -306,18 +312,16 @@ class AccountEditScreen extends HookConsumerWidget {
                                   action: localizations.actionDelete,
                                   isDangerousAction: true);
                           if (result ?? false) {
-                            final mailService = locator<MailService>();
                             if (!context.mounted) {
                               return;
                             }
-                            await mailService.removeAccount(account);
-                            if (mailService.accounts.isEmpty) {
-                              await locator<NavigationService>().push(
-                                Routes.welcome,
-                                clear: true,
-                              );
+                            ref
+                                .read(realAccountsProvider.notifier)
+                                .removeAccount(account);
+                            if (ref.read(realAccountsProvider).isEmpty) {
+                              context.go(Routes.welcome);
                             } else {
-                              locator<NavigationService>().pop();
+                              context.pop();
                             }
                           }
                         },
@@ -333,7 +337,7 @@ class AccountEditScreen extends HookConsumerWidget {
                           onChanged: (value) {
                             if (value != null) {
                               account.enableLogging = value;
-                              locator<MailService>().saveAccounts();
+                              ref.read(realAccountsProvider.notifier).save();
                               final message = value
                                   ? localizations.editAccountLoggingEnabled
                                   : localizations.editAccountLoggingDisabled;
@@ -360,11 +364,12 @@ class AccountEditScreen extends HookConsumerWidget {
 
   Future<void> _updateAuthentication(
     BuildContext context,
+    WidgetRef ref,
     RealAccount account,
     ValueNotifier<bool> isRetryingToConnectState,
   ) async {
-    final mailService = locator<MailService>();
-    unawaited(mailService.disconnect(account));
+    // TODO(RV): find solution to disconnect possibly connected account
+    // unawaited(mailService.disconnect(account));
     final authentication = account.mailAccount.incoming.authentication;
     if (authentication is PlainAuthentication) {
       // simple case: password is directly given,
@@ -399,14 +404,14 @@ class AccountEditScreen extends HookConsumerWidget {
             ),
           );
         }
-        final result = await _reconnect(
-          context,
-          account,
-          updatedMailAccount,
-          isRetryingToConnectState,
-        );
-        if (result) {
-          await mailService.saveAccounts();
+        if (context.mounted) {
+          await _reconnect(
+            context,
+            ref,
+            account,
+            updatedMailAccount,
+            isRetryingToConnectState,
+          );
         }
       }
     } else if (authentication is OauthAuthentication) {
@@ -437,13 +442,15 @@ class AccountEditScreen extends HookConsumerWidget {
             outgoing: mailAccount.outgoing
                 .copyWith(authentication: adaptedOutgoingAuth),
           );
-          await _reconnect(
-            context,
-            account,
-            updatedMailAccount,
-            isRetryingToConnectState,
-          );
-          await mailService.saveAccounts();
+          if (context.mounted) {
+            await _reconnect(
+              context,
+              ref,
+              account,
+              updatedMailAccount,
+              isRetryingToConnectState,
+            );
+          }
         }
       }
     }
@@ -451,17 +458,31 @@ class AccountEditScreen extends HookConsumerWidget {
 
   Future<bool> _reconnect(
     BuildContext context,
+    WidgetRef ref,
     RealAccount account,
     MailAccount mailAccount,
     ValueNotifier<bool> isRetryingToConnectState,
   ) async {
     isRetryingToConnectState.value = true;
-    final accountCopy = account.copyWith(mailAccount: mailAccount);
-    final mailService = locator<MailService>();
-    final result = await mailService.reconnect(accountCopy);
-    isRetryingToConnectState.value = false;
-    if (context.mounted) {
-      if (result) {
+
+    try {
+      final accountCopy = account.copyWith(mailAccount: mailAccount);
+      final connectedAccount = await ref.read(
+        firstTimeMailClientSourceProvider(
+          account: accountCopy,
+        ).future,
+      );
+      if (connectedAccount == null ||
+          !connectedAccount.mailClient.isConnected) {
+        throw Exception(
+          'Unable to connect',
+        );
+      }
+      ref
+          .read(realAccountsProvider.notifier)
+          .replaceAccount(oldAccount: account, newAccount: connectedAccount);
+      isRetryingToConnectState.value = false;
+      if (context.mounted) {
         final localizations = context.text;
         await LocalizedDialogHelper.showTextDialog(
           context,
@@ -469,9 +490,13 @@ class AccountEditScreen extends HookConsumerWidget {
           localizations.editAccountFailureToConnectFixedInfo,
         );
       }
-    }
 
-    return result;
+      return true;
+    } catch (e) {
+      logger.e('Unable to reconnect account: $e');
+
+      return false;
+    }
   }
 }
 
@@ -511,25 +536,27 @@ class _PasswordUpdateDialogState extends State<_PasswordUpdateDialog> {
       );
 }
 
-class _PlusAliasTestingDialog extends StatefulWidget {
+class _PlusAliasTestingDialog extends StatefulHookConsumerWidget {
   const _PlusAliasTestingDialog({required this.account});
   final RealAccount account;
 
   @override
-  _PlusAliasTestingDialogState createState() => _PlusAliasTestingDialogState();
+  ConsumerState<_PlusAliasTestingDialog> createState() =>
+      _PlusAliasTestingDialogState();
 }
 
-class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
+class _PlusAliasTestingDialogState
+    extends ConsumerState<_PlusAliasTestingDialog> {
   bool _isContinueAvailable = true;
   int _step = 0;
   static const int _maxStep = 1;
   late String _generatedAliasAddress;
   // MimeMessage? _testMessage;
+  MailClient? _mailClient;
 
   @override
   void initState() {
-    _generatedAliasAddress =
-        locator<MailService>().generateRandomPlusAlias(widget.account);
+    _generatedAliasAddress = generateRandomPlusAlias(widget.account);
     super.initState();
   }
 
@@ -546,7 +573,8 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
           _isContinueAvailable = true;
           _step++;
         });
-        _deleteMessage(msg);
+        _deleteMessage(event.mailClient, msg);
+
         return true;
       } else if ((msg.getHeaderValue('auto-submitted') != null) &&
           (msg.isTextPlainMessage()) &&
@@ -557,32 +585,30 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
           _isContinueAvailable = true;
           _step++;
         });
-        _deleteMessage(msg);
+        _deleteMessage(event.mailClient, msg);
+
         return true;
       }
     }
+
     return false;
   }
 
-  Future<void> _deleteMessage(MimeMessage msg) async {
-    final mailClient = await locator<MailService>().getClientFor(
-      widget.account,
-    );
+  Future<void> _deleteMessage(MailClient mailClient, MimeMessage msg) async {
     await mailClient.flagMessage(msg, isDeleted: true);
   }
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
     super.dispose();
-    final mailClient = await locator<MailService>().getClientFor(
-      widget.account,
-    );
-    mailClient.removeEventFilter(_filter);
+    _mailClient?.removeEventFilter(_filter);
+    _mailClient?.disconnect();
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
+
     return PlatformAlertDialog(
       title: Text(
         localizations.editAccountTestPlusAliasTitle(widget.account.name),
@@ -608,13 +634,17 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
                       });
                       // send the email and wait for a response:
                       final msg = MessageBuilder.buildSimpleTextMessage(
-                          widget.account.fromAddress,
-                          [MailAddress(null, _generatedAliasAddress)],
-                          'This is an automated message testing support for + aliases. Please ignore.',
-                          subject: 'Testing + Alias');
+                        widget.account.fromAddress,
+                        [MailAddress(null, _generatedAliasAddress)],
+                        'This is an automated message testing support '
+                        'for + aliases. Please ignore.',
+                        subject: 'Testing + Alias',
+                      );
                       // _testMessage = msg;
-                      final mailClient = await locator<MailService>()
-                          .getClientFor(widget.account);
+                      final mailClient = ref.read(
+                        mailClientSourceProvider(account: widget.account),
+                      );
+                      _mailClient = mailClient;
                       mailClient.addEventFilter(_filter);
                       await mailClient.sendMessage(msg, appendToSent: false);
                       break;
@@ -623,10 +653,13 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
           steps: [
             Step(
               title: Text(
-                  localizations.editAccountTestPlusAliasStepIntroductionTitle),
+                localizations.editAccountTestPlusAliasStepIntroductionTitle,
+              ),
               content: Text(
                 localizations.editAccountTestPlusAliasStepIntroductionText(
-                    widget.account.name, _generatedAliasAddress),
+                  widget.account.name,
+                  _generatedAliasAddress,
+                ),
                 style: const TextStyle(fontSize: 12),
               ),
               isActive: _step == 0,
@@ -660,9 +693,24 @@ class _PlusAliasTestingDialogState extends State<_PlusAliasTestingDialog> {
       ),
     );
   }
+
+  /// Creates a new random plus alias based on the primary email address
+  /// of the [account].
+  String generateRandomPlusAlias(RealAccount account) {
+    final mail = account.email;
+    final atIndex = mail.lastIndexOf('@');
+    if (atIndex == -1) {
+      throw StateError(
+        'unable to create alias based on invalid email <$mail>.',
+      );
+    }
+    final random = MessageBuilder.createRandomId(length: 8);
+
+    return '${mail.substring(0, atIndex)}+$random${mail.substring(atIndex)}';
+  }
 }
 
-class _AliasEditDialog extends StatefulWidget {
+class _AliasEditDialog extends StatefulHookConsumerWidget {
   const _AliasEditDialog({
     required this.isNewAlias,
     required this.alias,
@@ -673,10 +721,10 @@ class _AliasEditDialog extends StatefulWidget {
   final bool isNewAlias;
 
   @override
-  _AliasEditDialogState createState() => _AliasEditDialogState();
+  ConsumerState<_AliasEditDialog> createState() => _AliasEditDialogState();
 }
 
-class _AliasEditDialogState extends State<_AliasEditDialog> {
+class _AliasEditDialogState extends ConsumerState<_AliasEditDialog> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late bool _isEmailValid;
@@ -694,6 +742,7 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
+
     return PlatformAlertDialog(
       title: Text(widget.isNewAlias
           ? localizations.editAccountAddAliasTitle
@@ -708,7 +757,7 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
         ),
         PlatformTextButton(
           onPressed: _isEmailValid
-              ? () async {
+              ? () {
                   setState(() {
                     _isSaving = true;
                   });
@@ -716,15 +765,16 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
                     email: _emailController.text,
                     personalName: _nameController.text,
                   );
-                  await widget.account.addAlias(alias);
-                  if (mounted) {
-                    Navigator.of(context).pop();
-                  }
+                  widget.account.addAlias(alias);
+                  ref.read(realAccountsProvider.notifier).save();
+                  context.pop();
                 }
               : null,
-          child: ButtonText(widget.isNewAlias
-              ? localizations.editAccountAliasAddAction
-              : localizations.editAccountAliasUpdateAction),
+          child: ButtonText(
+            widget.isNewAlias
+                ? localizations.editAccountAliasAddAction
+                : localizations.editAccountAliasUpdateAction,
+          ),
         ),
       ],
     );
@@ -737,8 +787,9 @@ class _AliasEditDialogState extends State<_AliasEditDialog> {
           DecoratedPlatformTextField(
             controller: _nameController,
             decoration: InputDecoration(
-                labelText: localizations.editAccountEditAliasNameLabel,
-                hintText: localizations.addAccountNameOfUserHint),
+              labelText: localizations.editAccountEditAliasNameLabel,
+              hintText: localizations.addAccountNameOfUserHint,
+            ),
           ),
           DecoratedPlatformTextField(
             controller: _emailController,

@@ -4,16 +4,12 @@ import 'dart:io';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:go_router/go_router.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../account/model.dart';
-import '../locator.dart';
 import '../logger.dart';
 import '../models/message.dart' as maily;
-import '../models/message_source.dart';
 import '../routes.dart';
-import 'mail_service.dart';
-import 'navigation_service.dart';
 
 part 'notification_service.g.dart';
 
@@ -23,11 +19,13 @@ class NotificationService {
   static const String _messagePayloadStart = 'msg:';
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  Future<NotificationServiceInitResult> init(
-      {bool checkForLaunchDetails = true}) async {
+  Future<NotificationServiceInitResult> init({
+    bool checkForLaunchDetails = true,
+  }) async {
     // print('init notification service...');
     // set up local notifications:
-    // initialize the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    // initialize the plugin. app_icon needs to be a added as a drawable
+    // resource to the Android head project
     if (defaultTargetPlatform == TargetPlatform.windows) {
       // Windows is not yet supported:
       return NotificationServiceInitResult.normal;
@@ -50,8 +48,10 @@ class NotificationService {
         final response = launchDetails.notificationResponse;
         if (response != null) {
           // print(
-          //     'got notification launched details: $launchDetails with payload ${response.payload}');
-          await _selectNotification(response);
+          //     'got notification launched details: $launchDetails
+          // with payload ${response.payload}');
+          _selectNotification(response);
+
           return NotificationServiceInitResult.appLaunchedByNotification;
         }
       }
@@ -102,40 +102,22 @@ class NotificationService {
     return MailNotificationPayload.fromJson(json);
   }
 
-  Future _selectNotification(NotificationResponse response) async {
+  void _selectNotification(NotificationResponse response) {
     final payloadText = response.payload;
     if (kDebugMode) {
       print('select notification: $payloadText');
     }
-    if (payloadText != null && payloadText.startsWith(_messagePayloadStart)) {
-      try {
-        final payload = _deserialize(payloadText);
+    final context = Routes.navigatorKey.currentContext;
+    if (context == null) {
+      return;
+    }
 
-        final mailClient = await locator<MailService>()
-            .getClientForAccountWithEmail(payload.accountEmail);
-        if (mailClient.selectedMailbox == null) {
-          await mailClient.selectInbox();
-        }
-        final mimeMessage = MimeMessage()
-          ..sequenceId = payload.sequenceId
-          ..guid = payload.guid
-          ..uid = payload.uid
-          ..size = payload.size;
-        final currentMessageSource = locator<MailService>().messageSource;
-        final messageSource = SingleMessageSource(
-          currentMessageSource,
-          account:
-              currentMessageSource?.account ?? RealAccount(mailClient.account),
-        );
-        final message = maily.Message(mimeMessage, messageSource, 0);
-        messageSource.singleMessage = message;
-        await locator<NavigationService>()
-            .push(Routes.mailDetails, arguments: message);
-      } on MailException catch (e, s) {
-        if (kDebugMode) {
-          print('Unable to fetch notification message $payloadText: $e $s ');
-        }
-      }
+    if (payloadText != null && payloadText.startsWith(_messagePayloadStart)) {
+      final payload = _deserialize(payloadText);
+      context.pushNamed(
+        Routes.mailDetailsForNotification,
+        extra: payload,
+      );
     }
   }
 

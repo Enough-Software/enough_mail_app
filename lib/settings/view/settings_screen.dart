@@ -15,8 +15,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = context.text;
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.settingsTitle,
       content: SingleChildScrollView(
         child: SafeArea(

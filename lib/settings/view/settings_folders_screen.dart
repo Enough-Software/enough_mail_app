@@ -5,13 +5,13 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../account/model.dart';
+import '../../account/provider.dart';
 import '../../localization/extension.dart';
 import '../../locator.dart';
+import '../../mail/provider.dart';
 import '../../models/models.dart';
 import '../../screens/base.dart';
-import '../../services/i18n_service.dart';
 import '../../services/icon_service.dart';
-import '../../services/mail_service.dart';
 import '../../services/scaffold_messenger_service.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../../widgets/account_selector.dart';
@@ -33,8 +33,7 @@ class SettingsFoldersScreen extends ConsumerWidget {
     void onFolderNameSettingChanged(FolderNameSetting? value) =>
         _onFolderNameSettingChanged(context, value, ref);
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.settingsFolders,
       content: SingleChildScrollView(
         child: SafeArea(
@@ -43,8 +42,10 @@ class SettingsFoldersScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(localizations.folderNamesIntroduction,
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  localizations.folderNamesIntroduction,
+                  style: theme.textTheme.bodySmall,
+                ),
                 PlatformRadioListTile<FolderNameSetting>(
                   value: FolderNameSetting.localized,
                   groupValue: folderNameSetting,
@@ -91,24 +92,26 @@ class SettingsFoldersScreen extends ConsumerWidget {
     final localizations = context.text;
     var customNames = settings.customFolderNames;
     if (customNames == null) {
-      final l = locator<I18nService>().localizations;
+      final l = context.text;
       customNames = [
         l.folderInbox,
         l.folderDrafts,
         l.folderSent,
         l.folderTrash,
         l.folderArchive,
-        l.folderJunk
+        l.folderJunk,
       ];
     }
     final result = await LocalizedDialogHelper.showWidgetDialog(
-        context, CustomFolderNamesEditor(customNames: customNames),
-        title: localizations.folderNamesCustomTitle,
-        defaultActions: DialogActions.okAndCancel);
+      context,
+      CustomFolderNamesEditor(customNames: customNames),
+      title: localizations.folderNamesCustomTitle,
+      defaultActions: DialogActions.okAndCancel,
+    );
     if (result == true) {
-      settings = settings.copyWith(customFolderNames: customNames);
-      locator<MailService>().applyFolderNameSettings(settings);
-      await ref.read(settingsProvider.notifier).update(settings);
+      await ref.read(settingsProvider.notifier).update(
+            settings.copyWith(customFolderNames: customNames),
+          );
     }
   }
 
@@ -122,7 +125,6 @@ class SettingsFoldersScreen extends ConsumerWidget {
     await ref.read(settingsProvider.notifier).update(
           settings.copyWith(folderNameSetting: value),
         );
-    locator<MailService>().applyFolderNameSettings(settings);
   }
 }
 
@@ -210,23 +212,23 @@ class CustomFolderNamesEditor extends HookConsumerWidget {
   }
 }
 
-class FolderManagement extends StatefulWidget {
+class FolderManagement extends StatefulHookConsumerWidget {
   const FolderManagement({super.key});
 
   @override
-  State<FolderManagement> createState() => _FolderManagementState();
+  ConsumerState<FolderManagement> createState() => _FolderManagementState();
 }
 
-class _FolderManagementState extends State<FolderManagement> {
+class _FolderManagementState extends ConsumerState<FolderManagement> {
   late RealAccount _account;
   Mailbox? _mailbox;
   late TextEditingController _folderNameController;
 
   @override
   void initState() {
-    _account = locator<MailService>()
-        .accounts
-        .firstWhere((account) => account is RealAccount) as RealAccount;
+    final account = ref.read(currentAccountProvider);
+    _account =
+        account is RealAccount ? account : ref.read(realAccountsProvider).first;
     _folderNameController = TextEditingController();
     super.initState();
   }
@@ -240,6 +242,7 @@ class _FolderManagementState extends State<FolderManagement> {
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
+
     return SingleChildScrollView(
       child: SafeArea(
         child: Column(
@@ -249,12 +252,10 @@ class _FolderManagementState extends State<FolderManagement> {
             AccountSelector(
               account: _account,
               onChanged: (account) {
-                if (account != null) {
-                  setState(() {
-                    _mailbox = null;
-                    _account = account;
-                  });
-                }
+                setState(() {
+                  _mailbox = null;
+                  _account = account;
+                });
               },
             ),
             const Divider(),
@@ -288,32 +289,35 @@ class _FolderManagementState extends State<FolderManagement> {
   }
 }
 
-class MailboxWidget extends StatelessWidget {
-  const MailboxWidget(
-      {super.key,
-      required this.mailbox,
-      required this.account,
-      required this.onMailboxAdded,
-      required this.onMailboxDeleted});
+class MailboxWidget extends ConsumerWidget {
+  const MailboxWidget({
+    super.key,
+    required this.mailbox,
+    required this.account,
+    required this.onMailboxAdded,
+    required this.onMailboxDeleted,
+  });
+
   final RealAccount account;
   final Mailbox? mailbox;
   final void Function() onMailboxAdded;
   final void Function() onMailboxDeleted;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final localizations = context.text;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PlatformTextButtonIcon(
-          onPressed: () => _createFolder(context),
+          onPressed: () => _createFolder(context, ref),
           icon: Icon(CommonPlatformIcons.add),
           label: ButtonText(localizations.folderAddAction),
         ),
         if (mailbox != null)
           PlatformTextButtonIcon(
-            onPressed: () => _deleteFolder(context),
+            onPressed: () => _deleteFolder(context, ref),
             backgroundColor: Colors.red,
             style: TextButton.styleFrom(backgroundColor: Colors.red),
             icon: Icon(
@@ -322,17 +326,16 @@ class MailboxWidget extends StatelessWidget {
             ),
             label: ButtonText(
               localizations.folderDeleteAction,
-              style: Theme.of(context)
-                  .textTheme
-                  .labelLarge!
-                  .copyWith(color: Colors.white),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: Colors.white,
+                  ),
             ),
           ),
       ],
     );
   }
 
-  Future<void> _createFolder(context) async {
+  Future<void> _createFolder(BuildContext context, WidgetRef ref) async {
     final localizations = context.text;
     final folderNameController = TextEditingController();
     final result = await LocalizedDialogHelper.showWidgetDialog(
@@ -350,34 +353,44 @@ class MailboxWidget extends StatelessWidget {
     );
     if (result == true) {
       try {
-        await locator<MailService>().createMailbox(
-          account,
-          folderNameController.text,
-          mailbox,
-        );
+        await ref
+            .read(mailClientSourceProvider(account: account).notifier)
+            .createMailbox(
+              folderNameController.text,
+              mailbox,
+            );
         locator<ScaffoldMessengerService>()
             .showTextSnackBar(localizations.folderAddResultSuccess);
         onMailboxAdded();
       } on MailException catch (e) {
-        await LocalizedDialogHelper.showTextDialog(
-          context,
-          localizations.errorTitle,
-          localizations.folderAddResultFailure(e.message!),
-        );
+        if (context.mounted) {
+          await LocalizedDialogHelper.showTextDialog(
+            context,
+            localizations.errorTitle,
+            localizations.folderAddResultFailure(e.message ?? e.toString()),
+          );
+        }
       }
     }
   }
 
-  Future<void> _deleteFolder(BuildContext context) async {
+  Future<void> _deleteFolder(BuildContext context, WidgetRef ref) async {
     final localizations = context.text;
+    final mailbox = this.mailbox;
+    if (mailbox == null) {
+      return;
+    }
+
     final confirmed = await LocalizedDialogHelper.askForConfirmation(
       context,
       title: localizations.folderDeleteConfirmTitle,
-      query: localizations.folderDeleteConfirmText(mailbox!.path),
+      query: localizations.folderDeleteConfirmText(mailbox.path),
     );
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       try {
-        await locator<MailService>().deleteMailbox(account, mailbox!);
+        await ref
+            .read(mailClientSourceProvider(account: account).notifier)
+            .deleteMailbox(mailbox);
         locator<ScaffoldMessengerService>()
             .showTextSnackBar(localizations.folderDeleteResultSuccess);
         onMailboxDeleted();
@@ -386,7 +399,7 @@ class MailboxWidget extends StatelessWidget {
           await LocalizedDialogHelper.showTextDialog(
             context,
             localizations.errorTitle,
-            localizations.folderDeleteResultFailure(e.message!),
+            localizations.folderDeleteResultFailure(e.message ?? e.toString()),
           );
         }
       }

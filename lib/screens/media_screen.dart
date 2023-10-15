@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,11 +8,13 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart' as pathprovider;
 import 'package:share_plus/share_plus.dart';
 
 import '../account/model.dart';
+import '../account/provider.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/compose_data.dart';
@@ -19,8 +22,6 @@ import '../models/message.dart';
 import '../models/message_source.dart';
 import '../routes.dart';
 import '../services/icon_service.dart';
-import '../services/mail_service.dart';
-import '../services/navigation_service.dart';
 import '../settings/provider.dart';
 import '../util/localized_dialog_helper.dart';
 import 'base.dart';
@@ -38,14 +39,13 @@ class InteractiveMediaScreen extends ConsumerWidget {
     final localizations = context.text;
     final iconService = locator<IconService>();
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: mediaWidget.mediaProvider.name,
       content: mediaWidget,
       appBarActions: [
         DensePlatformIconButton(
           icon: Icon(iconService.messageActionForward),
-          onPressed: _forward,
+          onPressed: () => _forward(context),
         ),
         DensePlatformIconButton(
           icon: Icon(iconService.share),
@@ -67,19 +67,19 @@ class InteractiveMediaScreen extends ConsumerWidget {
                       mime = MimeMessage.parseFromData(provider.data);
                     }
                     if (mime != null) {
-                      final mailService = locator<MailService>();
-                      final account = mailService.currentAccount;
+                      final account = ref.read(currentAccountProvider);
                       if (account is RealAccount) {
                         final source = SingleMessageSource(
-                          mailService.messageSource,
+                          null,
                           account: account,
                         );
-                        final message = Message(mime, source, 0);
-                        message.isEmbedded = true;
+                        final message = Message(mime, source, 0)
+                          ..isEmbedded = true;
                         source.singleMessage = message;
                         showErrorMessage = false;
-                        await locator<NavigationService>()
-                            .push(Routes.mailDetails, arguments: message);
+                        unawaited(
+                          context.pushNamed(Routes.mailDetails, extra: message),
+                        );
                       }
                     }
                   } catch (e, s) {
@@ -88,11 +88,15 @@ class InteractiveMediaScreen extends ConsumerWidget {
                     }
                   }
                   if (showErrorMessage) {
-                    await LocalizedDialogHelper.showTextDialog(
+                    if (context.mounted) {
+                      await LocalizedDialogHelper.showTextDialog(
                         context,
                         localizations.errorTitle,
-                        localizations.developerShowAsEmailFailed);
+                        localizations.developerShowAsEmailFailed,
+                      );
+                    }
                   }
+
                   break;
               }
             },
@@ -107,23 +111,26 @@ class InteractiveMediaScreen extends ConsumerWidget {
     );
   }
 
-  void _forward() {
+  void _forward(BuildContext context) {
     final provider = mediaWidget.mediaProvider;
     final messageBuilder = MessageBuilder()..subject = provider.name;
 
     if (provider is TextMediaProvider) {
-      messageBuilder.addBinary(utf8.encode(provider.text) as Uint8List,
-          MediaType.fromText(provider.mediaType),
-          filename: provider.name);
+      messageBuilder.addBinary(
+        utf8.encode(provider.text) as Uint8List,
+        MediaType.fromText(provider.mediaType),
+        filename: provider.name,
+      );
     } else if (provider is MemoryMediaProvider) {
       messageBuilder.addBinary(
-          provider.data, MediaType.fromText(provider.mediaType),
-          filename: provider.name);
+        provider.data,
+        MediaType.fromText(provider.mediaType),
+        filename: provider.name,
+      );
     }
     final composeData =
         ComposeData(null, messageBuilder, ComposeAction.newMessage);
-    locator<NavigationService>()
-        .push(Routes.mailCompose, arguments: composeData);
+    context.pushNamed(Routes.mailCompose, extra: composeData);
   }
 
   void _share() {

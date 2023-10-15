@@ -1,11 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'providers.dart';
+part of 'provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
+String _$sendersHash() => r'ac054c05e85b5665da4f1dc8671418c211154bd1';
+
+/// Generates a list of senders for composing a new message
+///
+/// Copied from [Senders].
+@ProviderFor(Senders)
+final sendersProvider = AutoDisposeProvider<List<Sender>>.internal(
+  Senders,
+  name: r'sendersProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$sendersHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef SendersRef = AutoDisposeProviderRef<List<Sender>>;
 String _$unifiedAccountHash() => r'e59dc865d2ef074d5da9cdc4d228551153ef0a53';
 
 /// Provides the unified account, if any
@@ -24,7 +40,7 @@ final unifiedAccountProvider = Provider<UnifiedAccount?>.internal(
 
 typedef UnifiedAccountRef = ProviderRef<UnifiedAccount?>;
 String _$findAccountByEmailHash() =>
-    r'd098fc64ea914fb4ba974196600a1386546c4e70';
+    r'951fd91a8a1e1722378dcc2542e0857486f9b5cd';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -342,7 +358,24 @@ final hasAccountWithErrorProvider = Provider<bool>.internal(
 );
 
 typedef HasAccountWithErrorRef = ProviderRef<bool>;
-String _$realAccountsHash() => r'3ff51534497e5e36a7b0e0f19dc0e5fb09cfdcfe';
+String _$currentAccountHash() => r'1a478a132562c199f6e6f9a8e23d485b2d93e2bc';
+
+/// Provides the locally current active account
+///
+/// Copied from [currentAccount].
+@ProviderFor(currentAccount)
+final currentAccountProvider = AutoDisposeProvider<Account?>.internal(
+  currentAccount,
+  name: r'currentAccountProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentAccountHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef CurrentAccountRef = AutoDisposeProviderRef<Account?>;
+String _$realAccountsHash() => r'665041d146a86069048493163e33d76a4896d3cb';
 
 /// Provides all real email accounts
 ///
