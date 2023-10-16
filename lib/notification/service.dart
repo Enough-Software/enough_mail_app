@@ -5,17 +5,19 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 import '../logger.dart';
 import '../models/message.dart' as maily;
 import '../routes.dart';
-
-part 'notification_service.g.dart';
-
-enum NotificationServiceInitResult { appLaunchedByNotification, normal }
+import 'model.dart';
 
 class NotificationService {
+  NotificationService._();
+  static final NotificationService _instance = NotificationService._();
+
+  /// Retrieves the instance of the notification service
+  static NotificationService get instance => _instance;
+
   static const String _messagePayloadStart = 'msg:';
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -226,44 +228,4 @@ class NotificationService {
       _flutterLocalNotificationsPlugin.cancel(id);
     }
   }
-}
-
-/// Details to identify a mail message in a notification
-@JsonSerializable()
-class MailNotificationPayload {
-  /// Creates a new payload
-  const MailNotificationPayload({
-    required this.guid,
-    required this.uid,
-    required this.sequenceId,
-    required this.accountEmail,
-    required this.subject,
-    required this.size,
-  });
-
-  /// Creates a new payload from the given [mimeMessage]
-  MailNotificationPayload.fromMail(
-    MimeMessage mimeMessage,
-    this.accountEmail,
-  )   : uid = mimeMessage.uid ?? 0,
-        guid = mimeMessage.guid ?? 0,
-        sequenceId = mimeMessage.sequenceId ?? 0,
-        subject = mimeMessage.decodeSubject() ?? '',
-        size = mimeMessage.size ?? 0;
-
-  /// Creates a new payload from the given [json]
-  factory MailNotificationPayload.fromJson(Map<String, dynamic> json) =>
-      _$MailNotificationPayloadFromJson(json);
-
-  final int guid;
-  final int uid;
-  @JsonKey(name: 'id')
-  final int sequenceId;
-  @JsonKey(name: 'account-email')
-  final String accountEmail;
-  final String subject;
-  final int size;
-
-  /// Creates JSON from this payoad
-  Map<String, dynamic> toJson() => _$MailNotificationPayloadToJson(this);
 }

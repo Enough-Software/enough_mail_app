@@ -3,7 +3,8 @@ import 'package:enough_mail_app/account/model.dart';
 import 'package:enough_mail_app/models/async_mime_source.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
-import 'package:enough_mail_app/services/notification_service.dart';
+import 'package:enough_mail_app/notification/model.dart';
+import 'package:enough_mail_app/notification/service.dart';
 import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
 import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
 import 'package:flutter/src/material/scaffold.dart';
@@ -1217,15 +1218,22 @@ class TestNotificationService implements NotificationService {
   }
 
   @override
-  Future<NotificationServiceInitResult> init(
-      {bool checkForLaunchDetails = true}) {
+  Future<NotificationServiceInitResult> init({
+    bool checkForLaunchDetails = true,
+  }) {
     // TODO: implement init
     throw UnimplementedError();
   }
 
   @override
-  Future sendLocalNotification(int id, String title, String? text,
-      {String? payloadText, DateTime? when, bool channelShowBadge = true}) {
+  Future sendLocalNotification(
+    int id,
+    String title,
+    String? text, {
+    String? payloadText,
+    DateTime? when,
+    bool channelShowBadge = true,
+  }) {
     _sendNotifications++;
     return Future.value();
   }

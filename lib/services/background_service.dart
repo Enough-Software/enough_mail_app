@@ -9,8 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../locator.dart';
 import '../models/async_mime_source_factory.dart';
 import '../models/background_update_info.dart';
+import '../notification/service.dart';
 import 'mail_service.dart';
-import 'notification_service.dart';
 
 class BackgroundService {
   static const String _keyInboxUids = 'nextUidsInfo';
@@ -128,7 +128,7 @@ class BackgroundService {
           const AsyncMimeSourceFactory(isOfflineModeSupported: false),
     );
     final accounts = await mailService.loadRealMailAccounts();
-    final notificationService = NotificationService();
+    final notificationService = NotificationService.instance;
     await notificationService.init(checkForLaunchDetails: false);
     // final activeMailNotifications =
     //     await notificationService.getActiveMailNotifications();

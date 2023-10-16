@@ -10,8 +10,8 @@ import 'package:go_router/go_router.dart';
 import 'account/model.dart';
 import 'main.dart';
 import 'models/models.dart';
+import 'notification/model.dart';
 import 'screens/screens.dart';
-import 'services/notification_service.dart';
 import 'settings/view/view.dart';
 import 'widgets/app_drawer.dart';
 

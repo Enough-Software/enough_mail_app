@@ -13,11 +13,11 @@ import '../models/async_mime_source.dart';
 import '../models/async_mime_source_factory.dart';
 import '../models/message_source.dart';
 import '../models/sender.dart';
+import '../notification/service.dart';
 import '../routes.dart';
 import '../settings/model.dart';
 import '../util/gravatar.dart';
 import 'navigation_service.dart';
-import 'notification_service.dart';
 import 'providers.dart';
 
 class MailService implements MimeSourceSubscriber {

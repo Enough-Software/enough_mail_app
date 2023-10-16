@@ -8,9 +8,16 @@ import '../util/indexed_cache.dart';
 
 /// Let other classes get notified about changes in a mime source
 abstract class MimeSourceSubscriber {
+  ///  Notifies about a single new message
   void onMailArrived(MimeMessage mime, AsyncMimeSource source, {int index = 0});
+
+  ///  Notifies about a single removed message
   void onMailVanished(MimeMessage mime, AsyncMimeSource source);
+
+  ///  Notifies about a flags change for a single message
   void onMailFlagsUpdated(MimeMessage mime, AsyncMimeSource source);
+
+  ///  Notifies about the required to reload the cache
   void onMailCacheInvalidated(AsyncMimeSource source);
 }
 
@@ -238,6 +245,8 @@ abstract class CachedMimeSource extends AsyncMimeSource {
   /// Creates a new cached mime source
   CachedMimeSource({int maxCacheSize = IndexedCache.defaultMaxCacheSize})
       : cache = IndexedCache<MimeMessage>(maxCacheSize: maxCacheSize);
+
+  /// The cache for the received mime messages
   final IndexedCache<MimeMessage> cache;
 
   @override

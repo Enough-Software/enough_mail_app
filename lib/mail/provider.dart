@@ -7,7 +7,8 @@ import '../account/provider.dart';
 import '../models/async_mime_source.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
-import '../services/notification_service.dart';
+import '../notification/model.dart';
+import '../notification/service.dart';
 import '../settings/provider.dart';
 import 'service.dart';
 
@@ -86,7 +87,7 @@ class UnifiedSource extends _$UnifiedSource {
 
 /// Provides the message source for the given account
 @Riverpod(keepAlive: true)
-class RealSource extends _$RealSource {
+class RealSource extends _$RealSource implements MimeSourceSubscriber {
   @override
   Future<MailboxMessageSource> build({
     required RealAccount account,
@@ -94,8 +95,8 @@ class RealSource extends _$RealSource {
   }) async {
     final source = await ref.watch(
       realMimeSourceProvider(account: account, mailbox: mailbox).future,
-    ); //..addSubscriber(this);
-    // TODO(RV): add subscriber to send notification for unseen inbox mails
+    )
+      ..addSubscriber(this);
 
     return MailboxMessageSource.fromMimeSource(
       source,
@@ -103,6 +104,37 @@ class RealSource extends _$RealSource {
       mailbox ?? source.mailbox,
       account: account,
     );
+  }
+
+  @override
+  void onMailArrived(
+    MimeMessage mime,
+    AsyncMimeSource source, {
+    int index = 0,
+  }) {
+    source.mailClient.lowLevelIncomingMailClient
+        .logApp('new message: ${mime.decodeSubject()}');
+    if (!mime.isSeen && source.isInbox) {
+      NotificationService.instance
+          .sendLocalNotificationForMail(mime, source.mailClient.account.email);
+    }
+  }
+
+  @override
+  void onMailCacheInvalidated(AsyncMimeSource source) {
+    // ignore
+  }
+
+  @override
+  void onMailFlagsUpdated(MimeMessage mime, AsyncMimeSource source) {
+    if (mime.isSeen) {
+      NotificationService.instance.cancelNotificationForMail(mime);
+    }
+  }
+
+  @override
+  void onMailVanished(MimeMessage mime, AsyncMimeSource source) {
+    NotificationService.instance.cancelNotificationForMail(mime);
   }
 }
 
@@ -135,7 +167,7 @@ Future<Tree<Mailbox?>> mailboxTree(
 }
 
 //// Loads the mailbox tree for the given account
-@Riverpod(keepAlive: true)
+@riverpod
 Future<Mailbox?> findMailbox(
   FindMailboxRef ref, {
   required Account account,
@@ -151,21 +183,19 @@ Future<Mailbox?> findMailbox(
 
 /// Provides the message source for the given account
 @Riverpod(keepAlive: true)
-class RealMimeSource extends _$RealMimeSource {
-  @override
-  Future<AsyncMimeSource> build({
-    required RealAccount account,
-    Mailbox? mailbox,
-  }) async {
-    final mailClient = ref.watch(
-      mailClientSourceProvider(account: account, mailbox: mailbox),
-    );
+Future<AsyncMimeSource> realMimeSource(
+  RealMimeSourceRef ref, {
+  required RealAccount account,
+  Mailbox? mailbox,
+}) async {
+  final mailClient = ref.watch(
+    mailClientSourceProvider(account: account, mailbox: mailbox),
+  );
 
-    return EmailService.instance.createMimeSource(
-      mailClient: mailClient,
-      mailbox: mailbox,
-    );
-  }
+  return EmailService.instance.createMimeSource(
+    mailClient: mailClient,
+    mailbox: mailbox,
+  );
 }
 
 /// Provides mail clients
@@ -231,20 +261,18 @@ Future<Message> singleMessageLoader(
 }
 
 /// Provides mail clients
-@Riverpod(keepAlive: false)
-class FirstTimeMailClientSource extends _$FirstTimeMailClientSource {
-  @override
-  Future<ConnectedAccount?> build({
-    required RealAccount account,
-    Mailbox? mailbox,
-  }) =>
-      EmailService.instance.connectFirstTime(
-        account.mailAccount,
-        (mailAccount) => ref
-            .watch(realAccountsProvider.notifier)
-            .updateMailAccount(account, mailAccount),
-      );
-}
+@riverpod
+Future<ConnectedAccount?> firstTimeMailClientSource(
+  FirstTimeMailClientSourceRef ref, {
+  required RealAccount account,
+  Mailbox? mailbox,
+}) =>
+    EmailService.instance.connectFirstTime(
+      account.mailAccount,
+      (mailAccount) => ref
+          .watch(realAccountsProvider.notifier)
+          .updateMailAccount(account, mailAccount),
+    );
 
 /// Creates a new [MessageBuilder] based on the given [mailtoUri] uri
 @riverpod

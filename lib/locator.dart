@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 
 import 'models/async_mime_source_factory.dart';
+import 'notification/service.dart';
 import 'services/app_service.dart';
 import 'services/background_service.dart';
 import 'services/biometrics_service.dart';
@@ -11,7 +12,6 @@ import 'services/key_service.dart';
 import 'services/location_service.dart';
 import 'services/mail_service.dart';
 import 'services/navigation_service.dart';
-import 'services/notification_service.dart';
 import 'services/providers.dart';
 import 'services/scaffold_messenger_service.dart';
 
@@ -30,7 +30,7 @@ void setupLocator() {
     ..registerLazySingleton(ScaffoldMessengerService.new)
     ..registerLazySingleton(DateService.new)
     ..registerSingleton(IconService())
-    ..registerLazySingleton(NotificationService.new)
+    ..registerLazySingleton(() => NotificationService.instance)
     ..registerLazySingleton(BackgroundService.new)
     ..registerLazySingleton(AppService.new)
     ..registerLazySingleton(LocationService.new)

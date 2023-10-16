@@ -34,11 +34,12 @@ class FakeMimeSource extends PagedCachedMimeSource {
   final Duration _differencePerMessage;
   List<MimeMessage> messages = [];
 
-  static List<MimeMessage> generateMessages(
-      {required int size,
-      String name = '',
-      DateTime? startDate,
-      Duration? differencePerMessage}) {
+  static List<MimeMessage> generateMessages({
+    required int size,
+    String name = '',
+    DateTime? startDate,
+    Duration? differencePerMessage,
+  }) {
     final messages = <MimeMessage>[];
     for (int i = size; --i >= 0;) {
       messages.add(
@@ -268,4 +269,8 @@ class FakeMimeSource extends PagedCachedMimeSource {
     // TODO: implement sendMessage
     throw UnimplementedError();
   }
+
+  @override
+  // TODO: implement mailbox
+  Mailbox get mailbox => throw UnimplementedError();
 }

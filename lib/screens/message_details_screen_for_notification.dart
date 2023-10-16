@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../mail/provider.dart';
-import '../services/notification_service.dart';
+import '../notification/model.dart';
 import 'message_details_screen.dart';
 
 /// Displays the message details for a notification
