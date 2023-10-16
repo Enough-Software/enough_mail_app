@@ -144,7 +144,7 @@ abstract class MessageSource extends ChangeNotifier
     final parent = _parentMessageSource;
     if (parent != null) {
       final mime = message.mimeMessage;
-      parent.removeMime(mime);
+      parent.removeMime(mime, getMimeSource(message));
     }
     if (removed && notify) {
       notifyListeners();
@@ -155,7 +155,7 @@ abstract class MessageSource extends ChangeNotifier
 
   @override
   void onMailFlagsUpdated(MimeMessage mime, AsyncMimeSource source) {
-    final message = cache.getWithMime(mime);
+    final message = cache.getWithMime(mime, source);
     if (message != null) {
       message.updateFlags(mime.flags);
     }
@@ -163,7 +163,7 @@ abstract class MessageSource extends ChangeNotifier
 
   @override
   void onMailVanished(MimeMessage mime, AsyncMimeSource source) {
-    final message = cache.getWithMime(mime);
+    final message = cache.getWithMime(mime, source);
 
     if (message != null) {
       removeFromCache(message);
@@ -414,7 +414,7 @@ abstract class MessageSource extends ChangeNotifier
     }
     msg.isSeen = isSeen;
     final parent = _parentMessageSource;
-    final parentMsg = parent?.cache.getWithMime(msg.mimeMessage);
+    final parentMsg = parent?.cache.getWithMime(msg.mimeMessage, source);
     if (parent != null && parentMsg != null) {
       return parent.markAsSeen(parentMsg, isSeen);
     }
@@ -430,7 +430,8 @@ abstract class MessageSource extends ChangeNotifier
     msg.isSeen = isSeen;
     final parent = _parentMessageSource;
     if (parent != null) {
-      final parentMsg = parent.cache.getWithMime(msg.mimeMessage);
+      final parentMsg =
+          parent.cache.getWithMime(msg.mimeMessage, getMimeSource(msg));
       if (parentMsg != null) {
         parent.onMarkedAsSeen(parentMsg, isSeen);
       }
@@ -451,7 +452,10 @@ abstract class MessageSource extends ChangeNotifier
     msg.isFlagged = isFlagged;
     final parent = _parentMessageSource;
     if (parent != null) {
-      final parentMsg = parent.cache.getWithMime(msg.mimeMessage);
+      final parentMsg = parent.cache.getWithMime(
+        msg.mimeMessage,
+        getMimeSource(msg),
+      );
       if (parentMsg != null) {
         parent.onMarkedAsFlagged(parentMsg, isFlagged);
       }
@@ -541,8 +545,8 @@ abstract class MessageSource extends ChangeNotifier
 
   MessageSource search(MailSearch search);
 
-  void removeMime(MimeMessage mimeMessage) {
-    final existingMessage = cache.getWithMime(mimeMessage);
+  void removeMime(MimeMessage mimeMessage, AsyncMimeSource? mimeSource) {
+    final existingMessage = cache.getWithMime(mimeMessage, mimeSource);
     if (existingMessage != null) {
       removeFromCache(existingMessage);
     }
@@ -688,7 +692,7 @@ class MailboxMessageSource extends MessageSource {
     if (parent != null) {
       for (final removedMessage in removedMessages) {
         final mime = removedMessage.mimeMessage;
-        parent.removeMime(mime);
+        parent.removeMime(mime, getMimeSource(removedMessage));
       }
     }
 
@@ -937,7 +941,10 @@ class MultipleMessageSource extends MessageSource {
     final parent = _parentMessageSource;
     if (parent != null) {
       for (final removedMessage in removedMessages) {
-        parent.removeMime(removedMessage.mimeMessage);
+        parent.removeMime(
+          removedMessage.mimeMessage,
+          getMimeSource(removedMessage),
+        );
       }
     }
     final futureResults = await Future.wait(futures);
@@ -1303,11 +1310,19 @@ class ListMessageSource extends MessageSource {
 // }
 
 extension _ExtensionsOnMessageIndexedCache on IndexedCache<Message> {
-  Message? getWithMime(MimeMessage mime) {
+  Message? getWithMime(MimeMessage mime, AsyncMimeSource? mimeSource) {
     final guid = mime.guid;
     if (guid != null) {
       return firstWhereOrNull(
         (msg) => msg.mimeMessage.guid == guid,
+      );
+    }
+    final sequenceId = mime.sequenceId;
+    if (sequenceId != null) {
+      return firstWhereOrNull(
+        (msg) =>
+            msg.mimeMessage.sequenceId == sequenceId &&
+            msg.source.getMimeSource(msg) == mimeSource,
       );
     }
 

@@ -348,8 +348,15 @@ abstract class CachedMimeSource extends AsyncMimeSource {
 
   @override
   Future<void> onMessageFlagsUpdated(MimeMessage message) {
-    final existing =
-        cache.firstWhereOrNull((element) => element.guid == message.guid);
+    final guid = message.guid;
+    final sequenceId = message.sequenceId;
+    final existing = guid != null
+        ? cache.firstWhereOrNull(
+            (element) => element.guid == guid,
+          )
+        : cache.firstWhereOrNull(
+            (element) => element.sequenceId == sequenceId,
+          );
     if (existing != null) {
       existing.flags = message.flags;
     }
