@@ -4,24 +4,36 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
+import '../localization/app_localizations.g.dart';
+import '../localization/extension.dart';
 import '../locator.dart';
+import '../mail/model.dart';
 import '../mail/provider.dart';
 import '../services/icon_service.dart';
+import '../settings/model.dart';
+import '../settings/provider.dart';
 
+/// Displays a tree of mailboxes
 class MailboxTree extends ConsumerWidget {
+  /// Creates a new [MailboxTree]
   const MailboxTree({
     super.key,
     required this.account,
     required this.onSelected,
   });
 
+  /// The associated account
   final Account account;
+
+  /// Callback when a mailbox is selected
   final void Function(Mailbox mailbox) onSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mailboxTreeValue = ref.watch(mailboxTreeProvider(account: account));
     final currentMailbox = ref.watch(currentMailboxProvider);
+    final settings = ref.watch(settingsProvider);
+    final localizations = context.text;
 
     return mailboxTreeValue.when(
       loading: () => Center(
@@ -38,7 +50,13 @@ class MailboxTree extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (final element in mailboxTreeElements)
-              _buildMailboxElement(element, 0, currentMailbox),
+              _buildMailboxElement(
+                localizations,
+                settings,
+                element,
+                0,
+                currentMailbox,
+              ),
           ],
         );
       },
@@ -46,6 +64,8 @@ class MailboxTree extends ConsumerWidget {
   }
 
   Widget _buildMailboxElement(
+    AppLocalizations localizations,
+    Settings settings,
     TreeElement<Mailbox?> element,
     final int level,
     Mailbox? current,
@@ -57,7 +77,7 @@ class MailboxTree extends ConsumerWidget {
 
     final title = Padding(
       padding: EdgeInsets.only(left: level * 8.0),
-      child: Text(mailbox.name),
+      child: Text(mailbox.localizedName(localizations, settings)),
     );
     final children = element.children;
     if (children == null) {
@@ -77,7 +97,13 @@ class MailboxTree extends ConsumerWidget {
         title: title,
         children: [
           for (final childElement in children)
-            _buildMailboxElement(childElement, level + 1, current),
+            _buildMailboxElement(
+              localizations,
+              settings,
+              childElement,
+              level + 1,
+              current,
+            ),
         ],
       ),
     );

@@ -10,16 +10,16 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
   /// Creates a new [OfflineMailboxMimeSource]
   OfflineMailboxMimeSource({
     required MailAccount mailAccount,
-    required Mailbox mailbox,
+    required this.mailbox,
     required PagedCachedMimeSource onlineMimeSource,
     required OfflineMimeStorage storage,
   })  : _mailAccount = mailAccount,
-        _mailbox = mailbox,
         _onlineMimeSource = onlineMimeSource,
         _storage = storage;
 
   final MailAccount _mailAccount;
-  final Mailbox _mailbox;
+  @override
+  final Mailbox mailbox;
   final PagedCachedMimeSource _onlineMimeSource;
   final OfflineMimeStorage _storage;
 
@@ -70,8 +70,11 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
   }
 
   @override
-  Future<MimePart> fetchMessagePart(MimeMessage message,
-          {required String fetchId, Duration? responseTimeout}) =>
+  Future<MimePart> fetchMessagePart(
+    MimeMessage message, {
+    required String fetchId,
+    Duration? responseTimeout,
+  }) =>
       _onlineMimeSource.fetchMessagePart(
         message,
         fetchId: fetchId,
@@ -110,19 +113,19 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
       );
 
   @override
-  bool get isArchive => _mailbox.isArchive;
+  bool get isArchive => mailbox.isArchive;
 
   @override
-  bool get isInbox => _mailbox.isInbox;
+  bool get isInbox => mailbox.isInbox;
 
   @override
-  bool get isJunk => _mailbox.isJunk;
+  bool get isJunk => mailbox.isJunk;
 
   @override
-  bool get isSent => _mailbox.isSent;
+  bool get isSent => mailbox.isSent;
 
   @override
-  bool get isTrash => _mailbox.isTrash;
+  bool get isTrash => mailbox.isTrash;
 
   @override
   Future<List<MimeMessage>> loadMessages(MessageSequence sequence) async {
@@ -196,7 +199,7 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
   }
 
   @override
-  int get size => _mailbox.messagesExists;
+  int get size => mailbox.messagesExists;
 
   @override
   Future<void> store(

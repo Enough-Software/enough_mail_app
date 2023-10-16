@@ -362,6 +362,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get folderJunk => 'Junk';
 
   @override
+  String get folderUnknown => 'Unknown';
+
+  @override
   String get viewContentsAction => 'View contents';
 
   @override

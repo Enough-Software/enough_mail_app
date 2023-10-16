@@ -409,6 +409,10 @@
   "@folderJunk": {
     "description": "Folder name."
   },
+  "folderUnknown": "Unknown",
+  "@folderUnknown": {
+    "description": "Folder name for a message source without a name."
+  },
   "viewContentsAction": "View contents",
   "@viewContentsAction": {
     "description": "Show contents of a message on a separate screen."

@@ -19,6 +19,9 @@ abstract class AsyncMimeSource {
   /// The mail client associated with this source
   MailClient get mailClient;
 
+  /// Retrieves the mailbox associated with this source
+  Mailbox get mailbox;
+
   /// The name of this source
   String get name;
 
@@ -100,8 +103,11 @@ abstract class AsyncMimeSource {
   Future<MoveResult> undoMoveMessages(MoveResult moveResult);
 
   /// Adds or removes [flags] to/from the given [messages]
-  Future<void> store(List<MimeMessage> messages, List<String> flags,
-      {StoreAction action = StoreAction.add});
+  Future<void> store(
+    List<MimeMessage> messages,
+    List<String> flags, {
+    StoreAction action = StoreAction.add,
+  });
 
   /// Adds or removes [flags]to all messages
   Future<void> storeAll(
@@ -297,8 +303,7 @@ abstract class CachedMimeSource extends AsyncMimeSource {
     final largerMatcher =
         sequence.isUidSequence ? uidLargerMatcher : sequenceIdLargerMatcher;
 
-    final ids = sequence.toList();
-    ids.sort((a, b) => b.compareTo(a));
+    final ids = sequence.toList()..sort((a, b) => b.compareTo(a));
     for (final id in ids) {
       final mime = cache.removeFirstWhere((m) => equalsMatcher(m, id));
 
@@ -489,6 +494,7 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   AsyncMailboxMimeSource(this.mailbox, this.mailClient);
 
   /// The mailbox
+  @override
   final Mailbox mailbox;
 
   @override
@@ -766,6 +772,7 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
   final MailSearch mailSearch;
 
   /// The mailbox on which the search is done
+  @override
   final Mailbox mailbox;
 
   /// The parent mime source

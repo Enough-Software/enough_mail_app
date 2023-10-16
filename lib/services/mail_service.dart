@@ -200,7 +200,7 @@ class MailService implements MimeSourceSubscriber {
         return MailboxMessageSource.fromMimeSource(
           source,
           mailClient.account.email,
-          mailbox.name,
+          mailbox,
           account: account,
         );
       }

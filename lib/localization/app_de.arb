@@ -90,6 +90,7 @@
   "folderTrash": "Papierkorb",
   "folderArchive": "Archiv",
   "folderJunk": "Spam Nachrichten",
+  "folderUnknown": "Unbekannt",
   "viewContentsAction": "Inhalt anzeigen",
   "viewSourceAction": "Sourcecode anzeigen",
   "detailsErrorDownloadInfo": "E-Mail konnte nicht geladen werden.",

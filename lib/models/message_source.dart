@@ -630,15 +630,18 @@ class MailboxMessageSource extends MessageSource {
   MailboxMessageSource.fromMimeSource(
     this.mimeSource,
     String description,
-    String name, {
+    this.mailbox, {
     required this.account,
     super.parent,
     super.isSearch,
   }) {
     _description = description;
-    _name = name;
+    _name = mailbox.name;
     mimeSource.addSubscriber(this);
   }
+
+  /// The associated mailbox
+  final Mailbox mailbox;
 
   @override
   final RealAccount account;
@@ -726,12 +729,11 @@ class MailboxMessageSource extends MessageSource {
   @override
   MessageSource search(MailSearch search) {
     final searchSource = mimeSource.search(search);
-    final localizations = locator<I18nService>().localizations;
 
     return MailboxMessageSource.fromMimeSource(
       searchSource,
-      localizations.searchQueryDescription(name!),
-      localizations.searchQueryTitle(search.query),
+      search.query,
+      mailbox,
       account: account,
       parent: this,
       isSearch: true,
@@ -783,7 +785,7 @@ class MultipleMessageSource extends MessageSource {
   MultipleMessageSource(
     this.mimeSources,
     String name,
-    MailboxFlag? flag, {
+    this.flag, {
     required this.account,
     super.parent,
     super.isSearch,
@@ -793,7 +795,6 @@ class MultipleMessageSource extends MessageSource {
       _multipleMimeSources.add(_MultipleMimeSource(s));
     }
     _name = name;
-    _flag = flag;
     _description = mimeSources.map((s) => s.mailClient.account.name).join(', ');
   }
 
@@ -810,7 +811,10 @@ class MultipleMessageSource extends MessageSource {
   /// The integrated mime sources
   final List<AsyncMimeSource> mimeSources;
   final _multipleMimeSources = <_MultipleMimeSource>[];
-  MailboxFlag? _flag;
+
+  /// The identity flag of the mailbox
+  MailboxFlag flag;
+
   final _indicesCache = <_MultipleMessageSourceId>[];
 
   @override
@@ -997,7 +1001,7 @@ class MultipleMessageSource extends MessageSource {
     final searchMessageSource = MultipleMessageSource(
       searchMimeSources,
       localizations.searchQueryTitle(search.query),
-      _flag,
+      flag,
       account: account,
       parent: this,
       isSearch: true,

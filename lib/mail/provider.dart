@@ -100,7 +100,7 @@ class RealSource extends _$RealSource {
     return MailboxMessageSource.fromMimeSource(
       source,
       account.email,
-      mailbox?.name ?? '',
+      mailbox ?? source.mailbox,
       account: account,
     );
   }

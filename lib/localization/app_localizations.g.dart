@@ -627,6 +627,12 @@ abstract class AppLocalizations {
   /// **'Junk'**
   String get folderJunk;
 
+  /// Folder name for a message source without a name.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get folderUnknown;
+
   /// Show contents of a message on a separate screen.
   ///
   /// In en, this message translates to:

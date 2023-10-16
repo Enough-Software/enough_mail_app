@@ -362,6 +362,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get folderJunk => 'Spam Nachrichten';
 
   @override
+  String get folderUnknown => 'Unbekannt';
+
+  @override
   String get viewContentsAction => 'Inhalt anzeigen';
 
   @override

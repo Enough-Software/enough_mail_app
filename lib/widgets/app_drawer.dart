@@ -170,7 +170,7 @@ class AppDrawer extends ConsumerWidget {
                             ? currentAccount.accounts
                                 .map((a) => a.name)
                                 .join(', ')
-                            : (currentAccount as RealAccount).email,
+                            : currentAccount.email,
                         style: const TextStyle(
                           fontStyle: FontStyle.italic,
                           fontSize: 14,
@@ -199,7 +199,10 @@ class AppDrawer extends ConsumerWidget {
               ),
               children: [
                 for (final account in accounts)
-                  _SelectableAccountTile(account: account),
+                  _SelectableAccountTile(
+                    account: account,
+                    currentAccount: currentAccount,
+                  ),
                 _buildAddAccountTile(context, localizations),
               ],
             )
@@ -252,9 +255,13 @@ class AppDrawer extends ConsumerWidget {
 }
 
 class _SelectableAccountTile extends StatelessWidget {
-  const _SelectableAccountTile({required this.account});
+  const _SelectableAccountTile({
+    required this.account,
+    required this.currentAccount,
+  });
 
   final Account account;
+  final Account? currentAccount;
 
   @override
   Widget build(BuildContext context) {

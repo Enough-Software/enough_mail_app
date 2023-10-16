@@ -10,6 +10,7 @@ import '../account/provider.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
+import '../mail/model.dart';
 import '../models/compose_data.dart';
 import '../models/date_sectioned_message_source.dart';
 import '../models/message.dart';
@@ -141,6 +142,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   @override
   Widget build(BuildContext context) {
     // print('parent name: ${widget.messageSource.parentName}');
+    final settings = ref.watch(settingsProvider);
     final theme = Theme.of(context);
     final localizations = context.text;
     final source = _sectionedMessageSource.messageSource;
@@ -173,8 +175,11 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
             },
           )
         : (PlatformInfo.isCupertino)
-            ? Text(source.name ?? '')
-            : BaseTitle(title: source.name ?? '', subtitle: source.description);
+            ? Text(source.localizedName(localizations, settings))
+            : BaseTitle(
+                title: source.localizedName(localizations, settings),
+                subtitle: source.description,
+              );
 
     final appBarActions = [
       if (_isInSearchMode && _hasSearchInput)
@@ -338,7 +343,8 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                         padding: const EdgeInsets.all(8),
                         child: Text(
                           localizations.homeLoading(
-                              source.name ?? source.description ?? ''),
+                            source.name ?? source.description ?? '',
+                          ),
                         ),
                       ),
                     ),
@@ -350,6 +356,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                 return WillPopScope(
                   onWillPop: () {
                     switchVisualization(_Visualization.list);
+
                     return Future.value(false);
                   },
                   child: MessageStack(messageSource: source),
@@ -363,8 +370,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                 onWillPop: () {
                   if (_isInSelectionMode) {
                     leaveSelectionMode();
+
                     return Future.value(false);
                   }
+
                   return Future.value(true);
                 },
                 child: RefreshIndicator(
@@ -414,6 +423,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                               }
                               index--;
                             }
+
                             return FutureBuilder<SectionElement>(
                               future:
                                   _sectionedMessageSource.getElementAt(index),
@@ -872,13 +882,17 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         final notification =
             localizations.multipleMovedToArchive(_selectedMessages.length);
         await source.moveMessagesToFlag(
-            _selectedMessages, MailboxFlag.archive, notification);
+          _selectedMessages,
+          MailboxFlag.archive,
+          notification,
+        );
         break;
       case _MultipleChoice.viewInSafeMode:
         if (_selectedMessages.isNotEmpty) {
-          await locator<NavigationService>().push(Routes.mailDetails,
-              arguments:
-                  DisplayMessageArguments(_selectedMessages.first, true));
+          await locator<NavigationService>().push(
+            Routes.mailDetails,
+            arguments: DisplayMessageArguments(_selectedMessages.first, true),
+          );
         }
         endSelectionMode = false;
         leaveSelectionMode();
@@ -909,7 +923,8 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   }
 
   Future<void> forwardAttachmentsLike(
-      Future? Function(Message, MessageBuilder) loader) async {
+    Future? Function(Message, MessageBuilder) loader,
+  ) async {
     final builder = MessageBuilder();
     final fromAddresses = <MailAddress>[];
     final subjects = <String>[];
@@ -944,13 +959,16 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     }
     final composeFuture = futures.isEmpty ? null : Future.wait(futures);
     final composeData = ComposeData(
-        _selectedMessages, builder, ComposeAction.forward,
-        future: composeFuture);
+      _selectedMessages,
+      builder,
+      ComposeAction.forward,
+      future: composeFuture,
+    );
     await locator<NavigationService>()
         .push(Routes.mailCompose, arguments: composeData, fade: true);
   }
 
-  Future? addMessageAttachment(Message message, MessageBuilder builder) {
+  Future<void> addMessageAttachment(Message message, MessageBuilder builder) {
     final mime = message.mimeMessage;
     if (mime.mimeData == null) {
       return message.source.fetchMessageContents(message).then((value) {
@@ -959,7 +977,8 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     } else {
       builder.addMessagePart(mime);
     }
-    return null;
+
+    return Future.value();
   }
 
   Future? addAttachments(Message message, MessageBuilder builder) {
