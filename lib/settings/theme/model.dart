@@ -145,6 +145,7 @@ Color _colorFromJson(Map<String, dynamic> json) {
 }
 
 //// The actually applied theme data
+@immutable
 class ThemeSettingsData {
   /// Creates the theme data
   const ThemeSettingsData({
@@ -165,4 +166,15 @@ class ThemeSettingsData {
 
   /// The (material) theme mode
   final ThemeMode themeMode;
+
+  @override
+  int get hashCode =>
+      darkTheme.hashCode ^ lightTheme.hashCode ^ themeMode.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ThemeSettingsData &&
+      other.darkTheme == darkTheme &&
+      other.lightTheme == lightTheme &&
+      other.themeMode == themeMode;
 }
