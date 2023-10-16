@@ -8,6 +8,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:enough_text_editor/enough_text_editor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -42,6 +43,95 @@ enum _OverflowMenuChoice {
 }
 
 enum _Autofocus { to, subject, text }
+
+/// A dropdown to select the sender
+class SenderDropdown extends HookConsumerWidget {
+  /// Creates a new [SenderDropdown] with the given [onChanged]
+  const SenderDropdown({
+    super.key,
+    required this.onChanged,
+    this.from,
+  });
+
+  /// Callback when the selected sender changes
+  final ValueChanged<Sender> onChanged;
+
+  /// Optional list of from sender addresses
+  final List<MailAddress>? from;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // TODO(RV): consider adding first from as sender
+    final senders = ref.watch(sendersProvider);
+
+    RealAccount getCurrentAccount() {
+      final providedCurrentAccount = ref.read(currentAccountProvider);
+
+      return providedCurrentAccount is RealAccount
+          ? providedCurrentAccount
+          : (providedCurrentAccount is UnifiedAccount
+              ? providedCurrentAccount.accounts.first
+              : ref.read(realAccountsProvider).first);
+    }
+
+    Sender getInitialSender() {
+      final from = this.from;
+      if (from != null && from.isNotEmpty) {
+        final senderEmail = from.first.email.toLowerCase();
+        final sender = senders.firstWhereOrNull(
+          (s) => s.address.email.toLowerCase() == senderEmail,
+        );
+        if (sender != null) {
+          return sender;
+        }
+      }
+      final defaultSender = ref.read(settingsProvider).defaultSender;
+      if (defaultSender != null) {
+        final senderEmail = defaultSender.email.toLowerCase();
+        final sender = senders.firstWhereOrNull(
+          (s) => s.address.email.toLowerCase() == senderEmail,
+        );
+        if (sender != null) {
+          return sender;
+        }
+      }
+      final account = getCurrentAccount();
+      final senderEmail = account.fromAddress.email.toLowerCase();
+      final sender = senders.firstWhereOrNull(
+        (s) => s.address.email.toLowerCase() == senderEmail,
+      );
+      if (sender != null) {
+        return sender;
+      }
+
+      return senders.first;
+    }
+
+    final senderState = useState(getInitialSender());
+
+    return PlatformDropdownButton<Sender>(
+      items: senders
+          .map(
+            (s) => DropdownMenuItem<Sender>(
+              value: s,
+              child: Text(
+                s.toString(),
+                overflow: TextOverflow.fade,
+              ),
+            ),
+          )
+          .toList(),
+      onChanged: (s) async {
+        if (s != null) {
+          senderState.value = s;
+          onChanged(s);
+        }
+      },
+      value: senderState.value,
+      hint: Text(context.text.composeSenderHint),
+    );
+  }
+}
 
 /// Compose a new email message
 class ComposeScreen extends ConsumerStatefulWidget {
@@ -90,9 +180,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         : (_subjectController.text.isEmpty)
             ? _Autofocus.subject
             : _Autofocus.text;
-    _senders = ref.watch(sendersProvider);
-    final realAccounts = ref.watch(realAccountsProvider);
-    final providedCurrentAccount = ref.watch(currentAccountProvider);
+    _senders = ref.read(sendersProvider);
+    final realAccounts = ref.read(realAccountsProvider);
+    final providedCurrentAccount = ref.read(currentAccountProvider);
 
     final currentAccount = providedCurrentAccount is RealAccount
         ? providedCurrentAccount
@@ -522,46 +612,49 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                       localizations.detailsHeaderFrom,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
-                    PlatformDropdownButton<Sender>(
-                      //isExpanded: true,
-                      items: _senders
-                          .map(
-                            (s) => DropdownMenuItem<Sender>(
-                              value: s,
-                              child: Text(
-                                s.toString(),
-                                overflow: TextOverflow.fade,
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (s) async {
-                        if (s != null) {
-                          final builder = widget.data.messageBuilder
-                            ..from = [s.address];
-                          final lastSignature = _signature;
-                          _from = s;
-                          final newSignature = _signature;
-                          if (newSignature != lastSignature) {
-                            await _htmlEditorApi?.replaceAll(
-                              lastSignature,
-                              newSignature,
-                            );
-                          }
-                          if (_isReadReceiptRequested) {
-                            builder.requestReadReceipt(
-                              recipient: _from.address,
-                            );
-                          }
-                          setState(() {
-                            _realAccount = s.account;
-                          });
-
-                          await _checkAccountContactManager(_from.account);
+                    SenderDropdown(
+                      from: widget.data.messageBuilder.from,
+                      onChanged:
+                          // PlatformDropdownButton<Sender>(
+                          //   //isExpanded: true,
+                          //   items: _senders
+                          //       .map(
+                          //         (s) => DropdownMenuItem<Sender>(
+                          //           value: s,
+                          //           child: Text(
+                          //             s.toString(),
+                          //             overflow: TextOverflow.fade,
+                          //           ),
+                          //         ),
+                          //       )
+                          //       .toList(),
+                          //   onChanged: (s) async {
+                          //     if (s != null) {
+                          (s) {
+                        final builder = widget.data.messageBuilder
+                          ..from = [s.address];
+                        final lastSignature = _signature;
+                        _from = s;
+                        final newSignature = _signature;
+                        if (newSignature != lastSignature) {
+                          _htmlEditorApi?.replaceAll(
+                            lastSignature,
+                            newSignature,
+                          );
                         }
+                        if (_isReadReceiptRequested) {
+                          builder.requestReadReceipt(
+                            recipient: _from.address,
+                          );
+                        }
+                        setState(() {
+                          _realAccount = s.account;
+                        });
+
+                        _checkAccountContactManager(_from.account);
                       },
-                      value: _from,
-                      hint: Text(localizations.composeSenderHint),
+                      // value: _from,
+                      // hint: Text(localizations.composeSenderHint),
                     ),
                     RecipientInputField(
                       contactManager: _from.account.contactManager,
