@@ -33,15 +33,6 @@ import '../widgets/button_text.dart';
 import '../widgets/editor_extensions.dart';
 import '../widgets/recipient_input_field.dart';
 
-class ComposeScreen extends ConsumerStatefulWidget {
-  const ComposeScreen({super.key, required this.data});
-
-  final ComposeData data;
-
-  @override
-  ConsumerState<ComposeScreen> createState() => _ComposeScreenState();
-}
-
 enum _OverflowMenuChoice {
   showSourceCode,
   saveAsDraft,
@@ -51,6 +42,18 @@ enum _OverflowMenuChoice {
 }
 
 enum _Autofocus { to, subject, text }
+
+/// Compose a new email message
+class ComposeScreen extends ConsumerStatefulWidget {
+  /// Creates a new [ComposeScreen] with the given [ComposeData
+  const ComposeScreen({super.key, required this.data});
+
+  /// The initial data for composing the message
+  final ComposeData data;
+
+  @override
+  ConsumerState<ComposeScreen> createState() => _ComposeScreenState();
+}
 
 class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   late List<MailAddress> _toRecipients;
@@ -270,12 +273,14 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         final multipartAlternativeBuilder = mb.hasAttachments
             ? mb.getPart(MediaSubtype.multipartAlternative, recursive: false) ??
                 mb.addPart(
-                    mediaSubtype: MediaSubtype.multipartAlternative,
-                    insert: true)
+                  mediaSubtype: MediaSubtype.multipartAlternative,
+                  insert: true,
+                )
             : mb;
         if (!mb.hasAttachments) {
           mb.setContentType(
-              MediaType.fromSubtype(MediaSubtype.multipartAlternative));
+            MediaType.fromSubtype(MediaSubtype.multipartAlternative),
+          );
         }
         final plainTextBuilder = multipartAlternativeBuilder.getTextPlainPart();
         if (plainTextBuilder != null) {
@@ -388,9 +393,10 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         }
         try {
           await mailClient.store(
-              MessageSequence.fromMessage(originalMessage.mimeMessage),
-              originalMessage.mimeMessage.flags!,
-              action: StoreAction.replace);
+            MessageSequence.fromMessage(originalMessage.mimeMessage),
+            originalMessage.mimeMessage.flags!,
+            action: StoreAction.replace,
+          );
         } catch (e, s) {
           if (kDebugMode) {
             print('Unable to update message flags: $e $s'); // otherwise ignore
@@ -402,10 +408,11 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       // delete draft message:
       try {
         final originalMessage = widget.data.originalMessage!;
-        final source = originalMessage.source;
-        source.removeFromCache(originalMessage);
-        await mailClient.flagMessage(originalMessage.mimeMessage,
-            isDeleted: true);
+        originalMessage.source.removeFromCache(originalMessage);
+        await mailClient.flagMessage(
+          originalMessage.mimeMessage,
+          isDeleted: true,
+        );
       } catch (e, s) {
         if (kDebugMode) {
           print('Unable to update message flags: $e $s'); // otherwise ignore
@@ -485,8 +492,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                     if (_composeMode == ComposeMode.html)
                       PlatformPopupMenuItem<_OverflowMenuChoice>(
                         value: _OverflowMenuChoice.convertToPlainTextEditor,
-                        child: Text(localizations
-                            .composeConvertToPlainTextEditorAction),
+                        child: Text(
+                          localizations.composeConvertToPlainTextEditorAction,
+                        ),
                       )
                     else
                       PlatformPopupMenuItem<_OverflowMenuChoice>(
