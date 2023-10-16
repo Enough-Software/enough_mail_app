@@ -1635,7 +1635,7 @@ class _RealSourceProviderElement
   Mailbox? get mailbox => (origin as RealSourceProvider).mailbox;
 }
 
-String _$mailClientSourceHash() => r'd9c97325207816d3dadefe6e6afee06707af88b5';
+String _$mailClientSourceHash() => r'7ac0dcba26568bfa298f314958e433db9ce41de5';
 
 abstract class _$MailClientSource extends BuildlessNotifier<MailClient> {
   late final RealAccount account;
