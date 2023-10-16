@@ -1,9 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
+import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../account/model.dart';
 import '../account/provider.dart';
+import '../app_lifecycle/provider.dart';
 import '../models/async_mime_source.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
@@ -201,17 +203,34 @@ Future<AsyncMimeSource> realMimeSource(
 /// Provides mail clients
 @Riverpod(keepAlive: true)
 class MailClientSource extends _$MailClientSource {
+  MailClient? _existingClient;
+
   @override
   MailClient build({
     required RealAccount account,
     Mailbox? mailbox,
-  }) =>
-      EmailService.instance.createMailClient(
-        account.mailAccount,
-        (mailAccount) => ref
-            .watch(realAccountsProvider.notifier)
-            .updateMailAccount(account, mailAccount),
-      );
+  }) {
+    final isResumed = ref.watch(appLifecycleStateProvider.select(
+      (value) => value == AppLifecycleState.resumed,
+    ));
+    final client = _existingClient ??
+        EmailService.instance.createMailClient(
+          account.mailAccount,
+          (mailAccount) => ref
+              .watch(realAccountsProvider.notifier)
+              .updateMailAccount(account, mailAccount),
+        );
+    final existingClient = _existingClient;
+    if (existingClient != null) {
+      if (isResumed) {
+        existingClient.resume();
+      }
+    } else {
+      _existingClient = client;
+    }
+
+    return client;
+  }
 
   /// Creates a new mailbox with the given [mailboxName]
   Future<void> createMailbox(

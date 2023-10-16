@@ -29,7 +29,9 @@ void main() {
   );
 }
 
+/// Runs the app
 class MailyApp extends HookConsumerWidget {
+  /// Creates a new app
   const MailyApp({super.key});
 
   @override
@@ -39,7 +41,7 @@ class MailyApp extends HookConsumerWidget {
       ref.read(appLifecycleStateProvider.notifier).state = current;
     });
 
-    final themeSettingsData = ref.watch(themeProvider);
+    final themeSettingsData = ref.watch(themeFinderProvider(context: context));
     final languageTag =
         ref.watch(settingsProvider.select((settings) => settings.languageTag));
 
@@ -105,9 +107,6 @@ class _InitializationScreen extends ConsumerState<InitializationScreen> {
 
   Future<void> _initApp() async {
     await ref.read(settingsProvider.notifier).init();
-    if (context.mounted) {
-      ref.read(themeProvider.notifier).init(context);
-    }
     await ref.read(realAccountsProvider.notifier).init();
 
     final settings = ref.read(settingsProvider);
