@@ -875,7 +875,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   void _returnToCompose() {
     final currentContext = Routes.navigatorKey.currentContext;
     if (currentContext != null && currentContext.mounted) {
-      context.pushNamed(
+      currentContext.pushNamed(
         Routes.mailCompose,
         extra: _resumeComposeData,
       );
