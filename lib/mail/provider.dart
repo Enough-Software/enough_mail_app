@@ -130,13 +130,13 @@ class RealSource extends _$RealSource implements MimeSourceSubscriber {
   @override
   void onMailFlagsUpdated(MimeMessage mime, AsyncMimeSource source) {
     if (mime.isSeen) {
-      NotificationService.instance.cancelNotificationForMail(mime);
+      NotificationService.instance.cancelNotificationForMime(mime);
     }
   }
 
   @override
   void onMailVanished(MimeMessage mime, AsyncMimeSource source) {
-    NotificationService.instance.cancelNotificationForMail(mime);
+    NotificationService.instance.cancelNotificationForMime(mime);
   }
 }
 

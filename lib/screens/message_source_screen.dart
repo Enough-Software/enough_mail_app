@@ -4,6 +4,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/provider.dart';
@@ -20,7 +21,6 @@ import '../notification/service.dart';
 import '../routes.dart';
 import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
-import '../services/navigation_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../settings/provider.dart';
 import '../util/localized_dialog_helper.dart';
@@ -132,8 +132,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     }
     final search = MailSearch(query, SearchQueryType.allTextHeaders);
     final searchSource = _sectionedMessageSource.messageSource.search(search);
-    locator<NavigationService>()
-        .push(Routes.messageSource, arguments: searchSource);
+    context.pushNamed(Routes.messageSource, extra: searchSource);
     setState(() {
       _isInSearchMode = false;
     });
@@ -299,9 +298,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                   rightAction: PlatformIconButton(
                     //TODO use CupertinoIcons.create once it's not buggy anymore
                     icon: const Icon(CupertinoIcons.pen),
-                    onPressed: () => locator<NavigationService>().push(
+                    onPressed: () => context.pushNamed(
                       Routes.mailCompose,
-                      arguments: ComposeData(
+                      extra: ComposeData(
                         null,
                         MessageBuilder(),
                         ComposeAction.newMessage,
@@ -888,11 +887,14 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         );
         break;
       case _MultipleChoice.viewInSafeMode:
-        if (_selectedMessages.isNotEmpty) {
-          await locator<NavigationService>().push(
+        if (_selectedMessages.isNotEmpty && context.mounted) {
+          unawaited(context.pushNamed(
             Routes.mailDetails,
-            arguments: DisplayMessageArguments(_selectedMessages.first, true),
-          );
+            extra: _selectedMessages.first,
+            queryParameters: {
+              Routes.queryParameterBlockExternalContent: 'true',
+            },
+          ));
         }
         endSelectionMode = false;
         leaveSelectionMode();
@@ -964,8 +966,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       ComposeAction.forward,
       future: composeFuture,
     );
-    await locator<NavigationService>()
-        .push(Routes.mailCompose, arguments: composeData, fade: true);
+    unawaited(context.pushNamed(Routes.mailCompose, extra: composeData));
   }
 
   Future<void> addMessageAttachment(Message message, MessageBuilder builder) {
@@ -1053,7 +1054,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     setState(() {
       _isInSelectionMode = false;
     });
-    locator<NavigationService>().pop(); // alert
+    context.pop(); // alert
     final source = _sectionedMessageSource.messageSource;
     final localizations = locator<I18nService>().localizations;
     final account = widget.messageSource.account;
@@ -1095,12 +1096,14 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         //message.updateMime(mime);
         final builder = MessageBuilder.prepareFromDraft(mime);
         final data = ComposeData([message], builder, ComposeAction.newMessage);
-        await locator<NavigationService>()
-            .push(Routes.mailCompose, arguments: data);
+        if (context.mounted) {
+          unawaited(context.pushNamed(Routes.mailCompose, extra: data));
+        }
       } else {
         // move to mail details:
-        await locator<NavigationService>()
-            .push(Routes.mailDetails, arguments: message);
+        if (context.mounted) {
+          unawaited(context.pushNamed(Routes.mailDetails, extra: message));
+        }
       }
     }
   }

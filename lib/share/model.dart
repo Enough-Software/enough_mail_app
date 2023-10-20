@@ -4,10 +4,12 @@ import 'dart:typed_data';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_mail/enough_mail.dart';
 
+/// State of a shared data item
 enum SharedDataAddState { added, notAdded }
 
+/// Result of adding a shared data item
 class SharedDataAddResult {
-
+  /// Creates a new [SharedDataAddResult]
   const SharedDataAddResult(this.state, [this.details]);
   static const added = SharedDataAddResult(SharedDataAddState.added);
   static const notAdded = SharedDataAddResult(SharedDataAddState.notAdded);
@@ -15,9 +17,12 @@ class SharedDataAddResult {
   final dynamic details;
 }
 
+/// Shared data item
 abstract class SharedData {
-
+  /// Creates a new [SharedData]
   SharedData(this.mediaType);
+
+  /// The media type of the item, e.g. `image/jpeg`
   final MediaType mediaType;
 
   Future<SharedDataAddResult> addToMessageBuilder(MessageBuilder builder);
@@ -57,6 +62,7 @@ class SharedBinary extends SharedData {
   Future<SharedDataAddResult> addToMessageBuilder(
       MessageBuilder builder) async {
     builder.addBinary(data!, mediaType, filename: filename);
+
     return SharedDataAddResult.added;
   }
 
@@ -64,16 +70,24 @@ class SharedBinary extends SharedData {
   Future<SharedDataAddResult> addToEditor(HtmlEditorApi editorApi) async {
     if (mediaType.isImage) {
       await editorApi.insertImageData(
-          data!, mediaType.sub.mediaType.toString());
+        data!,
+        mediaType.sub.mediaType.toString(),
+      );
+
       return SharedDataAddResult.added;
     }
+
     return SharedDataAddResult.notAdded;
   }
 }
 
 class SharedText extends SharedData {
-  SharedText(this.text, MediaType? mediaType, {this.subject})
-      : super(mediaType ?? MediaType.textPlain);
+  SharedText(
+    this.text,
+    MediaType? mediaType, {
+    this.subject,
+  }) : super(mediaType ?? MediaType.textPlain);
+
   final String text;
   final String? subject;
 

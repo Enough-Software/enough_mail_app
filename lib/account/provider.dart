@@ -160,3 +160,16 @@ bool hasAccountWithError(
 /// Provides the locally current active account
 @riverpod
 Account? currentAccount(CurrentAccountRef ref) => null;
+
+/// Provides the current real account
+@riverpod
+RealAccount? currentRealAccount(CurrentRealAccountRef ref) {
+  final realAccounts = ref.watch(realAccountsProvider);
+  final providedCurrentAccount = ref.watch(currentAccountProvider);
+
+  return providedCurrentAccount is RealAccount
+      ? providedCurrentAccount
+      : (providedCurrentAccount is UnifiedAccount
+          ? providedCurrentAccount.accounts.first
+          : (realAccounts.isNotEmpty ? realAccounts.first : null));
+}

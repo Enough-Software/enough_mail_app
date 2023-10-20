@@ -2,6 +2,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../localization/extension.dart';
 import '../locator.dart';
@@ -11,7 +12,6 @@ import '../routes.dart';
 import '../screens/media_screen.dart';
 import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
-import '../services/navigation_service.dart';
 import 'button_text.dart';
 import 'ical_interactive_media.dart';
 
@@ -203,16 +203,16 @@ class _AttachmentChipState extends State<AttachmentChip> {
       if (mime != null) {
         final message = Message.embedded(mime, widget.message);
 
-        return locator<NavigationService>().push(
+        return context.pushNamed(
           Routes.mailDetails,
-          arguments: message,
+          extra: message,
         );
       }
     }
 
-    return locator<NavigationService>().push(
+    return context.pushNamed(
       Routes.interactiveMedia,
-      arguments: media,
+      extra: media,
     );
   }
 

@@ -136,28 +136,38 @@ class NotificationService {
     MimeMessage mimeMessage,
     String accountEmail,
   ) {
-    if (kDebugMode) {
-      logger.d(
-        'sending notification for mime ${mimeMessage.decodeSubject()}'
-        ' with GUID ${mimeMessage.guid}',
-      );
-    }
-    final notificationId = mimeMessage.guid!;
-    var from = mimeMessage.from?.isNotEmpty ?? false
-        ? mimeMessage.from!.first.personalName
-        : mimeMessage.sender?.personalName;
-    if (from == null || from.isEmpty) {
-      from = mimeMessage.from?.isNotEmpty ?? false
-          ? mimeMessage.from!.first.email
+    logger.d(
+      'sending notification for mime ${mimeMessage.decodeSubject()}'
+      ' with GUID ${mimeMessage.guid}',
+    );
+    String retrieveFromName() {
+      final mimeFrom = mimeMessage.from;
+      final personalName = mimeFrom != null && mimeFrom.isNotEmpty
+          ? mimeFrom.first.personalName
+          : mimeMessage.sender?.personalName;
+      if (personalName != null && personalName.isNotEmpty) {
+        return personalName;
+      }
+      final email = mimeFrom != null && mimeFrom.isNotEmpty
+          ? mimeFrom.first.email
           : mimeMessage.sender?.email;
+      if (email != null && email.isNotEmpty) {
+        return email;
+      }
+
+      return '';
     }
+
+    final notificationId = mimeMessage.guid!;
+    final from = retrieveFromName();
+
     final subject = mimeMessage.decodeSubject();
     final payload = MailNotificationPayload.fromMail(mimeMessage, accountEmail);
     final payloadText = _messagePayloadStart + jsonEncode(payload.toJson());
 
     return sendLocalNotification(
       notificationId,
-      from!,
+      from,
       subject,
       payloadText: payloadText,
       when: mimeMessage.decodeDate(),
@@ -172,7 +182,7 @@ class NotificationService {
   //   return (email?.hashCode ?? 0) + uid;
   // }
 
-  Future sendLocalNotification(
+  Future<void> sendLocalNotification(
     int id,
     String title,
     String? text, {
@@ -180,6 +190,7 @@ class NotificationService {
     DateTime? when,
     bool channelShowBadge = true,
   }) async {
+    logger.d('sendLocalNotification: $id: $title $text');
     AndroidNotificationDetails? androidPlatformChannelSpecifics;
     DarwinNotificationDetails? iosPlatformChannelSpecifics;
     if (Platform.isAndroid) {
@@ -208,11 +219,10 @@ class NotificationService {
         .show(id, title, text, platformChannelSpecifics, payload: payloadText);
   }
 
-  void cancelNotificationForMailMessage(maily.Message message) {
-    cancelNotificationForMail(message.mimeMessage);
-  }
+  void cancelNotificationForMessage(maily.Message message) =>
+      cancelNotificationForMime(message.mimeMessage);
 
-  void cancelNotificationForMail(MimeMessage mimeMessage) {
+  void cancelNotificationForMime(MimeMessage mimeMessage) {
     final guid = mimeMessage.guid;
     if (guid != null) {
       cancelNotification(guid);

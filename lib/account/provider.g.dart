@@ -375,6 +375,24 @@ final currentAccountProvider = AutoDisposeProvider<Account?>.internal(
 );
 
 typedef CurrentAccountRef = AutoDisposeProviderRef<Account?>;
+String _$currentRealAccountHash() =>
+    r'dd79b65ff2ea824e117c4f13416c6b6993fa4a86';
+
+/// Provides the current real account
+///
+/// Copied from [currentRealAccount].
+@ProviderFor(currentRealAccount)
+final currentRealAccountProvider = AutoDisposeProvider<RealAccount?>.internal(
+  currentRealAccount,
+  name: r'currentRealAccountProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentRealAccountHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef CurrentRealAccountRef = AutoDisposeProviderRef<RealAccount?>;
 String _$realAccountsHash() => r'665041d146a86069048493163e33d76a4896d3cb';
 
 /// Provides all real email accounts

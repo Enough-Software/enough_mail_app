@@ -173,14 +173,14 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
 
   Future<void> _onStepProgressed(int step) async {
     _progressedSteps = step;
-    switch (step) {
-      case _stepEmail + 1:
+    switch (step - 1) {
+      case _stepEmail:
         await _discover(_emailController.text);
         break;
-      case _stepPassword + 1:
+      case _stepPassword:
         await _verifyAccount();
         break;
-      case _stepAccountSetup + 1:
+      case _stepAccountSetup:
         await _finalizeAccount();
         break;
     }

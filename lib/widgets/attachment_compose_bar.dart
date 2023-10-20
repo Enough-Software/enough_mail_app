@@ -4,7 +4,9 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/app_localizations.g.dart';
@@ -15,7 +17,6 @@ import '../models/message.dart';
 import '../routes.dart';
 import '../services/icon_service.dart';
 import '../services/key_service.dart';
-import '../services/navigation_service.dart';
 import '../util/http_helper.dart';
 import '../util/localized_dialog_helper.dart';
 import 'ical_composer.dart';
@@ -168,23 +169,29 @@ class AddAttachmentPopupButton extends ConsumerWidget {
             changed = await addAttachmentFile(fileType: FileType.audio);
             break;
           case 4: // location
-            final result =
-                await locator<NavigationService>().push(Routes.locationPicker);
-            if (result != null) {
-              composeData.messageBuilder.addBinary(
-                result,
-                MediaSubtype.imagePng.mediaType,
-                filename: 'location.jpg',
-              );
-              changed = true;
+            if (context.mounted) {
+              final result =
+                  await context.pushNamed<Uint8List>(Routes.locationPicker);
+              if (result != null) {
+                composeData.messageBuilder.addBinary(
+                  result,
+                  MediaSubtype.imagePng.mediaType,
+                  filename: 'location.jpg',
+                );
+                changed = true;
+              }
             }
             break;
           case 5: // gif / sticker / emoji file
-            changed = await addAttachmentGif(context, localizations);
+            if (context.mounted) {
+              changed = await addAttachmentGif(context, localizations);
+            }
             break;
           case 6: // appointment
-            changed =
-                await addAttachmentAppointment(context, ref, localizations);
+            if (context.mounted) {
+              changed =
+                  await addAttachmentAppointment(context, ref, localizations);
+            }
             break;
         }
         if (changed) {
@@ -362,9 +369,9 @@ class ComposeAttachment extends ConsumerWidget {
               final mime = MimeMessage.parseFromData(attachment.data!);
               final message = Message.embedded(mime, parentMessage);
 
-              return locator<NavigationService>().push(
+              return context.pushNamed(
                 Routes.mailDetails,
-                arguments: message,
+                extra: message,
               );
             }
             if (attachment.mediaType.sub == MediaSubtype.applicationIcs ||
@@ -380,12 +387,12 @@ class ComposeAttachment extends ConsumerWidget {
                 attachment.part.text = update.toString();
               }
 
-              return;
+              return Future.value();
             }
 
-            return locator<NavigationService>().push(
+            return context.pushNamed(
               Routes.interactiveMedia,
-              arguments: interactiveMedia,
+              extra: interactiveMedia,
             );
           },
           contextMenuEntries: [

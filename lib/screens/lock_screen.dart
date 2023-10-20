@@ -1,12 +1,12 @@
 import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
 import '../services/biometrics_service.dart';
-import '../services/navigation_service.dart';
 import 'base.dart';
 
 class LockScreen extends StatelessWidget {
@@ -45,9 +45,9 @@ class LockScreen extends StatelessWidget {
       );
 
   Future<void> _authenticate(BuildContext context) async {
-    final didAuthencate = await locator<BiometricsService>().authenticate();
-    if (didAuthencate) {
-      locator<NavigationService>().pop();
+    final didAuthenticate = await locator<BiometricsService>().authenticate();
+    if (didAuthenticate && context.mounted) {
+      context.pop();
     }
   }
 }

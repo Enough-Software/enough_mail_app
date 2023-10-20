@@ -21,12 +21,11 @@ import '../locator.dart';
 import '../mail/provider.dart';
 import '../models/compose_data.dart';
 import '../models/sender.dart';
-import '../models/shared_data.dart';
 import '../routes.dart';
-import '../services/app_service.dart';
-import '../services/i18n_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../settings/provider.dart';
+import '../share/model.dart';
+import '../share/provider.dart';
 import '../util/localized_dialog_helper.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/attachment_compose_bar.dart';
@@ -64,16 +63,6 @@ class SenderDropdown extends HookConsumerWidget {
     // TODO(RV): consider adding first from as sender
     final senders = ref.watch(sendersProvider);
 
-    RealAccount getCurrentAccount() {
-      final providedCurrentAccount = ref.read(currentAccountProvider);
-
-      return providedCurrentAccount is RealAccount
-          ? providedCurrentAccount
-          : (providedCurrentAccount is UnifiedAccount
-              ? providedCurrentAccount.accounts.first
-              : ref.read(realAccountsProvider).first);
-    }
-
     Sender getInitialSender() {
       final from = this.from;
       if (from != null && from.isNotEmpty) {
@@ -95,13 +84,15 @@ class SenderDropdown extends HookConsumerWidget {
           return sender;
         }
       }
-      final account = getCurrentAccount();
-      final senderEmail = account.fromAddress.email.toLowerCase();
-      final sender = senders.firstWhereOrNull(
-        (s) => s.address.email.toLowerCase() == senderEmail,
-      );
-      if (sender != null) {
-        return sender;
+      final account = ref.read(currentRealAccountProvider);
+      if (account != null) {
+        final senderEmail = account.fromAddress.email.toLowerCase();
+        final sender = senders.firstWhereOrNull(
+          (s) => s.address.email.toLowerCase() == senderEmail,
+        );
+        if (sender != null) {
+          return sender;
+        }
       }
 
       return senders.first;
@@ -167,7 +158,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
 
   @override
   void initState() {
-    locator<AppService>().onSharedData = _onSharedData;
+    onSharedData = _onSharedData;
     _composeMode = widget.data.composeMode;
     final mb = widget.data.messageBuilder;
     _toRecipients = mb.to ?? [];
@@ -181,14 +172,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
             ? _Autofocus.subject
             : _Autofocus.text;
     _senders = ref.read(sendersProvider);
-    final realAccounts = ref.read(realAccountsProvider);
-    final providedCurrentAccount = ref.read(currentAccountProvider);
-
-    final currentAccount = providedCurrentAccount is RealAccount
-        ? providedCurrentAccount
-        : (providedCurrentAccount is UnifiedAccount
-            ? providedCurrentAccount.accounts.first
-            : realAccounts.first);
+    final currentAccount = ref.read(currentRealAccountProvider)!;
     _realAccount = currentAccount;
     final defaultSender = ref.read(settingsProvider).defaultSender;
     mb.from ??= [defaultSender ?? currentAccount.fromAddress];
@@ -204,7 +188,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     }
     if (from == null) {
       from = Sender(mb.from!.first, currentAccount);
-      _senders.insert(0, from);
+      _senders = [from, ..._senders];
     }
     _from = from;
     _checkAccountContactManager(_from.account);
@@ -227,7 +211,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   void dispose() {
     _subjectController.dispose();
     _plainTextController.dispose();
-    locator<AppService>().onSharedData = null;
+    onSharedData = null;
     super.dispose();
   }
 
@@ -254,8 +238,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       }
     } else {
       const blockExternalImages = false;
-      final emptyMessageText =
-          locator<I18nService>().localizations.composeEmptyMessage;
+      final emptyMessageText = context.text.composeEmptyMessage;
       const maxImageWidth = 300;
       if (widget.data.action == ComposeAction.newMessage) {
         // continue with draft:
@@ -612,49 +595,50 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                       localizations.detailsHeaderFrom,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
-                    SenderDropdown(
-                      from: widget.data.messageBuilder.from,
-                      onChanged:
-                          // PlatformDropdownButton<Sender>(
-                          //   //isExpanded: true,
-                          //   items: _senders
-                          //       .map(
-                          //         (s) => DropdownMenuItem<Sender>(
-                          //           value: s,
-                          //           child: Text(
-                          //             s.toString(),
-                          //             overflow: TextOverflow.fade,
-                          //           ),
-                          //         ),
-                          //       )
-                          //       .toList(),
-                          //   onChanged: (s) async {
-                          //     if (s != null) {
-                          (s) {
-                        final builder = widget.data.messageBuilder
-                          ..from = [s.address];
-                        final lastSignature = _signature;
-                        _from = s;
-                        final newSignature = _signature;
-                        if (newSignature != lastSignature) {
-                          _htmlEditorApi?.replaceAll(
-                            lastSignature,
-                            newSignature,
-                          );
-                        }
-                        if (_isReadReceiptRequested) {
-                          builder.requestReadReceipt(
-                            recipient: _from.address,
-                          );
-                        }
-                        setState(() {
-                          _realAccount = s.account;
-                        });
+                    // SenderDropdown(
+                    //   from: widget.data.messageBuilder.from,
+                    //   onChanged:
+                    PlatformDropdownButton<Sender>(
+                      //isExpanded: true,
+                      items: _senders
+                          .map(
+                            (s) => DropdownMenuItem<Sender>(
+                              value: s,
+                              child: Text(
+                                s.toString(),
+                                overflow: TextOverflow.fade,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (s) async {
+                        if (s != null) {
+                          // (s) {
+                          final builder = widget.data.messageBuilder
+                            ..from = [s.address];
+                          final lastSignature = _signature;
+                          _from = s;
+                          final newSignature = _signature;
+                          if (newSignature != lastSignature) {
+                            await _htmlEditorApi?.replaceAll(
+                              lastSignature,
+                              newSignature,
+                            );
+                          }
+                          if (_isReadReceiptRequested) {
+                            builder.requestReadReceipt(
+                              recipient: _from.address,
+                            );
+                          }
+                          setState(() {
+                            _realAccount = s.account;
+                          });
 
-                        _checkAccountContactManager(_from.account);
+                          await _checkAccountContactManager(_from.account);
+                        }
                       },
-                      // value: _from,
-                      // hint: Text(localizations.composeSenderHint),
+                      value: _from,
+                      hint: Text(localizations.composeSenderHint),
                     ),
                     RecipientInputField(
                       contactManager: _from.account.contactManager,
@@ -703,7 +687,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                       ),
                       const Divider(
                         color: Colors.grey,
-                      )
+                      ),
                     ],
                   ],
                 ),
@@ -791,7 +775,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
 
   Future<void> _saveAsDraft() async {
     context.pop();
-    final localizations = locator<I18nService>().localizations;
+    final localizations = context.text;
     final mailClient = _getMailClient();
     final mime = await _buildMimeMessage(mailClient);
     try {
@@ -883,8 +867,12 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   }
 
   Future<void> _checkAccountContactManager(RealAccount account) async {
-    account.contactManager ??=
-        await ref.read(contactsLoaderProvider(account: account).future);
+    final contactManager = account.contactManager;
+    if (contactManager == null) {
+      account.contactManager =
+          await ref.read(contactsLoaderProvider(account: account).future);
+      setState(() {});
+    }
   }
 
   Future _onSharedData(List<SharedData> sharedData) {

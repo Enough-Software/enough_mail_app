@@ -2,14 +2,13 @@ import 'dart:io';
 
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart' hide WebViewConfiguration;
 
 import '../account/model.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../models/models.dart';
 import '../routes.dart';
-import '../services/navigation_service.dart';
 import 'extensions.dart';
 
 class ExtensionActionTile extends StatelessWidget {
@@ -50,32 +49,41 @@ class ExtensionActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final languageCode = context.text.localeName;
+    final icon = actionDescription.icon;
 
     return PlatformListTile(
-      leading: actionDescription.icon == null
+      leading: icon == null
           ? null
           : Image.network(
-              actionDescription.icon!,
+              icon,
               height: 24,
               width: 24,
             ),
-      title: Text(actionDescription.getLabel(languageCode)!),
+      title: Text(actionDescription.getLabel(languageCode) ?? ''),
       onTap: () {
-        final url = actionDescription.action!.url;
-        switch (actionDescription.action!.mechanism) {
+        final action = actionDescription.action;
+        if (action == null) {
+          return;
+        }
+
+        final url = action.url;
+        switch (action.mechanism) {
           case AppExtensionActionMechanism.inApp:
-            final navService = locator<NavigationService>();
-            if (!(Platform.isIOS || Platform.isMacOS)) {
-              // close app drawer:
-              navService.pop();
+            final context = Routes.navigatorKey.currentContext;
+            if (context != null) {
+              if (!(Platform.isIOS || Platform.isMacOS)) {
+                // close app drawer:
+                context.pop();
+              }
+              context.pushNamed(
+                Routes.webview,
+                extra: WebViewConfiguration(
+                  actionDescription.getLabel(languageCode),
+                  Uri.parse(url),
+                ),
+              );
             }
-            navService.push(
-              Routes.webview,
-              arguments: WebViewConfiguration(
-                actionDescription.getLabel(languageCode),
-                Uri.parse(url),
-              ),
-            );
+
             break;
           case AppExtensionActionMechanism.external:
             launchUrl(Uri.parse(url));

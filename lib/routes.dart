@@ -15,8 +15,11 @@ import 'screens/screens.dart';
 import 'settings/view/view.dart';
 import 'widgets/app_drawer.dart';
 
+/// Defines app navigation routes
 class Routes {
   Routes._();
+
+  /// The root route
   static const String _root = '/';
 
   /// Displays either the welcome screen or the mail screen
@@ -100,12 +103,20 @@ class Routes {
   ///
   /// extra: [InteractiveMediaWidget]
   static const String interactiveMedia = '/interactiveMedia';
+
+  /// Allows to pick a location
+  ///
+  /// Pops the [Uint8List] after selecting a location
   static const String locationPicker = '/locationPicker';
 
   /// Displays the source code of a message
   ///
   /// extra: [MimeMessage]
   static const String sourceCode = '/sourceCode';
+
+  /// Displays the web view based on the given configuration
+  ///
+  /// extra: [WebViewConfiguration]
   static const String webview = '/webview';
   static const String appDrawer = '/appDrawer';
   static const String lockScreen = '/lock';
@@ -349,6 +360,22 @@ class Routes {
               : const HomeScreen();
         },
       ),
+      GoRoute(
+        name: webview,
+        path: webview,
+        builder: (context, state) {
+          final configuration = state.extra;
+
+          return configuration is WebViewConfiguration
+              ? WebViewScreen(configuration: configuration)
+              : const HomeScreen();
+        },
+      ),
+      GoRoute(
+        name: locationPicker,
+        path: locationPicker,
+        builder: (context, state) => const LocationScreen(),
+      ),
     ],
   );
 }
@@ -415,11 +442,6 @@ class AppRouter {
       case Routes.mailDetails:
         if (arguments is Message) {
           page = MessageDetailsScreen(message: arguments);
-        } else if (arguments is DisplayMessageArguments) {
-          page = MessageDetailsScreen(
-            message: arguments.message,
-            blockExternalContent: arguments.blockExternalContent,
-          );
         } else {
           page = const WelcomeScreen();
         }

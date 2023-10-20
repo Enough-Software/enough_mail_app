@@ -5,14 +5,15 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlng/latlng.dart';
 import 'package:location/location.dart';
 import 'package:map/map.dart';
 
 import '../localization/extension.dart';
 import '../locator.dart';
+import '../routes.dart';
 import '../services/location_service.dart';
-import '../services/navigation_service.dart';
 import 'base.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -29,7 +30,7 @@ class _LocationScreenState extends State<LocationScreen> {
   late MapController _controller;
   Future<LocationData?>? _findLocation;
   late Offset _dragStart;
-  double _scaleStart = 1;
+  var _scaleStart = 1.0;
 
   @override
   void initState() {
@@ -74,18 +75,30 @@ class _LocationScreenState extends State<LocationScreen> {
   Future<void> _onLocationSelected() async {
     final context = _repaintBoundaryKey.currentContext;
     if (context == null) {
-      locator<NavigationService>().pop();
+      final currentContext = Routes.navigatorKey.currentContext;
+      if (currentContext != null) {
+        currentContext.pop();
+      }
+
       return;
     }
-    final boundary = context.findRenderObject()! as RenderRepaintBoundary;
+    final boundary = context.findRenderObject();
+    if (boundary is! RenderRepaintBoundary) {
+      context.pop();
+
+      return;
+    }
     final image = await boundary.toImage(pixelRatio: 3);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     final pngBytes = byteData?.buffer.asUint8List();
-    locator<NavigationService>().pop(pngBytes);
+    if (context.mounted) {
+      context.pop(pngBytes);
+    }
   }
 
   Widget _buildMap(BuildContext context, double latitude, double longitude) {
     final size = MediaQuery.of(context).size;
+
     return MapLayout(
       controller: _controller,
       builder: (context, transformer) => GestureDetector(

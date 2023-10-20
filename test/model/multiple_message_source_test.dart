@@ -1202,12 +1202,12 @@ class TestNotificationService implements NotificationService {
   }
 
   @override
-  void cancelNotificationForMail(MimeMessage mimeMessage) {
+  void cancelNotificationForMime(MimeMessage mimeMessage) {
     _cancelledNotifications++;
   }
 
   @override
-  void cancelNotificationForMailMessage(Message message) {
+  void cancelNotificationForMessage(Message message) {
     _cancelledNotifications++;
   }
 

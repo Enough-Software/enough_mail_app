@@ -3,10 +3,9 @@ import 'package:enough_ascii_art/enough_ascii_art.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../localization/extension.dart';
-import '../locator.dart';
-import '../services/navigation_service.dart';
 import '../util/localized_dialog_helper.dart';
 import 'button_text.dart';
 
@@ -108,8 +107,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
                   if (text != null && text.isNotEmpty) {
                     widget.editorApi.insertText(text);
                   }
-                  final navService = locator<NavigationService>();
-                  navService.pop();
+                  context.pop();
                 },
               ),
               const Divider(),

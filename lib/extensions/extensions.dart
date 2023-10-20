@@ -54,11 +54,12 @@ class AppExtension {
     if (map == null) {
       return null;
     }
-    var sign = map[languageCode];
-    if (sign == null && languageCode != 'en') {
-      sign = map['en'];
+    var signature = map[languageCode];
+    if (signature == null && languageCode != 'en') {
+      signature = map['en'];
     }
-    return sign;
+
+    return signature;
   }
 
   Map<String, dynamic> toJson() => _$AppExtensionToJson(this);
@@ -68,8 +69,14 @@ class AppExtension {
   static Future<List<AppExtension>> loadFor(MailAccount mailAccount) async {
     final domains = <String, Future<AppExtension?>>{};
     _addEmail(mailAccount.email, domains);
-    _addHostname(mailAccount.incoming.serverConfig.hostname!, domains);
-    _addHostname(mailAccount.outgoing.serverConfig.hostname!, domains);
+    final incomingHostname = mailAccount.incoming.serverConfig.hostname;
+    if (incomingHostname != null) {
+      _addHostname(incomingHostname, domains);
+    }
+    final outgoingHostname = mailAccount.outgoing.serverConfig.hostname;
+    if (outgoingHostname != null) {
+      _addHostname(outgoingHostname, domains);
+    }
     final allExtensions = await Future.wait(domains.values);
     final appExtensions = <AppExtension>[];
     for (final ext in allExtensions) {
@@ -77,11 +84,14 @@ class AppExtension {
         appExtensions.add(ext);
       }
     }
+
     return appExtensions;
   }
 
   static void _addEmail(
-      String email, Map<String, Future<AppExtension?>> domains) {
+    String email,
+    Map<String, Future<AppExtension?>> domains,
+  ) {
     _addDomain(email.substring(email.indexOf('@') + 1), domains);
   }
 

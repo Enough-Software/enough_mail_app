@@ -3,16 +3,15 @@ import 'dart:async';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../account/model.dart';
 import '../../account/provider.dart';
 import '../../localization/app_localizations.g.dart';
 import '../../localization/extension.dart';
-import '../../locator.dart';
 import '../../routes.dart';
 import '../../screens/base.dart';
-import '../../services/navigation_service.dart';
 import '../../widgets/button_text.dart';
 
 /// Allows to select an account for editing and to re-order the accounts
@@ -62,14 +61,15 @@ class SettingsAccountsScreen extends HookConsumerWidget {
                 PlatformListTile(
                   leading: Icon(CommonPlatformIcons.account),
                   title: Text(account.name),
-                  onTap: () => locator<NavigationService>()
-                      .push(Routes.accountEdit, arguments: account),
+                  onTap: () => context.pushNamed(
+                    Routes.accountEdit,
+                    pathParameters: {Routes.pathParameterEmail: account.email},
+                  ),
                 ),
               PlatformListTile(
                 leading: Icon(CommonPlatformIcons.add),
                 title: Text(localizations.drawerEntryAddAccount),
-                onTap: () =>
-                    locator<NavigationService>().push(Routes.accountAdd),
+                onTap: () => context.pushNamed(Routes.accountAdd),
               ),
               if (accounts.length > 1)
                 Padding(

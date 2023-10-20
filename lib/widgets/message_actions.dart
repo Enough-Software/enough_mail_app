@@ -2,6 +2,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
@@ -12,9 +13,7 @@ import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../notification/service.dart';
 import '../routes.dart';
-import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
-import '../services/navigation_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../settings/model.dart';
 import '../settings/provider.dart';
@@ -55,25 +54,25 @@ class MessageActions extends HookConsumerWidget {
     void onOverflowChoiceSelected(_OverflowMenuChoice result) {
       switch (result) {
         case _OverflowMenuChoice.reply:
-          _reply(ref);
+          _reply(context, ref);
           break;
         case _OverflowMenuChoice.replyAll:
-          _replyAll(ref);
+          _replyAll(context, ref);
           break;
         case _OverflowMenuChoice.forward:
-          _forward(ref);
+          _forward(context, ref);
           break;
         case _OverflowMenuChoice.forwardAsAttachment:
-          _forwardAsAttachment(ref);
+          _forwardAsAttachment(context, ref);
           break;
         case _OverflowMenuChoice.forwardAttachments:
-          _forwardAttachments(ref);
+          _forwardAttachments(context, ref);
           break;
         case _OverflowMenuChoice.delete:
-          _delete();
+          _delete(context);
           break;
         case _OverflowMenuChoice.inbox:
-          _moveToInbox();
+          _moveToInbox(context);
           break;
         case _OverflowMenuChoice.seen:
           _toggleSeen();
@@ -85,10 +84,10 @@ class MessageActions extends HookConsumerWidget {
           _move(context);
           break;
         case _OverflowMenuChoice.junk:
-          _moveJunk();
+          _moveJunk(context);
           break;
         case _OverflowMenuChoice.archive:
-          _moveArchive();
+          _moveArchive(context);
           break;
         case _OverflowMenuChoice.redirect:
           _redirectMessage(context, ref);
@@ -121,25 +120,25 @@ class MessageActions extends HookConsumerWidget {
               const Spacer(),
               DensePlatformIconButton(
                 icon: Icon(iconService.messageActionReply),
-                onPressed: () => _reply(ref),
+                onPressed: () => _reply(context, ref),
               ),
               DensePlatformIconButton(
                 icon: Icon(iconService.messageActionReplyAll),
-                onPressed: () => _replyAll(ref),
+                onPressed: () => _replyAll(context, ref),
               ),
               DensePlatformIconButton(
                 icon: Icon(iconService.messageActionForward),
-                onPressed: () => _forward(ref),
+                onPressed: () => _forward(context, ref),
               ),
               if (message.source.isTrash)
                 DensePlatformIconButton(
                   icon: Icon(iconService.messageActionMoveToInbox),
-                  onPressed: _moveToInbox,
+                  onPressed: () => _moveToInbox(context),
                 )
               else if (!message.isEmbedded)
                 DensePlatformIconButton(
                   icon: Icon(iconService.messageActionDelete),
-                  onPressed: _delete,
+                  onPressed: () => _delete(context),
                 ),
               PlatformPopupMenuButton<_OverflowMenuChoice>(
                 onSelected: onOverflowChoiceSelected,
@@ -304,11 +303,11 @@ class MessageActions extends HookConsumerWidget {
   //   }
   // }
 
-  void _replyAll(WidgetRef ref) {
-    _reply(ref, all: true);
+  void _replyAll(BuildContext context, WidgetRef ref) {
+    _reply(context, ref, all: true);
   }
 
-  void _reply(WidgetRef ref, {all = false}) {
+  void _reply(BuildContext context, WidgetRef ref, {all = false}) {
     final account = message.account;
 
     final builder = MessageBuilder.prepareReplyToMessage(
@@ -318,7 +317,7 @@ class MessageActions extends HookConsumerWidget {
       handlePlusAliases: account is RealAccount && account.supportsPlusAliases,
       replyAll: all,
     );
-    _navigateToCompose(ref, message, builder, ComposeAction.answer);
+    _navigateToCompose(context, ref, message, builder, ComposeAction.answer);
   }
 
   Future<void> _redirectMessage(BuildContext context, WidgetRef ref) async {
@@ -417,22 +416,22 @@ class MessageActions extends HookConsumerWidget {
     }
   }
 
-  Future<void> _delete() async {
-    locator<NavigationService>().pop();
+  Future<void> _delete(BuildContext context) async {
+    context.pop();
     await message.source.deleteMessages(
       [message],
-      locator<I18nService>().localizations.resultDeleted,
+      context.text.resultDeleted,
     );
   }
 
   void _move(BuildContext context) {
-    final localizations = locator<I18nService>().localizations;
+    final localizations = context.text;
     LocalizedDialogHelper.showWidgetDialog(
       context,
       SingleChildScrollView(
         child: MailboxTree(
           account: message.account,
-          onSelected: _moveTo,
+          onSelected: (mailbox) => _moveTo(context, mailbox),
           // TODO(RV): retrieve the current selected mailbox in a different way
           // current:  message.mailClient.selectedMailbox,
         ),
@@ -442,10 +441,11 @@ class MessageActions extends HookConsumerWidget {
     );
   }
 
-  Future<void> _moveTo(Mailbox mailbox) async {
-    locator<NavigationService>().pop(); // alert
-    locator<NavigationService>().pop(); // detail view
-    final localizations = locator<I18nService>().localizations;
+  Future<void> _moveTo(BuildContext context, Mailbox mailbox) async {
+    context
+      ..pop() // alert
+      ..pop(); // detail view
+    final localizations = context.text;
     final source = message.source;
     await source.moveMessage(
       message,
@@ -454,36 +454,45 @@ class MessageActions extends HookConsumerWidget {
     );
   }
 
-  Future<void> _moveJunk() async {
+  Future<void> _moveJunk(BuildContext context) async {
     final source = message.source;
     if (source.isJunk) {
       await source.markAsNotJunk(message);
     } else {
-      locator<NotificationService>().cancelNotificationForMailMessage(message);
+      locator<NotificationService>().cancelNotificationForMessage(message);
       await source.markAsJunk(message);
     }
-    locator<NavigationService>().pop();
+    if (context.mounted) {
+      context.pop();
+    }
   }
 
-  Future<void> _moveToInbox() async {
+  Future<void> _moveToInbox(BuildContext context) async {
     final source = message.source;
-    await source.moveMessageToFlag(message, MailboxFlag.inbox,
-        locator<I18nService>().localizations.resultMovedToInbox);
-    locator<NavigationService>().pop();
+    await source.moveMessageToFlag(
+      message,
+      MailboxFlag.inbox,
+      context.text.resultMovedToInbox,
+    );
+    if (context.mounted) {
+      context.pop();
+    }
   }
 
-  Future<void> _moveArchive() async {
+  Future<void> _moveArchive(BuildContext context) async {
     final source = message.source;
     if (source.isArchive) {
       await source.moveToInbox(message);
     } else {
-      locator<NotificationService>().cancelNotificationForMailMessage(message);
+      locator<NotificationService>().cancelNotificationForMessage(message);
       await source.archive(message);
     }
-    locator<NavigationService>().pop();
+    if (context.mounted) {
+      context.pop();
+    }
   }
 
-  void _forward(WidgetRef ref) {
+  void _forward(BuildContext context, WidgetRef ref) {
     final from = message.account.fromAddress;
     final builder = MessageBuilder.prepareForwardMessage(
       message.mimeMessage,
@@ -493,6 +502,7 @@ class MessageActions extends HookConsumerWidget {
     );
     final composeFuture = _addAttachments(message, builder);
     _navigateToCompose(
+      context,
       ref,
       message,
       builder,
@@ -501,7 +511,7 @@ class MessageActions extends HookConsumerWidget {
     );
   }
 
-  Future<void> _forwardAsAttachment(WidgetRef ref) async {
+  Future<void> _forwardAsAttachment(BuildContext context, WidgetRef ref) async {
     final message = this.message;
     final from = message.account.fromAddress;
     final mime = message.mimeMessage;
@@ -519,6 +529,7 @@ class MessageActions extends HookConsumerWidget {
       builder.addMessagePart(mime);
     }
     _navigateToCompose(
+      context,
       ref,
       message,
       builder,
@@ -527,7 +538,7 @@ class MessageActions extends HookConsumerWidget {
     );
   }
 
-  Future<void> _forwardAttachments(WidgetRef ref) async {
+  Future<void> _forwardAttachments(BuildContext context, WidgetRef ref) async {
     final message = this.message;
     final from = message.account.fromAddress;
     final mime = message.mimeMessage;
@@ -538,6 +549,7 @@ class MessageActions extends HookConsumerWidget {
       );
     final composeFuture = _addAttachments(message, builder);
     _navigateToCompose(
+      context,
       ref,
       message,
       builder,
@@ -595,6 +607,7 @@ class MessageActions extends HookConsumerWidget {
   }
 
   void _navigateToCompose(
+    BuildContext context,
     WidgetRef ref,
     Message? message,
     MessageBuilder builder,
@@ -629,8 +642,7 @@ class MessageActions extends HookConsumerWidget {
       future: composeFuture,
       composeMode: mode,
     );
-    locator<NavigationService>()
-        .push(Routes.mailCompose, arguments: data, replace: true);
+    context.goNamed(Routes.mailCompose, extra: data);
   }
 
   void _addNotification() {

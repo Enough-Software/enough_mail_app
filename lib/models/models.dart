@@ -8,6 +8,5 @@ export 'message_date_section.dart';
 export 'message_source.dart';
 export 'search.dart';
 export 'sender.dart';
-export 'shared_data.dart';
 export 'swipe.dart';
 export 'web_view_configuration.dart';

@@ -79,6 +79,7 @@ class RealAccount extends Account {
   }
 
   /// Does this account have a login error?
+  @JsonKey(includeToJson: false, includeFromJson: false)
   bool hasError = false;
 
   @override
@@ -95,6 +96,7 @@ class RealAccount extends Account {
   }
 
   /// Should this account be excluded from the unified account?
+  @JsonKey(includeToJson: false, includeFromJson: false)
   bool get excludeFromUnified =>
       getAttribute(attributeExcludeFromUnified) ?? false;
   set excludeFromUnified(bool value) =>
@@ -148,11 +150,13 @@ class RealAccount extends Account {
   /// Account-specific signature for plain text messages
   ///
   /// Compare [signatureHtml]
+  @JsonKey(includeToJson: false, includeFromJson: false)
   String? get signaturePlain => _account.attributes[attributeSignaturePlain];
   set signaturePlain(String? value) =>
       setAttribute(attributeSignaturePlain, value);
 
   /// The name used for sending
+  @JsonKey(includeToJson: false, includeFromJson: false)
   String? get userName => _account.userName;
   set userName(String? value) {
     _account = _account.copyWith(userName: value);

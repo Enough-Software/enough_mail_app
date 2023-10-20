@@ -474,8 +474,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
         _blockExternalImages = blockExternalImages;
       });
     }
-    locator<NotificationService>()
-        .cancelNotificationForMailMessage(widget.message);
+    locator<NotificationService>().cancelNotificationForMessage(widget.message);
     if (_notifyMarkedAsSeen) {
       widget.message.source.onMarkedAsSeen(widget.message, true);
     }

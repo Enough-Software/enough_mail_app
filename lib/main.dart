@@ -8,16 +8,17 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'account/provider.dart';
 import 'app_lifecycle/provider.dart';
+import 'background/provider.dart';
 import 'localization/app_localizations.g.dart';
 import 'locator.dart';
 import 'logger.dart';
 import 'routes.dart';
 import 'screens/screens.dart';
-import 'services/background_service.dart';
 import 'services/i18n_service.dart';
 import 'services/scaffold_messenger_service.dart';
 import 'settings/provider.dart';
 import 'settings/theme/provider.dart';
+import 'share/provider.dart';
 // AppStyles appStyles = AppStyles.instance;
 
 void main() {
@@ -44,6 +45,8 @@ class MailyApp extends HookConsumerWidget {
     final themeSettingsData = ref.watch(themeFinderProvider(context: context));
     final languageTag =
         ref.watch(settingsProvider.select((settings) => settings.languageTag));
+    ref.watch(incomingShareProvider);
+    ref.watch(backgroundProvider);
 
     final app = PlatformSnackApp.router(
       supportedLocales: AppLocalizations.supportedLocales,
@@ -160,9 +163,7 @@ class _InitializationScreen extends ConsumerState<InitializationScreen> {
     //   unawaited(locator<NavigationService>()
     //       .push(Routes.welcome, fade: true, replace: true));
     // }
-    if (BackgroundService.isSupported) {
-      await locator<BackgroundService>().init();
-    }
+    await ref.read(backgroundProvider.notifier).init();
     // final usedContext = Routes.navigatorKey.currentContext ?? context;
     // if (usedContext.mounted) {
     //   usedContext.pushReplacement(Routes.home);

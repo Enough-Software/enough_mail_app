@@ -1,13 +1,12 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../localization/extension.dart';
-import '../../locator.dart';
 import '../../models/swipe.dart';
 import '../../screens/base.dart';
-import '../../services/navigation_service.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../../widgets/button_text.dart';
 import '../provider.dart';
@@ -108,7 +107,7 @@ class _SwipeSetting extends HookConsumerWidget {
                       ],
                     ),
                     onPressed: () {
-                      locator<NavigationService>().pop(action);
+                      context.pop(action);
                     },
                   ),
                 )

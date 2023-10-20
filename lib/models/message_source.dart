@@ -307,7 +307,7 @@ abstract class MessageSource extends ChangeNotifier
     NotificationService notificationService, {
     bool notify = true,
   }) {
-    notificationService.cancelNotificationForMailMessage(message);
+    notificationService.cancelNotificationForMessage(message);
     removeFromCache(message, notify: notify);
   }
 
@@ -407,7 +407,7 @@ abstract class MessageSource extends ChangeNotifier
     if (source != null) {
       onMarkedAsSeen(msg, isSeen);
       if (isSeen) {
-        locator<NotificationService>().cancelNotificationForMailMessage(msg);
+        locator<NotificationService>().cancelNotificationForMessage(msg);
       }
 
       return source.store([msg.mimeMessage], [MessageFlags.seen]);
@@ -467,7 +467,7 @@ abstract class MessageSource extends ChangeNotifier
     for (final msg in messages) {
       onMarkedAsSeen(msg, isSeen);
       if (isSeen) {
-        notificationService.cancelNotificationForMailMessage(msg);
+        notificationService.cancelNotificationForMessage(msg);
       }
     }
 

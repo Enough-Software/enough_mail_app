@@ -11,18 +11,10 @@ RealAccount _$RealAccountFromJson(Map<String, dynamic> json) => RealAccount(
       appExtensions: (json['appExtensions'] as List<dynamic>?)
           ?.map((e) => AppExtension.fromJson(e as Map<String, dynamic>))
           .toList(),
-    )
-      ..hasError = json['hasError'] as bool
-      ..excludeFromUnified = json['excludeFromUnified'] as bool
-      ..signaturePlain = json['signaturePlain'] as String?
-      ..userName = json['userName'] as String?;
+    );
 
 Map<String, dynamic> _$RealAccountToJson(RealAccount instance) =>
     <String, dynamic>{
       'mailAccount': instance.mailAccount,
-      'hasError': instance.hasError,
-      'excludeFromUnified': instance.excludeFromUnified,
-      'signaturePlain': instance.signaturePlain,
-      'userName': instance.userName,
       'appExtensions': instance.appExtensions,
     };
