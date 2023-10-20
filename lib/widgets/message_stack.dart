@@ -5,10 +5,10 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
-import '../services/i18n_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import 'mail_address_chip.dart';
 
@@ -78,8 +78,8 @@ class _MessageStackState extends State<MessageStack> {
   Widget build(BuildContext context) {
     final quickReplies = ['OK', 'Thank you!', '👍', '😊'];
     final dateTime = _currentMessage!.mimeMessage.decodeDate();
-    final dayName =
-        dateTime == null ? '' : locator<I18nService>().formatDay(dateTime);
+    final dayName = dateTime == null ? '' : context.formatDay(dateTime);
+
     return Stack(
       alignment: Alignment.center,
       fit: StackFit.expand,
@@ -180,8 +180,11 @@ class _MessageStackState extends State<MessageStack> {
     );
   }
 
-  Future<void> acceptDragOperation(Message message, DragAction action,
-      {Object? data}) async {
+  Future<void> acceptDragOperation(
+    Message message,
+    DragAction action, {
+    Object? data,
+  }) async {
     moveToNextMessage();
     //print('drag operation: $action');
     String? snack;
@@ -215,30 +218,35 @@ class _MessageStackState extends State<MessageStack> {
         break;
     }
     if (snack != null) {
-      //TODO allow undo when marking as deleted
-      locator<ScaffoldMessengerService>().showTextSnackBar(
-        snack,
-        undo: () async {
-          // bring back message:
-          setState(() {
-            _currentMessage = message;
-            _currentMessageIndex = message.sourceIndex;
-          });
-          await undo();
-        },
-      );
+      if (context.mounted) {
+        //TODO allow undo when marking as deleted
+        locator<ScaffoldMessengerService>().showTextSnackBar(
+          context.text,
+          snack,
+          undo: () async {
+            // bring back message:
+            setState(() {
+              _currentMessage = message;
+              _currentMessageIndex = message.sourceIndex;
+            });
+            await undo();
+          },
+        );
+      }
     }
   }
 }
 
 class MessageDragTarget extends StatefulWidget {
-  const MessageDragTarget(
-      {super.key,
-      required this.action,
-      required this.onComplete,
-      this.data,
-      this.width,
-      this.height});
+  const MessageDragTarget({
+    super.key,
+    required this.action,
+    required this.onComplete,
+    this.data,
+    this.width,
+    this.height,
+  });
+
   final DragAction action;
   final Object? data;
   final Function(Message message, DragAction action, {Object? data}) onComplete;
@@ -441,6 +449,7 @@ class _MessageCardState extends State<MessageCard> {
 
   Widget buildMessageContents() {
     final mime = widget.message!.mimeMessage;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -478,22 +487,25 @@ class _MessageCardState extends State<MessageCard> {
     // when the widget is not exposed, unless the content is there already
     if (!widget.message!.mimeMessage.isDownloaded) {
       return FutureBuilder(
-          future: downloadMessageContents(widget.message!),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-              case ConnectionState.active:
-                return const Center(child: PlatformProgressIndicator());
-              case ConnectionState.done:
-                if (snapshot.hasError) {
-                  return const Text('Unable to download message');
-                }
-                break;
-            }
-            return buildMessageContent(context);
-          });
+        future: downloadMessageContents(widget.message!),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              return const Center(child: PlatformProgressIndicator());
+            case ConnectionState.done:
+              if (snapshot.hasError) {
+                return const Text('Unable to download message');
+              }
+              break;
+          }
+
+          return buildMessageContent(context);
+        },
+      );
     }
+
     return buildMessageContent(context);
   }
 

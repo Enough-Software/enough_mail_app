@@ -184,6 +184,7 @@ class AccountEditScreen extends HookConsumerWidget {
                         onDismissed: (direction) {
                           account.removeAlias(alias);
                           locator<ScaffoldMessengerService>().showTextSnackBar(
+                            localizations,
                             localizations.editAccountAliasRemoved(
                               alias.email,
                             ),
@@ -342,7 +343,7 @@ class AccountEditScreen extends HookConsumerWidget {
                                   ? localizations.editAccountLoggingEnabled
                                   : localizations.editAccountLoggingDisabled;
                               locator<ScaffoldMessengerService>()
-                                  .showTextSnackBar(message);
+                                  .showTextSnackBar(localizations, message);
                             }
                           },
                         ),

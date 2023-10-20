@@ -219,6 +219,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       Future.value(widget.data.resumeText);
 
   String get _signature => ref.read(settingsProvider.notifier).getSignatureHtml(
+        context,
         _from.account,
         widget.data.action,
         context.text.localeName,
@@ -422,8 +423,8 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         from: _from.account.fromAddress,
         appendToSent: append,
       );
-      locator<ScaffoldMessengerService>()
-          .showTextSnackBar(localizations.composeMailSendSuccess);
+      locator<ScaffoldMessengerService>().showTextSnackBar(
+          localizations, localizations.composeMailSendSuccess);
     } catch (e, s) {
       if (kDebugMode) {
         print('Unable to send or append mail: $e $s');
@@ -508,6 +509,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         // let it pop but show snackbar to return:
         await _populateMessageBuilder(storeComposeDataForResume: true);
         locator<ScaffoldMessengerService>().showTextSnackBar(
+          localizations,
           localizations.composeLeftByMistake,
           undo: _returnToCompose,
         );
@@ -780,8 +782,10 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     final mime = await _buildMimeMessage(mailClient);
     try {
       await mailClient.saveDraftMessage(mime);
-      locator<ScaffoldMessengerService>()
-          .showTextSnackBar(localizations.composeMessageSavedAsDraft);
+      locator<ScaffoldMessengerService>().showTextSnackBar(
+        localizations,
+        localizations.composeMessageSavedAsDraft,
+      );
       final originalMessage = widget.data.originalMessage;
       if (originalMessage != null) {
         await Future.delayed(const Duration(milliseconds: 20));

@@ -45,7 +45,8 @@ class LockScreen extends StatelessWidget {
       );
 
   Future<void> _authenticate(BuildContext context) async {
-    final didAuthenticate = await locator<BiometricsService>().authenticate();
+    final didAuthenticate =
+        await locator<BiometricsService>().authenticate(context.text);
     if (didAuthenticate && context.mounted) {
       context.pop();
     }

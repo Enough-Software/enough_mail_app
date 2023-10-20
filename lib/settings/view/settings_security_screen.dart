@@ -129,8 +129,10 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                                 ? null
                                 : localizations.securityUnlockDisableReason;
                             final didAuthenticate =
-                                await locator<BiometricsService>()
-                                    .authenticate(reason: reason);
+                                await locator<BiometricsService>().authenticate(
+                              localizations,
+                              reason: reason,
+                            );
                             if (didAuthenticate) {
                               await ref.read(settingsProvider.notifier).update(
                                     settings.copyWith(

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -12,9 +11,9 @@ import 'background/provider.dart';
 import 'localization/app_localizations.g.dart';
 import 'locator.dart';
 import 'logger.dart';
+import 'notification/service.dart';
 import 'routes.dart';
 import 'screens/screens.dart';
-import 'services/i18n_service.dart';
 import 'services/scaffold_messenger_service.dart';
 import 'settings/provider.dart';
 import 'settings/theme/provider.dart';
@@ -45,8 +44,9 @@ class MailyApp extends HookConsumerWidget {
     final themeSettingsData = ref.watch(themeFinderProvider(context: context));
     final languageTag =
         ref.watch(settingsProvider.select((settings) => settings.languageTag));
-    ref.watch(incomingShareProvider);
-    ref.watch(backgroundProvider);
+    ref
+      ..watch(incomingShareProvider)
+      ..watch(backgroundProvider);
 
     final app = PlatformSnackApp.router(
       supportedLocales: AppLocalizations.supportedLocales,
@@ -111,17 +111,9 @@ class _InitializationScreen extends ConsumerState<InitializationScreen> {
   Future<void> _initApp() async {
     await ref.read(settingsProvider.notifier).init();
     await ref.read(realAccountsProvider.notifier).init();
-
-    final settings = ref.read(settingsProvider);
-
-    final i18nService = locator<I18nService>();
-    final languageTag = settings.languageTag ?? 'en';
-    final settingsLocale = AppLocalizations.supportedLocales
-        .firstWhereOrNull((l) => l.toLanguageTag() == languageTag);
-    if (settingsLocale != null) {
-      final settingsLocalizations =
-          await AppLocalizations.delegate.load(settingsLocale);
-      i18nService.init(settingsLocalizations, settingsLocale);
+    await ref.read(backgroundProvider.notifier).init();
+    if (context.mounted) {
+      await NotificationService.instance.init(context: context);
     }
     // final mailService = locator<MailService>();
     // // key service is required before mail service due to Oauth configs
@@ -163,7 +155,6 @@ class _InitializationScreen extends ConsumerState<InitializationScreen> {
     //   unawaited(locator<NavigationService>()
     //       .push(Routes.welcome, fade: true, replace: true));
     // }
-    await ref.read(backgroundProvider.notifier).init();
     // final usedContext = Routes.navigatorKey.currentContext ?? context;
     // if (usedContext.mounted) {
     //   usedContext.pushReplacement(Routes.home);

@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../models/message.dart';
-import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
 
 class MessageOverviewContent extends StatelessWidget {
@@ -27,8 +25,9 @@ class MessageOverviewContent extends StatelessWidget {
     final subject = mime.decodeSubject() ?? localizations.subjectUndefined;
     final senderOrRecipients = _getSenderOrRecipients(mime, localizations);
     final hasAttachments = msg.hasAttachment;
-    final date = locator<I18nService>().formatDateTime(mime.decodeDate());
+    final date = context.formatDateTime(mime.decodeDate());
     final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4),
       color: msg.isFlagged ? theme.colorScheme.secondary : null,
@@ -47,8 +46,9 @@ class MessageOverviewContent extends StatelessWidget {
                     overflow: TextOverflow.fade,
                     softWrap: false,
                     style: TextStyle(
-                        fontWeight:
-                            msg.isSeen ? FontWeight.normal : FontWeight.bold),
+                      fontWeight:
+                          msg.isSeen ? FontWeight.normal : FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -69,8 +69,11 @@ class MessageOverviewContent extends StatelessWidget {
                       if (msg.isAnswered) const Icon(Icons.reply, size: 12),
                       if (msg.isForwarded) const Icon(Icons.forward, size: 12),
                       if (threadLength != 0)
-                        IconService.buildNumericIcon(context, threadLength,
-                            size: 12),
+                        IconService.buildNumericIcon(
+                          context,
+                          threadLength,
+                          size: 12,
+                        ),
                     ],
                   ),
                 ),
@@ -80,8 +83,9 @@ class MessageOverviewContent extends StatelessWidget {
             subject,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-                fontStyle: FontStyle.italic,
-                fontWeight: msg.isSeen ? FontWeight.normal : FontWeight.bold),
+              fontStyle: FontStyle.italic,
+              fontWeight: msg.isSeen ? FontWeight.normal : FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -96,11 +100,8 @@ class MessageOverviewContent extends StatelessWidget {
           .join(', ');
     }
     MailAddress? from;
-    if (mime.from?.isNotEmpty ?? false) {
-      from = mime.from!.first;
-    } else {
-      from = mime.sender;
-    }
+    from = mime.from?.isNotEmpty ?? false ? mime.from!.first : mime.sender;
+
     return (from?.personalName?.isNotEmpty ?? false)
         ? from!.personalName!
         : from?.email != null

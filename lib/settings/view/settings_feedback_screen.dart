@@ -97,6 +97,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: info ?? ''));
                         locator<ScaffoldMessengerService>().showTextSnackBar(
+                          localizations,
                           localizations.feedbackResultInfoCopied,
                         );
                       },

@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import '../locator.dart';
-import 'i18n_service.dart';
-import '../widgets/cupertino_status_bar.dart';
 import 'package:flutter/material.dart';
+
+import '../localization/app_localizations.g.dart';
+import '../widgets/cupertino_status_bar.dart';
 
 class ScaffoldMessengerService {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
@@ -20,37 +20,43 @@ class ScaffoldMessengerService {
   }
 
   void popStatusBarState() {
-    if (_statusBarStates.isNotEmpty) {
-      _statusBarState = _statusBarStates.removeLast();
-    } else {
-      _statusBarState = null;
-    }
+    _statusBarState =
+        _statusBarStates.isNotEmpty ? _statusBarStates.removeLast() : null;
   }
 
-  SnackBar _buildTextSnackBar(String text, {Function()? undo}) => SnackBar(
-      content: Text(text),
-      action: undo == null
-          ? null
-          : SnackBarAction(
-              label: locator<I18nService>().localizations.actionUndo,
-              onPressed: undo,
-            ),
-    );
+  SnackBar _buildTextSnackBar(
+    AppLocalizations localizations,
+    String text, {
+    Function()? undo,
+  }) =>
+      SnackBar(
+        content: Text(text),
+        action: undo == null
+            ? null
+            : SnackBarAction(
+                label: localizations.actionUndo,
+                onPressed: undo,
+              ),
+      );
 
   void _showSnackBar(SnackBar snackBar) {
     scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
   }
 
-  void showTextSnackBar(String text, {Function()? undo}) {
+  void showTextSnackBar(
+    AppLocalizations localizations,
+    String text, {
+    Function()? undo,
+  }) {
     if (Platform.isIOS || Platform.isMacOS) {
       final state = _statusBarState;
       if (state != null) {
         state.showTextStatus(text, undo: undo);
       } else {
-        _showSnackBar(_buildTextSnackBar(text, undo: undo));
+        _showSnackBar(_buildTextSnackBar(localizations, text, undo: undo));
       }
     } else {
-      _showSnackBar(_buildTextSnackBar(text, undo: undo));
+      _showSnackBar(_buildTextSnackBar(localizations, text, undo: undo));
     }
   }
 }

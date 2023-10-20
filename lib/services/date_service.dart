@@ -1,6 +1,3 @@
-import '../locator.dart';
-import 'i18n_service.dart';
-
 /// The date section of a given date
 enum DateSectionRange {
   /// The date is in the future, more distant than tomorrow
@@ -34,9 +31,12 @@ enum DateSectionRange {
 /// Allows to determine the date section of a given date
 class DateService {
   /// Creates a new [DateService]
-  DateService() {
+  DateService(this.firstDayOfWeek) {
     _setupDates();
   }
+
+  /// The first weekday of the week
+  final int firstDayOfWeek;
 
   late DateTime _today;
   late DateTime _tomorrow;
@@ -51,7 +51,6 @@ class DateService {
     _tomorrow = _today.add(const Duration(days: 1));
     _dayAfterTomorrow = _tomorrow.add(const Duration(days: 1));
     _yesterday = _today.subtract(const Duration(days: 1));
-    final firstDayOfWeek = locator<I18nService>().firstDayOfWeek;
     if (_today.weekday == firstDayOfWeek) {
       _thisWeek = _today;
     } else if (_yesterday.weekday == firstDayOfWeek) {
@@ -66,7 +65,9 @@ class DateService {
   }
 
   /// Determines the date section of the given [localTime]
-  DateSectionRange determineDateSection(DateTime localTime) {
+  DateSectionRange determineDateSection(
+    DateTime localTime,
+  ) {
     if (_today.weekday != DateTime.now().weekday) {
       _setupDates();
     }

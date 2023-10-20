@@ -10,7 +10,7 @@ import 'message_source_screen.dart';
 
 /// Displays the search result for
 class MailSearchScreen extends ConsumerWidget {
-  /// Creates a [MailScreen]
+  /// Creates a [MailSearchScreen]
   const MailSearchScreen({
     super.key,
     required this.search,
@@ -24,6 +24,7 @@ class MailSearchScreen extends ConsumerWidget {
     final text = context.text;
     final searchSource = ref.watch(
       mailSearchProvider(
+        localizations: text,
         search: search,
       ),
     );

@@ -2,17 +2,20 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
-import '../locator.dart';
+import '../localization/app_localizations.g.dart';
 import '../services/date_service.dart';
-import '../services/i18n_service.dart';
 import 'message.dart';
 import 'message_date_section.dart';
 import 'message_source.dart';
 
 class DateSectionedMessageSource extends ChangeNotifier {
-  DateSectionedMessageSource(this.messageSource) {
+  DateSectionedMessageSource(
+    this.messageSource, {
+    required this.firstDayOfWeek,
+  }) {
     messageSource.addListener(_update);
   }
+  final int firstDayOfWeek;
   final MessageSource messageSource;
   int _numberOfSections = 0;
   int get size {
@@ -65,11 +68,13 @@ class DateSectionedMessageSource extends ChangeNotifier {
     int numberOfMessagesToBeConsidered = 40,
   }) async {
     final max = messageSource.size;
-    if (numberOfMessagesToBeConsidered > max) {
-      numberOfMessagesToBeConsidered = max;
-    }
+    final usedNumberOfMessagesToBeConsidered =
+        (numberOfMessagesToBeConsidered > max)
+            ? max
+            : numberOfMessagesToBeConsidered;
+
     final messages = <Message>[];
-    for (var i = 0; i < numberOfMessagesToBeConsidered; i++) {
+    for (var i = 0; i < usedNumberOfMessagesToBeConsidered; i++) {
       final message = await messageSource.getMessageAt(i);
       messages.add(message);
     }
@@ -77,7 +82,9 @@ class DateSectionedMessageSource extends ChangeNotifier {
     return getDateSections(messages);
   }
 
-  List<MessageDateSection> getDateSections(List<Message> messages) {
+  List<MessageDateSection> getDateSections(
+    List<Message> messages,
+  ) {
     final sections = <MessageDateSection>[];
     DateSectionRange? lastRange;
     int foundSections = 0;
@@ -85,7 +92,8 @@ class DateSectionedMessageSource extends ChangeNotifier {
       final message = messages[i];
       final dateTime = message.mimeMessage.decodeDate();
       if (dateTime != null) {
-        final range = locator<DateService>().determineDateSection(dateTime);
+        final range =
+            DateService(firstDayOfWeek).determineDateSection(dateTime);
         if (range != lastRange) {
           final index = (lastRange == null) ? 0 : i + foundSections;
           sections.add(MessageDateSection(range, dateTime, index));
@@ -94,6 +102,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
         lastRange = range;
       }
     }
+
     return sections;
   }
 
@@ -151,21 +160,21 @@ class DateSectionedMessageSource extends ChangeNotifier {
       futures.add(messageSource.getMessageAt(i));
     }
     final messages = await Future.wait(futures);
+
     return messages;
   }
 
   List<Message> _getTopMessages(int length) {
     final max = messageSource.size;
-    if (length > max) {
-      length = max;
-    }
+    final usedLength = (length > max) ? max : length;
     final messages = <Message>[];
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < usedLength; i++) {
       final message = messageSource.cache[i];
       if (message != null) {
         messages.add(message);
       }
     }
+
     return messages;
   }
 
@@ -175,9 +184,11 @@ class DateSectionedMessageSource extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteMessage(Message message) => messageSource.deleteMessages(
+  Future<void> deleteMessage(AppLocalizations localizations, Message message) =>
+      messageSource.deleteMessages(
+        localizations,
         [message],
-        locator<I18nService>().localizations.resultDeleted,
+        localizations.resultDeleted,
       );
 }
 

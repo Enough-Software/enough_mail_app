@@ -10,7 +10,6 @@ import '../logger.dart';
 import '../models/message.dart';
 import '../routes.dart';
 import '../screens/media_screen.dart';
-import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
 import 'button_text.dart';
 import 'ical_interactive_media.dart';
@@ -220,7 +219,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
     BuildContext context,
     MediaProvider mediaProvider,
   ) {
-    final sizeText = locator<I18nService>().formatMemory(mediaProvider.size);
+    final sizeText = context.formatMemory(mediaProvider.size);
     final localizations = context.text;
     final iconData = locator<IconService>()
         .getForMediaType(MediaType.fromText(mediaProvider.mediaType));

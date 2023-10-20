@@ -61,8 +61,10 @@ class MailAddressChip extends StatelessWidget {
             break;
           case _AddressAction.copy:
             await Clipboard.setData(ClipboardData(text: mailAddress.email));
-            locator<ScaffoldMessengerService>()
-                .showTextSnackBar(localizations.feedbackResultInfoCopied);
+            locator<ScaffoldMessengerService>().showTextSnackBar(
+              localizations,
+              localizations.feedbackResultInfoCopied,
+            );
             break;
           case _AddressAction.compose:
             final messageBuilder = MessageBuilder()..to = [mailAddress];

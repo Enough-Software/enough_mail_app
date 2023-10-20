@@ -1,10 +1,9 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../services/i18n_service.dart';
-import '../services/scaffold_messenger_service.dart';
-
+import '../localization/extension.dart';
 import '../locator.dart';
+import '../services/scaffold_messenger_service.dart';
 
 /// Status bar for cupertino.
 ///
@@ -26,11 +25,11 @@ class CupertinoStatusBar extends StatefulWidget {
   CupertinoStatusBarState createState() => CupertinoStatusBarState();
 
   static Widget? createInfo(String? text) => (text == null)
-        ? null
-        : Text(
-            text,
-            style: _statusTextStyle,
-          );
+      ? null
+      : Text(
+          text,
+          style: _statusTextStyle,
+        );
 }
 
 class CupertinoStatusBarState extends State<CupertinoStatusBar> {
@@ -74,6 +73,7 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
             child: _status,
           )
         : widget.info ?? Container();
+
     return CupertinoBar(
       blurBackground: true,
       backgroundOpacity: 0.8,
@@ -124,7 +124,7 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
           padding: const EdgeInsets.all(8),
           minSize: 20,
           child: Text(
-            locator<I18nService>().localizations.actionUndo,
+            context.text.actionUndo,
             style: CupertinoStatusBar._statusTextStyle,
           ),
           onPressed: () {

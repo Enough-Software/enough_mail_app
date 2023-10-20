@@ -6,9 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../localization/app_localizations.g.dart';
 import '../../localization/extension.dart';
-import '../../locator.dart';
 import '../../screens/base.dart';
-import '../../services/i18n_service.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../../widgets/button_text.dart';
 import '../provider.dart';
@@ -28,18 +26,19 @@ class SettingsLanguageScreen extends HookConsumerWidget {
         )
         .toList();
     final systemLanguage = _Language(
-        null, locator<I18nService>().localizations.designThemeOptionSystem);
+      null,
+      context.text.designThemeOptionSystem,
+    );
+
     final languages = [systemLanguage, ...available];
     final languageTag = ref.watch(
       settingsProvider.select((value) => value.languageTag),
     );
     final _Language? selectedLanguage;
-    if (languageTag != null) {
-      selectedLanguage = available
-          .firstWhereOrNull((l) => l.locale?.toLanguageTag() == languageTag);
-    } else {
-      selectedLanguage = systemLanguage;
-    }
+    selectedLanguage = languageTag != null
+        ? available
+            .firstWhereOrNull((l) => l.locale?.toLanguageTag() == languageTag)
+        : systemLanguage;
 
     final theme = Theme.of(context);
     final localizations = context.text;

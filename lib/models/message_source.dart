@@ -3,11 +3,11 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
 
 import '../account/model.dart';
+import '../localization/app_localizations.g.dart';
 import '../locator.dart';
 import '../logger.dart';
 import '../notification/model.dart';
 import '../notification/service.dart';
-import '../services/i18n_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../util/indexed_cache.dart';
 import 'async_mime_source.dart';
@@ -191,13 +191,16 @@ abstract class MessageSource extends ChangeNotifier
   ///
   /// Just forwards to [deleteMessages]
   @Deprecated('use deleteMessages instead')
-  Future<void> deleteMessage(Message message) => deleteMessages(
+  Future<void> deleteMessage(AppLocalizations localizations, Message message) =>
+      deleteMessages(
+        localizations,
         [message],
-        locator<I18nService>().localizations.resultDeleted,
+        localizations.resultDeleted,
       );
 
   /// Deletes the given messages
   Future<void> deleteMessages(
+    AppLocalizations localizations,
     List<Message> messages,
     String notification,
   ) {
@@ -211,10 +214,11 @@ abstract class MessageSource extends ChangeNotifier
     }
     notifyListeners();
 
-    return _deleteMessages(messages, notification);
+    return _deleteMessages(localizations, messages, notification);
   }
 
   Future<void> _deleteMessages(
+    AppLocalizations localizations,
     List<Message> messages,
     String notification,
   ) async {
@@ -228,6 +232,7 @@ abstract class MessageSource extends ChangeNotifier
       }
     }
     locator<ScaffoldMessengerService>().showTextSnackBar(
+      localizations,
       notification,
       undo: resultsBySource.isEmpty
           ? null
@@ -241,24 +246,30 @@ abstract class MessageSource extends ChangeNotifier
     );
   }
 
-  Future<void> markAsJunk(Message message) => moveMessageToFlag(
+  Future<void> markAsJunk(AppLocalizations localizations, Message message) =>
+      moveMessageToFlag(
+        localizations,
         message,
         MailboxFlag.junk,
-        locator<I18nService>().localizations.resultMovedToJunk,
+        localizations.resultMovedToJunk,
       );
 
-  Future<void> markAsNotJunk(Message message) => moveMessageToFlag(
+  Future<void> markAsNotJunk(AppLocalizations localizations, Message message) =>
+      moveMessageToFlag(
+        localizations,
         message,
         MailboxFlag.inbox,
-        locator<I18nService>().localizations.resultMovedToInbox,
+        localizations.resultMovedToInbox,
       );
 
   Future<void> moveMessageToFlag(
+    AppLocalizations localizations,
     Message message,
     MailboxFlag targetMailboxFlag,
     String notification,
   ) =>
       moveMessage(
+        localizations,
         message,
         message.source
                 .getMimeSource(message)
@@ -274,6 +285,7 @@ abstract class MessageSource extends ChangeNotifier
       );
 
   Future<void> moveMessage(
+    AppLocalizations localizations,
     Message message,
     Mailbox targetMailbox,
     String notification,
@@ -292,6 +304,7 @@ abstract class MessageSource extends ChangeNotifier
     notifyListeners();
     if (moveResult.canUndo) {
       locator<ScaffoldMessengerService>().showTextSnackBar(
+        localizations,
         notification,
         undo: () async {
           await mailClient.undoMoveMessages(moveResult);
@@ -312,6 +325,7 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> moveMessagesToFlag(
+    AppLocalizations localizations,
     List<Message> messages,
     MailboxFlag targetMailboxFlag,
     String notification,
@@ -337,6 +351,7 @@ abstract class MessageSource extends ChangeNotifier
     notifyListeners();
     if (resultsBySource.isNotEmpty) {
       locator<ScaffoldMessengerService>().showTextSnackBar(
+        localizations,
         notification,
         undo: () async {
           for (final source in resultsBySource.keys) {
@@ -350,6 +365,7 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> moveMessages(
+    AppLocalizations localizations,
     List<Message> messages,
     Mailbox targetMailbox,
     String notification,
@@ -369,6 +385,7 @@ abstract class MessageSource extends ChangeNotifier
       final moveResult = await source.moveMessages(mimes, targetMailbox);
       notifyListeners();
       locator<ScaffoldMessengerService>().showTextSnackBar(
+        localizations,
         notification,
         undo: moveResult.canUndo
             ? () async {
@@ -379,7 +396,12 @@ abstract class MessageSource extends ChangeNotifier
             : null,
       );
     } else if (parent != null) {
-      return parent.moveMessages(messages, targetMailbox, notification);
+      return parent.moveMessages(
+        localizations,
+        messages,
+        targetMailbox,
+        notification,
+      );
     }
   }
 
@@ -390,16 +412,23 @@ abstract class MessageSource extends ChangeNotifier
     }
   }
 
-  Future<void> moveToInbox(Message message) async => moveMessageToFlag(
+  Future<void> moveToInbox(
+    AppLocalizations localizations,
+    Message message,
+  ) async =>
+      moveMessageToFlag(
+        localizations,
         message,
         MailboxFlag.inbox,
-        locator<I18nService>().localizations.resultMovedToInbox,
+        localizations.resultMovedToInbox,
       );
 
-  Future<void> archive(Message message) => moveMessageToFlag(
+  Future<void> archive(AppLocalizations localizations, Message message) =>
+      moveMessageToFlag(
+        localizations,
         message,
         MailboxFlag.archive,
-        locator<I18nService>().localizations.resultArchived,
+        localizations.resultArchived,
       );
 
   Future<void> markAsSeen(Message msg, bool isSeen) {
@@ -410,7 +439,11 @@ abstract class MessageSource extends ChangeNotifier
         locator<NotificationService>().cancelNotificationForMessage(msg);
       }
 
-      return source.store([msg.mimeMessage], [MessageFlags.seen]);
+      return source.store(
+        [msg.mimeMessage],
+        [MessageFlags.seen],
+        action: isSeen ? StoreAction.add : StoreAction.remove,
+      );
     }
     msg.isSeen = isSeen;
     final parent = _parentMessageSource;
@@ -433,7 +466,7 @@ abstract class MessageSource extends ChangeNotifier
       final parentMsg =
           parent.cache.getWithMime(msg.mimeMessage, getMimeSource(msg));
       if (parentMsg != null) {
-        parent.onMarkedAsSeen(parentMsg, isSeen);
+        return parent.onMarkedAsSeen(parentMsg, isSeen);
       }
     }
   }
@@ -543,7 +576,7 @@ abstract class MessageSource extends ChangeNotifier
     return Future.wait(futures);
   }
 
-  MessageSource search(MailSearch search);
+  MessageSource search(AppLocalizations localizations, MailSearch search);
 
   void removeMime(MimeMessage mimeMessage, AsyncMimeSource? mimeSource) {
     final existingMessage = cache.getWithMime(mimeMessage, mimeSource);
@@ -732,7 +765,7 @@ class MailboxMessageSource extends MessageSource {
   bool get supportsSearching => mimeSource.supportsSearching;
 
   @override
-  MessageSource search(MailSearch search) {
+  MessageSource search(AppLocalizations localizations, MailSearch search) {
     final searchSource = mimeSource.search(search);
 
     return MailboxMessageSource.fromMimeSource(
@@ -1000,12 +1033,11 @@ class MultipleMessageSource extends MessageSource {
       mimeSources.any((source) => source.supportsSearching);
 
   @override
-  MessageSource search(MailSearch search) {
+  MessageSource search(AppLocalizations localizations, MailSearch search) {
     final searchMimeSources = mimeSources
         .where((source) => source.supportsSearching)
         .map((source) => source.search(search))
         .toList();
-    final localizations = locator<I18nService>().localizations;
     final searchMessageSource = MultipleMessageSource(
       searchMimeSources,
       localizations.searchQueryTitle(search.query),
@@ -1184,7 +1216,7 @@ class SingleMessageSource extends MessageSource {
   bool get isSent => false;
 
   @override
-  MessageSource search(MailSearch search) {
+  MessageSource search(AppLocalizations localizations, MailSearch search) {
     throw UnimplementedError();
   }
 
@@ -1267,7 +1299,7 @@ class ListMessageSource extends MessageSource {
   bool get isSent => false;
 
   @override
-  MessageSource search(MailSearch search) {
+  MessageSource search(AppLocalizations localizations, MailSearch search) {
     throw UnimplementedError();
   }
 

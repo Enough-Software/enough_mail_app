@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,6 +23,7 @@ class NotificationService {
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Future<NotificationServiceInitResult> init({
+    BuildContext? context,
     bool checkForLaunchDetails = true,
   }) async {
     // print('init notification service...');
@@ -43,6 +45,12 @@ class NotificationService {
       initSettings,
       onDidReceiveNotificationResponse: _selectNotification,
     );
+    if (Platform.isAndroid) {
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestNotificationsPermission();
+    }
     if (checkForLaunchDetails) {
       final launchDetails = await _flutterLocalNotificationsPlugin
           .getNotificationAppLaunchDetails();
@@ -52,7 +60,7 @@ class NotificationService {
           // print(
           //     'got notification launched details: $launchDetails
           // with payload ${response.payload}');
-          _selectNotification(response);
+          _selectNotification(response, context: context);
 
           return NotificationServiceInitResult.appLaunchedByNotification;
         }
@@ -104,19 +112,24 @@ class NotificationService {
     return MailNotificationPayload.fromJson(json);
   }
 
-  void _selectNotification(NotificationResponse response) {
+  void _selectNotification(
+    NotificationResponse response, {
+    BuildContext? context,
+  }) {
     final payloadText = response.payload;
     if (kDebugMode) {
       print('select notification: $payloadText');
     }
-    final context = Routes.navigatorKey.currentContext;
-    if (context == null) {
+    final usedContext = context ?? Routes.navigatorKey.currentContext;
+    if (usedContext == null) {
+      logger.e('Unable to show notification: no context found');
+
       return;
     }
 
     if (payloadText != null && payloadText.startsWith(_messagePayloadStart)) {
       final payload = _deserialize(payloadText);
-      context.pushNamed(
+      usedContext.pushNamed(
         Routes.mailDetailsForNotification,
         extra: payload,
       );

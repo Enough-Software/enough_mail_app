@@ -26,7 +26,7 @@ class CupertinoSearch extends StatelessWidget {
 
   void _onSearchSubmitted(BuildContext context, String text) {
     final search = MailSearch(text, SearchQueryType.allTextHeaders);
-    final next = messageSource.search(search);
+    final next = messageSource.search(context.text, search);
     context.pushNamed(
       Routes.messageSource,
       extra: next,

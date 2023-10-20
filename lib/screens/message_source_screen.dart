@@ -19,7 +19,6 @@ import '../models/message_source.dart';
 import '../models/swipe.dart';
 import '../notification/service.dart';
 import '../routes.dart';
-import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../settings/provider.dart';
@@ -98,7 +97,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   void initState() {
     super.initState();
     _searchEditingController = TextEditingController();
-    _sectionedMessageSource = DateSectionedMessageSource(widget.messageSource);
+    _sectionedMessageSource = DateSectionedMessageSource(
+      widget.messageSource,
+      firstDayOfWeek: context.firstDayOfWeek,
+    );
     _sectionedMessageSource.addListener(_update);
     _messageLoader = initMessageSource();
   }
@@ -131,7 +133,8 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       return;
     }
     final search = MailSearch(query, SearchQueryType.allTextHeaders);
-    final searchSource = _sectionedMessageSource.messageSource.search(search);
+    final searchSource =
+        _sectionedMessageSource.messageSource.search(context.text, search);
     context.pushNamed(Routes.messageSource, extra: searchSource);
     setState(() {
       _isInSearchMode = false;
@@ -238,7 +241,6 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       //     ],
       //   ),
     ];
-    final i18nService = locator<I18nService>();
     Widget? zeroPosWidget;
     if (_sectionedMessageSource.isInitialized && source.size == 0) {
       final emptyMessage = source.isSearch
@@ -451,8 +453,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                                 }
                                 final section = element.section;
                                 if (section != null) {
-                                  final text = i18nService.formatDateRange(
-                                      section.range, section.date);
+                                  final text = context.getDateRangeName(
+                                    section.range,
+                                  );
+
                                   return GestureDetector(
                                     onLongPress: () async {
                                       _selectedMessages =
@@ -471,7 +475,8 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                                             final sectionMessages =
                                                 await _sectionedMessageSource
                                                     .getMessagesForSection(
-                                                        section);
+                                              section,
+                                            );
                                             final doSelect = !sectionMessages
                                                 .first.isSelected;
                                             for (final msg in sectionMessages) {
@@ -508,7 +513,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                                             ),
                                           ),
                                         ),
-                                        const Divider()
+                                        const Divider(),
                                       ],
                                     ),
                                   );
@@ -516,6 +521,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                                 final message = element.message!;
                                 // print(
                                 //     '$index subject=${message.mimeMessage?.decodeSubject()}');
+
                                 return Dismissible(
                                   key: ValueKey(message),
                                   dismissThresholds: {
@@ -528,24 +534,29 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                                     color:
                                         swipeLeftToRightAction.colorBackground,
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
+                                      horizontal: 8,
+                                    ),
                                     alignment: AlignmentDirectional.centerStart,
                                     child: Row(
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 8),
+                                            horizontal: 8,
+                                          ),
                                           child: Text(
                                             swipeLeftToRightAction
                                                 .name(localizations),
                                             style: TextStyle(
-                                                color: swipeLeftToRightAction
-                                                    .colorForeground),
+                                              color: swipeLeftToRightAction
+                                                  .colorForeground,
+                                            ),
                                           ),
                                         ),
-                                        Icon(swipeLeftToRightAction.icon,
-                                            color: swipeLeftToRightAction
-                                                .colorIcon),
+                                        Icon(
+                                          swipeLeftToRightAction.icon,
+                                          color:
+                                              swipeLeftToRightAction.colorIcon,
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -553,7 +564,8 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                                     color:
                                         swipeRightToLeftAction.colorBackground,
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
+                                      horizontal: 8,
+                                    ),
                                     alignment: AlignmentDirectional.centerEnd,
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
@@ -565,13 +577,15 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 8),
+                                            horizontal: 8,
+                                          ),
                                           child: Text(
                                             swipeRightToLeftAction
                                                 .name(localizations),
                                             style: TextStyle(
-                                                color: swipeRightToLeftAction
-                                                    .colorForeground),
+                                              color: swipeRightToLeftAction
+                                                  .colorForeground,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -589,7 +603,12 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                                         direction == DismissDirection.startToEnd
                                             ? swipeLeftToRightAction
                                             : swipeRightToLeftAction;
-                                    fireSwipeAction(swipeAction, message);
+                                    fireSwipeAction(
+                                      localizations,
+                                      swipeAction,
+                                      message,
+                                    );
+
                                     return Future.value(
                                       swipeAction.isMessageMoving,
                                     );
@@ -606,6 +625,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                             if (widget is MessageOverview) {
                               return widget.message.sourceIndex;
                             }
+
                             return null;
                           },
                         ),
@@ -627,6 +647,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     final isAnyUnseen = _selectedMessages.any((m) => !m.isSeen);
     final isAnyUnflagged = _selectedMessages.any((m) => !m.isFlagged);
     final iconService = locator<IconService>();
+
     return PlatformBottomBar(
       cupertinoBlurBackground: true,
       child: SafeArea(
@@ -821,10 +842,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
 
   Future<void> handleMultipleChoice(_MultipleChoice choice) async {
     final source = _sectionedMessageSource.messageSource;
-    final localizations = locator<I18nService>().localizations;
+    final localizations = context.text;
     if (_selectedMessages.isEmpty) {
-      locator<ScaffoldMessengerService>()
-          .showTextSnackBar(localizations.multipleSelectionNeededInfo);
+      locator<ScaffoldMessengerService>().showTextSnackBar(
+          localizations, localizations.multipleSelectionNeededInfo);
 
       return;
     }
@@ -839,13 +860,18 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       case _MultipleChoice.delete:
         final notification =
             localizations.multipleMovedToTrash(_selectedMessages.length);
-        await source.deleteMessages(_selectedMessages, notification);
+        await source.deleteMessages(
+            localizations, _selectedMessages, notification);
         break;
       case _MultipleChoice.inbox:
         final notification =
             localizations.multipleMovedToInbox(_selectedMessages.length);
         await source.moveMessagesToFlag(
-            _selectedMessages, MailboxFlag.inbox, notification);
+          localizations,
+          _selectedMessages,
+          MailboxFlag.inbox,
+          notification,
+        );
         break;
       case _MultipleChoice.seen:
         endSelectionMode = false;
@@ -875,12 +901,17 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         final notification =
             localizations.multipleMovedToJunk(_selectedMessages.length);
         await source.moveMessagesToFlag(
-            _selectedMessages, MailboxFlag.junk, notification);
+          localizations,
+          _selectedMessages,
+          MailboxFlag.junk,
+          notification,
+        );
         break;
       case _MultipleChoice.archive:
         final notification =
             localizations.multipleMovedToArchive(_selectedMessages.length);
         await source.moveMessagesToFlag(
+          localizations,
           _selectedMessages,
           MailboxFlag.archive,
           notification,
@@ -1014,7 +1045,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   }
 
   void move() {
-    final localizations = locator<I18nService>().localizations;
+    final localizations = context.text;
     var account = widget.messageSource.account;
     if (account.isVirtual) {
       // check how many mail-clients are involved in the current selection
@@ -1056,16 +1087,18 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     });
     context.pop(); // alert
     final source = _sectionedMessageSource.messageSource;
-    final localizations = locator<I18nService>().localizations;
+    final localizations = context.text;
     final account = widget.messageSource.account;
     if (account.isVirtual) {
       await source.moveMessagesToFlag(
+        localizations,
         _selectedMessages,
         mailbox.flags.first,
         localizations.moveSuccess(mailbox.name),
       );
     } else {
       await source.moveMessages(
+        localizations,
         _selectedMessages,
         mailbox,
         localizations.moveSuccess(mailbox.name),
@@ -1126,7 +1159,8 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     });
   }
 
-  Future<void> fireSwipeAction(SwipeAction action, Message message) {
+  Future<void> fireSwipeAction(
+      AppLocalizations localizations, SwipeAction action, Message message) {
     switch (action) {
       case SwipeAction.markRead:
         final isSeen = !message.isSeen;
@@ -1134,11 +1168,13 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         return _sectionedMessageSource.messageSource
             .markAsSeen(message, isSeen);
       case SwipeAction.archive:
-        return _sectionedMessageSource.messageSource.archive(message);
+        return _sectionedMessageSource.messageSource
+            .archive(localizations, message);
       case SwipeAction.markJunk:
-        return _sectionedMessageSource.messageSource.markAsJunk(message);
+        return _sectionedMessageSource.messageSource
+            .markAsJunk(localizations, message);
       case SwipeAction.delete:
-        return _sectionedMessageSource.deleteMessage(message);
+        return _sectionedMessageSource.deleteMessage(localizations, message);
       case SwipeAction.flag:
         final isFlagged = !message.isFlagged;
         message.isFlagged = isFlagged;
@@ -1197,8 +1233,11 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
           }
         };
       }
-      locator<ScaffoldMessengerService>()
-          .showTextSnackBar(localizations.homeDeleteAllSuccess, undo: undo);
+      locator<ScaffoldMessengerService>().showTextSnackBar(
+        localizations,
+        localizations.homeDeleteAllSuccess,
+        undo: undo,
+      );
     }
   }
 }

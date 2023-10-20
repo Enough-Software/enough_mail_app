@@ -19,7 +19,6 @@ import '../models/message.dart';
 import '../models/message_source.dart';
 import '../notification/service.dart';
 import '../routes.dart';
-import '../services/i18n_service.dart';
 import '../services/icon_service.dart';
 import '../settings/model.dart';
 import '../settings/provider.dart';
@@ -193,29 +192,26 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
   Widget build(BuildContext context) {
     final localizations = context.text;
 
-    return _buildMailDetails(localizations);
+    return SingleChildScrollView(
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: _buildHeader(context, localizations),
+            ),
+            _buildContent(localizations),
+          ],
+        ),
+      ),
+    );
   }
 
-  Widget _buildMailDetails(AppLocalizations localizations) =>
-      SingleChildScrollView(
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: _buildHeader(localizations),
-              ),
-              _buildContent(localizations),
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildHeader(AppLocalizations localizations) {
+  Widget _buildHeader(BuildContext context, AppLocalizations localizations) {
     final mime = widget.message.mimeMessage;
     final attachments = widget.message.attachments;
-    final date = locator<I18nService>().formatDateTime(mime.decodeDate());
+    final date = context.formatDateTime(mime.decodeDate());
     final subject = mime.decodeSubject();
 
     return Column(

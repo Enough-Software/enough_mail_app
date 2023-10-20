@@ -15,7 +15,6 @@ import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
 import '../models/message.dart';
-import '../services/i18n_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../util/localized_dialog_helper.dart';
 import 'mail_address_chip.dart';
@@ -85,7 +84,6 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
     }
     final isReply = _calendar?.method == Method.reply;
     final attendees = isReply ? <AttendeeProperty>[] : event.attendees;
-    final i18nService = locator<I18nService>();
     final userEmail = widget.message.account.email.toLowerCase();
     final recurrenceRule = event.recurrenceRule;
     final end = event.end;
@@ -178,7 +176,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                       Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
-                          i18nService.formatDateTime(
+                          context.formatDateTime(
                             start.toLocal(),
                             alwaysUseAbsoluteFormat: true,
                             useLongFormat: true,
@@ -197,7 +195,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                       Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
-                          i18nService.formatDateTime(
+                          context.formatDateTime(
                             end.toLocal(),
                             alwaysUseAbsoluteFormat: true,
                             useLongFormat: true,
@@ -216,7 +214,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                       Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
-                          i18nService.formatIsoDuration(duration),
+                          context.formatIsoDuration(duration),
                         ),
                       ),
                     ],
@@ -414,7 +412,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
         productId: 'Maily',
       );
       locator<ScaffoldMessengerService>()
-          .showTextSnackBar(status.localization(localizations));
+          .showTextSnackBar(localizations, status.localization(localizations));
     } catch (e, s) {
       if (kDebugMode) {
         print('Unable to send status update: $e $s');

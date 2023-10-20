@@ -397,8 +397,10 @@ class MessageActions extends HookConsumerWidget {
                 recipients: recipients,
                 appendToSent: false,
               );
-          locator<ScaffoldMessengerService>()
-              .showTextSnackBar(localizations.resultRedirectedSuccess);
+          locator<ScaffoldMessengerService>().showTextSnackBar(
+            localizations,
+            localizations.resultRedirectedSuccess,
+          );
         } on MailException catch (e, s) {
           if (kDebugMode) {
             print('message could not get redirected: $e $s');
@@ -417,10 +419,12 @@ class MessageActions extends HookConsumerWidget {
   }
 
   Future<void> _delete(BuildContext context) async {
+    final localizations = context.text;
     context.pop();
     await message.source.deleteMessages(
+      localizations,
       [message],
-      context.text.resultDeleted,
+      localizations.resultDeleted,
     );
   }
 
@@ -448,6 +452,7 @@ class MessageActions extends HookConsumerWidget {
     final localizations = context.text;
     final source = message.source;
     await source.moveMessage(
+      localizations,
       message,
       mailbox,
       localizations.moveSuccess(mailbox.name),
@@ -457,10 +462,10 @@ class MessageActions extends HookConsumerWidget {
   Future<void> _moveJunk(BuildContext context) async {
     final source = message.source;
     if (source.isJunk) {
-      await source.markAsNotJunk(message);
+      await source.markAsNotJunk(context.text, message);
     } else {
       locator<NotificationService>().cancelNotificationForMessage(message);
-      await source.markAsJunk(message);
+      await source.markAsJunk(context.text, message);
     }
     if (context.mounted) {
       context.pop();
@@ -469,10 +474,12 @@ class MessageActions extends HookConsumerWidget {
 
   Future<void> _moveToInbox(BuildContext context) async {
     final source = message.source;
+    final localizations = context.text;
     await source.moveMessageToFlag(
+      localizations,
       message,
       MailboxFlag.inbox,
-      context.text.resultMovedToInbox,
+      localizations.resultMovedToInbox,
     );
     if (context.mounted) {
       context.pop();
@@ -482,10 +489,10 @@ class MessageActions extends HookConsumerWidget {
   Future<void> _moveArchive(BuildContext context) async {
     final source = message.source;
     if (source.isArchive) {
-      await source.moveToInbox(message);
+      await source.moveToInbox(context.text, message);
     } else {
       locator<NotificationService>().cancelNotificationForMessage(message);
-      await source.archive(message);
+      await source.archive(context.text, message);
     }
     if (context.mounted) {
       context.pop();

@@ -4,9 +4,9 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:local_auth/local_auth.dart';
 
+import '../localization/app_localizations.g.dart';
 import '../locator.dart';
 import 'app_service.dart';
-import 'i18n_service.dart';
 
 /// Handles biometrics
 class BiometricsService {
@@ -35,18 +35,21 @@ class BiometricsService {
   }
 
   /// Authenticates the user with biometrics
-  Future<bool> authenticate({String? reason}) async {
+  Future<bool> authenticate(
+    AppLocalizations localizations, {
+    String? reason,
+  }) async {
     if (!_isResolved) {
       await isDeviceSupported();
     }
     if (!_isSupported) {
       return false;
     }
-    reason ??= await _getLocalizedUnlockReason();
     locator<AppService>().ignoreBiometricsCheckAtNextResume = true;
     try {
       final result = await _localAuth.authenticate(
-        localizedReason: reason,
+        localizedReason:
+            reason ?? await _getLocalizedUnlockReason(localizations),
         options: const AuthenticationOptions(
           sensitiveTransaction: false,
         ),
@@ -65,8 +68,9 @@ class BiometricsService {
     return false;
   }
 
-  Future<String> _getLocalizedUnlockReason() async {
-    final localizations = locator<I18nService>().localizations;
+  Future<String> _getLocalizedUnlockReason(
+    AppLocalizations localizations,
+  ) async {
     if (PlatformInfo.isCupertino) {
       final availableBiometrics = await _localAuth.getAvailableBiometrics();
       if (availableBiometrics.contains(BiometricType.face)) {

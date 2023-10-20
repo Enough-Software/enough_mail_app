@@ -26,7 +26,7 @@ class SignatureWidget extends HookConsumerWidget {
     final account = this.account;
     final signatureState = useState<String?>(
       account?.getSignatureHtml(context.text.localeName) ??
-          ref.read(settingsProvider.notifier).getSignatureHtmlGlobal(),
+          ref.read(settingsProvider.notifier).getSignatureHtmlGlobal(context),
     );
     final signature = signatureState.value;
 
@@ -40,7 +40,9 @@ class SignatureWidget extends HookConsumerWidget {
         account?.name ?? localizations.signatureSettingsTitle,
         PackagedHtmlEditor(
           initialContent: signature ??
-              ref.read(settingsProvider.notifier).getSignatureHtmlGlobal(),
+              ref
+                  .read(settingsProvider.notifier)
+                  .getSignatureHtmlGlobal(context),
           excludeDocumentLevelControls: true,
           onCreated: (api) => editorApi = api,
         ),
@@ -58,10 +60,11 @@ class SignatureWidget extends HookConsumerWidget {
                 } else {
                   final settings = ref.read(settingsProvider);
                   final notifier = ref.read(settingsProvider.notifier);
+                  signatureState.value =
+                      notifier.getSignatureHtmlGlobal(context);
                   await notifier.update(
                     settings.withoutSignatures(),
                   );
-                  signatureState.value = notifier.getSignatureHtmlGlobal();
                 }
               },
             ),

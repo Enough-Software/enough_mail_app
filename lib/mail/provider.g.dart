@@ -482,7 +482,7 @@ class _RealMimeSourceProviderElement
   Mailbox? get mailbox => (origin as RealMimeSourceProvider).mailbox;
 }
 
-String _$mailSearchHash() => r'166028850f57246adf47921d461b1ff3b5bc3230';
+String _$mailSearchHash() => r'12e814bd6c0f53f6209dd0f68edf09a0ec769c8b';
 
 /// Carries out a search for mail messages
 ///
@@ -503,9 +503,11 @@ class MailSearchFamily extends Family<AsyncValue<MessageSource>> {
   ///
   /// Copied from [mailSearch].
   MailSearchProvider call({
+    required AppLocalizations localizations,
     required MailSearch search,
   }) {
     return MailSearchProvider(
+      localizations: localizations,
       search: search,
     );
   }
@@ -515,6 +517,7 @@ class MailSearchFamily extends Family<AsyncValue<MessageSource>> {
     covariant MailSearchProvider provider,
   ) {
     return call(
+      localizations: provider.localizations,
       search: provider.search,
     );
   }
@@ -542,10 +545,12 @@ class MailSearchProvider extends AutoDisposeFutureProvider<MessageSource> {
   ///
   /// Copied from [mailSearch].
   MailSearchProvider({
+    required AppLocalizations localizations,
     required MailSearch search,
   }) : this._internal(
           (ref) => mailSearch(
             ref as MailSearchRef,
+            localizations: localizations,
             search: search,
           ),
           from: mailSearchProvider,
@@ -557,6 +562,7 @@ class MailSearchProvider extends AutoDisposeFutureProvider<MessageSource> {
           dependencies: MailSearchFamily._dependencies,
           allTransitiveDependencies:
               MailSearchFamily._allTransitiveDependencies,
+          localizations: localizations,
           search: search,
         );
 
@@ -567,9 +573,11 @@ class MailSearchProvider extends AutoDisposeFutureProvider<MessageSource> {
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
+    required this.localizations,
     required this.search,
   }) : super.internal();
 
+  final AppLocalizations localizations;
   final MailSearch search;
 
   @override
@@ -585,6 +593,7 @@ class MailSearchProvider extends AutoDisposeFutureProvider<MessageSource> {
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
+        localizations: localizations,
         search: search,
       ),
     );
@@ -597,12 +606,15 @@ class MailSearchProvider extends AutoDisposeFutureProvider<MessageSource> {
 
   @override
   bool operator ==(Object other) {
-    return other is MailSearchProvider && other.search == search;
+    return other is MailSearchProvider &&
+        other.localizations == localizations &&
+        other.search == search;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, localizations.hashCode);
     hash = _SystemHash.combine(hash, search.hashCode);
 
     return _SystemHash.finish(hash);
@@ -610,6 +622,9 @@ class MailSearchProvider extends AutoDisposeFutureProvider<MessageSource> {
 }
 
 mixin MailSearchRef on AutoDisposeFutureProviderRef<MessageSource> {
+  /// The parameter `localizations` of this provider.
+  AppLocalizations get localizations;
+
   /// The parameter `search` of this provider.
   MailSearch get search;
 }
@@ -618,6 +633,9 @@ class _MailSearchProviderElement
     extends AutoDisposeFutureProviderElement<MessageSource> with MailSearchRef {
   _MailSearchProviderElement(super.provider);
 
+  @override
+  AppLocalizations get localizations =>
+      (origin as MailSearchProvider).localizations;
   @override
   MailSearch get search => (origin as MailSearchProvider).search;
 }
@@ -1456,7 +1474,7 @@ class _UnifiedSourceProviderElement
   Mailbox? get mailbox => (origin as UnifiedSourceProvider).mailbox;
 }
 
-String _$realSourceHash() => r'3583e95ef8796fe9a9696ece4708c1aacf222964';
+String _$realSourceHash() => r'8f473819a0105254df83c234906e6e4889f29ef0';
 
 abstract class _$RealSource
     extends BuildlessAsyncNotifier<MailboxMessageSource> {

@@ -1,5 +1,7 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/account/model.dart';
+import 'package:enough_mail_app/localization/app_localizations.g.dart';
+import 'package:enough_mail_app/localization/app_localizations_en.g.dart';
 import 'package:enough_mail_app/models/async_mime_source.dart';
 import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
@@ -21,7 +23,8 @@ void main() async {
   final notificationService = TestNotificationService();
   GetIt.instance.registerSingleton<NotificationService>(notificationService);
   GetIt.instance.registerLazySingleton<ScaffoldMessengerService>(
-      TestScaffoldMessengerService.new);
+    TestScaffoldMessengerService.new,
+  );
 
   final firstMimeSourceStartDate = DateTime.utc(2022, 04, 16, 09);
   const firstMimeSourceDifferencePerMessage = Duration(minutes: 5);
@@ -1054,14 +1057,19 @@ void main() async {
       expect(message.mimeMessage.sequenceId, 19);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
-          message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate
-              .subtract(secondMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate
+            .subtract(secondMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
 
       final messages = [await source.getMessageAt(2)];
       expect(source.size, 120);
-      await source.deleteMessages(messages, 'deleted messages');
+      await source.deleteMessages(
+        AppLocalizationsEn(),
+        messages,
+        'deleted messages',
+      );
       expect(source.size, 119);
       expect(sourceNotifyCounter, 1);
       expect(notificationService.sendNotifications, 0);
@@ -1070,24 +1078,29 @@ void main() async {
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 99);
       expect(message.mimeMessage.guid, 100);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(2);
       expect(message.mimeMessage.sequenceId, 19);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
-          message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate
-              .subtract(secondMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate
+            .subtract(secondMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
       await _expectMessagesOrderedByDate();
     });
 
@@ -1101,14 +1114,18 @@ void main() async {
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(2);
       expect(message.mimeMessage.sequenceId, 99);
@@ -1130,7 +1147,11 @@ void main() async {
 
       final messages = [await source.getMessageAt(2)];
       expect(source.size, 120);
-      await source.deleteMessages(messages, 'deleted messages');
+      await source.deleteMessages(
+        AppLocalizationsEn(),
+        messages,
+        'deleted messages',
+      );
       source.cache.clear();
       expect(source.size, 119);
       expect(sourceNotifyCounter, 1);
@@ -1140,8 +1161,10 @@ void main() async {
       message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 99);
@@ -1175,7 +1198,11 @@ class TestScaffoldMessengerService implements ScaffoldMessengerService {
       throw UnimplementedError();
 
   @override
-  void showTextSnackBar(String text, {Function()? undo}) {
+  void showTextSnackBar(
+    AppLocalizations localization,
+    String text, {
+    Function()? undo,
+  }) {
     // TODO: implement showTextSnackBar
   }
 

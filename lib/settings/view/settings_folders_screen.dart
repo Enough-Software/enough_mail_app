@@ -359,8 +359,10 @@ class MailboxWidget extends ConsumerWidget {
               folderNameController.text,
               mailbox,
             );
-        locator<ScaffoldMessengerService>()
-            .showTextSnackBar(localizations.folderAddResultSuccess);
+        locator<ScaffoldMessengerService>().showTextSnackBar(
+          localizations,
+          localizations.folderAddResultSuccess,
+        );
         onMailboxAdded();
       } on MailException catch (e) {
         if (context.mounted) {
@@ -391,8 +393,10 @@ class MailboxWidget extends ConsumerWidget {
         await ref
             .read(mailClientSourceProvider(account: account).notifier)
             .deleteMailbox(mailbox);
-        locator<ScaffoldMessengerService>()
-            .showTextSnackBar(localizations.folderDeleteResultSuccess);
+        locator<ScaffoldMessengerService>().showTextSnackBar(
+          localizations,
+          localizations.folderDeleteResultSuccess,
+        );
         onMailboxDeleted();
       } on MailException catch (e) {
         if (context.mounted) {

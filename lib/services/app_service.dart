@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import '../localization/app_localizations_en.g.dart';
 import '../locator.dart';
 import '../logger.dart';
 import '../settings/model.dart';
@@ -54,8 +55,8 @@ class AppService {
             // if (navService.currentRouteName != Routes.lockScreen) {
             //   await navService.push(Routes.lockScreen);
             // }
-            final bool didAuthenticate =
-                await locator<BiometricsService>().authenticate();
+            final bool didAuthenticate = await locator<BiometricsService>()
+                .authenticate(AppLocalizationsEn());
             // if (!didAuthenticate) {
             //   if (navService.currentRouteName != Routes.lockScreen) {
             //     await navService.push(Routes.lockScreen);

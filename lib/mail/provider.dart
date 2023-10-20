@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../account/model.dart';
 import '../account/provider.dart';
 import '../app_lifecycle/provider.dart';
+import '../localization/app_localizations.g.dart';
 import '../models/async_mime_source.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
@@ -256,13 +257,14 @@ class MailClientSource extends _$MailClientSource {
 @riverpod
 Future<MessageSource> mailSearch(
   MailSearchRef ref, {
+  required AppLocalizations localizations,
   required MailSearch search,
 }) async {
   final account =
       ref.watch(currentAccountProvider) ?? ref.watch(allAccountsProvider).first;
   final source = await ref.watch(sourceProvider(account: account).future);
 
-  return source.search(search);
+  return source.search(localizations, search);
 }
 
 /// Loads the message source for the given payload
