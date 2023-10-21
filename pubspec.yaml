@@ -163,6 +163,7 @@ dev_dependencies:
   custom_lint: ^0.5.3
   dart_code_metrics: 5.7.6
   flutter_lints: ^2.0.1
+  flutter_native_splash: ^2.3.2
   flutter_test:
     sdk: flutter
   hive_generator: ^2.0.0
