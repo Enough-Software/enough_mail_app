@@ -1112,6 +1112,22 @@ class MultipleMessageSource extends MessageSource {
       multipleSource.clear();
     }
   }
+
+  // @override
+  // Future<Message> loadSingleMessage(MailNotificationPayload payload) async {
+  //   final mimeSource = mimeSources.firstWhereOrNull(
+  //     (source) => source.mailClient.account.email == payload.accountEmail,
+  //   );
+  //   if (mimeSource == null) {
+  //     throw Exception('Unable to find mime source for ${payload.accountEmail}');
+  //   }
+  //   final payloadMime = MimeMessage()
+  //     ..sequenceId = payload.sequenceId
+  //     ..uid = payload.uid;
+  //   final mime = await mimeSource.fetchMessageContents(payloadMime);
+
+  //   return createMessage(mime, mimeSource, 0);
+  // }
 }
 
 class _UnifiedMessage extends Message {
@@ -1169,8 +1185,10 @@ class _MultipleMimeSource {
     if (mimeSource.supportsDeleteAll) {
       _currentIndex = 0;
       _currentMessage = null;
+
       return mimeSource.deleteAllMessages(expunge: expunge);
     }
+
     return Future.value([]);
   }
 

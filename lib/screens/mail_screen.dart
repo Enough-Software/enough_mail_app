@@ -8,18 +8,27 @@ import '../account/provider.dart';
 import '../localization/extension.dart';
 import '../mail/provider.dart';
 import 'base.dart';
-import 'message_source_screen.dart';
+import 'error_screen.dart';
+import 'screens.dart';
 
 /// Displays the mail for a given account
 class MailScreen extends ConsumerWidget {
   /// Creates a [MailScreen]
-  const MailScreen({super.key, required this.account, this.mailbox});
+  const MailScreen({
+    super.key,
+    required this.account,
+    this.mailbox,
+    this.showSplashWhileLoading = false,
+  });
 
   /// The account to display
   final Account account;
 
   /// The optional mailbox
   final Mailbox? mailbox;
+
+  /// Should the splash screen shown while loading the message source?
+  final bool showSplashWhileLoading;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,17 +49,18 @@ class MailScreen extends ConsumerWidget {
         currentMailboxProvider.overrideWithValue(mailbox),
       ],
       child: sourceFuture.when(
-        loading: () => BasePage(
-          title: title,
-          subtitle: subtitle,
-          content: const Center(
-            child: PlatformProgressIndicator(),
-          ),
-        ),
-        error: (error, stack) => BasePage(
-          title: title,
-          subtitle: subtitle,
-          content: Center(child: Text('$error')),
+        loading: () => showSplashWhileLoading
+            ? const SplashScreen()
+            : BasePage(
+                title: title,
+                subtitle: subtitle,
+                content: const Center(
+                  child: PlatformProgressIndicator(),
+                ),
+              ),
+        error: (error, stack) => ErrorScreen(
+          error: error,
+          stackTrace: stack,
         ),
         data: (source) => MessageSourceScreen(messageSource: source),
       ),

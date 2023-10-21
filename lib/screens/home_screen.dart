@@ -24,6 +24,7 @@ class HomeScreen extends ConsumerWidget {
 
     return MailScreen(
       account: accounts.first,
+      showSplashWhileLoading: true,
     );
   }
 }

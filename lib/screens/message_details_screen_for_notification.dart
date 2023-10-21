@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../mail/provider.dart';
 import '../notification/model.dart';
+import 'error_screen.dart';
 import 'message_details_screen.dart';
 
 /// Displays the message details for a notification
@@ -28,7 +29,7 @@ class MessageDetailsForNotificationScreen extends ConsumerWidget {
 
     return messageValue.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text('$error')),
+      error: (error, stack) => ErrorScreen(error: error, stackTrace: stack),
       data: (data) => MessageDetailsScreen(
         message: data,
         blockExternalContent: blockExternalContent,

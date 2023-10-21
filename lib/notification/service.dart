@@ -143,7 +143,11 @@ class NotificationService {
       );
 
   Future sendLocalNotificationForMailMessage(maily.Message message) =>
-      sendLocalNotificationForMail(message.mimeMessage, message.account.email);
+      sendLocalNotificationForMail(
+        message.mimeMessage,
+        message.source.getMimeSource(message)?.mailClient.account.email ??
+            message.account.email,
+      );
 
   Future sendLocalNotificationForMail(
     MimeMessage mimeMessage,
