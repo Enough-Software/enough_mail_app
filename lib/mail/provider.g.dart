@@ -325,163 +325,6 @@ class _FindMailboxProviderElement
       (origin as FindMailboxProvider).encodedMailboxPath;
 }
 
-String _$realMimeSourceHash() => r'f9aa67160da33cc3ebb0ae9fd9edfeeaab85ab76';
-
-/// Provides the message source for the given account
-///
-/// Copied from [realMimeSource].
-@ProviderFor(realMimeSource)
-const realMimeSourceProvider = RealMimeSourceFamily();
-
-/// Provides the message source for the given account
-///
-/// Copied from [realMimeSource].
-class RealMimeSourceFamily extends Family<AsyncValue<AsyncMimeSource>> {
-  /// Provides the message source for the given account
-  ///
-  /// Copied from [realMimeSource].
-  const RealMimeSourceFamily();
-
-  /// Provides the message source for the given account
-  ///
-  /// Copied from [realMimeSource].
-  RealMimeSourceProvider call({
-    required RealAccount account,
-    Mailbox? mailbox,
-  }) {
-    return RealMimeSourceProvider(
-      account: account,
-      mailbox: mailbox,
-    );
-  }
-
-  @override
-  RealMimeSourceProvider getProviderOverride(
-    covariant RealMimeSourceProvider provider,
-  ) {
-    return call(
-      account: provider.account,
-      mailbox: provider.mailbox,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'realMimeSourceProvider';
-}
-
-/// Provides the message source for the given account
-///
-/// Copied from [realMimeSource].
-class RealMimeSourceProvider extends FutureProvider<AsyncMimeSource> {
-  /// Provides the message source for the given account
-  ///
-  /// Copied from [realMimeSource].
-  RealMimeSourceProvider({
-    required RealAccount account,
-    Mailbox? mailbox,
-  }) : this._internal(
-          (ref) => realMimeSource(
-            ref as RealMimeSourceRef,
-            account: account,
-            mailbox: mailbox,
-          ),
-          from: realMimeSourceProvider,
-          name: r'realMimeSourceProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$realMimeSourceHash,
-          dependencies: RealMimeSourceFamily._dependencies,
-          allTransitiveDependencies:
-              RealMimeSourceFamily._allTransitiveDependencies,
-          account: account,
-          mailbox: mailbox,
-        );
-
-  RealMimeSourceProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.account,
-    required this.mailbox,
-  }) : super.internal();
-
-  final RealAccount account;
-  final Mailbox? mailbox;
-
-  @override
-  Override overrideWith(
-    FutureOr<AsyncMimeSource> Function(RealMimeSourceRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: RealMimeSourceProvider._internal(
-        (ref) => create(ref as RealMimeSourceRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        account: account,
-        mailbox: mailbox,
-      ),
-    );
-  }
-
-  @override
-  FutureProviderElement<AsyncMimeSource> createElement() {
-    return _RealMimeSourceProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is RealMimeSourceProvider &&
-        other.account == account &&
-        other.mailbox == mailbox;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, account.hashCode);
-    hash = _SystemHash.combine(hash, mailbox.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-mixin RealMimeSourceRef on FutureProviderRef<AsyncMimeSource> {
-  /// The parameter `account` of this provider.
-  RealAccount get account;
-
-  /// The parameter `mailbox` of this provider.
-  Mailbox? get mailbox;
-}
-
-class _RealMimeSourceProviderElement
-    extends FutureProviderElement<AsyncMimeSource> with RealMimeSourceRef {
-  _RealMimeSourceProviderElement(super.provider);
-
-  @override
-  RealAccount get account => (origin as RealMimeSourceProvider).account;
-  @override
-  Mailbox? get mailbox => (origin as RealMimeSourceProvider).mailbox;
-}
-
 String _$mailSearchHash() => r'12e814bd6c0f53f6209dd0f68edf09a0ec769c8b';
 
 /// Carries out a search for mail messages
@@ -1474,7 +1317,7 @@ class _UnifiedSourceProviderElement
   Mailbox? get mailbox => (origin as UnifiedSourceProvider).mailbox;
 }
 
-String _$realSourceHash() => r'8f473819a0105254df83c234906e6e4889f29ef0';
+String _$realSourceHash() => r'd9f16bf2faa477e3d2e25f1dc9e1f89a3f3e7094';
 
 abstract class _$RealSource
     extends BuildlessAsyncNotifier<MailboxMessageSource> {
@@ -1651,6 +1494,185 @@ class _RealSourceProviderElement
   RealAccount get account => (origin as RealSourceProvider).account;
   @override
   Mailbox? get mailbox => (origin as RealSourceProvider).mailbox;
+}
+
+String _$realMimeSourceHash() => r'5e0396a1c7cccecc8da8c95c449c985c364ced60';
+
+abstract class _$RealMimeSource
+    extends BuildlessAsyncNotifier<AsyncMimeSource> {
+  late final RealAccount account;
+  late final Mailbox? mailbox;
+
+  Future<AsyncMimeSource> build({
+    required RealAccount account,
+    Mailbox? mailbox,
+  });
+}
+
+/// Provides the message source for the given account
+///
+/// Copied from [RealMimeSource].
+@ProviderFor(RealMimeSource)
+const realMimeSourceProvider = RealMimeSourceFamily();
+
+/// Provides the message source for the given account
+///
+/// Copied from [RealMimeSource].
+class RealMimeSourceFamily extends Family<AsyncValue<AsyncMimeSource>> {
+  /// Provides the message source for the given account
+  ///
+  /// Copied from [RealMimeSource].
+  const RealMimeSourceFamily();
+
+  /// Provides the message source for the given account
+  ///
+  /// Copied from [RealMimeSource].
+  RealMimeSourceProvider call({
+    required RealAccount account,
+    Mailbox? mailbox,
+  }) {
+    return RealMimeSourceProvider(
+      account: account,
+      mailbox: mailbox,
+    );
+  }
+
+  @override
+  RealMimeSourceProvider getProviderOverride(
+    covariant RealMimeSourceProvider provider,
+  ) {
+    return call(
+      account: provider.account,
+      mailbox: provider.mailbox,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'realMimeSourceProvider';
+}
+
+/// Provides the message source for the given account
+///
+/// Copied from [RealMimeSource].
+class RealMimeSourceProvider
+    extends AsyncNotifierProviderImpl<RealMimeSource, AsyncMimeSource> {
+  /// Provides the message source for the given account
+  ///
+  /// Copied from [RealMimeSource].
+  RealMimeSourceProvider({
+    required RealAccount account,
+    Mailbox? mailbox,
+  }) : this._internal(
+          () => RealMimeSource()
+            ..account = account
+            ..mailbox = mailbox,
+          from: realMimeSourceProvider,
+          name: r'realMimeSourceProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$realMimeSourceHash,
+          dependencies: RealMimeSourceFamily._dependencies,
+          allTransitiveDependencies:
+              RealMimeSourceFamily._allTransitiveDependencies,
+          account: account,
+          mailbox: mailbox,
+        );
+
+  RealMimeSourceProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.account,
+    required this.mailbox,
+  }) : super.internal();
+
+  final RealAccount account;
+  final Mailbox? mailbox;
+
+  @override
+  Future<AsyncMimeSource> runNotifierBuild(
+    covariant RealMimeSource notifier,
+  ) {
+    return notifier.build(
+      account: account,
+      mailbox: mailbox,
+    );
+  }
+
+  @override
+  Override overrideWith(RealMimeSource Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: RealMimeSourceProvider._internal(
+        () => create()
+          ..account = account
+          ..mailbox = mailbox,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        account: account,
+        mailbox: mailbox,
+      ),
+    );
+  }
+
+  @override
+  AsyncNotifierProviderElement<RealMimeSource, AsyncMimeSource>
+      createElement() {
+    return _RealMimeSourceProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RealMimeSourceProvider &&
+        other.account == account &&
+        other.mailbox == mailbox;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, account.hashCode);
+    hash = _SystemHash.combine(hash, mailbox.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin RealMimeSourceRef on AsyncNotifierProviderRef<AsyncMimeSource> {
+  /// The parameter `account` of this provider.
+  RealAccount get account;
+
+  /// The parameter `mailbox` of this provider.
+  Mailbox? get mailbox;
+}
+
+class _RealMimeSourceProviderElement
+    extends AsyncNotifierProviderElement<RealMimeSource, AsyncMimeSource>
+    with RealMimeSourceRef {
+  _RealMimeSourceProviderElement(super.provider);
+
+  @override
+  RealAccount get account => (origin as RealMimeSourceProvider).account;
+  @override
+  Mailbox? get mailbox => (origin as RealMimeSourceProvider).mailbox;
 }
 
 String _$mailClientSourceHash() => r'7ac0dcba26568bfa298f314958e433db9ce41de5';

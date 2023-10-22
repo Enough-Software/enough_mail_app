@@ -38,7 +38,7 @@ class EmailService {
     final source = _mimeSourceFactory.createMailboxMimeSource(
       mailClient,
       mailbox,
-    ); //..addSubscriber(this);
+    );
 
     return source;
   }

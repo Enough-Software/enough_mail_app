@@ -57,7 +57,6 @@ class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
   void initState() {
     _pageController = PageController(initialPage: widget.message.sourceIndex);
     _current = widget.message;
-    _current.addListener(_update);
     _source = _current.source;
     super.initState();
   }
@@ -65,12 +64,7 @@ class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
   @override
   void dispose() {
     _pageController.dispose();
-    _current.removeListener(_update);
     super.dispose();
-  }
-
-  void _update() {
-    setState(() {});
   }
 
   Future<Message> _getMessageAt(int index) {
@@ -88,61 +82,62 @@ class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
   Widget build(BuildContext context) {
     final localizations = context.text;
 
-    return BasePage(
-      title: _current.mimeMessage.decodeSubject() ??
-          localizations.subjectUndefined,
-      appBarActions: [
-        //PlatformIconButton(icon: Icon(Icons.reply), onPressed: reply),
-        PlatformPopupMenuButton<_OverflowMenuChoice>(
-          onSelected: (_OverflowMenuChoice result) {
-            switch (result) {
-              case _OverflowMenuChoice.showContents:
-                context.pushNamed(Routes.mailContents, extra: _current);
-                break;
-              case _OverflowMenuChoice.showSourceCode:
-                _showSourceCode();
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) => [
-            PlatformPopupMenuItem<_OverflowMenuChoice>(
-              value: _OverflowMenuChoice.showContents,
-              child: Text(localizations.viewContentsAction),
-            ),
-            if (ref.read(settingsProvider).enableDeveloperMode)
+    return ListenableBuilder(
+      listenable: _current,
+      builder: (context, child) => BasePage(
+        title: _current.mimeMessage.decodeSubject() ??
+            localizations.subjectUndefined,
+        appBarActions: [
+          //PlatformIconButton(icon: Icon(Icons.reply), onPressed: reply),
+          PlatformPopupMenuButton<_OverflowMenuChoice>(
+            onSelected: (_OverflowMenuChoice result) {
+              switch (result) {
+                case _OverflowMenuChoice.showContents:
+                  context.pushNamed(Routes.mailContents, extra: _current);
+                  break;
+                case _OverflowMenuChoice.showSourceCode:
+                  _showSourceCode();
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) => [
               PlatformPopupMenuItem<_OverflowMenuChoice>(
-                value: _OverflowMenuChoice.showSourceCode,
-                child: Text(localizations.viewSourceAction),
+                value: _OverflowMenuChoice.showContents,
+                child: Text(localizations.viewContentsAction),
               ),
-          ],
-        ),
-      ],
-      bottom: MessageActions(message: _current),
-      content: PageView.builder(
-        controller: _pageController,
-        itemCount: _source.size,
-        itemBuilder: (context, index) => FutureBuilder<Message>(
-          future: _getMessageAt(index),
-          builder: (context, snapshot) {
-            final data = snapshot.data;
-            if (data == null) {
-              return const EmptyMessage();
-            }
+              if (ref.read(settingsProvider).enableDeveloperMode)
+                PlatformPopupMenuItem<_OverflowMenuChoice>(
+                  value: _OverflowMenuChoice.showSourceCode,
+                  child: Text(localizations.viewSourceAction),
+                ),
+            ],
+          ),
+        ],
+        bottom: MessageActions(message: _current),
+        content: PageView.builder(
+          controller: _pageController,
+          itemCount: _source.size,
+          itemBuilder: (context, index) => FutureBuilder<Message>(
+            future: _getMessageAt(index),
+            builder: (context, snapshot) {
+              final data = snapshot.data;
+              if (data == null) {
+                return const EmptyMessage();
+              }
 
-            return _MessageContent(
-              data,
-              blockExternalContents: _blockExternalContents(index),
-            );
+              return _MessageContent(
+                data,
+                blockExternalContents: _blockExternalContents(index),
+              );
+            },
+          ),
+          onPageChanged: (index) async {
+            final current = await _getMessageAt(index);
+            setState(() {
+              _current = current;
+            });
           },
         ),
-        onPageChanged: (index) async {
-          final current = await _getMessageAt(index);
-          setState(() {
-            _current.removeListener(_update);
-            _current = current;
-            _current.addListener(_update);
-          });
-        },
       ),
     );
   }
@@ -153,6 +148,7 @@ class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
 
 class _MessageContent extends ConsumerStatefulWidget {
   const _MessageContent(this.message, {this.blockExternalContents = false});
+
   final Message message;
   final bool blockExternalContents;
 
@@ -178,7 +174,9 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
     } else if (mime.isDownloaded) {
       _blockExternalImages = _shouldImagesBeBlocked(mime);
       if (!mime.isSeen) {
-        unawaited(message.source.markAsSeen(message, true));
+        Future.delayed(const Duration(milliseconds: 50)).then(
+          (_) => message.source.markAsSeen(message, true),
+        );
       }
     } else {
       _messageRequiresRefresh = mime.envelope == null;
@@ -280,7 +278,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
               if (mime.threadSequence != null)
                 ThreadSequenceButton(message: widget.message)
               else
-                Container(),
+                const SizedBox.shrink(),
               if (_isWebViewZoomedOut)
                 PlatformIconButton(
                   icon: const Icon(Icons.zoom_in),
@@ -290,7 +288,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
                   ),
                 )
               else
-                Container(),
+                const SizedBox.shrink(),
               if (_blockExternalImages)
                 PlatformElevatedButton(
                   child: ButtonText(localizations.detailsActionShowImages),
@@ -301,13 +299,13 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
                   ),
                 )
               else
-                Container(),
+                const SizedBox.shrink(),
               if (mime.isNewsletter)
                 UnsubscribeButton(
                   message: widget.message,
                 )
               else
-                Container(),
+                const SizedBox.shrink(),
             ],
           ),
         if (ReadReceiptButton.shouldBeShown(mime, ref.read(settingsProvider)))
@@ -320,7 +318,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
 
   Widget _buildMailAddresses(List<MailAddress>? addresses) {
     if (addresses?.isEmpty ?? true) {
-      return Container();
+      return const SizedBox.shrink();
     }
     return MailAddressList(mailAddresses: addresses!);
   }
@@ -437,6 +435,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
             );
           }
         }
+
         return null;
       },
     );
@@ -453,6 +452,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
         blockExternalImages = false;
       }
     }
+
     return blockExternalImages;
   }
 

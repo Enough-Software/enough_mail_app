@@ -90,7 +90,7 @@ class UnifiedSource extends _$UnifiedSource {
 
 /// Provides the message source for the given account
 @Riverpod(keepAlive: true)
-class RealSource extends _$RealSource implements MimeSourceSubscriber {
+class RealSource extends _$RealSource {
   @override
   Future<MailboxMessageSource> build({
     required RealAccount account,
@@ -98,8 +98,7 @@ class RealSource extends _$RealSource implements MimeSourceSubscriber {
   }) async {
     final source = await ref.watch(
       realMimeSourceProvider(account: account, mailbox: mailbox).future,
-    )
-      ..addSubscriber(this);
+    );
 
     return MailboxMessageSource.fromMimeSource(
       source,
@@ -107,37 +106,6 @@ class RealSource extends _$RealSource implements MimeSourceSubscriber {
       mailbox ?? source.mailbox,
       account: account,
     );
-  }
-
-  @override
-  void onMailArrived(
-    MimeMessage mime,
-    AsyncMimeSource source, {
-    int index = 0,
-  }) {
-    source.mailClient.lowLevelIncomingMailClient
-        .logApp('new message: ${mime.decodeSubject()}');
-    if (!mime.isSeen && source.isInbox) {
-      NotificationService.instance
-          .sendLocalNotificationForMail(mime, source.mailClient.account.email);
-    }
-  }
-
-  @override
-  void onMailCacheInvalidated(AsyncMimeSource source) {
-    // ignore
-  }
-
-  @override
-  void onMailFlagsUpdated(MimeMessage mime, AsyncMimeSource source) {
-    if (mime.isSeen) {
-      NotificationService.instance.cancelNotificationForMime(mime);
-    }
-  }
-
-  @override
-  void onMailVanished(MimeMessage mime, AsyncMimeSource source) {
-    NotificationService.instance.cancelNotificationForMime(mime);
   }
 }
 
@@ -186,19 +154,55 @@ Future<Mailbox?> findMailbox(
 
 /// Provides the message source for the given account
 @Riverpod(keepAlive: true)
-Future<AsyncMimeSource> realMimeSource(
-  RealMimeSourceRef ref, {
-  required RealAccount account,
-  Mailbox? mailbox,
-}) async {
-  final mailClient = ref.watch(
-    mailClientSourceProvider(account: account, mailbox: mailbox),
-  );
+class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
+  @override
+  Future<AsyncMimeSource> build({
+    required RealAccount account,
+    Mailbox? mailbox,
+  }) async {
+    final mailClient = ref.watch(
+      mailClientSourceProvider(account: account, mailbox: mailbox),
+    );
 
-  return EmailService.instance.createMimeSource(
-    mailClient: mailClient,
-    mailbox: mailbox,
-  );
+    final mimeSource = await EmailService.instance.createMimeSource(
+      mailClient: mailClient,
+      mailbox: mailbox,
+    )
+      ..addSubscriber(this);
+
+    return mimeSource;
+  }
+
+  @override
+  void onMailArrived(
+    MimeMessage mime,
+    AsyncMimeSource source, {
+    int index = 0,
+  }) {
+    source.mailClient.lowLevelIncomingMailClient
+        .logApp('new message: ${mime.decodeSubject()}');
+    if (!mime.isSeen && source.isInbox) {
+      NotificationService.instance
+          .sendLocalNotificationForMail(mime, source.mailClient.account.email);
+    }
+  }
+
+  @override
+  void onMailCacheInvalidated(AsyncMimeSource source) {
+    // ignore
+  }
+
+  @override
+  void onMailFlagsUpdated(MimeMessage mime, AsyncMimeSource source) {
+    if (mime.isSeen) {
+      NotificationService.instance.cancelNotificationForMime(mime);
+    }
+  }
+
+  @override
+  void onMailVanished(MimeMessage mime, AsyncMimeSource source) {
+    NotificationService.instance.cancelNotificationForMime(mime);
+  }
 }
 
 /// Provides mail clients

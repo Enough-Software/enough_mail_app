@@ -87,7 +87,7 @@ class Background extends _$Background {
   Future<void> _saveStateOnPause() async {
     logger.d('save state on pause: isActive=$_isActive');
     if (!_isActive) {
-      return;
+      return _checkForNewMail();
     }
 
     final accounts = ref.read(realAccountsProvider);

@@ -6,7 +6,7 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$backgroundHash() => r'e71958e083fcc34aa39eb838b6087a408299eaf2';
+String _$backgroundHash() => r'813a3c2544d226255cd75b4fbb9716e05fbd0679';
 
 /// Registers the background service to check for emails regularly
 ///
