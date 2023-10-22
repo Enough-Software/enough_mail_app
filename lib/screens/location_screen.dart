@@ -2,7 +2,6 @@ import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +11,7 @@ import 'package:map/map.dart';
 
 import '../localization/extension.dart';
 import '../locator.dart';
+import '../logger.dart';
 import '../routes.dart';
 import '../services/location_service.dart';
 import 'base.dart';
@@ -28,13 +28,26 @@ class _LocationScreenState extends State<LocationScreen> {
 
   final _defaultLocation = const LatLng(53.07516, 8.80777);
   late MapController _controller;
-  Future<LocationData?>? _findLocation;
+  Future<LocationData?>? _findLocationFuture;
   late Offset _dragStart;
   var _scaleStart = 1.0;
 
   @override
   void initState() {
-    _findLocation = locator<LocationService>().getCurrentLocation();
+    _controller = MapController(
+      location: _defaultLocation,
+    );
+    _findLocationFuture = locator<LocationService>().getCurrentLocation().then(
+      (value) {
+        final latitude = value?.latitude;
+        final longitude = value?.longitude;
+        if (latitude != null && longitude != null) {
+          _controller.center = LatLng(latitude, longitude);
+        }
+
+        return value;
+      },
+    );
     super.initState();
   }
 
@@ -51,7 +64,7 @@ class _LocationScreenState extends State<LocationScreen> {
         ),
       ],
       content: FutureBuilder<LocationData?>(
-        future: _findLocation,
+        future: _findLocationFuture,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -106,10 +119,10 @@ class _LocationScreenState extends State<LocationScreen> {
         onScaleStart: _onScaleStart,
         onScaleUpdate: (details) => _onScaleUpdate(details, transformer),
         onScaleEnd: (details) {
-          if (kDebugMode) {
-            print(
-                'Location: ${_controller.center.latitude}, ${_controller.center.longitude}');
-          }
+          logger.d(
+            'Location: ${_controller.center.latitude}, '
+            '${_controller.center.longitude}',
+          );
         },
         child: SizedBox(
           width: size.width,
