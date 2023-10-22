@@ -157,7 +157,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   TextEditorApi? _plainTextEditorApi;
 
   @override
-  void initState() {
+  void didChangeDependencies() {
     onSharedData = _onSharedData;
     _composeMode = widget.data.composeMode;
     final mb = widget.data.messageBuilder;
@@ -204,7 +204,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         });
       });
     }
-    super.initState();
+    super.didChangeDependencies();
   }
 
   @override
@@ -314,11 +314,11 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   Future<void> _populateMessageBuilder({
     bool storeComposeDataForResume = false,
   }) async {
-    final mb = widget.data.messageBuilder;
-    mb.to = _toRecipients;
-    mb.cc = _ccRecipients;
-    mb.bcc = _bccRecipients;
-    mb.subject = _subjectController.text;
+    final mb = widget.data.messageBuilder
+      ..to = _toRecipients
+      ..cc = _ccRecipients
+      ..bcc = _bccRecipients
+      ..subject = _subjectController.text;
 
     final text = _composeMode == ComposeMode.html
         ? await _htmlEditorApi!.getText()
