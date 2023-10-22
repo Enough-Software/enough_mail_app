@@ -14,6 +14,7 @@ import 'logger.dart';
 import 'notification/service.dart';
 import 'routes.dart';
 import 'screens/screens.dart';
+import 'services/key_service.dart';
 import 'services/scaffold_messenger_service.dart';
 import 'settings/provider.dart';
 import 'settings/theme/provider.dart';
@@ -115,6 +116,7 @@ class _InitializationScreen extends ConsumerState<InitializationScreen> {
     if (context.mounted) {
       await NotificationService.instance.init(context: context);
     }
+    await locator<KeyService>().init();
     // final mailService = locator<MailService>();
     // // key service is required before mail service due to Oauth configs
     // await locator<KeyService>().init();
