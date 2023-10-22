@@ -3,10 +3,10 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../account/model.dart';
 import '../account/provider.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
+import '../logger.dart';
 import '../util/datetime.dart';
 import '../util/modal_bottom_sheet_helper.dart';
 
@@ -23,11 +23,10 @@ class IcalComposer extends StatefulHookConsumerWidget {
   }) async {
     final localizations = context.text;
     // final iconService = locator<IconService>();
-    var account = ref.read(currentAccountProvider);
-    if (account is UnifiedAccount) {
-      account = account.accounts.first;
-    }
-    if (account is! RealAccount) {
+    final account = ref.read(currentRealAccountProvider);
+    if (account == null) {
+      logger.e('Unable to determine current real account');
+
       return null;
     }
     final now = DateTime.now();

@@ -1247,6 +1247,7 @@ class TestNotificationService implements NotificationService {
   @override
   Future<NotificationServiceInitResult> init({
     bool checkForLaunchDetails = true,
+    BuildContext? context,
   }) {
     // TODO: implement init
     throw UnimplementedError();

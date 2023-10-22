@@ -528,7 +528,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
               actions: [
                 AddAttachmentPopupButton(
                   composeData: widget.data,
-                  update: () => setState(() {}),
+                  update: () => setState(
+                    () {},
+                  ),
                 ),
                 PlatformIconButton(
                   icon: const Icon(Icons.send),
@@ -632,6 +634,8 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                               recipient: _from.address,
                             );
                           }
+                          ref.read(currentAccountProvider.notifier).account =
+                              s.account;
                           setState(() {
                             _realAccount = s.account;
                           });

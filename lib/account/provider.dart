@@ -159,7 +159,20 @@ bool hasAccountWithError(
 
 /// Provides the locally current active account
 @riverpod
-Account? currentAccount(CurrentAccountRef ref) => null;
+class CurrentAccount extends _$CurrentAccount {
+  /// Creates a [CurrentAccount]
+  CurrentAccount({Account? initialAccount}) : _initialAccount = initialAccount;
+
+  final Account? _initialAccount;
+  @override
+  Account? build() => _initialAccount;
+
+  /// Sets the current account
+  // ignore: avoid_setters_without_getters
+  set account(Account? account) {
+    state = account;
+  }
+}
 
 /// Provides the current real account
 @riverpod

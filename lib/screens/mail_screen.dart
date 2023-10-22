@@ -45,8 +45,10 @@ class MailScreen extends ConsumerWidget {
 
     return ProviderScope(
       overrides: [
-        currentAccountProvider.overrideWithValue(account),
         currentMailboxProvider.overrideWithValue(mailbox),
+        currentAccountProvider.overrideWith(
+          () => CurrentAccount(initialAccount: account),
+        ),
       ],
       child: sourceFuture.when(
         loading: () => showSplashWhileLoading

@@ -358,23 +358,6 @@ final hasAccountWithErrorProvider = Provider<bool>.internal(
 );
 
 typedef HasAccountWithErrorRef = ProviderRef<bool>;
-String _$currentAccountHash() => r'1a478a132562c199f6e6f9a8e23d485b2d93e2bc';
-
-/// Provides the locally current active account
-///
-/// Copied from [currentAccount].
-@ProviderFor(currentAccount)
-final currentAccountProvider = AutoDisposeProvider<Account?>.internal(
-  currentAccount,
-  name: r'currentAccountProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$currentAccountHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef CurrentAccountRef = AutoDisposeProviderRef<Account?>;
 String _$currentRealAccountHash() =>
     r'dd79b65ff2ea824e117c4f13416c6b6993fa4a86';
 
@@ -427,5 +410,23 @@ final allAccountsProvider =
 );
 
 typedef _$AllAccounts = Notifier<List<Account>>;
+String _$currentAccountHash() => r'1609b7a565d0521aa1d52e0659d6eb42ff72b5cd';
+
+/// Provides the locally current active account
+///
+/// Copied from [CurrentAccount].
+@ProviderFor(CurrentAccount)
+final currentAccountProvider =
+    AutoDisposeNotifierProvider<CurrentAccount, Account?>.internal(
+  CurrentAccount.new,
+  name: r'currentAccountProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentAccountHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$CurrentAccount = AutoDisposeNotifier<Account?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

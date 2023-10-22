@@ -1496,7 +1496,7 @@ class _RealSourceProviderElement
   Mailbox? get mailbox => (origin as RealSourceProvider).mailbox;
 }
 
-String _$realMimeSourceHash() => r'5e0396a1c7cccecc8da8c95c449c985c364ced60';
+String _$realMimeSourceHash() => r'5c1451ab3222cdfaf79717dbc989184615529302';
 
 abstract class _$RealMimeSource
     extends BuildlessAsyncNotifier<AsyncMimeSource> {
