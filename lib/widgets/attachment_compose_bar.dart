@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../app_lifecycle/provider.dart';
 import '../keys/service.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
@@ -85,6 +86,10 @@ class AddAttachmentPopupButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    void ignoreNextResume() => ref
+        .read(appLifecycleProvider.notifier)
+        .ignoreNextInactivationCycle(timeout: const Duration(seconds: 120));
+
     final localizations = context.text;
     final iconService = IconService.instance;
     const brightness = Brightness.light;
@@ -156,16 +161,26 @@ class AddAttachmentPopupButton extends ConsumerWidget {
         var changed = false;
         switch (value) {
           case 0: // any file
+            ignoreNextResume();
             changed = await addAttachmentFile();
             break;
           case 1: // photo file
-            changed = await addAttachmentFile(fileType: FileType.image);
+            ignoreNextResume();
+            changed = await addAttachmentFile(
+              fileType: FileType.image,
+            );
             break;
           case 2: // video file
-            changed = await addAttachmentFile(fileType: FileType.video);
+            ignoreNextResume();
+            changed = await addAttachmentFile(
+              fileType: FileType.video,
+            );
             break;
           case 3: // audio file
-            changed = await addAttachmentFile(fileType: FileType.audio);
+            ignoreNextResume();
+            changed = await addAttachmentFile(
+              fileType: FileType.audio,
+            );
             break;
           case 4: // location
             if (context.mounted) {
@@ -200,7 +215,9 @@ class AddAttachmentPopupButton extends ConsumerWidget {
     );
   }
 
-  Future<bool> addAttachmentFile({FileType fileType = FileType.any}) async {
+  Future<bool> addAttachmentFile({
+    FileType fileType = FileType.any,
+  }) async {
     final result = await FilePicker.platform
         .pickFiles(type: fileType, allowMultiple: true, withData: true);
     if (result == null) {

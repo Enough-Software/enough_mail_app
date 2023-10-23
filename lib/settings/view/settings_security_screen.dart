@@ -4,7 +4,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
+import '../../app_lifecycle/provider.dart';
 import '../../localization/extension.dart';
+import '../../lock/provider.dart';
 import '../../lock/service.dart';
 import '../../screens/base.dart';
 import '../../util/localized_dialog_helper.dart';
@@ -111,12 +113,12 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                   ),
                 ),
                 const Divider(),
-                if (isBiometricsSupported.value == false)
+                if (!(isBiometricsSupported.value ?? false))
                   Padding(
                     padding: const EdgeInsets.all(8),
                     child: Text(localizations.securityUnlockNotAvailable),
                   )
-                else if (isBiometricsSupported.value ?? false == true) ...[
+                else if (isBiometricsSupported.value ?? false) ...[
                   Row(
                     children: [
                       Expanded(
@@ -127,12 +129,18 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                             final String? reason = enableBiometricLock
                                 ? null
                                 : localizations.securityUnlockDisableReason;
+                            ref
+                                .read(appLifecycleProvider.notifier)
+                                .ignoreNextInactivationCycle();
                             final didAuthenticate =
                                 await BiometricsService.instance.authenticate(
                               localizations,
                               reason: reason,
                             );
                             if (didAuthenticate) {
+                              if (enableBiometricLock && context.mounted) {
+                                AppLock.ignoreNextSettingsChange = true;
+                              }
                               await ref.read(settingsProvider.notifier).update(
                                     settings.copyWith(
                                       enableBiometricLock: enableBiometricLock,

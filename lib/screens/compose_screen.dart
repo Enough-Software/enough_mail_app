@@ -423,12 +423,15 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         appendToSent: append,
       );
       ScaffoldMessengerService.instance.showTextSnackBar(
-          localizations, localizations.composeMailSendSuccess);
+        localizations,
+        localizations.composeMailSendSuccess,
+      );
     } catch (e, s) {
       if (kDebugMode) {
         print('Unable to send or append mail: $e $s');
       }
-      // this state's context is now invalid because this widget is not mounted anymore
+      // this state's context is now invalid because this widget is not
+      // mounted anymore
       final currentContext = Routes.navigatorKey.currentContext;
       if (currentContext != null && currentContext.mounted) {
         final message =

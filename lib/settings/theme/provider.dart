@@ -15,11 +15,7 @@ class ThemeFinder extends _$ThemeFinder {
     final themeSettings = ref.watch(
       settingsProvider.select((value) => value.themeSettings),
     );
-    ref.watch(
-      appLifecycleStateProvider.select(
-        (value) => value == AppLifecycleState.resumed,
-      ),
-    );
+    ref.watch(appIsResumedProvider);
 
     return _fromThemeSettings(
       themeSettings,

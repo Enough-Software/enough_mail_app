@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
-import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../account/model.dart';
@@ -215,9 +214,7 @@ class MailClientSource extends _$MailClientSource {
     required RealAccount account,
     Mailbox? mailbox,
   }) {
-    final isResumed = ref.watch(appLifecycleStateProvider.select(
-      (value) => value == AppLifecycleState.resumed,
-    ));
+    final isResumed = ref.watch(appIsResumedProvider);
     final client = _existingClient ??
         EmailService.instance.createMailClient(
           account.mailAccount,

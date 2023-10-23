@@ -6,7 +6,7 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$incomingShareHash() => r'32114557815ae92e27439dc727c867060f784d2f';
+String _$incomingShareHash() => r'0580a0eb934b79968af40957fcdab5595c9831e2';
 
 /// Handles incoming shares
 ///

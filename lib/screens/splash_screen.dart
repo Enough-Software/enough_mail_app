@@ -5,8 +5,32 @@ import 'package:flutter/material.dart';
 
 import '../localization/extension.dart';
 
-class SplashScreen extends StatelessWidget {
+/// Displays a splash screen
+class SplashScreen extends StatefulWidget {
+  /// Creates a new [SplashScreen]
   const SplashScreen({super.key});
+
+  static var _isShown = false;
+
+  /// Is the splash screen shown?
+  static bool get isShown => _isShown;
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    SplashScreen._isShown = true;
+  }
+
+  @override
+  void dispose() {
+    SplashScreen._isShown = false;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +38,9 @@ class SplashScreen extends StatelessWidget {
     final texts = [
       localizations.splashLoading1,
       localizations.splashLoading2,
-      localizations.splashLoading3
+      localizations.splashLoading3,
     ];
+
     final index = Random().nextInt(texts.length);
     final text = texts[index];
     final timeOfDay = TimeOfDay.now();

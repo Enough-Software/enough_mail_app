@@ -410,7 +410,7 @@ final allAccountsProvider =
 );
 
 typedef _$AllAccounts = Notifier<List<Account>>;
-String _$currentAccountHash() => r'1609b7a565d0521aa1d52e0659d6eb42ff72b5cd';
+String _$currentAccountHash() => r'957c1c6dbeab49c29c0c1c647806aaa90486f046';
 
 /// Provides the locally current active account
 ///

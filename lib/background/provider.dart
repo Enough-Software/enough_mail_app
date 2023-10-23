@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:background_fetch/background_fetch.dart';
 import 'package:enough_mail/enough_mail.dart';
@@ -33,9 +32,7 @@ class Background extends _$Background {
     if (!_isSupported) {
       return Future.value();
     }
-    final isInactive = ref.watch(appLifecycleStateProvider.select(
-      (value) => value == AppLifecycleState.inactive,
-    ));
+    final isInactive = ref.watch(appIsInactivatedProvider);
     if (isInactive) {
       return _saveStateOnPause();
     }
@@ -139,6 +136,7 @@ class Background extends _$Background {
 
 const String _keyInboxUids = 'nextUidsInfo';
 
+/// Fetches data in the background when the app is not running
 Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {
   final taskId = task.taskId;
   logger.d(

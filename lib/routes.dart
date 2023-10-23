@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_media/enough_media.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,7 +11,6 @@ import 'models/models.dart';
 import 'notification/model.dart';
 import 'screens/screens.dart';
 import 'settings/view/view.dart';
-import 'widgets/app_drawer.dart';
 
 /// Defines app navigation routes
 class Routes {
@@ -96,7 +93,11 @@ class Routes {
   ///
   /// extra: [ComposeData]
   static const String mailCompose = '/mailCompose';
+
+  /// Displays the welcome screen
   static const String welcome = '/welcome';
+
+  /// Displays the splash screen
   static const String splash = '/splash';
 
   /// Displays interactive media
@@ -119,6 +120,8 @@ class Routes {
   /// extra: [WebViewConfiguration]
   static const String webview = '/webview';
   static const String appDrawer = '/appDrawer';
+
+  /// Displays the lock screen
   static const String lockScreen = '/lock';
 
   /// Path parameter name for an email address
@@ -376,124 +379,11 @@ class Routes {
         path: locationPicker,
         builder: (context, state) => const LocationScreen(),
       ),
+      GoRoute(
+        path: lockScreen,
+        name: lockScreen,
+        builder: (context, state) => const LockScreen(),
+      ),
     ],
   );
-}
-
-class AppRouter {
-  static Widget generatePage(String? name, Object? arguments) {
-    Widget page;
-    switch (name) {
-      case Routes.accountAdd:
-        page = AccountAddScreen(
-          launchedFromWelcome: arguments == true,
-        );
-        break;
-      case Routes.accountEdit:
-        page =
-            AccountEditScreen(accountEmail: (arguments! as RealAccount).email);
-        break;
-      case Routes.settings:
-        page = const SettingsScreen();
-        break;
-      case Routes.settingsSecurity:
-        page = const SettingsSecurityScreen();
-        break;
-      case Routes.settingsAccounts:
-        page = const SettingsAccountsScreen();
-        break;
-      case Routes.settingsDesign:
-        page = const SettingsDesignScreen();
-        break;
-      case Routes.settingsFeedback:
-        page = const SettingsFeedbackScreen();
-        break;
-      case Routes.settingsLanguage:
-        page = const SettingsLanguageScreen();
-        break;
-      case Routes.settingsFolders:
-        page = const SettingsFoldersScreen();
-        break;
-      case Routes.settingsReadReceipts:
-        page = const SettingsReadReceiptsScreen();
-        break;
-      case Routes.settingsDevelopment:
-        page = const SettingsDeveloperModeScreen();
-        break;
-      case Routes.settingsSwipe:
-        page = const SettingsSwipeScreen();
-        break;
-      case Routes.settingsSignature:
-        page = const SettingsSignatureScreen();
-        break;
-      case Routes.settingsDefaultSender:
-        page = const SettingsDefaultSenderScreen();
-        break;
-      case Routes.settingsReplyFormat:
-        page = const SettingsReplyScreen();
-        break;
-      case Routes.messageSourceFuture:
-        page = AsyncMessageSourceScreen(
-            messageSourceFuture: arguments! as Future<MessageSource>);
-        break;
-      case Routes.messageSource:
-        page = MessageSourceScreen(messageSource: arguments! as MessageSource);
-        break;
-      case Routes.mailDetails:
-        if (arguments is Message) {
-          page = MessageDetailsScreen(message: arguments);
-        } else {
-          page = const WelcomeScreen();
-        }
-        break;
-      case Routes.mailContents:
-        page = MessageContentsScreen(message: arguments! as Message);
-        break;
-      case Routes.mailCompose:
-        page = ComposeScreen(data: arguments! as ComposeData);
-        break;
-      case Routes.interactiveMedia:
-        page = InteractiveMediaScreen(
-            mediaWidget: arguments! as InteractiveMediaWidget);
-        break;
-      case Routes.locationPicker:
-        page = const LocationScreen();
-        break;
-      case Routes.splash:
-        page = const SplashScreen();
-        break;
-      case Routes.welcome:
-        page = const WelcomeScreen();
-        break;
-      case Routes.sourceCode:
-        page = SourceCodeScreen(mimeMessage: arguments! as MimeMessage);
-        break;
-      case Routes.webview:
-        page = WebViewScreen(configuration: arguments! as WebViewConfiguration);
-        break;
-      case Routes.appDrawer:
-        page = const AppDrawer();
-        break;
-      case Routes.lockScreen:
-        page = const LockScreen();
-        break;
-      default:
-        if (kDebugMode) {
-          print('Unknown route: $name');
-        }
-        page = Scaffold(
-          body: Center(child: Text('No route defined for $name')),
-        );
-    }
-
-    return page;
-  }
-
-  static Route<dynamic> generateRoute(RouteSettings settings) {
-    final page = generatePage(settings.name, settings.arguments);
-
-    return Platform.isAndroid
-        ? MaterialPageRoute(builder: (_) => page)
-        : CupertinoPageRoute(builder: (_) => page);
-  }
 }

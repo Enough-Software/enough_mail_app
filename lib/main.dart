@@ -10,6 +10,7 @@ import 'app_lifecycle/provider.dart';
 import 'background/provider.dart';
 import 'keys/service.dart';
 import 'localization/app_localizations.g.dart';
+import 'lock/provider.dart';
 import 'logger.dart';
 import 'notification/service.dart';
 import 'routes.dart';
@@ -36,8 +37,8 @@ class MailyApp extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useOnAppLifecycleStateChange((previous, current) {
-      logger.d('AppLifecycleState changed from $previous to $current');
-      ref.read(appLifecycleStateProvider.notifier).state = current;
+      logger.d('raw AppLifecycleState changed from $previous to $current');
+      ref.read(rawAppLifecycleStateProvider.notifier).state = current;
     });
 
     final themeSettingsData = ref.watch(themeFinderProvider(context: context));
@@ -45,7 +46,10 @@ class MailyApp extends HookConsumerWidget {
         ref.watch(settingsProvider.select((settings) => settings.languageTag));
     ref
       ..watch(incomingShareProvider)
-      ..watch(backgroundProvider);
+      ..watch(backgroundProvider)
+      ..watch(
+        appLockProvider(context: Routes.navigatorKey.currentContext ?? context),
+      );
 
     final app = PlatformSnackApp.router(
       supportedLocales: AppLocalizations.supportedLocales,

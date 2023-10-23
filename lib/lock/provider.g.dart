@@ -6,7 +6,7 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$themeFinderHash() => r'9d68c18c5f97c868c95fb419748361c36e3edf12';
+String _$appLockHash() => r'b00935864580ba0f3313c1a0710b8c9ca49df467';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,43 +29,43 @@ class _SystemHash {
   }
 }
 
-abstract class _$ThemeFinder extends BuildlessNotifier<ThemeSettingsData> {
+abstract class _$AppLock extends BuildlessNotifier<void> {
   late final BuildContext context;
 
-  ThemeSettingsData build({
+  void build({
     required BuildContext context,
   });
 }
 
-/// Provides the settings
+/// Checks the app life cycle and displays the lock screen if needed
 ///
-/// Copied from [ThemeFinder].
-@ProviderFor(ThemeFinder)
-const themeFinderProvider = ThemeFinderFamily();
+/// Copied from [AppLock].
+@ProviderFor(AppLock)
+const appLockProvider = AppLockFamily();
 
-/// Provides the settings
+/// Checks the app life cycle and displays the lock screen if needed
 ///
-/// Copied from [ThemeFinder].
-class ThemeFinderFamily extends Family<ThemeSettingsData> {
-  /// Provides the settings
+/// Copied from [AppLock].
+class AppLockFamily extends Family<void> {
+  /// Checks the app life cycle and displays the lock screen if needed
   ///
-  /// Copied from [ThemeFinder].
-  const ThemeFinderFamily();
+  /// Copied from [AppLock].
+  const AppLockFamily();
 
-  /// Provides the settings
+  /// Checks the app life cycle and displays the lock screen if needed
   ///
-  /// Copied from [ThemeFinder].
-  ThemeFinderProvider call({
+  /// Copied from [AppLock].
+  AppLockProvider call({
     required BuildContext context,
   }) {
-    return ThemeFinderProvider(
+    return AppLockProvider(
       context: context,
     );
   }
 
   @override
-  ThemeFinderProvider getProviderOverride(
-    covariant ThemeFinderProvider provider,
+  AppLockProvider getProviderOverride(
+    covariant AppLockProvider provider,
   ) {
     return call(
       context: provider.context,
@@ -84,34 +84,32 @@ class ThemeFinderFamily extends Family<ThemeSettingsData> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'themeFinderProvider';
+  String? get name => r'appLockProvider';
 }
 
-/// Provides the settings
+/// Checks the app life cycle and displays the lock screen if needed
 ///
-/// Copied from [ThemeFinder].
-class ThemeFinderProvider
-    extends NotifierProviderImpl<ThemeFinder, ThemeSettingsData> {
-  /// Provides the settings
+/// Copied from [AppLock].
+class AppLockProvider extends NotifierProviderImpl<AppLock, void> {
+  /// Checks the app life cycle and displays the lock screen if needed
   ///
-  /// Copied from [ThemeFinder].
-  ThemeFinderProvider({
+  /// Copied from [AppLock].
+  AppLockProvider({
     required BuildContext context,
   }) : this._internal(
-          () => ThemeFinder()..context = context,
-          from: themeFinderProvider,
-          name: r'themeFinderProvider',
+          () => AppLock()..context = context,
+          from: appLockProvider,
+          name: r'appLockProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$themeFinderHash,
-          dependencies: ThemeFinderFamily._dependencies,
-          allTransitiveDependencies:
-              ThemeFinderFamily._allTransitiveDependencies,
+                  : _$appLockHash,
+          dependencies: AppLockFamily._dependencies,
+          allTransitiveDependencies: AppLockFamily._allTransitiveDependencies,
           context: context,
         );
 
-  ThemeFinderProvider._internal(
+  AppLockProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -124,8 +122,8 @@ class ThemeFinderProvider
   final BuildContext context;
 
   @override
-  ThemeSettingsData runNotifierBuild(
-    covariant ThemeFinder notifier,
+  void runNotifierBuild(
+    covariant AppLock notifier,
   ) {
     return notifier.build(
       context: context,
@@ -133,10 +131,10 @@ class ThemeFinderProvider
   }
 
   @override
-  Override overrideWith(ThemeFinder Function() create) {
+  Override overrideWith(AppLock Function() create) {
     return ProviderOverride(
       origin: this,
-      override: ThemeFinderProvider._internal(
+      override: AppLockProvider._internal(
         () => create()..context = context,
         from: from,
         name: null,
@@ -149,13 +147,13 @@ class ThemeFinderProvider
   }
 
   @override
-  NotifierProviderElement<ThemeFinder, ThemeSettingsData> createElement() {
-    return _ThemeFinderProviderElement(this);
+  NotifierProviderElement<AppLock, void> createElement() {
+    return _AppLockProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is ThemeFinderProvider && other.context == context;
+    return other is AppLockProvider && other.context == context;
   }
 
   @override
@@ -167,18 +165,17 @@ class ThemeFinderProvider
   }
 }
 
-mixin ThemeFinderRef on NotifierProviderRef<ThemeSettingsData> {
+mixin AppLockRef on NotifierProviderRef<void> {
   /// The parameter `context` of this provider.
   BuildContext get context;
 }
 
-class _ThemeFinderProviderElement
-    extends NotifierProviderElement<ThemeFinder, ThemeSettingsData>
-    with ThemeFinderRef {
-  _ThemeFinderProviderElement(super.provider);
+class _AppLockProviderElement extends NotifierProviderElement<AppLock, void>
+    with AppLockRef {
+  _AppLockProviderElement(super.provider);
 
   @override
-  BuildContext get context => (origin as ThemeFinderProvider).context;
+  BuildContext get context => (origin as AppLockProvider).context;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

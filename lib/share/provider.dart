@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -29,8 +28,7 @@ class IncomingShare extends _$IncomingShare {
 
   @override
   Future<void> build() async {
-    final isResumed = ref.watch(appLifecycleStateProvider
-        .select((value) => value == AppLifecycleState.resumed));
+    final isResumed = ref.watch(appIsResumedProvider);
     if (isResumed) {
       if (Platform.isAndroid) {
         final shared = await _platform.invokeMethod('getSharedData');

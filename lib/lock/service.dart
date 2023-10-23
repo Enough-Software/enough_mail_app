@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:local_auth/local_auth.dart';
 
 import '../localization/app_localizations.g.dart';
-import 'app_service.dart';
 
 /// Handles biometrics
 class BiometricsService {
@@ -52,7 +51,7 @@ class BiometricsService {
     if (!_isSupported) {
       return false;
     }
-    AppService.instance.ignoreBiometricsCheckAtNextResume = true;
+    // AppService.instance.ignoreBiometricsCheckAtNextResume = true;
     try {
       final result = await _localAuth.authenticate(
         localizedReason:
@@ -61,9 +60,9 @@ class BiometricsService {
           sensitiveTransaction: false,
         ),
       );
-      unawaited(Future.delayed(const Duration(seconds: 2)).then(
-        (_) => AppService.instance.ignoreBiometricsCheckAtNextResume = false,
-      ));
+      // unawaited(Future.delayed(const Duration(seconds: 2)).then(
+      //   (_) => AppService.instance.ignoreBiometricsCheckAtNextResume = false,
+      // ));
 
       return result;
     } catch (e, s) {

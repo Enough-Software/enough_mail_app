@@ -1,16 +1,18 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../app_lifecycle/provider.dart';
 import '../contact/model.dart';
 import '../localization/extension.dart';
+import '../logger.dart';
 import '../util/validator.dart';
 import 'icon_text.dart';
 
-class RecipientInputField extends StatefulWidget {
+class RecipientInputField extends StatefulHookConsumerWidget {
   const RecipientInputField({
     super.key,
     this.labelText,
@@ -31,14 +33,15 @@ class RecipientInputField extends StatefulWidget {
   final ContactManager? contactManager;
 
   @override
-  State<RecipientInputField> createState() => _RecipientInputFieldState();
+  ConsumerState<RecipientInputField> createState() =>
+      _RecipientInputFieldState();
 }
 
 enum _AddressAction {
   copy,
 }
 
-class _RecipientInputFieldState extends State<RecipientInputField> {
+class _RecipientInputFieldState extends ConsumerState<RecipientInputField> {
   final _focusNode = FocusNode();
   late TextEditingController _controller;
 
@@ -57,7 +60,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
   }
 
   @override
-  dispose() {
+  void dispose() {
     super.dispose();
     _focusNode.dispose();
     _controller.dispose();
@@ -67,9 +70,11 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final localizations = context.text;
+
     return DragTarget<MailAddress>(
       builder: (context, candidateData, rejectedData) {
         final labelText = widget.labelText;
+
         return Container(
           color: candidateData.isEmpty ? null : theme.hoverColor,
           child: Wrap(
@@ -164,9 +169,8 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
           }
           final matches = contactManager.find(search).toList();
           // do not suggest recipients that are already added:
-          for (final existing in widget.addresses) {
-            matches.remove(existing);
-          }
+          widget.addresses.forEach(matches.remove);
+
           return matches;
         },
         displayStringForOption: (option) => option.toString(),
@@ -212,6 +216,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                 itemCount: options.length,
                 itemBuilder: (BuildContext context, int index) {
                   final MailAddress option = options.elementAt(index);
+
                   return PlatformActionChip(
                     label: Column(
                       children: [
@@ -253,31 +258,23 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
 
   Future<void> _pickContact(TextEditingController controller) async {
     try {
-      final contact = await FlutterContactPicker.pickEmailContact();
-      widget.addresses.add(
-        MailAddress(
-          contact.fullName,
-          contact.email!.email!,
-        ),
-      );
-      setState(() {});
+      ref
+          .read(appLifecycleProvider.notifier)
+          .ignoreNextInactivationCycle(timeout: const Duration(seconds: 120));
 
-      // final contact =
-      //     await FlutterContactPicker.pickEmailContact(askForPermission: true);
-      // widget.addresses
-      //     .add(MailAddress(contact.fullName, contact.email!.email!));
-      // setState(() {});
-      // if (controller.text.isNotEmpty) {
-      //   controller.text += '; ' + contact.email.email;
-      // } else {
-      //   controller.text = contact.email.email;
-      // }
-      // controller.selection =
-      //     TextSelection.collapsed(offset: controller.text.length);
-    } catch (e, s) {
-      if (kDebugMode) {
-        print('Unable to pick contact $e $s');
+      final contact = await FlutterContactPicker.pickEmailContact();
+      final email = contact.email?.email;
+      if (email != null) {
+        widget.addresses.add(
+          MailAddress(
+            contact.fullName,
+            email,
+          ),
+        );
       }
+      setState(() {});
+    } catch (e, s) {
+      logger.e('Unable to pick contact $e', error: e, stackTrace: s);
     }
   }
 }

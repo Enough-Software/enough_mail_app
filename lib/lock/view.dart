@@ -8,8 +8,32 @@ import '../localization/extension.dart';
 import '../screens/base.dart';
 import 'service.dart';
 
-class LockScreen extends StatelessWidget {
+/// Displays a lock screen
+class LockScreen extends StatefulWidget {
+  /// Creates a new [LockScreen]
   const LockScreen({super.key});
+
+  static var _isShown = false;
+
+  /// Is the lock screen currently shown?
+  static bool get isShown => _isShown;
+
+  @override
+  State<LockScreen> createState() => _LockScreenState();
+}
+
+class _LockScreenState extends State<LockScreen> {
+  @override
+  void initState() {
+    super.initState();
+    LockScreen._isShown = true;
+  }
+
+  @override
+  void dispose() {
+    LockScreen._isShown = false;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

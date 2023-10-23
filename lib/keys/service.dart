@@ -1,5 +1,3 @@
-/// contains rate limited beta keys,
-/// production keys are stored locally only
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../logger.dart';

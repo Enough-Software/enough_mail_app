@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/provider.dart';
-import '../settings/provider.dart';
 import 'screens.dart';
 
 /// Screen shown after accounts have been loaded:
@@ -16,10 +15,6 @@ class HomeScreen extends ConsumerWidget {
     final accounts = ref.watch(allAccountsProvider);
     if (accounts.isEmpty) {
       return const WelcomeScreen();
-    }
-    final enableBiometricLock = ref.read(settingsProvider).enableBiometricLock;
-    if (enableBiometricLock) {
-      return const LockScreen();
     }
 
     return MailScreen(
