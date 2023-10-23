@@ -7,46 +7,60 @@ import 'package:google_fonts/google_fonts.dart';
 import '../localization/extension.dart';
 import '../oauth/oauth.dart';
 
-class ProviderService {
-  ProviderService() {
+/// Allows to resolve mail-hoster specific settings like Oauth.
+class MailHosterService {
+  MailHosterService._() {
     addAll([
-      GmailProvider(),
-      OutlookProvider(),
-      YahooProvider(),
-      AolProvider(),
-      AppleProvider(),
-      GmxProvider(),
-      MailboxOrgProvider(),
+      GmailMailHoster(),
+      OutlookMailHoster(),
+      YahooMailHoster(),
+      AolMailHoster(),
+      AppleMailHoster(),
+      GmxMailHoster(),
+      MailboxOrMailHoster(),
     ]);
   }
-  final _providersByDomains = <String, Provider>{};
-  final _providers = <Provider>[];
-  List<Provider> get providers => _providers;
+
+  static final _instance = MailHosterService._();
+
+  /// Retrieves access to the singleton instance
+  static MailHosterService get instance => _instance;
+
+  final _providersByDomains = <String, MailHoster>{};
+  final _providers = <MailHoster>[];
+
+  /// Retrieves the supported hosters
+  List<MailHoster> get hosters => _providers;
 
   /// Retrieves the provider for the given [incomingHostName]
-  Provider? operator [](String incomingHostName) =>
+  MailHoster? operator [](String incomingHostName) =>
       _providersByDomains[incomingHostName];
 
-  Future<Provider?> discover(String email) async {
+  /// Discovers a hoster by the given [email]
+  Future<MailHoster?> discover(String email) async {
     final emailDomain = email.substring(email.indexOf('@') + 1);
     final providerEmail = _providersByDomains[emailDomain];
     if (providerEmail != null) {
       return providerEmail;
     }
     try {
-      final clientConfig = await Discover.discover(email,
-          forceSslConnection: true, isLogEnabled: true);
+      final clientConfig = await Discover.discover(
+        email,
+        forceSslConnection: true,
+        isLogEnabled: true,
+      );
       if (clientConfig == null ||
           clientConfig.preferredIncomingServer == null) {
         return null;
       }
-      final hostName = clientConfig.preferredIncomingServer!.hostname!;
+      final hostName = clientConfig.preferredIncomingServer?.hostname ?? '';
       final providerHostName = _providersByDomains[hostName];
       if (providerHostName != null) {
         return providerHostName;
       }
       final id = email.substring(email.indexOf('@') + 1);
-      return Provider(id, hostName, clientConfig);
+
+      return MailHoster(id, hostName, clientConfig);
     } catch (e, s) {
       if (kDebugMode) {
         print('Unable to discover settings for [$email]: $e $s');
@@ -55,13 +69,13 @@ class ProviderService {
     }
   }
 
-  void addAll(Iterable<Provider> providers) {
+  void addAll(Iterable<MailHoster> providers) {
     for (final p in providers) {
       add(p);
     }
   }
 
-  void add(Provider provider) {
+  void add(MailHoster provider) {
     _providers.add(provider);
     _providersByDomains[provider.incomingHostName] = provider;
     final domains = provider.domains;
@@ -73,8 +87,10 @@ class ProviderService {
   }
 }
 
-class Provider {
-  const Provider(
+/// Provides access information about a mail hoster
+class MailHoster {
+  /// Creates a new [MailHoster]
+  const MailHoster(
     this.key,
     this.incomingHostName,
     this.clientConfig, {
@@ -84,20 +100,29 @@ class Provider {
     this.domains,
   });
 
-  /// The key of the provider, help to resolves image resources and possibly other settings like branding guidelines
+  /// The key of the mail hoster, help to resolves image resources and
+  /// possibly other settings like branding guidelines
   final String key;
   final String incomingHostName;
   final ClientConfig clientConfig;
   final OauthClient? oauthClient;
-  bool get hasOAuthClient => oauthClient != null && oauthClient!.isEnabled;
+  bool get hasOAuthClient {
+    final oauthClient = this.oauthClient;
+
+    return oauthClient != null && oauthClient.isEnabled;
+  }
+
   final String? appSpecificPasswordSetupUrl;
   final String? manualImapAccessSetupUrl;
   final List<String>? domains;
 
-  String? get displayName => (clientConfig.emailProviders == null ||
-          clientConfig.emailProviders!.isEmpty)
-      ? null
-      : clientConfig.emailProviders!.first.displayName;
+  String? get displayName {
+    final emailProviders = clientConfig.emailProviders;
+
+    return (emailProviders == null || emailProviders.isEmpty)
+        ? null
+        : emailProviders.first.displayName;
+  }
 
   /// Builds the sign in button for this provider
   ///
@@ -112,6 +137,7 @@ class Provider {
     final buttonText = isSignInButton
         ? localizations.addAccountOauthSignIn(providerName)
         : providerName;
+
     return Theme(
       data: ThemeData(brightness: Brightness.light),
       child: PlatformTextButton(
@@ -144,8 +170,8 @@ class Provider {
   }
 }
 
-class GmailProvider extends Provider {
-  GmailProvider()
+class GmailMailHoster extends MailHoster {
+  GmailMailHoster()
       : super(
           'gmail',
           'imap.gmail.com',
@@ -191,11 +217,12 @@ class GmailProvider extends Provider {
     final localizations = context.text;
     const googleBlue = Color(0xff4285F4);
     const googleText = Color(0x89000000);
+
     return Theme(
       data: ThemeData(
-          brightness: Brightness.light,
-          colorScheme:
-              ColorScheme.fromSwatch().copyWith(secondary: googleBlue)),
+        brightness: Brightness.light,
+        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: googleBlue),
+      ),
       child: PlatformTextButton(
         onPressed: onPressed,
         child: Container(
@@ -230,8 +257,8 @@ class GmailProvider extends Provider {
   }
 }
 
-class OutlookProvider extends Provider {
-  OutlookProvider()
+class OutlookMailHoster extends MailHoster {
+  OutlookMailHoster()
       : super(
           'outlook',
           'outlook.office365.com',
@@ -248,7 +275,7 @@ class OutlookProvider extends Provider {
                     socketType: SocketType.ssl,
                     authentication: Authentication.oauth2,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
                 outgoingServers: [
                   ServerConfig(
@@ -258,7 +285,7 @@ class OutlookProvider extends Provider {
                     socketType: SocketType.starttls,
                     authentication: Authentication.oauth2,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
               )
             ],
@@ -372,8 +399,8 @@ class OutlookProvider extends Provider {
         );
 }
 
-class YahooProvider extends Provider {
-  YahooProvider()
+class YahooMailHoster extends MailHoster {
+  YahooMailHoster()
       : super(
           'yahoo',
           'imap.mail.yahoo.com',
@@ -428,8 +455,8 @@ class YahooProvider extends Provider {
         );
 }
 
-class AolProvider extends Provider {
-  AolProvider()
+class AolMailHoster extends MailHoster {
+  AolMailHoster()
       : super(
           'aol',
           'imap.aol.com',
@@ -486,8 +513,8 @@ class AolProvider extends Provider {
         );
 }
 
-class AppleProvider extends Provider {
-  AppleProvider()
+class AppleMailHoster extends MailHoster {
+  AppleMailHoster()
       : super(
           'apple',
           'imap.mail.me.com',
@@ -524,8 +551,8 @@ class AppleProvider extends Provider {
         );
 }
 
-class GmxProvider extends Provider {
-  GmxProvider()
+class GmxMailHoster extends MailHoster {
+  GmxMailHoster()
       : super(
           'gmx',
           'imap.gmx.net',
@@ -571,8 +598,8 @@ class GmxProvider extends Provider {
         );
 }
 
-class MailboxOrgProvider extends Provider {
-  MailboxOrgProvider()
+class MailboxOrMailHoster extends MailHoster {
+  MailboxOrMailHoster()
       : super(
           'mailbox_org',
           'imap.gmx.net',

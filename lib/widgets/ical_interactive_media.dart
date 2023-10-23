@@ -437,22 +437,19 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
       actions: [
         PlatformTextButton(
           child: PlatformText(localizations.actionAccept),
-          onPressed: () =>
-              Navigator.of(context).pop(ParticipantStatus.accepted),
+          onPressed: () => context.pop(ParticipantStatus.accepted),
         ),
         PlatformTextButton(
           child: PlatformText(localizations.icalendarAcceptTentatively),
-          onPressed: () =>
-              Navigator.of(context).pop(ParticipantStatus.tentative),
+          onPressed: () => context.pop(ParticipantStatus.tentative),
         ),
         PlatformTextButton(
           child: PlatformText(localizations.actionDecline),
-          onPressed: () =>
-              Navigator.of(context).pop(ParticipantStatus.declined),
+          onPressed: () => context.pop(ParticipantStatus.declined),
         ),
         PlatformTextButton(
           child: PlatformText(localizations.actionCancel),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
       ],
     );

@@ -38,13 +38,13 @@ class IcalComposer extends StatefulHookConsumerWidget {
           end: end,
           organizerEmail: account.email,
         );
-    final result = await ModelBottomSheetHelper.showModalBottomSheet(
+    final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
       context,
       editAppointment.summary ?? localizations.composeAppointmentTitle,
       IcalComposer(appointment: editAppointment),
     );
 
-    if (result) {
+    if (result ?? false) {
       _IcalComposerState._current.apply();
       appointment = editAppointment;
     }
@@ -385,7 +385,7 @@ class RecurrenceComposer extends StatefulWidget {
     final localizations = context.text;
     // final iconService = locator<IconService>();
 
-    final result = await ModelBottomSheetHelper.showModalBottomSheet(
+    final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
       context,
       localizations.composeAppointmentLabelRepeat,
       RecurrenceComposer(
@@ -394,11 +394,9 @@ class RecurrenceComposer extends StatefulWidget {
       ),
     );
 
-    if (result) {
-      return _RecurrenceComposerState._currentState._recurrenceRule;
-    } else {
-      return recurrenceRule;
-    }
+    return result ?? false
+        ? _RecurrenceComposerState._currentState._recurrenceRule
+        : recurrenceRule;
   }
 }
 
@@ -874,17 +872,21 @@ class UntilComposer extends StatefulWidget {
   @override
   State<UntilComposer> createState() => _UntilComposerState();
 
-  static Future<DateTime?> createOrEditUntil(BuildContext context,
-      DateTime start, DateTime? until, IsoDuration? recommendation) async {
+  static Future<DateTime?> createOrEditUntil(
+    BuildContext context,
+    DateTime start,
+    DateTime? until,
+    IsoDuration? recommendation,
+  ) async {
     final localizations = context.text;
     // final iconService = locator<IconService>();
-    final result = await ModelBottomSheetHelper.showModalBottomSheet(
+    final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
       context,
       localizations.composeAppointmentRecurrenceUntilLabel,
       UntilComposer(start: start, until: until, recommendation: recommendation),
     );
 
-    return result ? _UntilComposerState._currentState._until : until;
+    return (result ?? false) ? _UntilComposerState._currentState._until : until;
   }
 }
 

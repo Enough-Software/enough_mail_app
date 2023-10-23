@@ -362,7 +362,7 @@ class MessageActions extends HookConsumerWidget {
       actions: [
         TextButton(
           child: ButtonText(localizations.actionCancel),
-          onPressed: () => Navigator.of(context).pop(false),
+          onPressed: () => context.pop(false),
         ),
         TextButton(
           child: ButtonText(localizations.messageActionRedirect),
@@ -370,7 +370,7 @@ class MessageActions extends HookConsumerWidget {
             if (Validator.validateEmail(textEditingController.text)) {
               recipients.add(MailAddress(null, textEditingController.text));
             }
-            Navigator.of(context).pop(true);
+            context.pop(true);
           },
         ),
       ],

@@ -10,6 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
 import '../account/provider.dart';
+import '../hoster/service.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
@@ -17,7 +18,6 @@ import '../logger.dart';
 import '../mail/provider.dart';
 import '../routes.dart';
 import '../services/icon_service.dart';
-import '../services/providers.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../settings/provider.dart';
 import '../util/localized_dialog_helper.dart';
@@ -418,10 +418,10 @@ class AccountEditScreen extends HookConsumerWidget {
     } else if (authentication is OauthAuthentication) {
       // oauth case: restart oauth authentication,
       // save new token
-      final provider = locator<ProviderService>()[
-          account.mailAccount.incoming.serverConfig.hostname ?? ''];
-      final oauthClient = provider?.oauthClient;
-      if (provider != null && oauthClient != null) {
+      final hoster = MailHosterService
+          .instance[account.mailAccount.incoming.serverConfig.hostname ?? ''];
+      final oauthClient = hoster?.oauthClient;
+      if (hoster != null && oauthClient != null) {
         final token = await oauthClient.authenticate(account.mailAccount.email);
         if (token != null) {
           final adaptedIncomingAuth = authentication.copyWith(
@@ -617,14 +617,14 @@ class _PlusAliasTestingDialogState
       content: SizedBox(
         width: double.maxFinite,
         child: PlatformStepper(
-          onStepCancel: _step == 3 ? null : () => Navigator.of(context).pop(),
+          onStepCancel: _step == 3 ? null : () => context.pop(),
           onStepContinue: !_isContinueAvailable
               ? null
               : () async {
                   if (_step < _maxStep) {
                     _step++;
                   } else {
-                    Navigator.of(context).pop(
+                    context.pop(
                       widget.account.supportsPlusAliases,
                     );
                   }
@@ -754,7 +754,7 @@ class _AliasEditDialogState extends ConsumerState<_AliasEditDialog> {
       actions: [
         PlatformTextButton(
           child: ButtonText(localizations.actionCancel),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
         PlatformTextButton(
           onPressed: _isEmailValid

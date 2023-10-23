@@ -1,18 +1,21 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
+import '../hoster/service.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
-import '../services/providers.dart';
 
-class AccountProviderSelector extends StatelessWidget {
-  const AccountProviderSelector({super.key, required this.onSelected});
-  final void Function(Provider? provider) onSelected;
+/// Allows to select a mail hoster
+class MailHosterSelector extends StatelessWidget {
+  /// Creates a [MailHosterSelector]
+  const MailHosterSelector({super.key, required this.onSelected});
+
+  /// Called when a mail hoster has been selected
+  final void Function(MailHoster? hoster) onSelected;
 
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
-    final providers = locator<ProviderService>().providers;
+    final hosters = MailHosterService.instance.hosters;
 
     return ListView.separated(
       itemBuilder: (context, index) {
@@ -24,7 +27,8 @@ class AccountProviderSelector extends StatelessWidget {
             ),
           );
         }
-        final provider = providers[index - 1];
+        final provider = hosters[index - 1];
+
         return Center(
           child: provider.buildSignInButton(
             context,
@@ -33,7 +37,7 @@ class AccountProviderSelector extends StatelessWidget {
         );
       },
       separatorBuilder: (context, index) => const Divider(),
-      itemCount: providers.length + 1,
+      itemCount: hosters.length + 1,
     );
   }
 }

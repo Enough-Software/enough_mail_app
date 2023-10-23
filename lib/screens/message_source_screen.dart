@@ -1206,12 +1206,12 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       actions: [
         PlatformDialogActionText(
           text: localizations.actionCancel,
-          onPressed: () => Navigator.of(context).pop(false),
+          onPressed: () => context.pop(false),
         ),
         PlatformDialogActionText(
           text: localizations.homeDeleteAllAction,
           isDestructiveAction: true,
-          onPressed: () => Navigator.of(context).pop(true),
+          onPressed: () => context.pop(true),
         ),
       ],
     );

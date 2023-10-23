@@ -6,7 +6,6 @@ import 'services/biometrics_service.dart';
 import 'services/icon_service.dart';
 import 'services/key_service.dart';
 import 'services/location_service.dart';
-import 'services/providers.dart';
 import 'services/scaffold_messenger_service.dart';
 
 GetIt locator = GetIt.instance;
@@ -19,6 +18,5 @@ void setupLocator() {
     ..registerLazySingleton(AppService.new)
     ..registerLazySingleton(LocationService.new)
     ..registerLazySingleton(KeyService.new)
-    ..registerLazySingleton(ProviderService.new)
     ..registerLazySingleton(BiometricsService.new);
 }

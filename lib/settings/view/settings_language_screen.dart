@@ -88,11 +88,11 @@ class SettingsLanguageScreen extends HookConsumerWidget {
                             child: ButtonText(
                               selectedLocalizations.actionCancel,
                             ),
-                            onPressed: () => Navigator.of(context).pop(false),
+                            onPressed: () => context.pop(false),
                           ),
                           PlatformTextButton(
                             child: ButtonText(selectedLocalizations.actionOk),
-                            onPressed: () => Navigator.of(context).pop(true),
+                            onPressed: () => context.pop(true),
                           ),
                         ],
                       );

@@ -11,15 +11,14 @@ import 'package:url_launcher/url_launcher.dart' as launcher;
 import '../account/model.dart';
 import '../account/provider.dart';
 import '../extensions/extensions.dart';
+import '../hoster/service.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../mail/provider.dart';
 import '../routes.dart';
-import '../services/providers.dart' as mail_providers;
 import '../util/modal_bottom_sheet_helper.dart';
 import '../util/validator.dart';
-import '../widgets/account_provider_selector.dart';
+import '../widgets/account_hoster_selector.dart';
 import '../widgets/button_text.dart';
 import '../widgets/password_field.dart';
 import 'base.dart';
@@ -51,7 +50,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
   final TextEditingController _userNameController = TextEditingController();
 
   bool _isProviderResolving = false;
-  mail_providers.Provider? _provider;
+  MailHoster? _mailHoster;
   final bool _isManualSettings = false;
   bool _isAccountVerifying = false;
   bool _isAccountVerified = false;
@@ -64,28 +63,25 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     BuildContext context,
     AppLocalizations localizations,
   ) async {
-    mail_providers.Provider? selectedProvider;
-    final result = await ModelBottomSheetHelper.showModalBottomSheet(
+    final selectedHoster =
+        await ModelBottomSheetHelper.showModalBottomSheet<MailHoster>(
       context,
       localizations.accountProviderStepTitle,
-      AccountProviderSelector(
-        onSelected: (provider) {
-          selectedProvider = provider;
-          Navigator.of(context).pop(true);
+      MailHosterSelector(
+        onSelected: (hoster) {
+          context.pop(hoster);
         },
       ),
       useScrollView: false,
       appBarActions: [],
     );
-    if (!result) {
-      return;
-    }
-    if (selectedProvider != null) {
-      // a standard provider has been chosen, now query the password or start the oauth process:
+    if (selectedHoster != null) {
+      // a standard hoster has been chosen,
+      // now query the password or start the oauth process:
       setState(() {
-        _provider = selectedProvider;
+        _mailHoster = selectedHoster;
       });
-      _onProviderChanged(selectedProvider!, _emailController.text);
+      _onMailHosterChanged(selectedHoster, _emailController.text);
     } else {
       final account = MailAccount(
         email: _emailController.text,
@@ -196,8 +192,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     if (kDebugMode) {
       print('discover settings for $email');
     }
-    final provider =
-        await locator<mail_providers.ProviderService>().discover(email);
+    final provider = await MailHosterService.instance.discover(email);
     if (!mounted) {
       // ignore if user has cancelled operation
       return;
@@ -212,18 +207,18 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     final domainName = email.substring(email.lastIndexOf('@') + 1);
     _accountNameController.text = domainName;
     if (provider != null) {
-      _onProviderChanged(provider, email);
+      _onMailHosterChanged(provider, email);
     }
 
     setState(() {
       _isProviderResolving = false;
-      _provider = provider;
+      _mailHoster = provider;
       _isContinueAvailable =
           (provider != null) && _passwordController.text.isNotEmpty;
     });
   }
 
-  Future _loginWithOAuth(mail_providers.Provider provider, String email) async {
+  Future _loginWithOAuth(MailHoster provider, String email) async {
     setState(() {
       _isAccountVerifying = true;
       _currentStep = _stepAccountSetup;
@@ -280,7 +275,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       userName: _emailController.text,
       email: _emailController.text,
       password: _passwordController.text,
-      config: _provider!.clientConfig,
+      config: _mailHoster!.clientConfig,
     );
     final connectedAccount = await ref.read(
       firstTimeMailClientSourceProvider(
@@ -321,19 +316,11 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     final bool goToAppDrawer = Platform.isIOS && widget.launchedFromWelcome;
     if (goToAppDrawer) {
       context.goNamed(Routes.appDrawer);
-      // await locator<NavigationService>().push(Routes.appDrawer, clear: true);
     }
     context.goNamed(
       Routes.mail,
       pathParameters: {Routes.pathParameterEmail: account.key},
     );
-    // locator<NavigationService>().push(
-    //   Routes.messageSource,
-    //   arguments: service.messageSource,
-    //   clear: !Platform.isIOS && widget.launchedFromWelcome,
-    //   replace: !widget.launchedFromWelcome,
-    //   fade: true,
-    // );
   }
 
   Step _buildEmailStep(BuildContext context, AppLocalizations localizations) =>
@@ -387,7 +374,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     BuildContext context,
     AppLocalizations localizations,
   ) {
-    final provider = _provider;
+    final provider = _mailHoster;
     final appSpecificPasswordSetupUrl = provider?.appSpecificPasswordSetupUrl;
 
     return Step(
@@ -475,7 +462,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                     cupertinoShowLabel: false,
                     onChanged: (value) {
                       final bool isValid = value.isNotEmpty &&
-                          (_provider?.clientConfig != null ||
+                          (_mailHoster?.clientConfig != null ||
                               _isManualSettings);
                       if (isValid != _isContinueAvailable) {
                         setState(() {
@@ -492,7 +479,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                       _navigateToManualSettings(context, localizations),
                   child: ButtonText(
                     localizations.addAccountResolvedSettingsWrongAction(
-                        _provider?.displayName ?? '<unknown>'),
+                        _mailHoster?.displayName ?? '<unknown>'),
                   ),
                 ),
                 if (_extensionForgotPassword != null) ...[
@@ -611,7 +598,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                   _emailController.text,
                 ),
               ),
-              if (_provider?.manualImapAccessSetupUrl != null) ...[
+              if (_mailHoster?.manualImapAccessSetupUrl != null) ...[
                 Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 8),
                   child: Text(
@@ -623,7 +610,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                     localizations.addAccountSetupImapAccessButtonLabel,
                   ),
                   onPressed: () => launcher.launchUrl(
-                    Uri.parse(_provider!.manualImapAccessSetupUrl!),
+                    Uri.parse(_mailHoster!.manualImapAccessSetupUrl!),
                   ),
                 ),
               ],
@@ -632,7 +619,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
         ),
       );
 
-  void _onProviderChanged(mail_providers.Provider provider, String email) {
+  void _onMailHosterChanged(MailHoster provider, String email) {
     final mailAccount = MailAccount.fromDiscoveredSettings(
       name: _emailController.text,
       email: _emailController.text,

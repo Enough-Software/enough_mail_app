@@ -3,10 +3,9 @@ import 'package:flutter/foundation.dart';
 
 import '../account/model.dart';
 import '../events/app_event_bus.dart';
-import '../locator.dart';
+import '../hoster/service.dart';
 import '../models/async_mime_source.dart';
 import '../models/async_mime_source_factory.dart';
-import '../services/providers.dart';
 
 /// Callback when the configuration of a mail client has changed,
 /// typically when the OAuth token has been refreshed
@@ -75,7 +74,7 @@ class EmailService {
       );
     }
     // TODO(RV): replace provider service with a riverpod provider
-    final provider = locator<ProviderService>()[providerId];
+    final provider = MailHosterService.instance[providerId];
     if (provider == null) {
       throw MailException(
         mailClient,

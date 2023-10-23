@@ -1,4 +1,4 @@
-export 'account_provider_selector.dart';
+export 'account_hoster_selector.dart';
 export 'account_selector.dart';
 export 'app_drawer.dart';
 export 'attachment_chip.dart';

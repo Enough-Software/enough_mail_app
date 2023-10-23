@@ -35,7 +35,7 @@ class SignatureWidget extends HookConsumerWidget {
       final iconService = locator<IconService>();
       HtmlEditorApi? editorApi;
 
-      final result = await ModelBottomSheetHelper.showModalBottomSheet(
+      final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
         context,
         account?.name ?? localizations.signatureSettingsTitle,
         PackagedHtmlEditor(
@@ -70,12 +70,12 @@ class SignatureWidget extends HookConsumerWidget {
             ),
           DensePlatformIconButton(
             icon: Icon(CommonPlatformIcons.ok),
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => context.pop(true),
           ),
         ],
       );
       final usedEditorApi = editorApi;
-      if (result && usedEditorApi != null) {
+      if ((result ?? false) && usedEditorApi != null) {
         final newSignature = await usedEditorApi.getText();
         signatureState.value = newSignature;
         if (account == null) {
