@@ -10,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../../localization/extension.dart';
 import '../../screens/base.dart';
-import '../../services/scaffold_messenger_service.dart';
+import '../../scaffold_messenger/service.dart';
 import '../../widgets/button_text.dart';
 
 class SettingsFeedbackScreen extends StatefulWidget {

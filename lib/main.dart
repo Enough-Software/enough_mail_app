@@ -10,19 +10,17 @@ import 'app_lifecycle/provider.dart';
 import 'background/provider.dart';
 import 'keys/service.dart';
 import 'localization/app_localizations.g.dart';
-import 'locator.dart';
 import 'logger.dart';
 import 'notification/service.dart';
 import 'routes.dart';
+import 'scaffold_messenger/service.dart';
 import 'screens/screens.dart';
-import 'services/scaffold_messenger_service.dart';
 import 'settings/provider.dart';
 import 'settings/theme/provider.dart';
 import 'share/provider.dart';
 // AppStyles appStyles = AppStyles.instance;
 
 void main() {
-  setupLocator();
   runApp(
     const ProviderScope(
       child: MailyApp(),
@@ -147,7 +145,7 @@ class _InitializationScreen extends ConsumerState<InitializationScreen> {
     //   if (settings.enableBiometricLock) {
     //     unawaited(locator<NavigationService>().push(Routes.lockScreen));
     //     final didAuthenticate =
-    //         await locator<BiometricsService>().authenticate();
+    //         await BiometricsService.instance.authenticate();
     //     if (didAuthenticate) {
     //       locator<NavigationService>().pop();
     //     }

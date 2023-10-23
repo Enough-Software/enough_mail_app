@@ -10,11 +10,10 @@ import 'package:location/location.dart';
 import 'package:map/map.dart';
 
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../logger.dart';
 import '../routes.dart';
-import '../services/location_service.dart';
-import 'base.dart';
+import '../screens/base.dart';
+import 'service.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -37,7 +36,7 @@ class _LocationScreenState extends State<LocationScreen> {
     _controller = MapController(
       location: _defaultLocation,
     );
-    _findLocationFuture = locator<LocationService>().getCurrentLocation().then(
+    _findLocationFuture = LocationService.instance.getCurrentLocation().then(
       (value) {
         final latitude = value?.latitude;
         final longitude = value?.longitude;

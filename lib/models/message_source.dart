@@ -7,7 +7,7 @@ import '../localization/app_localizations.g.dart';
 import '../logger.dart';
 import '../notification/model.dart';
 import '../notification/service.dart';
-import '../services/scaffold_messenger_service.dart';
+import '../scaffold_messenger/service.dart';
 import '../util/indexed_cache.dart';
 import 'async_mime_source.dart';
 import 'message.dart';

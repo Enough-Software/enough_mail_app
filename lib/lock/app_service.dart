@@ -1,15 +1,19 @@
 import 'dart:ui';
 
 import '../localization/app_localizations_en.g.dart';
-import '../locator.dart';
 import '../logger.dart';
 import '../settings/model.dart';
-import 'biometrics_service.dart';
+import 'service.dart';
 
 /// Handles app life cycle events
 class AppService {
   /// Creates a new [AppService]
-  AppService();
+  AppService._();
+
+  static final _instance = AppService._();
+
+  /// The instance of the [AppService]
+  static AppService get instance => _instance;
 
   /// The current [AppLifecycleState]
   AppLifecycleState appLifecycleState = AppLifecycleState.resumed;
@@ -55,7 +59,7 @@ class AppService {
             // if (navService.currentRouteName != Routes.lockScreen) {
             //   await navService.push(Routes.lockScreen);
             // }
-            final bool didAuthenticate = await locator<BiometricsService>()
+            final bool didAuthenticate = await BiometricsService.instance
                 .authenticate(AppLocalizationsEn());
             // if (!didAuthenticate) {
             //   if (navService.currentRouteName != Routes.lockScreen) {

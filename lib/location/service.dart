@@ -2,6 +2,13 @@ import 'package:location/location.dart';
 
 /// Allows to query the current location
 class LocationService {
+  LocationService._();
+
+  static final _instance = LocationService._();
+
+  /// Returns the singleton instance
+  static LocationService get instance => _instance;
+
   Location? _location;
   bool _serviceEnabled = false;
   PermissionStatus _permissionStatus = PermissionStatus.denied;

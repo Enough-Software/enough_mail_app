@@ -6,7 +6,7 @@ import 'package:intl/date_symbol_data_local.dart' as date_intl;
 import 'package:intl/date_symbols.dart';
 import 'package:intl/intl.dart';
 
-import '../services/date_service.dart';
+import '../util/date_helper.dart';
 import 'app_localizations.g.dart';
 import 'app_localizations_en.g.dart';
 

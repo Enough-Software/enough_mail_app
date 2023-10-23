@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import '../localization/extension.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
-import '../services/scaffold_messenger_service.dart';
+import '../scaffold_messenger/service.dart';
 import 'mail_address_chip.dart';
 
 enum DragAction { noted, later, delete, reply }

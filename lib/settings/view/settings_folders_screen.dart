@@ -10,7 +10,7 @@ import '../../localization/extension.dart';
 import '../../mail/provider.dart';
 import '../../models/models.dart';
 import '../../screens/base.dart';
-import '../../services/scaffold_messenger_service.dart';
+import '../../scaffold_messenger/service.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../../widgets/account_selector.dart';
 import '../../widgets/button_text.dart';

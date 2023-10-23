@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../localization/extension.dart';
 import '../models/compose_data.dart';
 import '../routes.dart';
-import '../services/scaffold_messenger_service.dart';
+import '../scaffold_messenger/service.dart';
 import 'icon_text.dart';
 
 class MailAddressChip extends StatelessWidget {

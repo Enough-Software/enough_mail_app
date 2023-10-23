@@ -12,7 +12,7 @@ import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../notification/service.dart';
 import '../routes.dart';
-import '../services/scaffold_messenger_service.dart';
+import '../scaffold_messenger/service.dart';
 import '../settings/model.dart';
 import '../settings/provider.dart';
 import '../settings/theme/icon_service.dart';

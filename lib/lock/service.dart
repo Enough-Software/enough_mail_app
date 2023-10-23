@@ -5,11 +5,18 @@ import 'package:flutter/foundation.dart';
 import 'package:local_auth/local_auth.dart';
 
 import '../localization/app_localizations.g.dart';
-import '../locator.dart';
 import 'app_service.dart';
 
 /// Handles biometrics
 class BiometricsService {
+  /// Creates a new [BiometricsService]
+  BiometricsService._();
+
+  static final _instance = BiometricsService._();
+
+  /// The instance of the [BiometricsService]
+  static BiometricsService get instance => _instance;
+
   bool _isResolved = false;
   bool _isSupported = false;
   final _localAuth = LocalAuthentication();
@@ -45,7 +52,7 @@ class BiometricsService {
     if (!_isSupported) {
       return false;
     }
-    locator<AppService>().ignoreBiometricsCheckAtNextResume = true;
+    AppService.instance.ignoreBiometricsCheckAtNextResume = true;
     try {
       final result = await _localAuth.authenticate(
         localizedReason:
@@ -55,7 +62,7 @@ class BiometricsService {
         ),
       );
       unawaited(Future.delayed(const Duration(seconds: 2)).then(
-        (_) => locator<AppService>().ignoreBiometricsCheckAtNextResume = false,
+        (_) => AppService.instance.ignoreBiometricsCheckAtNextResume = false,
       ));
 
       return result;

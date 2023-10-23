@@ -29,9 +29,9 @@ enum DateSectionRange {
 }
 
 /// Allows to determine the date section of a given date
-class DateService {
-  /// Creates a new [DateService]
-  DateService(this.firstDayOfWeek) {
+class DateHelper {
+  /// Creates a new [DateHelper]
+  DateHelper(this.firstDayOfWeek) {
     _setupDates();
   }
 

@@ -2,7 +2,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../localization/extension.dart';
-import '../services/scaffold_messenger_service.dart';
+import '../scaffold_messenger/service.dart';
 
 /// Status bar for cupertino.
 ///

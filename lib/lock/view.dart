@@ -5,9 +5,8 @@ import 'package:go_router/go_router.dart';
 
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
-import '../services/biometrics_service.dart';
-import 'base.dart';
+import '../screens/base.dart';
+import 'service.dart';
 
 class LockScreen extends StatelessWidget {
   const LockScreen({super.key});
@@ -46,7 +45,7 @@ class LockScreen extends StatelessWidget {
 
   Future<void> _authenticate(BuildContext context) async {
     final didAuthenticate =
-        await locator<BiometricsService>().authenticate(context.text);
+        await BiometricsService.instance.authenticate(context.text);
     if (didAuthenticate && context.mounted) {
       context.pop();
     }

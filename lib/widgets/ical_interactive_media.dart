@@ -15,7 +15,7 @@ import '../account/model.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../models/message.dart';
-import '../services/scaffold_messenger_service.dart';
+import '../scaffold_messenger/service.dart';
 import '../util/localized_dialog_helper.dart';
 import 'mail_address_chip.dart';
 import 'text_with_links.dart';

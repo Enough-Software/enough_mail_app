@@ -7,7 +7,7 @@ import 'package:enough_mail_app/models/message.dart';
 import 'package:enough_mail_app/models/message_source.dart';
 import 'package:enough_mail_app/notification/model.dart';
 import 'package:enough_mail_app/notification/service.dart';
-import 'package:enough_mail_app/services/scaffold_messenger_service.dart';
+import 'package:enough_mail_app/scaffold_messenger/service.dart';
 import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
 import 'package:flutter/src/material/scaffold.dart';
 import 'package:flutter/src/widgets/framework.dart';

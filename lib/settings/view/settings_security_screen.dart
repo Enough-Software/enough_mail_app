@@ -5,9 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../../localization/extension.dart';
-import '../../locator.dart';
+import '../../lock/service.dart';
 import '../../screens/base.dart';
-import '../../services/biometrics_service.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../model.dart';
 import '../provider.dart';
@@ -22,7 +21,7 @@ class SettingsSecurityScreen extends HookConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final isBiometricsSupported = useState<bool?>(null);
     useMemoized(() async {
-      final supported = await locator<BiometricsService>().isDeviceSupported();
+      final supported = await BiometricsService.instance.isDeviceSupported();
       isBiometricsSupported.value = supported;
     });
 
@@ -129,7 +128,7 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                                 ? null
                                 : localizations.securityUnlockDisableReason;
                             final didAuthenticate =
-                                await locator<BiometricsService>().authenticate(
+                                await BiometricsService.instance.authenticate(
                               localizations,
                               reason: reason,
                             );

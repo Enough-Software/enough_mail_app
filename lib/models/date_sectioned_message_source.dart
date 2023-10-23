@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 
 import '../localization/app_localizations.g.dart';
-import '../services/date_service.dart';
+import '../util/date_helper.dart';
 import 'message.dart';
 import 'message_date_section.dart';
 import 'message_source.dart';
@@ -92,8 +92,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
       final message = messages[i];
       final dateTime = message.mimeMessage.decodeDate();
       if (dateTime != null) {
-        final range =
-            DateService(firstDayOfWeek).determineDateSection(dateTime);
+        final range = DateHelper(firstDayOfWeek).determineDateSection(dateTime);
         if (range != lastRange) {
           final index = (lastRange == null) ? 0 : i + foundSections;
           sections.add(MessageDateSection(range, dateTime, index));
