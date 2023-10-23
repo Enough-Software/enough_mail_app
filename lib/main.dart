@@ -8,13 +8,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'account/provider.dart';
 import 'app_lifecycle/provider.dart';
 import 'background/provider.dart';
+import 'keys/service.dart';
 import 'localization/app_localizations.g.dart';
 import 'locator.dart';
 import 'logger.dart';
 import 'notification/service.dart';
 import 'routes.dart';
 import 'screens/screens.dart';
-import 'services/key_service.dart';
 import 'services/scaffold_messenger_service.dart';
 import 'settings/provider.dart';
 import 'settings/theme/provider.dart';
@@ -116,10 +116,10 @@ class _InitializationScreen extends ConsumerState<InitializationScreen> {
     if (context.mounted) {
       await NotificationService.instance.init(context: context);
     }
-    await locator<KeyService>().init();
+    await KeyService.instance.init();
     // final mailService = locator<MailService>();
     // // key service is required before mail service due to Oauth configs
-    // await locator<KeyService>().init();
+    // await KeyService.instance.init();
     // await mailService.init(i18nService.localizations, settings);
 
     // if (mailService.messageSource != null) {

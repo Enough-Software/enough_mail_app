@@ -1,12 +1,11 @@
 import 'package:enough_mail/enough_mail.dart';
-import '../locator.dart';
-import '../services/key_service.dart';
-import '../util/http_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 
-class OauthClientId {
+import '../keys/service.dart';
+import '../util/http_helper.dart';
 
+class OauthClientId {
   const OauthClientId(this.id, this.secret);
   final String id;
   final String? secret;
@@ -17,7 +16,7 @@ abstract class OauthClient {
   final String incomingHostName;
   bool get isEnabled => oauthClientId != null;
   OauthClientId? get oauthClientId =>
-      locator<KeyService>().oauth[incomingHostName];
+      KeyService.instance.oauth[incomingHostName];
 
   Future<OauthToken?> authenticate(String email) async {
     try {

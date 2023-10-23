@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../keys/service.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../locator.dart';
@@ -16,7 +17,6 @@ import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../routes.dart';
 import '../services/icon_service.dart';
-import '../services/key_service.dart';
 import '../util/http_helper.dart';
 import '../util/localized_dialog_helper.dart';
 import 'ical_composer.dart';
@@ -135,7 +135,7 @@ class AddAttachmentPopupButton extends ConsumerWidget {
             brightness: brightness,
           ),
         ),
-        if (locator<KeyService>().hasGiphy)
+        if (KeyService.instance.hasGiphy)
           PlatformPopupMenuItem(
             value: 5,
             child: IconText(
@@ -227,7 +227,7 @@ class AddAttachmentPopupButton extends ConsumerWidget {
     BuildContext context,
     AppLocalizations localizations,
   ) async {
-    final giphy = locator<KeyService>().giphy;
+    final giphy = KeyService.instance.giphy;
     if (giphy == null) {
       await LocalizedDialogHelper.showTextDialog(
         context,

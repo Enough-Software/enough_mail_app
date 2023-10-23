@@ -8,7 +8,12 @@ import '../oauth/oauth.dart';
 /// Allows to load the keys from assets/keys.txt
 class KeyService {
   /// Creates a new [KeyService]
-  KeyService();
+  KeyService._();
+
+  static final _instance = KeyService._();
+
+  /// Retrieves access to the [KeyService] singleton
+  static KeyService get instance => _instance;
 
   /// Loads the key data
   Future<void> init() async {
