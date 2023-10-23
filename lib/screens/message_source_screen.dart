@@ -10,7 +10,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../account/provider.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../mail/model.dart';
 import '../models/compose_data.dart';
 import '../models/date_sectioned_message_source.dart';
@@ -844,7 +843,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     final source = _sectionedMessageSource.messageSource;
     final localizations = context.text;
     if (_selectedMessages.isEmpty) {
-      locator<ScaffoldMessengerService>().showTextSnackBar(
+      ScaffoldMessengerService.instance.showTextSnackBar(
           localizations, localizations.multipleSelectionNeededInfo);
 
       return;
@@ -1233,7 +1232,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
           }
         };
       }
-      locator<ScaffoldMessengerService>().showTextSnackBar(
+      ScaffoldMessengerService.instance.showTextSnackBar(
         localizations,
         localizations.homeDeleteAllSuccess,
         undo: undo,

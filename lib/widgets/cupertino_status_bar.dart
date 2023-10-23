@@ -2,7 +2,6 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../services/scaffold_messenger_service.dart';
 
 /// Status bar for cupertino.
@@ -40,13 +39,13 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
   @override
   void initState() {
     super.initState();
-    locator<ScaffoldMessengerService>().statusBarState = this;
+    ScaffoldMessengerService.instance.statusBarState = this;
   }
 
   @override
   void dispose() {
     super.dispose();
-    locator<ScaffoldMessengerService>().popStatusBarState();
+    ScaffoldMessengerService.instance.popStatusBarState();
   }
 
   @override

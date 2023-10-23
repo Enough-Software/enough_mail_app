@@ -7,7 +7,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../account/model.dart';
 import '../../account/provider.dart';
 import '../../localization/extension.dart';
-import '../../locator.dart';
 import '../../mail/provider.dart';
 import '../../models/models.dart';
 import '../../screens/base.dart';
@@ -359,7 +358,7 @@ class MailboxWidget extends ConsumerWidget {
               folderNameController.text,
               mailbox,
             );
-        locator<ScaffoldMessengerService>().showTextSnackBar(
+        ScaffoldMessengerService.instance.showTextSnackBar(
           localizations,
           localizations.folderAddResultSuccess,
         );
@@ -393,7 +392,7 @@ class MailboxWidget extends ConsumerWidget {
         await ref
             .read(mailClientSourceProvider(account: account).notifier)
             .deleteMailbox(mailbox);
-        locator<ScaffoldMessengerService>().showTextSnackBar(
+        ScaffoldMessengerService.instance.showTextSnackBar(
           localizations,
           localizations.folderDeleteResultSuccess,
         );

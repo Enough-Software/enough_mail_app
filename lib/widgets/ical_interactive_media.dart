@@ -14,7 +14,6 @@ import 'package:go_router/go_router.dart';
 import '../account/model.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../models/message.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../util/localized_dialog_helper.dart';
@@ -412,7 +411,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
         originatingMessage: widget.message.mimeMessage,
         productId: 'Maily',
       );
-      locator<ScaffoldMessengerService>()
+      ScaffoldMessengerService.instance
           .showTextSnackBar(localizations, status.localization(localizations));
     } catch (e, s) {
       if (kDebugMode) {

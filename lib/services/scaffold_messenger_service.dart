@@ -5,7 +5,17 @@ import 'package:flutter/material.dart';
 import '../localization/app_localizations.g.dart';
 import '../widgets/cupertino_status_bar.dart';
 
+/// Allows to show snack bars
 class ScaffoldMessengerService {
+  /// Creates a new [ScaffoldMessengerService]
+  ScaffoldMessengerService._();
+
+  static final _instance = ScaffoldMessengerService._();
+
+  /// The instance of the [ScaffoldMessengerService]
+  static ScaffoldMessengerService get instance => _instance;
+
+  /// The key of the scaffold messenger
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 

@@ -9,7 +9,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../../localization/extension.dart';
-import '../../locator.dart';
 import '../../screens/base.dart';
 import '../../services/scaffold_messenger_service.dart';
 import '../../widgets/button_text.dart';
@@ -96,7 +95,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                       icon: Icon(CommonPlatformIcons.copy),
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: info ?? ''));
-                        locator<ScaffoldMessengerService>().showTextSnackBar(
+                        ScaffoldMessengerService.instance.showTextSnackBar(
                           localizations,
                           localizations.feedbackResultInfoCopied,
                         );

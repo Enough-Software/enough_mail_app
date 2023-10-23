@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 
 import '../account/model.dart';
 import '../localization/app_localizations.g.dart';
-import '../locator.dart';
 import '../logger.dart';
 import '../notification/model.dart';
 import '../notification/service.dart';
@@ -231,7 +230,7 @@ abstract class MessageSource extends ChangeNotifier
         resultsBySource[source] = deleteResult;
       }
     }
-    locator<ScaffoldMessengerService>().showTextSnackBar(
+    ScaffoldMessengerService.instance.showTextSnackBar(
       localizations,
       notification,
       undo: resultsBySource.isEmpty
@@ -303,7 +302,7 @@ abstract class MessageSource extends ChangeNotifier
         await mailClient.moveMessage(message.mimeMessage, targetMailbox);
     notifyListeners();
     if (moveResult.canUndo) {
-      locator<ScaffoldMessengerService>().showTextSnackBar(
+      ScaffoldMessengerService.instance.showTextSnackBar(
         localizations,
         notification,
         undo: () async {
@@ -350,7 +349,7 @@ abstract class MessageSource extends ChangeNotifier
     }
     notifyListeners();
     if (resultsBySource.isNotEmpty) {
-      locator<ScaffoldMessengerService>().showTextSnackBar(
+      ScaffoldMessengerService.instance.showTextSnackBar(
         localizations,
         notification,
         undo: () async {
@@ -384,7 +383,7 @@ abstract class MessageSource extends ChangeNotifier
       final mimes = messages.map((m) => m.mimeMessage).toList();
       final moveResult = await source.moveMessages(mimes, targetMailbox);
       notifyListeners();
-      locator<ScaffoldMessengerService>().showTextSnackBar(
+      ScaffoldMessengerService.instance.showTextSnackBar(
         localizations,
         notification,
         undo: moveResult.canUndo

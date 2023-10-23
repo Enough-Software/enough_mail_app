@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
 import '../services/scaffold_messenger_service.dart';
@@ -220,7 +219,7 @@ class _MessageStackState extends State<MessageStack> {
     if (snack != null) {
       if (context.mounted) {
         //TODO allow undo when marking as deleted
-        locator<ScaffoldMessengerService>().showTextSnackBar(
+        ScaffoldMessengerService.instance.showTextSnackBar(
           context.text,
           snack,
           undo: () async {

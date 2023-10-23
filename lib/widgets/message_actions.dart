@@ -8,7 +8,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../account/model.dart';
 import '../contact/provider.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../notification/service.dart';
@@ -397,7 +396,7 @@ class MessageActions extends HookConsumerWidget {
                 recipients: recipients,
                 appendToSent: false,
               );
-          locator<ScaffoldMessengerService>().showTextSnackBar(
+          ScaffoldMessengerService.instance.showTextSnackBar(
             localizations,
             localizations.resultRedirectedSuccess,
           );

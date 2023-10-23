@@ -13,7 +13,6 @@ import '../account/provider.dart';
 import '../hoster/service.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../logger.dart';
 import '../mail/provider.dart';
 import '../routes.dart';
@@ -183,7 +182,7 @@ class AccountEditScreen extends HookConsumerWidget {
                         ),
                         onDismissed: (direction) {
                           account.removeAlias(alias);
-                          locator<ScaffoldMessengerService>().showTextSnackBar(
+                          ScaffoldMessengerService.instance.showTextSnackBar(
                             localizations,
                             localizations.editAccountAliasRemoved(
                               alias.email,
@@ -342,7 +341,7 @@ class AccountEditScreen extends HookConsumerWidget {
                               final message = value
                                   ? localizations.editAccountLoggingEnabled
                                   : localizations.editAccountLoggingDisabled;
-                              locator<ScaffoldMessengerService>()
+                              ScaffoldMessengerService.instance
                                   .showTextSnackBar(localizations, message);
                             }
                           },

@@ -17,7 +17,6 @@ import '../account/provider.dart';
 import '../contact/provider.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../mail/provider.dart';
 import '../models/compose_data.dart';
 import '../models/sender.dart';
@@ -423,7 +422,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         from: _from.account.fromAddress,
         appendToSent: append,
       );
-      locator<ScaffoldMessengerService>().showTextSnackBar(
+      ScaffoldMessengerService.instance.showTextSnackBar(
           localizations, localizations.composeMailSendSuccess);
     } catch (e, s) {
       if (kDebugMode) {
@@ -508,7 +507,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       onWillPop: () async {
         // let it pop but show snackbar to return:
         await _populateMessageBuilder(storeComposeDataForResume: true);
-        locator<ScaffoldMessengerService>().showTextSnackBar(
+        ScaffoldMessengerService.instance.showTextSnackBar(
           localizations,
           localizations.composeLeftByMistake,
           undo: _returnToCompose,
@@ -786,7 +785,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     final mime = await _buildMimeMessage(mailClient);
     try {
       await mailClient.saveDraftMessage(mime);
-      locator<ScaffoldMessengerService>().showTextSnackBar(
+      ScaffoldMessengerService.instance.showTextSnackBar(
         localizations,
         localizations.composeMessageSavedAsDraft,
       );

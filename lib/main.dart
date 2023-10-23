@@ -56,7 +56,7 @@ class MailyApp extends HookConsumerWidget {
       title: 'Maily',
       routerConfig: Routes.routerConfig,
       scaffoldMessengerKey:
-          locator<ScaffoldMessengerService>().scaffoldMessengerKey,
+          ScaffoldMessengerService.instance.scaffoldMessengerKey,
       // builder: (context, child) => Consumer(
       //   builder: (context, ref, child) {
       //     final languageTag =

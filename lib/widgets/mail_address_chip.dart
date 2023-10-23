@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../models/compose_data.dart';
 import '../routes.dart';
 import '../services/scaffold_messenger_service.dart';
@@ -61,7 +60,7 @@ class MailAddressChip extends StatelessWidget {
             break;
           case _AddressAction.copy:
             await Clipboard.setData(ClipboardData(text: mailAddress.email));
-            locator<ScaffoldMessengerService>().showTextSnackBar(
+            ScaffoldMessengerService.instance.showTextSnackBar(
               localizations,
               localizations.feedbackResultInfoCopied,
             );
