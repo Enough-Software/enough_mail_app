@@ -17,9 +17,9 @@ import '../locator.dart';
 import '../logger.dart';
 import '../mail/provider.dart';
 import '../routes.dart';
-import '../services/icon_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../settings/provider.dart';
+import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import '../util/validator.dart';
 import '../widgets/button_text.dart';
@@ -45,7 +45,7 @@ class AccountEditScreen extends HookConsumerWidget {
     final accountNameController = useTextEditingController(text: account.name);
     final userNameController = useTextEditingController(text: account.userName);
     final theme = Theme.of(context);
-    final iconService = locator<IconService>();
+    final iconService = IconService.instance;
 
     final enableDeveloperMode = ref.watch(
       settingsProvider.select((value) => value.enableDeveloperMode),

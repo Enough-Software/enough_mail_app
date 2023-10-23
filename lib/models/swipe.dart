@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.g.dart';
-import '../locator.dart';
-import '../services/icon_service.dart';
+import '../settings/theme/icon_service.dart';
 
 enum SwipeAction {
   markRead,
@@ -76,7 +75,7 @@ extension SwipeExtension on SwipeAction {
 
   /// Icon of the action
   IconData get icon {
-    final iconService = locator<IconService>();
+    final iconService = IconService.instance;
     switch (this) {
       case SwipeAction.markRead:
         return iconService.messageIsNotSeen;

@@ -11,7 +11,6 @@ import '../../locator.dart';
 import '../../mail/provider.dart';
 import '../../models/models.dart';
 import '../../screens/base.dart';
-import '../../services/icon_service.dart';
 import '../../services/scaffold_messenger_service.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../../widgets/account_selector.dart';
@@ -19,6 +18,7 @@ import '../../widgets/button_text.dart';
 import '../../widgets/mailbox_selector.dart';
 import '../model.dart';
 import '../provider.dart';
+import '../theme/icon_service.dart';
 
 class SettingsFoldersScreen extends ConsumerWidget {
   const SettingsFoldersScreen({super.key});
@@ -136,7 +136,7 @@ class CustomFolderNamesEditor extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final localizations = context.text;
-    final iconService = locator<IconService>();
+    final iconService = IconService.instance;
 
     final inboxController = useTextEditingController(text: customNames[0]);
     final draftsController = useTextEditingController(text: customNames[1]);

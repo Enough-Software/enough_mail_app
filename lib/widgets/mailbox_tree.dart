@@ -6,12 +6,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../account/model.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../mail/model.dart';
 import '../mail/provider.dart';
-import '../services/icon_service.dart';
 import '../settings/model.dart';
 import '../settings/provider.dart';
+import '../settings/theme/icon_service.dart';
 
 /// Displays a tree of mailboxes
 class MailboxTree extends ConsumerWidget {
@@ -82,7 +81,7 @@ class MailboxTree extends ConsumerWidget {
     final children = element.children;
     if (children == null) {
       final isCurrent = (mailbox == current);
-      final iconData = locator<IconService>().getForMailbox(mailbox);
+      final iconData = IconService.instance.getForMailbox(mailbox);
 
       return SelectablePlatformListTile(
         leading: Icon(iconData),

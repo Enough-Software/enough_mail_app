@@ -204,7 +204,7 @@ abstract class MessageSource extends ChangeNotifier
     List<Message> messages,
     String notification,
   ) {
-    final notificationService = locator<NotificationService>();
+    final notificationService = NotificationService.instance;
     for (final message in messages) {
       _removeMessageFromCacheAndCancelNotification(
         message,
@@ -292,7 +292,7 @@ abstract class MessageSource extends ChangeNotifier
   ) async {
     _removeMessageFromCacheAndCancelNotification(
       message,
-      locator<NotificationService>(),
+      NotificationService.instance,
       notify: false,
     );
     final mailClient = message.source.getMimeSource(message)?.mailClient;
@@ -330,7 +330,7 @@ abstract class MessageSource extends ChangeNotifier
     MailboxFlag targetMailboxFlag,
     String notification,
   ) async {
-    final notificationService = locator<NotificationService>();
+    final notificationService = NotificationService.instance;
     for (final message in messages) {
       _removeMessageFromCacheAndCancelNotification(
         message,
@@ -370,7 +370,7 @@ abstract class MessageSource extends ChangeNotifier
     Mailbox targetMailbox,
     String notification,
   ) async {
-    final notificationService = locator<NotificationService>();
+    final notificationService = NotificationService.instance;
     for (final message in messages) {
       _removeMessageFromCacheAndCancelNotification(
         message,
@@ -436,7 +436,7 @@ abstract class MessageSource extends ChangeNotifier
     if (source != null) {
       onMarkedAsSeen(msg, isSeen);
       if (isSeen) {
-        locator<NotificationService>().cancelNotificationForMessage(msg);
+        NotificationService.instance.cancelNotificationForMessage(msg);
       }
 
       return source.store(
@@ -496,7 +496,7 @@ abstract class MessageSource extends ChangeNotifier
   }
 
   Future<void> markMessagesAsSeen(List<Message> messages, bool isSeen) {
-    final notificationService = locator<NotificationService>();
+    final notificationService = NotificationService.instance;
     for (final msg in messages) {
       onMarkedAsSeen(msg, isSeen);
       if (isSeen) {

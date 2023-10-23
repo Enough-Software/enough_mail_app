@@ -12,11 +12,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../keys/service.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../routes.dart';
-import '../services/icon_service.dart';
+import '../settings/theme/icon_service.dart';
 import '../util/http_helper.dart';
 import '../util/localized_dialog_helper.dart';
 import 'ical_composer.dart';
@@ -87,7 +86,7 @@ class AddAttachmentPopupButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final localizations = context.text;
-    final iconService = locator<IconService>();
+    final iconService = IconService.instance;
     const brightness = Brightness.light;
     // TODO(RV): implement brightness access
     // themeService.brightness(context);

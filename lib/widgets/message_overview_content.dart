@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../models/message.dart';
-import '../services/icon_service.dart';
+import '../settings/theme/icon_service.dart';
 
 class MessageOverviewContent extends StatelessWidget {
   const MessageOverviewContent({

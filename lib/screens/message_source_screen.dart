@@ -19,9 +19,9 @@ import '../models/message_source.dart';
 import '../models/swipe.dart';
 import '../notification/service.dart';
 import '../routes.dart';
-import '../services/icon_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../settings/provider.dart';
+import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import '../util/string_helper.dart';
 import '../widgets/search_text_field.dart';
@@ -251,7 +251,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         child: Text(emptyMessage),
       );
     } else if (source.supportsDeleteAll) {
-      final iconService = locator<IconService>();
+      final iconService = IconService.instance;
       final style = TextButton.styleFrom(foregroundColor: Colors.grey[600]);
       final textStyle = Theme.of(context).textTheme.labelLarge;
       zeroPosWidget = Padding(
@@ -646,7 +646,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     final isJunk = source.isJunk;
     final isAnyUnseen = _selectedMessages.any((m) => !m.isSeen);
     final isAnyUnflagged = _selectedMessages.any((m) => !m.isFlagged);
-    final iconService = locator<IconService>();
+    final iconService = IconService.instance;
 
     return PlatformBottomBar(
       cupertinoBlurBackground: true,
@@ -932,7 +932,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         break;
       case _MultipleChoice.addNotification:
         endSelectionMode = false;
-        final notificationService = locator<NotificationService>();
+        final notificationService = NotificationService.instance;
         for (final message in _selectedMessages) {
           await notificationService
               .sendLocalNotificationForMailMessage(message);

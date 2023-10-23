@@ -6,9 +6,8 @@ import 'package:shimmer_animation/shimmer_animation.dart';
 
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../routes.dart';
-import '../services/icon_service.dart';
+import '../settings/theme/icon_service.dart';
 import '../widgets/button_text.dart';
 import '../widgets/legalese.dart';
 
@@ -104,7 +103,7 @@ class WelcomeScreen extends StatelessWidget {
               duration: const Duration(seconds: 4),
               interval: const Duration(seconds: 6),
               child: PlatformFilledButtonIcon(
-                icon: Icon(locator<IconService>().email),
+                icon: Icon(IconService.instance.email),
                 label: Center(
                   child: PlatformText(localizations.welcomeActionSignIn),
                 ),

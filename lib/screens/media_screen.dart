@@ -16,13 +16,12 @@ import 'package:share_plus/share_plus.dart';
 import '../account/model.dart';
 import '../account/provider.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
 import '../routes.dart';
-import '../services/icon_service.dart';
 import '../settings/provider.dart';
+import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import 'base.dart';
 
@@ -37,7 +36,7 @@ class InteractiveMediaScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final localizations = context.text;
-    final iconService = locator<IconService>();
+    final iconService = IconService.instance;
 
     return BasePage(
       title: mediaWidget.mediaProvider.name,

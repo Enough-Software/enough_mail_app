@@ -12,9 +12,8 @@ import 'package:url_launcher/url_launcher.dart' as launcher;
 import '../account/model.dart';
 import '../account/provider.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
-import '../services/icon_service.dart';
 import '../settings/provider.dart';
+import '../settings/theme/icon_service.dart';
 import '../util/modal_bottom_sheet_helper.dart';
 
 class SignatureWidget extends HookConsumerWidget {
@@ -32,7 +31,7 @@ class SignatureWidget extends HookConsumerWidget {
 
     Future<void> showEditor() async {
       final localizations = context.text;
-      final iconService = locator<IconService>();
+      final iconService = IconService.instance;
       HtmlEditorApi? editorApi;
 
       final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(

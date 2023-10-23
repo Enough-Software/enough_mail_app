@@ -5,6 +5,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class IconService {
+  IconService._();
+
+  static final _instance = IconService._();
+
+  /// Returns the singleton instance
+  static IconService get instance => _instance;
+
   static final _isCupertino = PlatformInfo.isCupertino;
 
   IconData get share => _isCupertino ? CupertinoIcons.share : Icons.share;
@@ -116,6 +123,8 @@ class IconService {
 
       case MediaToptype.other:
         return Icons.attachment;
+
+      // ignore: no_default_cases
       default:
         return Icons.attachment;
     }
@@ -136,17 +145,18 @@ class IconService {
     } else if (mailbox.isJunk) {
       iconData = folderJunk;
     }
+
     return iconData;
   }
 
-  static Widget buildNumericIcon(BuildContext context, int value,
-      {double? size}) {
+  static Widget buildNumericIcon(
+    BuildContext context,
+    int value, {
+    double? size,
+  }) {
     switch (value) {
       case 1:
-        return Icon(
-          Icons.looks_one_outlined,
-          size: size,
-        );
+        return Icon(Icons.looks_one_outlined, size: size);
       case 2:
         return Icon(Icons.looks_two_outlined, size: size);
       case 3:

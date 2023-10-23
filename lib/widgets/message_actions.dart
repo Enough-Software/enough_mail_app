@@ -13,10 +13,10 @@ import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../notification/service.dart';
 import '../routes.dart';
-import '../services/icon_service.dart';
 import '../services/scaffold_messenger_service.dart';
 import '../settings/model.dart';
 import '../settings/provider.dart';
+import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import '../util/validator.dart';
 import 'button_text.dart';
@@ -49,7 +49,7 @@ class MessageActions extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final localizations = context.text;
     final attachments = message.attachments;
-    final iconService = locator<IconService>();
+    final iconService = IconService.instance;
 
     void onOverflowChoiceSelected(_OverflowMenuChoice result) {
       switch (result) {
@@ -464,7 +464,7 @@ class MessageActions extends HookConsumerWidget {
     if (source.isJunk) {
       await source.markAsNotJunk(context.text, message);
     } else {
-      locator<NotificationService>().cancelNotificationForMessage(message);
+      NotificationService.instance.cancelNotificationForMessage(message);
       await source.markAsJunk(context.text, message);
     }
     if (context.mounted) {
@@ -491,7 +491,7 @@ class MessageActions extends HookConsumerWidget {
     if (source.isArchive) {
       await source.moveToInbox(context.text, message);
     } else {
-      locator<NotificationService>().cancelNotificationForMessage(message);
+      NotificationService.instance.cancelNotificationForMessage(message);
       await source.archive(context.text, message);
     }
     if (context.mounted) {
@@ -653,6 +653,6 @@ class MessageActions extends HookConsumerWidget {
   }
 
   void _addNotification() {
-    locator<NotificationService>().sendLocalNotificationForMailMessage(message);
+    NotificationService.instance.sendLocalNotificationForMailMessage(message);
   }
 }

@@ -13,9 +13,8 @@ import '../account/provider.dart';
 import '../extensions/extension_action_tile.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../routes.dart';
-import '../services/icon_service.dart';
+import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import 'mailbox_tree.dart';
 
@@ -29,7 +28,7 @@ class AppDrawer extends ConsumerWidget {
     final accounts = ref.watch(allAccountsProvider);
     final theme = Theme.of(context);
     final localizations = context.text;
-    final iconService = locator<IconService>();
+    final iconService = IconService.instance;
     final currentAccount = ref.watch(currentAccountProvider);
     final hasAccountsWithErrors = ref.watch(hasAccountWithErrorProvider);
 

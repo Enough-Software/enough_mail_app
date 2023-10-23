@@ -22,7 +22,7 @@ class IcalComposer extends StatefulHookConsumerWidget {
     VCalendar? appointment,
   }) async {
     final localizations = context.text;
-    // final iconService = locator<IconService>();
+    // final iconService = IconService.instance;
     final account = ref.read(currentRealAccountProvider);
     if (account == null) {
       logger.e('Unable to determine current real account');
@@ -383,7 +383,7 @@ class RecurrenceComposer extends StatefulWidget {
   static Future<Recurrence?> createOrEditRecurrence(BuildContext context,
       Recurrence? recurrenceRule, DateTime startDate) async {
     final localizations = context.text;
-    // final iconService = locator<IconService>();
+    // final iconService = IconService.instance;
 
     final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
       context,
@@ -879,7 +879,7 @@ class UntilComposer extends StatefulWidget {
     IsoDuration? recommendation,
   ) async {
     final localizations = context.text;
-    // final iconService = locator<IconService>();
+    // final iconService = IconService.instance;
     final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
       context,
       localizations.composeAppointmentRecurrenceUntilLabel,

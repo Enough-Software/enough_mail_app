@@ -12,16 +12,15 @@ import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../mail/provider.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
 import '../notification/service.dart';
 import '../routes.dart';
-import '../services/icon_service.dart';
 import '../settings/model.dart';
 import '../settings/provider.dart';
+import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import '../widgets/attachment_chip.dart';
 import '../widgets/button_text.dart';
@@ -470,7 +469,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
         _blockExternalImages = blockExternalImages;
       });
     }
-    locator<NotificationService>().cancelNotificationForMessage(widget.message);
+    NotificationService.instance.cancelNotificationForMessage(widget.message);
     if (_notifyMarkedAsSeen) {
       widget.message.source.onMarkedAsSeen(widget.message, true);
     }

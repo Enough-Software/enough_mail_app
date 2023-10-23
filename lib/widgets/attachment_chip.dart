@@ -5,12 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../localization/extension.dart';
-import '../locator.dart';
 import '../logger.dart';
 import '../models/message.dart';
 import '../routes.dart';
 import '../screens/media_screen.dart';
-import '../services/icon_service.dart';
+import '../settings/theme/icon_service.dart';
 import 'button_text.dart';
 import 'ical_interactive_media.dart';
 
@@ -47,7 +46,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
     final name = widget.info.fileName;
     final mediaProvider = _mediaProvider;
     if (mediaProvider == null) {
-      final fallbackIcon = locator<IconService>().getForMediaType(mediaType);
+      final fallbackIcon = IconService.instance.getForMediaType(mediaType);
 
       return PlatformTextButton(
         onPressed: _isDownloading ? null : _download,
@@ -79,7 +78,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
   }
 
   Widget _buildFallbackPreview(BuildContext context, MediaProvider provider) {
-    final fallbackIcon = locator<IconService>()
+    final fallbackIcon = IconService.instance
         .getForMediaType(MediaType.fromText(provider.mediaType));
 
     return _buildPreviewWidget(false, fallbackIcon, provider.name);
@@ -221,7 +220,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
   ) {
     final sizeText = context.formatMemory(mediaProvider.size);
     final localizations = context.text;
-    final iconData = locator<IconService>()
+    final iconData = IconService.instance
         .getForMediaType(MediaType.fromText(mediaProvider.mediaType));
 
     return Material(

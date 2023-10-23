@@ -138,7 +138,7 @@ class _InitializationScreen extends ConsumerState<InitializationScreen> {
     //   ));
     //   // check for a tapped notification that started the app:
     //   final notificationInitResult =
-    //       await locator<NotificationService>().init();
+    //       await NotificationService.instance.init();
     //   if (notificationInitResult !=
     //       NotificationServiceInitResult.appLaunchedByNotification) {
     //     // the app has not been launched by a notification
