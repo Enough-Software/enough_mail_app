@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -222,7 +223,7 @@ class NotificationService {
         when: when?.millisecondsSinceEpoch,
         sound: const RawResourceAndroidNotificationSound('pop'),
       );
-    } else if (Platform.isIOS) {
+    } else if (PlatformInfo.isCupertino) {
       iosPlatformChannelSpecifics = const DarwinNotificationDetails(
         presentSound: true,
         presentBadge: true,

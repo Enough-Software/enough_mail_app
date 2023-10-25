@@ -39,6 +39,9 @@ class AccountEditScreen extends HookConsumerWidget {
     final account = ref.watch(
       findRealAccountByEmailProvider(email: accountEmail),
     );
+    if (account == null) {
+      return Center(child: PlatformCircularProgressIndicator());
+    }
     final unifiedAccount = ref.watch(unifiedAccountProvider);
     final localizations = context.text;
     final accountNameController = useTextEditingController(text: account.name);
@@ -315,14 +318,14 @@ class AccountEditScreen extends HookConsumerWidget {
                             if (!context.mounted) {
                               return;
                             }
-                            ref
-                                .read(realAccountsProvider.notifier)
-                                .removeAccount(account);
-                            if (ref.read(realAccountsProvider).isEmpty) {
+                            if (ref.read(realAccountsProvider).length == 1) {
                               context.go(Routes.welcome);
                             } else {
                               context.pop();
                             }
+                            ref
+                                .read(realAccountsProvider.notifier)
+                                .removeAccount(account);
                           }
                         },
                       ),

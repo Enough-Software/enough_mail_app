@@ -11,6 +11,7 @@ import 'models/models.dart';
 import 'notification/model.dart';
 import 'screens/screens.dart';
 import 'settings/view/view.dart';
+import 'widgets/widgets.dart';
 
 /// Defines app navigation routes
 class Routes {
@@ -24,6 +25,9 @@ class Routes {
   static const String home = '/home';
 
   /// Creates a new account
+  ///
+  /// query parameters: set "welcome" to "true" when launched from
+  /// within the welcome screen.
   static const String accountAdd = '/accountAdd';
 
   /// Allows to edit a single account
@@ -119,6 +123,10 @@ class Routes {
   ///
   /// extra: [WebViewConfiguration]
   static const String webview = '/webview';
+
+  /// Displays the account and mailbox switcher on a separate screen.
+  ///
+  /// This is only applicable on iOS.
   static const String appDrawer = '/appDrawer';
 
   /// Displays the lock screen
@@ -150,6 +158,11 @@ class Routes {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
+        name: appDrawer,
+        path: appDrawer,
+        builder: (context, state) => const AppDrawer(),
+      ),
+      GoRoute(
         name: accountAdd,
         path: accountAdd,
         builder: (context, state) => AccountAddScreen(
@@ -157,6 +170,7 @@ class Routes {
         ),
       ),
       GoRoute(
+        name: home,
         path: home,
         builder: (context, state) => const HomeScreen(),
       ),

@@ -442,13 +442,13 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
           localizations.composeSendErrorInfo(message),
           actions: [
             PlatformTextButton(
+              onPressed: currentContext.pop,
               child: ButtonText(localizations.actionCancel),
-              onPressed: () => Navigator.of(currentContext).pop(),
             ),
             PlatformTextButton(
               child: ButtonText(localizations.composeContinueEditingAction),
               onPressed: () {
-                Navigator.of(currentContext).pop();
+                currentContext.pop();
                 _returnToCompose();
               },
             ),
@@ -636,7 +636,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                               recipient: _from.address,
                             );
                           }
-                          ref.read(currentAccountProvider.notifier).account =
+                          ref.read(currentAccountProvider.notifier).state =
                               s.account;
                           setState(() {
                             _realAccount = s.account;

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
@@ -648,7 +650,7 @@ class MessageActions extends HookConsumerWidget {
       future: composeFuture,
       composeMode: mode,
     );
-    context.goNamed(Routes.mailCompose, extra: data);
+    context.pushReplacementNamed(Routes.mailCompose, extra: data);
   }
 
   void _addNotification() {

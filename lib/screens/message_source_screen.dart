@@ -69,11 +69,13 @@ class AsyncMessageSourceScreen extends StatelessWidget {
 
 /// Displays a list of mails
 class MessageSourceScreen extends ConsumerStatefulWidget {
+  /// Creates a new [MessageSourceScreen]
   const MessageSourceScreen({
     super.key,
     required this.messageSource,
   });
 
+  /// The source for the shown messages
   final MessageSource messageSource;
 
   @override
@@ -101,10 +103,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       firstDayOfWeek: context.firstDayOfWeek,
     );
     _sectionedMessageSource.addListener(_update);
-    _messageLoader = initMessageSource();
+    _messageLoader = _initMessageSource();
   }
 
-  Future<void> initMessageSource() {
+  Future<void> _initMessageSource() {
     //print('${DateTime.now()}: initMessageSource()');
     return _sectionedMessageSource.init();
     //print('${DateTime.now()}: loaded ${_sectionedMessageSource.size} messages');
@@ -1059,11 +1061,14 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       }
       if (mailClients.length == 1) {
         // ok, all messages belong to one account:
-        account = ref.read(
+        final singleAccount = ref.read(
           findRealAccountByEmailProvider(
             email: mailClients.first.account.email,
           ),
         );
+        if (singleAccount != null) {
+          account = singleAccount;
+        }
       }
     }
 

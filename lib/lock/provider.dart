@@ -27,9 +27,7 @@ class AppLock extends _$AppLock {
       _ignoreNextSettingsChange = value;
 
   @override
-  void build({
-    required BuildContext context,
-  }) {
+  void build() {
     final enableBiometricLock = ref.watch(
       settingsProvider.select((value) => value.enableBiometricLock),
     );
@@ -44,6 +42,10 @@ class AppLock extends _$AppLock {
       _ignoreNextSettingsChange = false;
       logger.d('ignoring settings change');
 
+      return;
+    }
+    final context = Routes.navigatorKey.currentContext;
+    if (context == null) {
       return;
     }
     if (!isResumed) {
@@ -97,15 +99,7 @@ class AppLock extends _$AppLock {
     }
     if (isUnlocked && LockScreen.isShown) {
       if (context.mounted) {
-        logger.d('popping lock screen: canPop: ${context.canPop()}');
         context.pop();
-        logger.d(
-          'after popping lock screen: canPop: ${context.canPop()}, '
-          'splash is shown: ${SplashScreen.isShown}',
-        );
-        // if (SplashScreen.isShown) {
-        //   context.goNamed(Routes.home);
-        // }
       }
     }
   }

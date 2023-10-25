@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'account/provider.dart';
@@ -47,9 +48,7 @@ class MailyApp extends HookConsumerWidget {
     ref
       ..watch(incomingShareProvider)
       ..watch(backgroundProvider)
-      ..watch(
-        appLockProvider(context: Routes.navigatorKey.currentContext ?? context),
-      );
+      ..watch(appLockProvider);
 
     final app = PlatformSnackApp.router(
       supportedLocales: AppLocalizations.supportedLocales,
@@ -95,14 +94,17 @@ class MailyApp extends HookConsumerWidget {
   }
 }
 
+/// Initializes the app
 class InitializationScreen extends ConsumerStatefulWidget {
+  /// Creates a new [InitializationScreen]
   const InitializationScreen({super.key});
 
   @override
-  ConsumerState<InitializationScreen> createState() => _InitializationScreen();
+  ConsumerState<InitializationScreen> createState() =>
+      _InitializationScreenState();
 }
 
-class _InitializationScreen extends ConsumerState<InitializationScreen> {
+class _InitializationScreenState extends ConsumerState<InitializationScreen> {
   late Future<void> _appInitialization;
 
   @override
@@ -119,50 +121,12 @@ class _InitializationScreen extends ConsumerState<InitializationScreen> {
       await NotificationService.instance.init(context: context);
     }
     await KeyService.instance.init();
-    // final mailService = locator<MailService>();
-    // // key service is required before mail service due to Oauth configs
-    // await KeyService.instance.init();
-    // await mailService.init(i18nService.localizations, settings);
-
-    // if (mailService.messageSource != null) {
-    //   // on ios show the app drawer:
-    //   if (Platform.isIOS) {
-    //     await locator<NavigationService>()
-    //         .push(Routes.appDrawer, replace: true);
-    //   }
-
-    //   /// the app has at least one configured account
-    //   unawaited(locator<NavigationService>().push(
-    //     Routes.messageSource,
-    //     arguments: mailService.messageSource,
-    //     fade: true,
-    //     replace: !Platform.isIOS,
-    //   ));
-    //   // check for a tapped notification that started the app:
-    //   final notificationInitResult =
-    //       await NotificationService.instance.init();
-    //   if (notificationInitResult !=
-    //       NotificationServiceInitResult.appLaunchedByNotification) {
-    //     // the app has not been launched by a notification
-    //     await locator<AppService>().checkForShare();
-    //   }
-    //   if (settings.enableBiometricLock) {
-    //     unawaited(locator<NavigationService>().push(Routes.lockScreen));
-    //     final didAuthenticate =
-    //         await BiometricsService.instance.authenticate();
-    //     if (didAuthenticate) {
-    //       locator<NavigationService>().pop();
-    //     }
-    //   }
-    // } else {
-    //   // this app has no mail accounts yet, so switch to welcome screen:
-    //   unawaited(locator<NavigationService>()
-    //       .push(Routes.welcome, fade: true, replace: true));
-    // }
-    // final usedContext = Routes.navigatorKey.currentContext ?? context;
-    // if (usedContext.mounted) {
-    //   usedContext.pushReplacement(Routes.home);
-    // }
+    if (PlatformInfo.isCupertino &&
+        ref.read(realAccountsProvider).isNotEmpty &&
+        context.mounted) {
+      context.goNamed(Routes.appDrawer);
+      unawaited(context.pushNamed(Routes.home));
+    }
 
     logger.d('App initialized');
   }

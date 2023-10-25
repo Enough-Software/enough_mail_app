@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,11 +14,14 @@ class ExtensionActionTile extends StatelessWidget {
   final AppExtensionActionDescription actionDescription;
 
   static Widget buildSideMenuForAccount(
-      BuildContext context, RealAccount? currentAccount) {
+    BuildContext context,
+    RealAccount? currentAccount,
+  ) {
     if (currentAccount == null || currentAccount.isVirtual) {
       return Container();
     }
     final actions = currentAccount.appExtensionsAccountSideMenu;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: buildActionWidgets(context, actions),
@@ -71,7 +72,7 @@ class ExtensionActionTile extends StatelessWidget {
           case AppExtensionActionMechanism.inApp:
             final context = Routes.navigatorKey.currentContext;
             if (context != null) {
-              if (!(Platform.isIOS || Platform.isMacOS)) {
+              if (!PlatformInfo.isCupertino) {
                 // close app drawer:
                 context.pop();
               }

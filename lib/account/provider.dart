@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../models/sender.dart';
@@ -20,6 +21,9 @@ class RealAccounts extends _$RealAccounts {
   Future<void> init() async {
     _storage = const AccountStorage();
     final accounts = await _storage.loadAccounts();
+    if (accounts.isNotEmpty) {
+      ref.read(currentAccountProvider.notifier).state = accounts.first;
+    }
     state = accounts;
   }
 
@@ -27,12 +31,19 @@ class RealAccounts extends _$RealAccounts {
   void addAccount(RealAccount account) {
     final cleanState = state.toList()..removeWhere((a) => a.key == account.key);
     state = [...cleanState, account];
+    if (state.length == 1) {
+      ref.read(currentAccountProvider.notifier).state = account;
+    }
     _saveAccounts();
   }
 
   /// Removes the given [account]
   void removeAccount(RealAccount account) {
     state = state.where((a) => a.key != account.key).toList();
+    if (ref.read(currentAccountProvider) == account) {
+      final replacement = state.isEmpty ? null : state.first;
+      ref.read(currentAccountProvider.notifier).state = replacement;
+    }
     _saveAccounts();
   }
 
@@ -48,6 +59,9 @@ class RealAccounts extends _$RealAccounts {
     }
     final newState = state.toList()..[index] = newAccount;
     state = newState;
+    if (ref.read(currentAccountProvider) == oldAccount) {
+      ref.read(currentAccountProvider.notifier).state = newAccount;
+    }
     if (save) {
       _saveAccounts();
     }
@@ -76,7 +90,7 @@ class RealAccounts extends _$RealAccounts {
 
 /// Generates a list of senders for composing a new message
 @riverpod
-List<Sender> Senders(SendersRef ref) {
+List<Sender> senders(SendersRef ref) {
   final accounts = ref.watch(realAccountsProvider);
   final senders = <Sender>[];
   for (final account in accounts) {
@@ -97,8 +111,15 @@ UnifiedAccount? unifiedAccount(UnifiedAccountRef ref) {
   if (accounts.length <= 1) {
     return null;
   }
+  final account = UnifiedAccount(accounts);
+  final currentAccount = ref.read(currentAccountProvider);
+  Future.delayed(const Duration(milliseconds: 20)).then((_) {
+    if (currentAccount == null || currentAccount is RealAccount) {
+      ref.read(currentAccountProvider.notifier).state = account;
+    }
+  });
 
-  return UnifiedAccount(accounts);
+  return account;
 }
 
 /// Provides all accounts
@@ -137,14 +158,14 @@ Account findAccountByEmail(
 
 //// Finds a real account by its email
 @Riverpod(keepAlive: true)
-RealAccount findRealAccountByEmail(
+RealAccount? findRealAccountByEmail(
   FindRealAccountByEmailRef ref, {
   required String email,
 }) {
   final key = email.toLowerCase();
   final realAccounts = ref.watch(realAccountsProvider);
 
-  return realAccounts.firstWhere((a) => a.key == key);
+  return realAccounts.firstWhereOrNull((a) => a.key == key);
 }
 
 //// Checks if there is at least one real account with a login error
@@ -158,21 +179,7 @@ bool hasAccountWithError(
 }
 
 /// Provides the locally current active account
-@riverpod
-class CurrentAccount extends _$CurrentAccount {
-  /// Creates a [CurrentAccount]
-  CurrentAccount({Account? initialAccount}) : _initialAccount = initialAccount;
-
-  final Account? _initialAccount;
-  @override
-  Account? build() => _initialAccount;
-
-  /// Sets the current account
-  // ignore: avoid_setters_without_getters
-  set account(Account? account) {
-    state = account;
-  }
-}
+final currentAccountProvider = StateProvider<Account?>((ref) => null);
 
 /// Provides the current real account
 @riverpod

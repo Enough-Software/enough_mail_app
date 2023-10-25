@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../account/model.dart';
@@ -24,6 +25,9 @@ class Source extends _$Source {
     required Account account,
     Mailbox? mailbox,
   }) {
+    Future.delayed(const Duration(milliseconds: 10)).then(
+      (_) => ref.read(currentMailboxProvider.notifier).state = mailbox,
+    );
     if (account is RealAccount) {
       return ref.watch(
         realSourceProvider(account: account, mailbox: mailbox).future,
@@ -323,5 +327,4 @@ MessageBuilder mailto(
 }
 
 /// Provides the locally current active mailbox
-@riverpod
-Mailbox? currentMailbox(CurrentMailboxRef ref) => null;
+final currentMailboxProvider = StateProvider<Mailbox?>((ref) => null);

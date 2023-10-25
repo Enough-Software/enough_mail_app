@@ -16,9 +16,10 @@ class HomeScreen extends ConsumerWidget {
     if (accounts.isEmpty) {
       return const WelcomeScreen();
     }
+    final account = accounts.first;
 
     return MailScreen(
-      account: accounts.first,
+      account: account,
       showSplashWhileLoading: true,
     );
   }

@@ -947,24 +947,7 @@ class _MailtoProviderElement extends AutoDisposeProviderElement<MessageBuilder>
       (origin as MailtoProvider).originatingMessage;
 }
 
-String _$currentMailboxHash() => r'b11103d25c249597f26cf9342d17fa7e5e192359';
-
-/// Provides the locally current active mailbox
-///
-/// Copied from [currentMailbox].
-@ProviderFor(currentMailbox)
-final currentMailboxProvider = AutoDisposeProvider<Mailbox?>.internal(
-  currentMailbox,
-  name: r'currentMailboxProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$currentMailboxHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef CurrentMailboxRef = AutoDisposeProviderRef<Mailbox?>;
-String _$sourceHash() => r'ed4bfa87f9547328583d2c849f27a43200a6df1f';
+String _$sourceHash() => r'03e97ce855369989074b10cf92965f12a7229fd0';
 
 abstract class _$Source extends BuildlessAsyncNotifier<MessageSource> {
   late final Account account;

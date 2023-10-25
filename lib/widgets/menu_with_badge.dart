@@ -22,7 +22,7 @@ class MenuWithBadge extends StatelessWidget {
           child: _buildIndicator(context),
         ),
         onPressed: () {
-          if (Platform.isIOS) {
+          if (PlatformInfo.isCupertino) {
             // go back
             context.pop();
           } else {
@@ -32,7 +32,7 @@ class MenuWithBadge extends StatelessWidget {
       );
 
   Widget _buildIndicator(BuildContext context) {
-    if (Platform.isIOS) {
+    if (PlatformInfo.isCupertino) {
       final iOSText = this.iOSText;
 
       return iOSText != null ? Text(iOSText) : const Icon(CupertinoIcons.back);

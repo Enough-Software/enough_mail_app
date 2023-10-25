@@ -6,14 +6,14 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sendersHash() => r'ac054c05e85b5665da4f1dc8671418c211154bd1';
+String _$sendersHash() => r'7d45f5bd244bb17ed18983d9eac9a6170dfde855';
 
 /// Generates a list of senders for composing a new message
 ///
-/// Copied from [Senders].
-@ProviderFor(Senders)
+/// Copied from [senders].
+@ProviderFor(senders)
 final sendersProvider = AutoDisposeProvider<List<Sender>>.internal(
-  Senders,
+  senders,
   name: r'sendersProvider',
   debugGetCreateSourceHash:
       const bool.fromEnvironment('dart.vm.product') ? null : _$sendersHash,
@@ -22,7 +22,7 @@ final sendersProvider = AutoDisposeProvider<List<Sender>>.internal(
 );
 
 typedef SendersRef = AutoDisposeProviderRef<List<Sender>>;
-String _$unifiedAccountHash() => r'e59dc865d2ef074d5da9cdc4d228551153ef0a53';
+String _$unifiedAccountHash() => r'5380f681599f9354b8ecd0cbda4c40dedd9de535';
 
 /// Provides the unified account, if any
 ///
@@ -202,7 +202,7 @@ class _FindAccountByEmailProviderElement extends ProviderElement<Account>
 }
 
 String _$findRealAccountByEmailHash() =>
-    r'5738473cdcb5e7c531051904276d03d20dfe7f1e';
+    r'4fbe9680f101417c67bc9eebda553005f78d77c1';
 
 //// Finds a real account by its email
 ///
@@ -213,7 +213,7 @@ const findRealAccountByEmailProvider = FindRealAccountByEmailFamily();
 //// Finds a real account by its email
 ///
 /// Copied from [findRealAccountByEmail].
-class FindRealAccountByEmailFamily extends Family<RealAccount> {
+class FindRealAccountByEmailFamily extends Family<RealAccount?> {
   //// Finds a real account by its email
   ///
   /// Copied from [findRealAccountByEmail].
@@ -257,7 +257,7 @@ class FindRealAccountByEmailFamily extends Family<RealAccount> {
 //// Finds a real account by its email
 ///
 /// Copied from [findRealAccountByEmail].
-class FindRealAccountByEmailProvider extends Provider<RealAccount> {
+class FindRealAccountByEmailProvider extends Provider<RealAccount?> {
   //// Finds a real account by its email
   ///
   /// Copied from [findRealAccountByEmail].
@@ -294,7 +294,7 @@ class FindRealAccountByEmailProvider extends Provider<RealAccount> {
 
   @override
   Override overrideWith(
-    RealAccount Function(FindRealAccountByEmailRef provider) create,
+    RealAccount? Function(FindRealAccountByEmailRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -311,7 +311,7 @@ class FindRealAccountByEmailProvider extends Provider<RealAccount> {
   }
 
   @override
-  ProviderElement<RealAccount> createElement() {
+  ProviderElement<RealAccount?> createElement() {
     return _FindRealAccountByEmailProviderElement(this);
   }
 
@@ -329,13 +329,13 @@ class FindRealAccountByEmailProvider extends Provider<RealAccount> {
   }
 }
 
-mixin FindRealAccountByEmailRef on ProviderRef<RealAccount> {
+mixin FindRealAccountByEmailRef on ProviderRef<RealAccount?> {
   /// The parameter `email` of this provider.
   String get email;
 }
 
 class _FindRealAccountByEmailProviderElement
-    extends ProviderElement<RealAccount> with FindRealAccountByEmailRef {
+    extends ProviderElement<RealAccount?> with FindRealAccountByEmailRef {
   _FindRealAccountByEmailProviderElement(super.provider);
 
   @override
@@ -376,7 +376,7 @@ final currentRealAccountProvider = AutoDisposeProvider<RealAccount?>.internal(
 );
 
 typedef CurrentRealAccountRef = AutoDisposeProviderRef<RealAccount?>;
-String _$realAccountsHash() => r'665041d146a86069048493163e33d76a4896d3cb';
+String _$realAccountsHash() => r'cf98cca42c7239746aea0af704cbf02a96108a7f';
 
 /// Provides all real email accounts
 ///
@@ -410,23 +410,5 @@ final allAccountsProvider =
 );
 
 typedef _$AllAccounts = Notifier<List<Account>>;
-String _$currentAccountHash() => r'957c1c6dbeab49c29c0c1c647806aaa90486f046';
-
-/// Provides the locally current active account
-///
-/// Copied from [CurrentAccount].
-@ProviderFor(CurrentAccount)
-final currentAccountProvider =
-    AutoDisposeNotifierProvider<CurrentAccount, Account?>.internal(
-  CurrentAccount.new,
-  name: r'currentAccountProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$currentAccountHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$CurrentAccount = AutoDisposeNotifier<Account?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

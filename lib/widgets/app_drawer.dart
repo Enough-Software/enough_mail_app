@@ -215,7 +215,7 @@ class AppDrawer extends ConsumerWidget {
         leading: const Icon(Icons.add),
         title: Text(localizations.drawerEntryAddAccount),
         onTap: () {
-          if (!Platform.isIOS) {
+          if (!PlatformInfo.isCupertino) {
             context.pop();
           }
           context.pushNamed(Routes.accountAdd);

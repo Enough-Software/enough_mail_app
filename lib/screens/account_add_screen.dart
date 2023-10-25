@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
@@ -23,11 +24,15 @@ import '../widgets/button_text.dart';
 import '../widgets/password_field.dart';
 import 'base.dart';
 
+/// Adds a new account
 class AccountAddScreen extends ConsumerStatefulWidget {
+  /// Creates a new [AccountAddScreen]
   const AccountAddScreen({
     super.key,
     required this.launchedFromWelcome,
   });
+
+  /// Is the screen launched from the welcome screen
   final bool launchedFromWelcome;
 
   @override
@@ -313,14 +318,21 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       ..name = _accountNameController.text
       ..userName = _userNameController.text;
     ref.read(realAccountsProvider.notifier).addAccount(account);
-    final bool goToAppDrawer = Platform.isIOS && widget.launchedFromWelcome;
-    if (goToAppDrawer) {
+
+    if (Platform.isIOS) {
       context.goNamed(Routes.appDrawer);
+      unawaited(
+        context.pushNamed(
+          Routes.mail,
+          pathParameters: {Routes.pathParameterEmail: account.key},
+        ),
+      );
+    } else {
+      context.pushReplacementNamed(
+        Routes.mail,
+        pathParameters: {Routes.pathParameterEmail: account.key},
+      );
     }
-    context.goNamed(
-      Routes.mail,
-      pathParameters: {Routes.pathParameterEmail: account.key},
-    );
   }
 
   Step _buildEmailStep(BuildContext context, AppLocalizations localizations) =>

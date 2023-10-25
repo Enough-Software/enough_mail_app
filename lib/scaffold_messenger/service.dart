@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.g.dart';
@@ -58,7 +59,7 @@ class ScaffoldMessengerService {
     String text, {
     Function()? undo,
   }) {
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (PlatformInfo.isCupertino) {
       final state = _statusBarState;
       if (state != null) {
         state.showTextStatus(text, undo: undo);
