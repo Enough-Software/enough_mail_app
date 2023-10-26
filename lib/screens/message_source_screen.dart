@@ -1192,7 +1192,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
 
   Future<void> _deleteAllMessages() async {
     final localizations = context.text;
-    bool expunge = false;
+    final firstMessage = widget.messageSource.cache.first;
+    var expunge =
+        firstMessage?.mimeMessage.hasFlag(MessageFlags.deleted) ?? false;
     final confirmed = await LocalizedDialogHelper.showWidgetDialog(
       context,
       Column(
@@ -1200,7 +1202,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         children: [
           Text(localizations.homeDeleteAllQuestion),
           CheckboxText(
-            initialValue: false,
+            initialValue: expunge,
             onChanged: (value) => expunge = value,
             text: localizations.homeDeleteAllScrubOption,
           ),

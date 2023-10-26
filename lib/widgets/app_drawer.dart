@@ -241,6 +241,7 @@ class AppDrawer extends ConsumerWidget {
     Account account,
     Mailbox mailbox,
   ) async {
+    context.pop();
     await context.pushNamed(
       Routes.mail,
       pathParameters: {

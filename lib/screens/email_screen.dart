@@ -21,6 +21,7 @@ class EMailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final account = ref.watch(findAccountByEmailProvider(email: email));
     final encodedMailboxPath = this.encodedMailboxPath;
+
     if (encodedMailboxPath == null) {
       return MailScreen(account: account);
     }

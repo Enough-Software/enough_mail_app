@@ -7,6 +7,7 @@ import '../account/model.dart';
 import '../account/provider.dart';
 import '../app_lifecycle/provider.dart';
 import '../localization/app_localizations.g.dart';
+import '../logger.dart';
 import '../models/async_mime_source.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
@@ -28,14 +29,15 @@ class Source extends _$Source {
     Future.delayed(const Duration(milliseconds: 10)).then(
       (_) => ref.read(currentMailboxProvider.notifier).state = mailbox,
     );
+    final usedMailbox = mailbox?.isInbox ?? true ? null : mailbox;
     if (account is RealAccount) {
       return ref.watch(
-        realSourceProvider(account: account, mailbox: mailbox).future,
+        realSourceProvider(account: account, mailbox: usedMailbox).future,
       );
     }
     if (account is UnifiedAccount) {
       return ref.watch(
-        unifiedSourceProvider(account: account, mailbox: mailbox).future,
+        unifiedSourceProvider(account: account, mailbox: usedMailbox).future,
       );
     }
     throw UnimplementedError('for account $account');
@@ -163,15 +165,24 @@ class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
     required RealAccount account,
     Mailbox? mailbox,
   }) async {
+    final usedMailboxForMailClient =
+        (mailbox?.isInbox ?? true) ? null : mailbox;
+    logger.d('Creating mime source for ${account.name}: ${mailbox?.name}');
+
     final mailClient = ref.watch(
-      mailClientSourceProvider(account: account, mailbox: mailbox),
+      mailClientSourceProvider(
+        account: account,
+        mailbox: usedMailboxForMailClient,
+      ),
     );
 
     final mimeSource = await EmailService.instance.createMimeSource(
       mailClient: mailClient,
       mailbox: mailbox,
-    )
-      ..addSubscriber(this);
+    );
+    if (mailbox == null || mailbox.isInbox) {
+      mimeSource.addSubscriber(this);
+    }
 
     return mimeSource;
   }
@@ -209,6 +220,8 @@ class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
 }
 
 /// Provides mail clients
+///
+/// Expects [Mailbox] to be `null` for the inbox.
 @Riverpod(keepAlive: true)
 class MailClientSource extends _$MailClientSource {
   MailClient? _existingClient;
@@ -218,14 +231,23 @@ class MailClientSource extends _$MailClientSource {
     required RealAccount account,
     Mailbox? mailbox,
   }) {
+    MailClient create() {
+      final logName =
+          mailbox != null ? '${account.name}-${mailbox.name}' : account.name;
+      logger.d('Create MailClient $logName');
+
+      return EmailService.instance.createMailClient(
+        account.mailAccount,
+        logName,
+        (mailAccount) => ref
+            .watch(realAccountsProvider.notifier)
+            .updateMailAccount(account, mailAccount),
+      );
+    }
+
     final isResumed = ref.watch(appIsResumedProvider);
-    final client = _existingClient ??
-        EmailService.instance.createMailClient(
-          account.mailAccount,
-          (mailAccount) => ref
-              .watch(realAccountsProvider.notifier)
-              .updateMailAccount(account, mailAccount),
-        );
+
+    final client = _existingClient ?? create();
     final existingClient = _existingClient;
     if (existingClient != null) {
       if (isResumed) {

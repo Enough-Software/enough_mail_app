@@ -15,8 +15,8 @@ Future<ContactManager> contactsLoader(
   ContactsLoaderRef ref, {
   required RealAccount account,
 }) async {
-  final mailClient =
-      EmailService.instance.createMailClient(account.mailAccount, null);
+  final mailClient = EmailService.instance
+      .createMailClient(account.mailAccount, account.name, null);
   try {
     await mailClient.connect();
     final mailbox = await mailClient.selectMailboxByFlag(MailboxFlag.sent);

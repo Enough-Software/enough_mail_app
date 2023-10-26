@@ -608,6 +608,8 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   @override
   Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) async {
     clear();
+    mailbox.messagesExists = 0;
+
     final result =
         await mailClient.deleteAllMessages(mailbox, expunge: expunge);
 

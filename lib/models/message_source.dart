@@ -718,6 +718,9 @@ class MailboxMessageSource extends MessageSource {
     cache.clear();
     final futureResults = mimeSource.deleteAllMessages(expunge: expunge);
     clear();
+    logger
+      ..d('deleteAllMessages: in cache: ${removedMessages.length}')
+      ..d('size after deletion: $size');
     notifyListeners();
     final results = await futureResults;
     final parent = _parentMessageSource;

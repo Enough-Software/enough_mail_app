@@ -45,6 +45,7 @@ class EmailService {
   /// Creates a mail client for the given account
   MailClient createMailClient(
     MailAccount mailAccount,
+    String logName,
     OnMailClientConfigChanged? onMailClientConfigChanged,
   ) {
     final bool isLogEnabled = kDebugMode ||
@@ -53,7 +54,7 @@ class EmailService {
     return MailClient(
       mailAccount,
       isLogEnabled: isLogEnabled,
-      logName: mailAccount.name,
+      logName: logName,
       eventBus: AppEventBus.eventBus,
       clientId: _clientId,
       refresh: _refreshToken,
@@ -102,6 +103,7 @@ class EmailService {
     var usedMailAccount = mailAccount;
     var mailClient = createMailClient(
       usedMailAccount,
+      mailAccount.name,
       onMailClientConfigChanged,
     );
     try {
@@ -119,6 +121,7 @@ class EmailService {
         await mailClient.disconnect();
         mailClient = createMailClient(
           usedMailAccount,
+          mailAccount.name,
           onMailClientConfigChanged,
         );
         try {

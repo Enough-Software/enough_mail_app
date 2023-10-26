@@ -21,11 +21,13 @@ abstract class OauthClient {
   Future<OauthToken?> authenticate(String email) async {
     try {
       final token = await _authenticate(email, incomingHostName);
+
       return token;
     } catch (e, s) {
       if (kDebugMode) {
         print('Unable to authenticate: $e $s');
       }
+
       return Future.value();
     }
   }
@@ -33,11 +35,13 @@ abstract class OauthClient {
   Future<OauthToken?> refresh(OauthToken token) async {
     try {
       final refreshedToken = await _refresh(token, incomingHostName);
+
       return refreshedToken;
     } catch (e, s) {
       if (kDebugMode) {
         print('Unable to refresh tokens: $e $s');
       }
+
       return Future.value();
     }
   }
@@ -87,8 +91,11 @@ class GmailOAuthClient extends OauthClient {
     final text = response.text;
     if (response.statusCode != 200 || text == null) {
       throw StateError(
-          'Unable to get Google OAuth token with code $code, status code=${response.statusCode}, response=$text');
+        'Unable to get Google OAuth token with code $code, '
+        'status code=${response.statusCode}, response=$text',
+      );
     }
+
     return OauthToken.fromText(text, provider: provider);
   }
 
@@ -106,8 +113,11 @@ class GmailOAuthClient extends OauthClient {
     final text = response.text;
     if (response.statusCode != 200 || text == null) {
       throw StateError(
-          'Unable to refresh Google OAuth token $token, status code=${response.statusCode}, response=$text');
+        'Unable to refresh Google OAuth token $token, '
+        'status code=${response.statusCode}, response=$text',
+      );
     }
+
     return OauthToken.fromText(text, provider: provider);
   }
 }

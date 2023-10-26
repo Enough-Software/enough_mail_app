@@ -174,8 +174,8 @@ Future<void> _checkForNewMail() async {
   const storage = AccountStorage();
   final accounts = await storage.loadAccounts();
   final mailClients = accounts.map(
-    (account) =>
-        EmailService.instance.createMailClient(account.mailAccount, null),
+    (account) => EmailService.instance
+        .createMailClient(account.mailAccount, account.name, null),
   );
   final notificationService = NotificationService.instance;
   await notificationService.init(checkForLaunchDetails: false);

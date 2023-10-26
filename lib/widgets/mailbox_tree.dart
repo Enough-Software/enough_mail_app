@@ -80,7 +80,8 @@ class MailboxTree extends ConsumerWidget {
     );
     final children = element.children;
     if (children == null) {
-      final isCurrent = (mailbox == current);
+      final isCurrent =
+          mailbox == current || (current == null && mailbox.isInbox);
       final iconData = IconService.instance.getForMailbox(mailbox);
 
       return SelectablePlatformListTile(

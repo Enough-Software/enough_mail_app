@@ -2,9 +2,9 @@ import 'package:collection/collection.dart';
 
 /// Temporarily stores values that can be accessed by an integer index.
 class IndexedCache<T> {
-
   /// Creates a new cache
   IndexedCache({this.maxCacheSize = defaultMaxCacheSize});
+
   /// default maximum cache size is 200
   static const int defaultMaxCacheSize = 200;
 
@@ -13,6 +13,11 @@ class IndexedCache<T> {
 
   final _entries = <T?>[];
   final _indices = <int>[];
+
+  /// Retrieves the first non-null entry of this cache if available.
+  ///
+  /// This operation is independent of an index.
+  T? get first => _entries.firstWhereOrNull((element) => element != null);
 
   /// Inserts the [value] at the [index] and changes
   /// the source indices of subsequent entries
@@ -41,6 +46,7 @@ class IndexedCache<T> {
     if (removed != null) {
       _indices.remove(index);
     }
+
     return removed;
   }
 
@@ -51,6 +57,7 @@ class IndexedCache<T> {
       return false;
     }
     removeAt(index);
+
     return true;
   }
 
@@ -61,6 +68,7 @@ class IndexedCache<T> {
     if (index == -1) {
       return null;
     }
+
     return removeAt(index);
   }
 
@@ -74,7 +82,7 @@ class IndexedCache<T> {
   T? operator [](int index) => index < _entries.length ? _entries[index] : null;
 
   /// Set the value for the given [index].
-  operator []=(int index, T value) {
+  void operator []=(int index, T value) {
     if (_entries.length > index) {
       final existing = _entries[index];
       _entries[index] = value;
@@ -103,7 +111,9 @@ class IndexedCache<T> {
 
   /// Triggers the [action] for any elements that fit the [test]
   void forEachWhere(
-      bool Function(T element) test, void Function(T element) action) {
+    bool Function(T element) test,
+    void Function(T element) action,
+  ) {
     _entries
         .where((value) => value != null && test(value))
         .forEach((element) => action(element as T));
