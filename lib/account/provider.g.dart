@@ -40,7 +40,7 @@ final unifiedAccountProvider = Provider<UnifiedAccount?>.internal(
 
 typedef UnifiedAccountRef = ProviderRef<UnifiedAccount?>;
 String _$findAccountByEmailHash() =>
-    r'951fd91a8a1e1722378dcc2542e0857486f9b5cd';
+    r'692760656b2f9223f3ef929e040c413f2dd4c571';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -72,7 +72,7 @@ const findAccountByEmailProvider = FindAccountByEmailFamily();
 //// Finds an account by its email
 ///
 /// Copied from [findAccountByEmail].
-class FindAccountByEmailFamily extends Family<Account> {
+class FindAccountByEmailFamily extends Family<Account?> {
   //// Finds an account by its email
   ///
   /// Copied from [findAccountByEmail].
@@ -116,7 +116,7 @@ class FindAccountByEmailFamily extends Family<Account> {
 //// Finds an account by its email
 ///
 /// Copied from [findAccountByEmail].
-class FindAccountByEmailProvider extends Provider<Account> {
+class FindAccountByEmailProvider extends Provider<Account?> {
   //// Finds an account by its email
   ///
   /// Copied from [findAccountByEmail].
@@ -153,7 +153,7 @@ class FindAccountByEmailProvider extends Provider<Account> {
 
   @override
   Override overrideWith(
-    Account Function(FindAccountByEmailRef provider) create,
+    Account? Function(FindAccountByEmailRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -170,7 +170,7 @@ class FindAccountByEmailProvider extends Provider<Account> {
   }
 
   @override
-  ProviderElement<Account> createElement() {
+  ProviderElement<Account?> createElement() {
     return _FindAccountByEmailProviderElement(this);
   }
 
@@ -188,12 +188,12 @@ class FindAccountByEmailProvider extends Provider<Account> {
   }
 }
 
-mixin FindAccountByEmailRef on ProviderRef<Account> {
+mixin FindAccountByEmailRef on ProviderRef<Account?> {
   /// The parameter `email` of this provider.
   String get email;
 }
 
-class _FindAccountByEmailProviderElement extends ProviderElement<Account>
+class _FindAccountByEmailProviderElement extends ProviderElement<Account?>
     with FindAccountByEmailRef {
   _FindAccountByEmailProviderElement(super.provider);
 

@@ -139,7 +139,7 @@ class AllAccounts extends _$AllAccounts {
 
 //// Finds an account by its email
 @Riverpod(keepAlive: true)
-Account findAccountByEmail(
+Account? findAccountByEmail(
   FindAccountByEmailRef ref, {
   required String email,
 }) {
@@ -147,13 +147,8 @@ Account findAccountByEmail(
   final realAccounts = ref.watch(realAccountsProvider);
   final unifiedAccount = ref.watch(unifiedAccountProvider);
 
-  final account = realAccounts.firstWhereOrNull((a) => a.key == key) ??
+  return realAccounts.firstWhereOrNull((a) => a.key == key) ??
       ((unifiedAccount?.key == key) ? unifiedAccount : null);
-  if (account == null) {
-    throw StateError('account not found for $email');
-  }
-
-  return account;
 }
 
 //// Finds a real account by its email

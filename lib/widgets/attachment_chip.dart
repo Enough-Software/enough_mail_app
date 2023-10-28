@@ -10,6 +10,7 @@ import '../models/message.dart';
 import '../routes.dart';
 import '../screens/media_screen.dart';
 import '../settings/theme/icon_service.dart';
+import '../util/localized_dialog_helper.dart';
 import 'button_text.dart';
 import 'ical_interactive_media.dart';
 
@@ -30,14 +31,27 @@ class _AttachmentChipState extends State<AttachmentChip> {
   final _height = 72.0;
 
   @override
-  void initState() {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     final mimeMessage = widget.message.mimeMessage;
     final mimePart = mimeMessage.getPart(widget.info.fetchId);
     _mimePart = mimePart;
     if (mimePart != null) {
-      _mediaProvider = MimeMediaProviderFactory.fromMime(mimeMessage, mimePart);
+      try {
+        _mediaProvider =
+            MimeMediaProviderFactory.fromMime(mimeMessage, mimePart);
+      } catch (e, s) {
+        _mediaProvider = MimeMediaProviderFactory.fromError(
+          title: context.text.errorTitle,
+          text: context.text.attachmentDecodeError(e.toString()),
+        );
+        logger.e(
+          'Unable to decode mime-part with headers ${mimePart.headers}: $e',
+          error: e,
+          stackTrace: s,
+        );
+      }
     }
-    super.initState();
   }
 
   @override
@@ -186,6 +200,13 @@ class _AttachmentChipState extends State<AttachmentChip> {
         'Unable to download attachment with '
         'fetch id ${widget.info.fetchId}: $e',
       );
+      if (context.mounted) {
+        await LocalizedDialogHelper.showTextDialog(
+          context,
+          context.text.errorTitle,
+          context.text.attachmentDownloadError(e.message ?? e.toString()),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {

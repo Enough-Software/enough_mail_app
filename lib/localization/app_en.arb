@@ -577,6 +577,26 @@
   "@attachmentActionOpen": {
     "description": "Open action for attachments without interactive viewer."
   },
+  "attachmentDecodeError": "This attachment has an unsupported format or encoding.\nDetails: ${details}",
+  "@attachmentDecodeError": {
+    "description": "Text shown when downloaded attachment could not be decoded.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "FormatException"
+      }
+    }
+  },
+  "attachmentDownloadError": "Unable to download this attachment.\nDetails: ${details}",
+  "@attachmentDownloadError": {
+    "description": "Text shown when attachment could not be downloaded.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "NotFound"
+      }
+    }
+  },
   "messageActionReply": "Reply",
   "@messageActionReply": {
     "description": "Action for single message."
@@ -1142,7 +1162,7 @@
   "@addAccountApplicationPasswordRequiredButton": {
     "description": "Button text for setting up app specific password."
   },
-  "addAccountApplicationPasswordRequiredAcknowledged": "Understood",
+  "addAccountApplicationPasswordRequiredAcknowledged": "I already have an app password",
   "@addAccountApplicationPasswordRequiredAcknowledged": {
     "description": "Acknowledgement to be confirmed by user to acknowledge the fact that an app specific password is required."
   },

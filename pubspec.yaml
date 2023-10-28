@@ -1,5 +1,5 @@
 name: enough_mail_app
-description: Maily aims to become a fully feature email app once it has grown up.
+description: Maily aims to become a fully featured email app once it has grown up.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -15,7 +15,7 @@ publish_to: "none"
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+86
+version: 1.0.0+90
 
 environment:
   flutter: ">=3.13.0"

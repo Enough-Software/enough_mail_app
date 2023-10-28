@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/provider.dart';
 import '../mail/provider.dart';
-import 'mail_screen.dart';
+import 'screens.dart';
 
 /// Displays the mail for a given account
 class EMailScreen extends ConsumerWidget {
@@ -21,6 +21,14 @@ class EMailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final account = ref.watch(findAccountByEmailProvider(email: email));
     final encodedMailboxPath = this.encodedMailboxPath;
+
+    if (account == null) {
+      if (ref.read(realAccountsProvider).isEmpty) {
+        return const WelcomeScreen();
+      }
+
+      return const HomeScreen();
+    }
 
     if (encodedMailboxPath == null) {
       return MailScreen(account: account);

@@ -52,37 +52,47 @@ class UnifiedSource extends _$UnifiedSource {
     required UnifiedAccount account,
     Mailbox? mailbox,
   }) async {
-    Future<AsyncMimeSource> resolve(
+    Future<AsyncMimeSource?> resolve(
       RealAccount realAccount,
       Mailbox? mailbox,
     ) async {
-      var usedMailbox = mailbox;
-      final flag = mailbox?.identityFlag;
+      try {
+        var usedMailbox = mailbox;
+        final flag = mailbox?.identityFlag;
 
-      if (mailbox != null && mailbox.isVirtual && flag != null) {
-        final mailboxTree = await ref.watch(
-          mailboxTreeProvider(account: realAccount).future,
+        if (mailbox != null && mailbox.isVirtual && flag != null) {
+          final mailboxTree = await ref.watch(
+            mailboxTreeProvider(account: realAccount).future,
+          );
+          usedMailbox = mailboxTree.firstWhereOrNull(
+            (m) => m?.flags.contains(flag) ?? false,
+          );
+        }
+
+        final source = await ref.watch(
+          realMimeSourceProvider(
+            account: realAccount,
+            mailbox: usedMailbox,
+          ).future,
         );
-        usedMailbox = mailboxTree.firstWhereOrNull(
-          (m) => m?.flags.contains(flag) ?? false,
-        );
+
+        return source;
+      } catch (e) {
+        logger.e('Error loading source for ${realAccount.name}', error: e);
+
+        return null;
       }
-
-      final source = await ref.watch(
-        realMimeSourceProvider(
-          account: realAccount,
-          mailbox: usedMailbox,
-        ).future,
-      );
-
-      return source;
     }
 
     final accounts = account.accounts;
     final futureSources = accounts.map(
       (a) => resolve(a, mailbox),
     );
-    final mimeSources = await Future.wait(futureSources);
+    final mimeSourcesWithNullValues = await Future.wait(futureSources);
+    final mimeSources = mimeSourcesWithNullValues.whereNotNull().toList();
+    if (mimeSources.isEmpty) {
+      throw Exception('No mime sources could be connected');
+    }
 
     return MultipleMessageSource(
       mimeSources,
@@ -175,16 +185,26 @@ class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
         mailbox: usedMailboxForMailClient,
       ),
     );
+    try {
+      final mimeSource = await EmailService.instance.createMimeSource(
+        mailClient: mailClient,
+        mailbox: mailbox,
+      );
+      if (mailbox == null || mailbox.isInbox) {
+        mimeSource.addSubscriber(this);
+      }
 
-    final mimeSource = await EmailService.instance.createMimeSource(
-      mailClient: mailClient,
-      mailbox: mailbox,
-    );
-    if (mailbox == null || mailbox.isInbox) {
-      mimeSource.addSubscriber(this);
+      return mimeSource;
+    } catch (e, s) {
+      logger.e(
+        'Error creating mime source for ${account.name}',
+        error: e,
+        stackTrace: s,
+      );
+      account.hasError = true;
+
+      rethrow;
     }
-
-    return mimeSource;
   }
 
   @override
@@ -303,6 +323,9 @@ Future<Message> singleMessageLoader(
   final account = ref.watch(
     findAccountByEmailProvider(email: payload.accountEmail),
   );
+  if (account == null) {
+    throw Exception('Account not found for ${payload.accountEmail}');
+  }
   final source = await ref.watch(sourceProvider(account: account).future);
 
   return source.loadSingleMessage(payload);

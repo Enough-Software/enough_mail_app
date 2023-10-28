@@ -947,7 +947,7 @@ class _MailtoProviderElement extends AutoDisposeProviderElement<MessageBuilder>
       (origin as MailtoProvider).originatingMessage;
 }
 
-String _$sourceHash() => r'03e97ce855369989074b10cf92965f12a7229fd0';
+String _$sourceHash() => r'd4e787d804ab333fbd5079af8a66fc5222bdef45';
 
 abstract class _$Source extends BuildlessAsyncNotifier<MessageSource> {
   late final Account account;
@@ -1121,7 +1121,7 @@ class _SourceProviderElement
   Mailbox? get mailbox => (origin as SourceProvider).mailbox;
 }
 
-String _$unifiedSourceHash() => r'99774ff4963680842bdf0e538d5c4b8554bac75c';
+String _$unifiedSourceHash() => r'd065ee7acddd895e44ce502094eeb0bec70ab818';
 
 abstract class _$UnifiedSource
     extends BuildlessAsyncNotifier<MultipleMessageSource> {
@@ -1479,7 +1479,7 @@ class _RealSourceProviderElement
   Mailbox? get mailbox => (origin as RealSourceProvider).mailbox;
 }
 
-String _$realMimeSourceHash() => r'5c1451ab3222cdfaf79717dbc989184615529302';
+String _$realMimeSourceHash() => r'2bebfe53595c7cc57a87b55302d680d46113a79c';
 
 abstract class _$RealMimeSource
     extends BuildlessAsyncNotifier<AsyncMimeSource> {
@@ -1658,7 +1658,7 @@ class _RealMimeSourceProviderElement
   Mailbox? get mailbox => (origin as RealMimeSourceProvider).mailbox;
 }
 
-String _$mailClientSourceHash() => r'd49fc359f07fa5121695defd0c4db364dbbf8a9c';
+String _$mailClientSourceHash() => r'b38b5b583765b7078c959777bb9d2f346914fbb5';
 
 abstract class _$MailClientSource extends BuildlessNotifier<MailClient> {
   late final RealAccount account;
@@ -1672,20 +1672,28 @@ abstract class _$MailClientSource extends BuildlessNotifier<MailClient> {
 
 /// Provides mail clients
 ///
+/// Expects [Mailbox] to be `null` for the inbox.
+///
 /// Copied from [MailClientSource].
 @ProviderFor(MailClientSource)
 const mailClientSourceProvider = MailClientSourceFamily();
 
 /// Provides mail clients
 ///
+/// Expects [Mailbox] to be `null` for the inbox.
+///
 /// Copied from [MailClientSource].
 class MailClientSourceFamily extends Family<MailClient> {
   /// Provides mail clients
+  ///
+  /// Expects [Mailbox] to be `null` for the inbox.
   ///
   /// Copied from [MailClientSource].
   const MailClientSourceFamily();
 
   /// Provides mail clients
+  ///
+  /// Expects [Mailbox] to be `null` for the inbox.
   ///
   /// Copied from [MailClientSource].
   MailClientSourceProvider call({
@@ -1725,10 +1733,14 @@ class MailClientSourceFamily extends Family<MailClient> {
 
 /// Provides mail clients
 ///
+/// Expects [Mailbox] to be `null` for the inbox.
+///
 /// Copied from [MailClientSource].
 class MailClientSourceProvider
     extends NotifierProviderImpl<MailClientSource, MailClient> {
   /// Provides mail clients
+  ///
+  /// Expects [Mailbox] to be `null` for the inbox.
   ///
   /// Copied from [MailClientSource].
   MailClientSourceProvider({

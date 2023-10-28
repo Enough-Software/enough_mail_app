@@ -23,11 +23,13 @@ class DateSectionedMessageSource extends ChangeNotifier {
     if (sourceSize == 0) {
       return 0;
     }
+
     return sourceSize + _numberOfSections;
   }
 
   late List<MessageDateSection> _sections;
   bool isInitialized = false;
+  var _isDisposed = false;
 
   Future<void> init() async {
     try {
@@ -35,7 +37,9 @@ class DateSectionedMessageSource extends ChangeNotifier {
       _sections = await downloadDateSections();
       _numberOfSections = _sections.length;
       isInitialized = true;
-      notifyListeners();
+      if (!_isDisposed) {
+        notifyListeners();
+      }
     } catch (e, s) {
       if (kDebugMode) {
         print('unexpected error $e at $s');
@@ -50,7 +54,9 @@ class DateSectionedMessageSource extends ChangeNotifier {
       _sections = await downloadDateSections();
       _numberOfSections = _sections.length;
       isInitialized = true;
-      notifyListeners();
+      if (!_isDisposed) {
+        notifyListeners();
+      }
     } catch (e, s) {
       if (kDebugMode) {
         print('unexpected error $e at $s');
@@ -61,6 +67,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
   @override
   void dispose() {
     messageSource.removeListener(_update);
+    _isDisposed = true;
     super.dispose();
   }
 

@@ -49,26 +49,47 @@ class Routes {
 
   /// Displays the settings
   static const String settings = '/settings';
+
+  /// Displays security settings
   static const String settingsSecurity = '/settings/security';
 
   /// Displays the settings for all accounts
   static const String settingsAccounts = '/settings/accounts';
+
+  /// Displays theme settings
   static const String settingsDesign = '/settings/design';
+
+  /// Displays feedback options
   static const String settingsFeedback = '/settings/feedback';
+
+  /// Displays language settings
   static const String settingsLanguage = '/settings/language';
+
+  /// Displays folder naming settings
   static const String settingsFolders = '/settings/folders';
+
+  /// Displays read receipts settings
   static const String settingsReadReceipts = '/settings/readReceipts';
+
+  /// Displays developer settings
   static const String settingsDevelopment = '/settings/developerMode';
+
+  /// Displays swipe settings
   static const String settingsSwipe = '/settings/swipe';
+
+  /// Displays signature settings
   static const String settingsSignature = '/settingsSignature';
+
+  /// Displays default sender settings
   static const String settingsDefaultSender = '/settingsDefaultSender';
+
+  /// Displays reply settings
   static const String settingsReplyFormat = '/settingsReplyFormat';
 
   /// Displays a message source directly
   ///
   /// extra: [MessageSource]
   static const String messageSource = '/messageSource';
-  static const String messageSourceFuture = '/messageSource/future';
 
   /// Displays a mail search
   ///
@@ -154,6 +175,7 @@ class Routes {
         builder: (context, state) => const InitializationScreen(),
       ),
       GoRoute(
+        name: splash,
         path: splash,
         builder: (context, state) => const SplashScreen(),
       ),
@@ -168,6 +190,11 @@ class Routes {
         builder: (context, state) => AccountAddScreen(
           launchedFromWelcome: state.uri.queryParameters['welcome'] == 'true',
         ),
+      ),
+      GoRoute(
+        name: welcome,
+        path: welcome,
+        builder: (context, state) => const WelcomeScreen(),
       ),
       GoRoute(
         name: home,

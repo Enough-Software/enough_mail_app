@@ -49,14 +49,15 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
   int _progressedSteps = 0;
   bool _isContinueAvailable = false;
   bool? _isApplicationSpecificPasswordAcknowledged = false;
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _accountNameController = TextEditingController();
-  final TextEditingController _userNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _accountNameController = TextEditingController();
+  final _userNameController = TextEditingController();
+  final _accountNameNode = FocusNode();
 
   bool _isProviderResolving = false;
   MailHoster? _mailHoster;
-  final bool _isManualSettings = false;
+  final _isManualSettings = false;
   bool _isAccountVerifying = false;
   bool _isAccountVerified = false;
   MailClient? _mailClient;
@@ -128,6 +129,16 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
   }
 
   @override
+  void dispose() {
+    _accountNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _userNameController.dispose();
+    _accountNameNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // print('build: current step=$_currentStep');
     final localizations = context.text;
@@ -141,12 +152,6 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
               onStepContinue: _isContinueAvailable
                   ? () async {
                       final step = _currentStep + 1;
-                      if (step < _availableSteps) {
-                        setState(() {
-                          _currentStep = step;
-                          _isContinueAvailable = false;
-                        });
-                      }
                       await _onStepProgressed(step);
                     }
                   : null,
@@ -173,6 +178,12 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
   }
 
   Future<void> _onStepProgressed(int step) async {
+    if (step < _availableSteps) {
+      setState(() {
+        _currentStep = step;
+        _isContinueAvailable = false;
+      });
+    }
     _progressedSteps = step;
     switch (step - 1) {
       case _stepEmail:
@@ -375,6 +386,11 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                 icon: const Icon(Icons.email),
               ),
               autofocus: true,
+              onSubmitted: (value) {
+                if (_isContinueAvailable) {
+                  _onStepProgressed(1);
+                }
+              },
             ),
           ],
         ),
@@ -405,7 +421,8 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                 Expanded(
                   child: Text(
                     localizations.addAccountResolvingSettingsLabel(
-                        _emailController.text),
+                      _emailController.text,
+                    ),
                   ),
                 ),
               ],
@@ -417,13 +434,16 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                   // The user can continue to sign in with the provider or by using an app-specific password
                   Text(
                     localizations.addAccountOauthOptionsText(
-                        provider.displayName ?? '<unknown>'),
+                      provider.displayName ?? '<unknown>',
+                    ),
                   ),
                   FittedBox(
                     child: provider.buildSignInButton(
                       context,
-                      onPressed: () =>
-                          _loginWithOAuth(provider, _emailController.text),
+                      onPressed: () => _loginWithOAuth(
+                        provider,
+                        _emailController.text,
+                      ),
                       isSignInButton: true,
                     ),
                   ),
@@ -460,11 +480,14 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                         .addAccountApplicationPasswordRequiredButton),
                   ),
                   PlatformCheckboxListTile(
-                    onChanged: (value) => setState(() =>
-                        _isApplicationSpecificPasswordAcknowledged = value),
+                    onChanged: (value) => setState(
+                      () => _isApplicationSpecificPasswordAcknowledged = value,
+                    ),
                     value: _isApplicationSpecificPasswordAcknowledged,
-                    title: Text(localizations
-                        .addAccountApplicationPasswordRequiredAcknowledged),
+                    title: Text(
+                      localizations
+                          .addAccountApplicationPasswordRequiredAcknowledged,
+                    ),
                   ),
                 ],
                 if (provider.appSpecificPasswordSetupUrl == null ||
@@ -485,6 +508,11 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                     autofocus: true,
                     labelText: localizations.addAccountPasswordLabel,
                     hintText: localizations.addAccountPasswordHint,
+                    onSubmitted: (value) {
+                      if (_isContinueAvailable) {
+                        _onStepProgressed(2);
+                      }
+                    },
                   ),
                 PlatformTextButton(
                   onPressed: () =>
@@ -584,8 +612,10 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                 ),
                 autofocus: true,
                 cupertinoAlignLabelOnTop: true,
+                onSubmitted: (_) => _accountNameNode.requestFocus(),
               ),
               DecoratedPlatformTextField(
+                focusNode: _accountNameNode,
                 controller: _accountNameController,
                 keyboardType: TextInputType.text,
                 onChanged: (value) {
@@ -603,6 +633,11 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                   icon: const Icon(Icons.email),
                 ),
                 cupertinoAlignLabelOnTop: true,
+                onSubmitted: (_) {
+                  if (_isContinueAvailable) {
+                    _onStepProgressed(3);
+                  }
+                },
               ),
             ] else ...[
               Text(

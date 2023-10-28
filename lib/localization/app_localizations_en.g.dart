@@ -473,6 +473,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attachmentActionOpen => 'Open';
 
   @override
+  String attachmentDecodeError(String details) {
+    return 'This attachment has an unsupported format or encoding.\nDetails: \$$details';
+  }
+
+  @override
+  String attachmentDownloadError(String details) {
+    return 'Unable to download this attachment.\nDetails: \$$details';
+  }
+
+  @override
   String get messageActionReply => 'Reply';
 
   @override
@@ -878,7 +888,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addAccountApplicationPasswordRequiredButton => 'Create app specific password';
 
   @override
-  String get addAccountApplicationPasswordRequiredAcknowledged => 'Understood';
+  String get addAccountApplicationPasswordRequiredAcknowledged => 'I already have an app password';
 
   @override
   String get addAccountVerificationStep => 'Verification';

@@ -473,6 +473,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get attachmentActionOpen => 'Öffnen';
 
   @override
+  String attachmentDecodeError(String details) {
+    return 'Dieses Attachment ist in einem unbekannten Format.\nDetails: \$$details';
+  }
+
+  @override
+  String attachmentDownloadError(String details) {
+    return 'Dieses Attachment konnte nicht heruntergeladen werden.\nDetails: \$$details';
+  }
+
+  @override
   String get messageActionReply => 'Antworten';
 
   @override
@@ -878,7 +888,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get addAccountApplicationPasswordRequiredButton => 'App Passwort erstellen';
 
   @override
-  String get addAccountApplicationPasswordRequiredAcknowledged => 'Verstanden';
+  String get addAccountApplicationPasswordRequiredAcknowledged => 'Ich habe bereits ein App Passwort';
 
   @override
   String get addAccountVerificationStep => 'Überprüfen';

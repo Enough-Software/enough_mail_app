@@ -146,7 +146,7 @@ class AccountEditScreen extends HookConsumerWidget {
                         onChanged: (value) async {
                           final exclude = (value == false);
                           account.excludeFromUnified = exclude;
-                          ref.refresh(unifiedAccountProvider);
+                          ref.invalidate(unifiedAccountProvider);
                           await saveAccounts();
                         },
                         title: Text(
@@ -298,34 +298,41 @@ class AccountEditScreen extends HookConsumerWidget {
                         ),
                         label: ButtonText(
                           localizations.editAccountDeleteAccountAction,
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelLarge
-                              ?.copyWith(color: Colors.white),
+                          style:
+                              Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: Colors.white,
+                                  ),
                         ),
                         onPressed: () async {
                           final result =
                               await LocalizedDialogHelper.askForConfirmation(
-                                  context,
-                                  title: localizations
-                                      .editAccountDeleteAccountConfirmationTitle,
-                                  query: localizations
-                                      .editAccountDeleteAccountConfirmationQuery(
-                                          accountNameController.text),
-                                  action: localizations.actionDelete,
-                                  isDangerousAction: true);
+                            context,
+                            title: localizations
+                                .editAccountDeleteAccountConfirmationTitle,
+                            query: localizations
+                                .editAccountDeleteAccountConfirmationQuery(
+                              accountNameController.text,
+                            ),
+                            action: localizations.actionDelete,
+                            isDangerousAction: true,
+                          );
                           if (result ?? false) {
                             if (!context.mounted) {
                               return;
                             }
-                            if (ref.read(realAccountsProvider).length == 1) {
-                              context.go(Routes.welcome);
-                            } else {
-                              context.pop();
-                            }
                             ref
                                 .read(realAccountsProvider.notifier)
                                 .removeAccount(account);
+                            if (ref.read(realAccountsProvider).isEmpty) {
+                              context.go(Routes.welcome);
+                            } else {
+                              if (PlatformInfo.isCupertino) {
+                                context.go(Routes.appDrawer);
+                                unawaited(context.pushNamed(Routes.home));
+                              } else {
+                                context.go(Routes.home);
+                              }
+                            }
                           }
                         },
                       ),
@@ -493,10 +500,22 @@ class AccountEditScreen extends HookConsumerWidget {
           localizations.editAccountFailureToConnectFixedInfo,
         );
       }
+      if (!account.excludeFromUnified) {
+        ref.invalidate(unifiedAccountProvider);
+      }
 
       return true;
     } catch (e) {
       logger.e('Unable to reconnect account: $e');
+      isRetryingToConnectState.value = false;
+      if (context.mounted) {
+        final localizations = context.text;
+        await LocalizedDialogHelper.showTextDialog(
+          context,
+          localizations.errorTitle,
+          localizations.editAccountFailureToConnectInfo(account.name),
+        );
+      }
 
       return false;
     }

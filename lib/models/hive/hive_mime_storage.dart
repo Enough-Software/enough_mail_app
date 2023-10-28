@@ -96,18 +96,21 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
       if (messageId == null) {
         print(
             '${_mailAccount.name}: ${isUid ? 'uid' : 'sequence-id'} $id not found in allIds');
+
         return null;
       }
       final messageEnvelope = await _boxEnvelopes.get(messageId.guid);
       if (messageEnvelope == null) {
         print(
             '${_mailAccount.name}: message data not found for guid ${messageId.guid} belonging to ${isUid ? 'uid' : 'sequence-id'} $id ');
+
         return null;
       }
       final mimeMessage = messageEnvelope.toMimeMessage();
       envelopes.add(mimeMessage);
     }
     print('${_mailAccount.name}: all messages loaded offline :-)');
+
     return envelopes;
   }
 

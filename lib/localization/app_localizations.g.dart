@@ -825,6 +825,18 @@ abstract class AppLocalizations {
   /// **'Open'**
   String get attachmentActionOpen;
 
+  /// Text shown when downloaded attachment could not be decoded.
+  ///
+  /// In en, this message translates to:
+  /// **'This attachment has an unsupported format or encoding.\nDetails: \${details}'**
+  String attachmentDecodeError(String details);
+
+  /// Text shown when attachment could not be downloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to download this attachment.\nDetails: \${details}'**
+  String attachmentDownloadError(String details);
+
   /// Action for single message.
   ///
   /// In en, this message translates to:
@@ -1566,7 +1578,7 @@ abstract class AppLocalizations {
   /// Acknowledgement to be confirmed by user to acknowledge the fact that an app specific password is required.
   ///
   /// In en, this message translates to:
-  /// **'Understood'**
+  /// **'I already have an app password'**
   String get addAccountApplicationPasswordRequiredAcknowledged;
 
   /// Section header of verification/log in step.
