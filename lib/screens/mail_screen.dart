@@ -1,6 +1,7 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
@@ -12,7 +13,7 @@ import 'error_screen.dart';
 import 'screens.dart';
 
 /// Displays the mail for a given account
-class MailScreen extends ConsumerWidget {
+class MailScreen extends HookConsumerWidget {
   /// Creates a [MailScreen]
   const MailScreen({
     super.key,
@@ -39,6 +40,15 @@ class MailScreen extends ConsumerWidget {
         mailbox: mailbox,
       ),
     );
+    if (PlatformInfo.isCupertino) {
+      // on Cupertino the app drawer is below in the widget tree:
+      useMemoized(() async {
+        await Future.delayed(const Duration(milliseconds: 10));
+        ref.read(currentAccountProvider.notifier).state = account;
+        ref.read(currentMailboxProvider.notifier).state = mailbox;
+      });
+    }
+
     final title =
         account is UnifiedAccount ? text.unifiedAccountName : account.name;
     final subtitle = account.fromAddress.email;

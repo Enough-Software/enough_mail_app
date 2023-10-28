@@ -330,7 +330,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       ..userName = _userNameController.text;
     ref.read(realAccountsProvider.notifier).addAccount(account);
 
-    if (Platform.isIOS) {
+    if (PlatformInfo.isCupertino) {
       context.goNamed(Routes.appDrawer);
       unawaited(
         context.pushNamed(

@@ -241,7 +241,9 @@ class AppDrawer extends ConsumerWidget {
     Account account,
     Mailbox mailbox,
   ) async {
-    context.pop();
+    if (!PlatformInfo.isCupertino) {
+      context.pop();
+    }
     await context.pushNamed(
       Routes.mail,
       pathParameters: {
@@ -279,7 +281,7 @@ class _SelectableAccountTile extends StatelessWidget {
       ),
       selected: account == currentAccount,
       onTap: () {
-        if (!Platform.isIOS) {
+        if (!PlatformInfo.isCupertino) {
           context.pop();
         }
         if (hasError) {

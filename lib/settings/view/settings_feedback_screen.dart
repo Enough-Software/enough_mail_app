@@ -33,18 +33,27 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
     final packageInfo = await PackageInfo.fromPlatform();
     var textualInfo =
         'Maily v${packageInfo.version}+${packageInfo.buildNumber}\n'
-        'Platform ${Platform.operatingSystem} ${Platform.operatingSystemVersion}\n';
-    if (Platform.isAndroid || Platform.isIOS) {
-      final deviceInfoPlugin = DeviceInfoPlugin();
-      if (Platform.isAndroid) {
-        final androidInfo = await deviceInfoPlugin.androidInfo;
-        textualInfo +=
-            '${androidInfo.manufacturer}/${androidInfo.model} (${androidInfo.device})\nAndroid ${androidInfo.version.release} with API level ${androidInfo.version.sdkInt}';
-      } else {
-        final iosInfo = await deviceInfoPlugin.iosInfo;
-        textualInfo +=
-            '${iosInfo.localizedModel}\n${iosInfo.systemName}/${iosInfo.systemVersion}\n';
-      }
+        'Platform '
+        '${Platform.operatingSystem} ${Platform.operatingSystemVersion}\n';
+    final deviceInfoPlugin = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfoPlugin.androidInfo;
+      textualInfo += '${androidInfo.manufacturer}/${androidInfo.model} '
+          '(${androidInfo.device})\nAndroid ${androidInfo.version.release} '
+          'with API level ${androidInfo.version.sdkInt}';
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfoPlugin.iosInfo;
+      textualInfo += '${iosInfo.localizedModel}\n'
+          '${iosInfo.systemName}/${iosInfo.systemVersion}\n';
+    } else if (Platform.isWindows) {
+      final windowsInfo = await deviceInfoPlugin.windowsInfo;
+      textualInfo += '${windowsInfo.productName}\n${windowsInfo.majorVersion}.'
+          '${windowsInfo.minorVersion} ${windowsInfo.displayVersion}\n';
+    } else if (Platform.isMacOS) {
+      final macOsInfo = await deviceInfoPlugin.macOsInfo;
+      textualInfo += '${macOsInfo.model}\n'
+          'MacOS ${macOsInfo.majorVersion}.${macOsInfo.minorVersion} '
+          '${macOsInfo.osRelease}\n';
     }
     setState(() {
       info = textualInfo;
