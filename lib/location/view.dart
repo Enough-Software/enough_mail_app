@@ -11,7 +11,7 @@ import 'package:map/map.dart';
 
 import '../localization/extension.dart';
 import '../logger.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../screens/base.dart';
 import 'service.dart';
 

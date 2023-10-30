@@ -52,6 +52,11 @@ class UnifiedSource extends _$UnifiedSource {
     required UnifiedAccount account,
     Mailbox? mailbox,
   }) async {
+    logger.d(
+      'Creating unified source for ${account.name}: '
+      '${mailbox?.name ?? '<inbox>'}',
+    );
+
     Future<AsyncMimeSource?> resolve(
       RealAccount realAccount,
       Mailbox? mailbox,
@@ -111,6 +116,11 @@ class RealSource extends _$RealSource {
     required RealAccount account,
     Mailbox? mailbox,
   }) async {
+    logger.d(
+      'Creating message source for ${account.name}: '
+      '${mailbox?.name ?? '<inbox>'}',
+    );
+
     final source = await ref.watch(
       realMimeSourceProvider(account: account, mailbox: mailbox).future,
     );
@@ -177,7 +187,10 @@ class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
   }) async {
     final usedMailboxForMailClient =
         (mailbox?.isInbox ?? true) ? null : mailbox;
-    logger.d('Creating mime source for ${account.name}: ${mailbox?.name}');
+    logger.d(
+      'Creating real mime source for ${account.name}: '
+      '${mailbox?.name ?? '<inbox>'}',
+    );
 
     final mailClient = ref.watch(
       mailClientSourceProvider(
@@ -213,11 +226,15 @@ class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
     AsyncMimeSource source, {
     int index = 0,
   }) {
-    source.mailClient.lowLevelIncomingMailClient
-        .logApp('new message: ${mime.decodeSubject()}');
-    if (!mime.isSeen && source.isInbox) {
-      NotificationService.instance
-          .sendLocalNotificationForMail(mime, source.mailClient.account.email);
+    if (source == state.value) {
+      source.mailClient.lowLevelIncomingMailClient
+          .logApp('new message: ${mime.decodeSubject()}');
+      if (!mime.isSeen && source.isInbox) {
+        NotificationService.instance.sendLocalNotificationForMail(
+          mime,
+          source.mailClient.account.email,
+        );
+      }
     }
   }
 

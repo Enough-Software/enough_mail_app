@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../account/provider.dart';
 import '../app_lifecycle/provider.dart';
 import '../models/compose_data.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import 'model.dart';
 
 part 'provider.g.dart';

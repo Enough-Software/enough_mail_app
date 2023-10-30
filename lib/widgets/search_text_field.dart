@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../localization/extension.dart';
 import '../models/message_source.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 
 /// A dedicated search field optimized for Cupertino
 class CupertinoSearch extends StatelessWidget {

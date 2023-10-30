@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../app_lifecycle/provider.dart';
 import '../localization/extension.dart';
 import '../logger.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../screens/screens.dart';
 import '../settings/model.dart';
 import '../settings/provider.dart';

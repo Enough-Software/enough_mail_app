@@ -113,6 +113,7 @@ const _$ReadReceiptDisplaySettingEnumMap = {
 const _$LaunchModeEnumMap = {
   LaunchMode.platformDefault: 'platformDefault',
   LaunchMode.inAppWebView: 'inAppWebView',
+  LaunchMode.inAppBrowserView: 'inAppBrowserView',
   LaunchMode.externalApplication: 'externalApplication',
   LaunchMode.externalNonBrowserApplication: 'externalNonBrowserApplication',
 };

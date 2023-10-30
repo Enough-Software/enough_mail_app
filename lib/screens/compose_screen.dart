@@ -20,7 +20,7 @@ import '../localization/extension.dart';
 import '../mail/provider.dart';
 import '../models/compose_data.dart';
 import '../models/sender.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../scaffold_messenger/service.dart';
 import '../settings/provider.dart';
 import '../share/model.dart';

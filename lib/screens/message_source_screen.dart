@@ -17,7 +17,7 @@ import '../models/message.dart';
 import '../models/message_source.dart';
 import '../models/swipe.dart';
 import '../notification/service.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../scaffold_messenger/service.dart';
 import '../settings/provider.dart';
 import '../settings/theme/icon_service.dart';

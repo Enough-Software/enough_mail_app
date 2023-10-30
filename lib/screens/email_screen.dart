@@ -4,6 +4,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/provider.dart';
 import '../mail/provider.dart';
+import 'base.dart';
+import 'error_screen.dart';
 import 'screens.dart';
 
 /// Displays the mail for a given account
@@ -27,7 +29,7 @@ class EMailScreen extends ConsumerWidget {
         return const WelcomeScreen();
       }
 
-      return const HomeScreen();
+      return const MailScreenForDefaultAccount();
     }
 
     if (encodedMailboxPath == null) {
@@ -42,12 +44,12 @@ class EMailScreen extends ConsumerWidget {
     );
 
     return mailboxValue.when(
-      loading: () => const Center(
-        child: PlatformProgressIndicator(),
+      loading: () => const BasePage(
+        content: Center(
+          child: PlatformProgressIndicator(),
+        ),
       ),
-      error: (error, stack) => Center(
-        child: Text('$error'),
-      ),
+      error: (error, stack) => ErrorScreen(error: error, stackTrace: stack),
       data: (mailbox) => MailScreen(
         account: account,
         mailbox: mailbox,

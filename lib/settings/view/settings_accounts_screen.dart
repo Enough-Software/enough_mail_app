@@ -10,7 +10,7 @@ import '../../account/model.dart';
 import '../../account/provider.dart';
 import '../../localization/app_localizations.g.dart';
 import '../../localization/extension.dart';
-import '../../routes.dart';
+import '../../routes/routes.dart';
 import '../../screens/base.dart';
 import '../../widgets/button_text.dart';
 
@@ -59,7 +59,9 @@ class SettingsAccountsScreen extends HookConsumerWidget {
             children: [
               for (final account in accounts)
                 PlatformListTile(
-                  leading: Icon(CommonPlatformIcons.account),
+                  leading: account.hasError
+                      ? Badge(child: Icon(CommonPlatformIcons.account))
+                      : Icon(CommonPlatformIcons.account),
                   title: Text(account.name),
                   onTap: () => context.pushNamed(
                     Routes.accountEdit,

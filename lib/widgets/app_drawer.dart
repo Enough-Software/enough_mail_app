@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:badges/badges.dart' as badges;
 import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
@@ -13,7 +11,7 @@ import '../account/provider.dart';
 import '../extensions/extension_action_tile.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import 'mailbox_tree.dart';
@@ -236,23 +234,30 @@ class AppDrawer extends ConsumerWidget {
     );
   }
 
-  Future<void> _navigateToMailbox(
+  void _navigateToMailbox(
     BuildContext context,
     Account account,
     Mailbox mailbox,
-  ) async {
+  ) {
     if (!PlatformInfo.isCupertino) {
       context.pop();
     }
-    await context.pushNamed(
-      Routes.mail,
-      pathParameters: {
-        Routes.pathParameterEmail: account.email,
-      },
-      queryParameters: {
-        Routes.queryParameterEncodedMailboxPath: mailbox.encodedPath,
-      },
-    );
+    if (mailbox.isInbox) {
+      context.goNamed(
+        Routes.mailForAccount,
+        pathParameters: {
+          Routes.pathParameterEmail: account.email,
+        },
+      );
+    } else {
+      context.pushNamed(
+        Routes.mailForMailbox,
+        pathParameters: {
+          Routes.pathParameterEmail: account.email,
+          Routes.pathParameterEncodedMailboxPath: mailbox.encodedPath,
+        },
+      );
+    }
   }
 }
 
@@ -292,8 +297,8 @@ class _SelectableAccountTile extends StatelessWidget {
             },
           );
         } else {
-          context.pushNamed(
-            Routes.mail,
+          context.goNamed(
+            Routes.mailForAccount,
             pathParameters: {
               Routes.pathParameterEmail: account.email,
             },

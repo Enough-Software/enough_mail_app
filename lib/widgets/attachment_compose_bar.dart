@@ -15,7 +15,7 @@ import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../settings/theme/icon_service.dart';
 import '../util/http_helper.dart';
 import '../util/localized_dialog_helper.dart';

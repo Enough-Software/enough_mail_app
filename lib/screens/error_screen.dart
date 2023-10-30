@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import '../localization/extension.dart';
 import '../logger.dart';
@@ -35,7 +35,7 @@ class ErrorScreen extends StatelessWidget {
         content: Center(
           child: Padding(
             padding: const EdgeInsets.all(8),
-            child: Text(message ?? '$error'),
+            child: SelectableText(message ?? '$error'),
           ),
         ),
       );

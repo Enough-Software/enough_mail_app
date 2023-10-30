@@ -19,7 +19,7 @@ import '../localization/extension.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../settings/provider.dart';
 import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';

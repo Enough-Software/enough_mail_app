@@ -17,7 +17,7 @@ import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';
 import '../notification/service.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../settings/model.dart';
 import '../settings/provider.dart';
 import '../settings/theme/icon_service.dart';
@@ -163,11 +163,14 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
   Object? errorObject;
   StackTrace? errorStackTrace;
   bool _notifyMarkedAsSeen = false;
+  late bool _settingsBlockExternalImages;
 
   @override
   void initState() {
     final message = widget.message;
     final mime = message.mimeMessage;
+    _settingsBlockExternalImages =
+        ref.read(settingsProvider).blockExternalImages;
     if (widget.blockExternalContents) {
       _blockExternalImages = true;
     } else if (mime.isDownloaded) {
@@ -442,7 +445,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
 
   bool _shouldImagesBeBlocked(MimeMessage mimeMessage) {
     var blockExternalImages = widget.blockExternalContents ||
-        ref.read(settingsProvider).blockExternalImages ||
+        _settingsBlockExternalImages ||
         widget.message.source.shouldBlockImages;
     if (blockExternalImages) {
       final html = mimeMessage.decodeTextHtmlPart();

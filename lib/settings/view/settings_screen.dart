@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../localization/extension.dart';
-import '../../routes.dart';
+import '../../routes/routes.dart';
 import '../../screens/base.dart';
 import '../../util/localized_dialog_helper.dart';
 

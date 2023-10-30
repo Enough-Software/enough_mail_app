@@ -10,7 +10,7 @@ import 'package:go_router/go_router.dart';
 
 import '../logger.dart';
 import '../models/message.dart' as maily;
-import '../routes.dart';
+import '../routes/routes.dart';
 import 'model.dart';
 
 class NotificationService {
@@ -137,12 +137,6 @@ class NotificationService {
     }
   }
 
-  Future sendLocalNotificationForMailLoadEvent(MailLoadEvent event) =>
-      sendLocalNotificationForMail(
-        event.message,
-        event.mailClient.account.email,
-      );
-
   Future sendLocalNotificationForMailMessage(maily.Message message) =>
       sendLocalNotificationForMail(
         message.mimeMessage,
@@ -154,10 +148,6 @@ class NotificationService {
     MimeMessage mimeMessage,
     String accountEmail,
   ) {
-    logger.d(
-      'sending notification for mime ${mimeMessage.decodeSubject()}'
-      ' with GUID ${mimeMessage.guid}',
-    );
     String retrieveFromName() {
       final mimeFrom = mimeMessage.from;
       final personalName = mimeFrom != null && mimeFrom.isNotEmpty
@@ -176,14 +166,14 @@ class NotificationService {
       return '';
     }
 
-    final notificationId = mimeMessage.guid!;
+    final notificationId = mimeMessage.guid ?? 0;
     final from = retrieveFromName();
 
     final subject = mimeMessage.decodeSubject();
     final payload = MailNotificationPayload.fromMail(mimeMessage, accountEmail);
     final payloadText = _messagePayloadStart + jsonEncode(payload.toJson());
 
-    return sendLocalNotification(
+    return _sendLocalNotification(
       notificationId,
       from,
       subject,
@@ -200,7 +190,7 @@ class NotificationService {
   //   return (email?.hashCode ?? 0) + uid;
   // }
 
-  Future<void> sendLocalNotification(
+  Future<void> _sendLocalNotification(
     int id,
     String title,
     String? text, {

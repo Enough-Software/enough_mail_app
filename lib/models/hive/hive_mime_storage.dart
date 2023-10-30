@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../logger.dart';
 import '../offline_mime_storage.dart';
 
 part 'hive_mime_storage.g.dart';
@@ -81,11 +82,12 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
   Future<List<MimeMessage>?> loadMessageEnvelopes(
     MessageSequence sequence,
   ) async {
-    print('load offline message for ${_mailAccount.name}');
+    logger.d('load offline message for ${_mailAccount.name}');
     final ids = sequence.toList(_mailbox.messagesExists);
     final allIds = _allMessageIds;
     if (allIds.length < ids.length) {
-      print('${_mailAccount.name}: not enough ids (${allIds.length})');
+      logger.d('${_mailAccount.name}: not enough ids (${allIds.length})');
+
       return null;
     }
     final envelopes = <MimeMessage>[];
@@ -94,22 +96,27 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
       final messageId = allIds.firstWhereOrNull((messageId) =>
           isUid ? messageId.uid == id : messageId.sequenceId == id);
       if (messageId == null) {
-        print(
-            '${_mailAccount.name}: ${isUid ? 'uid' : 'sequence-id'} $id not found in allIds');
+        logger.d(
+          '${_mailAccount.name}: ${isUid ? 'uid' : 'sequence-id'}'
+          ' $id not found in allIds',
+        );
 
         return null;
       }
       final messageEnvelope = await _boxEnvelopes.get(messageId.guid);
       if (messageEnvelope == null) {
-        print(
-            '${_mailAccount.name}: message data not found for guid ${messageId.guid} belonging to ${isUid ? 'uid' : 'sequence-id'} $id ');
+        logger.d(
+          '${_mailAccount.name}: message data not found for '
+          'guid ${messageId.guid} belonging to '
+          '${isUid ? 'uid' : 'sequence-id'} $id ',
+        );
 
         return null;
       }
       final mimeMessage = messageEnvelope.toMimeMessage();
       envelopes.add(mimeMessage);
     }
-    print('${_mailAccount.name}: all messages loaded offline :-)');
+    logger.d('${_mailAccount.name}: all messages loaded offline :-)');
 
     return envelopes;
   }
@@ -151,10 +158,13 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
     }
     final futures = [
       _boxEnvelopes.putAll(map),
-      _boxIds.put(_keyMessageIds, allMessageIds)
+      _boxIds.put(_keyMessageIds, allMessageIds),
     ];
-    print(
-        '${_mailAccount.name}: saved message envelopes :-)  (ids: $addedMessageIds (total: ${allMessageIds.length}) / envelopes: ${map.length})');
+    logger.d(
+      '${_mailAccount.name}: saved message envelopes :-)  '
+      '(ids: $addedMessageIds (total: ${allMessageIds.length}) / '
+      'envelopes: ${map.length})',
+    );
     await Future.wait(futures);
   }
 
@@ -172,6 +182,7 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
     if (existingContent == null) {
       return null;
     }
+
     return MimeMessage.parseFromText(existingContent);
   }
 
@@ -182,6 +193,7 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
       Hive.deleteBoxFromDisk(_boxNameEnvelopes),
       Hive.deleteBoxFromDisk(_boxNameFullMessages),
     ];
+
     return Future.wait(futures);
   }
 
@@ -191,8 +203,9 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
     if (guid == null) {
       return Future.value();
     }
-    print('delete message with guid $guid from storage');
+    logger.d('delete message with guid $guid from storage');
     _allMessageIds.removeWhere((id) => id.guid == guid);
+
     return Future.wait([
       _boxIds.put(_keyMessageIds, _allMessageIds),
       _boxEnvelopes.delete(guid),

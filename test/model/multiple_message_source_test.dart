@@ -1254,7 +1254,7 @@ class TestNotificationService implements NotificationService {
   }
 
   @override
-  Future sendLocalNotification(
+  Future _sendLocalNotification(
     int id,
     String title,
     String? text, {

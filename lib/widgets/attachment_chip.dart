@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../localization/extension.dart';
 import '../logger.dart';
 import '../models/message.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../screens/media_screen.dart';
 import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';

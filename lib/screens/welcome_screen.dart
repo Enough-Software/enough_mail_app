@@ -6,12 +6,14 @@ import 'package:shimmer_animation/shimmer_animation.dart';
 
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../settings/theme/icon_service.dart';
 import '../widgets/button_text.dart';
 import '../widgets/legalese.dart';
 
+/// Displays a welcome screen
 class WelcomeScreen extends StatelessWidget {
+  /// Creates a [WelcomeScreen]
   const WelcomeScreen({super.key});
 
   @override
@@ -30,10 +32,7 @@ class WelcomeScreen extends StatelessWidget {
             pages: pages,
             done: ButtonText(localizations.actionDone),
             onDone: () {
-              context.goNamed(
-                Routes.accountAdd,
-                queryParameters: {'welcome': 'true'},
-              );
+              context.goNamed(Routes.accountAdd);
             },
             next: ButtonText(localizations.actionNext),
             skip: ButtonText(localizations.actionSkip),
@@ -108,10 +107,7 @@ class WelcomeScreen extends StatelessWidget {
                   child: PlatformText(localizations.welcomeActionSignIn),
                 ),
                 onPressed: () {
-                  context.goNamed(
-                    Routes.accountAdd,
-                    queryParameters: {'welcome': 'true'},
-                  );
+                  context.goNamed(Routes.accountAdd);
                 },
               ),
             ),

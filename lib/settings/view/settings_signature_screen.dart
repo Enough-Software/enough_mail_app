@@ -8,7 +8,7 @@ import '../../account/model.dart';
 import '../../account/provider.dart';
 import '../../localization/extension.dart';
 import '../../models/compose_data.dart';
-import '../../routes.dart';
+import '../../routes/routes.dart';
 import '../../screens/base.dart';
 import '../../widgets/button_text.dart';
 import '../../widgets/signature.dart';

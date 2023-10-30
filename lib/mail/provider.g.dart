@@ -484,7 +484,7 @@ class _MailSearchProviderElement
 }
 
 String _$singleMessageLoaderHash() =>
-    r'2f1eccab1f4f817417d5036ec0bef4bd393e02b3';
+    r'ec18c48ee5c6ad77cb303cfea02e959979b4c9ce';
 
 /// Loads the message source for the given payload
 ///

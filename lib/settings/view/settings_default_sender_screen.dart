@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../account/provider.dart';
 import '../../localization/extension.dart';
-import '../../routes.dart';
+import '../../routes/routes.dart';
 import '../../screens/base.dart';
 import '../../widgets/text_with_links.dart';
 import '../provider.dart';

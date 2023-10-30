@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../localization/extension.dart';
 import '../models/compose_data.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 
 /// Visualize a button to compose a new mail message
 ///

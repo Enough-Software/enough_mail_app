@@ -4,11 +4,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../account/provider.dart';
 import 'screens.dart';
 
-/// Screen shown after accounts have been loaded:
-/// Either the welcome content or the first account's inbox is shown
-class HomeScreen extends ConsumerWidget {
-  /// Creates a [HomeScreen]
-  const HomeScreen({super.key});
+/// Shows the inbox of the default account
+class MailScreenForDefaultAccount extends ConsumerWidget {
+  /// Creates a [MailScreenForDefaultAccount]
+  const MailScreenForDefaultAccount({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

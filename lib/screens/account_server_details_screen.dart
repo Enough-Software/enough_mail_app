@@ -13,7 +13,7 @@ import '../mail/provider.dart';
 import '../util/localized_dialog_helper.dart';
 import '../widgets/password_field.dart';
 import 'base.dart';
-import 'home_screen.dart';
+import 'mail_screen_for_default_account.dart';
 
 class AccountServerDetailsScreen extends ConsumerWidget {
   const AccountServerDetailsScreen({
@@ -39,7 +39,7 @@ class AccountServerDetailsScreen extends ConsumerWidget {
               )
             : null);
     if (account == null) {
-      return const HomeScreen();
+      return const MailScreenForDefaultAccount();
     }
     final editor = AccountServerDetailsEditor(account: account);
 

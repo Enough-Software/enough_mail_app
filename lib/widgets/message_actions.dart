@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
@@ -13,7 +11,7 @@ import '../localization/extension.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../notification/service.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../scaffold_messenger/service.dart';
 import '../settings/model.dart';
 import '../settings/provider.dart';

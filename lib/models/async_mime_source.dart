@@ -172,6 +172,7 @@ abstract class AsyncMimeSource {
 
   /// Adds a subscriber
   void addSubscriber(MimeSourceSubscriber subscriber) {
+    print('$this: add subscriber $subscriber');
     _subscribers.add(subscriber);
   }
 
@@ -774,6 +775,10 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
         use8BitEncoding: use8BitEncoding,
         recipients: recipients,
       );
+
+  @override
+  String toString() => 'AsyncMailboxMimeSource(${mailClient.account.email}: '
+      '${mailbox.name})';
 }
 
 /// Accesses search results

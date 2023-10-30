@@ -675,6 +675,7 @@ class MailboxMessageSource extends MessageSource {
     _description = description;
     _name = mailbox.name;
     mimeSource.addSubscriber(this);
+    logger.d('Creating MailboxMessageSource for mimeSource $mimeSource');
   }
 
   /// The associated mailbox
@@ -809,6 +810,24 @@ class MailboxMessageSource extends MessageSource {
     source.singleMessage = message;
 
     return message;
+  }
+
+  @override
+  void onMailArrived(
+    MimeMessage mime,
+    AsyncMimeSource source, {
+    int index = 0,
+  }) {
+    if (source == mimeSource) {
+      logger.e(
+        'Accepting mail arrived for "${mime.decodeSubject()}" with '
+        'parent $_parentMessageSource and '
+        'stacktrace ${StackTrace.current}',
+      );
+      super.onMailArrived(mime, source, index: index);
+    } else {
+      logger.d('Ignore mail arrived for ${mime.decodeSubject()} from $source');
+    }
   }
 }
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -16,7 +15,7 @@ import '../hoster/service.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../mail/provider.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../util/modal_bottom_sheet_helper.dart';
 import '../util/validator.dart';
 import '../widgets/account_hoster_selector.dart';
@@ -29,11 +28,7 @@ class AccountAddScreen extends ConsumerStatefulWidget {
   /// Creates a new [AccountAddScreen]
   const AccountAddScreen({
     super.key,
-    required this.launchedFromWelcome,
   });
-
-  /// Is the screen launched from the welcome screen
-  final bool launchedFromWelcome;
 
   @override
   ConsumerState<AccountAddScreen> createState() => _AccountAddScreenState();
@@ -90,8 +85,8 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       _onMailHosterChanged(selectedHoster, _emailController.text);
     } else {
       final account = MailAccount(
-        email: _emailController.text,
-        name: _userNameController.text,
+        email: _emailController.text.trim(),
+        name: _userNameController.text.trim(),
         incoming: MailServerConfig(
           authentication: const PlainAuthentication('', ''),
           serverConfig: ServerConfig(),
@@ -276,7 +271,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
         _isAccountVerifying = false;
         _isAccountVerified = isVerified;
         _isContinueAvailable =
-            isVerified && _userNameController.text.isNotEmpty;
+            isVerified && _userNameController.text.trim().isNotEmpty;
       });
     }
   }
@@ -310,7 +305,8 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     setState(() {
       _isAccountVerifying = false;
       _isAccountVerified = isVerified;
-      _isContinueAvailable = isVerified && _userNameController.text.isNotEmpty;
+      _isContinueAvailable =
+          isVerified && _userNameController.text.trim().isNotEmpty;
     });
   }
 
@@ -326,21 +322,21 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     }
     // Account name has been specified
     account
-      ..name = _accountNameController.text
-      ..userName = _userNameController.text;
+      ..name = _accountNameController.text.trim()
+      ..userName = _userNameController.text.trim();
     ref.read(realAccountsProvider.notifier).addAccount(account);
 
     if (PlatformInfo.isCupertino) {
       context.goNamed(Routes.appDrawer);
       unawaited(
         context.pushNamed(
-          Routes.mail,
+          Routes.mailForAccount,
           pathParameters: {Routes.pathParameterEmail: account.key},
         ),
       );
     } else {
       context.pushReplacementNamed(
-        Routes.mail,
+        Routes.mailForAccount,
         pathParameters: {Routes.pathParameterEmail: account.key},
       );
     }
@@ -597,8 +593,8 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                 keyboardType: TextInputType.text,
                 textCapitalization: TextCapitalization.words,
                 onChanged: (value) {
-                  final bool isValid = value.isNotEmpty &&
-                      _accountNameController.text.isNotEmpty;
+                  final bool isValid = value.trim().isNotEmpty &&
+                      _accountNameController.text.trim().isNotEmpty;
                   if (isValid != _isContinueAvailable) {
                     setState(() {
                       _isContinueAvailable = isValid;
@@ -619,8 +615,8 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                 controller: _accountNameController,
                 keyboardType: TextInputType.text,
                 onChanged: (value) {
-                  final bool isValid =
-                      value.isNotEmpty && _userNameController.text.isNotEmpty;
+                  final bool isValid = value.isNotEmpty &&
+                      _userNameController.text.trim().isNotEmpty;
                   if (isValid != _isContinueAvailable) {
                     setState(() {
                       _isContinueAvailable = isValid;
@@ -667,10 +663,11 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       );
 
   void _onMailHosterChanged(MailHoster provider, String email) {
+    final email = _emailController.text.trim();
     final mailAccount = MailAccount.fromDiscoveredSettings(
-      name: _emailController.text,
-      email: _emailController.text,
-      userName: _emailController.text,
+      name: email,
+      email: email,
+      userName: email,
       password: _passwordController.text,
       config: provider.clientConfig,
     );

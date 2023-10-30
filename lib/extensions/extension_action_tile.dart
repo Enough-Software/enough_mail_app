@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart' hide WebViewConfiguration;
 import '../account/model.dart';
 import '../localization/extension.dart';
 import '../models/models.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import 'extensions.dart';
 
 class ExtensionActionTile extends StatelessWidget {

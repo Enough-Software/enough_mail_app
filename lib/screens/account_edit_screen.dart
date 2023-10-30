@@ -15,7 +15,7 @@ import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../logger.dart';
 import '../mail/provider.dart';
-import '../routes.dart';
+import '../routes/routes.dart';
 import '../scaffold_messenger/service.dart';
 import '../settings/provider.dart';
 import '../settings/theme/icon_service.dart';
@@ -326,11 +326,12 @@ class AccountEditScreen extends HookConsumerWidget {
                             if (ref.read(realAccountsProvider).isEmpty) {
                               context.go(Routes.welcome);
                             } else {
+                              // TODO(RV): simplify routing
                               if (PlatformInfo.isCupertino) {
                                 context.go(Routes.appDrawer);
-                                unawaited(context.pushNamed(Routes.home));
+                                unawaited(context.pushNamed(Routes.mail));
                               } else {
-                                context.go(Routes.home);
+                                context.go(Routes.mail);
                               }
                             }
                           }

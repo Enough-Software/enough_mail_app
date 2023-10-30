@@ -14,7 +14,8 @@ import 'localization/app_localizations.g.dart';
 import 'lock/provider.dart';
 import 'logger.dart';
 import 'notification/service.dart';
-import 'routes.dart';
+import 'routes/provider.dart';
+import 'routes/routes.dart';
 import 'scaffold_messenger/service.dart';
 import 'screens/screens.dart';
 import 'settings/provider.dart';
@@ -45,6 +46,8 @@ class MailyApp extends HookConsumerWidget {
     final themeSettingsData = ref.watch(themeFinderProvider(context: context));
     final languageTag =
         ref.watch(settingsProvider.select((settings) => settings.languageTag));
+    final routerConfig = ref.watch(routerConfigProvider);
+
     ref
       ..watch(incomingShareProvider)
       ..watch(backgroundProvider)
@@ -55,31 +58,16 @@ class MailyApp extends HookConsumerWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       debugShowCheckedModeBanner: false,
       title: 'Maily',
-      routerConfig: Routes.routerConfig,
+      routerConfig: routerConfig,
       scaffoldMessengerKey:
           ScaffoldMessengerService.instance.scaffoldMessengerKey,
-      // builder: (context, child) => Consumer(
-      //   builder: (context, ref, child) {
-      //     final languageTag =
-      //         ref.watch(settingsProvider.select((value) => value.languageTag));
-      //     final usedChild = child ?? const SplashScreen();
-
-      //     return languageTag == null
-      //         ? usedChild
-      //         : Localizations.override(
-      //             context: context,
-      //             locale: Locale(languageTag),
-      //             child: usedChild,
-      //           );
-      //   },
-      // ),
       materialTheme: themeSettingsData.lightTheme,
       materialDarkTheme: themeSettingsData.darkTheme,
       materialThemeMode: themeSettingsData.themeMode,
       cupertinoTheme: CupertinoThemeData(
         brightness: themeSettingsData.brightness,
         applyThemeToAll: true,
-        //TODO support theming on Cupertino
+        // TODO(RV): support theming on Cupertino
       ),
     );
     if (languageTag == null) {
@@ -105,11 +93,9 @@ class InitializationScreen extends ConsumerStatefulWidget {
 }
 
 class _InitializationScreenState extends ConsumerState<InitializationScreen> {
-  late Future<void> _appInitialization;
-
   @override
   void initState() {
-    _appInitialization = _initApp();
+    _initApp();
     super.initState();
   }
 
@@ -118,29 +104,26 @@ class _InitializationScreenState extends ConsumerState<InitializationScreen> {
     await ref.read(realAccountsProvider.notifier).init();
     await ref.read(backgroundProvider.notifier).init();
     if (context.mounted) {
+      // TODO(RV): check if the context is really needed for NotificationService
       await NotificationService.instance.init(context: context);
     }
     await KeyService.instance.init();
+    // TODO(RV): change routing for Cupertino
     if (PlatformInfo.isCupertino &&
         ref.read(realAccountsProvider).isNotEmpty &&
         context.mounted) {
       context.goNamed(Routes.appDrawer);
-      unawaited(context.pushNamed(Routes.home));
     }
-
     logger.d('App initialized');
+    if (context.mounted) {
+      if (ref.read(allAccountsProvider).isEmpty) {
+        context.go(Routes.welcome);
+      } else {
+        context.go(Routes.mail);
+      }
+    }
   }
 
   @override
-  Widget build(BuildContext context) => FutureBuilder(
-        future: _appInitialization,
-        builder: (context, snapshot) {
-          final done = snapshot.connectionState == ConnectionState.done;
-          if (!done) {
-            return const SplashScreen();
-          }
-
-          return const HomeScreen();
-        },
-      );
+  Widget build(BuildContext context) => const SplashScreen();
 }
