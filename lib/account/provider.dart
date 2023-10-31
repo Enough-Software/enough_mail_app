@@ -3,6 +3,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../logger.dart';
 import '../models/sender.dart';
 import 'model.dart';
 import 'storage.dart';
@@ -129,6 +130,7 @@ class AllAccounts extends _$AllAccounts {
   List<Account> build() {
     final realAccounts = ref.watch(realAccountsProvider);
     final unifiedAccount = ref.watch(unifiedAccountProvider);
+    logger.d('Creating all accounts');
 
     return [
       if (unifiedAccount != null) unifiedAccount,

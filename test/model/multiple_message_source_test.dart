@@ -1257,11 +1257,7 @@ class TestNotificationService implements NotificationService {
   Future _sendLocalNotification(
     int id,
     String title,
-    String? text, {
-    String? payloadText,
-    DateTime? when,
-    bool channelShowBadge = true,
-  }) {
+    String? text) {
     _sendNotifications++;
     return Future.value();
   }

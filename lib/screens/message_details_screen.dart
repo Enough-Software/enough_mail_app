@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
+import '../logger.dart';
 import '../mail/provider.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
@@ -214,6 +215,17 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
     final date = context.formatDateTime(mime.decodeDate());
     final subject = mime.decodeSubject();
 
+    TableRow _rowWithLabel({required String label, required Widget child}) =>
+        TableRow(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
+              child: Text(label),
+            ),
+            child,
+          ],
+        );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -222,42 +234,22 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
           textBaseline: TextBaseline.alphabetic,
           columnWidths: const {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
           children: [
-            TableRow(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-                  child: Text(localizations.detailsHeaderFrom),
-                ),
-                _buildMailAddresses(mime.from)
-              ],
+            _rowWithLabel(
+              label: localizations.detailsHeaderFrom,
+              child: _buildMailAddresses(mime.from),
             ),
-            TableRow(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-                  child: Text(localizations.detailsHeaderTo),
-                ),
-                _buildMailAddresses(mime.to)
-              ],
+            _rowWithLabel(
+              label: localizations.detailsHeaderTo,
+              child: _buildMailAddresses(mime.to),
             ),
             if (mime.cc?.isNotEmpty ?? false)
-              TableRow(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-                    child: Text(localizations.detailsHeaderCc),
-                  ),
-                  _buildMailAddresses(mime.cc)
-                ],
+              _rowWithLabel(
+                label: localizations.detailsHeaderCc,
+                child: _buildMailAddresses(mime.cc),
               ),
-            TableRow(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-                  child: Text(localizations.detailsHeaderDate),
-                ),
-                Text(date),
-              ],
+            _rowWithLabel(
+              label: localizations.detailsHeaderDate,
+              child: Text(date),
             ),
           ],
         ),
@@ -319,10 +311,11 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
   }
 
   Widget _buildMailAddresses(List<MailAddress>? addresses) {
-    if (addresses?.isEmpty ?? true) {
+    if (addresses == null || addresses.isEmpty) {
       return const SizedBox.shrink();
     }
-    return MailAddressList(mailAddresses: addresses!);
+
+    return MailAddressList(mailAddresses: addresses);
   }
 
   Widget _buildAttachments(List<ContentInfo> attachments) => Wrap(
@@ -332,9 +325,8 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
         ],
       );
 
-  Widget _buildContent(AppLocalizations localizations) {
-    if (_messageDownloadError) {
-      return Column(
+  Widget _buildMessageDownloadErrorContent(AppLocalizations localizations) =>
+      Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -369,6 +361,10 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
           ],
         ],
       );
+
+  Widget _buildContent(AppLocalizations localizations) {
+    if (_messageDownloadError) {
+      return _buildMessageDownloadErrorContent(localizations);
     }
     final message = widget.message;
 
@@ -421,6 +417,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
           });
         }
       },
+      logger: logger,
       builder: (context, mimeMessage) {
         final textCalendarPart =
             mimeMessage.getAlternativePart(MediaSubtype.textCalendar);
@@ -537,6 +534,7 @@ class MessageContentsScreen extends ConsumerWidget {
             showMediaDelegate: (mediaViewer) =>
                 _navigateToMedia(context, mediaViewer),
             enableDarkMode: Theme.of(context).brightness == Brightness.dark,
+            logger: logger,
           ),
         ),
       );

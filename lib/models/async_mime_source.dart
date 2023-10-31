@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
 
+import '../logger.dart';
 import '../util/indexed_cache.dart';
 
 /// Let other classes get notified about changes in a mime source
@@ -23,6 +24,11 @@ abstract class MimeSourceSubscriber {
 
 /// Defines a low level mime message source
 abstract class AsyncMimeSource {
+  /// Creates a new mime source
+  AsyncMimeSource() {
+    logger.d('Creating $this / $runtimeType');
+  }
+
   /// The mail client associated with this source
   MailClient get mailClient;
 
@@ -172,7 +178,12 @@ abstract class AsyncMimeSource {
 
   /// Adds a subscriber
   void addSubscriber(MimeSourceSubscriber subscriber) {
-    print('$this: add subscriber $subscriber');
+    if (_subscribers.contains(subscriber)) {
+      logger.e('subscriber $subscriber already added to $this');
+
+      return;
+    }
+    logger.d('$this: add subscriber $subscriber, existing: $_subscribers');
     _subscribers.add(subscriber);
   }
 
@@ -184,6 +195,7 @@ abstract class AsyncMimeSource {
   /// Notifies subscribers about a new mime message
   void notifySubscriberOnMessageArrived(MimeMessage mime) {
     for (final subscriber in _subscribers) {
+      logger.d('$this: notify subscriber $subscriber');
       subscriber.onMailArrived(mime, this);
     }
   }

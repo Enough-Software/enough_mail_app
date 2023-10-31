@@ -53,7 +53,7 @@ class UnifiedSource extends _$UnifiedSource {
     Mailbox? mailbox,
   }) async {
     logger.d(
-      'Creating unified source for ${account.name}: '
+      'Creating unified source for ${account.key}: '
       '${mailbox?.name ?? '<inbox>'}',
     );
 
@@ -72,6 +72,9 @@ class UnifiedSource extends _$UnifiedSource {
           usedMailbox = mailboxTree.firstWhereOrNull(
             (m) => m?.flags.contains(flag) ?? false,
           );
+        }
+        if (usedMailbox != null && usedMailbox.isInbox) {
+          usedMailbox = null;
         }
 
         final source = await ref.watch(
@@ -117,7 +120,7 @@ class RealSource extends _$RealSource {
     Mailbox? mailbox,
   }) async {
     logger.d(
-      'Creating message source for ${account.name}: '
+      'Creating message source for ${account.key}: '
       '${mailbox?.name ?? '<inbox>'}',
     );
 
@@ -140,6 +143,7 @@ Future<Tree<Mailbox?>> mailboxTree(
   MailboxTreeRef ref, {
   required Account account,
 }) async {
+  logger.d('Creating mailbox tree for ${account.key}');
   if (account is RealAccount) {
     final source = await ref.watch(realSourceProvider(account: account).future);
 
@@ -188,8 +192,8 @@ class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
     final usedMailboxForMailClient =
         (mailbox?.isInbox ?? true) ? null : mailbox;
     logger.d(
-      'Creating real mime source for ${account.name}: '
-      '${mailbox?.name ?? '<inbox>'}',
+      'Creating real mime source for ${account.key}: '
+      '${mailbox?.name ?? '<inbox>'}\n${StackTrace.current}',
     );
 
     final mailClient = ref.watch(
@@ -210,7 +214,7 @@ class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
       return mimeSource;
     } catch (e, s) {
       logger.e(
-        'Error creating mime source for ${account.name}',
+        'Error creating mime source for ${account.key}',
         error: e,
         stackTrace: s,
       );
@@ -271,7 +275,7 @@ class MailClientSource extends _$MailClientSource {
     MailClient create() {
       final logName =
           mailbox != null ? '${account.name}-${mailbox.name}' : account.name;
-      logger.d('Create MailClient $logName');
+      logger.d('Creating MailClient $logName');
 
       return EmailService.instance.createMailClient(
         account.mailAccount,
