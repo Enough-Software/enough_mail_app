@@ -78,7 +78,6 @@ class StringHelper {
 }
 
 class _StringSequence {
-
   _StringSequence(this.startIndex, this.length);
   final int startIndex;
   final int length;

@@ -108,18 +108,12 @@ class _InitializationScreenState extends ConsumerState<InitializationScreen> {
       await NotificationService.instance.init(context: context);
     }
     await KeyService.instance.init();
-    // TODO(RV): change routing for Cupertino
-    if (PlatformInfo.isCupertino &&
-        ref.read(realAccountsProvider).isNotEmpty &&
-        context.mounted) {
-      context.goNamed(Routes.appDrawer);
-    }
     logger.d('App initialized');
     if (context.mounted) {
       if (ref.read(allAccountsProvider).isEmpty) {
-        context.go(Routes.welcome);
+        context.goNamed(Routes.welcome);
       } else {
-        context.go(Routes.mail);
+        context.goNamed(Routes.mail);
       }
     }
   }

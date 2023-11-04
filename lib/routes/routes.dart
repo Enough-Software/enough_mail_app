@@ -1,5 +1,6 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_media/enough_media.dart';
+import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,11 @@ import 'package:flutter/material.dart';
 import '../account/model.dart';
 import '../models/models.dart';
 import '../notification/model.dart';
+
+/// Should the app drawer be used as root?
+///
+/// This is `true` on Cupertino platforms.
+final useAppDrawerAsRoot = PlatformInfo.isCupertino;
 
 /// Defines app navigation routes
 class Routes {
@@ -19,7 +25,7 @@ class Routes {
   static const String welcome = '/welcome';
 
   /// Creates a new account
-  static const String accountAdd = '/accountAdd';
+  static const String accountAdd = 'accountAdd';
 
   /// Allows to edit a single account
   ///
@@ -36,7 +42,7 @@ class Routes {
 
   /// Displays inbox messages of the default account
   ///
-  static const String mail = '/mail';
+  static const String mail = 'mail';
 
   /// Displays inbox messages of the given account
   ///
@@ -51,7 +57,7 @@ class Routes {
   static const String mailForMailbox = 'box';
 
   /// Displays the settings
-  static const String settings = '/settings';
+  static const String settings = 'settings';
 
   /// Displays security settings
   static const String settingsSecurity = 'security';
@@ -107,7 +113,7 @@ class Routes {
   ///
   /// queryParameters: [queryParameterBlockExternalContent]
   ///
-  static const String mailDetails = '/mailDetails';
+  static const String mailDetails = 'mailDetails';
 
   /// Loads message details from notification data
   ///
@@ -115,19 +121,19 @@ class Routes {
   ///
   /// queryParameters: [queryParameterBlockExternalContent]
   ///
-  static const String mailDetailsForNotification = '/mailNotification';
+  static const String mailDetailsForNotification = 'mailNotification';
 
   /// Shows all message contents
   ///
   /// extra: [Message]
   ///
-  static const String mailContents = '/mailContents';
+  static const String mailContents = 'mailContents';
 
   /// Composes a new message
   ///
   /// extra: [ComposeData]
   ///
-  static const String mailCompose = '/mailCompose';
+  static const String mailCompose = 'mailCompose';
 
   /// Allows to pick a location
   ///
@@ -139,19 +145,19 @@ class Routes {
   ///
   /// extra: [InteractiveMediaWidget]
   ///
-  static const String interactiveMedia = '/interactiveMedia';
+  static const String interactiveMedia = 'interactiveMedia';
 
   /// Displays the source code of a message
   ///
   /// extra: [MimeMessage]
   ///
-  static const String sourceCode = '/sourceCode';
+  static const String sourceCode = 'sourceCode';
 
   /// Displays the web view based on the given configuration
   ///
   /// extra: [WebViewConfiguration]
   ///
-  static const String webview = '/webview';
+  static const String webview = 'webview';
 
   /// Displays the account and mailbox switcher on a separate screen.
   ///

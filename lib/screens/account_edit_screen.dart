@@ -324,15 +324,9 @@ class AccountEditScreen extends HookConsumerWidget {
                                 .read(realAccountsProvider.notifier)
                                 .removeAccount(account);
                             if (ref.read(realAccountsProvider).isEmpty) {
-                              context.go(Routes.welcome);
+                              context.goNamed(Routes.welcome);
                             } else {
-                              // TODO(RV): simplify routing
-                              if (PlatformInfo.isCupertino) {
-                                context.go(Routes.appDrawer);
-                                unawaited(context.pushNamed(Routes.mail));
-                              } else {
-                                context.go(Routes.mail);
-                              }
+                              context.goNamed(Routes.mail);
                             }
                           }
                         },
@@ -817,14 +811,16 @@ class _AliasEditDialogState extends ConsumerState<_AliasEditDialog> {
           DecoratedPlatformTextField(
             controller: _emailController,
             decoration: InputDecoration(
-                labelText: localizations.editAccountEditAliasEmailLabel,
-                hintText: localizations.editAccountEditAliasEmailHint),
+              labelText: localizations.editAccountEditAliasEmailLabel,
+              hintText: localizations.editAccountEditAliasEmailHint,
+            ),
             onChanged: (value) {
               final bool isValid = Validator.validateEmail(value);
               final emailValue = value.toLowerCase();
               if (isValid) {
                 final existingAlias = widget.account.aliases.firstWhereOrNull(
-                    (e) => e.email.toLowerCase() == emailValue);
+                  (e) => e.email.toLowerCase() == emailValue,
+                );
                 if (existingAlias != null && existingAlias != widget.alias) {
                   setState(() {
                     _errorMessage =

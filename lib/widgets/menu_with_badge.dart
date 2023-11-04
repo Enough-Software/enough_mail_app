@@ -1,4 +1,3 @@
-
 import 'package:badges/badges.dart' as badges;
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';

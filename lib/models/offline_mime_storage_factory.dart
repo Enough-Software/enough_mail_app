@@ -11,5 +11,6 @@ class OfflineMimeStorageFactory {
   OfflineMimeStorage getMailboxStorage({
     required MailAccount mailAccount,
     required Mailbox mailbox,
-  }) => HiveMailboxMimeStorage(mailAccount: mailAccount, mailbox: mailbox);
+  }) =>
+      HiveMailboxMimeStorage(mailAccount: mailAccount, mailbox: mailbox);
 }

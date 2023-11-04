@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 
 class ButtonText extends StatelessWidget {
-
   const ButtonText(
     this.data, {
     this.style,

@@ -1,3 +1,1 @@
-class Search {
-  
-}
+class Search {}

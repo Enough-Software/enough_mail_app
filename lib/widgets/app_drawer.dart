@@ -11,6 +11,7 @@ import '../account/provider.dart';
 import '../extensions/extension_action_tile.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
+import '../routes/provider.dart';
 import '../routes/routes.dart';
 import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
@@ -213,7 +214,7 @@ class AppDrawer extends ConsumerWidget {
         leading: const Icon(Icons.add),
         title: Text(localizations.drawerEntryAddAccount),
         onTap: () {
-          if (!PlatformInfo.isCupertino) {
+          if (!useAppDrawerAsRoot) {
             context.pop();
           }
           context.pushNamed(Routes.accountAdd);
@@ -239,7 +240,7 @@ class AppDrawer extends ConsumerWidget {
     Account account,
     Mailbox mailbox,
   ) {
-    if (!PlatformInfo.isCupertino) {
+    if (!useAppDrawerAsRoot) {
       context.pop();
     }
     if (mailbox.isInbox) {
@@ -286,7 +287,7 @@ class _SelectableAccountTile extends StatelessWidget {
       ),
       selected: account == currentAccount,
       onTap: () {
-        if (!PlatformInfo.isCupertino) {
+        if (!useAppDrawerAsRoot) {
           context.pop();
         }
         if (hasError) {

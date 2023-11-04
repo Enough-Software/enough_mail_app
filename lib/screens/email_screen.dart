@@ -33,7 +33,9 @@ class EMailScreen extends ConsumerWidget {
     }
 
     if (encodedMailboxPath == null) {
-      return MailScreen(account: account);
+      return MailScreen(
+        account: account,
+      );
     }
 
     final mailboxValue = ref.watch(

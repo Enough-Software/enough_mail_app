@@ -176,18 +176,19 @@ class ExpansionWrap2 extends MultiChildRenderObjectWidget {
   final int? maxRuns;
 
   @override
-  RenderExpansionWrap createRenderObject(BuildContext context) => RenderExpansionWrap(
-      direction: direction,
-      alignment: alignment,
-      spacing: spacing,
-      runAlignment: runAlignment,
-      runSpacing: runSpacing,
-      crossAxisAlignment: crossAxisAlignment,
-      textDirection: textDirection ?? Directionality.maybeOf(context),
-      verticalDirection: verticalDirection,
-      clipBehavior: clipBehavior,
-      maxRuns: maxRuns,
-    );
+  RenderExpansionWrap createRenderObject(BuildContext context) =>
+      RenderExpansionWrap(
+        direction: direction,
+        alignment: alignment,
+        spacing: spacing,
+        runAlignment: runAlignment,
+        runSpacing: runSpacing,
+        crossAxisAlignment: crossAxisAlignment,
+        textDirection: textDirection ?? Directionality.maybeOf(context),
+        verticalDirection: verticalDirection,
+        clipBehavior: clipBehavior,
+        maxRuns: maxRuns,
+      );
 
   @override
   void updateRenderObject(
@@ -605,7 +606,8 @@ class RenderExpansionWrap extends RenderBox
   }
 
   @override
-  double? computeDistanceToActualBaseline(TextBaseline baseline) => defaultComputeDistanceToHighestActualBaseline(baseline);
+  double? computeDistanceToActualBaseline(TextBaseline baseline) =>
+      defaultComputeDistanceToHighestActualBaseline(baseline);
 
   double _getMainAxisExtent(Size childSize) {
     switch (direction) {
@@ -648,7 +650,8 @@ class RenderExpansionWrap extends RenderBox
   }
 
   @override
-  Size computeDryLayout(BoxConstraints constraints) => _computeDryLayout(constraints);
+  Size computeDryLayout(BoxConstraints constraints) =>
+      _computeDryLayout(constraints);
 
   Size _computeDryLayout(BoxConstraints constraints,
       [ChildLayouter layoutChild = ChildLayoutHelper.dryLayoutChild]) {
@@ -957,7 +960,8 @@ class RenderExpansionWrap extends RenderBox
   }
 
   @override
-  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) => defaultHitTestChildren(result, position: position);
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
+      defaultHitTestChildren(result, position: position);
 
   @override
   void paint(PaintingContext context, Offset offset) {

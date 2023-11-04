@@ -100,6 +100,9 @@ class SenderDropdown extends HookConsumerWidget {
     final senderState = useState(getInitialSender());
 
     return PlatformDropdownButton<Sender>(
+      material: (context, platform) => MaterialDropdownButtonData(
+        isExpanded: true,
+      ),
       items: senders
           .map(
             (s) => DropdownMenuItem<Sender>(
@@ -605,7 +608,10 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                     //   from: widget.data.messageBuilder.from,
                     //   onChanged:
                     PlatformDropdownButton<Sender>(
-                      //isExpanded: true,
+                      material: (context, platform) =>
+                          MaterialDropdownButtonData(
+                        isExpanded: true,
+                      ),
                       items: _senders
                           .map(
                             (s) => DropdownMenuItem<Sender>(

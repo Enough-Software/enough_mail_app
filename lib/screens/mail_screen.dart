@@ -8,6 +8,7 @@ import '../account/model.dart';
 import '../account/provider.dart';
 import '../localization/extension.dart';
 import '../mail/provider.dart';
+import '../routes/routes.dart';
 import 'base.dart';
 import 'error_screen.dart';
 import 'screens.dart';
@@ -40,8 +41,9 @@ class MailScreen extends HookConsumerWidget {
         mailbox: mailbox,
       ),
     );
-    if (PlatformInfo.isCupertino) {
-      // on Cupertino the app drawer is below in the widget tree:
+    if (useAppDrawerAsRoot) {
+      // when the app drawer is below in the widget tree,
+      // set the account and mailbox:
       useMemoized(() async {
         await Future.delayed(const Duration(milliseconds: 10));
         ref.read(currentAccountProvider.notifier).state = account;

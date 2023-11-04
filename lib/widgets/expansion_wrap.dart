@@ -412,7 +412,8 @@ class RenderExpansionWrap extends RenderBox {
   }
 
   @override
-  double computeMaxIntrinsicHeight(double width) => computeMinIntrinsicHeight(width);
+  double computeMaxIntrinsicHeight(double width) =>
+      computeMinIntrinsicHeight(width);
 
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {

@@ -1,6 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_media/enough_media.dart';
-import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -29,7 +28,7 @@ RouterConfig<Object> routerConfig(RouterConfigRef ref) => GoRouter(
       //   return null;
       // },
       routes: [
-        if (PlatformInfo.isCupertino) ...[
+        if (useAppDrawerAsRoot) ...[
           _rootRoute,
           _appDrawerRoute,
           _lockRoute,
@@ -52,19 +51,36 @@ RouterConfig<Object> routerConfig(RouterConfigRef ref) => GoRouter(
       ],
     );
 
+String _path(String routeName) =>
+    useAppDrawerAsRoot ? routeName : '/$routeName';
+
 GoRoute get _rootRoute => GoRoute(
       path: Routes.root,
       builder: (context, state) => const InitializationScreen(),
     );
+
 GoRoute get _appDrawerRoute => GoRoute(
       name: Routes.appDrawer,
       path: Routes.appDrawer,
       builder: (context, state) => const AppDrawer(),
+      routes: [
+        _accountAddRoute,
+        _mailRoute,
+        _mailForAccountRoute,
+        _mailDetailsRoute,
+        _mailDetailsForNotificationRoute,
+        _mailContentsRoute,
+        _sourceCodeRoute,
+        _composeRoute,
+        _interactiveMediaRoute,
+        _settingsRoute,
+        _webviewRoute,
+      ],
     );
 
 GoRoute get _accountAddRoute => GoRoute(
       name: Routes.accountAdd,
-      path: Routes.accountAdd,
+      path: _path(Routes.accountAdd),
       builder: (context, state) => const AccountAddScreen(),
     );
 GoRoute get _welcomeRoute => GoRoute(
@@ -75,94 +91,94 @@ GoRoute get _welcomeRoute => GoRoute(
 
 GoRoute get _mailRoute => GoRoute(
       name: Routes.mail,
-      path: Routes.mail,
+      path: _path(Routes.mail),
       builder: (context, state) => const MailScreenForDefaultAccount(),
       routes: [
+        if (!useAppDrawerAsRoot) _mailForAccountRoute,
+      ],
+    );
+
+GoRoute get _mailForAccountRoute => GoRoute(
+      name: Routes.mailForAccount,
+      path: '${Routes.mailForAccount}/:${Routes.pathParameterEmail}',
+      builder: (context, state) {
+        final email = state.pathParameters[Routes.pathParameterEmail] ?? '';
+
+        return EMailScreen(key: ValueKey(email), email: email);
+      },
+      routes: [
         GoRoute(
-          name: Routes.mailForAccount,
-          path: '${Routes.mailForAccount}/:${Routes.pathParameterEmail}',
+          name: Routes.mailForMailbox,
+          path: '${Routes.mailForMailbox}/'
+              ':${Routes.pathParameterEncodedMailboxPath}',
           builder: (context, state) {
             final email = state.pathParameters[Routes.pathParameterEmail] ?? '';
-
-            return EMailScreen(key: ValueKey(email), email: email);
-          },
-          routes: [
-            GoRoute(
-              name: Routes.mailForMailbox,
-              path: '${Routes.mailForMailbox}/'
-                  ':${Routes.pathParameterEncodedMailboxPath}',
-              builder: (context, state) {
-                final email =
-                    state.pathParameters[Routes.pathParameterEmail] ?? '';
-                final encodedMailboxPath = state.pathParameters[
-                        Routes.pathParameterEncodedMailboxPath] ??
+            final encodedMailboxPath =
+                state.pathParameters[Routes.pathParameterEncodedMailboxPath] ??
                     '';
 
-                return EMailScreen(
-                  key: ValueKey('$email/$encodedMailboxPath'),
-                  email: email,
-                  encodedMailboxPath: encodedMailboxPath,
-                );
-              },
-            ),
-            GoRoute(
-              name: Routes.messageSource,
-              path: Routes.messageSource,
-              builder: (context, state) {
-                final extra = state.extra;
+            return EMailScreen(
+              key: ValueKey('$email/$encodedMailboxPath'),
+              email: email,
+              encodedMailboxPath: encodedMailboxPath,
+            );
+          },
+        ),
+        GoRoute(
+          name: Routes.messageSource,
+          path: Routes.messageSource,
+          builder: (context, state) {
+            final extra = state.extra;
 
-                return extra is MessageSource
-                    ? MessageSourceScreen(messageSource: extra)
-                    : const MailScreenForDefaultAccount();
-              },
-            ),
-            GoRoute(
-              name: Routes.mailSearch,
-              path: Routes.mailSearch,
-              builder: (context, state) {
-                final extra = state.extra;
+            return extra is MessageSource
+                ? MessageSourceScreen(messageSource: extra)
+                : const MailScreenForDefaultAccount();
+          },
+        ),
+        GoRoute(
+          name: Routes.mailSearch,
+          path: Routes.mailSearch,
+          builder: (context, state) {
+            final extra = state.extra;
 
-                return extra is MailSearch
-                    ? MailSearchScreen(search: extra)
-                    : const MailScreenForDefaultAccount();
-              },
-            ),
-            GoRoute(
-              name: Routes.accountEdit,
-              path: Routes.accountEdit,
-              builder: (context, state) => AccountEditScreen(
-                accountEmail:
-                    state.pathParameters[Routes.pathParameterEmail] ?? '',
-              ),
-            ),
-            GoRoute(
-              name: Routes.accountServerDetails,
-              path: Routes.accountServerDetails,
-              builder: (context, state) {
-                final email = state.pathParameters[Routes.pathParameterEmail];
-                if (email != null) {
-                  return AccountServerDetailsScreen(
-                    accountEmail: email,
-                  );
-                }
-                final account = state.extra;
-                if (account is RealAccount) {
-                  return AccountServerDetailsScreen(
-                    account: account,
-                  );
-                }
+            return extra is MailSearch
+                ? MailSearchScreen(search: extra)
+                : const MailScreenForDefaultAccount();
+          },
+        ),
+        GoRoute(
+          name: Routes.accountEdit,
+          path: Routes.accountEdit,
+          builder: (context, state) => AccountEditScreen(
+            accountEmail: state.pathParameters[Routes.pathParameterEmail] ?? '',
+          ),
+        ),
+        GoRoute(
+          name: Routes.accountServerDetails,
+          path: Routes.accountServerDetails,
+          builder: (context, state) {
+            final email = state.pathParameters[Routes.pathParameterEmail];
+            if (email != null) {
+              return AccountServerDetailsScreen(
+                accountEmail: email,
+              );
+            }
+            final account = state.extra;
+            if (account is RealAccount) {
+              return AccountServerDetailsScreen(
+                account: account,
+              );
+            }
 
-                return const MailScreenForDefaultAccount();
-              },
-            ),
-          ],
+            return const MailScreenForDefaultAccount();
+          },
         ),
       ],
     );
 
 GoRoute get _composeRoute => GoRoute(
       name: Routes.mailCompose,
-      path: Routes.mailCompose,
+      path: _path(Routes.mailCompose),
       builder: (context, state) {
         final data = state.extra;
 
@@ -181,7 +197,7 @@ GoRoute get _composeRoute => GoRoute(
 
 GoRoute get _mailDetailsRoute => GoRoute(
       name: Routes.mailDetails,
-      path: Routes.mailDetails,
+      path: _path(Routes.mailDetails),
       builder: (context, state) {
         final extra = state.extra;
         final blockExternalContent = state.uri
@@ -198,7 +214,7 @@ GoRoute get _mailDetailsRoute => GoRoute(
     );
 GoRoute get _mailDetailsForNotificationRoute => GoRoute(
       name: Routes.mailDetailsForNotification,
-      path: Routes.mailDetailsForNotification,
+      path: _path(Routes.mailDetailsForNotification),
       builder: (context, state) {
         final extra = state.extra;
         final blockExternalContent = state.uri
@@ -216,7 +232,7 @@ GoRoute get _mailDetailsForNotificationRoute => GoRoute(
 
 GoRoute get _mailContentsRoute => GoRoute(
       name: Routes.mailContents,
-      path: Routes.mailContents,
+      path: _path(Routes.mailContents),
       builder: (context, state) {
         final extra = state.extra;
 
@@ -229,7 +245,7 @@ GoRoute get _mailContentsRoute => GoRoute(
     );
 GoRoute get _sourceCodeRoute => GoRoute(
       name: Routes.sourceCode,
-      path: Routes.sourceCode,
+      path: _path(Routes.sourceCode),
       builder: (context, state) {
         final mimeMessage = state.extra;
 
@@ -241,7 +257,7 @@ GoRoute get _sourceCodeRoute => GoRoute(
 
 GoRoute get _interactiveMediaRoute => GoRoute(
       name: Routes.interactiveMedia,
-      path: Routes.interactiveMedia,
+      path: _path(Routes.interactiveMedia),
       builder: (context, state) {
         final widget = state.extra;
 
@@ -252,8 +268,8 @@ GoRoute get _interactiveMediaRoute => GoRoute(
     );
 
 GoRoute get _settingsRoute => GoRoute(
-      path: Routes.settings,
       name: Routes.settings,
+      path: _path(Routes.settings),
       builder: (context, state) => const SettingsScreen(),
       routes: [
         GoRoute(
@@ -320,14 +336,14 @@ GoRoute get _settingsRoute => GoRoute(
     );
 
 GoRoute get _lockRoute => GoRoute(
-      path: Routes.lockScreen,
       name: Routes.lockScreen,
+      path: Routes.lockScreen,
       builder: (context, state) => const LockScreen(),
     );
 
 GoRoute _webviewRoute = GoRoute(
   name: Routes.webview,
-  path: Routes.webview,
+  path: _path(Routes.webview),
   builder: (context, state) {
     final configuration = state.extra;
 

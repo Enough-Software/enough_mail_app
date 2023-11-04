@@ -29,44 +29,6 @@ import 'base.dart';
 
 enum _Visualization { stack, list }
 
-/// Loads a message source future
-class AsyncMessageSourceScreen extends StatelessWidget {
-  /// Creates a [AsyncMessageSourceScreen]
-  const AsyncMessageSourceScreen({
-    super.key,
-    required this.messageSourceFuture,
-  });
-
-  /// The future to load the message source
-  final Future<MessageSource> messageSourceFuture;
-
-  @override
-  Widget build(BuildContext context) => FutureBuilder<MessageSource>(
-        future: messageSourceFuture,
-        builder: (context, snapshot) {
-          final data = snapshot.data;
-          if (data != null) {
-            return MessageSourceScreen(messageSource: data);
-          }
-          if (snapshot.hasError) {
-            return BasePage(
-              title: context.text.errorTitle,
-              content: Center(
-                child: Text(context.text.detailsErrorDownloadInfo),
-              ),
-            );
-          }
-
-          return BasePage(
-            title: context.text.homeLoadingMessageSourceTitle,
-            content: Center(
-              child: PlatformCircularProgressIndicator(),
-            ),
-          );
-        },
-      );
-}
-
 /// Displays a list of mails
 class MessageSourceScreen extends ConsumerStatefulWidget {
   /// Creates a new [MessageSourceScreen]
@@ -106,11 +68,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     _messageLoader = _initMessageSource();
   }
 
-  Future<void> _initMessageSource() {
-    //print('${DateTime.now()}: initMessageSource()');
-    return _sectionedMessageSource.init();
-    //print('${DateTime.now()}: loaded ${_sectionedMessageSource.size} messages');
-  }
+  Future<void> _initMessageSource() => _sectionedMessageSource.init();
 
   @override
   void dispose() {

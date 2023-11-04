@@ -63,7 +63,6 @@ class TextWithLinks extends StatelessWidget {
 }
 
 class TextWithNamedLinks extends StatelessWidget {
-
   const TextWithNamedLinks({super.key, required this.parts, this.style});
   final List<TextLink> parts;
   final TextStyle? style;
@@ -111,7 +110,6 @@ class TextWithNamedLinks extends StatelessWidget {
 }
 
 class TextLink {
-
   const TextLink(this.text, [this.url]) : callback = null;
   const TextLink.callback(this.text, this.callback) : url = null;
   final String text;

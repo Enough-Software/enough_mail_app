@@ -72,7 +72,7 @@ class ExtensionActionTile extends StatelessWidget {
           case AppExtensionActionMechanism.inApp:
             final context = Routes.navigatorKey.currentContext;
             if (context != null) {
-              if (!PlatformInfo.isCupertino) {
+              if (!useAppDrawerAsRoot) {
                 // close app drawer:
                 context.pop();
               }
