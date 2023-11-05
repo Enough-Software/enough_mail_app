@@ -17,7 +17,7 @@ class NewMailMessageButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => FloatingActionButton(
-        onPressed: () => context.push(
+        onPressed: () => context.pushNamed(
           Routes.mailCompose,
           extra: ComposeData(
             null,

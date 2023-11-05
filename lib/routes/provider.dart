@@ -42,7 +42,7 @@ RouterConfig<Object> routerConfig(RouterConfigRef ref) => GoRouter(
           _mailDetailsForNotificationRoute,
           _mailContentsRoute,
           _sourceCodeRoute,
-          _composeRoute,
+          _mailComposeRoute,
           _interactiveMediaRoute,
           _settingsRoute,
           _webviewRoute,
@@ -71,7 +71,7 @@ GoRoute get _appDrawerRoute => GoRoute(
         _mailDetailsForNotificationRoute,
         _mailContentsRoute,
         _sourceCodeRoute,
-        _composeRoute,
+        _mailComposeRoute,
         _interactiveMediaRoute,
         _settingsRoute,
         _webviewRoute,
@@ -176,7 +176,7 @@ GoRoute get _mailForAccountRoute => GoRoute(
       ],
     );
 
-GoRoute get _composeRoute => GoRoute(
+GoRoute get _mailComposeRoute => GoRoute(
       name: Routes.mailCompose,
       path: _path(Routes.mailCompose),
       builder: (context, state) {
