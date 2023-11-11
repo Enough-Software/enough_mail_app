@@ -811,24 +811,6 @@ class MailboxMessageSource extends MessageSource {
 
     return message;
   }
-
-  @override
-  void onMailArrived(
-    MimeMessage mime,
-    AsyncMimeSource source, {
-    int index = 0,
-  }) {
-    if (source == mimeSource) {
-      logger.e(
-        'Accepting mail arrived for "${mime.decodeSubject()}" with '
-        'parent $_parentMessageSource and '
-        'stacktrace ${StackTrace.current}',
-      );
-      super.onMailArrived(mime, source, index: index);
-    } else {
-      logger.d('Ignore mail arrived for ${mime.decodeSubject()} from $source');
-    }
-  }
 }
 
 class _MultipleMessageSourceId {

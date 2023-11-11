@@ -2,7 +2,6 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
 
 import '../account/model.dart';
-import '../events/app_event_bus.dart';
 import '../hoster/service.dart';
 import '../models/async_mime_source.dart';
 import '../models/async_mime_source_factory.dart';
@@ -55,7 +54,6 @@ class EmailService {
       mailAccount,
       isLogEnabled: isLogEnabled,
       logName: logName,
-      eventBus: AppEventBus.eventBus,
       clientId: _clientId,
       refresh: _refreshToken,
       onConfigChanged: onMailClientConfigChanged,

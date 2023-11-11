@@ -193,7 +193,7 @@ class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
         (mailbox?.isInbox ?? true) ? null : mailbox;
     logger.d(
       'Creating real mime source for ${account.key}: '
-      '${mailbox?.name ?? '<inbox>'}\n${StackTrace.current}',
+      '${mailbox?.name ?? '<inbox>'}',
     );
 
     final mailClient = ref.watch(

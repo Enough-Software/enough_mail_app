@@ -178,12 +178,6 @@ abstract class AsyncMimeSource {
 
   /// Adds a subscriber
   void addSubscriber(MimeSourceSubscriber subscriber) {
-    if (_subscribers.contains(subscriber)) {
-      logger.e('subscriber $subscriber already added to $this');
-
-      return;
-    }
-    logger.d('$this: add subscriber $subscriber, existing: $_subscribers');
     _subscribers.add(subscriber);
   }
 
@@ -529,14 +523,18 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   @override
   final MailClient mailClient;
 
-  late StreamSubscription<MailLoadEvent> _mailLoadEventSubscription;
-  late StreamSubscription<MailVanishedEvent> _mailVanishedEventSubscription;
-  late StreamSubscription<MailUpdateEvent> _mailUpdatedEventSubscription;
-  late StreamSubscription<MailConnectionReEstablishedEvent>
+  StreamSubscription<MailLoadEvent>? _mailLoadEventSubscription;
+  StreamSubscription<MailVanishedEvent>? _mailVanishedEventSubscription;
+  StreamSubscription<MailUpdateEvent>? _mailUpdatedEventSubscription;
+  StreamSubscription<MailConnectionReEstablishedEvent>?
       _mailReconnectedEventSubscription;
 
   @override
   Future<void> init() {
+    if (_mailLoadEventSubscription != null) {
+      return Future.value();
+    }
+
     _registerEvents();
 
     return mailClient.startPolling();
@@ -573,10 +571,14 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   }
 
   void _deregisterEvents() {
-    _mailLoadEventSubscription.cancel();
-    _mailVanishedEventSubscription.cancel();
-    _mailUpdatedEventSubscription.cancel();
-    _mailReconnectedEventSubscription.cancel();
+    _mailLoadEventSubscription?.cancel();
+    _mailVanishedEventSubscription?.cancel();
+    _mailUpdatedEventSubscription?.cancel();
+    _mailReconnectedEventSubscription?.cancel();
+    _mailLoadEventSubscription = null;
+    _mailVanishedEventSubscription = null;
+    _mailUpdatedEventSubscription = null;
+    _mailReconnectedEventSubscription = null;
   }
 
   Future<void> _onMailReconnected(
@@ -587,12 +589,10 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
       final messages = await event.mailClient
           .fetchMessages(fetchPreference: FetchPreference.envelope);
       if (messages.isEmpty) {
-        if (kDebugMode) {
-          print(
-            'MESSAGES ARE EMPTY FOR '
-            '${event.mailClient.lowLevelOutgoingMailClient.logName}',
-          );
-        }
+        logger.w(
+          'MESSAGES ARE EMPTY FOR '
+          '${event.mailClient.lowLevelOutgoingMailClient.logName}',
+        );
         // since this is an unlikely outcome, the assumption is that this
         // an error and resync will be aborted, therefore.
 

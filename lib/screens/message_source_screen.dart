@@ -411,6 +411,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                                   return const EmptyMessage();
                                 }
                                 final section = element.section;
+
                                 if (section != null) {
                                   final text = context.getDateRangeName(
                                     section.range,
@@ -477,7 +478,11 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                                     ),
                                   );
                                 }
-                                final message = element.message!;
+                                final message = element.message;
+
+                                if (message == null) {
+                                  return const SizedBox.shrink();
+                                }
                                 // print(
                                 //     '$index subject=${message.mimeMessage?.decodeSubject()}');
 
