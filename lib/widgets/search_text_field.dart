@@ -10,8 +10,10 @@ import '../routes/routes.dart';
 
 /// A dedicated search field optimized for Cupertino
 class CupertinoSearch extends StatelessWidget {
+  /// Creates a new [CupertinoSearch]
   const CupertinoSearch({super.key, required this.messageSource});
 
+  /// The source in which should be searched
   final MessageSource messageSource;
 
   @override
@@ -29,6 +31,9 @@ class CupertinoSearch extends StatelessWidget {
     final next = messageSource.search(context.text, search);
     context.pushNamed(
       Routes.messageSource,
+      pathParameters: {
+        Routes.pathParameterEmail: messageSource.account.email,
+      },
       extra: next,
     );
   }
