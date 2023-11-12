@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
@@ -40,8 +41,12 @@ enum _OverflowMenuChoice {
   addNotification,
 }
 
+/// Displays actions for a single message.
 class MessageActions extends HookConsumerWidget {
+  /// Creates a [MessageActions] widget.
   const MessageActions({super.key, required this.message});
+
+  /// The message to display actions for.
   final Message message;
 
   @override
@@ -177,8 +182,10 @@ class MessageActions extends HookConsumerWidget {
                       child: IconText(
                         icon: Icon(iconService.messageActionForwardAttachments),
                         label: Text(
-                            localizations.messageActionForwardAttachments(
-                                attachments.length)),
+                          localizations.messageActionForwardAttachments(
+                            attachments.length,
+                          ),
+                        ),
                       ),
                     ),
                   if (message.source.isTrash)
@@ -215,7 +222,8 @@ class MessageActions extends HookConsumerWidget {
                       value: _OverflowMenuChoice.flag,
                       child: IconText(
                         icon: Icon(
-                            iconService.getMessageIsFlagged(message.isFlagged)),
+                          iconService.getMessageIsFlagged(message.isFlagged),
+                        ),
                         label: Text(
                           message.isFlagged
                               ? localizations.messageStatusFlagged
@@ -308,12 +316,33 @@ class MessageActions extends HookConsumerWidget {
 
   void _reply(BuildContext context, WidgetRef ref, {all = false}) {
     final account = message.account;
+    final mime = message.mimeMessage;
+    final recipientAddresses = mime.recipientAddresses;
+    bool matchesRecipients(RealAccount account) {
+      final aliases = [
+        account.email,
+        ...account.aliases.map((alias) => alias.email),
+      ];
+      for (final email in aliases) {
+        if (recipientAddresses.contains(email)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    final realAccount = account is RealAccount
+        ? account
+        : account is UnifiedAccount
+            ? account.accounts.firstWhereOrNull(matchesRecipients)
+            : null;
 
     final builder = MessageBuilder.prepareReplyToMessage(
-      message.mimeMessage,
-      account.fromAddress,
-      aliases: account is RealAccount ? account.aliases : null,
-      handlePlusAliases: account is RealAccount && account.supportsPlusAliases,
+      mime,
+      realAccount?.fromAddress ?? account.fromAddress,
+      aliases: realAccount?.aliases,
+      handlePlusAliases: realAccount?.supportsPlusAliases ?? false,
       replyAll: all,
     );
     _navigateToCompose(context, ref, message, builder, ComposeAction.answer);
@@ -597,6 +626,7 @@ class MessageActions extends HookConsumerWidget {
         composeFuture = futures.isEmpty ? null : Future.wait(futures);
       }
     }
+
     return composeFuture;
   }
 
