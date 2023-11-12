@@ -36,7 +36,6 @@ assets/keys.txt
 .pub-cache/
 .pub/
 /build/
-pubspec.lock
 
 # Web related
 lib/generated_plugin_registrant.dart

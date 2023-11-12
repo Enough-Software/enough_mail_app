@@ -11,7 +11,6 @@ import '../account/provider.dart';
 import '../extensions/extension_action_tile.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
-import '../routes/provider.dart';
 import '../routes/routes.dart';
 import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';

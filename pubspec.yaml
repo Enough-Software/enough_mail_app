@@ -15,7 +15,7 @@ publish_to: "none"
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+90
+version: 1.0.0+91
 
 environment:
   flutter: ">=3.13.0"
@@ -84,15 +84,15 @@ dependencies:
   webview_flutter: ^4.0.2
 
 dependency_overrides:
-  collection: ^1.16.0
-  intl: ^0.18.0
+  collection: ^1.18.0
+  intl: ^0.18.1
   http: ^1.1.0 #for dart_code_metrics
-  xml: ^6.1.0
-  device_info_plus: ^9.0.0
-  package_info_plus: ^4.0.2
-  ffi: ^2.0.1
+  xml: ^6.4.2
+  device_info_plus: ^9.1.0
+  package_info_plus: ^4.2.0
+  ffi: ^2.1.0
   # flutter_inappwebview:
-  #   git: https://github.com/CodeEagle/flutter_inappwebview
+  #   git: https://github.com/CodeEagle/flutter_inappwebviewchore:
   # out-comment the following to enable git-based development:
   # enough_mail:
   #   git:
