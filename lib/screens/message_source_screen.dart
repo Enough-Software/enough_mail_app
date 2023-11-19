@@ -94,7 +94,13 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     final search = MailSearch(query, SearchQueryType.allTextHeaders);
     final searchSource =
         _sectionedMessageSource.messageSource.search(context.text, search);
-    context.pushNamed(Routes.messageSource, extra: searchSource);
+    context.pushNamed(
+      Routes.messageSource,
+      pathParameters: {
+        Routes.pathParameterEmail: widget.messageSource.account.email,
+      },
+      extra: searchSource,
+    );
     setState(() {
       _isInSearchMode = false;
     });
