@@ -91,6 +91,7 @@ dependency_overrides:
   device_info_plus: ^9.1.0
   package_info_plus: ^4.2.0
   ffi: ^2.1.0
+  uuid: ^4.0.0  #for dart_code_metrics
   # flutter_inappwebview:
   #   git: https://github.com/CodeEagle/flutter_inappwebviewchore:
   # out-comment the following to enable git-based development:
