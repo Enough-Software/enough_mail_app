@@ -12,7 +12,9 @@ import '../logger.dart';
 import '../util/validator.dart';
 import 'icon_text.dart';
 
+/// Allows to enter recipients for a message
 class RecipientInputField extends StatefulHookConsumerWidget {
+  /// Creates a new [RecipientInputField]
   const RecipientInputField({
     super.key,
     this.labelText,
@@ -24,12 +26,27 @@ class RecipientInputField extends StatefulHookConsumerWidget {
     required this.contactManager,
   });
 
+  /// Optional label text
   final String? labelText;
+
+  /// Optional hint text
   final String? hintText;
+
+  /// Optional controller
   final TextEditingController? controller;
+
+  /// Optional additional suffix icon
   final Widget? additionalSuffixIcon;
+
+  /// Should the field be focused on first build?
+  ///
+  /// Defaults to `false`
   final bool autofocus;
+
+  /// The list of addresses
   final List<MailAddress> addresses;
+
+  /// The optional contact manager
   final ContactManager? contactManager;
 
   @override
@@ -139,7 +156,9 @@ class _RecipientInputFieldState extends ConsumerState<RecipientInputField> {
         );
       },
       onAccept: (mailAddress) {
-        widget.addresses.add(mailAddress);
+        if (!widget.addresses.contains(mailAddress)) {
+          widget.addresses.add(mailAddress);
+        }
       },
       onLeave: (mailAddress) {
         widget.addresses.remove(mailAddress);
@@ -196,7 +215,7 @@ class _RecipientInputFieldState extends ConsumerState<RecipientInputField> {
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      widget.additionalSuffixIcon!,
+                      widget.additionalSuffixIcon ?? const SizedBox.shrink(),
                       PlatformIconButton(
                         icon: const Icon(Icons.contacts),
                         onPressed: () => _pickContact(textEditingController),
@@ -220,7 +239,10 @@ class _RecipientInputFieldState extends ConsumerState<RecipientInputField> {
                   return PlatformActionChip(
                     label: Column(
                       children: [
-                        if (option.hasPersonalName) Text(option.personalName!),
+                        if (option.hasPersonalName)
+                          Text(
+                            option.personalName ?? '',
+                          ),
                         Text(option.email, style: theme.textTheme.bodySmall),
                       ],
                     ),
@@ -234,7 +256,8 @@ class _RecipientInputFieldState extends ConsumerState<RecipientInputField> {
                       } else {
                         _controller.value = TextEditingValue(
                           selection: TextSelection.collapsed(
-                              offset: currentTextInput.length),
+                            offset: currentTextInput.length,
+                          ),
                           text: currentTextInput,
                         );
                       }
@@ -299,22 +322,24 @@ class _AddressChip<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final content = PlatformChip(
-        label: Column(
-          children: [
-            Text(address.personalName ?? ''),
-            Text(address.email, style: Theme.of(context).textTheme.bodySmall),
-          ],
-        ),
-        deleteIcon: const Icon(Icons.close),
-        onDeleted: onDeleted);
+      label: Column(
+        children: [
+          Text(address.personalName ?? ''),
+          Text(address.email, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+      deleteIcon: const Icon(Icons.close),
+      onDeleted: onDeleted,
+    );
     final menuItems = this.menuItems;
     if (menuItems == null) {
       return content;
     }
     final theme = Theme.of(context);
+
     return PlatformPopupMenuButton<T>(
       cupertinoButtonPadding: EdgeInsets.zero,
-      title: address.hasPersonalName ? Text(address.personalName!) : null,
+      title: address.hasPersonalName ? Text(address.personalName ?? '') : null,
       message: Text(address.email, style: theme.textTheme.bodySmall),
       itemBuilder: (context) => menuItems,
       onSelected: onMenuItemSelected,
