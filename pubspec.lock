@@ -13,10 +13,10 @@ packages:
     dependency: transitive
     description:
       name: add_2_calendar
-      sha256: "8d7a82aba607d35f2a5bc913419e12f865a96a350a8ad2509a59322bc161f200"
+      sha256: dbcd0bf296fbbe00861a6f101af8cdb3c163a8c3ff5d3c99a4b081c2f37c724f
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.1"
+    version: "2.2.5"
   analyzer:
     dependency: transitive
     description:
@@ -722,10 +722,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_native_splash
-      sha256: d93394f22f73e810bda59e11ebe83329c5511d6460b6b7509c4e1f3c92d6d625
+      sha256: c4d899312b36e7454bedfd0a4740275837b99e532d81c8477579d8183db1de6c
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.5"
+    version: "2.3.6"
   flutter_platform_widgets:
     dependency: transitive
     description:
@@ -746,10 +746,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_riverpod
-      sha256: "49b55e8a467229eedb801bd0864baa7f891c39cc00f790189ba8479e9ad0fa06"
+      sha256: e90eaad95b2543d5473ca561f22995bb33f186b2b6065e26e9e22d913be481aa
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.6"
+    version: "2.4.7"
   flutter_secure_storage:
     dependency: "direct main"
     description:
@@ -916,10 +916,10 @@ packages:
     dependency: "direct main"
     description:
       name: hooks_riverpod
-      sha256: "4fee3c75360e353128149df23ed93414477082bb130f9e23723b1a79a54bc6d0"
+      sha256: dcb557be94f6ae6c5483f74362615ebc9429c288581f570b38d3f2f70fcbad6b
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.6"
+    version: "2.4.7"
   hotreloader:
     dependency: transitive
     description:
@@ -1373,10 +1373,10 @@ packages:
     dependency: transitive
     description:
       name: riverpod
-      sha256: "01fa385aa5d6db42fd602d8c400c28ae1c83d1fd6fbae1cbf0f4c78bac58d4b2"
+      sha256: f003970b2b47fc708f0697299e32693fd8f5e2d490edcba65e4987f88b840cf4
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.6"
+    version: "2.4.7"
   riverpod_analyzer_utils:
     dependency: transitive
     description:
