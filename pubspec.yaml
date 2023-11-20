@@ -18,8 +18,8 @@ publish_to: "none"
 version: 1.0.0+92
 
 environment:
-  flutter: ">=3.13.0"
-  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.16.0"
+  sdk: '>=3.2.0 <4.0.0'
 
 dependencies:
   background_fetch: ^1.2.1
@@ -92,6 +92,11 @@ dependency_overrides:
   package_info_plus: ^4.2.0
   ffi: ^2.1.0
   uuid: ^4.0.0  #for dart_code_metrics
+  pdfx: # fix util compatible version is released
+    git:
+      url: 'https://github.com/ScerIO/packages.flutter'
+      path: packages/pdfx
+
   # flutter_inappwebview:
   #   git: https://github.com/CodeEagle/flutter_inappwebviewchore:
   # out-comment the following to enable git-based development:
