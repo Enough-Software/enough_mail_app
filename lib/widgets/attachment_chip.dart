@@ -85,6 +85,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
             fallbackBuilder: _buildFallbackPreview,
             interactiveBuilder: _buildInteractiveMedia,
             interactiveFallbackBuilder: _buildInteractiveFallback,
+            useHeroAnimation: false,
           ),
         ),
       );
