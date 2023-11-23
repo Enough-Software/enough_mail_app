@@ -14,7 +14,9 @@ import '../extensions/extensions.dart';
 import '../hoster/service.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
+import '../logger.dart';
 import '../mail/provider.dart';
+import '../oauth/oauth.dart';
 import '../routes/routes.dart';
 import '../util/modal_bottom_sheet_helper.dart';
 import '../util/validator.dart';
@@ -229,13 +231,17 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     });
   }
 
-  Future _loginWithOAuth(MailHoster provider, String email) async {
+  Future _loginWithOAuth(
+    MailHoster mailHoster,
+    OauthClient oauthClient,
+    String email,
+  ) async {
     setState(() {
       _isAccountVerifying = true;
       _currentStep = _stepAccountSetup;
       _progressedSteps = _stepAccountSetup;
     });
-    final token = await provider.oauthClient!.authenticate(email);
+    final token = await oauthClient.authenticate(email);
 
     // when the user either has cancelled the verification,
     // not granted the scope or the verification failed for other reasons,
@@ -252,7 +258,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
         name: domainName,
         email: email,
         auth: OauthAuthentication(email, token),
-        config: provider.clientConfig,
+        config: mailHoster.clientConfig,
       );
       final connectedAccount = await ref.read(
         firstTimeMailClientSourceProvider(
@@ -262,8 +268,20 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       _mailClient = connectedAccount?.mailClient;
       final isVerified = _mailClient?.isConnected ?? false;
       if (connectedAccount != null && isVerified) {
-        final extensions = await AppExtension.loadFor(mailAccount);
-        _realAccount = connectedAccount.copyWith(appExtensions: extensions);
+        if (mailHoster is GmailMailHoster || mailHoster is OutlookMailHoster) {
+          _realAccount = connectedAccount;
+        } else {
+          try {
+            final extensions = await AppExtension.loadFor(mailAccount);
+            _realAccount = connectedAccount.copyWith(appExtensions: extensions);
+          } catch (e, s) {
+            logger.e(
+              'Unable to load app extensions for ${mailAccount.email}: $e',
+              error: e,
+              stackTrace: s,
+            );
+          }
+        }
       } else {
         FocusManager.instance.primaryFocus?.unfocus();
       }
@@ -398,8 +416,9 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     BuildContext context,
     AppLocalizations localizations,
   ) {
-    final provider = _mailHoster;
-    final appSpecificPasswordSetupUrl = provider?.appSpecificPasswordSetupUrl;
+    final mailHoster = _mailHoster;
+    final oauthClient = mailHoster?.oauthClient;
+    final appSpecificPasswordSetupUrl = mailHoster?.appSpecificPasswordSetupUrl;
 
     return Step(
       title: Text(localizations.addAccountPasswordLabel),
@@ -423,21 +442,22 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                 ),
               ],
             )
-          else if (provider != null)
+          else if (mailHoster != null)
             Column(
               children: [
-                if (provider.hasOAuthClient) ...[
+                if (oauthClient != null) ...[
                   // The user can continue to sign in with the provider or by using an app-specific password
                   Text(
                     localizations.addAccountOauthOptionsText(
-                      provider.displayName ?? '<unknown>',
+                      mailHoster.displayName ?? '<unknown>',
                     ),
                   ),
                   FittedBox(
-                    child: provider.buildSignInButton(
+                    child: mailHoster.buildSignInButton(
                       context,
                       onPressed: () => _loginWithOAuth(
-                        provider,
+                        mailHoster,
+                        oauthClient,
                         _emailController.text,
                       ),
                       isSignInButton: true,
@@ -447,33 +467,41 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
-                          localizations.addAccountOauthSignInWithAppPassword),
+                        localizations.addAccountOauthSignInWithAppPassword,
+                      ),
                     ),
                     PlatformTextButton(
                       onPressed: () async {
                         await launcher
                             .launchUrl(Uri.parse(appSpecificPasswordSetupUrl));
                       },
-                      child: ButtonText(localizations
-                          .addAccountApplicationPasswordRequiredButton),
+                      child: ButtonText(
+                        localizations
+                            .addAccountApplicationPasswordRequiredButton,
+                      ),
                     ),
                     PlatformCheckboxListTile(
-                      onChanged: (value) => setState(() =>
-                          _isApplicationSpecificPasswordAcknowledged = value),
+                      onChanged: (value) => setState(
+                        () =>
+                            _isApplicationSpecificPasswordAcknowledged = value,
+                      ),
                       value: _isApplicationSpecificPasswordAcknowledged,
-                      title: Text(localizations
-                          .addAccountApplicationPasswordRequiredAcknowledged),
+                      title: Text(
+                        localizations
+                            .addAccountApplicationPasswordRequiredAcknowledged,
+                      ),
                     ),
                   ],
-                ] else if (provider.appSpecificPasswordSetupUrl != null) ...[
+                ] else if (mailHoster.appSpecificPasswordSetupUrl != null) ...[
                   Text(localizations.addAccountApplicationPasswordRequiredInfo),
                   PlatformTextButton(
                     onPressed: () async {
                       await launcher.launchUrl(
-                          Uri.parse(provider.appSpecificPasswordSetupUrl!));
+                          Uri.parse(mailHoster.appSpecificPasswordSetupUrl!));
                     },
-                    child: ButtonText(localizations
-                        .addAccountApplicationPasswordRequiredButton),
+                    child: ButtonText(
+                      localizations.addAccountApplicationPasswordRequiredButton,
+                    ),
                   ),
                   PlatformCheckboxListTile(
                     onChanged: (value) => setState(
@@ -486,7 +514,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                     ),
                   ),
                 ],
-                if (provider.appSpecificPasswordSetupUrl == null ||
+                if (mailHoster.appSpecificPasswordSetupUrl == null ||
                     _isApplicationSpecificPasswordAcknowledged!)
                   PasswordField(
                     controller: _passwordController,

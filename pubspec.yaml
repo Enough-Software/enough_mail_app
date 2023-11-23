@@ -63,7 +63,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   hooks_riverpod: ^2.4.4
-  http: ^1.1.0
+  http: ^1.1.1
   intl: ^0.17.0
   introduction_screen: ^3.0.2
   json_annotation: ^4.8.1
@@ -86,12 +86,13 @@ dependencies:
 dependency_overrides:
   collection: ^1.18.0
   intl: ^0.18.1
-  http: ^1.1.0 #for dart_code_metrics
+  http: ^1.1.1 # for dart_code_metrics
   xml: ^6.4.2
   device_info_plus: ^9.1.0
   package_info_plus: ^4.2.0
   ffi: ^2.1.0
-  uuid: ^4.0.0  #for dart_code_metrics
+  uuid: ^4.0.0 # for dart_code_metrics
+  web: ^0.4.0 # for flutter test from SDK / http
   pdfx: # fix util compatible version is released
     git:
       url: 'https://github.com/ScerIO/packages.flutter'

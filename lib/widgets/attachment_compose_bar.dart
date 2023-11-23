@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 import '../app_lifecycle/provider.dart';
 import '../keys/service.dart';
@@ -17,7 +18,6 @@ import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../routes/routes.dart';
 import '../settings/theme/icon_service.dart';
-import '../util/http_helper.dart';
 import '../util/localized_dialog_helper.dart';
 import 'ical_composer.dart';
 import 'icon_text.dart';
@@ -270,11 +270,11 @@ class AddAttachmentPopupButton extends ConsumerWidget {
     if (gif == null || contentUrl == null) {
       return false;
     }
-    final result = await HttpHelper.httpGet(contentUrl);
-    final data = result.data;
-    if (data == null) {
+    final response = await http.get(Uri.parse(contentUrl));
+    if (response.statusCode != 200) {
       return false;
     }
+    final data = response.bodyBytes;
     composeData.messageBuilder.addBinary(
       data,
       MediaType.fromSubtype(MediaSubtype.imageGif),

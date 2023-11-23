@@ -1,5 +1,6 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:http/http.dart' as http;
 
 import '../keys/service.dart';
 import '../logger.dart';
@@ -82,8 +83,8 @@ class GmailOAuthClient extends OauthClient {
     final code = Uri.parse(result).queryParameters['code'];
 
     // Use this code to get an access token
-    final response = await HttpHelper.httpPost(
-      'https://oauth2.googleapis.com/token',
+    final response = await http.post(
+      Uri.parse('https://oauth2.googleapis.com/token'),
       body: {
         'client_id': clientId,
         'redirect_uri': '$callbackUrlScheme:/',
@@ -109,8 +110,8 @@ class GmailOAuthClient extends OauthClient {
   Future<OauthToken> _refresh(OauthToken token, String provider) async {
     final clientId = oauthClientId!.id;
     final callbackUrlScheme = clientId.split('.').reversed.join('.');
-    final response = await HttpHelper.httpPost(
-      'https://oauth2.googleapis.com/token',
+    final response = await http.post(
+      Uri.parse('https://oauth2.googleapis.com/token'),
       body: {
         'client_id': clientId,
         'redirect_uri': '$callbackUrlScheme:/',
@@ -176,8 +177,8 @@ class OutlookOAuthClient extends OauthClient {
     // Extract code from resulting url
     final code = Uri.parse(result).queryParameters['code'];
     // Use this code to get an access token
-    final response = await HttpHelper.httpPost(
-      'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+    final response = await http.post(
+      Uri.parse('https://login.microsoftonline.com/common/oauth2/v2.0/token'),
       body: {
         'client_id': clientId,
         'redirect_uri': callbackUrlScheme,
@@ -201,8 +202,8 @@ class OutlookOAuthClient extends OauthClient {
   @override
   Future<OauthToken> _refresh(OauthToken token, String provider) async {
     final clientId = oauthClientId!.id;
-    final response = await HttpHelper.httpPost(
-      'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+    final response = await http.post(
+      Uri.parse('https://login.microsoftonline.com/common/oauth2/v2.0/token'),
       body: {
         'client_id': clientId,
         'scope': _scope,

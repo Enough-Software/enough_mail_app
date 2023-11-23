@@ -72,7 +72,7 @@ class EmailService {
         'no provider registered for token $expiredToken',
       );
     }
-    // TODO(RV): replace provider service with a riverpod provider
+    // TODO(RV): replace mail hoster service with a riverpod provider
     final provider = MailHosterService.instance[providerId];
     if (provider == null) {
       throw MailException(
@@ -105,7 +105,7 @@ class EmailService {
       onMailClientConfigChanged,
     );
     try {
-      await mailClient.connect();
+      await mailClient.connect(timeout: const Duration(seconds: 30));
     } on MailException {
       await mailClient.disconnect();
       final email = usedMailAccount.email;
@@ -123,7 +123,7 @@ class EmailService {
           onMailClientConfigChanged,
         );
         try {
-          await mailClient.connect();
+          await mailClient.connect(timeout: const Duration(seconds: 30));
         } on MailException {
           await mailClient.disconnect();
 

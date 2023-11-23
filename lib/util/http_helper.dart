@@ -1,72 +1,9 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:http/http.dart' as http;
 
-class HttpHelper {
-  HttpHelper._();
+import 'package:http/http.dart';
 
-  static Future<HttpResult> httpGet(String url) async {
-    try {
-      final client = HttpClient();
-      final request = await client.getUrl(Uri.parse(url));
-      final response = await request.close();
-
-      if (response.statusCode != 200) {
-        return HttpResult(response.statusCode);
-      }
-      final data = await _readHttpResponse(response);
-      return HttpResult(response.statusCode, data);
-    } catch (e) {
-      return HttpResult(400);
-    }
-  }
-
-  static Future<HttpResult> httpPost(String url,
-      {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
-    try {
-      final response = await http.post(Uri.parse(url),
-          headers: headers, body: body, encoding: encoding);
-
-      if (response.statusCode != 200) {
-        return HttpResult(response.statusCode);
-      }
-      return HttpResult(response.statusCode, response.bodyBytes);
-    } catch (e) {
-      return HttpResult(400);
-    }
-  }
-
-  static Future<Uint8List> _readHttpResponse(HttpClientResponse response) {
-    final completer = Completer<Uint8List>();
-    final contents = BytesBuilder();
-    response.listen((data) {
-      if (data is Uint8List) {
-        contents.add(data);
-      } else {
-        contents.add(Uint8List.fromList(data));
-      }
-    }, onDone: () => completer.complete(contents.takeBytes()));
-    return completer.future;
-  }
-}
-
-class HttpResult {
-  HttpResult(this.statusCode, [this.data]);
-  final int statusCode;
-  String? _text;
-  String? get text {
-    var t = _text;
-    if (t == null) {
-      final d = data;
-      if (d != null) {
-        t = utf8.decode(d);
-        _text = t;
-      }
-    }
-    return t;
-  }
-
-  final Uint8List? data;
+/// Extension methods for [Response]
+extension HttpResponseExtension on Response {
+  /// Retrieves the UTF8 decoded text
+  String? get text => utf8.decode(bodyBytes);
 }

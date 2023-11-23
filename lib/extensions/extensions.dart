@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
 
 import '../account/model.dart';
+import '../logger.dart';
 import '../util/http_helper.dart';
 
 part 'extensions.g.dart';
@@ -27,12 +29,14 @@ extension MailAccountExtension on RealAccount {
         }
       }
     }
+
     return entries;
   }
 }
 
 @JsonSerializable()
 class AppExtension {
+  /// Creates a new [AppExtension]
   const AppExtension({
     this.version,
     this.accountSideMenu,
@@ -40,6 +44,7 @@ class AppExtension {
     this.signatureHtml,
   });
 
+  /// Creates a new [AppExtension] from the given [json]
   factory AppExtension.fromJson(Map<String, dynamic> json) =>
       _$AppExtensionFromJson(json);
 
@@ -62,30 +67,44 @@ class AppExtension {
     return signature;
   }
 
+  /// Converts this [AppExtension] to JSON.
   Map<String, dynamic> toJson() => _$AppExtensionToJson(this);
 
+  /// REtrieves the app extension url for the given [domain]
   static String urlFor(String domain) => 'https://$domain/.maily.json';
 
+  //// Loads the app extensions for the given [mailAccount]
   static Future<List<AppExtension>> loadFor(MailAccount mailAccount) async {
-    final domains = <String, Future<AppExtension?>>{};
-    _addEmail(mailAccount.email, domains);
-    final incomingHostname = mailAccount.incoming.serverConfig.hostname;
-    if (incomingHostname != null) {
-      _addHostname(incomingHostname, domains);
-    }
-    final outgoingHostname = mailAccount.outgoing.serverConfig.hostname;
-    if (outgoingHostname != null) {
-      _addHostname(outgoingHostname, domains);
-    }
-    final allExtensions = await Future.wait(domains.values);
-    final appExtensions = <AppExtension>[];
-    for (final ext in allExtensions) {
-      if (ext != null) {
-        appExtensions.add(ext);
+    try {
+      final domains = <String, Future<AppExtension?>>{};
+      _addEmail(mailAccount.email, domains);
+      final incomingHostname = mailAccount.incoming.serverConfig.hostname;
+      if (incomingHostname != null) {
+        _addHostname(incomingHostname, domains);
       }
-    }
+      final outgoingHostname = mailAccount.outgoing.serverConfig.hostname;
+      if (outgoingHostname != null) {
+        _addHostname(outgoingHostname, domains);
+      }
+      final allExtensions = await Future.wait(domains.values);
+      final appExtensions = <AppExtension>[];
+      for (final ext in allExtensions) {
+        if (ext != null) {
+          appExtensions.add(ext);
+        }
+      }
 
-    return appExtensions;
+      return appExtensions;
+    } catch (e, s) {
+      logger.e(
+        'Unable to load app extensions for mail account '
+        '${mailAccount.email}: $e',
+        error: e,
+        stackTrace: s,
+      );
+
+      return const [];
+    }
   }
 
   static void _addEmail(
@@ -96,7 +115,9 @@ class AppExtension {
   }
 
   static void _addHostname(
-      String hostname, Map<String, Future<AppExtension?>> domains) {
+    String hostname,
+    Map<String, Future<AppExtension?>> domains,
+  ) {
     final domainIndex = hostname.indexOf('.');
     if (domainIndex != -1) {
       _addDomain(hostname.substring(domainIndex + 1), domains);
@@ -104,21 +125,28 @@ class AppExtension {
   }
 
   static void _addDomain(
-      String domain, Map<String, Future<AppExtension?>> domains) {
+    String domain,
+    Map<String, Future<AppExtension?>> domains,
+  ) {
     if (!domains.containsKey(domain)) {
       domains[domain] = loadFrom(domain);
     }
   }
 
+  /// Loads the app extension from the given [domain]
   static Future<AppExtension?> loadFrom(String domain) async =>
       loadFromUrl(urlFor(domain));
 
+  /// Loads the app extension from the given [url]
   static Future<AppExtension?> loadFromUrl(String url) async {
     String? text = '<>';
     try {
-      final httpResult = await HttpHelper.httpGet(url);
-      text = httpResult.text;
-      if (httpResult.statusCode != 200 || text == null || text.isEmpty) {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode != 200) {
+        return null;
+      }
+      text = response.text;
+      if (text == null || text.isEmpty) {
         return null;
       }
 
@@ -131,6 +159,7 @@ class AppExtension {
         print('Unable to load extension from $url / text $text: $e $s');
       }
     }
+
     return null;
   }
 }
