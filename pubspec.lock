@@ -13,10 +13,10 @@ packages:
     dependency: transitive
     description:
       name: add_2_calendar
-      sha256: dbcd0bf296fbbe00861a6f101af8cdb3c163a8c3ff5d3c99a4b081c2f37c724f
+      sha256: "8d7a82aba607d35f2a5bc913419e12f865a96a350a8ad2509a59322bc161f200"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.5"
+    version: "3.0.1"
   analyzer:
     dependency: transitive
     description:
