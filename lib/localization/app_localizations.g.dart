@@ -2322,13 +2322,13 @@ abstract class AppLocalizations {
   /// Info text after having specified the language.
   ///
   /// In en, this message translates to:
-  /// **'Maily is now shown in English. Please restart the app to take effect.'**
+  /// **'Maily is now shown in English.'**
   String get languageSetInfo;
 
   /// Info text after choosing the system's language for Maily.
   ///
   /// In en, this message translates to:
-  /// **'Maily will now use the system\'s language or English if the system\'s language is not supported. Please restart the app to take effect.'**
+  /// **'Maily will now use the system\'s language or English if the system\'s language is not supported.'**
   String get languageSystemSetInfo;
 
   /// Title of swipe setting screen

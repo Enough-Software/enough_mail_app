@@ -1300,10 +1300,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageSettingConfirmationQuery => 'Please confirm to use English as your chosen language.';
 
   @override
-  String get languageSetInfo => 'Maily is now shown in English. Please restart the app to take effect.';
+  String get languageSetInfo => 'Maily is now shown in English.';
 
   @override
-  String get languageSystemSetInfo => 'Maily will now use the system\'s language or English if the system\'s language is not supported. Please restart the app to take effect.';
+  String get languageSystemSetInfo => 'Maily will now use the system\'s language or English if the system\'s language is not supported.';
 
   @override
   String get swipeSettingTitle => 'Swipe gestures';

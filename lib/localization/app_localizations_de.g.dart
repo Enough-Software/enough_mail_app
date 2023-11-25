@@ -1378,7 +1378,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get editorArtInputHint => 'Hier Text eingeben';
 
   @override
-  String get editorArtWaitingForInputHint => 'warte auf Eingabe';
+  String get editorArtWaitingForInputHint => 'warte auf Eingabe...';
 
   @override
   String get fontSerifBold => 'Serif fett';

@@ -1791,11 +1791,11 @@
   "@languageSettingConfirmationQuery": {
     "description": "Query to be confirmed by user when switching the language"
   },
-  "languageSetInfo": "Maily is now shown in English. Please restart the app to take effect.",
+  "languageSetInfo": "Maily is now shown in English.",
   "@languageSetInfo": {
     "description": "Info text after having specified the language."
   },
-  "languageSystemSetInfo": "Maily will now use the system's language or English if the system's language is not supported. Please restart the app to take effect.",
+  "languageSystemSetInfo": "Maily will now use the system's language or English if the system's language is not supported.",
   "@languageSystemSetInfo": {
     "description": "Info text after choosing the system's language for Maily."
   },
