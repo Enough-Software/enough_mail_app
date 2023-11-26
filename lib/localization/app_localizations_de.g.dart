@@ -602,7 +602,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get legaleseTermsAndConditions => 'Bedingungen';
 
   @override
-  String get aboutApplicationLegalese => 'Maily ist freie Software unter der GPL GNU General Public License lizensiert.';
+  String get aboutApplicationLegalese => 'Maily ist freie Software, die unter der GPL GNU General Public License veröffentlicht ist.';
 
   @override
   String get feedbackActionSuggestFeature => 'Feature vorschlagen';
@@ -617,7 +617,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get feedbackTitle => 'Feedback';
 
   @override
-  String get feedbackIntro => 'Danke dass du Maily testest!';
+  String get feedbackIntro => 'Danke, dass du Maily testest!';
 
   @override
   String get feedbackProvideInfoRequest => 'Bitte teile folgende Information mit, wenn du ein Problem berichtest:';
@@ -641,7 +641,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSecurityBlockExternalImagesDescriptionTitle => 'Externe Bilder';
 
   @override
-  String get settingsSecurityBlockExternalImagesDescriptionText => 'E-Mails können Bilder enthalten, die entweder in der Nachricht integriert sind oder die von externen Servern bereitgestellt werden. Solche externe Bilder können Daten zu dem Absender der Nachricht freigeben, zum Beispiel dass die Nachricht geöffnet wurde. Diese Option erlaubt es solche externen Bilder zu blockieren, um solche Datenlecks zu minimieren. Beim Lesen einer E-Mail kannst für jede Nachricht individual externe Bilder nachladen.';
+  String get settingsSecurityBlockExternalImagesDescriptionText => 'E-Mail-Nachrichten können Bilder enthalten, die entweder auf externen Servern integriert oder gehostet werden. Die letzteren externen Bilder können dem Absender der Nachricht Informationen offen legen, z.B. um dem Absender mitzuteilen, dass Sie die Nachricht geöffnet haben. Mit dieser Option können Sie solche externen Bilder blockieren, was das Risiko verringert, sensible Informationen zu enthüllen. Wenn Sie eine Nachricht lesen, können Sie diese Bilder immer noch pro Nachricht laden.';
 
   @override
   String get settingsSecurityMessageRenderingHtml => 'Gesamte Nachricht anzeigen';
@@ -1402,7 +1402,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fontSansBoldItalic => 'Sans fett kursiv';
 
   @override
-  String get fontScript => 'Script';
+  String get fontScript => 'Skript';
 
   @override
   String get fontScriptBold => 'Script fett';
@@ -1420,7 +1420,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fontFullwidth => 'Fullwidth';
 
   @override
-  String get fontDoublestruck => 'Double struck';
+  String get fontDoublestruck => 'Doppelt gestrichen';
 
   @override
   String get fontCapitalized => 'Grossbuchstaben';

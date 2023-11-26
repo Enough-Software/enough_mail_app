@@ -1,70 +1,70 @@
 {
-  "@@locale": "de",
-  "signature": "Mit Maily gesendet",
+  "@@locale": "es",
+  "signature": "Enviado con Maily",
   "@signature": {
     "description": "Default signature text"
   },
-  "actionCancel": "Abbrechen",
+  "actionCancel": "Cancelar",
   "@actionCancel": {
     "description": "Generic cancel action"
   },
-  "actionOk": "OK",
+  "actionOk": "Ok",
   "@actionOk": {
     "description": "Generic OK action"
   },
-  "actionDone": "Fertig",
+  "actionDone": "Hecho",
   "@actionDone": {
     "description": "Generic done action"
   },
-  "actionNext": "Weiter",
+  "actionNext": "Siguiente",
   "@actionNext": {
     "description": "Generic next action"
   },
-  "actionSkip": "Überspringen",
+  "actionSkip": "Saltar",
   "@actionSkip": {
     "description": "Generic skip action"
   },
-  "actionUndo": "Rückgängig",
+  "actionUndo": "Deshacer",
   "@actionUndo": {
     "description": "Generic undo action"
   },
-  "actionDelete": "Löschen",
+  "actionDelete": "Eliminar",
   "@actionDelete": {
     "description": "Generic delete action"
   },
-  "actionAccept": "Akzeptieren",
+  "actionAccept": "Aceptar",
   "@actionAccept": {
     "description": "Generic accept action"
   },
-  "actionDecline": "Ablehnen",
+  "actionDecline": "Rechazar",
   "@actionDecline": {
     "description": "Generic decline action"
   },
-  "actionEdit": "Bearbeiten",
+  "actionEdit": "Editar",
   "@actionEdit": {
     "description": "Generic edit action"
   },
-  "actionAddressCopy": "Kopieren",
+  "actionAddressCopy": "Copiar",
   "@actionAddressCopy": {
     "description": "Copy action for email addresses"
   },
-  "actionAddressCompose": "Neue Nachricht",
+  "actionAddressCompose": "Nuevo mensaje",
   "@actionAddressCompose": {
     "description": "Compose action for email addresses"
   },
-  "actionAddressSearch": "Suchen",
+  "actionAddressSearch": "Buscar",
   "@actionAddressSearch": {
     "description": "Search action for email addresses"
   },
-  "splashLoading1": "Maily startet...",
+  "splashLoading1": "Iniciando...",
   "@splashLoading1": {
     "description": "Message shown on splash screen while loading"
   },
-  "splashLoading2": "Maily fängt an zu arbeiten...",
+  "splashLoading2": "Preparando tu Motor de Maily...",
   "@splashLoading2": {
     "description": "Message shown on splash screen while loading"
   },
-  "splashLoading3": "Maily startet in 10, 9, 8...",
+  "splashLoading3": "Lanzando en el 10, 9, 8...",
   "@splashLoading3": {
     "description": "Message shown on splash screen while loading"
   },
@@ -72,95 +72,95 @@
   "@welcomePanel1Title": {
     "description": "Welcome panel title"
   },
-  "welcomePanel1Text": "Willkommen zu Maily, deinem freundlichen und schnellen E-Mail Helferlein!",
+  "welcomePanel1Text": "Bienvenido a Maily, tu ayudante de correo electrónico rápido y amistoso!",
   "@welcomePanel1Text": {
     "description": "Welcome message shown on first panel"
   },
-  "welcomePanel2Title": "Konten",
+  "welcomePanel2Title": "Cuentas",
   "@welcomePanel2Title": {
     "description": "Welcome panel title"
   },
-  "welcomePanel2Text": "Verwalte beliebig viele E-Mail Konten. Lese und suche Mails in allen Konten gleichzeitig",
+  "welcomePanel2Text": "Administra cuentas de correo electrónico ilimitadas. Lee y busca correos en todas tus cuentas a la vez.",
   "@welcomePanel2Text": {
     "description": "Welcome message shown on second panel"
   },
-  "welcomePanel3Title": "Wisch und drück mich!",
+  "welcomePanel3Title": "Deslizar y pulsar largo",
   "@welcomePanel3Title": {
     "description": "Welcome panel title"
   },
-  "welcomePanel3Text": "Wische eine E-Mail um sie zu löschen oder als gelesen zu markieren. Halte eine E-Mail lange um mehrere gleichzeitig zu bearbeiten.",
+  "welcomePanel3Text": "Desliza el dedo por tus mensajes para borrarlos o marcarlos como leídos. Mantén pulsado un mensaje para seleccionarlo y gestionar varios.",
   "@welcomePanel3Text": {
     "description": "Welcome message shown on third panel"
   },
-  "welcomePanel4Title": "Halte Deinen Posteingang sauber",
+  "welcomePanel4Title": "Mantén tu bandeja de entrada limpia",
   "@welcomePanel4Title": {
     "description": "Welcome panel title"
   },
-  "welcomePanel4Text": "Melde Dich von Newslettern mit einem Klick ab.",
+  "welcomePanel4Text": "Darse de baja de los boletines con un solo toque.",
   "@welcomePanel4Text": {
     "description": "Welcome message shown on fourth panel"
   },
-  "welcomeActionSignIn": "Melde dich bei deinem E-Mail Konto an",
+  "welcomeActionSignIn": "Inicia sesión en tu cuenta de correo",
   "@welcomeActionSignIn": {
     "description": "Button showing login option"
   },
-  "homeSearchHint": "Deine Suche",
+  "homeSearchHint": "Tu búsqueda",
   "@homeSearchHint": {
     "description": "Hint shown in empty search field"
   },
-  "homeActionsShowAsStack": "Stapel Modus",
+  "homeActionsShowAsStack": "Mostrar como pila",
   "@homeActionsShowAsStack": {
     "description": "Action to show mails as stack"
   },
-  "homeActionsShowAsList": "Listen Modus",
+  "homeActionsShowAsList": "Mostrar como lista",
   "@homeActionsShowAsList": {
     "description": "Action to show mails as list"
   },
-  "homeEmptyFolderMessage": "Alles fertig!\n\nEs gibt keine E-Mails in diesem Ordner.",
+  "homeEmptyFolderMessage": "¡Todo listo!\n\nNo hay mensajes en esta carpeta.",
   "@homeEmptyFolderMessage": {
     "description": "Message shown when there are no messages in the folder"
   },
-  "homeEmptySearchMessage": "Keine E-Mails gefunden.",
+  "homeEmptySearchMessage": "No se encontraron mensajes.",
   "@homeEmptySearchMessage": {
     "description": "Message shown when there are no messages found in a search query"
   },
-  "homeDeleteAllTitle": "Bestätigung",
+  "homeDeleteAllTitle": "Confirmar",
   "@homeDeleteAllTitle": {
     "description": "Title of confirmation dialog when deleting all messages"
   },
-  "homeDeleteAllQuestion": "Wirklich alle E-Mails löschen?",
+  "homeDeleteAllQuestion": "¿Realmente eliminar todos los mensajes?",
   "@homeDeleteAllQuestion": {
     "description": "Question in confirmation dialog when deleting all messages"
   },
-  "homeDeleteAllAction": "Alle löschen",
+  "homeDeleteAllAction": "Borrar todo",
   "@homeDeleteAllAction": {
     "description": "Action to tap to delete all messages (must be short)."
   },
-  "homeDeleteAllScrubOption": "Endgültig löschen",
+  "homeDeleteAllScrubOption": "Limpiar mensajes",
   "@homeDeleteAllScrubOption": {
     "description": "Option to remove deleted messages from disk."
   },
-  "homeDeleteAllSuccess": "Alle E-Mails gelöscht.",
+  "homeDeleteAllSuccess": "Todos los mensajes eliminados.",
   "@homeDeleteAllSuccess": {
     "description": "Message shown after all messages have been deleted."
   },
-  "homeMarkAllSeenAction": "Gelesen",
+  "homeMarkAllSeenAction": "Todos leídos",
   "@homeMarkAllSeenAction": {
     "description": "Action to tap to mark all messages as seen / read (must be short)."
   },
-  "homeMarkAllUnseenAction": "Ungelesen",
+  "homeMarkAllUnseenAction": "Todos no leídos",
   "@homeMarkAllUnseenAction": {
     "description": "Action to tap to mark all messages as unseen / unread (must be short)."
   },
-  "homeFabTooltip": "Neue E-Mail",
+  "homeFabTooltip": "Nuevo mensaje",
   "@homeFabTooltip": {
     "description": "Tooltip for 'compose new message' floating action button."
   },
-  "homeLoadingMessageSourceTitle": "Lade Daten...",
+  "homeLoadingMessageSourceTitle": "Cargando...",
   "@homeLoadingMessageSourceTitle": {
     "description": "Title shown while message source itself is being loaded."
   },
-  "homeLoading": "Lade {name}...",
+  "homeLoading": "cargando {name}...",
   "@homeLoading": {
     "description": "Message shown while loading message.",
     "placeholders": {
@@ -170,27 +170,27 @@
       }
     }
   },
-  "swipeActionToggleRead": "Gelesen / ungelesen",
+  "swipeActionToggleRead": "Marcar como leído/no leídos",
   "@swipeActionToggleRead": {
     "description": "Swipe action for marking a message as read / unread."
   },
-  "swipeActionDelete": "Löschen",
+  "swipeActionDelete": "Eliminar",
   "@swipeActionDelete": {
     "description": "Swipe action for deleting a message."
   },
-  "swipeActionMarkJunk": "Als Spam markieren",
+  "swipeActionMarkJunk": "Marcar como basura",
   "@swipeActionMarkJunk": {
     "description": "Swipe action for moving a message to junk."
   },
-  "swipeActionArchive": "Archivieren",
+  "swipeActionArchive": "Archivar",
   "@swipeActionArchive": {
     "description": "Swipe action for moving a message to archive."
   },
-  "swipeActionFlag": "Markieren",
+  "swipeActionFlag": "Cambiar bandera",
   "@swipeActionFlag": {
     "description": "Swipe action for marking a message as flagged / unflagged."
   },
-  "multipleMovedToJunk": "{number,plural, =1{Eine Nachricht als Spam markiert} other{{number} Nachrichten als Spam markiert}}",
+  "multipleMovedToJunk": "{number,plural, =1{Un mensaje marcado como basura} other{Marcado {number} mensajes como basura}}",
   "@multipleMovedToJunk": {
     "description": "Message shown after moving messages to junk. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -201,7 +201,7 @@
       }
     }
   },
-  "multipleMovedToInbox": "{number,plural, =1{Eine Nachricht in Inbox geschoben} other{{number} Nachrichten in Inbox geschoben}}",
+  "multipleMovedToInbox": "{number,plural, =1{¡Se ha movido un mensaje a la bandeja de entrada} other{¡Se ha movido {number} ¡Los mensajes a la bandeja de entrada}}",
   "@multipleMovedToInbox": {
     "description": "Message shown after moving messages from junk, trash or archive back to the Inbox. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -212,7 +212,7 @@
       }
     }
   },
-  "multipleMovedToArchive": "{number,plural, =1{Eine Nachricht archiviert} other{{number} Nachrichten archiviert}}",
+  "multipleMovedToArchive": "{number,plural, =1{¡Archivado un mensaje} other{¡Archivado {number} ¡Mensajes}}",
   "@multipleMovedToArchive": {
     "description": "Message shown after moving messages to archive. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -223,7 +223,7 @@
       }
     }
   },
-  "multipleMovedToTrash": "{number,plural, =1{Eine Nachricht gelöscht} other{{number} Nachrichten gelöscht}}",
+  "multipleMovedToTrash": "{number,plural, =1{¡Eliminado un mensaje} other{¡Eliminado {number} ¡Mensajes}}",
   "@multipleMovedToTrash": {
     "description": "Message shown after moving messages to trash. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -234,11 +234,11 @@
       }
     }
   },
-  "multipleSelectionNeededInfo": "Wähle mindestens eine Nachricht aus.",
+  "multipleSelectionNeededInfo": "Por favor, seleccione mensajes primero.",
   "@multipleSelectionNeededInfo": {
     "description": "Short info shown when a multiple message action is triggered without selecting at least one message first."
   },
-  "multipleMoveTitle": "{number,plural, =1{Nachricht verschieben} other{{number} Nachrichten verschieben}}",
+  "multipleMoveTitle": "{number,plural, =1{Mover mensaje} other{Mover {number} mensajes}}",
   "@multipleMoveTitle": {
     "description": "Title of move dialog for multiple messages. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -249,83 +249,83 @@
       }
     }
   },
-  "messageActionMultipleMarkSeen": "Als gelesen markieren",
+  "messageActionMultipleMarkSeen": "Marcar como leído",
   "@messageActionMultipleMarkSeen": {
     "description": "Action for several messages."
   },
-  "messageActionMultipleMarkUnseen": "Als ungelesen markieren",
+  "messageActionMultipleMarkUnseen": "Marcar como no leído",
   "@messageActionMultipleMarkUnseen": {
     "description": "Action for several messages."
   },
-  "messageActionMultipleMarkFlagged": "Markieren",
+  "messageActionMultipleMarkFlagged": "Marcar mensajes",
   "@messageActionMultipleMarkFlagged": {
     "description": "Action for several messages."
   },
-  "messageActionMultipleMarkUnflagged": "Markierung entfernen",
+  "messageActionMultipleMarkUnflagged": "Desmarcar mensajes",
   "@messageActionMultipleMarkUnflagged": {
     "description": "Action for several messages."
   },
-  "messageActionViewInSafeMode": "Ohne externe Inhalte anzeigen",
+  "messageActionViewInSafeMode": "Ver sin contenido externo",
   "@messageActionMultipleViewInSafeMode": {
     "description": "Action for message."
   },
-  "emailSenderUnknown": "<unbekannt>",
+  "emailSenderUnknown": "<sin remitente>",
   "@emailSenderUnknown": {
     "description": "Shown as replacement when there is no known sender of a message."
   },
-  "dateRangeFuture": "Zukunft",
+  "dateRangeFuture": "futuro",
   "@dateRangeFuture": {
     "description": "Date range title."
   },
-  "dateRangeTomorrow": "morgen",
+  "dateRangeTomorrow": "mañana",
   "@dateRangeTomorrow": {
     "description": "Date range title."
   },
-  "dateRangeToday": "heute",
+  "dateRangeToday": "hoy",
   "@dateRangeToday": {
     "description": "Date range title."
   },
-  "dateRangeYesterday": "gestern",
+  "dateRangeYesterday": "ayer",
   "@dateRangeYesterday": {
     "description": "Date range title."
   },
-  "dateRangeCurrentWeek": "diese Woche",
+  "dateRangeCurrentWeek": "esta semana",
   "@dateRangeCurrentWeek": {
     "description": "Date range title."
   },
-  "dateRangeLastWeek": "letzte Woche",
+  "dateRangeLastWeek": "semana pasada",
   "@dateRangeLastWeek": {
     "description": "Date range title."
   },
-  "dateRangeCurrentMonth": "diesen Monat",
+  "dateRangeCurrentMonth": "este mes",
   "@dateRangeCurrentMonth": {
     "description": "Date range title."
   },
-  "dateRangeLastMonth": "letzten Monat",
+  "dateRangeLastMonth": "mes pasado",
   "@dateRangeLastMonth": {
     "description": "Date range title."
   },
-  "dateRangeCurrentYear": "dieses Jahr",
+  "dateRangeCurrentYear": "este año",
   "@dateRangeCurrentYear": {
     "description": "Date range title."
   },
-  "dateRangeLongAgo": "lange her",
+  "dateRangeLongAgo": "hace mucho tiempo",
   "@dateRangeLongAgo": {
     "description": "Date range title."
   },
-  "dateUndefined": "undefiniert",
+  "dateUndefined": "indefinido",
   "@dateUndefined": {
     "description": "Unknown date."
   },
-  "dateDayToday": "heute",
+  "dateDayToday": "hoy",
   "@dateDayToday": {
     "description": "Message data is today."
   },
-  "dateDayYesterday": "gestern",
+  "dateDayYesterday": "ayer",
   "@dateDayYesterday": {
     "description": "Message data is yesterday."
   },
-  "dateDayLastWeekday": "letzten {day}",
+  "dateDayLastWeekday": "último {day}",
   "@dateDayLastWeekday": {
     "description": "Message data is a recent weekday.",
     "placeholders": {
@@ -335,15 +335,15 @@
       }
     }
   },
-  "drawerEntryAbout": "Über Maily",
+  "drawerEntryAbout": "Sobre Maily",
   "@drawerEntryAbout": {
     "description": "Menu entry for about."
   },
-  "drawerEntrySettings": "Einstellungen",
+  "drawerEntrySettings": "Ajustes",
   "@drawerEntrySettings": {
     "description": "Menu entry for settings."
   },
-  "drawerAccountsSectionTitle": "{number,plural, =1{1 Konto} other{{number} Konten}}",
+  "drawerAccountsSectionTitle": "{number,plural, =1{Una cuenta} other{{number} cuentas}}",
   "@drawerAccountsSectionTitle": {
     "description": "Title shown for accounts drop down. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -354,87 +354,87 @@
       }
     }
   },
-  "drawerEntryAddAccount": "Konto hinzufügen",
+  "drawerEntryAddAccount": "Añadir cuenta",
   "@drawerEntryAddAccount": {
     "description": "Menu entry for adding a new account."
   },
-  "unifiedAccountName": "Alle Konten",
+  "unifiedAccountName": "Cuenta unificada",
   "@unifiedAccountName": {
     "description": "Name of unified account."
   },
-  "unifiedFolderInbox": "Alle Posteingänge",
+  "unifiedFolderInbox": "Entrada unificada",
   "@unifiedFolderInbox": {
     "description": "Folder name of unified account."
   },
-  "unifiedFolderSent": "Alle Gesendeten",
+  "unifiedFolderSent": "Enviado unificado",
   "@unifiedFolderSent": {
     "description": "Folder name of unified account."
   },
-  "unifiedFolderDrafts": "Alle Entwürfe",
+  "unifiedFolderDrafts": "Borradores unificados",
   "@unifiedFolderDrafts": {
     "description": "Folder name of unified account."
   },
-  "unifiedFolderTrash": "Alle Gelöschten",
+  "unifiedFolderTrash": "Basura unificada",
   "@unifiedFolderTrash": {
     "description": "Folder name of unified account."
   },
-  "unifiedFolderArchive": "Alle Archivierten",
+  "unifiedFolderArchive": "Archivo unificado",
   "@unifiedFolderArchive": {
     "description": "Folder name of unified account."
   },
-  "unifiedFolderJunk": "Alle Spam Nachrichten",
+  "unifiedFolderJunk": "Chatarra unificada",
   "@unifiedFolderJunk": {
     "description": "Folder name of unified account."
   },
-  "folderInbox": "Posteingang",
+  "folderInbox": "Entrada",
   "@folderInbox": {
     "description": "Folder name."
   },
-  "folderSent": "Gesendete Nachrichten",
+  "folderSent": "Enviado",
   "@folderSent": {
     "description": "Folder name."
   },
-  "folderDrafts": "Entwürfe",
+  "folderDrafts": "Borradores",
   "@folderDrafts": {
     "description": "Folder name."
   },
-  "folderTrash": "Papierkorb",
+  "folderTrash": "Basura",
   "@folderTrash": {
     "description": "Folder name."
   },
-  "folderArchive": "Archiv",
+  "folderArchive": "Archivar",
   "@folderArchive": {
     "description": "Folder name."
   },
-  "folderJunk": "Spam Nachrichten",
+  "folderJunk": "Chatarra",
   "@folderJunk": {
     "description": "Folder name."
   },
-  "folderUnknown": "Unbekannt",
+  "folderUnknown": "Desconocido",
   "@folderUnknown": {
     "description": "Folder name for a message source without a name."
   },
-  "viewContentsAction": "Inhalt anzeigen",
+  "viewContentsAction": "Ver contenido",
   "@viewContentsAction": {
     "description": "Show contents of a message on a separate screen."
   },
-  "viewSourceAction": "Sourcecode anzeigen",
+  "viewSourceAction": "Ver fuente",
   "@viewSourceAction": {
     "description": "Show source code of a message."
   },
-  "detailsErrorDownloadInfo": "E-Mail konnte nicht geladen werden.",
+  "detailsErrorDownloadInfo": "No se pudo descargar el mensaje.",
   "@detailsErrorDownloadInfo": {
     "description": "Info shown when an email could not be downloaded."
   },
-  "detailsErrorDownloadRetry": "wiederholen",
+  "detailsErrorDownloadRetry": "Reintentar",
   "@detailsErrorDownloadRetry": {
     "description": "Retry action shown when an email could not be downloaded."
   },
-  "detailsHeaderFrom": "Von",
+  "detailsHeaderFrom": "De",
   "@detailsHeaderFrom": {
     "description": "Label for sender(s) of email."
   },
-  "detailsHeaderTo": "An",
+  "detailsHeaderTo": "A",
   "@detailsHeaderTo": {
     "description": "Label for [to] recipient(s) of email."
   },
@@ -446,35 +446,35 @@
   "@detailsHeaderBcc": {
     "description": "Label for [BCC] - blind carbon copy - recipient(s) of email."
   },
-  "detailsHeaderDate": "Datum",
+  "detailsHeaderDate": "Fecha",
   "@detailsHeaderDate": {
     "description": "Label for date of email."
   },
-  "subjectUndefined": "<ohne Betreff>",
+  "subjectUndefined": "<sin sujeto>",
   "@subjectUndefined": {
     "description": "Shown instead of the subject when it is undefined."
   },
-  "detailsActionShowImages": "Bilder anzeigen",
+  "detailsActionShowImages": "Mostrar imágenes",
   "@detailsActionShowImages": {
     "description": "Action for showing images. Only visible when external images are blocked."
   },
-  "detailsNewsletterActionUnsubscribe": "Abbestellen",
+  "detailsNewsletterActionUnsubscribe": "Desuscribirse",
   "@detailsNewsletterActionUnsubscribe": {
     "description": "Action shown for unsubscribable newsletter."
   },
-  "detailsNewsletterActionResubscribe": "Neu abbonieren",
+  "detailsNewsletterActionResubscribe": "Volver a suscribirse",
   "@detailsNewsletterActionResubscribe": {
     "description": "Action shown after re-subscribable newsletter has been unsubscribed."
   },
-  "detailsNewsletterStatusUnsubscribed": "Abbestellt",
+  "detailsNewsletterStatusUnsubscribed": "No suscrito",
   "@detailsNewsletterStatusUnsubscribed": {
     "description": "Status shown for unsubscribed newsletter."
   },
-  "detailsNewsletterUnsubscribeDialogTitle": "Abbestellen",
+  "detailsNewsletterUnsubscribeDialogTitle": "Cancelar suscripción",
   "@detailsNewsletterUnsubscribeDialogTitle": {
     "description": "Title for unsubscribe newsletter dialog."
   },
-  "detailsNewsletterUnsubscribeDialogQuestion": "Möchtest du die Mailingliste {listName} abbestellen?",
+  "detailsNewsletterUnsubscribeDialogQuestion": "¿Quieres darte de baja de la lista de correo {listName}?",
   "@detailsNewsletterUnsubscribeDialogQuestion": {
     "description": "Question for unsubscribe newsletter dialog.",
     "placeholders": {
@@ -484,15 +484,15 @@
       }
     }
   },
-  "detailsNewsletterUnsubscribeDialogAction": "Abbestellen",
+  "detailsNewsletterUnsubscribeDialogAction": "Cancelar suscripción",
   "@detailsNewsletterUnsubscribeDialogAction": {
     "description": "Action for unsubscribe newsletter dialog."
   },
-  "detailsNewsletterUnsubscribeSuccessTitle": "Abbestellt",
+  "detailsNewsletterUnsubscribeSuccessTitle": "No suscrito",
   "@detailsNewsletterUnsubscribeSuccessTitle": {
     "description": "Title for dialog after unsubscribing newsletter successfully."
   },
-  "detailsNewsletterUnsubscribeSuccessMessage": "Du hast dich von der Mailingliste {listName} erfolgreich abgemeldet.",
+  "detailsNewsletterUnsubscribeSuccessMessage": "Te has dado de baja de la lista de correo {listName}.",
   "@detailsNewsletterUnsubscribeSuccessMessage": {
     "description": "Text confirmation after successfully unsubscribing a newsletter.",
     "placeholders": {
@@ -502,11 +502,11 @@
       }
     }
   },
-  "detailsNewsletterUnsubscribeFailureTitle": "Nicht abbestellt",
+  "detailsNewsletterUnsubscribeFailureTitle": "No desuscrito",
   "@detailsNewsletterUnsubscribeFailureTitle": {
     "description": "Title for dialog after unsubscribing newsletter failed."
   },
-  "detailsNewsletterUnsubscribeFailureMessage": "Entschuldige, ich konnte dich nicht automatisch von {listName} abmelden.",
+  "detailsNewsletterUnsubscribeFailureMessage": "Lo siento, pero no he podido darte de baja de {listName} automáticamente.",
   "@detailsNewsletterUnsubscribeFailureMessage": {
     "description": "Text confirmation after unsubscribing a newsletter failed.",
     "placeholders": {
@@ -516,11 +516,11 @@
       }
     }
   },
-  "detailsNewsletterResubscribeDialogTitle": "Abonnieren",
+  "detailsNewsletterResubscribeDialogTitle": "Volver a suscribirse",
   "@detailsNewsletterResubscribeDialogTitle": {
     "description": "Title for re-subscribe newsletter dialog."
   },
-  "detailsNewsletterResubscribeDialogQuestion": "Möchtest du die Mailingliste {listName} wieder abonnieren?",
+  "detailsNewsletterResubscribeDialogQuestion": "¿Quieres suscribirte de nuevo a esta lista de correo {listName}?",
   "@detailsNewsletterResubscribeDialogQuestion": {
     "description": "Question for re-subscribe newsletter dialog.",
     "placeholders": {
@@ -530,15 +530,15 @@
       }
     }
   },
-  "detailsNewsletterResubscribeDialogAction": "Abonnieren",
+  "detailsNewsletterResubscribeDialogAction": "Suscribirse",
   "@detailsNewsletterResubscribeDialogAction": {
     "description": "Action for re-subscribe newsletter dialog."
   },
-  "detailsNewsletterResubscribeSuccessTitle": "Aboniert",
+  "detailsNewsletterResubscribeSuccessTitle": "Suscrito",
   "@detailsNewsletterResubscribeSuccessTitle": {
     "description": "Title for dialog after re-subscribed newsletter successfully."
   },
-  "detailsNewsletterResubscribeSuccessMessage": "Du hast wieder die Mailingliste {listName} abonniert.",
+  "detailsNewsletterResubscribeSuccessMessage": "Ahora estás suscrito a la lista de correo {listName} de nuevo.",
   "@detailsNewsletterResubscribeSuccessMessage": {
     "description": "Text confirmation after successfully re-subscribing a newsletter.",
     "placeholders": {
@@ -548,11 +548,11 @@
       }
     }
   },
-  "detailsNewsletterResubscribeFailureTitle": "Nicht abonniert",
+  "detailsNewsletterResubscribeFailureTitle": "No suscrito",
   "@detailsNewsletterResubscribeFailureTitle": {
     "description": "Title for dialog after re-subscribing newsletter failed."
   },
-  "detailsNewsletterResubscribeFailureMessage": "Entschuldige, ich konnte dich leider nicht automatisch bei der Mailingliste {listName} anmelden.",
+  "detailsNewsletterResubscribeFailureMessage": "Lo sentimos, pero la solicitud de suscripción ha fallado para la lista de correo {listName}.",
   "@detailsNewsletterResubscribeFailureMessage": {
     "description": "Text confirmation after re-subscribing a newsletter failed.",
     "placeholders": {
@@ -562,23 +562,23 @@
       }
     }
   },
-  "detailsSendReadReceiptAction": "Lesebestätigung senden",
+  "detailsSendReadReceiptAction": "Enviar recibo de lectura",
   "@detailsSendReadReceiptAction": {
     "description": "Action to send the read receipt for the shown message."
   },
-  "detailsReadReceiptSentStatus": "Lesebestätigung gesendet ✔",
+  "detailsReadReceiptSentStatus": "Leer el recibo enviado ✔️",
   "@detailsReadReceiptSentStatus": {
     "description": "Status after sending the read receipt for the shown message."
   },
-  "detailsReadReceiptSubject": "Lesebestätigung",
+  "detailsReadReceiptSubject": "Leer recibo",
   "@detailsReadReceiptSubject": {
     "description": "Message subject for read receipts."
   },
-  "attachmentActionOpen": "Öffnen",
+  "attachmentActionOpen": "Abrir",
   "@attachmentActionOpen": {
     "description": "Open action for attachments without interactive viewer."
   },
-  "attachmentDecodeError": "Dieses Attachment ist in einem unbekannten Format.\nDetails: ${details}",
+  "attachmentDecodeError": "Este archivo adjunto tiene un formato o codificación no compatibles.\nDetalles: ${details}",
   "@attachmentDecodeError": {
     "description": "Text shown when downloaded attachment could not be decoded.",
     "placeholders": {
@@ -588,7 +588,7 @@
       }
     }
   },
-  "attachmentDownloadError": "Dieses Attachment konnte nicht heruntergeladen werden.\nDetails: ${details}",
+  "attachmentDownloadError": "No se puede descargar este adjunto.\nDetalles: ${details}",
   "@attachmentDownloadError": {
     "description": "Text shown when attachment could not be downloaded.",
     "placeholders": {
@@ -598,23 +598,23 @@
       }
     }
   },
-  "messageActionReply": "Antworten",
+  "messageActionReply": "Responder",
   "@messageActionReply": {
     "description": "Action for single message."
   },
-  "messageActionReplyAll": "Allen antworten",
+  "messageActionReplyAll": "Responder a todos",
   "@messageActionReplyAll": {
     "description": "Action for single message."
   },
-  "messageActionForward": "Weiterleiten",
+  "messageActionForward": "Reenviar",
   "@messageActionForward": {
     "description": "Action for single message."
   },
-  "messageActionForwardAsAttachment": "Als Anhang weiterleiten",
+  "messageActionForwardAsAttachment": "Reenviar como archivo adjunto",
   "@messageActionForwardAsAttachment": {
     "description": "Action for single message."
   },
-  "messageActionForwardAttachments": "{number,plural, =1{Anhang weiterleiten} other{{number} Anhänge weiterleiten}}",
+  "messageActionForwardAttachments": "{number,plural, =1{¡Adelante el adjunto} other{Reenviar {number} archivos adjuntos}}",
   "@messageActionForwardAttachments": {
     "description": "Action for single message to forward the given number of attachments.",
     "placeholders": {
@@ -625,83 +625,83 @@
       }
     }
   },
-  "messagesActionForwardAttachments": "Anhänge weiterleiten",
+  "messagesActionForwardAttachments": "Reenviar archivos adjuntos",
   "@messagesActionForwardAttachments": {
     "description": "Action for multiple selected messages to forward all attachments of the messages."
   },
-  "messageActionDelete": "Löschen",
+  "messageActionDelete": "Eliminar",
   "@messageActionDelete": {
     "description": "Action for single message."
   },
-  "messageActionMoveToInbox": "In Posteingang verschieben",
+  "messageActionMoveToInbox": "Mover a bandeja de entrada",
   "@messageActionMoveToInbox": {
     "description": "Action for single message."
   },
-  "messageActionMove": "Verschieben",
+  "messageActionMove": "Mover",
   "@messageActionMove": {
     "description": "Action for single message."
   },
-  "messageStatusSeen": "Ist gelesen",
+  "messageStatusSeen": "Es leído",
   "@messageStatusSeen": {
     "description": "Status of single message."
   },
-  "messageStatusUnseen": "Ist ungelesen",
+  "messageStatusUnseen": "No es leído",
   "@messageStatusUnseen": {
     "description": "Status of single message."
   },
-  "messageStatusFlagged": "Ist markiert",
+  "messageStatusFlagged": "Está marcado",
   "@messageStatusFlagged": {
     "description": "Status of single message."
   },
-  "messageStatusUnflagged": "Ist nicht markiert",
+  "messageStatusUnflagged": "No está marcado",
   "@messageStatusUnflagged": {
     "description": "Status of single message."
   },
-  "messageActionMarkAsJunk": "Als Spam markieren",
+  "messageActionMarkAsJunk": "Marcar como basura",
   "@messageActionMarkAsJunk": {
     "description": "Action for single message."
   },
-  "messageActionMarkAsNotJunk": "Als nicht-Spam markieren",
+  "messageActionMarkAsNotJunk": "Marcar como no basura",
   "@messageActionMarkAsNotJunk": {
     "description": "Action for single message."
   },
-  "messageActionArchive": "Archivieren",
+  "messageActionArchive": "Archivar",
   "@messageActionArchive": {
     "description": "Action for single message."
   },
-  "messageActionUnarchive": "In Posteingang verschieben",
+  "messageActionUnarchive": "Mover a bandeja de entrada",
   "@messageActionUnarchive": {
     "description": "Action for single message."
   },
-  "messageActionRedirect": "Umleiten",
+  "messageActionRedirect": "Redireccionar",
   "@messageActionRedirect": {
     "description": "Action for single message."
   },
-  "messageActionAddNotification": "Benachrichtigung hinzufügen",
+  "messageActionAddNotification": "Añadir notificación",
   "@messageActionAddNotification": {
     "description": "Action for single message."
   },
-  "resultDeleted": "Gelöscht",
+  "resultDeleted": "Eliminado",
   "@resultDeleted": {
     "description": "Successful short snackbar message after deleting message(s)."
   },
-  "resultMovedToJunk": "Als Spam markiert",
+  "resultMovedToJunk": "Marcado como basura",
   "@resultMovedToJunk": {
     "description": "Successful short snackbar message after moving message(s) to junk."
   },
-  "resultMovedToInbox": "In Posteingang verschoben",
+  "resultMovedToInbox": "Movido a la bandeja de entrada",
   "@resultMovedToInbox": {
     "description": "Successful short snackbar message after moving message(s) to inbox."
   },
-  "resultArchived": "Archiviert",
+  "resultArchived": "Archivado",
   "@resultArchived": {
     "description": "Successful short snackbar message after moving message(s) to archive."
   },
-  "resultRedirectedSuccess": "Nachricht umgeleitet 👍",
+  "resultRedirectedSuccess": "Mensaje redireccionado 👍",
   "@resultRedirectedSuccess": {
     "description": "Successful snackbar message after redirecting message to new recipient(s)."
   },
-  "resultRedirectedFailure": "Nachricht konnte nicht umgeleitet werden.\n\nDer Server meldet folgende Details: \"{details}\"",
+  "resultRedirectedFailure": "No se puede redirigir el mensaje.\n\nEl servidor respondió con los siguientes detalles: \"{details}\"",
   "@resultRedirectedFailure": {
     "description": "Failure snackbar message after failed to redirect message to new recipient(s).",
     "placeholders": {
@@ -711,19 +711,19 @@
       }
     }
   },
-  "redirectTitle": "Umleiten",
+  "redirectTitle": "Redireccionar",
   "@redirectTitle": {
     "description": "Title of redirect dialog."
   },
-  "redirectInfo": "Leite diese Nachricht an folgende Empfänger:innen um. Umleiten verändert nicht die Nachricht.",
+  "redirectInfo": "Redirigir este mensaje a los siguientes destinatarios. Redirigir no altera el mensaje.",
   "@redirectInfo": {
     "description": "Short explanation of redirect action in redirect dialog."
   },
-  "redirectEmailInputRequired": "Bitte gebe mindestens eine gültige E-Mail-Adresse ein.",
+  "redirectEmailInputRequired": "Necesitas añadir al menos una dirección de correo electrónico válida.",
   "@redirectEmailInputRequired": {
     "description": "Information when redirect is wanted but no address has been entered."
   },
-  "searchQueryDescription": "Suche in {folder}...",
+  "searchQueryDescription": "Buscar en {folder}...",
   "@searchQueryDescription": {
     "description": "Description of search within the given folder.",
     "placeholders": {
@@ -733,7 +733,7 @@
       }
     }
   },
-  "searchQueryTitle": "Suche \"{query}\"",
+  "searchQueryTitle": "Buscar \"{query}\"",
   "@searchQueryTitle": {
     "description": "Title for a search with the given query.",
     "placeholders": {
@@ -743,183 +743,183 @@
       }
     }
   },
-  "legaleseUsage": "Durch die Nutzung von Maily stimmst du unserer [PP] und unseren [TC] zu.",
+  "legaleseUsage": "Al utilizar Maily aceptas nuestras [PP] y nuestras [TC].",
   "@legaleseUsage": {
     "description": "Legal info shown on initial welcome screen and later in about. [PP] is replaced with the legalesePrivacyPolicy text and [TC] with legaleseTermsAndConditions."
   },
-  "legalesePrivacyPolicy": "Datenschutzerlärung",
+  "legalesePrivacyPolicy": "Política de Privacidad",
   "@legalesePrivacyPolicy": {
     "description": "Translation of privacy policy"
   },
-  "legaleseTermsAndConditions": "Bedingungen",
+  "legaleseTermsAndConditions": "Términos y Condiciones",
   "@legaleseTermsAndConditions": {
     "description": "Translation of Terms & Conditions "
   },
-  "aboutApplicationLegalese": "Maily ist freie Software, die unter der GPL GNU General Public License veröffentlicht ist.",
+  "aboutApplicationLegalese": "Maily es un software libre publicado bajo la Licencia Pública General GNU.",
   "@aboutApplicationLegalese": {
     "description": "Legal info shown in about dialog."
   },
-  "feedbackActionSuggestFeature": "Feature vorschlagen",
+  "feedbackActionSuggestFeature": "Sugerir una característica",
   "@feedbackActionSuggestFeature": {
     "description": "Action to suggest a feature."
   },
-  "feedbackActionReportProblem": "Problem berichten",
+  "feedbackActionReportProblem": "Reportar un problema",
   "@feedbackActionReportProblem": {
     "description": "Action to report a problem."
   },
-  "feedbackActionHelpDeveloping": "Hilf Maily zu entwickeln",
+  "feedbackActionHelpDeveloping": "Ayuda al desarrollo de Maily",
   "@feedbackActionHelpDeveloping": {
     "description": "Action to help developing."
   },
-  "feedbackTitle": "Feedback",
+  "feedbackTitle": "Comentarios",
   "@feedbackTitle": {
     "description": "Title of feedback settings screen."
   },
-  "feedbackIntro": "Danke, dass du Maily testest!",
+  "feedbackIntro": "¡Gracias por probar Maily!",
   "@feedbackIntro": {
     "description": "Intro for feedback settings screen."
   },
-  "feedbackProvideInfoRequest": "Bitte teile folgende Information mit, wenn du ein Problem berichtest:",
+  "feedbackProvideInfoRequest": "Por favor, proporcione esta información cuando reporte un problema:",
   "@feedbackProvideInfoRequest": {
     "description": "Request to provide device and app information when reporting a problem."
   },
-  "feedbackResultInfoCopied": "kopiert",
+  "feedbackResultInfoCopied": "Copiado al portapapeles",
   "@feedbackResultInfoCopied": {
     "description": "Info shown after copying device and app info to clipboard."
   },
-  "accountsTitle": "Konten",
+  "accountsTitle": "Cuentas",
   "@accountsTitle": {
     "description": "Title of accounts settings screen."
   },
-  "accountsActionReorder": "Konten Reihenfolge ändern",
+  "accountsActionReorder": "Reordenar cuentas",
   "@accountActionReorder": {
     "description": "Action to start reordering accounts."
   },
-  "settingsTitle": "Einstellungen",
+  "settingsTitle": "Ajustes",
   "@settingsTitle": {
     "description": "Title of base settings screen."
   },
-  "settingsSecurityBlockExternalImages": "Externe Bilder blockieren",
+  "settingsSecurityBlockExternalImages": "Bloquear imágenes externas",
   "@settingsSecurityBlockExternalImages": {
     "description": "Settings option to block external options."
   },
-  "settingsSecurityBlockExternalImagesDescriptionTitle": "Externe Bilder",
+  "settingsSecurityBlockExternalImagesDescriptionTitle": "Imágenes externas",
   "@settingsSecurityBlockExternalImagesDescriptionTitle": {
     "description": "Title of dialog that shows additional information about the 'block external images' option."
   },
-  "settingsSecurityBlockExternalImagesDescriptionText": "E-Mail-Nachrichten können Bilder enthalten, die entweder auf externen Servern integriert oder gehostet werden. Die letzteren externen Bilder können dem Absender der Nachricht Informationen offen legen, z.B. um dem Absender mitzuteilen, dass Sie die Nachricht geöffnet haben. Mit dieser Option können Sie solche externen Bilder blockieren, was das Risiko verringert, sensible Informationen zu enthüllen. Wenn Sie eine Nachricht lesen, können Sie diese Bilder immer noch pro Nachricht laden.",
+  "settingsSecurityBlockExternalImagesDescriptionText": "Los mensajes de correo electrónico pueden contener imágenes que están integradas o alojadas en servidores externos. Este último, imágenes externas pueden exponer información al remitente del mensaje, por ejemplo, para que el remitente sepa que ha abierto el mensaje. Esta opción le permite bloquear dichas imágenes externas, lo que reduce el riesgo de exponer información confidencial. Todavía puede optar por cargar dichas imágenes por mensaje cuando lea un mensaje.",
   "@settingsSecurityBlockExternalImagesDescriptionText": {
     "description": "Text of dialog that shows additional information about the 'block external images' option."
   },
-  "settingsSecurityMessageRenderingHtml": "Gesamte Nachricht anzeigen",
+  "settingsSecurityMessageRenderingHtml": "Mostrar contenido completo del mensaje",
   "@settingsSecurityMessageRenderingHtml": {
     "description": "Option for how to render messages."
   },
-  "settingsSecurityMessageRenderingPlainText": "Nur den Text der Nachricht anzeigen",
+  "settingsSecurityMessageRenderingPlainText": "Mostrar sólo el texto de los mensajes",
   "@settingsSecurityMessageRenderingPlainText": {
     "description": "Option for how to render messages."
   },
-  "settingsSecurityLaunchModeLabel": "Wie soll Maily Links öffnen?",
+  "settingsSecurityLaunchModeLabel": "¿Cómo debe abrir enlaces Maily?",
   "@settingsSecurityLaunchModeLabel": {
     "description": "Option for how to launch URLs."
   },
-  "settingsSecurityLaunchModeExternal": "Öffne Links extern",
+  "settingsSecurityLaunchModeExternal": "Abrir enlaces externamente",
   "@settingsSecurityLaunchModeExternal": {
     "description": "Option for how to launch URLs."
   },
-  "settingsSecurityLaunchModeInApp": "Öffne Links in Maily",
+  "settingsSecurityLaunchModeInApp": "Abrir enlaces en Maily",
   "@settingsSecurityLaunchModeInApp": {
     "description": "Option for how to launch URLs."
   },
-  "settingsActionAccounts": "Konten verwalten",
+  "settingsActionAccounts": "Administrar cuentas",
   "@settingsActionAccounts": {
     "description": "Settings action to manage accounts."
   },
-  "settingsActionDesign": "Darstellung",
+  "settingsActionDesign": "Apariencia",
   "@settingsActionDesign": {
     "description": "Settings action to manage the visualization of the app."
   },
-  "settingsActionFeedback": "Feedback geben",
+  "settingsActionFeedback": "Proporcionar comentarios",
   "@settingsActionFeedback": {
     "description": "Settings action to provide feedback about the app."
   },
-  "settingsActionWelcome": "Willkommen anzeigen",
+  "settingsActionWelcome": "Mostrar bienvenida",
   "@settingsActionWelcome": {
     "description": "Settings action to show welcome screen of the app again."
   },
-  "settingsReadReceipts": "Lesebestätigungen",
+  "settingsReadReceipts": "Leer recibos",
   "@settingsReadReceipts": {
     "description": "Settings action to customize read receipts."
   },
-  "readReceiptsSettingsIntroduction": "Sollen Lesebestätigungs-Anforderungen angezeigt werden?",
+  "readReceiptsSettingsIntroduction": "¿Quieres mostrar las solicitudes de recibos de lectura?",
   "@readReceiptsSettingsIntroduction": {
     "description": "Introduction text for managing read receipt requests."
   },
-  "readReceiptOptionAlways": "Immer",
+  "readReceiptOptionAlways": "Siempre",
   "@readReceiptOptionAlways": {
     "description": "Display option for read receipt requests."
   },
-  "readReceiptOptionNever": "Nie",
+  "readReceiptOptionNever": "Nunca",
   "@readReceiptOptionNever": {
     "description": "Display option for read receipt requests."
   },
-  "settingsFolders": "Ordner",
+  "settingsFolders": "Carpetas",
   "@settingsFolders": {
     "description": "Settings action to customize folders."
   },
-  "folderNamesIntroduction": "Welche Ordner-Namen möchtest du nutzen?",
+  "folderNamesIntroduction": "¿Qué nombres prefiere para sus carpetas?",
   "@folderNamesIntroduction": {
     "description": "Introduction for folder names setting."
   },
-  "folderNamesSettingLocalized": "Von Maily vorgegebene Namen",
+  "folderNamesSettingLocalized": "Nombres dados por Maily",
   "@folderNamesSettingLocalized": {
     "description": "Folder name setting option."
   },
-  "folderNamesSettingServer": "Vom Maildienst gegebene Namen",
+  "folderNamesSettingServer": "Nombres dados por el servicio",
   "@folderNamesSettingServer": {
     "description": "Folder name setting option."
   },
-  "folderNamesSettingCustom": "Meine eigenen Namen",
+  "folderNamesSettingCustom": "Mis nombres personalizados",
   "@folderNamesSettingCustom": {
     "description": "Folder name setting option."
   },
-  "folderNamesEditAction": "Eigene Ordner Namen ändern",
+  "folderNamesEditAction": "Editar nombres personalizados",
   "@folderNamesEditAction": {
     "description": "Action to specify custom folder names."
   },
-  "folderNamesCustomTitle": "Eigene Namen",
+  "folderNamesCustomTitle": "Nombres personalizados",
   "@folderNamesCustomTitle": {
     "description": "Title of dialog to specify custom folder names."
   },
-  "folderAddAction": "Ordner erstellen",
+  "folderAddAction": "Crear carpeta",
   "@folderAddAction": {
     "description": "Action to create a new folder."
   },
-  "folderAddTitle": "Ordner erstellen",
+  "folderAddTitle": "Crear carpeta",
   "@folderAddTitle": {
     "description": "Dialog title when creating a new folder."
   },
-  "folderAddNameLabel": "Name",
+  "folderAddNameLabel": "Nombre",
   "@folderAddNameLabel": {
     "description": "Label for input field for the folder name."
   },
-  "folderAddNameHint": "Name des Ordners",
+  "folderAddNameHint": "Nombre de la nueva carpeta",
   "@folderAddNameHint": {
     "description": "Hint for input field for the folder name."
   },
-  "folderAccountLabel": "Konto",
+  "folderAccountLabel": "Cuenta",
   "@folderAddAccountLabel": {
     "description": "Label to select the current account."
   },
-  "folderMailboxLabel": "Erstelle in",
+  "folderMailboxLabel": "Carpeta",
   "@folderAddParentFolderLabel": {
     "description": "Label to select the current folder."
   },
-  "folderAddResultSuccess": "Ordner erstellt 😊",
+  "folderAddResultSuccess": "Carpeta creada 😊",
   "@folderAddResultSuccess": {
     "description": "Info for showing the creation success."
   },
-  "folderAddResultFailure": "Der Ordner konnte nicht erstellt werden.\n\nDer Server antwortete mit \"{details}\".",
+  "folderAddResultFailure": "No se pudo crear la carpeta.\n\nEl servidor respondió con {details}",
   "@folderAddResultFailure": {
     "description": "Info for showing a folder creation error.",
     "placeholders": {
@@ -929,15 +929,15 @@
       }
     }
   },
-  "folderDeleteAction": "Löschen",
+  "folderDeleteAction": "Eliminar",
   "@folderDeleteAction": {
     "description": "Action to delete an existing folder."
   },
-  "folderDeleteConfirmTitle": "Bestätigen",
+  "folderDeleteConfirmTitle": "Confirmar",
   "@folderDeleteConfirmTitle": {
     "description": "Dialog title to confirm deleting a folder."
   },
-  "folderDeleteConfirmText": "Möchtest Du den Ordner {name} wirklich löschen?",
+  "folderDeleteConfirmText": "¿Realmente desea eliminar la carpeta {name}?",
   "@folderDeleteConfirmText": {
     "description": "Dialog text to confirm deleting a folder.",
     "placeholders": {
@@ -947,11 +947,11 @@
       }
     }
   },
-  "folderDeleteResultSuccess": "Ordner gelöscht.",
+  "folderDeleteResultSuccess": "Carpeta eliminada.",
   "@folderDeleteResultSuccess": {
     "description": "Info for showing the creation success."
   },
-  "folderDeleteResultFailure": "Der Ordner konnte nicht gelöscht werden.\n\nDer Server antwortete mit \"{details}\".",
+  "folderDeleteResultFailure": "No se ha podido eliminar la carpeta.\n\nEl servidor ha respondido con {details}",
   "@folderDeleteResultFailure": {
     "description": "Info for showing a folder deletion error.",
     "placeholders": {
@@ -961,59 +961,59 @@
       }
     }
   },
-  "settingsDevelopment": "Entwicklungs-Einstellungen",
+  "settingsDevelopment": "Configuración de desarrollo",
   "@settingsDevelopment": {
     "description": "Settings action to specify the development options."
   },
-  "developerModeTitle": "Entwicklungs-Modus",
+  "developerModeTitle": "Modo de desarrollo",
   "@developerModeTitle": {
     "description": "Title of the development mode section."
   },
-  "developerModeIntroduction": "Mit einem aktivierten Entwicklungs-Modus kannst du den Sourcecode von Mails einsehen, siehst alle Fehler-Details und Text Anhänge in eine Mail Nachricht umwandeln.",
+  "developerModeIntroduction": "Si activas el modo de desarrollo podrás ver el código fuente de los mensajes y convertir los archivos adjuntos de texto a mensajes.",
   "@developerModeIntroduction": {
     "description": "Text explaining the development mode."
   },
-  "developerModeEnable": "Entwicklungs-Modus aktivieren",
+  "developerModeEnable": "Activar modo de desarrollo",
   "@developerModeEnable": {
     "description": "Text in checkbox to enable the development mode."
   },
-  "developerShowAsEmail": "Text zu E-Mail konvertieren",
+  "developerShowAsEmail": "Convertir texto a email",
   "@developerShowAsEmail": {
     "description": "Action to convert text into an email."
   },
-  "developerShowAsEmailFailed": "Dieser Text kann nicht in einer MIME Nachricht umgewandelt werden.",
+  "developerShowAsEmailFailed": "Este texto no se puede convertir en un mensaje MIME.",
   "@developerShowAsEmailFailed": {
     "description": "Text shown when text cannot be converted into an email."
   },
-  "designTitle": "Design Einstellungen",
+  "designTitle": "Ajustes de diseño",
   "@designTitle": {
     "description": "Title of design settings screen."
   },
-  "designSectionThemeTitle": "Modus",
+  "designSectionThemeTitle": "Tema",
   "@designSectionThemeTitle": {
     "description": "Title of theme section on design settings screen."
   },
-  "designThemeOptionLight": "Hell",
+  "designThemeOptionLight": "Luz",
   "@designThemeOptionLight": {
     "description": "Theme option."
   },
-  "designThemeOptionDark": "Dunkel",
+  "designThemeOptionDark": "Oscuro",
   "@designThemeOptionDark": {
     "description": "Theme option."
   },
-  "designThemeOptionSystem": "System",
+  "designThemeOptionSystem": "Sistema",
   "@designThemeOptionSystem": {
     "description": "Theme option."
   },
-  "designThemeOptionCustom": "Selbst definieren",
+  "designThemeOptionCustom": "Personalizado",
   "@designThemeOptionCustom": {
     "description": "Theme option."
   },
-  "designSectionCustomTitle": "Der dunkle Modus wird aktiviert",
+  "designSectionCustomTitle": "Activar tema oscuro",
   "@designSectionCustomTitle": {
     "description": "Title of custom theme option section on design settings screen."
   },
-  "designThemeCustomStart": "von {time}",
+  "designThemeCustomStart": "de {time}",
   "@designThemeCustomStart": {
     "description": "Start time of custom theme setting.",
     "placeholders": {
@@ -1023,7 +1023,7 @@
       }
     }
   },
-  "designThemeCustomEnd": "bis {time}",
+  "designThemeCustomEnd": "hasta {time}",
   "@designThemeCustomEnd": {
     "description": "End time of custom theme setting.",
     "placeholders": {
@@ -1033,87 +1033,87 @@
       }
     }
   },
-  "designSectionColorTitle": "Farbschema",
+  "designSectionColorTitle": "Esquema de color",
   "@designSectionColorTitle": {
     "description": "Title of color section on design settings screen."
   },
-  "securitySettingsTitle": "Sicherheit",
+  "securitySettingsTitle": "Seguridad",
   "@securitySettingsTitle": {
     "description": "Title of security settings screen."
   },
-  "securitySettingsIntro": "Passe die Sicherheitseinstellungen deinen persönlichen Ansprüchen an.",
+  "securitySettingsIntro": "Adapte la configuración de seguridad a sus necesidades personales.",
   "@securitySettingsIntro": {
     "description": "Introduction of security settings screen."
   },
-  "securityUnlockWithFaceId": "Entsicher Maily mit Face ID.",
+  "securityUnlockWithFaceId": "Desbloquea Maily con Face ID.",
   "@securityUnlockWithFaceId": {
     "description": "iOS-specific unlock reason."
   },
-  "securityUnlockWithTouchId": "Entsicher Maily mit Touch ID.",
+  "securityUnlockWithTouchId": "Desbloquea Maily con Touch ID.",
   "@securityUnlockWithTouchId": {
     "description": "iOS-specific unlock reason."
   },
-  "securityUnlockReason": "Entsicher Maily.",
+  "securityUnlockReason": "Desbloquea Maily.",
   "@securityUnlockReason": {
     "description": "Generic unlock reason."
   },
-  "securityUnlockDisableReason": "Entsicher Maily um die Sicherung zu deaktvieren.",
+  "securityUnlockDisableReason": "Desbloquear Maily para desactivar el bloqueo.",
   "@securityUnlockDisableReason": {
     "description": "Generic unlock disable reason."
   },
-  "securityUnlockNotAvailable": "Dein Gerät unterstützt keine Biometrie-Absicherung. Vielleicht musst du zuerst die Displaysperre in den Geräteeinstellungen aktivieren.",
+  "securityUnlockNotAvailable": "Su dispositivo no soporta biométricos, posiblemente necesite configurar las opciones de desbloqueo primero.",
   "@securityUnlockNotAvailable": {
     "description": "Message when biometric authentication is not available."
   },
-  "securityUnlockLabel": "Maily Absichern",
+  "securityUnlockLabel": "Bloquear Maily",
   "@securityUnlockLabel": {
     "description": "Label of biometric authentication lock feature."
   },
-  "securityUnlockDescriptionTitle": "Maily Absichern",
+  "securityUnlockDescriptionTitle": "Bloquear Maily",
   "@securityUnlockDescriptionTitle": {
     "description": "Title to explain lock feature via biometric authentication."
   },
-  "securityUnlockDescriptionText": "Du kannst Maily absichern, so dass anderen deine E-Mails auch dann nicht lesen können, wenn sie Zugang zu deinem Gerät haben.",
+  "securityUnlockDescriptionText": "Puedes elegir bloquear el acceso a Maily, para que otros no puedan leer tu correo electrónico incluso cuando tengan acceso a tu dispositivo.",
   "@securityUnlockDescriptionText": {
     "description": "Text explaining lock feature via biometric authentication."
   },
-  "securityLockImmediately": "Sofort absichern",
+  "securityLockImmediately": "Bloquear inmediatamente",
   "@securityLockImmediately": {
     "description": "Lock timing option."
   },
-  "securityLockAfter5Minutes": "Nach 5 Minuten absichern",
+  "securityLockAfter5Minutes": "Bloquear después de 5 minutos",
   "@securityLockAfter5Minutes": {
     "description": "Lock timing option."
   },
-  "securityLockAfter30Minutes": "Nach 30 Minuten absichern",
+  "securityLockAfter30Minutes": "Bloquear después de 30 minutos",
   "@securityLockAfter30Minutes": {
     "description": "Lock timing option."
   },
-  "lockScreenTitle": "Maily ist gesichert",
+  "lockScreenTitle": "Maily está bloqueado",
   "@lockScreenTitle": {
     "description": "Title of lock screen."
   },
-  "lockScreenIntro": "Maily ist gesichert, bitte authentifiziere dich um weiter zu machen.",
+  "lockScreenIntro": "Maily está bloqueado, por favor autentifíquese para continuar.",
   "@lockScreenIntro": {
     "description": "Text on lock screen."
   },
-  "lockScreenUnlockAction": "Entsichern",
+  "lockScreenUnlockAction": "Desbloquear",
   "@lockScreenUnlockAction": {
     "description": "Action to unlock on lock screen."
   },
-  "addAccountTitle": "Konto hinzufügen",
+  "addAccountTitle": "Añadir cuenta",
   "@addAccountTitle": {
     "description": "Title of add account screen."
   },
-  "addAccountEmailLabel": "E-Mail",
+  "addAccountEmailLabel": "E-mail",
   "@addAccountEmailLabel": {
     "description": "Label and section header of email address input field."
   },
-  "addAccountEmailHint": "Deine E-Mail Adresse",
+  "addAccountEmailHint": "Introduzca su dirección de correo electrónico",
   "@addAccountEmailHint": {
     "description": "Hint text of email address input field."
   },
-  "addAccountResolvingSettingsLabel": "Suche {email} Einstellungen...",
+  "addAccountResolvingSettingsLabel": "Resolviendo {email}...",
   "@addAccountResolvingSettingsLabel": {
     "description": "Label shown while resolving the settings for the specified email address.",
     "placeholders": {
@@ -1123,7 +1123,7 @@
       }
     }
   },
-  "addAccountResolvedSettingsWrongAction": "Nicht bei {provider}?",
+  "addAccountResolvedSettingsWrongAction": "¿No está en {provider}?",
   "@addAccountResolvedSettingsWrongAction": {
     "description": "Button text shown for the user to edit server settings manually when the resolving was successful but turned out a different than expected provider name.",
     "placeholders": {
@@ -1133,7 +1133,7 @@
       }
     }
   },
-  "addAccountResolvingSettingsFailedInfo": "Ich konte die Einstellungen für {email} nicht finden. Bitte gehe zurück und ändere die E-Mail Adresse oder gebe die Einstellungen manuell an.",
+  "addAccountResolvingSettingsFailedInfo": "No se puede resolver {email}. Por favor, vuelve a cambiarlo o configura la cuenta manualmente.",
   "@addAccountResolvingSettingsFailedInfo": {
     "description": "Info shown after resolving the settings for the specified email address failed.",
     "placeholders": {
@@ -1143,39 +1143,39 @@
       }
     }
   },
-  "addAccountEditManuallyAction": "Manuell bearbeiten",
+  "addAccountEditManuallyAction": "Editar manualmente",
   "@addAccountEditManuallyAction": {
     "description": "Action shown after account settings could not be automatically be discovered."
   },
-  "addAccountPasswordLabel": "Passwort",
+  "addAccountPasswordLabel": "Contraseña",
   "@addAccountPasswordLabel": {
     "description": "Label and section header of password input field."
   },
-  "addAccountPasswordHint": "Dein Passwort",
+  "addAccountPasswordHint": "Por favor, introduce tu contraseña",
   "@addAccountPasswordHint": {
     "description": "Hint text of password input field."
   },
-  "addAccountApplicationPasswordRequiredInfo": "Dieser Anbieter verlangt ein Applikations-spezifisches Passwort.",
+  "addAccountApplicationPasswordRequiredInfo": "Este proveedor requiere que establezcas una contraseña específica para la aplicación.",
   "@addAccountApplicationPasswordRequiredInfo": {
     "description": "Text shown when the provider of the email account requires app specific passwords to be set up."
   },
-  "addAccountApplicationPasswordRequiredButton": "App Passwort erstellen",
+  "addAccountApplicationPasswordRequiredButton": "Crear contraseña específica de la aplicación",
   "@addAccountApplicationPasswordRequiredButton": {
     "description": "Button text for setting up app specific password."
   },
-  "addAccountApplicationPasswordRequiredAcknowledged": "Ich habe bereits ein App Passwort",
+  "addAccountApplicationPasswordRequiredAcknowledged": "Ya tengo una contraseña de la aplicación",
   "@addAccountApplicationPasswordRequiredAcknowledged": {
     "description": "Acknowledgement to be confirmed by user to acknowledge the fact that an app specific password is required."
   },
-  "addAccountVerificationStep": "Überprüfen",
+  "addAccountVerificationStep": "Verificación",
   "@addAccountVerificationStep": {
     "description": "Section header of verification/log in step."
   },
-  "addAccountSetupAccountStep": "Konto Einrichten",
+  "addAccountSetupAccountStep": "Configuracion de Cuenta",
   "@addAccountSetupAccountStep": {
     "description": "Section header of account setup step."
   },
-  "addAccountVerifyingSettingsLabel": "Überprüfe {email}...",
+  "addAccountVerifyingSettingsLabel": "Verificando {email}...",
   "@addAccountVerifyingSettingsLabel": {
     "description": "Info shown while the account settings for the given email are verified.",
     "placeholders": {
@@ -1185,7 +1185,7 @@
       }
     }
   },
-  "addAccountVerifyingSuccessInfo": "Erfolgreich mit {email} angemeldet.",
+  "addAccountVerifyingSuccessInfo": "Has iniciado sesión con éxito en {email}.",
   "@addAccountVerifyingSuccessInfo": {
     "description": "Info shown after the account settings for the given email have been verified.",
     "placeholders": {
@@ -1195,7 +1195,7 @@
       }
     }
   },
-  "addAccountVerifyingFailedInfo": "Leider konnte ich dich nicht anmelden. Überprüfe deine E-Mail {email} und dein Passwort.",
+  "addAccountVerifyingFailedInfo": "Lo sentimos, pero ha habido un problema. Por favor, comprueba tu correo electrónico {email} y contraseña.",
   "@addAccountVerifyingFailedInfo": {
     "description": "Info shown after the account settings for the given email could not be verified.",
     "placeholders": {
@@ -1205,7 +1205,7 @@
       }
     }
   },
-  "addAccountOauthOptionsText": "Melde dich mit {provider} an oder erstelle ein Applikations-spezifisches Passwort.",
+  "addAccountOauthOptionsText": "Inicie sesión con {provider} o cree una contraseña específica de la aplicación.",
   "@addAccountOauthOptionsText": {
     "description": "Info shown oauth process fails and the user can try again or use an app-specific password.",
     "placeholders": {
@@ -1215,7 +1215,7 @@
       }
     }
   },
-  "addAccountOauthSignIn": "Mit {provider} einloggen",
+  "addAccountOauthSignIn": "Iniciar sesión con {provider}",
   "@addAccountOauthSignIn": {
     "description": "Label of button to sign in via oauth with the given provider.",
     "placeholders": {
@@ -1225,39 +1225,39 @@
       }
     }
   },
-  "addAccountOauthSignInGoogle": "Mit Google einloggen",
+  "addAccountOauthSignInGoogle": "Iniciar sesión con Google",
   "@addAccountOauthSignInGoogle": {
     "description": "Label of button to sign in via oauth with the Google."
   },
-  "addAccountOauthSignInWithAppPassword": "Oder erstelle ein Applikations-Passwort:",
+  "addAccountOauthSignInWithAppPassword": "Alternativamente, cree una contraseña de la aplicación para iniciar sesión.",
   "@addAccountOauthSignInWithAppPassword": {
     "description": "Info to set up app specific password."
   },
-  "accountAddImapAccessSetupMightBeRequired": "Vielleicht musst Du bei deinem Anbieter den Zugang für E-Mail Apps aktivieren.",
+  "accountAddImapAccessSetupMightBeRequired": "Su proveedor puede requerir que configure el acceso para aplicaciones de correo electrónico manualmente.",
   "@accountAddImapAccessSetupMightBeRequired": {
     "description": "Info shown when login fails for a provider that is know to require manual activation of IMAP access."
   },
-  "addAccountSetupImapAccessButtonLabel": "E-Mail Zugang aktivieren",
+  "addAccountSetupImapAccessButtonLabel": "Configurar acceso a email",
   "@addAccountSetupImapAccessButtonLabel": {
     "description": "Label of button to launch website with instructions."
   },
-  "addAccountNameOfUserLabel": "Dein Name",
+  "addAccountNameOfUserLabel": "Tu nombre",
   "@addAccountNameOfUserLabel": {
     "description": "Label for user name input field."
   },
-  "addAccountNameOfUserHint": "Name, den Empfänger:innen sehen",
+  "addAccountNameOfUserHint": "El nombre que los destinatarios ven",
   "@addAccountNameOfUserHint": {
     "description": "Hint for user name input field."
   },
-  "addAccountNameOfAccountLabel": "Konto Name",
+  "addAccountNameOfAccountLabel": "Nombre de cuenta",
   "@addAccountNameOfAccountLabel": {
     "description": "Label for account name input field."
   },
-  "addAccountNameOfAccountHint": "Gebe den Namen des Kontos an",
+  "addAccountNameOfAccountHint": "Introduce el nombre de tu cuenta",
   "@addAccountNameOfAccountHint": {
     "description": "Hint for account name input field."
   },
-  "editAccountTitle": "Bearbeite {name}",
+  "editAccountTitle": "Editar {name}",
   "@editAccountTitle": {
     "description": "Title for screen when editing the account with the given name.",
     "placeholders": {
@@ -1267,7 +1267,7 @@
       }
     }
   },
-  "editAccountFailureToConnectInfo": "Maily konnte {name} nicht erreichen.",
+  "editAccountFailureToConnectInfo": "Maily no pudo conectar {name}.",
   "@editAccountFailureToConnectInfo": {
     "description": "Info about not being able to connect to the named service. Most common causes are temporary network problems or a changed password.",
     "placeholders": {
@@ -1277,27 +1277,27 @@
       }
     }
   },
-  "editAccountFailureToConnectRetryAction": "Wiederholen",
+  "editAccountFailureToConnectRetryAction": "Reintentar",
   "@editAccountFailureToConnectRetryAction": {
     "description": "Action to retry connecting to service again."
   },
-  "editAccountFailureToConnectChangePasswordAction": "Passwort ändern",
+  "editAccountFailureToConnectChangePasswordAction": "Cambiar contraseña",
   "@editAccountFailureToConnectChangePasswordAction": {
     "description": "Action to change password for the service."
   },
-  "editAccountFailureToConnectFixedTitle": "Verbunden",
+  "editAccountFailureToConnectFixedTitle": "Conectado",
   "@editAccountFailureToConnectFixedTitle": {
     "description": "Title of dialog shown after successfully connecting a failed account again."
   },
-  "editAccountFailureToConnectFixedInfo": "Das Konto ist wieder verbunden.",
+  "editAccountFailureToConnectFixedInfo": "La cuenta está conectada de nuevo.",
   "@editAccountFailureToConnectFixedInfo": {
     "description": "Message of dialog shown after successfully connecting a failed account again."
   },
-  "editAccountIncludeInUnifiedLabel": "zu \"Alle Konten\" hinzufügen",
+  "editAccountIncludeInUnifiedLabel": "Incluye en cuenta unificada",
   "@editAccountIncludeInUnifiedLabel": {
     "description": "Label for opting this account in/out of the unified account."
   },
-  "editAccountAliasLabel": "Alias E-Mail Adressen für {email}:",
+  "editAccountAliasLabel": "Direcciones de correo electrónico de {email}:",
   "@editAccountAliasLabel": {
     "description": "Label for any alias addresses that have been specified for the given email address.",
     "placeholders": {
@@ -1307,11 +1307,11 @@
       }
     }
   },
-  "editAccountNoAliasesInfo": "Du hast noch keine bekannten Alias E-Mail Adressen für dieses Konto.",
+  "editAccountNoAliasesInfo": "Aún no tienes alias conocidos para esta cuenta.",
   "@editAccountNoAliasesInfo": {
     "description": "Info when there have been no aliases specified for this account."
   },
-  "editAccountAliasRemoved": "{email} Alias gelöscht",
+  "editAccountAliasRemoved": "Alias {email} eliminado",
   "@editAccountAliasRemoved": {
     "description": "Info given after an alias was removed.",
     "placeholders": {
@@ -1321,43 +1321,43 @@
       }
     }
   },
-  "editAccountAddAliasAction": "Alias hinzufügen",
+  "editAccountAddAliasAction": "Añadir alias",
   "@editAccountAddAliasAction": {
     "description": "Button text for adding an alias to this account."
   },
-  "editAccountPlusAliasesSupported": "Unterstützt + Aliase",
+  "editAccountPlusAliasesSupported": "Soporta + alias",
   "@editAccountPlusAliasesSupported": {
     "description": "Info shown when + aliases are supported by this account."
   },
-  "editAccountCheckPlusAliasAction": "Teste Unterstützung für + Aliase",
+  "editAccountCheckPlusAliasAction": "Prueba de soporte para + alias",
   "@editAccountCheckPlusAliasAction": {
     "description": "Button text for testing of + aliases are supported by this account."
   },
-  "editAccountBccMyself": "Setze mich auf BCC",
+  "editAccountBccMyself": "BCC mismo",
   "@editAccountBccMyself": {
     "description": "Label of checkbox to enable the BCC-MYSELF-Feature."
   },
-  "editAccountBccMyselfDescriptionTitle": "Setze mich auf CC",
+  "editAccountBccMyselfDescriptionTitle": "BCC mismo",
   "@editAccountBccMyselfDescriptionTitle": {
     "description": "Title of alert explaining the BCC-MYSELF-Feature."
   },
-  "editAccountBccMyselfDescriptionText": "Du kannst Dir selbst eine \"BCC\" Kopie von jeder Nachricht schicken, die du von diesem Konto verschickst. Normalerweise ist das nicht nötig und nicht gewollt, weil alle gesendeten Nachrichten im\"Gesendete Nachrichten\" Ordner gespeichert werden.",
+  "editAccountBccMyselfDescriptionText": "Puedes enviar automáticamente mensajes a ti mismo para cada mensaje que envíes desde esta cuenta con la función \"BCC yo\". Normalmente esto no es necesario y deseado, ya que todos los mensajes salientes se almacenan en la carpeta \"Enviado\" de todos modos.",
   "@editAccountBccMyselfDescriptionText": {
     "description": "Explanation of the the BCC-MYSELF-Feature."
   },
-  "editAccountServerSettingsAction": "Bearbeite Server Einstellungen",
+  "editAccountServerSettingsAction": "Editar configuración del servidor",
   "@editAccountServerSettingsAction": {
     "description": "Button text for editing the server settings of  this account."
   },
-  "editAccountDeleteAccountAction": "Lösche Konto",
+  "editAccountDeleteAccountAction": "Eliminar cuenta",
   "@editAccountDeleteAccountAction": {
     "description": "Button text for deleting this account."
   },
-  "editAccountDeleteAccountConfirmationTitle": "Bestätige",
+  "editAccountDeleteAccountConfirmationTitle": "Confirmar",
   "@editAccountDeleteAccountConfirmationTitle": {
     "description": "Title for confirmation dialog when deleting this account."
   },
-  "editAccountDeleteAccountConfirmationQuery": "Möchtest du das Konto {name} löschen?",
+  "editAccountDeleteAccountConfirmationQuery": "¿Quieres eliminar la cuenta {name}?",
   "@editAccountDeleteAccountConfirmationQuery": {
     "description": "Request to confirm when deleting this account.",
     "placeholders": {
@@ -1367,7 +1367,7 @@
       }
     }
   },
-  "editAccountTestPlusAliasTitle": "+ Aliase für {name}",
+  "editAccountTestPlusAliasTitle": "+ Alias para {name}",
   "@editAccountTestPlusAliasTitle": {
     "description": "Title for dialog shown while testing + alias support",
     "placeholders": {
@@ -1377,11 +1377,11 @@
       }
     }
   },
-  "editAccountTestPlusAliasStepIntroductionTitle": "Einleitung",
+  "editAccountTestPlusAliasStepIntroductionTitle": "Introducción",
   "@editAccountTestPlusAliasStepIntroductionTitle": {
     "description": "Title for introducing concept of + aliases."
   },
-  "editAccountTestPlusAliasStepIntroductionText": "Dein Konto {accountName} könnte sogenannte + Aliase wie {example} unterstützen.\nEin + Alias hilft dir Deine Identität zu schützen und kann gegen Spam helfen.\nUm dies zu testen, wird eine Nachricht an diese generierte Adresse gesendet. Wenn sie ankommt, dann unterstützt dein Anbieter  + Aliase und du kannst leicht neue generieren wenn Du eine E-Mail schreibst.",
+  "editAccountTestPlusAliasStepIntroductionText": "Tu cuenta {accountName} podría ser compatible con los alias + llamados como {example}.\nUn alias A + te ayuda a proteger tu identidad y te ayuda contra el spam.\nPara probarlo, se enviará un mensaje de prueba a esta dirección generada. Si llega, su proveedor soporta + alias y puede generarlos fácilmente a petición al escribir un nuevo mensaje de correo.",
   "@editAccountTestPlusAliasStepIntroductionText": {
     "description": "Text for introducing concept of + aliases.",
     "placeholders": {
@@ -1395,15 +1395,15 @@
       }
     }
   },
-  "editAccountTestPlusAliasStepTestingTitle": "Testen",
+  "editAccountTestPlusAliasStepTestingTitle": "Pruebas",
   "@editAccountTestPlusAliasStepTestingTitle": {
     "description": "Title while testing concept of + aliases."
   },
-  "editAccountTestPlusAliasStepResultTitle": "Ergebnis",
+  "editAccountTestPlusAliasStepResultTitle": "Resultado",
   "@editAccountTestPlusAliasStepResultTitle": {
     "description": "Title after testing concept of + aliases."
   },
-  "editAccountTestPlusAliasStepResultSuccess": "Dein Konto {name} unterstütz + Aliase.",
+  "editAccountTestPlusAliasStepResultSuccess": "Tu cuenta {name} soporta + alias.",
   "@editAccountTestPlusAliasStepResultSuccess": {
     "description": "Result when account supports + aliases",
     "placeholders": {
@@ -1413,7 +1413,7 @@
       }
     }
   },
-  "editAccountTestPlusAliasStepResultNoSuccess": "Dein Konto {name} unterstütz leider keine + Aliase.",
+  "editAccountTestPlusAliasStepResultNoSuccess": "Tu cuenta {name} no soporta + alias.",
   "@editAccountTestPlusAliasStepResultNoSuccess": {
     "description": "Result when account does not supports + aliases",
     "placeholders": {
@@ -1423,35 +1423,35 @@
       }
     }
   },
-  "editAccountAddAliasTitle": "Alias hinzufügen",
+  "editAccountAddAliasTitle": "Añadir alias",
   "@editAccountAddAliasTitle": {
     "description": "Title when adding new alias."
   },
-  "editAccountEditAliasTitle": "Alias bearbeiten",
+  "editAccountEditAliasTitle": "Editar alias",
   "@editAccountEditAliasTitle": {
     "description": "Title when editing alias."
   },
-  "editAccountAliasAddAction": "Hinzufügen",
+  "editAccountAliasAddAction": "Añadir",
   "@editAccountAliasAddAction": {
     "description": "Action when adding new alias."
   },
-  "editAccountAliasUpdateAction": "Ändern",
+  "editAccountAliasUpdateAction": "Actualizar",
   "@editAccountAliasUpdateAction": {
     "description": "Action when editing alias."
   },
-  "editAccountEditAliasNameLabel": "Alias Name",
+  "editAccountEditAliasNameLabel": "Nombre del alias",
   "@editAccountEditAliasNameLabel": {
     "description": "Label for alias name input field."
   },
-  "editAccountEditAliasEmailLabel": "Alias E-Mail",
+  "editAccountEditAliasEmailLabel": "Alias email",
   "@editAccountEditAliasEmailLabel": {
     "description": "Label for alias email input field."
   },
-  "editAccountEditAliasEmailHint": "Deine Alias E-Mail Adresse",
+  "editAccountEditAliasEmailHint": "Tu dirección de email de alias",
   "@editAccountEditAliasEmailHint": {
     "description": "Hint for alias email input field."
   },
-  "editAccountEditAliasDuplicateError": "Es gibt bereits einen Alias mit {email}.",
+  "editAccountEditAliasDuplicateError": "Ya hay un alias con {email}.",
   "@editAccountEditAliasDuplicateError": {
     "description": "Error when the alias email is already known",
     "placeholders": {
@@ -1461,35 +1461,35 @@
       }
     }
   },
-  "editAccountEnableLogging": "Log aktivieren",
+  "editAccountEnableLogging": "Activar registro",
   "@editAccountEnableLogging": {
     "description": "Label developer mode option to enable logging."
   },
-  "editAccountLoggingEnabled": "Log aktiviert, bitte neu starten",
+  "editAccountLoggingEnabled": "Registro habilitado, por favor reinicie",
   "@editAccountLoggingEnabled": {
     "description": "Short message shown after the log has been enabled."
   },
-  "editAccountLoggingDisabled": "Log de-aktiviert, bitte neu starten",
+  "editAccountLoggingDisabled": "Registro desactivado, por favor reinicie",
   "@editAccountLoggingDisabled": {
     "description": "Short message shown after the log has been disabled."
   },
-  "accountDetailsFallbackTitle": "Server Einstellungen",
+  "accountDetailsFallbackTitle": "Ajustes del servidor",
   "@accountDetailsFallbackTitle": {
     "description": "Title shown when account name is not set."
   },
-  "errorTitle": "Fehler",
+  "errorTitle": "Error",
   "@errorTitle": {
     "description": "Title for error dialogs."
   },
-  "accountProviderStepTitle": "E-Mail Service Anbieter",
+  "accountProviderStepTitle": "Proveedor de Servicio de Email",
   "@accountProviderStepTitle": {
     "description": "Step to select a provider."
   },
-  "accountProviderCustom": "Anderer E-Mail Service",
+  "accountProviderCustom": "Otro servicio de email",
   "@accountProviderCustom": {
     "description": "When no standard provider is chosen."
   },
-  "accountDetailsErrorHostProblem": "Maily kann den angegeben Server nicht erreich. Bitte überprüfe die Einstellugen des Posteingang-Servers \"{incomingHost}\" und des Postausgang-Servers \"{outgoingHost}\".",
+  "accountDetailsErrorHostProblem": "Maily no puede llegar al servidor de correo especificado. Por favor, compruebe la configuración del servidor de entrada \"{incomingHost}\" y la configuración del servidor de salida \"{outgoingHost}\".",
   "@accountDetailsErrorHostProblem": {
     "description": "Error details when no connection to server could be established at all",
     "placeholders": {
@@ -1503,7 +1503,7 @@
       }
     }
   },
-  "accountDetailsErrorLoginProblem": "Anmeldung fehlgeschlagen. Bitte überprüfe den Login-Namen \"{userName}\" und das Passwort \"{password}\".",
+  "accountDetailsErrorLoginProblem": "No se puede iniciar sesión. Por favor, comprueba tu nombre de usuario \"{userName}\" y tu contraseña \"{password}\".",
   "@accountDetailsErrorLoginProblem": {
     "description": "Error details when login fails",
     "placeholders": {
@@ -1517,139 +1517,139 @@
       }
     }
   },
-  "accountDetailsUserNameLabel": "Login Name",
+  "accountDetailsUserNameLabel": "Nombre de usuario",
   "@accountDetailsUserNameLabel": {
     "description": "Label for user name input field."
   },
-  "accountDetailsUserNameHint": "Dein Login, falls es nicht die E-Mail ist",
+  "accountDetailsUserNameHint": "Su nombre de usuario, si es diferente del correo electrónico",
   "@accountDetailsUserNameHint": {
     "description": "Hint for user name input field."
   },
-  "accountDetailsPasswordLabel": "Login Passwort",
+  "accountDetailsPasswordLabel": "Contraseña de acceso",
   "@accountDetailsPasswordLabel": {
     "description": "Label for password input field."
   },
-  "accountDetailsPasswordHint": "Dein Passwort",
+  "accountDetailsPasswordHint": "Su contraseña",
   "@accountDetailsPasswordHint": {
     "description": "Hint for user password input field."
   },
-  "accountDetailsBaseSectionTitle": "Basis Einstellungen",
+  "accountDetailsBaseSectionTitle": "Ajustes de base",
   "@accountDetailsBaseSectionTitle": {
     "description": "Title of base settings section."
   },
-  "accountDetailsIncomingLabel": "Posteingangs-Server",
+  "accountDetailsIncomingLabel": "Servidor entrante",
   "@accountDetailsIncomingLabel": {
     "description": "Label for incoming server domain field."
   },
-  "accountDetailsIncomingHint": "Domäne wie imap.domain.de",
+  "accountDetailsIncomingHint": "Dominio como imap.domain.com",
   "@accountDetailsIncomingHint": {
     "description": "Hint for incoming server domain field."
   },
-  "accountDetailsOutgoingLabel": "Postausgangs-Server",
+  "accountDetailsOutgoingLabel": "Servidor saliente",
   "@accountDetailsOutgoingLabel": {
     "description": "Label for outgoing server domain field."
   },
-  "accountDetailsOutgoingHint": "Domäne wie smtp.domain.de",
+  "accountDetailsOutgoingHint": "Dominio como smtp.domain.com",
   "@accountDetailsOutgoingHint": {
     "description": "Hint for outgoing server domain field."
   },
-  "accountDetailsAdvancedIncomingSectionTitle": "Erweiterte Posteingang Einstellungen",
+  "accountDetailsAdvancedIncomingSectionTitle": "Configuración avanzada de entrada",
   "@accountDetailsAdvancedIncomingSectionTitle": {
     "description": "Title of incoming settings section."
   },
-  "accountDetailsIncomingServerTypeLabel": "Typ des Posteingang Servers:",
+  "accountDetailsIncomingServerTypeLabel": "Tipo de entrada:",
   "@accountDetailsIncomingServerTypeLabel": {
     "description": "Label for server type dropdown."
   },
-  "accountDetailsOptionAutomatic": "automatisch",
+  "accountDetailsOptionAutomatic": "automático",
   "@accountDetailsOptionAutomatic": {
     "description": "Option when the server type/security should be discovered automatically."
   },
-  "accountDetailsIncomingSecurityLabel": "Posteingang Sicherheit:",
+  "accountDetailsIncomingSecurityLabel": "Seguridad entrante:",
   "@accountDetailsIncomingSecurityLabel": {
     "description": "Label for server security dropdown."
   },
-  "accountDetailsSecurityOptionNone": "Plain (keine Verschlüsselung)",
+  "accountDetailsSecurityOptionNone": "Plain (sin cifrado)",
   "@accountDetailsSecurityOptionNone": {
     "description": "Label for security dropdown option without encryption."
   },
-  "accountDetailsIncomingPortLabel": "Posteingang Port",
+  "accountDetailsIncomingPortLabel": "Puerto entrante",
   "@accountDetailsIncomingPortLabel": {
     "description": "Label for incoming port input field."
   },
-  "accountDetailsPortHint": "Leer lassen um automatisch finden zu lassen",
+  "accountDetailsPortHint": "Dejar en blanco para determinar automáticamente",
   "@accountDetailsPortHint": {
     "description": "Hint for port input fields."
   },
-  "accountDetailsIncomingUserNameLabel": "Posteingang Login-Name",
+  "accountDetailsIncomingUserNameLabel": "Nombre de usuario entrante",
   "@accountDetailsIncomingUserNameLabel": {
     "description": "Label for incoming user name input field."
   },
-  "accountDetailsAlternativeUserNameHint": "Login, falls abweichend von oben",
+  "accountDetailsAlternativeUserNameHint": "Tu nombre de usuario, si es diferente de arriba",
   "@accountDetailsAlternativeUserNameHint": {
     "description": "Label for alternative user name input fields."
   },
-  "accountDetailsIncomingPasswordLabel": "Posteingang Passwort",
+  "accountDetailsIncomingPasswordLabel": "Contraseña entrante",
   "@accountDetailsIncomingPasswordLabel": {
     "description": "Label for incoming password input field."
   },
-  "accountDetailsAlternativePasswordHint": "Passwort, falls abweichend von oben",
+  "accountDetailsAlternativePasswordHint": "Su contraseña, si es diferente de la anterior",
   "@accountDetailsAlternativePasswordHint": {
     "description": "Label for alternative user name input fields."
   },
-  "accountDetailsAdvancedOutgoingSectionTitle": "Erweiterte Postausgang Einstellungen",
+  "accountDetailsAdvancedOutgoingSectionTitle": "Ajustes avanzados de salida",
   "@accountDetailsAdvancedOutgoingSectionTitle": {
     "description": "Title of incoming settings section."
   },
-  "accountDetailsOutgoingServerTypeLabel": "Typ des Postausgang Servers:",
+  "accountDetailsOutgoingServerTypeLabel": "Tipo saliente:",
   "@accountDetailsOutgoingServerTypeLabel": {
     "description": "Label for server type dropdown."
   },
-  "accountDetailsOutgoingSecurityLabel": "Postausgang Sicherheit:",
+  "accountDetailsOutgoingSecurityLabel": "Seguridad saliente:",
   "@accountDetailsOutgoingSecurityLabel": {
     "description": "Label for server security dropdown."
   },
-  "accountDetailsOutgoingPortLabel": "Postausgang Port",
+  "accountDetailsOutgoingPortLabel": "Puerto saliente",
   "@accountDetailsOutgoingPortLabel": {
     "description": "Label for outgoing port input field."
   },
-  "accountDetailsOutgoingUserNameLabel": "Postausgang Login-Name",
+  "accountDetailsOutgoingUserNameLabel": "Nombre de usuario saliente",
   "@accountDetailsOutgoingUserNameLabel": {
     "description": "Label for outgoing user name input field."
   },
-  "accountDetailsOutgoingPasswordLabel": "Postausgang Passwort",
+  "accountDetailsOutgoingPasswordLabel": "Contraseña saliente",
   "@accountDetailsOutgoingPasswordLabel": {
     "description": "Label for outgoing password input field."
   },
-  "composeTitleNew": "Neu",
+  "composeTitleNew": "Nuevo mensaje",
   "@composeTitleNew": {
     "description": "Title for compose screen when a new message is created."
   },
-  "composeTitleForward": "Weiterleitung",
+  "composeTitleForward": "Reenviar",
   "@composeTitleForward": {
     "description": "Title for compose screen when a message is forwarded."
   },
-  "composeTitleReply": "Antwort",
+  "composeTitleReply": "Responder",
   "@composeTitleReply": {
     "description": "Title for compose screen when a message is replied."
   },
-  "composeEmptyMessage": "Leere Nachricht",
+  "composeEmptyMessage": "mensaje vacío",
   "@composeEmptyMessage": {
     "description": "Message text for message without text."
   },
-  "composeWarningNoSubject": "Du hast kein Betreff geschrieben. Möchtest du die Nachricht ohne Betreff senden?",
+  "composeWarningNoSubject": "No ha especificado un asunto. ¿Desea enviar el mensaje sin un asunto?",
   "@composeWarningNoSubject": {
     "description": "Warning shown when trying to send a message without subject."
   },
-  "composeActionSentWithoutSubject": "Senden",
+  "composeActionSentWithoutSubject": "Enviar",
   "@composeActionSentWithoutSubject": {
     "description": "Action to send message without subject."
   },
-  "composeMailSendSuccess": "Gesendet 😊",
+  "composeMailSendSuccess": "Email enviado 😊",
   "@composeMailSendSuccess": {
     "description": "Notification shown after a mail was sent successfully."
   },
-  "composeSendErrorInfo": "Leider konnte die E-Mail nicht versendet werden.\nDer Postausgang Server liefert folgende Antwort:\n{details}",
+  "composeSendErrorInfo": "Lo sentimos, no se ha podido enviar tu correo. Hemos recibido el siguiente error:\n{details}.",
   "@composeSendErrorInfo": {
     "description": "Error shown when email could not be send",
     "placeholders": {
@@ -1659,19 +1659,19 @@
       }
     }
   },
-  "composeRequestReadReceiptAction": "Lesebestätigung anfordern",
+  "composeRequestReadReceiptAction": "Solicitar recibo de lectura",
   "@composeRequestReadReceiptAction": {
     "description": "Action to request a read receipt for this message"
   },
-  "composeSaveDraftAction": "Als Entwurf speichern",
+  "composeSaveDraftAction": "Guardar como borrador",
   "@composeSaveDraftAction": {
     "description": "Action to save a message as draft"
   },
-  "composeMessageSavedAsDraft": "Entwurf gespeichert",
+  "composeMessageSavedAsDraft": "Borrador guardado",
   "@composeMessageSavedAsDraft": {
     "description": "Info shown when message was saved as draft successfully"
   },
-  "composeMessageSavedAsDraftErrorInfo": "Der Entwurf konnte nicht gespeichert werden.\nDie Fehlermeldung lautet:\n{details}",
+  "composeMessageSavedAsDraftErrorInfo": "No se ha podido guardar tu borrador con el siguiente error:\n{details}",
   "@composeMessageSavedAsDraftErrorInfo": {
     "description": "Info shown when message could not be saved as a draft",
     "placeholders": {
@@ -1681,43 +1681,43 @@
       }
     }
   },
-  "composeConvertToPlainTextEditorAction": "Zu Text-Nachricht konvertieren",
+  "composeConvertToPlainTextEditorAction": "Convertir a texto plano",
   "@composeConvertToPlainTextEditorAction": {
     "description": "Action to write a plain text message instead of an html message"
   },
-  "composeConvertToHtmlEditorAction": "Zu HTML-Nachricht konvertieren",
+  "composeConvertToHtmlEditorAction": "Convertir a mensaje enriquecido (HTML)",
   "@composeConvertToHtmlEditorAction": {
     "description": "Action to write a HTML message instead of a text message"
   },
-  "composeContinueEditingAction": "Weiter bearbeiten",
+  "composeContinueEditingAction": "Continuar editando",
   "@composeContinueEditingAction": {
     "description": "Action to return to compose screen when draft cannot be saved"
   },
-  "composeCreatePlusAliasAction": "Neuen + Alias erstellen...",
+  "composeCreatePlusAliasAction": "Crear nuevos + alias...",
   "@composeCreatePlusAliasAction": {
     "description": "Action to create a new + alias as a sender"
   },
-  "composeSenderHint": "Absender:in",
+  "composeSenderHint": "Remitente",
   "@composeSenderHint": {
     "description": "Hint for From input field"
   },
-  "composeRecipientHint": "E-Mails der Empfänger:innen",
+  "composeRecipientHint": "Email del destinatario",
   "@composeRecipientHint": {
     "description": "Hint for To input field"
   },
-  "composeSubjectLabel": "Betreff",
+  "composeSubjectLabel": "Sujeto",
   "@composeSubjectLabel": {
     "description": "Label for Subject input field"
   },
-  "composeSubjectHint": "Betreff der Nachricht",
+  "composeSubjectHint": "Asunto del mensaje",
   "@composeSubjectHint": {
     "description": "Hint for Subject input field"
   },
-  "composeAddAttachmentAction": "Hinzufügen",
+  "composeAddAttachmentAction": "Añadir",
   "@composeAddAttachmentAction": {
     "description": "Action to add an attachment - should be short!"
   },
-  "composeRemoveAttachmentAction": "{name} entfernen",
+  "composeRemoveAttachmentAction": "Eliminar {name}",
   "@composeRemoveAttachmentAction": {
     "description": "Action to remove an attachment",
     "placeholders": {
@@ -1727,11 +1727,11 @@
       }
     }
   },
-  "composeLeftByMistake": "Aus Versehen verlassen?",
+  "composeLeftByMistake": "¿Dejado por error?",
   "@composeLeftByMistake": {
     "description": "Info shown after leaving compose screen to allow an easy return"
   },
-  "attachTypeFile": "Datei",
+  "attachTypeFile": "Fichero",
   "@attachTypeFile": {
     "description": "Attachment type to add"
   },
@@ -1739,7 +1739,7 @@
   "@attachTypePhoto": {
     "description": "Attachment type to add"
   },
-  "attachTypeVideo": "Video",
+  "attachTypeVideo": "Vídeo",
   "@attachTypeVideo": {
     "description": "Attachment type to add"
   },
@@ -1747,87 +1747,87 @@
   "@attachTypeAudio": {
     "description": "Attachment type to add"
   },
-  "attachTypeLocation": "Ort",
+  "attachTypeLocation": "Ubicación",
   "@attachTypeLocation": {
     "description": "Attachment type to add"
   },
-  "attachTypeGif": "Animiertes Gif",
+  "attachTypeGif": "Gif animado",
   "@attachTypeGif": {
     "description": "Attachment type to add"
   },
-  "attachTypeGifSearch": "in GIPHY suchen",
+  "attachTypeGifSearch": "buscar GIPHY",
   "@attachTypeGifSearch": {
     "description": "Text for searching in GIPHY service for GIF"
   },
-  "attachTypeSticker": "Sticker",
+  "attachTypeSticker": "Pegatina",
   "@attachTypeSticker": {
     "description": "Attachment type to add"
   },
-  "attachTypeStickerSearch": "in GIPHY suchen",
+  "attachTypeStickerSearch": "buscar GIPHY",
   "@attachTypeStickerSearch": {
     "description": "Text for searching in GIPHY service for sticker"
   },
-  "attachTypeAppointment": "Termin",
+  "attachTypeAppointment": "Cita",
   "@attachTypeAppointment": {
     "description": "Attachment type to add"
   },
-  "languageSettingTitle": "Sprache (Language)",
+  "languageSettingTitle": "Idioma",
   "@languageSettingTitle": {
     "description": "Title of language setting screen"
   },
-  "languageSettingLabel": "Währe die Sprache für Maily:",
+  "languageSettingLabel": "Elige el idioma para Maily:",
   "@languageSettingLabel": {
     "description": "Label for language setting dropdown screen"
   },
-  "languageSettingSystemOption": "Systemsprache",
+  "languageSettingSystemOption": "Idioma del sistema",
   "@languageSettingSystemOption": {
     "description": "Option to use the system's settings"
   },
-  "languageSettingConfirmationTitle": "Deutsch für Maily nutzen?",
+  "languageSettingConfirmationTitle": "¿Usar Inglés para Maily?",
   "@languageSettingConfirmationTitle": {
     "description": "Title of dialog to confirm when switching the language"
   },
-  "languageSettingConfirmationQuery": "Bitte bestätige, dass deutsch als Sprache verwendet werden soll.",
+  "languageSettingConfirmationQuery": "Por favor confirme el uso del inglés como idioma elegido.",
   "@languageSettingConfirmationQuery": {
     "description": "Query to be confirmed by user when switching the language"
   },
-  "languageSetInfo": "Maily ist nun auf deutsch. Bitte starte die App neu.",
+  "languageSetInfo": "Ahora se muestra en inglés. Por favor, reinicia la aplicación para que surta efecto.",
   "@languageSetInfo": {
     "description": "Info text after having specified the language."
   },
-  "languageSystemSetInfo": "Maily wird nun die Systemsprache oder englisch nutzen, wenn die Systemprache nicht unterstützt wird. Bitte starte die App neu.",
+  "languageSystemSetInfo": "Maily ahora utilizará el idioma del sistema o Inglés si el idioma del sistema no es compatible.",
   "@languageSystemSetInfo": {
     "description": "Info text after choosing the system's language for Maily."
   },
-  "swipeSettingTitle": "Wischgesten",
+  "swipeSettingTitle": "Deslizar gestos",
   "@swipeSettingTitle": {
     "description": "Title of swipe setting screen"
   },
-  "swipeSettingLeftToRightLabel": "Von links nach rechts wischen",
+  "swipeSettingLeftToRightLabel": "Deslizar de izquierda a derecha",
   "@swipeSettingLeftToRightLabel": {
     "description": "Label for swipe gesture"
   },
-  "swipeSettingRightToLeftLabel": "Von rechts nach links wischen",
+  "swipeSettingRightToLeftLabel": "Deslizar derecha a izquierda",
   "@swipeSettingRightToLeftLabel": {
     "description": "Label for swipe gesture"
   },
-  "swipeSettingChangeAction": "Ändern",
+  "swipeSettingChangeAction": "Cambiar",
   "@swipeSettingChangeAction": {
     "description": "Action for changing a swipe gesture"
   },
-  "signatureSettingsTitle": "Signatur",
+  "signatureSettingsTitle": "Firma",
   "@signatureSettingsTitle": {
     "description": "Title of signature setting screen"
   },
-  "signatureSettingsComposeActionsInfo": "Aktiviere die Signatur für folgende Nachrichten:",
+  "signatureSettingsComposeActionsInfo": "Activar la firma para los siguientes mensajes:",
   "@signatureSettingsComposeActionsInfo": {
     "description": "Text before selecting message types for a signature (new, forward, reply)."
   },
-  "signatureSettingsAccountInfo": "Du kannst Signaturen für Konten in den Konten-Einstellungen festlegen.",
+  "signatureSettingsAccountInfo": "Puede especificar firmas específicas de la cuenta en la configuración de la cuenta.",
   "@signatureSettingsAccountInfo": {
     "description": "Informational text before showing link to account settings."
   },
-  "signatureSettingsAddForAccount": "Signature für {account} hinzufügen",
+  "signatureSettingsAddForAccount": "Añadir firma para {account}",
   "@signatureSettingsAddForAccount": {
     "description": "Action to add account specific signature.",
     "placeholders": {
@@ -1837,15 +1837,15 @@
       }
     }
   },
-  "defaultSenderSettingsTitle": "Standard Absender",
+  "defaultSenderSettingsTitle": "Remitente por defecto",
   "@defaultSenderSettingsTitle": {
     "description": "Title of default sender setting screen"
   },
-  "defaultSenderSettingsLabel": "Wähle den Absender für neue Nachrichten aus.",
+  "defaultSenderSettingsLabel": "Seleccione el remitente para nuevos mensajes.",
   "@defaultSenderSettingsLabel": {
     "description": "Description of default sender setting screen"
   },
-  "defaultSenderSettingsFirstAccount": "Erstes Konto ({email})",
+  "defaultSenderSettingsFirstAccount": "Primera cuenta ({email})",
   "@defaultSenderSettingsFirstAccount": {
     "description": "The default sender is the one from the first account",
     "placeholders": {
@@ -1855,39 +1855,39 @@
       }
     }
   },
-  "defaultSenderSettingsAliasInfo": "Du kannst Alias E-Mail Adressen in den [AS] festlegen.",
+  "defaultSenderSettingsAliasInfo": "Puede configurar direcciones de alias de correo electrónico en la [AS].",
   "@defaultSenderSettingsAliasInfo": {
     "description": "Info about that email aliases can be set up in the account settings. [AS] is the place, where defaultSenderSettingsAliasAccountSettings is included as a link."
   },
-  "defaultSenderSettingsAliasAccountSettings": "Konto-Einstellungen",
+  "defaultSenderSettingsAliasAccountSettings": "configuración de cuenta",
   "@defaultSenderSettingsAliasAccountSettings": {
     "description": "Text of the account settings link."
   },
-  "replySettingsTitle": "Nachrichten Format",
+  "replySettingsTitle": "Formato de mensaje",
   "@replySettingsTitle": {
     "description": "Reply settings title."
   },
-  "replySettingsIntro": "In welchem Format möchtest du Nachrichten schreiben?",
+  "replySettingsIntro": "¿En qué formato desea responder o reenviar el correo electrónico por defecto?",
   "@replySettingsIntro": {
     "description": "Reply settings introduction text."
   },
-  "replySettingsFormatHtml": "Immer HTML",
+  "replySettingsFormatHtml": "Formato siempre rico (HTML)",
   "@replySettingsFormatHtml": {
     "description": "Reply settings option."
   },
-  "replySettingsFormatSameAsOriginal": "Im selben Format wie die Orignal-Nachricht",
+  "replySettingsFormatSameAsOriginal": "Usar el mismo formato que el correo original",
   "@replySettingsFormatSameAsOriginal": {
     "description": "Reply settings option."
   },
-  "replySettingsFormatPlainText": "Immer nur Text",
+  "replySettingsFormatPlainText": "Siempre sólo texto",
   "@replySettingsFormatPlainText": {
     "description": "Reply settings option."
   },
-  "moveTitle": "Nachricht verschieben",
+  "moveTitle": "Mover mensaje",
   "@moveTitle": {
     "description": "Title of move to mailbox dialog."
   },
-  "moveSuccess": "In {mailbox} verschoben.",
+  "moveSuccess": "Mensajes movidos a {mailbox}.",
   "@moveSuccess": {
     "description": "Message after moving message successfully.",
     "placeholders": {
@@ -1897,27 +1897,27 @@
       }
     }
   },
-  "editorArtInputLabel": "Deine Eingabe",
+  "editorArtInputLabel": "Tu entrada",
   "@editorArtInputLabel": {
     "description": "Label of input field when inserting a formatted text"
   },
-  "editorArtInputHint": "Hier Text eingeben",
+  "editorArtInputHint": "Introduce el texto aquí",
   "@editorArtInputHint": {
     "description": "Hint of input field when inserting a formatted text"
   },
-  "editorArtWaitingForInputHint": "warte auf Eingabe...",
+  "editorArtWaitingForInputHint": "esperando por entrada...",
   "@editorArtWaitingForInputHint": {
     "description": "Text shown while waiting for input"
   },
-  "fontSerifBold": "Serif fett",
+  "fontSerifBold": "Serif bold",
   "@fontSerifBold": {
     "description": "Font name"
   },
-  "fontSerifItalic": "Serif kursiv",
+  "fontSerifItalic": "Serif italic",
   "@fontSerifItalic": {
     "description": "Font name"
   },
-  "fontSerifBoldItalic": "Serif fett kursiv",
+  "fontSerifBoldItalic": "Serif bold italic",
   "@fontSerifBoldItalic": {
     "description": "Font name"
   },
@@ -1925,23 +1925,23 @@
   "@fontSans": {
     "description": "Font name"
   },
-  "fontSansBold": "Sans fett",
+  "fontSansBold": "Sans bold",
   "@fontSansBold": {
     "description": "Font name"
   },
-  "fontSansItalic": "Sans kursiv",
+  "fontSansItalic": "Sans italic",
   "@fontSansItalic": {
     "description": "Font name"
   },
-  "fontSansBoldItalic": "Sans fett kursiv",
+  "fontSansBoldItalic": "Sans bold italic",
   "@fontSansBoldItalic": {
     "description": "Font name"
   },
-  "fontScript": "Skript",
+  "fontScript": "Escribir",
   "@fontScript": {
     "description": "Font name"
   },
-  "fontScriptBold": "Script fett",
+  "fontScriptBold": "Escribir negrita",
   "@fontScriptBold": {
     "description": "Font name"
   },
@@ -1949,43 +1949,43 @@
   "@fontFraktur": {
     "description": "Font name"
   },
-  "fontFrakturBold": "Fraktur fett",
+  "fontFrakturBold": "Fraktur bold",
   "@fontFrakturBold": {
     "description": "Font name"
   },
-  "fontMonospace": "Monospace",
+  "fontMonospace": "Monoespaciado",
   "@fontMonospace": {
     "description": "Font name"
   },
-  "fontFullwidth": "Fullwidth",
+  "fontFullwidth": "Ancho completo",
   "@fontFullwidth": {
     "description": "Font name"
   },
-  "fontDoublestruck": "Doppelt gestrichen",
+  "fontDoublestruck": "Doble golpeado",
   "@fontDoublestruck": {
     "description": "Font name"
   },
-  "fontCapitalized": "Grossbuchstaben",
+  "fontCapitalized": "Capitalizado",
   "@fontCapitalized": {
     "description": "Font name"
   },
-  "fontCircled": "Eingekreist",
+  "fontCircled": "Circlado",
   "@fontCircled": {
     "description": "Font name"
   },
-  "fontParenthesized": "Geklammert",
+  "fontParenthesized": "Parentesizado",
   "@fontParenthesized": {
     "description": "Font name"
   },
-  "fontUnderlinedSingle": "Unterstrichen",
+  "fontUnderlinedSingle": "Subrayado",
   "@fontUnderlinedSingle": {
     "description": "Font name"
   },
-  "fontUnderlinedDouble": "Doppelt unterstrichen",
+  "fontUnderlinedDouble": "Doble subrayado",
   "@fontUnderlinedDouble": {
     "description": "Font name"
   },
-  "fontStrikethroughSingle": "Durchgestrichen",
+  "fontStrikethroughSingle": "Golpear a través",
   "@fontStrikethroughSingle": {
     "description": "Font name"
   },
@@ -1993,7 +1993,7 @@
   "@fontCrosshatch": {
     "description": "Font name"
   },
-  "accountLoadError": "Keine Verbindung mit {name} möglich. Wurde vielleicht das Passwort geändert?",
+  "accountLoadError": "No se puede conectar a su cuenta {name}. ¿Ha cambiado la contraseña?",
   "@accountLoadError": {
     "description": "Message shown when single account could not be loaded.",
     "placeholders": {
@@ -2003,39 +2003,39 @@
       }
     }
   },
-  "accountLoadErrorEditAction": "Konto bearbeiten",
+  "accountLoadErrorEditAction": "Editar cuenta",
   "@accountLoadErrorEditAction": {
     "description": "Action to edit account"
   },
-  "extensionsTitle": "Erweiterungen",
+  "extensionsTitle": "Extensiones",
   "@extensionsTitle": {
     "description": "Title of extension section within the development settings"
   },
-  "extensionsIntro": "Mit Erweiterungen können E-Mail-Dienstleister, Firmen und Entwickler:innen Maily mit hilfreichen Funktionen ergänzen.",
+  "extensionsIntro": "Con los proveedores de servicios de correo electrónico de extensiones, las empresas y los desarrolladores pueden adaptarse a las funcionalidades más útiles.",
   "@extensionsIntro": {
     "description": "Explanation of extensions"
   },
-  "extensionsLearnMoreAction": "Lerne mehr über Erweiterungen",
+  "extensionsLearnMoreAction": "Más información sobre extensiones",
   "@extensionsLearnMoreAction": {
     "description": "Label for launching a website with more information"
   },
-  "extensionsReloadAction": "Erweiterungen neu laden",
+  "extensionsReloadAction": "Recargar extensiones",
   "@extensionsReloadAction": {
     "description": "Action to refresh extensions"
   },
-  "extensionDeactivateAllAction": "Alle Erweiterungen deaktivieren",
+  "extensionDeactivateAllAction": "Desactivar todas las extensiones",
   "@extensionDeactivateAllAction": {
     "description": "Action to deactivate / unload any extension"
   },
-  "extensionsManualAction": "Manuell laden",
+  "extensionsManualAction": "Cargar manualmente",
   "@extensionsManualAction": {
     "description": "Action to load extension manually"
   },
-  "extensionsManualUrlLabel": "Url der Erweiterung",
+  "extensionsManualUrlLabel": "Url de la extensión",
   "@extensionsManualUrlLabel": {
     "description": "Label for URL input field"
   },
-  "extensionsManualLoadingError": "Es kann keine Erweiterung von \"{url}\" heruntergeladen werden.",
+  "extensionsManualLoadingError": "No se ha podido descargar la extensión de \"{url}\".",
   "@extensionsManualLoadingError": {
     "description": "Message shown when extensions could not be loaded.",
     "placeholders": {
@@ -2045,99 +2045,99 @@
       }
     }
   },
-  "icalendarAcceptTentatively": "Vorbehaltlich",
+  "icalendarAcceptTentatively": "Tentativamente",
   "@icalendarAcceptTentatively": {
     "description": "Action to accept an icalendar invitation tentatively"
   },
-  "icalendarActionChangeParticipantStatus": "Ändern",
+  "icalendarActionChangeParticipantStatus": "Cambiar",
   "@icalendarActionChangeParticipantStatus": {
     "description": "Action to change an icalendar invitation participant status"
   },
-  "icalendarLabelSummary": "Titel",
+  "icalendarLabelSummary": "Título",
   "@icalendarLabelSummary": {
     "description": "Label of the summary info of an icalendar object"
   },
-  "icalendarNoSummaryInfo": "(kein Titel)",
+  "icalendarNoSummaryInfo": "(sin título)",
   "@icalendarNoSummaryInfo": {
     "description": "Info shown when the icalendar object has no summary (no title)"
   },
-  "icalendarLabelDescription": "Beschreibung",
+  "icalendarLabelDescription": "Descripción",
   "@icalendarLabelDescription": {
     "description": "Label of the description info of an icalendar object"
   },
-  "icalendarLabelStart": "Start",
+  "icalendarLabelStart": "Comenzar",
   "@icalendarLabelStart": {
     "description": "Label of the start datetime info of an icalendar object"
   },
-  "icalendarLabelEnd": "Ende",
+  "icalendarLabelEnd": "Fin",
   "@icalendarLabelEnd": {
     "description": "Label of the end datetime info of an icalendar object"
   },
-  "icalendarLabelDuration": "Dauer",
+  "icalendarLabelDuration": "Duración",
   "@icalendarLabelDuration": {
     "description": "Label of the duration info of an icalendar object"
   },
-  "icalendarLabelLocation": "Ort",
+  "icalendarLabelLocation": "Ubicación",
   "@icalendarLabelLocation": {
     "description": "Label of the location info of an icalendar object"
   },
-  "icalendarLabelTeamsUrl": "Link",
+  "icalendarLabelTeamsUrl": "Enlace",
   "@icalendarLabelTeamsUrl": {
     "description": "Label of the ms teams url info of an icalendar object"
   },
-  "icalendarLabelRecurrenceRule": "Wiederholung",
+  "icalendarLabelRecurrenceRule": "Repetir",
   "@icalendarLabelRecurrenceRule": {
     "description": "Label of the recurrence info of an icalendar object"
   },
-  "icalendarLabelParticipants": "Teilnehmer",
+  "icalendarLabelParticipants": "Participantes",
   "@icalendarLabelParticipants": {
     "description": "Label of the participants info of an icalendar object"
   },
-  "icalendarParticipantStatusNeedsAction": "Du wirst gebeten, diese Einladung zu beantworten.",
+  "icalendarParticipantStatusNeedsAction": "Se le pide que responda a esta invitación.",
   "@icalendarParticipantStatusNeedsAction": {
     "description": "Participant status of the current user for a icalendar object"
   },
-  "icalendarParticipantStatusAccepted": "Du hast die Einladung akzeptiert.",
+  "icalendarParticipantStatusAccepted": "Has aceptado esta invitación.",
   "@icalendarParticipantStatusAccepted": {
     "description": "Participant status of the current user for a icalendar object"
   },
-  "icalendarParticipantStatusDeclined": "Du hast die Einladung abgelehnt.",
+  "icalendarParticipantStatusDeclined": "Has rechazado esta invitación.",
   "@icalendarParticipantStatusDeclined": {
     "description": "Participant status of the current user for a icalendar object"
   },
-  "icalendarParticipantStatusAcceptedTentatively": "Du hast die Einladung vorbehaltlich akzeptiert.",
+  "icalendarParticipantStatusAcceptedTentatively": "Has aceptado esta invitación de forma tentativa.",
   "@icalendarParticipantStatusAcceptedTentatively": {
     "description": "Participant status of the current user for a icalendar object"
   },
-  "icalendarParticipantStatusDelegated": "Du hast die Teilnahme delegiert.",
+  "icalendarParticipantStatusDelegated": "Usted ha delegado esta invitación.",
   "@icalendarParticipantStatusDelegated": {
     "description": "Participant status of the current user for a icalendar object"
   },
-  "icalendarParticipantStatusInProcess": "Die Aufgabe wird bearbeitet.",
+  "icalendarParticipantStatusInProcess": "La tarea está en curso.",
   "@icalendarParticipantStatusInProcess": {
     "description": "Participant status of the current user for a icalendar object"
   },
-  "icalendarParticipantStatusPartial": "Die Aufgabe ist teilweise erledigt.",
+  "icalendarParticipantStatusPartial": "La tarea está parcialmente hecha.",
   "@icalendarParticipantStatusPartial": {
     "description": "Participant status of the current user for a icalendar object"
   },
-  "icalendarParticipantStatusCompleted": "Die Aufgabe ist erledigt.",
+  "icalendarParticipantStatusCompleted": "La tarea está hecha.",
   "@icalendarParticipantStatusCompleted": {
     "description": "Participant status of the current user for a icalendar object"
   },
-  "icalendarParticipantStatusOther": "Der Status ist unbekannt.",
+  "icalendarParticipantStatusOther": "Su estado es desconocido.",
   "@icalendarParticipantStatusOther": {
     "description": "Participant status of the current user for a icalendar object"
   },
-  "icalendarParticipantStatusChangeTitle": "Dein Status",
+  "icalendarParticipantStatusChangeTitle": "Tu estado",
   "@icalendarParticipantStatusChangeTitle": {
     "description": "Title for dialog to change participant status"
   },
-  "icalendarParticipantStatusChangeText": "Möchtest Du an diese Einladung annehmen?",
+  "icalendarParticipantStatusChangeText": "¿Quieres aceptar esta invitación?",
   "@icalendarParticipantStatusChangeText": {
     "description": "Text of dialog to change participant status"
   },
-  "icalendarParticipantStatusSentFailure": "Antwort kann nicht gesendet werrden.\nDer Server hat mit den folgenden Details geantwortet:\n{details}",
+  "icalendarParticipantStatusSentFailure": "No se puede enviar la respuesta.\nEl servidor respondió con los siguientes detalles:\n{details}",
   "@icalendarParticipantStatusSentFailure": {
     "description": "Failure message for a status change reply",
     "placeholders": {
@@ -2147,11 +2147,11 @@
       }
     }
   },
-  "icalendarExportAction": "Exportieren",
+  "icalendarExportAction": "Exportar",
   "@icalendarExportAction": {
     "description": "Action to export the invite to the native calendar"
   },
-  "icalendarReplyStatusNeedsAction": "{attendee} hat diese Einladung nicht beantwortet.",
+  "icalendarReplyStatusNeedsAction": "{attendee} no ha respondido a esta invitación.",
   "@icalendarReplyStatusNeedsAction": {
     "description": "Valid Calendar reply",
     "placeholders": {
@@ -2161,7 +2161,7 @@
       }
     }
   },
-  "icalendarReplyStatusAccepted": "{attendee} hat die Einladung akzeptiert.",
+  "icalendarReplyStatusAccepted": "{attendee} ha aceptado la cita.",
   "@icalendarReplyStatusAccepted": {
     "description": "Valid Calendar reply",
     "placeholders": {
@@ -2171,7 +2171,7 @@
       }
     }
   },
-  "icalendarReplyStatusDeclined": "{attendee} hat die Einladung abgelehnt.",
+  "icalendarReplyStatusDeclined": "{attendee} ha rechazado esta invitación.",
   "@icalendarReplyStatusDeclined": {
     "description": "Valid Calendar reply",
     "placeholders": {
@@ -2181,7 +2181,7 @@
       }
     }
   },
-  "icalendarReplyStatusAcceptedTentatively": "{attendee} hat die Einladung vorbehaltlich akzeptiert.",
+  "icalendarReplyStatusAcceptedTentatively": "{attendee} ha aceptado tentativamente esta invitación.",
   "@icalendarReplyStatusAcceptedTentatively": {
     "description": "Valid Calendar reply",
     "placeholders": {
@@ -2191,7 +2191,7 @@
       }
     }
   },
-  "icalendarReplyStatusDelegated": "{attendee} hat die Teilnahme delegiert.",
+  "icalendarReplyStatusDelegated": "{attendee} ha delegado esta invitación.",
   "@icalendarReplyStatusDelegated": {
     "description": "Valid Calendar reply",
     "placeholders": {
@@ -2201,7 +2201,7 @@
       }
     }
   },
-  "icalendarReplyStatusInProcess": "{attendee} hat mit der Aufgabe begonnen.",
+  "icalendarReplyStatusInProcess": "{attendee} ha iniciado esta tarea.",
   "@icalendarReplyStatusInProcess": {
     "description": "Valid Calendar reply",
     "placeholders": {
@@ -2211,7 +2211,7 @@
       }
     }
   },
-  "icalendarReplyStatusPartial": "{attendee} hat die Aufgabe teilweise erledigt.",
+  "icalendarReplyStatusPartial": "{attendee} ha realizado parcialmente esta tarea.",
   "@icalendarReplyStatusPartial": {
     "description": "Valid Calendar reply",
     "placeholders": {
@@ -2221,7 +2221,7 @@
       }
     }
   },
-  "icalendarReplyStatusCompleted": "{attendee} hat die Aufgabe erledigt.",
+  "icalendarReplyStatusCompleted": "{attendee} ha finalizado esta tarea.",
   "@icalendarReplyStatusCompleted": {
     "description": "Valid Calendar reply",
     "placeholders": {
@@ -2231,7 +2231,7 @@
       }
     }
   },
-  "icalendarReplyStatusOther": "{attendee} hat mit einem unbekannten Status geantwortet.",
+  "icalendarReplyStatusOther": "{attendee} ha respondido con un estado desconocido.",
   "@icalendarReplyStatusOther": {
     "description": "Valid Calendar reply",
     "placeholders": {
@@ -2241,11 +2241,11 @@
       }
     }
   },
-  "icalendarReplyWithoutParticipants": "Diese Antwort enthält keine Teilnehmer:innen.",
+  "icalendarReplyWithoutParticipants": "Esta respuesta de calendario no contiene participantes.",
   "@icalendarReplyWithoutParticipants": {
     "description": "Calendar reply without any participant"
   },
-  "icalendarReplyWithoutStatus": "{attendee} hat eine Antwort ohne Teilnahme-Status gesendet.",
+  "icalendarReplyWithoutStatus": "{attendee} respondió sin un estado de participación.",
   "@icalendarReplyWithoutStatus": {
     "description": "Calendar reply without any participant status",
     "placeholders": {
@@ -2255,67 +2255,67 @@
       }
     }
   },
-  "composeAppointmentTitle": "Einladung erstellen",
+  "composeAppointmentTitle": "Crear cita",
   "@composeAppointmentTitle": {
     "description": "Title for adding a new appointment screen"
   },
-  "composeAppointmentLabelDay": "Tag",
+  "composeAppointmentLabelDay": "día",
   "@composeAppointmentLabelDay": {
     "description": "Label for select day button"
   },
-  "composeAppointmentLabelTime": "Zeit",
+  "composeAppointmentLabelTime": "tiempo",
   "@composeAppointmentLabelTime": {
     "description": "Label for select time button"
   },
-  "composeAppointmentLabelAllDayEvent": "Ganztägiger Termin",
+  "composeAppointmentLabelAllDayEvent": "Todo el día",
   "@composeAppointmentLabelAllDayEvent": {
     "description": "Label for is all day toggle"
   },
-  "composeAppointmentLabelRepeat": "Wiederholen",
+  "composeAppointmentLabelRepeat": "Repetir",
   "@composeAppointmentLabelRepeat": {
     "description": "Label for repeat drop-down"
   },
-  "composeAppointmentLabelRepeatOptionNever": "Nie",
+  "composeAppointmentLabelRepeatOptionNever": "Nunca",
   "@composeAppointmentLabelRepeatOptionNever": {
     "description": "Option for repeat drop-down"
   },
-  "composeAppointmentLabelRepeatOptionDaily": "Täglich",
+  "composeAppointmentLabelRepeatOptionDaily": "Diario",
   "@composeAppointmentLabelRepeatOptionDaily": {
     "description": "Option for repeat drop-down"
   },
-  "composeAppointmentLabelRepeatOptionWeekly": "Wöchentlich",
+  "composeAppointmentLabelRepeatOptionWeekly": "Semanal",
   "@composeAppointmentLabelRepeatOptionWeekly": {
     "description": "Option for repeat drop-down"
   },
-  "composeAppointmentLabelRepeatOptionMonthly": "Monatlich",
+  "composeAppointmentLabelRepeatOptionMonthly": "Mensual",
   "@composeAppointmentLabelRepeatOptionMonthly": {
     "description": "Option for repeat drop-down"
   },
-  "composeAppointmentLabelRepeatOptionYearly": "Jährlich",
+  "composeAppointmentLabelRepeatOptionYearly": "Anualmente",
   "@composeAppointmentLabelRepeatOptionYearly": {
     "description": "Option for repeat drop-down"
   },
-  "composeAppointmentRecurrenceFrequencyLabel": "Frequenz",
+  "composeAppointmentRecurrenceFrequencyLabel": "Frecuencia",
   "@composeAppointmentRecurrenceFrequencyLabel": {
     "description": "Label for frequency drop-down"
   },
-  "composeAppointmentRecurrenceIntervalLabel": "Intervall",
+  "composeAppointmentRecurrenceIntervalLabel": "Intervalo",
   "@composeAppointmentRecurrenceIntervalLabel": {
     "description": "Label for interval drop-down"
   },
-  "composeAppointmentRecurrenceDaysLabel": "An Tagen",
+  "composeAppointmentRecurrenceDaysLabel": "En días",
   "@composeAppointmentRecurrenceDaysLabel": {
     "description": "Label for days selection area in a weekly or monthly recurrence"
   },
-  "composeAppointmentRecurrenceUntilLabel": "Bis",
+  "composeAppointmentRecurrenceUntilLabel": "Hasta",
   "@composeAppointmentRecurrenceUntilLabel": {
     "description": "Label for choosing end date of recurrence"
   },
-  "composeAppointmentRecurrenceUntilOptionUnlimited": "Unlimitiert",
+  "composeAppointmentRecurrenceUntilOptionUnlimited": "Sin límite",
   "@composeAppointmentRecurrenceUntilOptionUnlimited": {
     "description": "Option for no end date of recurrence"
   },
-  "composeAppointmentRecurrenceUntilOptionRecommended": "Empfohlen ({duration})",
+  "composeAppointmentRecurrenceUntilOptionRecommended": "Recomendado ({duration})",
   "@composeAppointmentRecurrenceUntilOptionRecommended": {
     "description": "Option for standard end date of recurrence with the given duration",
     "placeholders": {
@@ -2325,11 +2325,11 @@
       }
     }
   },
-  "composeAppointmentRecurrenceUntilOptionSpecificDate": "Bestimmtes Datum",
+  "composeAppointmentRecurrenceUntilOptionSpecificDate": "Hasta la fecha elegida",
   "@composeAppointmentRecurrenceUntilOptionSpecificDate": {
     "description": "Option for specific end date of recurrence"
   },
-  "composeAppointmentRecurrenceMonthlyOnDayOfMonth": "Am {day}. Tag des Monats",
+  "composeAppointmentRecurrenceMonthlyOnDayOfMonth": "El {day}. día del mes",
   "@composeAppointmentRecurrenceMonthlyOnDayOfMonth": {
     "description": "Option for repeating an event always on that day of the month",
     "placeholders": {
@@ -2340,31 +2340,31 @@
       }
     }
   },
-  "composeAppointmentRecurrenceMonthlyOnWeekDay": "Am Wochentag des Monats",
+  "composeAppointmentRecurrenceMonthlyOnWeekDay": "Día de la semana en mes",
   "@composeAppointmentRecurrenceMonthlyOnWeekDay": {
     "description": "Monthly repeat on weekday of a chosen week"
   },
-  "composeAppointmentRecurrenceFirst": "Erster",
+  "composeAppointmentRecurrenceFirst": "Primero",
   "@composeAppointmentRecurrenceFirst": {
     "description": "Monthly day option"
   },
-  "composeAppointmentRecurrenceSecond": "Zweiter",
+  "composeAppointmentRecurrenceSecond": "Segundo",
   "@composeAppointmentRecurrenceSecond": {
     "description": "Monthly day option"
   },
-  "composeAppointmentRecurrenceThird": "Dritter",
+  "composeAppointmentRecurrenceThird": "Tercer",
   "@composeAppointmentRecurrenceThird": {
     "description": "Monthly day option"
   },
-  "composeAppointmentRecurrenceLast": "Letzter",
+  "composeAppointmentRecurrenceLast": "Último",
   "@composeAppointmentRecurrenceLast": {
     "description": "Monthly day option"
   },
-  "composeAppointmentRecurrenceSecondLast": "Vorletzter",
+  "composeAppointmentRecurrenceSecondLast": "Segundo-último",
   "@composeAppointmentRecurrenceSecondLast": {
     "description": "Monthly day option"
   },
-  "durationYears": "{number,plural, =1{1 Jahr} other{{number} Jahre}}",
+  "durationYears": "{number,plural, =1{1 año} other{{number} años}}",
   "@durationYears": {
     "description": "Duration. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -2375,7 +2375,7 @@
       }
     }
   },
-  "durationMonths": "{number,plural, =1{1 Monat} other{{number} Monate}}",
+  "durationMonths": "{number,plural, =1{1 mes} other{{number} meses}}",
   "@durationMonths": {
     "description": "Duration. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -2386,7 +2386,7 @@
       }
     }
   },
-  "durationWeeks": "{number,plural, =1{1 Woche} other{{number} Wochen}}",
+  "durationWeeks": "{number,plural, =1{1 semana} other{{number} semanas}}",
   "@durationWeeks": {
     "description": "Duration. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -2397,7 +2397,7 @@
       }
     }
   },
-  "durationDays": "{number,plural, =1{1 Tag} other{{number} Tage}}",
+  "durationDays": "{number,plural, =1{1 día} other{{number} días}}",
   "@durationDays": {
     "description": "Duration. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -2408,7 +2408,7 @@
       }
     }
   },
-  "durationHours": "{number,plural, =1{1 Stunde} other{{number} Stunden}}",
+  "durationHours": "{number,plural, =1{1 hora} other{{number} horas}}",
   "@durationHours": {
     "description": "Duration. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -2419,7 +2419,7 @@
       }
     }
   },
-  "durationMinutes": "{number,plural, =1{1 Minute} other{{number} Minuten}}",
+  "durationMinutes": "{number,plural, =1{1 minuto} other{{number} minutos}}",
   "@durationMinutes": {
     "description": "Duration. Message formatted using the plural JSON scheme.",
     "placeholders": {
@@ -2430,7 +2430,7 @@
       }
     }
   },
-  "durationEmpty": "Keine Dauer",
+  "durationEmpty": "Sin duración",
   "@durationEmpty": {
     "description": "Text shown when the duration is 0"
   }
