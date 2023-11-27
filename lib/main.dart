@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -53,21 +54,22 @@ class MailyApp extends HookConsumerWidget {
       ..watch(backgroundProvider)
       ..watch(appLockProvider);
 
-    final app = PlatformSnackApp.router(
-      supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      debugShowCheckedModeBanner: false,
-      title: 'Maily',
-      routerConfig: routerConfig,
-      scaffoldMessengerKey:
-          ScaffoldMessengerService.instance.scaffoldMessengerKey,
-      materialTheme: themeSettingsData.lightTheme,
-      materialDarkTheme: themeSettingsData.darkTheme,
-      materialThemeMode: themeSettingsData.themeMode,
-      cupertinoTheme: CupertinoThemeData(
-        brightness: themeSettingsData.brightness,
-        applyThemeToAll: true,
-        // TODO(RV): support theming on Cupertino
+    final app = Theme(
+      data: themeSettingsData.brightness == Brightness.dark
+          ? themeSettingsData.darkTheme
+          : themeSettingsData.lightTheme,
+      child: PlatformSnackApp.router(
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        debugShowCheckedModeBanner: false,
+        title: 'Maily',
+        routerConfig: routerConfig,
+        scaffoldMessengerKey:
+            ScaffoldMessengerService.instance.scaffoldMessengerKey,
+        materialTheme: themeSettingsData.lightTheme,
+        materialDarkTheme: themeSettingsData.darkTheme,
+        materialThemeMode: themeSettingsData.themeMode,
+        cupertinoTheme: themeSettingsData.cupertinoTheme,
       ),
     );
     if (languageTag == null) {

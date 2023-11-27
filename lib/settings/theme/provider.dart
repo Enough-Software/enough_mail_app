@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../app_lifecycle/provider.dart';
+import '../../logger.dart';
 import '../provider.dart';
 import 'model.dart';
 
@@ -29,24 +31,29 @@ class ThemeFinder extends _$ThemeFinder {
   }) {
     final mode = settings.getCurrentThemeMode();
     final brightness = _resolveBrightness(mode, context);
-    final dark = _generateTheme(Brightness.dark, settings.colorSchemeSeed);
-    final light = _generateTheme(Brightness.light, settings.colorSchemeSeed);
+    final dark =
+        _generateMaterialTheme(Brightness.dark, settings.colorSchemeSeed);
+    final light =
+        _generateMaterialTheme(Brightness.light, settings.colorSchemeSeed);
+    final cupertino =
+        _generateCupertinoTheme(brightness, settings.colorSchemeSeed);
 
     return ThemeSettingsData(
       brightness: brightness,
       lightTheme: light,
       darkTheme: dark,
       themeMode: mode,
+      cupertinoTheme: cupertino,
     );
   }
 
   /// The default light theme
   static final ThemeData defaultLightTheme =
-      _generateTheme(Brightness.light, Colors.green);
+      _generateMaterialTheme(Brightness.light, Colors.green);
 
   /// The default dark theme
   static final ThemeData defaultDarkTheme =
-      _generateTheme(Brightness.dark, Colors.green);
+      _generateMaterialTheme(Brightness.dark, Colors.green);
 
   static Brightness _resolveBrightness(
     ThemeMode mode,
@@ -64,7 +71,7 @@ class ThemeFinder extends _$ThemeFinder {
     }
   }
 
-  static ThemeData _generateTheme(Brightness brightness, Color color) =>
+  static ThemeData _generateMaterialTheme(Brightness brightness, Color color) =>
       color is MaterialColor
           ? ThemeData(
               brightness: brightness,
@@ -76,4 +83,38 @@ class ThemeFinder extends _$ThemeFinder {
               colorSchemeSeed: color,
               useMaterial3: true,
             );
+
+  static CupertinoThemeData _generateCupertinoTheme(
+    Brightness brightness,
+    Color color,
+  ) =>
+      CupertinoThemeData(
+        brightness: brightness,
+        primaryColor: color,
+      );
+  // CupertinoThemeData(
+  //   brightness: brightness,
+  //   primaryColor: color,
+  //   primaryContrastingColor: brightness == Brightness.dark
+  //       ? CupertinoColors.white
+  //       : CupertinoColors.black,
+  //   barBackgroundColor: CupertinoColors.systemBackground,
+  //   scaffoldBackgroundColor: CupertinoColors.systemFill,
+  //   textTheme: CupertinoTextThemeData(
+  //     primaryColor: brightness == Brightness.dark
+  //         ? CupertinoColors.white
+  //         : CupertinoColors.black,
+  //   ),
+  //   applyThemeToAll: true,
+  // );
+  // MaterialBasedCupertinoThemeData(
+  //   materialTheme: _generateMaterialTheme(brightness, color),
+  // .copyWith(
+  //   cupertinoOverrideTheme: CupertinoThemeData(
+  //     brightness: brightness,
+  //     primaryColor: color,
+  //     applyThemeToAll: true,
+  //   ),
+  // ),
+  // );
 }
