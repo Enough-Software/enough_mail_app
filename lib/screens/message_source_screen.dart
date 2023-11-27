@@ -1133,7 +1133,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   }
 
   Future<void> fireSwipeAction(
-      AppLocalizations localizations, SwipeAction action, Message message) {
+    AppLocalizations localizations,
+    SwipeAction action,
+    Message message,
+  ) {
     switch (action) {
       case SwipeAction.markRead:
         final isSeen = !message.isSeen;
@@ -1247,9 +1250,9 @@ class _CheckboxTextState extends State<CheckboxText> {
         title: Text(widget.text),
         value: _value,
         onChanged: (value) {
-          widget.onChanged(value == true);
+          widget.onChanged(value ?? false);
           setState(() {
-            _value = (value == true);
+            _value = value ?? false;
           });
         },
       );

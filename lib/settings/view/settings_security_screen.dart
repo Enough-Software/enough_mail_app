@@ -18,7 +18,6 @@ class SettingsSecurityScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    //final theme = Theme.of(context);
     final localizations = context.text;
     final settings = ref.watch(settingsProvider);
     final isBiometricsSupported = useState<bool?>(null);
@@ -52,7 +51,9 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                     vertical: 8,
                     horizontal: 4,
                   ),
-                  child: Text(localizations.securitySettingsIntro),
+                  child: Text(
+                    localizations.securitySettingsIntro,
+                  ),
                 ),
                 const Divider(),
                 Row(

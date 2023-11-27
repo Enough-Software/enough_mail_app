@@ -7,7 +7,9 @@ import '../../routes/routes.dart';
 import '../../screens/base.dart';
 import '../../util/localized_dialog_helper.dart';
 
+/// Allows to personalize the app settings
 class SettingsScreen extends StatelessWidget {
+  /// Creates a new [SettingsScreen]
   const SettingsScreen({super.key});
 
   @override
@@ -53,13 +55,12 @@ class SettingsScreen extends StatelessWidget {
                     context.pushNamed(Routes.settingsDefaultSender);
                   },
                 ),
-                if (!PlatformInfo.isCupertino)
-                  PlatformListTile(
-                    title: Text(localizations.settingsActionDesign),
-                    onTap: () {
-                      context.pushNamed(Routes.settingsDesign);
-                    },
-                  ),
+                PlatformListTile(
+                  title: Text(localizations.settingsActionDesign),
+                  onTap: () {
+                    context.pushNamed(Routes.settingsDesign);
+                  },
+                ),
                 PlatformListTile(
                   title: Text(localizations.languageSettingTitle),
                   onTap: () {
