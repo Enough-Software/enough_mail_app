@@ -20,6 +20,7 @@ class SettingsLanguageScreen extends HookConsumerWidget {
     final displayNames = {
       'de': 'deutsch',
       'en': 'English',
+      'es': 'español',
     };
     final available = AppLocalizations.supportedLocales
         .map(
