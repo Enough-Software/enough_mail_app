@@ -517,7 +517,7 @@ packages:
       path: "../enough_media"
       relative: true
     source: path
-    version: "2.2.2"
+    version: "2.2.1"
   enough_platform_widgets:
     dependency: "direct main"
     description:
