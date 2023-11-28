@@ -19,6 +19,7 @@ class MailboxTree extends ConsumerWidget {
     super.key,
     required this.account,
     required this.onSelected,
+    this.isReselectPossible = false,
   });
 
   /// The associated account
@@ -26,6 +27,9 @@ class MailboxTree extends ConsumerWidget {
 
   /// Callback when a mailbox is selected
   final void Function(Mailbox mailbox) onSelected;
+
+  /// Set to true if the user should be able to reselect the current mailbox
+  final bool isReselectPossible;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -87,7 +91,8 @@ class MailboxTree extends ConsumerWidget {
       return SelectablePlatformListTile(
         leading: Icon(iconData),
         title: title,
-        onTap: isCurrent ? null : () => onSelected(mailbox),
+        onTap:
+            isCurrent && !isReselectPossible ? null : () => onSelected(mailbox),
         selected: isCurrent,
       );
     }

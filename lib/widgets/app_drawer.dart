@@ -231,6 +231,7 @@ class AppDrawer extends ConsumerWidget {
     return MailboxTree(
       account: account,
       onSelected: (mailbox) => _navigateToMailbox(context, account, mailbox),
+      isReselectPossible: true,
     );
   }
 
@@ -240,7 +241,9 @@ class AppDrawer extends ConsumerWidget {
     Mailbox mailbox,
   ) {
     if (!useAppDrawerAsRoot) {
-      context.pop();
+      while (context.canPop()) {
+        context.pop();
+      }
     }
     if (mailbox.isInbox) {
       context.goNamed(
