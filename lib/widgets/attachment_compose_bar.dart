@@ -22,19 +22,28 @@ import '../util/localized_dialog_helper.dart';
 import 'ical_composer.dart';
 import 'icon_text.dart';
 
-class AttachmentMediaProviderFactory {
+class _AttachmentMediaProviderFactory {
   static MediaProvider fromAttachmentInfo(AttachmentInfo info) =>
-      MemoryMediaProvider(info.name!, info.mediaType.text, info.data!);
+      MemoryMediaProvider(
+        info.name ?? '',
+        info.mediaType.text,
+        info.data ?? Uint8List(0),
+      );
 }
 
+/// Allows to add attachments to a [ComposeData]
 class AttachmentComposeBar extends StatefulWidget {
+  /// Creates a new [AttachmentComposeBar]
   const AttachmentComposeBar({
     super.key,
     required this.composeData,
     this.isDownloading = false,
   });
 
+  /// The associated [ComposeData]
   final ComposeData composeData;
+
+  /// Set to true if the attachments are currently downloading
   final bool isDownloading;
 
   @override
@@ -54,7 +63,7 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
   Widget build(BuildContext context) => Wrap(
         children: [
           for (final attachment in _attachments)
-            ComposeAttachment(
+            _ComposeAttachment(
               parentMessage: widget.composeData.originalMessage,
               attachment: attachment,
               onRemove: removeAttachment,
@@ -162,23 +171,23 @@ class AddAttachmentPopupButton extends ConsumerWidget {
         switch (value) {
           case 0: // any file
             ignoreNextResume();
-            changed = await addAttachmentFile();
+            changed = await _addAttachmentFile();
             break;
           case 1: // photo file
             ignoreNextResume();
-            changed = await addAttachmentFile(
+            changed = await _addAttachmentFile(
               fileType: FileType.image,
             );
             break;
           case 2: // video file
             ignoreNextResume();
-            changed = await addAttachmentFile(
+            changed = await _addAttachmentFile(
               fileType: FileType.video,
             );
             break;
           case 3: // audio file
             ignoreNextResume();
-            changed = await addAttachmentFile(
+            changed = await _addAttachmentFile(
               fileType: FileType.audio,
             );
             break;
@@ -215,7 +224,7 @@ class AddAttachmentPopupButton extends ConsumerWidget {
     );
   }
 
-  Future<bool> addAttachmentFile({
+  Future<bool> _addAttachmentFile({
     FileType fileType = FileType.any,
   }) async {
     final result = await FilePicker.platform
@@ -224,16 +233,21 @@ class AddAttachmentPopupButton extends ConsumerWidget {
       return false;
     }
     for (final file in result.files) {
-      final lastDotIndex = file.path!.lastIndexOf('.');
+      final path = file.path;
+      final bytes = file.bytes;
+      if (path == null || bytes == null) {
+        continue;
+      }
+      final lastDotIndex = path.lastIndexOf('.');
       MediaType mediaType;
-      if (lastDotIndex == -1 || lastDotIndex == file.path!.length - 1) {
+      if (lastDotIndex == -1 || lastDotIndex == path.length - 1) {
         mediaType = MediaType.fromSubtype(MediaSubtype.applicationOctetStream);
       } else {
-        final ext = file.path!.substring(lastDotIndex + 1);
+        final ext = path.substring(lastDotIndex + 1);
         mediaType = MediaType.guessFromFileExtension(ext);
       }
       composeData.messageBuilder
-          .addBinary(file.bytes!, mediaType, filename: file.name);
+          .addBinary(bytes, mediaType, filename: file.name);
     }
 
     return true;
@@ -303,7 +317,7 @@ class AddAttachmentPopupButton extends ConsumerWidget {
           filename: 'invite.ics',
         ),
       );
-      attachmentBuilder.contentType!.setParameter('method', 'REQUEST');
+      attachmentBuilder.contentType?.setParameter('method', 'REQUEST');
       final finalizer = _AppointmentFinalizer(appointment, attachmentBuilder);
       composeData.addFinalizer(finalizer.finalize);
     }
@@ -318,43 +332,59 @@ class _AppointmentFinalizer {
   final PartBuilder attachmentBuilder;
 
   void finalize(MessageBuilder messageBuilder) {
-    final event = appointment.event!;
-    if (messageBuilder.from?.isNotEmpty ?? false) {
-      final organizer = messageBuilder.from!.first;
+    final event = appointment.event;
+    if (event == null) {
+      return;
+    }
+    void addAttendee({
+      required String email,
+      required String? name,
+      bool rsvp = true,
+      ParticipantStatus? participantStatus,
+    }) {
+      final attendeeProperty = AttendeeProperty.create(
+        attendeeEmail: email,
+        commonName: name,
+        rsvp: rsvp,
+        participantStatus: participantStatus,
+      );
+      if (attendeeProperty != null) {
+        event.addAttendee(attendeeProperty);
+      }
+    }
+
+    final from = messageBuilder.from;
+    if (from != null && from.isNotEmpty) {
+      final organizer = from.first;
       event.organizer = OrganizerProperty.create(
         email: organizer.email,
         commonName: organizer.personalName,
       );
-      event.addAttendee(
-        AttendeeProperty.create(
-          attendeeEmail: organizer.email,
-          commonName: organizer.personalName,
-          participantStatus: ParticipantStatus.accepted,
-        )!,
+      addAttendee(
+        email: organizer.email,
+        name: organizer.personalName,
+        rsvp: false,
+        participantStatus: ParticipantStatus.accepted,
       );
     }
     final recipients = <MailAddress>[];
-    if (messageBuilder.to != null) {
-      recipients.addAll(messageBuilder.to!);
+    void addRecipients(List<MailAddress>? addresses) {
+      if (addresses != null) {
+        recipients.addAll(addresses);
+      }
     }
-    if (messageBuilder.cc != null) {
-      recipients.addAll(messageBuilder.cc!);
-    }
+
+    addRecipients(messageBuilder.to);
+    addRecipients(messageBuilder.cc);
     for (final mailAddress in recipients) {
-      event.addAttendee(
-        AttendeeProperty.create(
-          attendeeEmail: mailAddress.email,
-          commonName: mailAddress.personalName,
-          rsvp: true,
-        )!,
-      );
+      addAttendee(email: mailAddress.email, name: mailAddress.personalName);
     }
     attachmentBuilder.text = appointment.toString();
   }
 }
 
-class ComposeAttachment extends ConsumerWidget {
-  const ComposeAttachment({
+class _ComposeAttachment extends ConsumerWidget {
+  const _ComposeAttachment({
     super.key,
     required this.parentMessage,
     required this.attachment,
@@ -376,13 +406,15 @@ class ComposeAttachment extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         child: PreviewMediaWidget(
           mediaProvider:
-              AttachmentMediaProviderFactory.fromAttachmentInfo(attachment),
+              _AttachmentMediaProviderFactory.fromAttachmentInfo(attachment),
           width: 60,
           height: 60,
           showInteractiveDelegate: (interactiveMedia) async {
+            final attachmentData = attachment.data;
             if (attachment.mediaType.sub == MediaSubtype.messageRfc822 &&
-                parentMessage != null) {
-              final mime = MimeMessage.parseFromData(attachment.data!);
+                parentMessage != null &&
+                attachmentData != null) {
+              final mime = MimeMessage.parseFromData(attachmentData);
               final message = Message.embedded(mime, parentMessage);
 
               return context.pushNamed(
@@ -390,10 +422,11 @@ class ComposeAttachment extends ConsumerWidget {
                 extra: message,
               );
             }
-            if (attachment.mediaType.sub == MediaSubtype.applicationIcs ||
-                attachment.mediaType.sub == MediaSubtype.textCalendar) {
-              final text = attachment.part.text!;
-              final appointment = VComponent.parse(text) as VCalendar;
+            final attachmentText = attachment.part.text;
+            if (attachmentText != null &&
+                (attachment.mediaType.sub == MediaSubtype.applicationIcs ||
+                    attachment.mediaType.sub == MediaSubtype.textCalendar)) {
+              final appointment = VComponent.parse(attachmentText) as VCalendar;
               final update = await IcalComposer.createOrEditAppointment(
                 context,
                 ref,
@@ -415,7 +448,9 @@ class ComposeAttachment extends ConsumerWidget {
             PopupMenuItem<String>(
               value: 'remove',
               child: Text(
-                localizations.composeRemoveAttachmentAction(attachment.name!),
+                localizations.composeRemoveAttachmentAction(
+                  attachment.name ?? '',
+                ),
               ),
             ),
           ],
