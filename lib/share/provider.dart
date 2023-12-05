@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../account/provider.dart';
 import '../app_lifecycle/provider.dart';
+import '../logger.dart';
 import '../models/compose_data.dart';
 import '../routes/routes.dart';
 import 'model.dart';
@@ -25,15 +27,21 @@ SharedDataCallback? onSharedData;
 @Riverpod(keepAlive: true)
 class IncomingShare extends _$IncomingShare {
   static const _platform = MethodChannel('app.channel.shared.data');
+  var _isFirstBuild = true;
 
   @override
   Future<void> build() async {
-    final isResumed = ref.watch(appIsResumedProvider);
+    final isResumed = ref.watch(rawAppLifecycleStateProvider
+        .select((value) => value == AppLifecycleState.resumed));
     if (isResumed) {
       if (Platform.isAndroid) {
         final shared = await _platform.invokeMethod('getSharedData');
-        //print('checkForShare: received data: $shared');
+        logger.d('checkForShare: received data: $shared');
         if (shared != null) {
+          if (_isFirstBuild) {
+            _isFirstBuild = false;
+            await Future.delayed(const Duration(seconds: 2));
+          }
           await _composeWithSharedData(shared);
         }
       }

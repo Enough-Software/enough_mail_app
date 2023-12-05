@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -105,6 +104,7 @@ class _InitializationScreenState extends ConsumerState<InitializationScreen> {
     await ref.read(settingsProvider.notifier).init();
     await ref.read(realAccountsProvider.notifier).init();
     await ref.read(backgroundProvider.notifier).init();
+
     if (context.mounted) {
       // TODO(RV): check if the context is really needed for NotificationService
       await NotificationService.instance.init(context: context);
