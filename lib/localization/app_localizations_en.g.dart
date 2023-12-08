@@ -218,6 +218,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get multipleSelectionNeededInfo => 'Please select messages first.';
 
   @override
+  String multipleSelectionActionFailed(String details) {
+    return 'Unable to perform action\nDetails: $details';
+  }
+
+  @override
   String multipleMoveTitle(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,

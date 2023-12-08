@@ -10,6 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../account/provider.dart';
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
+import '../logger.dart';
 import '../mail/model.dart';
 import '../models/compose_data.dart';
 import '../models/date_sectioned_message_source.dart';
@@ -619,50 +620,50 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
             if (isAnyUnseen)
               PlatformIconButton(
                 icon: Icon(iconService.messageIsNotSeen),
-                onPressed: () => handleMultipleChoice(_MultipleChoice.seen),
+                onPressed: () => _handleMultipleChoice(_MultipleChoice.seen),
               )
             else
               PlatformIconButton(
                 icon: Icon(iconService.messageIsSeen),
-                onPressed: () => handleMultipleChoice(_MultipleChoice.unseen),
+                onPressed: () => _handleMultipleChoice(_MultipleChoice.unseen),
               ),
             if (isAnyUnflagged)
               PlatformIconButton(
                 icon: Icon(iconService.messageIsNotFlagged),
-                onPressed: () => handleMultipleChoice(_MultipleChoice.flag),
+                onPressed: () => _handleMultipleChoice(_MultipleChoice.flag),
               )
             else
               PlatformIconButton(
                 icon: Icon(iconService.messageIsFlagged),
-                onPressed: () => handleMultipleChoice(_MultipleChoice.unflag),
+                onPressed: () => _handleMultipleChoice(_MultipleChoice.unflag),
               ),
             if (isJunk)
               PlatformIconButton(
                 icon: Icon(iconService.messageActionMoveFromJunkToInbox),
-                onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
+                onPressed: () => _handleMultipleChoice(_MultipleChoice.inbox),
               )
             else
               PlatformIconButton(
                 icon: Icon(iconService.messageActionMoveToJunk),
-                onPressed: () => handleMultipleChoice(_MultipleChoice.junk),
+                onPressed: () => _handleMultipleChoice(_MultipleChoice.junk),
               ),
             const Spacer(),
             if (isTrash)
               PlatformIconButton(
                 icon: Icon(iconService.messageActionMoveToInbox),
-                onPressed: () => handleMultipleChoice(_MultipleChoice.inbox),
+                onPressed: () => _handleMultipleChoice(_MultipleChoice.inbox),
               )
             else
               PlatformIconButton(
                 icon: Icon(iconService.messageActionDelete),
-                onPressed: () => handleMultipleChoice(_MultipleChoice.delete),
+                onPressed: () => _handleMultipleChoice(_MultipleChoice.delete),
               ),
             PlatformIconButton(
               icon: const Icon(Icons.close),
               onPressed: leaveSelectionMode,
             ),
             PlatformPopupMenuButton<_MultipleChoice>(
-              onSelected: handleMultipleChoice,
+              onSelected: _handleMultipleChoice,
               itemBuilder: (context) => [
                 PlatformPopupMenuItem(
                   value: _MultipleChoice.forwardAsAttachment,
@@ -798,15 +799,45 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     );
   }
 
-  Future<void> handleMultipleChoice(_MultipleChoice choice) async {
+  Future<void> _handleMultipleChoice(_MultipleChoice choice) async {
     final source = _sectionedMessageSource.messageSource;
     final localizations = context.text;
     if (_selectedMessages.isEmpty) {
       ScaffoldMessengerService.instance.showTextSnackBar(
-          localizations, localizations.multipleSelectionNeededInfo);
+        localizations,
+        localizations.multipleSelectionNeededInfo,
+      );
 
       return;
     }
+
+    try {
+      final endSelectionMode =
+          await _handleChoice(choice, source, localizations);
+      if (endSelectionMode) {
+        setState(() {
+          _isInSelectionMode = false;
+        });
+      }
+    } catch (e, s) {
+      logger.e(
+        'Unable to handle multiple choice $choice: $e',
+        error: e,
+        stackTrace: s,
+      );
+
+      ScaffoldMessengerService.instance.showTextSnackBar(
+        localizations,
+        localizations.multipleSelectionActionFailed(e.toString()),
+      );
+    }
+  }
+
+  Future<bool> _handleChoice(
+    _MultipleChoice choice,
+    MessageSource source,
+    AppLocalizations localizations,
+  ) async {
     var endSelectionMode = true;
     switch (choice) {
       case _MultipleChoice.forwardAsAttachment:
@@ -898,11 +929,8 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         leaveSelectionMode();
         break;
     }
-    if (endSelectionMode) {
-      setState(() {
-        _isInSelectionMode = false;
-      });
-    }
+
+    return endSelectionMode;
   }
 
   Future<void> forwardAsAttachments() async {

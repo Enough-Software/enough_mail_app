@@ -1,1 +1,9 @@
-{}
+{
+  "de": [
+    "multipleSelectionActionFailed"
+  ],
+
+  "es": [
+    "multipleSelectionActionFailed"
+  ]
+}

@@ -401,6 +401,12 @@ abstract class AppLocalizations {
   /// **'Please select messages first.'**
   String get multipleSelectionNeededInfo;
 
+  /// Error message when the selection action failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to perform action\nDetails: {details}'**
+  String multipleSelectionActionFailed(String details);
+
   /// Title of move dialog for multiple messages. Message formatted using the plural JSON scheme.
   ///
   /// In en, this message translates to:

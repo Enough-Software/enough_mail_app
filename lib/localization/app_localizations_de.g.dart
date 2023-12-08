@@ -218,6 +218,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get multipleSelectionNeededInfo => 'Wähle mindestens eine Nachricht aus.';
 
   @override
+  String multipleSelectionActionFailed(String details) {
+    return 'Unable to perform action\nDetails: $details';
+  }
+
+  @override
   String multipleMoveTitle(int number) {
     final intl.NumberFormat numberNumberFormat = intl.NumberFormat.compactLong(
       locale: localeName,

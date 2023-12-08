@@ -238,6 +238,16 @@
   "@multipleSelectionNeededInfo": {
     "description": "Short info shown when a multiple message action is triggered without selecting at least one message first."
   },
+  "multipleSelectionActionFailed": "Unable to perform action\nDetails: {details}",
+  "@multipleSelectionActionFailed": {
+    "description": "Error message when the selection action failed.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Mailbox not found"
+      }
+    }  
+  },
   "multipleMoveTitle":  "{number,plural, =1{Move message} other{Move {number} messages}}",
   "@multipleMoveTitle": {
     "description": "Title of move dialog for multiple messages. Message formatted using the plural JSON scheme.",
