@@ -89,13 +89,13 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       final account = MailAccount(
         email: _emailController.text.trim(),
         name: _userNameController.text.trim(),
-        incoming: MailServerConfig(
-          authentication: const PlainAuthentication('', ''),
-          serverConfig: ServerConfig(),
+        incoming: const MailServerConfig(
+          authentication: PlainAuthentication('', ''),
+          serverConfig: ServerConfig.empty(),
         ),
-        outgoing: MailServerConfig(
-          authentication: const PlainAuthentication('', ''),
-          serverConfig: ServerConfig(),
+        outgoing: const MailServerConfig(
+          authentication: PlainAuthentication('', ''),
+          serverConfig: ServerConfig.empty(),
         ),
       );
       if (context.mounted) {
