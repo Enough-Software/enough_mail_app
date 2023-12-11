@@ -21,12 +21,15 @@ class CupertinoSearch extends StatelessWidget {
     final localizations = context.text;
 
     return CupertinoSearchFlowTextField(
-      onSubmitted: (text) => _onSearchSubmitted(context, text),
+      onSubmitted: (text) => _onSearchSubmitted(context, text.trim()),
       cancelText: localizations.actionCancel,
     );
   }
 
   void _onSearchSubmitted(BuildContext context, String text) {
+    if (text.isEmpty) {
+      return;
+    }
     final search = MailSearch(text, SearchQueryType.allTextHeaders);
     final next = messageSource.search(context.text, search);
     context.pushNamed(

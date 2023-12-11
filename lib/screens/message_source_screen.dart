@@ -85,14 +85,15 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   }
 
   void _search(String query) {
-    if (query.isEmpty) {
+    final trimmedQuery = query.trim();
+    if (trimmedQuery.isEmpty) {
       setState(() {
         _isInSearchMode = false;
       });
 
       return;
     }
-    final search = MailSearch(query, SearchQueryType.allTextHeaders);
+    final search = MailSearch(trimmedQuery, SearchQueryType.allTextHeaders);
     final searchSource =
         _sectionedMessageSource.messageSource.search(context.text, search);
     context.pushNamed(
