@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../app_lifecycle/provider.dart';
-import '../../logger.dart';
 import '../provider.dart';
 import 'model.dart';
 

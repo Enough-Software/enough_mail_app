@@ -144,7 +144,9 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
 
   @override
   Future<MoveResult> moveMessages(
-      List<MimeMessage> messages, Mailbox targetMailbox) async {
+    List<MimeMessage> messages,
+    Mailbox targetMailbox,
+  ) async {
     // TODO(RV): this and most other offline ops should be done with a queue
     // Some ops can be done offline and an later online, e.g. store flags
     // Some ops must update their offline part after having finished it online,
@@ -155,12 +157,15 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
     final result =
         await _onlineMimeSource.moveMessages(messages, targetMailbox);
     await _storage.moveMessages(messages, targetMailbox);
+
     return result;
   }
 
   @override
   Future<MoveResult> moveMessagesToFlag(
-      List<MimeMessage> messages, MailboxFlag targetMailboxFlag) {
+    List<MimeMessage> messages,
+    MailboxFlag targetMailboxFlag,
+  ) {
     // TODO: implement moveMessagesToFlag
     throw UnimplementedError();
   }

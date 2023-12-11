@@ -10,12 +10,17 @@ import '../logger.dart';
 import '../util/datetime.dart';
 import '../util/modal_bottom_sheet_helper.dart';
 
+/// A widget to compose an iCalendar appointment.
 class IcalComposer extends StatefulHookConsumerWidget {
+  /// Creates a new [IcalComposer].
   const IcalComposer({super.key, required this.appointment});
+
+  /// The appointment to edit.
   final VCalendar appointment;
   @override
   ConsumerState<IcalComposer> createState() => _IcalComposerState();
 
+  /// Creates a new appointment or edits an existing one.
   static Future<VCalendar?> createOrEditAppointment(
     BuildContext context,
     WidgetRef ref, {
@@ -90,22 +95,21 @@ class _IcalComposerState extends ConsumerState<IcalComposer> {
   }
 
   void apply() {
-    final ev = _event;
-    ev.summary = _summaryController.text;
-    ev.description = _descriptionController.text.isNotEmpty
-        ? _descriptionController.text
-        : null;
-    ev.location =
-        _locationController.text.isNotEmpty ? _locationController.text : null;
+    _event
+      ..summary = _summaryController.text
+      ..description = _descriptionController.text.isNotEmpty
+          ? _descriptionController.text
+          : null
+      ..location =
+          _locationController.text.isNotEmpty ? _locationController.text : null;
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
-    // final i18nService = locator<I18nService>();
     final end = _event.end;
-    final start = _event.start!;
-    final isAllday = _event.isAllDayEvent ?? false;
+    final start = _event.start ?? DateTime.now();
+    final isAllDay = _event.isAllDayEvent ?? false;
     final recurrenceRule = _event.recurrenceRule;
     final theme = Theme.of(context);
 
@@ -140,14 +144,16 @@ class _IcalComposerState extends ConsumerState<IcalComposer> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
-              child: Text(localizations.icalendarLabelStart,
-                  style: theme.textTheme.bodySmall),
+              child: Text(
+                localizations.icalendarLabelStart,
+                style: theme.textTheme.bodySmall,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: DateTimePicker(
+              child: _DateTimePicker(
                 dateTime: start,
-                onlyDate: isAllday,
+                onlyDate: isAllDay,
                 onChanged: (dateTime) {
                   if (end != null) {
                     final diff = end.difference(start);
@@ -159,15 +165,17 @@ class _IcalComposerState extends ConsumerState<IcalComposer> {
                 },
               ),
             ),
-            if (!isAllday) ...[
+            if (!isAllDay) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
-                child: Text(localizations.icalendarLabelEnd,
-                    style: theme.textTheme.bodySmall),
+                child: Text(
+                  localizations.icalendarLabelEnd,
+                  style: theme.textTheme.bodySmall,
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: DateTimePicker(
+                child: _DateTimePicker(
                   dateTime: end,
                   onChanged: (dateTime) {
                     setState(() {
@@ -178,19 +186,21 @@ class _IcalComposerState extends ConsumerState<IcalComposer> {
               ),
             ],
             PlatformCheckboxListTile(
-              value: isAllday,
+              value: isAllDay,
               title: Text(localizations.composeAppointmentLabelAllDayEvent),
               onChanged: (value) {
-                if (value == null || value == false) {
-                  _event.duration = null;
-                  _event.start = _previousStart;
-                  _event.end = _previousEnd;
-                } else {
+                if (value ?? false) {
                   _previousStart = start;
                   _previousEnd = end;
-                  _event.end = null;
-                  _event.start = DateTime(start.year, start.month, start.day);
-                  _event.duration = IsoDuration(days: 1);
+                  _event
+                    ..end = null
+                    ..start = DateTime(start.year, start.month, start.day)
+                    ..duration = IsoDuration(days: 1);
+                } else {
+                  _event
+                    ..duration = null
+                    ..start = _previousStart
+                    ..end = _previousEnd;
                 }
                 setState(() {
                   _event.isAllDayEvent = value;
@@ -213,8 +223,11 @@ class _IcalComposerState extends ConsumerState<IcalComposer> {
                       style: theme.textTheme.bodySmall,
                     ),
               onTap: () async {
-                final result = await RecurrenceComposer.createOrEditRecurrence(
-                    context, recurrenceRule, start);
+                final result = await _RecurrenceComposer.createOrEditRecurrence(
+                  context,
+                  recurrenceRule,
+                  start,
+                );
                 setState(() {
                   _event.recurrenceRule = result;
                 });
@@ -296,9 +309,8 @@ extension _ExtensionRecurrenceFrequency on RecurrenceFrequency {
   }
 }
 
-class DateTimePicker extends StatelessWidget {
-  const DateTimePicker({
-    super.key,
+class _DateTimePicker extends StatelessWidget {
+  const _DateTimePicker({
     required this.dateTime,
     required this.onChanged,
     this.onlyDate = false,
@@ -371,24 +383,29 @@ class DateTimePicker extends StatelessWidget {
   }
 }
 
-class RecurrenceComposer extends StatefulWidget {
-  const RecurrenceComposer(
-      {super.key, this.recurrenceRule, required this.startDate});
+class _RecurrenceComposer extends StatefulWidget {
+  const _RecurrenceComposer({
+    this.recurrenceRule,
+    required this.startDate,
+  });
   final Recurrence? recurrenceRule;
   final DateTime startDate;
 
   @override
-  State<RecurrenceComposer> createState() => _RecurrenceComposerState();
+  State<_RecurrenceComposer> createState() => _RecurrenceComposerState();
 
-  static Future<Recurrence?> createOrEditRecurrence(BuildContext context,
-      Recurrence? recurrenceRule, DateTime startDate) async {
+  static Future<Recurrence?> createOrEditRecurrence(
+    BuildContext context,
+    Recurrence? recurrenceRule,
+    DateTime startDate,
+  ) async {
     final localizations = context.text;
     // final iconService = IconService.instance;
 
     final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
       context,
       localizations.composeAppointmentLabelRepeat,
-      RecurrenceComposer(
+      _RecurrenceComposer(
         recurrenceRule: recurrenceRule,
         startDate: startDate,
       ),
@@ -400,7 +417,7 @@ class RecurrenceComposer extends StatefulWidget {
   }
 }
 
-class _RecurrenceComposerState extends State<RecurrenceComposer> {
+class _RecurrenceComposerState extends State<_RecurrenceComposer> {
   static late _RecurrenceComposerState _currentState;
   Recurrence? _recurrenceRule;
   _RepeatFrequency _repeatFrequency = _RepeatFrequency.never;
@@ -449,10 +466,11 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                       _repeatFrequency = _RepeatFrequency.never;
                       _recurrenceRule = null;
                     });
+
                     return;
                   }
                   DateTime? until;
-                  final duration = freq.recurrenceFrequency!.recommendedUntil;
+                  final duration = freq.recurrenceFrequency?.recommendedUntil;
                   if (duration == null) {
                     _recommendationDate = null;
                   } else {
@@ -467,12 +485,14 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                           copyUntil: false,
                         )
                       : Recurrence(
-                          freq.recurrenceFrequency!,
+                          freq.recurrenceFrequency ?? RecurrenceFrequency.daily,
                           until: until,
                         );
                   if (newRule.frequency == RecurrenceFrequency.monthly) {
-                    final monthly = DayOfMonthSelector.updateMonthlyRecurrence(
-                        newRule, widget.startDate);
+                    final monthly = _DayOfMonthSelector.updateMonthlyRecurrence(
+                      newRule,
+                      widget.startDate,
+                    );
                     if (monthly != null) {
                       newRule = monthly;
                     }
@@ -492,7 +512,8 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: Text(
-                      localizations.composeAppointmentRecurrenceIntervalLabel),
+                    localizations.composeAppointmentRecurrenceIntervalLabel,
+                  ),
                 ),
                 PlatformDropdownButton<int>(
                   items: List.generate(
@@ -517,16 +538,14 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                 child:
                     Text(localizations.composeAppointmentRecurrenceDaysLabel),
               ),
-              WeekDaySelector(
+              _WeekDaySelector(
                 recurrence: rule,
                 startDate: widget.startDate,
                 onChanged: (rules) {
                   Recurrence value;
-                  if (rules == null) {
-                    value = rule.copyWith(copyByRules: false);
-                  } else {
-                    value = rule.copyWith(byWeekDay: rules);
-                  }
+                  value = rules == null
+                      ? rule.copyWith(copyByRules: false)
+                      : rule.copyWith(byWeekDay: rules);
                   setState(() {
                     _recurrenceRule = value;
                   });
@@ -538,7 +557,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                 child:
                     Text(localizations.composeAppointmentRecurrenceDaysLabel),
               ),
-              DayOfMonthSelector(
+              _DayOfMonthSelector(
                 recurrence: rule,
                 startDate: widget.startDate,
                 onChanged: (value) {
@@ -558,7 +577,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                         ? localizations
                             .composeAppointmentRecurrenceUntilOptionRecommended(
                             context.formatIsoDuration(
-                              rule.frequency.recommendedUntil!,
+                              rule.frequency.recommendedUntil ?? IsoDuration(),
                             ),
                           )
                         : context.formatDate(
@@ -567,7 +586,7 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
                           ),
               ),
               onTap: () async {
-                final until = await UntilComposer.createOrEditUntil(
+                final until = await _UntilComposer.createOrEditUntil(
                   context,
                   widget.startDate,
                   rule.until,
@@ -596,9 +615,8 @@ class _RecurrenceComposerState extends State<RecurrenceComposer> {
   }
 }
 
-class WeekDaySelector extends StatefulWidget {
-  const WeekDaySelector({
-    super.key,
+class _WeekDaySelector extends StatefulWidget {
+  const _WeekDaySelector({
     required this.recurrence,
     required this.onChanged,
     required this.startDate,
@@ -608,10 +626,10 @@ class WeekDaySelector extends StatefulWidget {
   final void Function(List<ByDayRule>? rules) onChanged;
 
   @override
-  State<WeekDaySelector> createState() => _WeekDaySelectorState();
+  State<_WeekDaySelector> createState() => _WeekDaySelectorState();
 }
 
-class _WeekDaySelectorState extends State<WeekDaySelector> {
+class _WeekDaySelectorState extends State<_WeekDaySelector> {
   late List<WeekDay> _weekdays;
   final _selectedDays = <bool>[false, false, false, false, false, false, false];
   @override
@@ -684,21 +702,23 @@ class _WeekDaySelectorState extends State<WeekDaySelector> {
 
 enum _DayOfMonthOption { dayOfMonth, dayInNumberedWeek }
 
-class DayOfMonthSelector extends StatefulWidget {
-  const DayOfMonthSelector(
-      {super.key,
-      required this.recurrence,
-      required this.startDate,
-      required this.onChanged});
+class _DayOfMonthSelector extends StatefulWidget {
+  const _DayOfMonthSelector({
+    required this.recurrence,
+    required this.startDate,
+    required this.onChanged,
+  });
   final Recurrence recurrence;
   final DateTime startDate;
   final void Function(Recurrence recurrence) onChanged;
 
   @override
-  State<DayOfMonthSelector> createState() => _DayOfMonthSelectorState();
+  State<_DayOfMonthSelector> createState() => _DayOfMonthSelectorState();
 
   static Recurrence? updateMonthlyRecurrence(
-      Recurrence recurrence, DateTime startDate) {
+    Recurrence recurrence,
+    DateTime startDate,
+  ) {
     if (recurrence.hasByMonthDay || recurrence.hasByWeekDay) {
       return null;
     }
@@ -711,11 +731,12 @@ class DayOfMonthSelector extends StatefulWidget {
       week = -((daysInMonth - day) / 7).ceil();
     }
     final rule = ByDayRule(weekday, week: week);
+
     return recurrence.copyWith(byWeekDay: [rule], copyByRules: false);
   }
 }
 
-class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
+class _DayOfMonthSelectorState extends State<_DayOfMonthSelector> {
   late _DayOfMonthOption _option;
   ByDayRule? _byDayRule;
   WeekDay? _currentWeekday;
@@ -730,14 +751,16 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
     } else {
       var recurrence = widget.recurrence;
       if (!widget.recurrence.hasByWeekDay) {
-        recurrence = DayOfMonthSelector.updateMonthlyRecurrence(
-                recurrence, widget.startDate) ??
+        recurrence = _DayOfMonthSelector.updateMonthlyRecurrence(
+              recurrence,
+              widget.startDate,
+            ) ??
             recurrence;
       }
       _option = _DayOfMonthOption.dayInNumberedWeek;
-      final rule = recurrence.byWeekDay!.first;
+      final rule = recurrence.byWeekDay?.first;
       _byDayRule = rule;
-      _currentWeekday = _weekdays.firstWhere((wd) => wd.day == rule.weekday);
+      _currentWeekday = _weekdays.firstWhere((wd) => wd.day == rule?.weekday);
     }
   }
 
@@ -758,11 +781,19 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
             ),
           ),
           onChanged: (value) {
+            if (value == null) {
+              return;
+            }
+
             setState(() {
-              _option = value!;
+              _option = value;
             });
-            widget.onChanged(widget.recurrence.copyWith(
-                byMonthDay: [widget.startDate.day], copyByRules: false));
+            widget.onChanged(
+              widget.recurrence.copyWith(
+                byMonthDay: [widget.startDate.day],
+                copyByRules: false,
+              ),
+            );
           },
         ),
         PlatformRadioListTile<_DayOfMonthOption>(
@@ -771,19 +802,25 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
           title:
               Text(localizations.composeAppointmentRecurrenceMonthlyOnWeekDay),
           onChanged: (value) {
+            if (value == null) {
+              return;
+            }
             if (_byDayRule == null) {
-              final recurrence = DayOfMonthSelector.updateMonthlyRecurrence(
-                widget.recurrence.copyWith(copyByRules: false),
-                widget.startDate,
-              )!;
-              final rule = recurrence.byWeekDay!.first;
+              final recurrence = _DayOfMonthSelector.updateMonthlyRecurrence(
+                    widget.recurrence.copyWith(copyByRules: false),
+                    widget.startDate,
+                  ) ??
+                  widget.recurrence.copyWith(
+                    byWeekDay: [ByDayRule(widget.startDate.weekday)],
+                  );
+              final rule = recurrence.byWeekDay?.first;
               _byDayRule = rule;
               _currentWeekday =
-                  _weekdays.firstWhere((wd) => wd.day == rule.weekday);
+                  _weekdays.firstWhere((wd) => wd.day == rule?.weekday);
               widget.onChanged(recurrence);
             }
             setState(() {
-              _option = value!;
+              _option = value;
             });
           },
         ),
@@ -802,12 +839,14 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
                     DropdownMenuItem<int>(
                       value: 2,
                       child: Text(
-                          localizations.composeAppointmentRecurrenceSecond),
+                        localizations.composeAppointmentRecurrenceSecond,
+                      ),
                     ),
                     DropdownMenuItem<int>(
                       value: 3,
-                      child:
-                          Text(localizations.composeAppointmentRecurrenceThird),
+                      child: Text(
+                        localizations.composeAppointmentRecurrenceThird,
+                      ),
                     ),
                     DropdownMenuItem<int>(
                       value: -1,
@@ -817,7 +856,8 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
                     DropdownMenuItem<int>(
                       value: -2,
                       child: Text(
-                          localizations.composeAppointmentRecurrenceSecondLast),
+                        localizations.composeAppointmentRecurrenceSecondLast,
+                      ),
                     ),
                   ],
                   value: rule.week,
@@ -841,7 +881,10 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
                       .toList(),
                   value: _currentWeekday,
                   onChanged: (value) {
-                    final newRule = ByDayRule(value!.day, week: rule.week);
+                    if (value == null) {
+                      return;
+                    }
+                    final newRule = ByDayRule(value.day, week: rule.week);
                     _byDayRule = newRule;
                     final recurrence =
                         widget.recurrence.copyWith(byWeekDay: [newRule]);
@@ -857,8 +900,8 @@ class _DayOfMonthSelectorState extends State<DayOfMonthSelector> {
   }
 }
 
-class UntilComposer extends StatefulWidget {
-  const UntilComposer({
+class _UntilComposer extends StatefulWidget {
+  const _UntilComposer({
     super.key,
     required this.start,
     this.until,
@@ -870,7 +913,7 @@ class UntilComposer extends StatefulWidget {
   final IsoDuration? recommendation;
 
   @override
-  State<UntilComposer> createState() => _UntilComposerState();
+  State<_UntilComposer> createState() => _UntilComposerState();
 
   static Future<DateTime?> createOrEditUntil(
     BuildContext context,
@@ -883,14 +926,18 @@ class UntilComposer extends StatefulWidget {
     final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
       context,
       localizations.composeAppointmentRecurrenceUntilLabel,
-      UntilComposer(start: start, until: until, recommendation: recommendation),
+      _UntilComposer(
+        start: start,
+        until: until,
+        recommendation: recommendation,
+      ),
     );
 
     return (result ?? false) ? _UntilComposerState._currentState._until : until;
   }
 }
 
-class _UntilComposerState extends State<UntilComposer> {
+class _UntilComposerState extends State<_UntilComposer> {
   static late _UntilComposerState _currentState;
   late _UntilOption _option;
   DateTime? _recommendationDate;
@@ -950,7 +997,7 @@ class _UntilComposerState extends State<UntilComposer> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: DateTimePicker(
+              child: _DateTimePicker(
                 dateTime: _until,
                 onlyDate: true,
                 onChanged: (dateTime) {

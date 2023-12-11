@@ -4,7 +4,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../localization/extension.dart';
-import '../widgets/button_text.dart';
 import '../widgets/legalese.dart';
 
 /// Helps to display localized dialogs
@@ -25,21 +24,21 @@ class LocalizedDialogHelper {
         applicationLegalese: localizations.aboutApplicationLegalese,
         children: [
           TextButton(
-            child: ButtonText(localizations.feedbackActionSuggestFeature),
+            child: Text(localizations.feedbackActionSuggestFeature),
             onPressed: () async {
               await launcher
                   .launchUrl(Uri.parse('https://maily.userecho.com/'));
             },
           ),
           TextButton(
-            child: ButtonText(localizations.feedbackActionReportProblem),
+            child: Text(localizations.feedbackActionReportProblem),
             onPressed: () async {
               await launcher
                   .launchUrl(Uri.parse('https://maily.userecho.com/'));
             },
           ),
           TextButton(
-            child: ButtonText(localizations.feedbackActionHelpDeveloping),
+            child: Text(localizations.feedbackActionHelpDeveloping),
             onPressed: () async {
               await launcher.launchUrl(Uri.parse(
                   'https://github.com/Enough-Software/enough_mail_app'));

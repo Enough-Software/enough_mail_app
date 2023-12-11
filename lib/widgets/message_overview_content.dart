@@ -6,13 +6,19 @@ import '../localization/extension.dart';
 import '../models/message.dart';
 import '../settings/theme/icon_service.dart';
 
+/// Displays the content of a message in the message overview.
 class MessageOverviewContent extends StatelessWidget {
+  /// Creates a new [MessageOverviewContent] widget.
   const MessageOverviewContent({
     super.key,
     required this.message,
     required this.isSentMessage,
   });
+
+  /// The message to display.
   final Message message;
+
+  /// Whether the message is a sent message.
   final bool isSentMessage;
 
   @override
@@ -20,8 +26,9 @@ class MessageOverviewContent extends StatelessWidget {
     final msg = message;
     final mime = msg.mimeMessage;
     final localizations = context.text;
+    final threadSequence = mime.threadSequence;
     final threadLength =
-        mime.threadSequence != null ? mime.threadSequence!.toList().length : 0;
+        threadSequence != null ? threadSequence.toList().length : 0;
     final subject = mime.decodeSubject() ?? localizations.subjectUndefined;
     final senderOrRecipients = _getSenderOrRecipients(mime, localizations);
     final hasAttachments = msg.hasAttachment;
@@ -93,19 +100,19 @@ class MessageOverviewContent extends StatelessWidget {
   }
 
   String _getSenderOrRecipients(
-      MimeMessage mime, AppLocalizations localizations) {
+    MimeMessage mime,
+    AppLocalizations localizations,
+  ) {
     if (isSentMessage) {
       return mime.recipients
           .map((r) => r.hasPersonalName ? r.personalName : r.email)
           .join(', ');
     }
     MailAddress? from;
-    from = mime.from?.isNotEmpty ?? false ? mime.from!.first : mime.sender;
+    from = (mime.from?.isNotEmpty ?? false) ? mime.from?.first : mime.sender;
 
     return (from?.personalName?.isNotEmpty ?? false)
-        ? from!.personalName!
-        : from?.email != null
-            ? from!.email
-            : localizations.emailSenderUnknown;
+        ? from?.personalName ?? ''
+        : from?.email ?? localizations.emailSenderUnknown;
   }
 }

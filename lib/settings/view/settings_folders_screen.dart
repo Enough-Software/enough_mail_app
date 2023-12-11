@@ -9,11 +9,10 @@ import '../../account/provider.dart';
 import '../../localization/extension.dart';
 import '../../mail/provider.dart';
 import '../../models/models.dart';
-import '../../screens/base.dart';
 import '../../scaffold_messenger/service.dart';
+import '../../screens/base.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../../widgets/account_selector.dart';
-import '../../widgets/button_text.dart';
 import '../../widgets/mailbox_selector.dart';
 import '../model.dart';
 import '../provider.dart';
@@ -67,7 +66,7 @@ class SettingsFoldersScreen extends ConsumerWidget {
                   const Divider(),
                   PlatformTextButtonIcon(
                     icon: Icon(CommonPlatformIcons.edit),
-                    label: ButtonText(localizations.folderNamesEditAction),
+                    label: Text(localizations.folderNamesEditAction),
                     onPressed: () => _editFolderNames(context, settings, ref),
                   ),
                 ],
@@ -312,7 +311,7 @@ class MailboxWidget extends ConsumerWidget {
         PlatformTextButtonIcon(
           onPressed: () => _createFolder(context, ref),
           icon: Icon(CommonPlatformIcons.add),
-          label: ButtonText(localizations.folderAddAction),
+          label: Text(localizations.folderAddAction),
         ),
         if (mailbox != null)
           PlatformTextButtonIcon(
@@ -323,7 +322,7 @@ class MailboxWidget extends ConsumerWidget {
               CommonPlatformIcons.delete,
               color: Colors.white,
             ),
-            label: ButtonText(
+            label: Text(
               localizations.folderDeleteAction,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: Colors.white,

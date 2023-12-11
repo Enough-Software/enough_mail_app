@@ -7,10 +7,13 @@ import 'package:go_router/go_router.dart';
 
 import '../localization/extension.dart';
 import '../util/localized_dialog_helper.dart';
-import 'button_text.dart';
 
+/// A button to open the art extension dialog.
 class EditorArtExtensionButton extends StatelessWidget {
+  /// Creates a new [EditorArtExtensionButton].
   const EditorArtExtensionButton({super.key, required this.editorApi});
+
+  /// The editor API.
   final HtmlEditorApi editorApi;
 
   @override
@@ -19,27 +22,30 @@ class EditorArtExtensionButton extends StatelessWidget {
         onPressed: () => showArtExtensionDialog(context, editorApi),
       );
 
+  /// Shows the art extension dialog.
   static void showArtExtensionDialog(
-      BuildContext context, HtmlEditorApi editorApi) {
+    BuildContext context,
+    HtmlEditorApi editorApi,
+  ) {
     //final localizations = context.text;
     LocalizedDialogHelper.showWidgetDialog(
       context,
-      EditorArtExtensionWidget(editorApi: editorApi),
+      _EditorArtExtensionWidget(editorApi: editorApi),
       defaultActions: DialogActions.cancel,
     );
   }
 }
 
-class EditorArtExtensionWidget extends StatefulWidget {
-  const EditorArtExtensionWidget({super.key, required this.editorApi});
+class _EditorArtExtensionWidget extends StatefulWidget {
+  const _EditorArtExtensionWidget({required this.editorApi});
   final HtmlEditorApi editorApi;
 
   @override
-  State<EditorArtExtensionWidget> createState() =>
+  State<_EditorArtExtensionWidget> createState() =>
       _EditorArtExtensionWidgetState();
 }
 
-class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
+class _EditorArtExtensionWidgetState extends State<_EditorArtExtensionWidget> {
   final _inputController = TextEditingController();
   final _textsByUnicodeFont = <UnicodeFont, String>{};
 
@@ -48,7 +54,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
     super.initState();
     widget.editorApi.getSelectedText().then((value) {
       _updateTexts(value);
-      _inputController.text = value!;
+      _inputController.text = value ?? '';
     });
   }
 
@@ -68,16 +74,21 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
       UnicodeFont.fraktur: localizations.fontFraktur,
       UnicodeFont.frakturBold: localizations.fontFrakturBold,
       UnicodeFont.monospace: localizations.fontMonospace,
+      // cSpell: disable
       UnicodeFont.fullwidth: localizations.fontFullwidth,
       UnicodeFont.doublestruck: localizations.fontDoublestruck,
+      // cSpell: enable
       UnicodeFont.capitalized: localizations.fontCapitalized,
       UnicodeFont.circled: localizations.fontCircled,
       UnicodeFont.parenthesized: localizations.fontParenthesized,
       UnicodeFont.underlinedSingle: localizations.fontUnderlinedSingle,
       UnicodeFont.underlinedDouble: localizations.fontUnderlinedDouble,
+      // cSpell: disable
       UnicodeFont.strikethroughSingle: localizations.fontStrikethroughSingle,
+      // cSpell: enable
     };
     final captionStyle = Theme.of(context).textTheme.bodySmall;
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,8 +111,10 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
                 style: captionStyle,
               ),
               PlatformTextButton(
-                child: ButtonText(_textsByUnicodeFont[unicodeFont] ??
-                    localizations.editorArtWaitingForInputHint),
+                child: Text(
+                  _textsByUnicodeFont[unicodeFont] ??
+                      localizations.editorArtWaitingForInputHint,
+                ),
                 onPressed: () {
                   final text = _textsByUnicodeFont[unicodeFont];
                   if (text != null && text.isNotEmpty) {
@@ -121,7 +134,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
     for (final unicodeFont in UnicodeFont.values) {
       if (unicodeFont != UnicodeFont.normal) {
         _textsByUnicodeFont[unicodeFont] =
-            UnicodeFontConverter.encode(input!, unicodeFont);
+            UnicodeFontConverter.encode(input ?? 'hello world', unicodeFont);
       }
     }
     setState(() {});

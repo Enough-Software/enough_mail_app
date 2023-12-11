@@ -24,7 +24,6 @@ import '../settings/provider.dart';
 import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import '../widgets/attachment_chip.dart';
-import '../widgets/button_text.dart';
 import '../widgets/empty_message.dart';
 import '../widgets/expansion_wrap.dart';
 import '../widgets/ical_interactive_media.dart';
@@ -285,7 +284,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
                 const SizedBox.shrink(),
               if (_blockExternalImages)
                 PlatformElevatedButton(
-                  child: ButtonText(localizations.detailsActionShowImages),
+                  child: Text(localizations.detailsActionShowImages),
                   onPressed: () => setState(
                     () {
                       _blockExternalImages = false;
@@ -336,7 +335,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
           ),
           TextButton.icon(
             icon: Icon(CommonPlatformIcons.refresh),
-            label: ButtonText(localizations.detailsErrorDownloadRetry),
+            label: Text(localizations.detailsErrorDownloadRetry),
             onPressed: () {
               setState(() {
                 _messageDownloadError = false;
@@ -349,7 +348,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
             SelectableText(errorStackTrace?.toString() ?? '<no stacktrace>'),
             TextButton.icon(
               icon: const Icon(Icons.copy),
-              label: const ButtonText('Copy to clipboard'),
+              label: const Text('Copy to clipboard'),
               onPressed: () {
                 final text =
                     '${errorObject?.toString() ?? '<unknown error>'} \n'
@@ -747,7 +746,7 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
       return const PlatformProgressIndicator();
     } else {
       return ElevatedButton(
-        child: ButtonText(localizations.detailsSendReadReceiptAction),
+        child: Text(localizations.detailsSendReadReceiptAction),
         onPressed: () async {
           setState(() {
             _isSendingReadReceipt = true;
@@ -795,8 +794,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
       return widget.message.isNewsLetterSubscribable
           ? PlatformElevatedButton(
               onPressed: _resubscribe,
-              child:
-                  ButtonText(localizations.detailsNewsletterActionResubscribe),
+              child: Text(localizations.detailsNewsletterActionResubscribe),
             )
           : Text(
               localizations.detailsNewsletterStatusUnsubscribed,
@@ -805,7 +803,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
     } else {
       return PlatformElevatedButton(
         onPressed: _unsubscribe,
-        child: ButtonText(localizations.detailsNewsletterActionUnsubscribe),
+        child: Text(localizations.detailsNewsletterActionUnsubscribe),
       );
     }
   }

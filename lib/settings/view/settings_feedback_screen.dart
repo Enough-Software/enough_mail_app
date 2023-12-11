@@ -9,9 +9,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import '../../localization/extension.dart';
-import '../../screens/base.dart';
 import '../../scaffold_messenger/service.dart';
-import '../../widgets/button_text.dart';
+import '../../screens/base.dart';
 
 class SettingsFeedbackScreen extends StatefulWidget {
   const SettingsFeedbackScreen({super.key});
@@ -115,8 +114,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: PlatformTextButton(
-                    child:
-                        ButtonText(localizations.feedbackActionSuggestFeature),
+                    child: Text(localizations.feedbackActionSuggestFeature),
                     onPressed: () async {
                       await launcher
                           .launchUrl(Uri.parse('https://maily.userecho.com/'));
@@ -126,8 +124,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: PlatformTextButton(
-                    child:
-                        ButtonText(localizations.feedbackActionReportProblem),
+                    child: Text(localizations.feedbackActionReportProblem),
                     onPressed: () async {
                       await launcher
                           .launchUrl(Uri.parse('https://maily.userecho.com/'));
@@ -137,8 +134,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: PlatformTextButton(
-                    child:
-                        ButtonText(localizations.feedbackActionHelpDeveloping),
+                    child: Text(localizations.feedbackActionHelpDeveloping),
                     onPressed: () async {
                       await launcher.launchUrl(
                         Uri.parse(

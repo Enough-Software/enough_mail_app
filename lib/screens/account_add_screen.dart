@@ -21,7 +21,6 @@ import '../routes/routes.dart';
 import '../util/modal_bottom_sheet_helper.dart';
 import '../util/validator.dart';
 import '../widgets/account_hoster_selector.dart';
-import '../widgets/button_text.dart';
 import '../widgets/password_field.dart';
 import 'base.dart';
 
@@ -475,7 +474,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                         await launcher
                             .launchUrl(Uri.parse(appSpecificPasswordSetupUrl));
                       },
-                      child: ButtonText(
+                      child: Text(
                         localizations
                             .addAccountApplicationPasswordRequiredButton,
                       ),
@@ -499,7 +498,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                       await launcher.launchUrl(
                           Uri.parse(mailHoster.appSpecificPasswordSetupUrl!));
                     },
-                    child: ButtonText(
+                    child: Text(
                       localizations.addAccountApplicationPasswordRequiredButton,
                     ),
                   ),
@@ -541,7 +540,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                 PlatformTextButton(
                   onPressed: () =>
                       _navigateToManualSettings(context, localizations),
-                  child: ButtonText(
+                  child: Text(
                     localizations.addAccountResolvedSettingsWrongAction(
                         _mailHoster?.displayName ?? '<unknown>'),
                   ),
@@ -555,7 +554,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                           .replaceAll('{language}', languageCode);
                       launcher.launchUrl(Uri.parse(url));
                     },
-                    child: ButtonText(
+                    child: Text(
                       _extensionForgotPassword!
                           .getLabel(localizations.localeName),
                     ),
@@ -573,7 +572,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                   ),
                 ),
                 PlatformElevatedButton(
-                  child: ButtonText(localizations.addAccountEditManuallyAction),
+                  child: Text(localizations.addAccountEditManuallyAction),
                   onPressed: () =>
                       _navigateToManualSettings(context, localizations),
                 )
@@ -677,7 +676,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                   ),
                 ),
                 PlatformTextButton(
-                  child: ButtonText(
+                  child: Text(
                     localizations.addAccountSetupImapAccessButtonLabel,
                   ),
                   onPressed: () => launcher.launchUrl(

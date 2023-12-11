@@ -1,7 +1,10 @@
 import 'dart:math';
 
+/// Helper methods for strings.
 class StringHelper {
   StringHelper._();
+
+  /// Returns the largest common sequence of the given texts.
   static String? largestCommonSequence(List<String> texts) {
     if (texts.isEmpty) {
       return null;
@@ -11,17 +14,20 @@ class StringHelper {
       return text;
     }
     for (var i = 1; i < texts.length; i++) {
-      text = largestCommonSequenceOf(text!, texts[i]);
+      text = largestCommonSequenceOf(text ?? '', texts[i]);
       if (text == null) {
         return null;
       }
     }
+
     return text;
   }
 
+  /// Returns the largest common sequence of the given texts.
   static String? largestCommonSequenceOf(String first, String second) {
     // print('lcs of "$first" and "$second"');
-    // problem: the longest sequence between first and second is not necessarily the longest sequence between all
+    // problem: the longest sequence between first and second is not
+    //necessarily the longest sequence between all
     String shorter, longer;
     if (first.length <= second.length) {
       shorter = first;
@@ -72,8 +78,12 @@ class StringHelper {
         longest = sequence;
       }
     }
+
     return String.fromCharCodes(
-        shorterRunes, longest.startIndex, longest.startIndex + longest.length);
+      shorterRunes,
+      longest.startIndex,
+      longest.startIndex + longest.length,
+    );
   }
 }
 

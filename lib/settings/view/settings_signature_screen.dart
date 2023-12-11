@@ -10,7 +10,6 @@ import '../../localization/extension.dart';
 import '../../models/compose_data.dart';
 import '../../routes/routes.dart';
 import '../../screens/base.dart';
-import '../../widgets/button_text.dart';
 import '../../widgets/signature.dart';
 import '../provider.dart';
 
@@ -100,7 +99,7 @@ class SettingsSignatureScreen extends HookConsumerWidget {
                     onPressed: () {
                       context.pushNamed(Routes.settingsAccounts);
                     },
-                    child: ButtonText(localizations.settingsActionAccounts),
+                    child: Text(localizations.settingsActionAccounts),
                   ),
                 ],
               ],

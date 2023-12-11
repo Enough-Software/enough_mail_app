@@ -8,7 +8,6 @@ import '../../localization/extension.dart';
 import '../../models/swipe.dart';
 import '../../screens/base.dart';
 import '../../util/localized_dialog_helper.dart';
-import '../../widgets/button_text.dart';
 import '../provider.dart';
 
 class SettingsSwipeScreen extends ConsumerWidget {
@@ -151,7 +150,7 @@ class _SwipeSetting extends HookConsumerWidget {
         PlatformTextButtonIcon(
           onPressed: onPressed,
           icon: const Icon(Icons.edit),
-          label: ButtonText(localizations.swipeSettingChangeAction),
+          label: Text(localizations.swipeSettingChangeAction),
         ),
       ],
     );

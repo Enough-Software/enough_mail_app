@@ -9,7 +9,6 @@ import '../../localization/app_localizations.g.dart';
 import '../../localization/extension.dart';
 import '../../screens/base.dart';
 import '../../util/localized_dialog_helper.dart';
-import '../../widgets/button_text.dart';
 import '../provider.dart';
 
 class SettingsLanguageScreen extends HookConsumerWidget {
@@ -87,13 +86,13 @@ class SettingsLanguageScreen extends HookConsumerWidget {
                         selectedLocalizations.languageSettingConfirmationQuery,
                         actions: [
                           PlatformTextButton(
-                            child: ButtonText(
+                            child: Text(
                               selectedLocalizations.actionCancel,
                             ),
                             onPressed: () => context.pop(false),
                           ),
                           PlatformTextButton(
-                            child: ButtonText(selectedLocalizations.actionOk),
+                            child: Text(selectedLocalizations.actionOk),
                             onPressed: () => context.pop(true),
                           ),
                         ],

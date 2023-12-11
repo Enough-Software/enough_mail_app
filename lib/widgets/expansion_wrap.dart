@@ -1,9 +1,22 @@
+// ignore_for_file: avoid_setters_without_getters
+
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-enum ExpansionWrapIndicatorPosition { inline, border }
+/// The position of the indicator.
+enum ExpansionWrapIndicatorPosition {
+  /// The indicator is placed at the end of the last visible line.
+  inline,
 
+  /// The indicator is placed at the end of the last visible line, but
+  /// aligned to the right border of the widget.
+  border,
+}
+
+/// A widget that displays its children in a wrap layout and adds an indicator
+/// at the end if the children do not fit in the available space.
 class ExpansionWrap extends RenderObjectWidget {
+  /// Creates a new [ExpansionWrap] widget.
   const ExpansionWrap({
     super.key,
     required this.children,
@@ -16,48 +29,60 @@ class ExpansionWrap extends RenderObjectWidget {
     this.indicatorPosition = ExpansionWrapIndicatorPosition.border,
   });
 
+  /// The children to display.
   final List<Widget> children;
+
+  /// The widget to display when the children are compressed.
   final Widget expandIndicator;
+
+  /// The widget to display when the children are expanded.
   final Widget compressIndicator;
+
+  /// The maximum number of lines to display.
   final int? maxRuns;
+
+  /// The spacing between the children.
   final double spacing;
+
+  /// The spacing between the lines.
   final double runSpacing;
+
+  /// Whether the children are expanded.
   final bool isExpanded;
+
+  /// The position of the indicator.
   final ExpansionWrapIndicatorPosition indicatorPosition;
 
   @override
-  RenderObjectElement createElement() {
-    // print('widget.createElement');
-    return ExpansionWrapElement(this);
-  }
+  RenderObjectElement createElement() => _ExpansionWrapElement(this);
 
   @override
-  RenderObject createRenderObject(BuildContext context) {
-    // print('widget.createRenderObject');
-    return RenderExpansionWrap(
-      maxRuns: maxRuns,
-      spacing: spacing,
-      runSpacing: runSpacing,
-      isExpanded: isExpanded,
-      indicatorPosition: indicatorPosition,
-    );
-  }
+  RenderObject createRenderObject(BuildContext context) => RenderExpansionWrap(
+        maxRuns: maxRuns,
+        spacing: spacing,
+        runSpacing: runSpacing,
+        isExpanded: isExpanded,
+        indicatorPosition: indicatorPosition,
+      );
 
   @override
   void updateRenderObject(
-      BuildContext context, covariant RenderExpansionWrap renderObject) {
+    BuildContext context,
+    covariant RenderExpansionWrap renderObject,
+  ) {
     // print('widget.updateRenderObject');
     super.updateRenderObject(context, renderObject);
-    renderObject.maxRuns = maxRuns;
-    renderObject.spacing = spacing;
-    renderObject.runSpacing = runSpacing;
-    renderObject.isExpanded = isExpanded;
-    renderObject.indicatorPosition = indicatorPosition;
+    renderObject
+      ..maxRuns = maxRuns
+      ..spacing = spacing
+      ..runSpacing = runSpacing
+      ..isExpanded = isExpanded
+      ..indicatorPosition = indicatorPosition;
   }
 }
 
-class ExpansionWrapElement extends RenderObjectElement {
-  ExpansionWrapElement(ExpansionWrap super.widget);
+class _ExpansionWrapElement extends RenderObjectElement {
+  _ExpansionWrapElement(ExpansionWrap super.widget);
   static const int _expandIndicatorSlot = -1;
   static const int _compressIndicatorSlot = -2;
 
@@ -95,6 +120,7 @@ class ExpansionWrapElement extends RenderObjectElement {
         return children[slot];
       }
     }
+
     return null;
   }
 
@@ -175,7 +201,7 @@ class ExpansionWrapElement extends RenderObjectElement {
     for (var i = 0; i < widgets.length; i++) {
       _updateChild(widgets[i], i);
     }
-    //TODO remove other children widgets?
+    // TODO(RV): remove other children widgets?
   }
 
   void _updateRenderObject(RenderBox? child, int? slot) {
@@ -218,7 +244,10 @@ class _WrapParentData extends BoxParentData {
   bool _isVisible = true;
 }
 
+/// Renders the children in a wrap layout and adds an indicator at the end if
+/// the children do not fit in the available space.
 class RenderExpansionWrap extends RenderBox {
+  /// Creates a new [RenderExpansionWrap] widget.
   RenderExpansionWrap({
     required int? maxRuns,
     required double spacing,
@@ -284,18 +313,19 @@ class RenderExpansionWrap extends RenderBox {
   }
 
   List<RenderBox>? _wrapChildren;
+
+  /// Adds a child to the end of the children list.
   void addWrapChild(RenderBox child) {
     adoptChild(child);
     _wrapChildren ??= [];
-    _wrapChildren!.add(child);
+    _wrapChildren?.add(child);
   }
 
+  /// Removes all children from the list.
   void clearWrapChildren() {
     final children = _wrapChildren;
     if (children != null) {
-      for (final child in children) {
-        dropChild(child);
-      }
+      children.forEach(dropChild);
       _wrapChildren = null;
     }
   }
@@ -334,7 +364,7 @@ class RenderExpansionWrap extends RenderBox {
 
   @override
   void detach() {
-    // print('dettach');
+    // print('detach');
     super.detach();
     for (final RenderBox child in _allChildren) {
       child.detach();
@@ -367,6 +397,7 @@ class RenderExpansionWrap extends RenderBox {
         addDiagnostic(child, 'child $i');
       }
     }
+
     return value;
   }
 
@@ -382,6 +413,7 @@ class RenderExpansionWrap extends RenderBox {
         min = minIntrinsic;
       }
     }
+
     return min;
   }
 
@@ -396,6 +428,7 @@ class RenderExpansionWrap extends RenderBox {
       max += child.getMaxIntrinsicWidth(height);
       addSpacing = true;
     }
+
     return max;
   }
 
@@ -408,6 +441,7 @@ class RenderExpansionWrap extends RenderBox {
         min = minIntrinsic;
       }
     }
+
     return min;
   }
 
@@ -418,14 +452,20 @@ class RenderExpansionWrap extends RenderBox {
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
     assert(_wrapChildren != null);
-    final first = _wrapChildren!.first;
-    final BoxParentData parentData = first.parentData! as BoxParentData;
-    return parentData.offset.dy + first.getDistanceToActualBaseline(baseline)!;
+    final first = _wrapChildren?.first;
+    final parentData = first?.parentData;
+    if (first != null && parentData is BoxParentData) {
+      return parentData.offset.dy +
+          (first.getDistanceToActualBaseline(baseline) ?? 0);
+    }
+
+    return 0;
   }
 
   static Size _layoutBox(RenderBox? box, BoxConstraints constraints) {
     if (box == null) return Size.zero;
     box.layout(constraints, parentUsesSize: true);
+
     return box.size;
   }
 
@@ -564,8 +604,8 @@ class RenderExpansionWrap extends RenderBox {
   void paint(PaintingContext context, Offset offset) {
     void doPaint(RenderBox? child) {
       if (child != null) {
-        final parentData = child.parentData! as _WrapParentData;
-        if (parentData._isVisible) {
+        final parentData = child.parentData;
+        if (parentData is _WrapParentData && parentData._isVisible) {
           context.paintChild(child, parentData.offset + offset);
         }
       }
@@ -585,18 +625,21 @@ class RenderExpansionWrap extends RenderBox {
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
     for (final RenderBox child in _allChildren) {
-      final parentData = child.parentData! as _WrapParentData;
-      final bool isHit = parentData._isVisible &&
+      final parentData = child.parentData;
+      final bool isHit = parentData is _WrapParentData &&
+          parentData._isVisible &&
           result.addWithPaintOffset(
             offset: parentData.offset,
             position: position,
             hitTest: (BoxHitTestResult result, Offset transformed) {
               assert(transformed == position - parentData.offset);
+
               return child.hitTest(result, position: transformed);
             },
           );
       if (isHit) return true;
     }
+
     return false;
   }
 }

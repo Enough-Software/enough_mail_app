@@ -28,7 +28,6 @@ import '../share/provider.dart';
 import '../util/localized_dialog_helper.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/attachment_compose_bar.dart';
-import '../widgets/button_text.dart';
 import '../widgets/editor_extensions.dart';
 import '../widgets/recipient_input_field.dart';
 
@@ -446,10 +445,10 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
           actions: [
             PlatformTextButton(
               onPressed: currentContext.pop,
-              child: ButtonText(localizations.actionCancel),
+              child: Text(localizations.actionCancel),
             ),
             PlatformTextButton(
-              child: ButtonText(localizations.composeContinueEditingAction),
+              child: Text(localizations.composeContinueEditingAction),
               onPressed: () {
                 currentContext.pop();
                 _returnToCompose();
@@ -661,7 +660,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                       labelText: localizations.detailsHeaderTo,
                       hintText: localizations.composeRecipientHint,
                       additionalSuffixIcon: PlatformTextButton(
-                        child: ButtonText(localizations.detailsHeaderCc),
+                        child: Text(localizations.detailsHeaderCc),
                         onPressed: () => setState(
                           () => _isCcBccVisible = !_isCcBccVisible,
                         ),
@@ -827,10 +826,10 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
           actions: [
             PlatformTextButton(
               onPressed: currentContext.pop,
-              child: ButtonText(localizations.actionCancel),
+              child: Text(localizations.actionCancel),
             ),
             PlatformTextButton(
-              child: ButtonText(localizations.composeContinueEditingAction),
+              child: Text(localizations.composeContinueEditingAction),
               onPressed: () {
                 currentContext.pop();
                 _returnToCompose();

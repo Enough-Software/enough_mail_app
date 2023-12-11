@@ -16,15 +16,15 @@ extension SwipeExtension on SwipeAction {
   Color get colorBackground {
     switch (this) {
       case SwipeAction.markRead:
-        return Colors.blue[200]!;
+        return Colors.blue[200] ?? Colors.lightBlue;
       case SwipeAction.archive:
-        return Colors.amber[200]!;
+        return Colors.amber[200] ?? Colors.amber;
       case SwipeAction.markJunk:
-        return Colors.red[200]!;
+        return Colors.red[200] ?? Colors.orangeAccent;
       case SwipeAction.delete:
-        return Colors.red[600]!;
+        return Colors.red[600] ?? Colors.red;
       case SwipeAction.flag:
-        return Colors.lime[600]!;
+        return Colors.lime[600] ?? Colors.lime;
     }
   }
 

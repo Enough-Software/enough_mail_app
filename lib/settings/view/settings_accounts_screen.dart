@@ -12,7 +12,6 @@ import '../../localization/app_localizations.g.dart';
 import '../../localization/extension.dart';
 import '../../routes/routes.dart';
 import '../../screens/base.dart';
-import '../../widgets/button_text.dart';
 
 /// Allows to select an account for editing and to re-order the accounts
 class SettingsAccountsScreen extends HookConsumerWidget {
@@ -78,7 +77,7 @@ class SettingsAccountsScreen extends HookConsumerWidget {
                   padding: const EdgeInsets.all(8),
                   child: PlatformElevatedButton(
                     onPressed: () => reorderAccountsState.value = true,
-                    child: ButtonText(localizations.accountsActionReorder),
+                    child: Text(localizations.accountsActionReorder),
                   ),
                 ),
             ],

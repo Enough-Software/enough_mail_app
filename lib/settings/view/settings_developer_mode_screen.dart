@@ -11,10 +11,11 @@ import '../../extensions/extensions.dart';
 import '../../localization/extension.dart';
 import '../../screens/base.dart';
 import '../../util/localized_dialog_helper.dart';
-import '../../widgets/button_text.dart';
 import '../provider.dart';
 
+/// A screen to configure the developer mode.
 class SettingsDeveloperModeScreen extends HookConsumerWidget {
+  /// Creates a new [SettingsDeveloperModeScreen].
   const SettingsDeveloperModeScreen({super.key});
 
   @override
@@ -69,7 +70,7 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
                   style: theme.textTheme.bodySmall,
                 ),
                 PlatformTextButton(
-                  child: ButtonText(localizations.extensionsLearnMoreAction),
+                  child: Text(localizations.extensionsLearnMoreAction),
                   onPressed: () => launchUrl(
                     Uri.parse(
                       'https://github.com/Enough-Software/enough_mail_app/wiki/Extensions',
@@ -114,11 +115,11 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
       title: localizations.extensionsManualAction,
       actions: [
         PlatformTextButton(
-          child: ButtonText(localizations.actionCancel),
+          child: Text(localizations.actionCancel),
           onPressed: () => context.pop(),
         ),
         PlatformTextButton(
-          child: ButtonText(localizations.actionOk),
+          child: Text(localizations.actionOk),
           onPressed: () {
             final urlText = controller.text.trim();
             context.pop(urlText);
@@ -134,11 +135,7 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
           usedUrl = 'https://$url';
         }
         if (!url.endsWith('json')) {
-          if (url.endsWith('/')) {
-            usedUrl = '$url.maily.json';
-          } else {
-            usedUrl = '$url/.maily.json';
-          }
+          usedUrl = url.endsWith('/') ? '$url.maily.json' : '$url/.maily.json';
         }
         final appExtension = await AppExtension.loadFromUrl(usedUrl);
         if (appExtension != null) {
@@ -185,12 +182,12 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
       _addEmail(account, account.email, domains);
       _addHostname(
         account,
-        account.mailAccount.incoming.serverConfig.hostname ?? '',
+        account.mailAccount.incoming.serverConfig.hostname,
         domains,
       );
       _addHostname(
         account,
-        account.mailAccount.outgoing.serverConfig.hostname ?? '',
+        account.mailAccount.outgoing.serverConfig.hostname,
         domains,
       );
     }

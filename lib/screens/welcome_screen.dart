@@ -8,7 +8,6 @@ import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../routes/routes.dart';
 import '../settings/theme/icon_service.dart';
-import '../widgets/button_text.dart';
 import '../widgets/legalese.dart';
 
 /// Displays a welcome screen
@@ -30,12 +29,12 @@ class WelcomeScreen extends StatelessWidget {
         child: PlatformScaffold(
           body: IntroductionScreen(
             pages: pages,
-            done: ButtonText(localizations.actionDone),
+            done: Text(localizations.actionDone),
             onDone: () {
               context.goNamed(Routes.accountAdd);
             },
-            next: ButtonText(localizations.actionNext),
-            skip: ButtonText(localizations.actionSkip),
+            next: Text(localizations.actionNext),
+            skip: Text(localizations.actionSkip),
             showSkipButton: true,
           ),
         ),

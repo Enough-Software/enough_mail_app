@@ -3,7 +3,6 @@ export 'account_selector.dart';
 export 'app_drawer.dart';
 export 'attachment_chip.dart';
 export 'attachment_compose_bar.dart';
-export 'button_text.dart';
 export 'cupertino_status_bar.dart';
 export 'editor_extensions.dart';
 export 'empty_message.dart';

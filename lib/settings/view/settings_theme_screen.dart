@@ -7,7 +7,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../localization/extension.dart';
 import '../../screens/base.dart';
 import '../../util/localized_dialog_helper.dart';
-import '../../widgets/button_text.dart';
 import '../provider.dart';
 import '../theme/model.dart';
 
@@ -89,7 +88,7 @@ class SettingsDesignScreen extends HookConsumerWidget {
                     Row(
                       children: [
                         PlatformTextButton(
-                          child: ButtonText(
+                          child: Text(
                             localizations.designThemeCustomStart(
                               darkThemeStartTime.format(context),
                             ),
@@ -110,7 +109,7 @@ class SettingsDesignScreen extends HookConsumerWidget {
                           },
                         ),
                         PlatformTextButton(
-                          child: ButtonText(
+                          child: Text(
                             localizations.designThemeCustomEnd(
                               darkThemeEndTime.format(context),
                             ),

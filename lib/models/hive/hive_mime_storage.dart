@@ -53,8 +53,9 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
       '${mailAccount.email}_${mailbox.encodedPath.replaceAll('/', '_')}_$name';
 
   static Future<void> initGlobal() async {
-    Hive.registerAdapter(StorageMessageIdAdapter());
-    Hive.registerAdapter(StorageMessageEnvelopeAdapter());
+    Hive
+      ..registerAdapter(StorageMessageIdAdapter())
+      ..registerAdapter(StorageMessageEnvelopeAdapter());
     await Hive.initFlutter();
   }
 
@@ -246,6 +247,7 @@ class TextHiveStorage {
   Future<String?> load(String key) async {
     final box = _textBox ?? await Hive.openBox<String>(_keyTextBox);
     _textBox ??= box;
+
     return box.get(key);
   }
 }

@@ -19,7 +19,6 @@ import '../settings/provider.dart';
 import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import '../util/validator.dart';
-import 'button_text.dart';
 import 'icon_text.dart';
 import 'mailbox_tree.dart';
 import 'recipient_input_field.dart';
@@ -389,11 +388,11 @@ class MessageActions extends HookConsumerWidget {
       title: localizations.redirectTitle,
       actions: [
         TextButton(
-          child: ButtonText(localizations.actionCancel),
+          child: Text(localizations.actionCancel),
           onPressed: () => context.pop(false),
         ),
         TextButton(
-          child: ButtonText(localizations.messageActionRedirect),
+          child: Text(localizations.messageActionRedirect),
           onPressed: () {
             if (Validator.validateEmail(textEditingController.text)) {
               recipients.add(MailAddress(null, textEditingController.text));

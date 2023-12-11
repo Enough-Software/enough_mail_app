@@ -21,7 +21,6 @@ import '../settings/provider.dart';
 import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import '../util/validator.dart';
-import '../widgets/button_text.dart';
 import '../widgets/password_field.dart';
 import '../widgets/signature.dart';
 import 'base.dart';
@@ -232,8 +231,8 @@ class AccountEditScreen extends HookConsumerWidget {
                           Text(localizations.editAccountPlusAliasesSupported),
                     ),
                     PlatformTextButton(
-                      child: ButtonText(
-                          localizations.editAccountCheckPlusAliasAction),
+                      child:
+                          Text(localizations.editAccountCheckPlusAliasAction),
                       onPressed: () async {
                         final result = await showPlatformDialog<bool>(
                           context: context,
@@ -282,8 +281,8 @@ class AccountEditScreen extends HookConsumerWidget {
                         },
                       ),
                       icon: const Icon(Icons.edit),
-                      label: ButtonText(
-                          localizations.editAccountServerSettingsAction),
+                      label:
+                          Text(localizations.editAccountServerSettingsAction),
                     ),
                     const Divider(),
                     Padding(
@@ -296,7 +295,7 @@ class AccountEditScreen extends HookConsumerWidget {
                           Icons.delete,
                           color: Colors.white,
                         ),
-                        label: ButtonText(
+                        label: Text(
                           localizations.editAccountDeleteAccountAction,
                           style:
                               Theme.of(context).textTheme.labelLarge?.copyWith(
@@ -769,7 +768,7 @@ class _AliasEditDialogState extends ConsumerState<_AliasEditDialog> {
           : _buildContent(localizations),
       actions: [
         PlatformTextButton(
-          child: ButtonText(localizations.actionCancel),
+          child: Text(localizations.actionCancel),
           onPressed: () => context.pop(),
         ),
         PlatformTextButton(
@@ -787,7 +786,7 @@ class _AliasEditDialogState extends ConsumerState<_AliasEditDialog> {
                   context.pop();
                 }
               : null,
-          child: ButtonText(
+          child: Text(
             widget.isNewAlias
                 ? localizations.editAccountAliasAddAction
                 : localizations.editAccountAliasUpdateAction,

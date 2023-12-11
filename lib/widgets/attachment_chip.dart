@@ -11,7 +11,6 @@ import '../routes/routes.dart';
 import '../screens/media_screen.dart';
 import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
-import 'button_text.dart';
 import 'ical_interactive_media.dart';
 
 class AttachmentChip extends StatefulWidget {
@@ -265,7 +264,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
                 child: Text(sizeText),
               ),
             PlatformTextButton(
-              child: ButtonText(localizations.attachmentActionOpen),
+              child: Text(localizations.attachmentActionOpen),
               onPressed: () => InteractiveMediaScreen.share(
                 mediaProvider,
               ),
