@@ -418,6 +418,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     final mailHoster = _mailHoster;
     final oauthClient = mailHoster?.oauthClient;
     final appSpecificPasswordSetupUrl = mailHoster?.appSpecificPasswordSetupUrl;
+    final extensionForgotPassword = _extensionForgotPassword;
 
     return Step(
       title: Text(localizations.addAccountPasswordLabel),
@@ -545,18 +546,19 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                         _mailHoster?.displayName ?? '<unknown>'),
                   ),
                 ),
-                if (_extensionForgotPassword != null) ...[
+                if (extensionForgotPassword != null) ...[
                   PlatformTextButton(
                     onPressed: () {
                       final languageCode = localizations.localeName;
-                      final url = (_extensionForgotPassword?.action?.url ?? '')
+                      final url = (extensionForgotPassword?.action?.url ?? '')
                           .replaceAll('{user.email}', _emailController.text)
                           .replaceAll('{language}', languageCode);
                       launcher.launchUrl(Uri.parse(url));
                     },
                     child: Text(
-                      _extensionForgotPassword!
-                          .getLabel(localizations.localeName),
+                      extensionForgotPassword
+                              .getLabel(localizations.localeName) ??
+                          '',
                     ),
                   ),
                 ],
