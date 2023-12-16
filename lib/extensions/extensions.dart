@@ -92,13 +92,9 @@ class AppExtension {
       final domains = <String, Future<AppExtension?>>{};
       _addEmail(mailAccount.email, domains);
       final incomingHostname = mailAccount.incoming.serverConfig.hostname;
-      if (incomingHostname != null) {
-        _addHostname(incomingHostname, domains);
-      }
+      _addHostname(incomingHostname, domains);
       final outgoingHostname = mailAccount.outgoing.serverConfig.hostname;
-      if (outgoingHostname != null) {
-        _addHostname(outgoingHostname, domains);
-      }
+      _addHostname(outgoingHostname, domains);
       final allExtensions = await Future.wait(domains.values);
       final appExtensions = <AppExtension>[];
       for (final ext in allExtensions) {

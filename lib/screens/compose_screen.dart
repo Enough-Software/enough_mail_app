@@ -19,6 +19,7 @@ import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
 import '../mail/provider.dart';
 import '../models/compose_data.dart';
+import '../models/message.dart';
 import '../models/sender.dart';
 import '../routes/routes.dart';
 import '../scaffold_messenger/service.dart';
@@ -232,6 +233,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     final mb = widget.data.messageBuilder;
     if (mb.originalMessage == null) {
       if (_composeMode == ComposeMode.html) {
+        // cSpell:ignore nbsp
         final html = '<p>${mb.text ?? '&nbsp;'}</p>$signature';
 
         return html;
@@ -264,15 +266,20 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         }
       }
 
-      //TODO localize quote templates
+      // TODO(RV): localize quote templates
       final quoteTemplate = widget.data.action == ComposeAction.answer
           ? MailConventions.defaultReplyHeaderTemplate
           : widget.data.action == ComposeAction.forward
               ? MailConventions.defaultForwardHeaderTemplate
               : MailConventions.defaultReplyHeaderTemplate;
       if (_composeMode == ComposeMode.html) {
-        final args = _HtmlGenerationArguments(quoteTemplate, mb.originalMessage,
-            blockExternalImages, emptyMessageText, maxImageWidth);
+        final args = _HtmlGenerationArguments(
+          quoteTemplate,
+          mb.originalMessage,
+          blockExternalImages,
+          emptyMessageText,
+          maxImageWidth,
+        );
         final html = await compute(_generateQuoteHtmlImpl, args) + signature;
 
         return html;
@@ -292,24 +299,24 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   }
 
   static String _generateQuoteHtmlImpl(_HtmlGenerationArguments args) {
-    final html = args.mimeMessage!.quoteToHtml(
+    final html = args.mimeMessage?.quoteToHtml(
       quoteHeaderTemplate: args.quoteTemplate,
       blockExternalImages: args.blockExternalImages,
       emptyMessageText: args.emptyMessageText,
       maxImageWidth: args.maxImageWidth,
     );
 
-    return html;
+    return html ?? '';
   }
 
   static String _generateDraftHtmlImpl(_HtmlGenerationArguments args) {
-    final html = args.mimeMessage!.transformToHtml(
+    final html = args.mimeMessage?.transformToHtml(
       emptyMessageText: args.emptyMessageText,
       maxImageWidth: args.maxImageWidth,
       blockExternalImages: args.blockExternalImages,
     );
 
-    return html;
+    return html ?? '';
   }
 
   Future<void> _populateMessageBuilder({
@@ -322,7 +329,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       ..subject = _subjectController.text;
 
     final text = _composeMode == ComposeMode.html
-        ? await _htmlEditorApi!.getText()
+        ? await _htmlEditorApi?.getText() ?? ''
         : _plainTextController.text;
     _resumeComposeData = widget.data.resume(text, composeMode: _composeMode);
     if (storeComposeDataForResume) {
@@ -338,8 +345,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
             mb.addTextPlain(text);
           }
         } else {
-          mb.text = text;
-          mb.setContentType(MediaType.textPlain);
+          mb
+            ..text = text
+            ..setContentType(MediaType.textPlain);
         }
       } else {
         // create a normal mail with an HTML and a plain text part:
@@ -364,7 +372,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
           multipartAlternativeBuilder.addTextPlain(plainText);
         }
         final fullHtmlMessageText =
-            await _htmlEditorApi!.getFullHtml(content: text);
+            await _htmlEditorApi?.getFullHtml(content: text) ?? '';
         final htmlTextBuilder = multipartAlternativeBuilder.getTextHtmlPart();
         if (htmlTextBuilder != null) {
           htmlTextBuilder.text = fullHtmlMessageText;
@@ -463,16 +471,20 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     final action = widget.data.action;
     final storeFlags = action != ComposeAction.newMessage;
     if (storeFlags) {
-      for (final originalMessage in widget.data.originalMessages!) {
+      for (final originalMessage
+          in widget.data.originalMessages ?? const <Message?>[]) {
+        if (originalMessage == null) {
+          continue;
+        }
         if (action == ComposeAction.answer) {
-          originalMessage!.isAnswered = true;
+          originalMessage.isAnswered = true;
         } else {
-          originalMessage!.isForwarded = true;
+          originalMessage.isForwarded = true;
         }
         try {
           await mailClient.store(
             MessageSequence.fromMessage(originalMessage.mimeMessage),
-            originalMessage.mimeMessage.flags!,
+            originalMessage.mimeMessage.flags ?? [],
             action: StoreAction.replace,
           );
         } catch (e, s) {
@@ -481,16 +493,19 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
           }
         }
       }
-    } else if ((widget.data.originalMessage != null) &&
-        widget.data.originalMessage!.mimeMessage.hasFlag(MessageFlags.draft)) {
+    } else if (widget.data.originalMessage?.mimeMessage
+            .hasFlag(MessageFlags.draft) ??
+        false) {
       // delete draft message:
       try {
-        final originalMessage = widget.data.originalMessage!;
-        originalMessage.source.removeFromCache(originalMessage);
-        await mailClient.flagMessage(
-          originalMessage.mimeMessage,
-          isDeleted: true,
-        );
+        final originalMessage = widget.data.originalMessage;
+        if (originalMessage != null) {
+          originalMessage.source.removeFromCache(originalMessage);
+          await mailClient.flagMessage(
+            originalMessage.mimeMessage,
+            isDeleted: true,
+          );
+        }
       } catch (e, s) {
         if (kDebugMode) {
           print('Unable to update message flags: $e $s'); // otherwise ignore
@@ -507,9 +522,10 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         : widget.data.action == ComposeAction.forward
             ? localizations.composeTitleForward
             : localizations.composeTitleNew;
+    final htmlEditorApi = _htmlEditorApi;
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      onPopInvoked: (didPop) async {
         // let it pop but show snackbar to return:
         await _populateMessageBuilder(storeComposeDataForResume: true);
         ScaffoldMessengerService.instance.showTextSnackBar(
@@ -517,8 +533,6 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
           localizations.composeLeftByMistake,
           undo: _returnToCompose,
         );
-
-        return true;
       },
       child: PlatformScaffold(
         material: (context, platform) =>
@@ -716,10 +730,10 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                   },
                 ),
               ),
-            if (_composeMode == ComposeMode.html && _htmlEditorApi != null)
+            if (_composeMode == ComposeMode.html && htmlEditorApi != null)
               SliverHeaderHtmlEditorControls(
-                editorApi: _htmlEditorApi,
-                suffix: EditorArtExtensionButton(editorApi: _htmlEditorApi!),
+                editorApi: htmlEditorApi,
+                suffix: EditorArtExtensionButton(editorApi: htmlEditorApi),
               )
             else if (_composeMode == ComposeMode.plainText &&
                 _plainTextEditorApi != null)
@@ -849,7 +863,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   }
 
   void _convertToPlainTextEditor() {
-    final future = _htmlEditorApi!.getText();
+    final future = _htmlEditorApi?.getText() ?? Future.value('');
     setState(() {
       _loadMailTextFuture = future.then(_convertToPlainText);
       _composeMode = ComposeMode.plainText;
@@ -893,7 +907,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   Future _onSharedData(List<SharedData> sharedData) {
     final firstData = sharedData.first;
     if (firstData is SharedMailto) {
-      //TODO add the recipients, set the subject, set the text?
+      // TODO(RV): add the recipients, set the subject, set the text?
     } else {
       final api = _htmlEditorApi;
       if (api != null) {

@@ -143,7 +143,7 @@ class CustomFolderNamesEditor extends HookConsumerWidget {
     final archiveController = useTextEditingController(text: customNames[4]);
     final junkController = useTextEditingController(text: customNames[5]);
 
-    //TODO support to save these values
+    // TODO(RV): support to save these values
 
     return SingleChildScrollView(
       child: SafeArea(

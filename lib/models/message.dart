@@ -197,7 +197,7 @@ extension NewsLetter on MimeMessage {
     if (value == null) {
       return null;
     }
-    //TODO allow comments in / before URIs, e.g. "(send a mail to unsubscribe) <mailto:unsubscribe@list.org>"
+    // TODO(RV): allow comments in / before URIs, e.g. "(send a mail to unsubscribe) <mailto:unsubscribe@list.org>"
     final uris = <Uri>[];
     final parts = value.split('>');
     for (var part in parts) {

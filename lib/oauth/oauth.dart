@@ -6,23 +6,44 @@ import '../keys/service.dart';
 import '../logger.dart';
 import '../util/http_helper.dart';
 
+/// Defines the ID and secret of an OAuth client
 class OauthClientId {
+  /// Creates a new [OauthClientId]
   const OauthClientId(this.id, this.secret);
 
+  /// The ID of the OAuth client
   final String id;
+
+  /// The secret of the OAuth client
   final String? secret;
 }
 
+/// Provides means to authenticate with an OAuth provider
+/// and to refresh the access token
 abstract class OauthClient {
+  /// Creates a new [OauthClient]
   OauthClient(this.incomingHostName);
+
+  /// The hostname of the incoming mail server
   final String incomingHostName;
+
+  /// Whether this client is enabled
   bool get isEnabled => oauthClientId != null;
+
+  /// The [OauthClientId] for this client
   OauthClientId? get oauthClientId =>
       KeyService.instance.oauth[incomingHostName];
 
+  /// Authenticates with the given [email] address
   Future<OauthToken?> authenticate(String email) async {
     try {
-      final token = await _authenticate(email, incomingHostName);
+      final oauthClientId = this.oauthClientId;
+      if (oauthClientId == null) {
+        logger.d('no oauth client id for $incomingHostName');
+
+        return Future.value();
+      }
+      final token = await _authenticate(oauthClientId, email, incomingHostName);
       logger.d(
         'authenticated $email and received refresh '
         'token  ${token.refreshToken}',
@@ -36,9 +57,20 @@ abstract class OauthClient {
     }
   }
 
+  /// Refreshes the given [token]
   Future<OauthToken?> refresh(OauthToken token) async {
+    final oauthClientId = this.oauthClientId;
+    if (oauthClientId == null) {
+      logger.d('no oauth client id for $incomingHostName');
+
+      return Future.value();
+    }
     try {
-      final refreshedToken = await _refresh(token, incomingHostName);
+      final refreshedToken = await _refresh(
+        oauthClientId,
+        token,
+        incomingHostName,
+      );
       logger.d(
         'refreshed token and received  refresh token '
         '${refreshedToken.refreshToken}',
@@ -52,16 +84,33 @@ abstract class OauthClient {
     }
   }
 
-  Future<OauthToken> _authenticate(String email, String provider);
-  Future<OauthToken> _refresh(OauthToken token, String provider);
+  /// Subclasses have to implement the actual authentication
+  Future<OauthToken> _authenticate(
+    OauthClientId oauthClientId,
+    String email,
+    String provider,
+  );
+
+  /// Subclasses have to implement the actual token refresh
+  Future<OauthToken> _refresh(
+    OauthClientId oauthClientId,
+    OauthToken token,
+    String provider,
+  );
 }
 
+/// Provide Gmail OAuth authentication
 class GmailOAuthClient extends OauthClient {
+  /// Creates a new [GmailOAuthClient]
   GmailOAuthClient() : super('imap.gmail.com');
 
   @override
-  Future<OauthToken> _authenticate(String email, String provider) async {
-    final clientId = oauthClientId!.id;
+  Future<OauthToken> _authenticate(
+    OauthClientId oauthClientId,
+    String email,
+    String provider,
+  ) async {
+    final clientId = oauthClientId.id;
     final callbackUrlScheme = clientId.split('.').reversed.join('.');
 
     // Construct the url
@@ -107,8 +156,12 @@ class GmailOAuthClient extends OauthClient {
   }
 
   @override
-  Future<OauthToken> _refresh(OauthToken token, String provider) async {
-    final clientId = oauthClientId!.id;
+  Future<OauthToken> _refresh(
+    OauthClientId oauthClientId,
+    OauthToken token,
+    String provider,
+  ) async {
+    final clientId = oauthClientId.id;
     final callbackUrlScheme = clientId.split('.').reversed.join('.');
     final response = await http.post(
       Uri.parse('https://oauth2.googleapis.com/token'),
@@ -138,7 +191,9 @@ class GmailOAuthClient extends OauthClient {
   }
 }
 
+/// Provide Outlook OAuth authentication
 class OutlookOAuthClient extends OauthClient {
+  /// Creates a new [OutlookOAuthClient]
   OutlookOAuthClient() : super('outlook.office365.com');
   // source: https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
   static const String _scope =
@@ -146,15 +201,18 @@ class OutlookOAuthClient extends OauthClient {
       'https://outlook.office.com/SMTP.Send offline_access';
 
   @override
-  Future<OauthToken> _authenticate(String email, String provider) async {
-    final clientId = oauthClientId!.id;
-    final clientSecret = oauthClientId!.secret;
-    const callbackUrlScheme =
-        //'https://login.microsoftonline.com/common/oauth2/nativeclient';
-        'maily://oauth';
+  Future<OauthToken> _authenticate(
+    OauthClientId oauthClientId,
+    String email,
+    String provider,
+  ) async {
+    final clientId = oauthClientId.id;
+    final clientSecret = oauthClientId.secret;
+    const callbackUrlScheme = 'maily://oauth';
 
     // Construct the url
     final uri = Uri.https(
+      // cSpell: disable-next-line
       'login.microsoftonline.com',
       '/common/oauth2/v2.0/authorize',
       {
@@ -200,8 +258,12 @@ class OutlookOAuthClient extends OauthClient {
   }
 
   @override
-  Future<OauthToken> _refresh(OauthToken token, String provider) async {
-    final clientId = oauthClientId!.id;
+  Future<OauthToken> _refresh(
+    OauthClientId oauthClientId,
+    OauthToken token,
+    String provider,
+  ) async {
+    final clientId = oauthClientId.id;
     final response = await http.post(
       Uri.parse('https://login.microsoftonline.com/common/oauth2/v2.0/token'),
       body: {

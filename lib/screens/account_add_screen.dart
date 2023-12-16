@@ -186,7 +186,10 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
         await _discover(_emailController.text);
         break;
       case _stepPassword:
-        await _verifyAccount();
+        final mailHoster = _mailHoster;
+        if (mailHoster != null) {
+          await _verifyAccount(mailHoster);
+        }
         break;
       case _stepAccountSetup:
         await _finalizeAccount();
@@ -293,7 +296,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
     }
   }
 
-  Future _verifyAccount() async {
+  Future _verifyAccount(MailHoster mailHoster) async {
     // password and possibly manual account details have been specified
     setState(() {
       _isAccountVerifying = true;
@@ -303,7 +306,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
       userName: _emailController.text,
       email: _emailController.text,
       password: _passwordController.text,
-      config: _mailHoster!.clientConfig,
+      config: mailHoster.clientConfig,
     );
     final connectedAccount = await ref.read(
       firstTimeMailClientSourceProvider(
@@ -443,126 +446,13 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
               ],
             )
           else if (mailHoster != null)
-            Column(
-              children: [
-                if (oauthClient != null) ...[
-                  // The user can continue to sign in with the provider or by using an app-specific password
-                  Text(
-                    localizations.addAccountOauthOptionsText(
-                      mailHoster.displayName ?? '<unknown>',
-                    ),
-                  ),
-                  FittedBox(
-                    child: mailHoster.buildSignInButton(
-                      context,
-                      onPressed: () => _loginWithOAuth(
-                        mailHoster,
-                        oauthClient,
-                        _emailController.text,
-                      ),
-                      isSignInButton: true,
-                    ),
-                  ),
-                  if (appSpecificPasswordSetupUrl != null) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        localizations.addAccountOauthSignInWithAppPassword,
-                      ),
-                    ),
-                    PlatformTextButton(
-                      onPressed: () async {
-                        await launcher
-                            .launchUrl(Uri.parse(appSpecificPasswordSetupUrl));
-                      },
-                      child: Text(
-                        localizations
-                            .addAccountApplicationPasswordRequiredButton,
-                      ),
-                    ),
-                    PlatformCheckboxListTile(
-                      onChanged: (value) => setState(
-                        () =>
-                            _isApplicationSpecificPasswordAcknowledged = value,
-                      ),
-                      value: _isApplicationSpecificPasswordAcknowledged,
-                      title: Text(
-                        localizations
-                            .addAccountApplicationPasswordRequiredAcknowledged,
-                      ),
-                    ),
-                  ],
-                ] else if (mailHoster.appSpecificPasswordSetupUrl != null) ...[
-                  Text(localizations.addAccountApplicationPasswordRequiredInfo),
-                  PlatformTextButton(
-                    onPressed: () async {
-                      await launcher.launchUrl(
-                          Uri.parse(mailHoster.appSpecificPasswordSetupUrl!));
-                    },
-                    child: Text(
-                      localizations.addAccountApplicationPasswordRequiredButton,
-                    ),
-                  ),
-                  PlatformCheckboxListTile(
-                    onChanged: (value) => setState(
-                      () => _isApplicationSpecificPasswordAcknowledged = value,
-                    ),
-                    value: _isApplicationSpecificPasswordAcknowledged,
-                    title: Text(
-                      localizations
-                          .addAccountApplicationPasswordRequiredAcknowledged,
-                    ),
-                  ),
-                ],
-                if (mailHoster.appSpecificPasswordSetupUrl == null ||
-                    _isApplicationSpecificPasswordAcknowledged!)
-                  PasswordField(
-                    controller: _passwordController,
-                    cupertinoShowLabel: false,
-                    onChanged: (value) {
-                      final bool isValid = value.isNotEmpty &&
-                          (_mailHoster?.clientConfig != null ||
-                              _isManualSettings);
-                      if (isValid != _isContinueAvailable) {
-                        setState(() {
-                          _isContinueAvailable = isValid;
-                        });
-                      }
-                    },
-                    autofocus: true,
-                    labelText: localizations.addAccountPasswordLabel,
-                    hintText: localizations.addAccountPasswordHint,
-                    onSubmitted: (value) {
-                      if (_isContinueAvailable) {
-                        _onStepProgressed(2);
-                      }
-                    },
-                  ),
-                PlatformTextButton(
-                  onPressed: () =>
-                      _navigateToManualSettings(context, localizations),
-                  child: Text(
-                    localizations.addAccountResolvedSettingsWrongAction(
-                        _mailHoster?.displayName ?? '<unknown>'),
-                  ),
-                ),
-                if (extensionForgotPassword != null) ...[
-                  PlatformTextButton(
-                    onPressed: () {
-                      final languageCode = localizations.localeName;
-                      final url = (extensionForgotPassword?.action?.url ?? '')
-                          .replaceAll('{user.email}', _emailController.text)
-                          .replaceAll('{language}', languageCode);
-                      launcher.launchUrl(Uri.parse(url));
-                    },
-                    child: Text(
-                      extensionForgotPassword
-                              .getLabel(localizations.localeName) ??
-                          '',
-                    ),
-                  ),
-                ],
-              ],
+            _buildPasswordStepWithMailHoster(
+              oauthClient,
+              localizations,
+              mailHoster,
+              context,
+              appSpecificPasswordSetupUrl,
+              extensionForgotPassword,
             )
           else
             Column(
@@ -577,13 +467,161 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                   child: Text(localizations.addAccountEditManuallyAction),
                   onPressed: () =>
                       _navigateToManualSettings(context, localizations),
-                )
+                ),
               ],
             ),
         ],
       ),
     );
   }
+
+  Column _buildPasswordStepWithMailHoster(
+    OauthClient? oauthClient,
+    AppLocalizations localizations,
+    MailHoster mailHoster,
+    BuildContext context,
+    String? appSpecificPasswordSetupUrl,
+    AppExtensionActionDescription? extensionForgotPassword,
+  ) =>
+      Column(
+        children: [
+          if (oauthClient != null)
+            ..._buildOauthAuthenticationSection(
+              localizations,
+              mailHoster,
+              context,
+              oauthClient,
+              appSpecificPasswordSetupUrl,
+            )
+          else if (mailHoster.appSpecificPasswordSetupUrl != null)
+            ..._buildAppSpecificPasswordSection(localizations, mailHoster),
+          if (mailHoster.appSpecificPasswordSetupUrl == null ||
+              (_isApplicationSpecificPasswordAcknowledged ?? false))
+            PasswordField(
+              controller: _passwordController,
+              cupertinoShowLabel: false,
+              onChanged: (value) {
+                final bool isValid = value.isNotEmpty &&
+                    (_mailHoster?.clientConfig != null || _isManualSettings);
+                if (isValid != _isContinueAvailable) {
+                  setState(() {
+                    _isContinueAvailable = isValid;
+                  });
+                }
+              },
+              autofocus: true,
+              labelText: localizations.addAccountPasswordLabel,
+              hintText: localizations.addAccountPasswordHint,
+              onSubmitted: (value) {
+                if (_isContinueAvailable) {
+                  _onStepProgressed(2);
+                }
+              },
+            ),
+          PlatformTextButton(
+            onPressed: () => _navigateToManualSettings(context, localizations),
+            child: Text(
+              localizations.addAccountResolvedSettingsWrongAction(
+                _mailHoster?.displayName ?? '<unknown>',
+              ),
+            ),
+          ),
+          if (extensionForgotPassword != null)
+            PlatformTextButton(
+              onPressed: () {
+                final languageCode = localizations.localeName;
+                final url = (extensionForgotPassword.action?.url ?? '')
+                    .replaceAll('{user.email}', _emailController.text)
+                    .replaceAll('{language}', languageCode);
+                launcher.launchUrl(Uri.parse(url));
+              },
+              child: Text(
+                extensionForgotPassword.getLabel(localizations.localeName) ??
+                    '',
+              ),
+            ),
+        ],
+      );
+
+  List<Widget> _buildAppSpecificPasswordSection(
+    AppLocalizations localizations,
+    MailHoster mailHoster,
+  ) =>
+      [
+        Text(localizations.addAccountApplicationPasswordRequiredInfo),
+        PlatformTextButton(
+          onPressed: () async {
+            await launcher.launchUrl(
+              Uri.parse(mailHoster.appSpecificPasswordSetupUrl ?? ''),
+            );
+          },
+          child: Text(
+            localizations.addAccountApplicationPasswordRequiredButton,
+          ),
+        ),
+        PlatformCheckboxListTile(
+          onChanged: (value) => setState(
+            () => _isApplicationSpecificPasswordAcknowledged = value,
+          ),
+          value: _isApplicationSpecificPasswordAcknowledged,
+          title: Text(
+            localizations.addAccountApplicationPasswordRequiredAcknowledged,
+          ),
+        ),
+      ];
+
+  List<Widget> _buildOauthAuthenticationSection(
+    AppLocalizations localizations,
+    MailHoster mailHoster,
+    BuildContext context,
+    OauthClient oauthClient,
+    String? appSpecificPasswordSetupUrl,
+  ) =>
+      [
+        // The user can continue to sign in with the provider
+        // or by using an app-specific password
+        Text(
+          localizations.addAccountOauthOptionsText(
+            mailHoster.displayName ?? '<unknown>',
+          ),
+        ),
+        FittedBox(
+          child: mailHoster.buildSignInButton(
+            context,
+            onPressed: () => _loginWithOAuth(
+              mailHoster,
+              oauthClient,
+              _emailController.text,
+            ),
+            isSignInButton: true,
+          ),
+        ),
+        if (appSpecificPasswordSetupUrl != null) ...[
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              localizations.addAccountOauthSignInWithAppPassword,
+            ),
+          ),
+          PlatformTextButton(
+            onPressed: () async {
+              await launcher.launchUrl(Uri.parse(appSpecificPasswordSetupUrl));
+            },
+            child: Text(
+              localizations.addAccountApplicationPasswordRequiredButton,
+            ),
+          ),
+          PlatformCheckboxListTile(
+            onChanged: (value) => setState(
+              () => _isApplicationSpecificPasswordAcknowledged = value,
+            ),
+            value: _isApplicationSpecificPasswordAcknowledged,
+            title: Text(
+              localizations.addAccountApplicationPasswordRequiredAcknowledged,
+            ),
+          ),
+        ],
+      ];
 
   Step _buildAccountSetupStep(
     BuildContext context,
@@ -611,85 +649,95 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                   ),
                 ],
               )
-            else if (_isAccountVerified) ...[
-              Text(
-                localizations.addAccountVerifyingSuccessInfo(
-                  _emailController.text,
-                ),
-              ),
-              DecoratedPlatformTextField(
-                controller: _userNameController,
-                keyboardType: TextInputType.text,
-                textCapitalization: TextCapitalization.words,
-                onChanged: (value) {
-                  final bool isValid = value.trim().isNotEmpty &&
-                      _accountNameController.text.trim().isNotEmpty;
-                  if (isValid != _isContinueAvailable) {
-                    setState(() {
-                      _isContinueAvailable = isValid;
-                    });
-                  }
-                },
-                decoration: InputDecoration(
-                  labelText: localizations.addAccountNameOfUserLabel,
-                  hintText: localizations.addAccountNameOfUserHint,
-                  icon: const Icon(Icons.account_circle),
-                ),
-                autofocus: true,
-                cupertinoAlignLabelOnTop: true,
-                onSubmitted: (_) => _accountNameNode.requestFocus(),
-              ),
-              DecoratedPlatformTextField(
-                focusNode: _accountNameNode,
-                controller: _accountNameController,
-                keyboardType: TextInputType.text,
-                onChanged: (value) {
-                  final bool isValid = value.isNotEmpty &&
-                      _userNameController.text.trim().isNotEmpty;
-                  if (isValid != _isContinueAvailable) {
-                    setState(() {
-                      _isContinueAvailable = isValid;
-                    });
-                  }
-                },
-                decoration: InputDecoration(
-                  labelText: localizations.addAccountNameOfAccountLabel,
-                  hintText: localizations.addAccountNameOfAccountHint,
-                  icon: const Icon(Icons.email),
-                ),
-                cupertinoAlignLabelOnTop: true,
-                onSubmitted: (_) {
-                  if (_isContinueAvailable) {
-                    _onStepProgressed(3);
-                  }
-                },
-              ),
-            ] else ...[
-              Text(
-                localizations.addAccountVerifyingFailedInfo(
-                  _emailController.text,
-                ),
-              ),
-              if (_mailHoster?.manualImapAccessSetupUrl != null) ...[
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 8),
-                  child: Text(
-                    localizations.accountAddImapAccessSetupMightBeRequired,
-                  ),
-                ),
-                PlatformTextButton(
-                  child: Text(
-                    localizations.addAccountSetupImapAccessButtonLabel,
-                  ),
-                  onPressed: () => launcher.launchUrl(
-                    Uri.parse(_mailHoster!.manualImapAccessSetupUrl!),
-                  ),
-                ),
-              ],
-            ],
+            else if (_isAccountVerified)
+              ..._buildAccountVerifiedSection(localizations)
+            else
+              ..._buildAccountVerificationFailedSection(localizations),
           ],
         ),
       );
+
+  List<Widget> _buildAccountVerificationFailedSection(
+    AppLocalizations localizations,
+  ) =>
+      [
+        Text(
+          localizations.addAccountVerifyingFailedInfo(
+            _emailController.text,
+          ),
+        ),
+        if (_mailHoster?.manualImapAccessSetupUrl != null) ...[
+          Padding(
+            padding: const EdgeInsets.only(top: 8, bottom: 8),
+            child: Text(
+              localizations.accountAddImapAccessSetupMightBeRequired,
+            ),
+          ),
+          PlatformTextButton(
+            child: Text(
+              localizations.addAccountSetupImapAccessButtonLabel,
+            ),
+            onPressed: () => launcher.launchUrl(
+              Uri.parse(_mailHoster?.manualImapAccessSetupUrl ?? ''),
+            ),
+          ),
+        ],
+      ];
+
+  List<Widget> _buildAccountVerifiedSection(AppLocalizations localizations) => [
+        Text(
+          localizations.addAccountVerifyingSuccessInfo(
+            _emailController.text,
+          ),
+        ),
+        DecoratedPlatformTextField(
+          controller: _userNameController,
+          keyboardType: TextInputType.text,
+          textCapitalization: TextCapitalization.words,
+          onChanged: (value) {
+            final bool isValid = value.trim().isNotEmpty &&
+                _accountNameController.text.trim().isNotEmpty;
+            if (isValid != _isContinueAvailable) {
+              setState(() {
+                _isContinueAvailable = isValid;
+              });
+            }
+          },
+          decoration: InputDecoration(
+            labelText: localizations.addAccountNameOfUserLabel,
+            hintText: localizations.addAccountNameOfUserHint,
+            icon: const Icon(Icons.account_circle),
+          ),
+          autofocus: true,
+          cupertinoAlignLabelOnTop: true,
+          onSubmitted: (_) => _accountNameNode.requestFocus(),
+        ),
+        DecoratedPlatformTextField(
+          focusNode: _accountNameNode,
+          controller: _accountNameController,
+          keyboardType: TextInputType.text,
+          onChanged: (value) {
+            final bool isValid =
+                value.isNotEmpty && _userNameController.text.trim().isNotEmpty;
+            if (isValid != _isContinueAvailable) {
+              setState(() {
+                _isContinueAvailable = isValid;
+              });
+            }
+          },
+          decoration: InputDecoration(
+            labelText: localizations.addAccountNameOfAccountLabel,
+            hintText: localizations.addAccountNameOfAccountHint,
+            icon: const Icon(Icons.email),
+          ),
+          cupertinoAlignLabelOnTop: true,
+          onSubmitted: (_) {
+            if (_isContinueAvailable) {
+              _onStepProgressed(3);
+            }
+          },
+        ),
+      ];
 
   void _onMailHosterChanged(MailHoster provider, String email) {
     final email = _emailController.text.trim();

@@ -23,5 +23,5 @@ class Contact {
   final List<MailAddress> mailAddresses;
   final DateTime? birthday;
   //phone numbers, profile photo(s),
-  //TODO consider full vCard support
+  // TODO(RV): consider full vCard support
 }

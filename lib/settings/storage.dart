@@ -8,11 +8,13 @@ import 'model.dart';
 /// Allows to read and store settings
 class SettingsStorage {
   /// Creates a [SettingsStorage]
-  const SettingsStorage();
+  const SettingsStorage({
+    FlutterSecureStorage storage = const FlutterSecureStorage(),
+  }) : _storage = storage;
 
   static const String _keySettings = 'settings';
 
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final FlutterSecureStorage _storage;
 
   /// Loads the settings
   Future<Settings> load() async {
@@ -24,6 +26,7 @@ class SettingsStorage {
         logger.d('error loading settings: $e');
       }
     }
+
     return const Settings();
   }
 

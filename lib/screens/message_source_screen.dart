@@ -265,7 +265,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
               ? CupertinoStatusBar(
                   info: CupertinoStatusBar.createInfo(source.description),
                   rightAction: PlatformIconButton(
-                    //TODO use CupertinoIcons.create once it's not buggy anymore
+                    // TODO(RV): use CupertinoIcons.create once it's not buggy anymore
                     icon: const Icon(CupertinoIcons.pen),
                     onPressed: () => context.pushNamed(
                       Routes.mailCompose,

@@ -159,7 +159,10 @@ class SliverSingleChildHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-          BuildContext context, double shrinkOffset, bool overlapsContent) =>
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) =>
       Material(
         elevation: elevation ?? 0,
         child: ConstrainedBox(

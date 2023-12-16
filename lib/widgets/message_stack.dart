@@ -208,7 +208,7 @@ class _MessageStackState extends State<MessageStack> {
         // nothing to do, just move on?
         break;
       case _DragAction.delete:
-        //TODO remove from message source
+        // TODO(RV): remove from message source
         await message.source.storeMessageFlags(
           [message],
           [MessageFlags.deleted],
@@ -218,16 +218,16 @@ class _MessageStackState extends State<MessageStack> {
               [message],
               [MessageFlags.deleted],
               action: StoreAction.remove,
-            ); //TODO add re-integration into message source
+            ); // TODO(RV): add re-integration into message source
         break;
       case _DragAction.reply:
-        //TODO implement quick reply
+        // TODO(RV): implement quick reply
         snack = 'replied with $data';
         break;
     }
     if (snack != null) {
       if (context.mounted) {
-        //TODO allow undo when marking as deleted
+        // TODO(RV): allow undo when marking as deleted
         ScaffoldMessengerService.instance.showTextSnackBar(
           context.text,
           snack,
@@ -495,7 +495,7 @@ class _MessageCardState extends State<MessageCard> {
   }
 
   Widget buildContent() {
-    //TODO do not download or display the content
+    // TODO(RV): do not download or display the content
     // when the widget is not exposed, unless the content is there already
     if (!widget.message.mimeMessage.isDownloaded) {
       return FutureBuilder(
@@ -552,7 +552,7 @@ class _MessageCardState extends State<MessageCard> {
     //   },
     //   onPageFinished: (url) {
     //     print('finished loading page');
-    //     //TODO inject JS to query size?
+    //     // TODO(RV): inject JS to query size?
     //   },
     // );
     // }
@@ -566,7 +566,7 @@ class _MessageCardState extends State<MessageCard> {
     if (text != null) {
       return SelectableText(text);
     }
-    //TODO add other content, attachments, etc
+    // TODO(RV): add other content, attachments, etc
 
     return Text(
       'Unsupported content: ${widget.message.mimeMessage.mediaType.text}',

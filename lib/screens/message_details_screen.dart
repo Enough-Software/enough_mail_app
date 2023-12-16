@@ -214,7 +214,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
     final date = context.formatDateTime(mime.decodeDate());
     final subject = mime.decodeSubject();
 
-    TableRow _rowWithLabel({required String label, required Widget child}) =>
+    TableRow rowWithLabel({required String label, required Widget child}) =>
         TableRow(
           children: [
             Padding(
@@ -233,20 +233,20 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
           textBaseline: TextBaseline.alphabetic,
           columnWidths: const {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
           children: [
-            _rowWithLabel(
+            rowWithLabel(
               label: localizations.detailsHeaderFrom,
               child: _buildMailAddresses(mime.from),
             ),
-            _rowWithLabel(
+            rowWithLabel(
               label: localizations.detailsHeaderTo,
               child: _buildMailAddresses(mime.to),
             ),
             if (mime.cc?.isNotEmpty ?? false)
-              _rowWithLabel(
+              rowWithLabel(
                 label: localizations.detailsHeaderCc,
                 child: _buildMailAddresses(mime.cc),
               ),
-            _rowWithLabel(
+            rowWithLabel(
               label: localizations.detailsHeaderDate,
               child: Text(date),
             ),
@@ -790,22 +790,21 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
       return const PlatformProgressIndicator();
     }
     final localizations = context.text;
-    if (widget.message.isNewsletterUnsubscribed) {
-      return widget.message.isNewsLetterSubscribable
-          ? PlatformElevatedButton(
-              onPressed: _resubscribe,
-              child: Text(localizations.detailsNewsletterActionResubscribe),
-            )
-          : Text(
-              localizations.detailsNewsletterStatusUnsubscribed,
-              style: const TextStyle(fontStyle: FontStyle.italic),
-            );
-    } else {
-      return PlatformElevatedButton(
-        onPressed: _unsubscribe,
-        child: Text(localizations.detailsNewsletterActionUnsubscribe),
-      );
-    }
+
+    return widget.message.isNewsletterUnsubscribed
+        ? widget.message.isNewsLetterSubscribable
+            ? PlatformElevatedButton(
+                onPressed: _resubscribe,
+                child: Text(localizations.detailsNewsletterActionResubscribe),
+              )
+            : Text(
+                localizations.detailsNewsletterStatusUnsubscribed,
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              )
+        : PlatformElevatedButton(
+            onPressed: _unsubscribe,
+            child: Text(localizations.detailsNewsletterActionUnsubscribe),
+          );
   }
 
   Future<void> _resubscribe() async {
@@ -832,7 +831,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
         setState(() {
           widget.message.isNewsletterUnsubscribed = false;
         });
-        //TODO store flag only when server/mailbox supports arbitrary flags?
+        // TODO(RV): store flag only when server/mailbox supports arbitrary flags?
         await mailClient.store(
           MessageSequence.fromMessage(mime),
           [Message.keywordFlagUnsubscribed],
@@ -865,7 +864,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
       action: localizations.detailsNewsletterUnsubscribeDialogAction,
       query: localizations.detailsNewsletterUnsubscribeDialogQuestion(listName),
     );
-    if (confirmation == true) {
+    if (confirmation ?? false) {
       setState(() {
         _isActive = true;
       });
@@ -886,7 +885,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
         setState(() {
           widget.message.isNewsletterUnsubscribed = true;
         });
-        //TODO store flag only when server/mailbox supports arbitrary flags?
+        // TODO(RV): store flag only when server/mailbox supports arbitrary flags?
         try {
           await mailClient?.store(
             MessageSequence.fromMessage(mime),

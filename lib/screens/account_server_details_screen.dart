@@ -370,7 +370,8 @@ class _AccountServerDetailsEditorState
                 ),
                 ExpansionTile(
                   title: Text(
-                      localizations.accountDetailsAdvancedIncomingSectionTitle),
+                    localizations.accountDetailsAdvancedIncomingSectionTitle,
+                  ),
                   children: [
                     Row(
                       children: [
@@ -417,13 +418,15 @@ class _AccountServerDetailsEditorState
                           items: [
                             DropdownMenuItem(
                               child: Text(
-                                  localizations.accountDetailsOptionAutomatic),
+                                localizations.accountDetailsOptionAutomatic,
+                              ),
                             ),
                             const DropdownMenuItem(
                               value: SocketType.ssl,
                               child: Text('SSL'),
                             ),
                             const DropdownMenuItem(
+                              // cSpell: ignore starttls
                               value: SocketType.starttls,
                               child: Text('Start TLS'),
                             ),

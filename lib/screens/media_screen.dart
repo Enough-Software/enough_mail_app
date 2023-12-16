@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_media/enough_media.dart';
@@ -10,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:path_provider/path_provider.dart' as pathprovider;
 import 'package:share_plus/share_plus.dart';
 
 import '../account/model.dart';
@@ -116,7 +114,7 @@ class InteractiveMediaScreen extends ConsumerWidget {
 
     if (provider is TextMediaProvider) {
       messageBuilder.addBinary(
-        utf8.encode(provider.text) as Uint8List,
+        utf8.encode(provider.text),
         MediaType.fromText(provider.mediaType),
         filename: provider.name,
       );
@@ -146,49 +144,27 @@ class InteractiveMediaScreen extends ConsumerWidget {
       if (kDebugMode) {
         print('Unable to share media provider $provider');
       }
+
       return Future.value();
     }
   }
 
-  static Future _shareText(TextMediaProvider provider) async {
-    await Share.share(provider.text,
-        subject: provider.description ?? provider.name);
-  }
+  static Future _shareText(TextMediaProvider provider) => Share.share(
+        provider.text,
+        subject: provider.description ?? provider.name,
+      );
 
   static Future _shareFile(MemoryMediaProvider provider) async {
-    final tempDir = await pathprovider.getTemporaryDirectory();
-    final originalFileName = provider.name;
-    final lastDotIndex = originalFileName.lastIndexOf('.');
-    final ext =
-        lastDotIndex != -1 ? originalFileName.substring(lastDotIndex) : '';
-    final safeFileName = _filterNonAscii(originalFileName);
-    final path = '${tempDir.path}/$safeFileName$ext';
-    final file = File(path);
-    await file.writeAsBytes(provider.data);
+    final file = XFile.fromData(
+      provider.data,
+      mimeType: provider.mediaType,
+      name: provider.name,
+    );
 
-    final paths = [path];
-    final mimeTypes = [provider.mediaType];
-    await Share.shareFiles(paths,
-        mimeTypes: mimeTypes,
-        subject: originalFileName,
-        text: provider.description);
-  }
-
-  static String _filterNonAscii(String input) {
-    final buffer = StringBuffer();
-    for (final rune in input.runes) {
-      if ((rune >= 48 && rune <= 57) || // 0-9
-          (rune >= 65 && rune <= 90) || // A-Z
-          (rune >= 97 && rune <= 122)) // a-z
-      {
-        buffer.writeCharCode(rune);
-      } else if (rune == 46) {
-        // dot / period
-        break;
-      } else {
-        buffer.write('_');
-      }
-    }
-    return buffer.toString();
+    await Share.shareXFiles(
+      [file],
+      subject: provider.name,
+      text: provider.description,
+    );
   }
 }

@@ -112,7 +112,7 @@ class AccountEditScreen extends HookConsumerWidget {
                                       .editAccountFailureToConnectChangePasswordAction,
                                 ),
                               ),
-                            )
+                            ),
                           ],
                         ),
                       const Divider(),
@@ -170,9 +170,10 @@ class AccountEditScreen extends HookConsumerWidget {
                     if (account.hasNoAlias)
                       Padding(
                         padding: const EdgeInsets.all(8),
-                        child: Text(localizations.editAccountNoAliasesInfo,
-                            style:
-                                const TextStyle(fontStyle: FontStyle.italic)),
+                        child: Text(
+                          localizations.editAccountNoAliasesInfo,
+                          style: const TextStyle(fontStyle: FontStyle.italic),
+                        ),
                       ),
 
                     for (final alias in account.aliases)
@@ -240,9 +241,12 @@ class AccountEditScreen extends HookConsumerWidget {
                               _PlusAliasTestingDialog(account: account),
                         );
                         if (result != null) {
-                          account.supportsPlusAliases = result;
-                          account.setAttribute(
-                              RealAccount.attributePlusAliasTested, true);
+                          account
+                            ..supportsPlusAliases = result
+                            ..setAttribute(
+                              RealAccount.attributePlusAliasTested,
+                              true,
+                            );
                           await saveAccounts();
                         }
                       },
@@ -277,7 +281,7 @@ class AccountEditScreen extends HookConsumerWidget {
                       onPressed: () => context.pushNamed(
                         Routes.accountServerDetails,
                         pathParameters: {
-                          Routes.pathParameterEmail: account.email
+                          Routes.pathParameterEmail: account.email,
                         },
                       ),
                       icon: const Icon(Icons.edit),
@@ -351,7 +355,7 @@ class AccountEditScreen extends HookConsumerWidget {
                           },
                         ),
                       ),
-                    ]
+                    ],
                   ],
                 ),
               ),
@@ -842,9 +846,11 @@ class _AliasEditDialogState extends ConsumerState<_AliasEditDialog> {
             Padding(
               padding: const EdgeInsets.all(8),
               child: Text(
-                _errorMessage!,
+                _errorMessage ?? '',
                 style: const TextStyle(
-                    color: Colors.red, fontStyle: FontStyle.italic),
+                  color: Colors.red,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ),
         ],
