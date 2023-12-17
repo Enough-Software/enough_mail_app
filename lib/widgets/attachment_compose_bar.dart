@@ -385,7 +385,6 @@ class _AppointmentFinalizer {
 
 class _ComposeAttachment extends ConsumerWidget {
   const _ComposeAttachment({
-    super.key,
     required this.parentMessage,
     required this.attachment,
     required this.onRemove,

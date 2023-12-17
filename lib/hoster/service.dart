@@ -181,7 +181,7 @@ class GmailMailHoster extends MailHoster {
                 displayName: 'Google Mail',
                 displayShortName: 'Gmail',
                 incomingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.imap,
                     hostname: 'imap.gmail.com',
                     port: 993,
@@ -191,7 +191,7 @@ class GmailMailHoster extends MailHoster {
                   )
                 ],
                 outgoingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.smtp,
                     hostname: 'smtp.gmail.com',
                     port: 465,
@@ -268,7 +268,7 @@ class OutlookMailHoster extends MailHoster {
                 displayName: 'Outlook.com',
                 displayShortName: 'Outlook',
                 incomingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.imap,
                     hostname: 'outlook.office365.com',
                     port: 993,
@@ -278,7 +278,7 @@ class OutlookMailHoster extends MailHoster {
                   ),
                 ],
                 outgoingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.smtp,
                     hostname: 'smtp.office365.com',
                     port: 587,
@@ -410,7 +410,7 @@ class YahooMailHoster extends MailHoster {
                 displayName: 'Yahoo! Mail',
                 displayShortName: 'Yahoo',
                 incomingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.imap,
                     hostname: 'imap.mail.yahoo.com',
                     port: 993,
@@ -420,7 +420,7 @@ class YahooMailHoster extends MailHoster {
                   )
                 ],
                 outgoingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.smtp,
                     hostname: 'smtp.mail.yahoo.com',
                     port: 465,
@@ -466,7 +466,7 @@ class AolMailHoster extends MailHoster {
                 displayName: 'AOL Mail',
                 displayShortName: 'AOL',
                 incomingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.imap,
                     hostname: 'imap.aol.com',
                     port: 993,
@@ -476,7 +476,7 @@ class AolMailHoster extends MailHoster {
                   )
                 ],
                 outgoingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.smtp,
                     hostname: 'smtp.aol.com',
                     port: 465,
@@ -524,7 +524,7 @@ class AppleMailHoster extends MailHoster {
                 displayName: 'Apple iCloud',
                 displayShortName: 'Apple',
                 incomingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.imap,
                     hostname: 'imap.mail.me.com',
                     port: 993,
@@ -534,7 +534,7 @@ class AppleMailHoster extends MailHoster {
                   )
                 ],
                 outgoingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.smtp,
                     hostname: 'smtp.mail.me.com',
                     port: 587,
@@ -562,7 +562,7 @@ class GmxMailHoster extends MailHoster {
                 displayName: 'GMX Freemail',
                 displayShortName: 'GMX',
                 incomingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.imap,
                     hostname: 'imap.gmx.net',
                     port: 993,
@@ -572,7 +572,7 @@ class GmxMailHoster extends MailHoster {
                   )
                 ],
                 outgoingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.smtp,
                     hostname: 'mail.gmx.net',
                     port: 465,
@@ -609,7 +609,7 @@ class MailboxOrMailHoster extends MailHoster {
                 displayName: 'mailbox.org',
                 displayShortName: 'mailbox',
                 incomingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.imap,
                     hostname: 'imap.mailbox.org',
                     port: 993,
@@ -619,7 +619,7 @@ class MailboxOrMailHoster extends MailHoster {
                   )
                 ],
                 outgoingServers: [
-                  ServerConfig(
+                  const ServerConfig(
                     type: ServerType.smtp,
                     hostname: 'smtp.mailbox.org',
                     port: 465,

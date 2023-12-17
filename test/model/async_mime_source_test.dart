@@ -139,8 +139,10 @@ void main() async {
         reason: 'second message should be the new message');
   });
 
-  Future<void> _expectMessagesOrderedByDate(AsyncMimeSource source,
-      {int? numberToTest}) async {
+  Future<void> expectMessagesOrderedByDate(
+    AsyncMimeSource source, {
+    int? numberToTest,
+  }) async {
     var lastDate = DateTime.now();
     var lastSubject = '<no message>';
     final length = numberToTest ?? source.size;
@@ -174,7 +176,7 @@ void main() async {
     source.messages[97]
         .setHeader(MailConventions.headerDate, DateCodec.encodeDate(oldDate));
     // first page should be sorted:
-    await _expectMessagesOrderedByDate(source, numberToTest: 20);
+    await expectMessagesOrderedByDate(source, numberToTest: 20);
   });
 
   test('onMessagesVanished - sequence IDs', () async {

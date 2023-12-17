@@ -902,7 +902,6 @@ class _DayOfMonthSelectorState extends State<_DayOfMonthSelector> {
 
 class _UntilComposer extends StatefulWidget {
   const _UntilComposer({
-    super.key,
     required this.start,
     this.until,
     this.recommendation,

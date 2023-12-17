@@ -55,7 +55,7 @@ void main() async {
     );
   });
 
-  Future<void> _expectMessagesOrderedByDate({int numberToTest = 20}) async {
+  Future<void> expectMessagesOrderedByDate({int numberToTest = 20}) async {
     var lastDate = DateTime.now();
     var lastSubject = '<no message>';
     for (int i = 0; i < numberToTest; i++) {
@@ -154,7 +154,7 @@ void main() async {
             .add(firstMimeSourceDifferencePerMessage)
             .toLocal(),
       );
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
 
     test('real update - onMessageArrived x 1', () async {
@@ -252,7 +252,7 @@ void main() async {
             .toLocal(),
       );
       expect(notifyCounter, 2);
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
 
     test('onMessageArrived - once per source ordered by data', () async {
@@ -282,7 +282,7 @@ void main() async {
             .add(firstMimeSourceDifferencePerMessage)
             .toLocal(),
       );
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
 
     test('onMessageArrived - once per source out of date order', () async {
@@ -312,7 +312,7 @@ void main() async {
             .add(firstMimeSourceDifferencePerMessage)
             .toLocal(),
       );
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
   });
 
@@ -653,7 +653,7 @@ void main() async {
               .subtract(secondMimeSourceDifferencePerMessage)
               .toLocal());
 
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
 
     test('1 message added flag after resync', () async {
@@ -689,7 +689,7 @@ void main() async {
       expect(message.mimeMessage.sequenceId, copy.sequenceId);
       expect(message.isSeen, isTrue);
 
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
 
     test('1 message removed flag after resync', () async {
@@ -725,7 +725,7 @@ void main() async {
       expect(message.mimeMessage.sequenceId, copy.sequenceId);
       expect(message.isSeen, isFalse);
 
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
 
     test('1 message added, 1 removed, 1 changed flags after resync', () async {
@@ -797,7 +797,7 @@ void main() async {
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(message.isSeen, isFalse);
 
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
 
     test('1 message added ordered by date on each source after resync',
@@ -860,7 +860,7 @@ void main() async {
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
 
     test('1 message added unordered by date on each source after resync',
@@ -923,7 +923,7 @@ void main() async {
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
       expect(message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate.toLocal());
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
 
     test(
@@ -1020,7 +1020,7 @@ void main() async {
       expect(message.isSeen, isFalse);
       expect(
           message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
   });
 
@@ -1101,7 +1101,7 @@ void main() async {
             .subtract(secondMimeSourceDifferencePerMessage)
             .toLocal(),
       );
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
 
     test('delete 1 message and clear cache', () async {
@@ -1181,7 +1181,7 @@ void main() async {
           secondMimeSourceStartDate
               .subtract(secondMimeSourceDifferencePerMessage)
               .toLocal());
-      await _expectMessagesOrderedByDate();
+      await expectMessagesOrderedByDate();
     });
   });
 }
