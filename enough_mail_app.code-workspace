@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../enough_mail"
+		},
+		{
+			"path": "../enough_mail_discovery"
+		},
+		{
+			"path": "../enough_mail_flutter"
+		},
+		{
+			"path": "../enough_mail_html"
+		}
+	],
+	"settings": {
+		"cSpell.words": [
+			"unflag"
+		]
+	}
+}
