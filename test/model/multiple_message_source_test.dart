@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/account/model.dart';
 import 'package:enough_mail_app/localization/app_localizations.g.dart';
@@ -99,7 +101,9 @@ void main() async {
       expect(message.mimeMessage.sequenceId, 100);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
     });
 
     test('load third message', () async {
@@ -133,11 +137,16 @@ void main() async {
       for (int i = 1; i < source.size; i++) {
         final nextDateTime =
             (await source.getMessageAt(i)).mimeMessage.decodeDate();
-        expect(nextDateTime, isNotNull,
-            reason: 'decodeDate() is null for message $i');
-        expect(nextDateTime?.isBefore(lastDateTime!), isTrue,
-            reason:
-                '$nextDateTime should be before $lastDateTime for message $i');
+        expect(
+          nextDateTime,
+          isNotNull,
+          reason: 'decodeDate() is null for message $i',
+        );
+        expect(
+          nextDateTime?.isBefore(lastDateTime ?? DateTime.now()),
+          isTrue,
+          reason: '$nextDateTime should be before $lastDateTime for message $i',
+        );
         lastDateTime = nextDateTime;
       }
     });
@@ -490,8 +499,8 @@ void main() async {
       });
 
       final updatedMime = (secondMimeSource as FakeMimeSource)
-          .createMessage(firstMime.sequenceId!);
-      updatedMime.setFlag(MessageFlags.seen, true);
+          .createMessage(firstMime.sequenceId!)
+        ..setFlag(MessageFlags.seen, true);
       await secondMimeSource.onMessageFlagsUpdated(updatedMime);
       expect(notifyCounter, 1);
       expect(firstMessage.isSeen, isTrue);
@@ -511,8 +520,8 @@ void main() async {
       });
 
       final updatedMime = (secondMimeSource as FakeMimeSource)
-          .createMessage(firstMime.sequenceId!);
-      updatedMime.setFlag(MessageFlags.seen, false);
+          .createMessage(firstMime.sequenceId!)
+        ..setFlag(MessageFlags.seen, false);
       await secondMimeSource.onMessageFlagsUpdated(updatedMime);
       expect(notifyCounter, 1);
       expect(firstMessage.isSeen, isFalse);
@@ -560,8 +569,10 @@ void main() async {
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
@@ -648,10 +659,11 @@ void main() async {
       expect(message.mimeMessage.guid, 19);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
-          message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate
-              .subtract(secondMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate
+            .subtract(secondMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
 
       await expectMessagesOrderedByDate();
     });
@@ -668,8 +680,8 @@ void main() async {
         messages.add(message);
       }
       final copy = (firstMimeSource as FakeMimeSource)
-          .createMessage(messages[1].sequenceId!);
-      copy.isSeen = true;
+          .createMessage(messages[1].sequenceId!)
+        ..isSeen = true;
       messages[1] = copy;
 
       var message = await source.getMessageAt(2);
@@ -736,14 +748,18 @@ void main() async {
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(2);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 99');
@@ -766,32 +782,39 @@ void main() async {
       expect(source.size, 120);
       expect(notifyCounter, 2);
       message = await source.getMessageAt(0);
-      expect(message.mimeMessage.guid, 101,
-          reason: 'first message should be the 101');
+      expect(
+        message.mimeMessage.guid,
+        101,
+        reason: 'first message should be the 101',
+      );
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
       expect(message.isSeen, isFalse);
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .add(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .add(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
 
       // previous first message should now be at the second position:
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
       expect(message.isSeen, isFalse);
 
       message = await source.getMessageAt(2);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 99');
       expect(message.isSeen, isTrue);
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .subtract(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .subtract(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
 
       message = await source.getMessageAt(3);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
@@ -800,228 +823,260 @@ void main() async {
       await expectMessagesOrderedByDate();
     });
 
-    test('1 message added ordered by date on each source after resync',
-        () async {
-      var notifyCounter = 0;
-      source.addListener(() {
-        notifyCounter++;
-      });
-      var message = await source.getMessageAt(0);
-      expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+    test(
+      '1 message added ordered by date on each source after resync',
+      () async {
+        var notifyCounter = 0;
+        source.addListener(() {
+          notifyCounter++;
+        });
+        var message = await source.getMessageAt(0);
+        expect(message.mimeMessage.sequenceId, 20);
+        expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
+        expect(
+          message.mimeMessage.decodeDate(),
+          secondMimeSourceStartDate.toLocal(),
+        );
 
-      message = await source.getMessageAt(1);
-      expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
-      expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message = await source.getMessageAt(1);
+        expect(message.mimeMessage.sequenceId, 100);
+        expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
+        expect(
+          message.mimeMessage.decodeDate(),
+          firstMimeSourceStartDate.toLocal(),
+        );
 
-      var messages = <MimeMessage>[];
-      for (int i = 0; i < 20; i++) {
-        final message =
-            (firstMimeSource as FakeMimeSource).createMessage(101 - i);
-        messages.add(message);
-      }
-      await firstMimeSource.resyncMessagesManually(messages);
+        var messages = <MimeMessage>[];
+        for (int i = 0; i < 20; i++) {
+          final message =
+              (firstMimeSource as FakeMimeSource).createMessage(101 - i);
+          messages.add(message);
+        }
+        await firstMimeSource.resyncMessagesManually(messages);
 
-      messages = <MimeMessage>[];
-      for (int i = 0; i < 20; i++) {
-        final message =
-            (secondMimeSource as FakeMimeSource).createMessage(21 - i);
-        messages.add(message);
-      }
-      await secondMimeSource.resyncMessagesManually(messages);
+        messages = <MimeMessage>[];
+        for (int i = 0; i < 20; i++) {
+          final message =
+              (secondMimeSource as FakeMimeSource).createMessage(21 - i);
+          messages.add(message);
+        }
+        await secondMimeSource.resyncMessagesManually(messages);
 
-      expect(source.size, 122);
-      expect(notifyCounter, 2);
-      message = await source.getMessageAt(0);
-      expect(message.mimeMessage.sequenceId, 21);
-      expect(message.mimeMessage.decodeSubject(), 'secondSubject 21');
-      expect(
+        expect(source.size, 122);
+        expect(notifyCounter, 2);
+        message = await source.getMessageAt(0);
+        expect(message.mimeMessage.sequenceId, 21);
+        expect(message.mimeMessage.decodeSubject(), 'secondSubject 21');
+        expect(
           message.mimeMessage.decodeDate(),
           secondMimeSourceStartDate
               .add(secondMimeSourceDifferencePerMessage)
-              .toLocal());
-      expect(message.isSeen, isFalse);
+              .toLocal(),
+        );
+        expect(message.isSeen, isFalse);
 
-      // previous first message should now be at the second position:
-      message = await source.getMessageAt(1);
-      expect(message.mimeMessage.sequenceId, 101);
-      expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
-      expect(
+        // previous first message should now be at the second position:
+        message = await source.getMessageAt(1);
+        expect(message.mimeMessage.sequenceId, 101);
+        expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
+        expect(
           message.mimeMessage.decodeDate(),
           firstMimeSourceStartDate
               .add(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+              .toLocal(),
+        );
 
-      message = await source.getMessageAt(2);
-      expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
-      await expectMessagesOrderedByDate();
-    });
-
-    test('1 message added unordered by date on each source after resync',
-        () async {
-      var notifyCounter = 0;
-      source.addListener(() {
-        notifyCounter++;
-      });
-      var message = await source.getMessageAt(0);
-      expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
-
-      message = await source.getMessageAt(1);
-      expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
-      expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
-
-      var messages = <MimeMessage>[];
-      for (int i = 0; i < 20; i++) {
-        final message =
-            (secondMimeSource as FakeMimeSource).createMessage(21 - i);
-        messages.add(message);
-      }
-      await secondMimeSource.resyncMessagesManually(messages);
-
-      messages = <MimeMessage>[];
-      for (int i = 0; i < 20; i++) {
-        final message =
-            (firstMimeSource as FakeMimeSource).createMessage(101 - i);
-        messages.add(message);
-      }
-      await firstMimeSource.resyncMessagesManually(messages);
-
-      expect(source.size, 122);
-      expect(notifyCounter, 2);
-      message = await source.getMessageAt(0);
-      expect(message.mimeMessage.sequenceId, 21);
-      expect(message.mimeMessage.decodeSubject(), 'secondSubject 21');
-      expect(
+        message = await source.getMessageAt(2);
+        expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
+        expect(
           message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate
-              .add(secondMimeSourceDifferencePerMessage)
-              .toLocal());
-      expect(message.isSeen, isFalse);
-
-      // previous first message should now be at the second position:
-      message = await source.getMessageAt(1);
-      expect(message.mimeMessage.sequenceId, 101);
-      expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
-      expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .add(firstMimeSourceDifferencePerMessage)
-              .toLocal());
-
-      message = await source.getMessageAt(2);
-      expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
-      await expectMessagesOrderedByDate();
-    });
+          secondMimeSourceStartDate.toLocal(),
+        );
+        await expectMessagesOrderedByDate();
+      },
+    );
 
     test(
-        'out of cache: 1 message added, 2 removed, 2 changed flags after resync',
-        () async {
-      firstMimeSource = FakeMimeSource(
-        size: 100,
-        name: 'first',
-        startDate: firstMimeSourceStartDate,
-        differencePerMessage: firstMimeSourceDifferencePerMessage,
-        maxCacheSize: 20,
-      );
-      secondMimeSource = FakeMimeSource(
-        size: 20,
-        name: 'second',
-        startDate: secondMimeSourceStartDate,
-        differencePerMessage: secondMimeSourceDifferencePerMessage,
-      );
-      source = MultipleMessageSource(
-        [firstMimeSource, secondMimeSource],
-        'multiple',
-        MailboxFlag.inbox,
-        account: MockUnifiedAccount(),
-      );
+      '1 message added unordered by date on each source after resync',
+      () async {
+        var notifyCounter = 0;
+        source.addListener(() {
+          notifyCounter++;
+        });
+        var message = await source.getMessageAt(0);
+        expect(message.mimeMessage.sequenceId, 20);
+        expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
+        expect(
+          message.mimeMessage.decodeDate(),
+          secondMimeSourceStartDate.toLocal(),
+        );
 
-      var notifyCounter = 0;
-      source.addListener(() {
-        notifyCounter++;
-      });
+        message = await source.getMessageAt(1);
+        expect(message.mimeMessage.sequenceId, 100);
+        expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
+        expect(
+          message.mimeMessage.decodeDate(),
+          firstMimeSourceStartDate.toLocal(),
+        );
 
-      // ensure caches are initialized across mime and message sources:
-      var message = await source.getMessageAt(0);
-      message.isSeen = true;
-      expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+        var messages = <MimeMessage>[];
+        for (int i = 0; i < 20; i++) {
+          final message =
+              (secondMimeSource as FakeMimeSource).createMessage(21 - i);
+          messages.add(message);
+        }
+        await secondMimeSource.resyncMessagesManually(messages);
 
-      message = await source.getMessageAt(1);
-      expect(message.mimeMessage.sequenceId, 100);
-      expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
-      expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        messages = <MimeMessage>[];
+        for (int i = 0; i < 20; i++) {
+          final message =
+              (firstMimeSource as FakeMimeSource).createMessage(101 - i);
+          messages.add(message);
+        }
+        await firstMimeSource.resyncMessagesManually(messages);
 
-      // create test messages:
-      final messages = <MimeMessage>[];
-      for (int i = 0; i < 20; i++) {
-        await firstMimeSource.getMessage(i);
-        final message =
-            (firstMimeSource as FakeMimeSource).createMessage(100 - i);
-        messages.add(message);
-      }
-      // as this is out of cache, simulate changes by also these changes
-      // to the underlying structure:
-      messages[2].isAnswered = true;
-      messages.removeAt(3);
-      messages.removeAt(7);
-      messages.insert(
-          0, (firstMimeSource as FakeMimeSource).createMessage(101));
-      final serverMessages = FakeMimeSource.generateMessages(size: 99);
-      for (int i = 0; i < messages.length; i++) {
-        final message = messages[i];
-        message.sequenceId = 99 - i;
-        serverMessages[98 - i] = message;
-      }
-      // resync: ensure to remove first message from cache:
-      await firstMimeSource.getMessage(21);
-      await firstMimeSource.resyncMessagesManually(messages);
-      (firstMimeSource as FakeMimeSource).messages = serverMessages;
+        expect(source.size, 122);
+        expect(notifyCounter, 2);
+        message = await source.getMessageAt(0);
+        expect(message.mimeMessage.sequenceId, 21);
+        expect(message.mimeMessage.decodeSubject(), 'secondSubject 21');
+        expect(
+          message.mimeMessage.decodeDate(),
+          secondMimeSourceStartDate
+              .add(secondMimeSourceDifferencePerMessage)
+              .toLocal(),
+        );
+        expect(message.isSeen, isFalse);
 
-      expect(source.size, 119);
-      expect(notifyCounter, 1);
-      message = await source.getMessageAt(0);
-      expect(message.mimeMessage.sequenceId, 99);
-      expect(message.mimeMessage.guid, 101);
-      expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
-      expect(message.isSeen, isFalse);
-      expect(
+        // previous first message should now be at the second position:
+        message = await source.getMessageAt(1);
+        expect(message.mimeMessage.sequenceId, 101);
+        expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
+        expect(
           message.mimeMessage.decodeDate(),
           firstMimeSourceStartDate
               .add(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+              .toLocal(),
+        );
 
-      // previous first message should now be at the second position:
-      message = await source.getMessageAt(1);
-      expect(message.mimeMessage.sequenceId, 20);
-      expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
-      expect(message.isSeen, isTrue);
+        message = await source.getMessageAt(2);
+        expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
+        expect(
+          message.mimeMessage.decodeDate(),
+          secondMimeSourceStartDate.toLocal(),
+        );
+        await expectMessagesOrderedByDate();
+      },
+    );
 
-      message = await source.getMessageAt(2);
-      expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
-      expect(message.isSeen, isFalse);
-      expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
-      await expectMessagesOrderedByDate();
-    });
+    test(
+      'out of cache: 1 message added, 2 removed, 2 changed flags after resync',
+      () async {
+        firstMimeSource = FakeMimeSource(
+          size: 100,
+          name: 'first',
+          startDate: firstMimeSourceStartDate,
+          differencePerMessage: firstMimeSourceDifferencePerMessage,
+          maxCacheSize: 20,
+        );
+        secondMimeSource = FakeMimeSource(
+          size: 20,
+          name: 'second',
+          startDate: secondMimeSourceStartDate,
+          differencePerMessage: secondMimeSourceDifferencePerMessage,
+        );
+        source = MultipleMessageSource(
+          [firstMimeSource, secondMimeSource],
+          'multiple',
+          MailboxFlag.inbox,
+          account: MockUnifiedAccount(),
+        );
+
+        var notifyCounter = 0;
+        source.addListener(() {
+          notifyCounter++;
+        });
+
+        // ensure caches are initialized across mime and message sources:
+        var message = await source.getMessageAt(0);
+        message.isSeen = true;
+        expect(message.mimeMessage.sequenceId, 20);
+        expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
+        expect(
+          message.mimeMessage.decodeDate(),
+          secondMimeSourceStartDate.toLocal(),
+        );
+
+        message = await source.getMessageAt(1);
+        expect(message.mimeMessage.sequenceId, 100);
+        expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
+        expect(
+          message.mimeMessage.decodeDate(),
+          firstMimeSourceStartDate.toLocal(),
+        );
+
+        // create test messages:
+        final messages = <MimeMessage>[];
+        for (int i = 0; i < 20; i++) {
+          await firstMimeSource.getMessage(i);
+          final message =
+              (firstMimeSource as FakeMimeSource).createMessage(100 - i);
+          messages.add(message);
+        }
+        // as this is out of cache, simulate changes by also these changes
+        // to the underlying structure:
+        messages[2].isAnswered = true;
+        messages
+          ..removeAt(3)
+          ..removeAt(7)
+          ..insert(
+            0,
+            (firstMimeSource as FakeMimeSource).createMessage(101),
+          );
+        final serverMessages = FakeMimeSource.generateMessages(size: 99);
+        for (int i = 0; i < messages.length; i++) {
+          final message = messages[i]..sequenceId = 99 - i;
+          serverMessages[98 - i] = message;
+        }
+        // resync: ensure to remove first message from cache:
+        await firstMimeSource.getMessage(21);
+        await firstMimeSource.resyncMessagesManually(messages);
+        (firstMimeSource as FakeMimeSource).messages = serverMessages;
+
+        expect(source.size, 119);
+        expect(notifyCounter, 1);
+        message = await source.getMessageAt(0);
+        expect(message.mimeMessage.sequenceId, 99);
+        expect(message.mimeMessage.guid, 101);
+        expect(message.mimeMessage.decodeSubject(), 'firstSubject 101');
+        expect(message.isSeen, isFalse);
+        expect(
+          message.mimeMessage.decodeDate(),
+          firstMimeSourceStartDate
+              .add(firstMimeSourceDifferencePerMessage)
+              .toLocal(),
+        );
+
+        // previous first message should now be at the second position:
+        message = await source.getMessageAt(1);
+        expect(message.mimeMessage.sequenceId, 20);
+        expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
+        expect(
+          message.mimeMessage.decodeDate(),
+          secondMimeSourceStartDate.toLocal(),
+        );
+        expect(message.isSeen, isTrue);
+
+        message = await source.getMessageAt(2);
+        expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
+        expect(message.isSeen, isFalse);
+        expect(
+          message.mimeMessage.decodeDate(),
+          firstMimeSourceStartDate.toLocal(),
+        );
+        await expectMessagesOrderedByDate();
+      },
+    );
   });
 
   group('delete', () {
@@ -1035,23 +1090,28 @@ void main() async {
       var message = await source.getMessageAt(0);
       expect(message.mimeMessage.sequenceId, 20);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 20');
-      expect(message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate.toLocal());
+      expect(
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(1);
       expect(message.mimeMessage.sequenceId, 100);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(2);
       expect(message.mimeMessage.sequenceId, 99);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 99');
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .subtract(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .subtract(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
 
       message = await source.getMessageAt(3);
       expect(message.mimeMessage.sequenceId, 19);
@@ -1131,19 +1191,21 @@ void main() async {
       expect(message.mimeMessage.sequenceId, 99);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 99');
       expect(
-          message.mimeMessage.decodeDate(),
-          firstMimeSourceStartDate
-              .subtract(firstMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate
+            .subtract(firstMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
 
       message = await source.getMessageAt(3);
       expect(message.mimeMessage.sequenceId, 19);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
-          message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate
-              .subtract(secondMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate
+            .subtract(secondMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
 
       final messages = [await source.getMessageAt(2)];
       expect(source.size, 120);
@@ -1171,16 +1233,19 @@ void main() async {
       expect(message.mimeMessage.guid, 100);
       expect(message.mimeMessage.decodeSubject(), 'firstSubject 100');
       expect(
-          message.mimeMessage.decodeDate(), firstMimeSourceStartDate.toLocal());
+        message.mimeMessage.decodeDate(),
+        firstMimeSourceStartDate.toLocal(),
+      );
 
       message = await source.getMessageAt(2);
       expect(message.mimeMessage.sequenceId, 19);
       expect(message.mimeMessage.decodeSubject(), 'secondSubject 19');
       expect(
-          message.mimeMessage.decodeDate(),
-          secondMimeSourceStartDate
-              .subtract(secondMimeSourceDifferencePerMessage)
-              .toLocal());
+        message.mimeMessage.decodeDate(),
+        secondMimeSourceStartDate
+            .subtract(secondMimeSourceDifferencePerMessage)
+            .toLocal(),
+      );
       await expectMessagesOrderedByDate();
     });
   });
@@ -1254,11 +1319,9 @@ class TestNotificationService implements NotificationService {
   }
 
   @override
-  Future _sendLocalNotification(
-    int id,
-    String title,
-    String? text) {
+  Future _sendLocalNotification(int id, String title, String? text) {
     _sendNotifications++;
+
     return Future.value();
   }
 
@@ -1275,11 +1338,14 @@ class TestNotificationService implements NotificationService {
   @override
   Future sendLocalNotificationForMailLoadEvent(MailLoadEvent event) =>
       sendLocalNotificationForMail(
-          event.message, event.mailClient.account.email);
+        event.message,
+        event.mailClient.account.email,
+      );
 
   @override
   Future sendLocalNotificationForMailMessage(Message message) {
     _sendNotifications++;
+
     return Future.value();
   }
 }

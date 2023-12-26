@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_app/models/async_mime_source.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -90,8 +92,11 @@ void main() async {
     }
     final messages = await Future.wait(futures);
     for (int i = 0; i < messages.length; i++) {
-      expect(messages[i].sequenceId, expectedSequenceIds[i],
-          reason: 'failed for index $i');
+      expect(
+        messages[i].sequenceId,
+        expectedSequenceIds[i],
+        reason: 'failed for index $i',
+      );
     }
   });
 
@@ -128,15 +133,23 @@ void main() async {
     final oldDate =
         firstMessage.decodeDate()!.subtract(const Duration(seconds: 30));
     newMessage.setHeader(
-        MailConventions.headerDate, DateCodec.encodeDate(oldDate));
+      MailConventions.headerDate,
+      DateCodec.encodeDate(oldDate),
+    );
     await source.onMessageArrived(newMessage);
     expect(source.size, 101);
     var message = await source.getMessage(0);
-    expect(message.sequenceId, 100,
-        reason: 'first message should stay the same');
+    expect(
+      message.sequenceId,
+      100,
+      reason: 'first message should stay the same',
+    );
     message = await source.getMessage(1);
-    expect(message.sequenceId, 101,
-        reason: 'second message should be the new message');
+    expect(
+      message.sequenceId,
+      101,
+      reason: 'second message should be the new message',
+    );
   });
 
   Future<void> expectMessagesOrderedByDate(
@@ -181,8 +194,11 @@ void main() async {
 
   test('onMessagesVanished - sequence IDs', () async {
     final AsyncMimeSource source = FakeMimeSource(size: 101);
-    Future<void> expectMessage(int index, int expectedGuid,
-        [String? reason]) async {
+    Future<void> expectMessage(
+      int index,
+      int expectedGuid, [
+      String? reason,
+    ]) async {
       final message = await source.getMessage(index);
       expect(message.guid, expectedGuid, reason: reason);
     }
@@ -234,8 +250,11 @@ void main() async {
 
   test('onMessagesVanished - same valid sequence ID twice', () async {
     final AsyncMimeSource source = FakeMimeSource(size: 101);
-    Future<void> expectMessage(int index, int expectedSequenceId,
-        [String? reason]) async {
+    Future<void> expectMessage(
+      int index,
+      int expectedSequenceId, [
+      String? reason,
+    ]) async {
       final message = await source.getMessage(index);
       expect(message.sequenceId, expectedSequenceId, reason: reason);
     }
@@ -250,7 +269,10 @@ void main() async {
     await source.onMessagesVanished(MessageSequence.fromIds([100]));
     expect(source.size, 100);
     await expectMessage(
-        0, 100, "first message's sequence ID should be adapted");
+      0,
+      100,
+      "first message's sequence ID should be adapted",
+    );
     await expectMessage(1, 99);
 
     await source.onMessagesVanished(MessageSequence.fromIds([100]));
@@ -267,8 +289,11 @@ void main() async {
 
   test('onMessagesVanished - sequence IDs reverse', () async {
     final AsyncMimeSource source = FakeMimeSource(size: 101);
-    Future<void> expectMessage(int index, int expectedGuid,
-        [String? reason]) async {
+    Future<void> expectMessage(
+      int index,
+      int expectedGuid, [
+      String? reason,
+    ]) async {
       final message = await source.getMessage(index);
       expect(message.guid, expectedGuid, reason: reason);
     }
@@ -294,8 +319,11 @@ void main() async {
 
   test('onMessagesVanished - UIDs', () async {
     final AsyncMimeSource source = FakeMimeSource(size: 101);
-    Future<void> expectMessage(int index, int expectedGuid,
-        [String? reason]) async {
+    Future<void> expectMessage(
+      int index,
+      int expectedGuid, [
+      String? reason,
+    ]) async {
       final message = await source.getMessage(index);
       expect(message.guid, expectedGuid, reason: reason);
     }
@@ -308,7 +336,8 @@ void main() async {
       expect(message.sequenceId, 101 - i);
     }
     await source.onMessagesVanished(
-        MessageSequence.fromIds([101, 99, 98], isUid: true));
+      MessageSequence.fromIds([101, 99, 98], isUid: true),
+    );
     expect(source.size, 98);
     await expectMessage(0, 100, 'first should be 100');
     await expectMessage(1, 97, 'second should be 97');
@@ -322,8 +351,11 @@ void main() async {
 
   test('onMessagesVanished - UIDs reversed', () async {
     final AsyncMimeSource source = FakeMimeSource(size: 101);
-    Future<void> expectMessage(int index, int expectedGuid,
-        [String? reason]) async {
+    Future<void> expectMessage(
+      int index,
+      int expectedGuid, [
+      String? reason,
+    ]) async {
       final message = await source.getMessage(index);
       expect(message.guid, expectedGuid, reason: reason);
     }
@@ -336,7 +368,8 @@ void main() async {
       expect(message.sequenceId, 101 - i);
     }
     await source.onMessagesVanished(
-        MessageSequence.fromIds([98, 99, 101], isUid: true));
+      MessageSequence.fromIds([98, 99, 101], isUid: true),
+    );
     expect(source.size, 98);
     await expectMessage(0, 100, 'first should be 100');
     await expectMessage(1, 97, 'second should be 97');
@@ -361,8 +394,11 @@ void main() async {
       expect(source.size, 100);
       for (int i = 0; i < 20; i++) {
         final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid message ${message.guid} at $i');
+        expect(
+          message.guid,
+          messages[i].guid,
+          reason: 'invalid message ${message.guid} at $i',
+        );
       }
     });
 
@@ -378,8 +414,11 @@ void main() async {
       expect(source.size, 100);
       for (int i = 0; i < 20; i++) {
         final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid message ${message.guid} at $i');
+        expect(
+          message.guid,
+          messages[i].guid,
+          reason: 'invalid message ${message.guid} at $i',
+        );
       }
     });
 
@@ -397,8 +436,11 @@ void main() async {
       expect(source.size, 101);
       for (int i = 0; i < 21; i++) {
         final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid message ${message.guid} at $i');
+        expect(
+          message.guid,
+          messages[i].guid,
+          reason: 'invalid message ${message.guid} at $i',
+        );
       }
     });
 
@@ -415,8 +457,11 @@ void main() async {
       expect(source.size, 99);
       for (int i = 0; i < 19; i++) {
         final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid message ${message.guid} at $i');
+        expect(
+          message.guid,
+          messages[i].guid,
+          reason: 'invalid message ${message.guid} at $i',
+        );
       }
     });
 
@@ -428,15 +473,17 @@ void main() async {
         final message = await source.getMessage(i);
         messages.add(message);
       }
-      final copy = source.createMessage(messages[1].sequenceId!);
-      copy.isSeen = true;
+      final copy = source.createMessage(messages[1].sequenceId!)..isSeen = true;
       messages[1] = copy;
       await source.resyncMessagesManually(messages);
       expect(source.size, 100);
       for (int i = 0; i < messages.length; i++) {
         final message = await source.getMessage(i);
-        expect(message.flags, messages[i].flags,
-            reason: 'flags differ for message ${message.guid} at $i');
+        expect(
+          message.flags,
+          messages[i].flags,
+          reason: 'flags differ for message ${message.guid} at $i',
+        );
       }
     });
 
@@ -457,8 +504,11 @@ void main() async {
       expect(source.size, 100);
       for (int i = 0; i < messages.length; i++) {
         final message = await source.getMessage(i);
-        expect(message.flags, messages[i].flags,
-            reason: 'flags differ for message ${message.guid} at $i');
+        expect(
+          message.flags,
+          messages[i].flags,
+          reason: 'flags differ for message ${message.guid} at $i',
+        );
       }
     });
 
@@ -471,8 +521,7 @@ void main() async {
         messages.add(message);
       }
 
-      final copy = source.createMessage(messages[1].sequenceId!);
-      copy.isSeen = true;
+      final copy = source.createMessage(messages[1].sequenceId!)..isSeen = true;
       messages[1] = copy;
       messages.removeAt(2);
       final newMessage = source.createMessage(101);
@@ -481,10 +530,16 @@ void main() async {
       expect(source.size, 100);
       for (int i = 0; i < messages.length; i++) {
         final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid message ${message.guid} at $i');
-        expect(message.flags, messages[i].flags,
-            reason: 'flags differ for message ${message.guid} at $i');
+        expect(
+          message.guid,
+          messages[i].guid,
+          reason: 'invalid message ${message.guid} at $i',
+        );
+        expect(
+          message.flags,
+          messages[i].flags,
+          reason: 'flags differ for message ${message.guid} at $i',
+        );
       }
     });
 
@@ -502,8 +557,11 @@ void main() async {
       expect(source.size, 102);
       for (int i = 0; i < 20; i++) {
         final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid message ${message.guid} at $i');
+        expect(
+          message.guid,
+          messages[i].guid,
+          reason: 'invalid message ${message.guid} at $i',
+        );
       }
     });
 
@@ -517,14 +575,18 @@ void main() async {
         final message = source.createMessage(100 - i);
         messages.add(message);
       }
-      messages.removeAt(1);
-      messages.removeAt(2);
+      messages
+        ..removeAt(1)
+        ..removeAt(2);
       await source.resyncMessagesManually(messages);
       expect(source.size, 98);
       for (int i = 0; i < 18; i++) {
         final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid message ${message.guid} at $i');
+        expect(
+          message.guid,
+          messages[i].guid,
+          reason: 'invalid message ${message.guid} at $i',
+        );
       }
     });
 
@@ -543,8 +605,11 @@ void main() async {
       expect(source.size, 100);
       for (int i = 0; i < messages.length; i++) {
         final message = await source.getMessage(i);
-        expect(message.flags, messages[i].flags,
-            reason: 'flags differ for message ${message.guid} at $i');
+        expect(
+          message.flags,
+          messages[i].flags,
+          reason: 'flags differ for message ${message.guid} at $i',
+        );
       }
     });
 
@@ -559,18 +624,25 @@ void main() async {
         messages.add(message);
       }
       messages[2].isAnswered = true;
-      messages.removeAt(3);
-      messages.removeAt(7);
-      messages.insert(0, source.createMessage(101));
-      messages.insert(0, source.createMessage(102));
+      messages
+        ..removeAt(3)
+        ..removeAt(7)
+        ..insert(0, source.createMessage(101))
+        ..insert(0, source.createMessage(102));
       await source.resyncMessagesManually(messages);
       expect(source.size, 100);
       for (int i = 0; i < messages.length; i++) {
         final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid message ${message.guid} at $i');
-        expect(message.flags, messages[i].flags,
-            reason: 'flags differ for message ${message.guid} at $i');
+        expect(
+          message.guid,
+          messages[i].guid,
+          reason: 'invalid message ${message.guid} at $i',
+        );
+        expect(
+          message.flags,
+          messages[i].flags,
+          reason: 'flags differ for message ${message.guid} at $i',
+        );
       }
     });
 
@@ -585,91 +657,112 @@ void main() async {
         messages.add(message);
       }
       messages[2].isAnswered = true;
-      messages.removeAt(3);
-      messages.removeAt(7);
-      messages.insert(0, source.createMessage(101));
+      messages
+        ..removeAt(3)
+        ..removeAt(7)
+        ..insert(0, source.createMessage(101));
       await source.resyncMessagesManually(messages);
       expect(source.size, 99);
       for (int i = 0; i < messages.length; i++) {
         final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid message ${message.guid} at $i');
-        expect(message.flags, messages[i].flags,
-            reason: 'flags differ for message ${message.guid} at $i');
+        expect(
+          message.guid,
+          messages[i].guid,
+          reason: 'invalid message ${message.guid} at $i',
+        );
+        expect(
+          message.flags,
+          messages[i].flags,
+          reason: 'flags differ for message ${message.guid} at $i',
+        );
       }
     });
 
     test(
-        'out of cache: 1 message added, 2 removed, 2 changed flags after resync',
-        () async {
-      final source = FakeMimeSource(size: 100, maxCacheSize: 20);
-      expect(source.size, 100);
-      final seen = await source.getMessage(1);
-      seen.isSeen = true;
-      final messages = <MimeMessage>[];
-      for (int i = 0; i < 20; i++) {
-        await source.getMessage(i);
-        final message = source.createMessage(100 - i);
-        messages.add(message);
-      }
-      // as this is out of cache, simulate changes by also these changes
-      // to the underlying structure:
-      messages[2].isAnswered = true;
-      messages.removeAt(3);
-      messages.removeAt(7);
-      messages.insert(0, source.createMessage(101));
-      final serverMessages = FakeMimeSource.generateMessages(size: 99);
-      for (int i = 0; i < messages.length; i++) {
-        final message = messages[i];
-        message.sequenceId = 99 - i;
-        serverMessages[98 - i] = message;
-      }
-      // resync: ensure to remove first message from cache:
-      await source.getMessage(21);
-      await source.resyncMessagesManually(messages);
-      source.messages = serverMessages;
-      expect(source.size, 99);
+      'out of cache: 1 message added, 2 removed, 2 changed flags after resync',
+      () async {
+        final source = FakeMimeSource(size: 100, maxCacheSize: 20);
+        expect(source.size, 100);
+        final seen = await source.getMessage(1);
+        seen.isSeen = true;
+        final messages = <MimeMessage>[];
+        for (int i = 0; i < 20; i++) {
+          await source.getMessage(i);
+          final message = source.createMessage(100 - i);
+          messages.add(message);
+        }
+        // as this is out of cache, simulate changes by also these changes
+        // to the underlying structure:
+        messages[2].isAnswered = true;
+        messages
+          ..removeAt(3)
+          ..removeAt(7)
+          ..insert(0, source.createMessage(101));
+        final serverMessages = FakeMimeSource.generateMessages(size: 99);
+        for (int i = 0; i < messages.length; i++) {
+          final message = messages[i]..sequenceId = 99 - i;
+          serverMessages[98 - i] = message;
+        }
+        // resync: ensure to remove first message from cache:
+        await source.getMessage(21);
+        await source.resyncMessagesManually(messages);
+        source.messages = serverMessages;
+        expect(source.size, 99);
 
-      for (int i = 0; i < messages.length; i++) {
-        final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid GUID ${message.guid} at $i');
-        expect(message.flags, messages[i].flags,
-            reason: 'flags differ for message ${message.guid} at $i');
-      }
-    });
+        for (int i = 0; i < messages.length; i++) {
+          final message = await source.getMessage(i);
+          expect(
+            message.guid,
+            messages[i].guid,
+            reason: 'invalid GUID ${message.guid} at $i',
+          );
+          expect(
+            message.flags,
+            messages[i].flags,
+            reason: 'flags differ for message ${message.guid} at $i',
+          );
+        }
+      },
+    );
 
     test(
-        'delete 1 message, then 1 message added, 2 removed, 2 changed flags after resync',
-        () async {
-      final source = FakeMimeSource(size: 100);
-      expect(source.size, 100);
-      final seenMessage = await source.getMessage(1);
-      seenMessage.isSeen = true;
-      final deleteMessage = await source.getMessage(2);
-      await source.deleteMessages([deleteMessage]);
-      expect(source.size, 99);
-      final firstMessage = await source.getMessage(0);
-      expect(firstMessage.sequenceId, 99);
-      final messages = <MimeMessage>[];
-      for (int i = 0; i < 20; i++) {
-        final message = source.createMessage(100 - i);
-        message.sequenceId = 99 - i;
-        messages.add(message);
-      }
-      messages[2].isAnswered = true;
-      messages.removeAt(3);
-      messages.removeAt(7);
-      messages.insert(0, source.createMessage(101));
-      await source.resyncMessagesManually(messages);
-      expect(source.size, 98);
-      for (int i = 0; i < messages.length; i++) {
-        final message = await source.getMessage(i);
-        expect(message.guid, messages[i].guid,
-            reason: 'invalid message ${message.guid} at $i');
-        expect(message.flags, messages[i].flags,
-            reason: 'flags differ for message ${message.guid} at $i');
-      }
-    });
+      'delete 1 message, then 1 message added, 2 removed, 2 changed flags after resync',
+      () async {
+        final source = FakeMimeSource(size: 100);
+        expect(source.size, 100);
+        final seenMessage = await source.getMessage(1);
+        seenMessage.isSeen = true;
+        final deleteMessage = await source.getMessage(2);
+        await source.deleteMessages([deleteMessage]);
+        expect(source.size, 99);
+        final firstMessage = await source.getMessage(0);
+        expect(firstMessage.sequenceId, 99);
+        final messages = <MimeMessage>[];
+        for (int i = 0; i < 20; i++) {
+          final message = source.createMessage(100 - i)..sequenceId = 99 - i;
+          messages.add(message);
+        }
+        messages[2].isAnswered = true;
+        messages
+          ..removeAt(3)
+          ..removeAt(7)
+          ..insert(0, source.createMessage(101));
+        await source.resyncMessagesManually(messages);
+        expect(source.size, 98);
+        for (int i = 0; i < messages.length; i++) {
+          final message = await source.getMessage(i);
+          expect(
+            message.guid,
+            messages[i].guid,
+            reason: 'invalid message ${message.guid} at $i',
+          );
+          expect(
+            message.flags,
+            messages[i].flags,
+            reason: 'flags differ for message ${message.guid} at $i',
+          );
+        }
+      },
+    );
   });
 }

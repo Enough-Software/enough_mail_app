@@ -52,27 +52,45 @@ class FakeMimeSource extends PagedCachedMimeSource {
         ),
       );
     }
+
     return messages;
   }
 
-  static MimeMessage _generateMessage(int sequenceId, int size, String name,
-          DateTime startDate, Duration differencePerMessage) =>
+  static MimeMessage _generateMessage(
+    int sequenceId,
+    int size,
+    String name,
+    DateTime startDate,
+    Duration differencePerMessage,
+  ) =>
       MimeMessage()
         ..sequenceId = sequenceId
         ..guid = sequenceId
         ..uid = sequenceId
         ..addHeader(MailConventions.headerSubject, '${name}Subject $sequenceId')
         ..addHeader(
-            MailConventions.headerDate,
-            DateCodec.encodeDate(_generateDate(
-                size - sequenceId, startDate, differencePerMessage)));
+          MailConventions.headerDate,
+          DateCodec.encodeDate(_generateDate(
+            size - sequenceId,
+            startDate,
+            differencePerMessage,
+          )),
+        );
 
   static DateTime _generateDate(
-          int index, DateTime startDate, Duration differencePerMessage) =>
+    int index,
+    DateTime startDate,
+    Duration differencePerMessage,
+  ) =>
       startDate.subtract(differencePerMessage * index);
 
   MimeMessage createMessage(int sequenceId) => _generateMessage(
-      sequenceId, size, name, _startDate, _differencePerMessage);
+        sequenceId,
+        size,
+        name,
+        _startDate,
+        _differencePerMessage,
+      );
 
   @override
   final String name;
@@ -92,15 +110,17 @@ class FakeMimeSource extends PagedCachedMimeSource {
         this.messages[i].sequenceId = i + 1;
       }
     }
+
     return Future.value(
       DeleteResult(
         DeleteAction.flag,
         messages.toSequence(),
         Mailbox(
-            encodedName: 'INBOX',
-            encodedPath: 'INBOX',
-            flags: [MailboxFlag.inbox],
-            pathSeparator: '/'),
+          encodedName: 'INBOX',
+          encodedPath: 'INBOX',
+          flags: [MailboxFlag.inbox],
+          pathSeparator: '/',
+        ),
         null,
         null,
         mailClient,
@@ -116,14 +136,22 @@ class FakeMimeSource extends PagedCachedMimeSource {
     clear();
     final sequence = MessageSequence.fromAll();
     final mailbox = Mailbox(
-        encodedName: 'INBOX',
-        encodedPath: 'INBOX',
-        flags: [MailboxFlag.inbox],
-        pathSeparator: '/');
+      encodedName: 'INBOX',
+      encodedPath: 'INBOX',
+      flags: [MailboxFlag.inbox],
+      pathSeparator: '/',
+    );
+
     return [
       DeleteResult(
-          DeleteAction.flag, sequence, mailbox, sequence, mailbox, mailClient,
-          canUndo: false)
+        DeleteAction.flag,
+        sequence,
+        mailbox,
+        sequence,
+        mailbox,
+        mailClient,
+        canUndo: false,
+      ),
     ];
   }
 
@@ -155,6 +183,7 @@ class FakeMimeSource extends PagedCachedMimeSource {
       final message = messages[index - 1];
       result.add(message);
     }
+
     return result;
   }
 
@@ -168,9 +197,7 @@ class FakeMimeSource extends PagedCachedMimeSource {
 
   @override
   Future<void> handleOnMessagesVanished(List<MimeMessage> removed) async {
-    for (final msg in removed) {
-      messages.remove(msg);
-    }
+    removed.forEach(messages.remove);
   }
 
   @override
@@ -199,15 +226,20 @@ class FakeMimeSource extends PagedCachedMimeSource {
   final MailClient mailClient;
 
   @override
-  Future<void> store(List<MimeMessage> messages, List<String> flags,
-      {StoreAction action = StoreAction.add}) {
+  Future<void> store(
+    List<MimeMessage> messages,
+    List<String> flags, {
+    StoreAction action = StoreAction.add,
+  }) {
     // TODO: implement store
     throw UnimplementedError();
   }
 
   @override
-  Future<void> storeAll(List<String> flags,
-      {StoreAction action = StoreAction.add}) {
+  Future<void> storeAll(
+    List<String> flags, {
+    StoreAction action = StoreAction.add,
+  }) {
     // TODO: implement storeAll
     throw UnimplementedError();
   }
@@ -220,14 +252,18 @@ class FakeMimeSource extends PagedCachedMimeSource {
 
   @override
   Future<MoveResult> moveMessages(
-      List<MimeMessage> messages, Mailbox targetMailbox) {
+    List<MimeMessage> messages,
+    Mailbox targetMailbox,
+  ) {
     // TODO: implement moveMessages
     throw UnimplementedError();
   }
 
   @override
   Future<MoveResult> moveMessagesToFlag(
-      List<MimeMessage> messages, MailboxFlag targetMailboxFlag) {
+    List<MimeMessage> messages,
+    MailboxFlag targetMailboxFlag,
+  ) {
     // TODO: implement moveMessagesToFlag
     throw UnimplementedError();
   }
@@ -239,11 +275,13 @@ class FakeMimeSource extends PagedCachedMimeSource {
   }
 
   @override
-  Future<MimeMessage> fetchMessageContents(MimeMessage message,
-      {int? maxSize,
-      bool markAsSeen = false,
-      List<MediaToptype>? includedInlineTypes,
-      Duration? responseTimeout}) {
+  Future<MimeMessage> fetchMessageContents(
+    MimeMessage message, {
+    int? maxSize,
+    bool markAsSeen = false,
+    List<MediaToptype>? includedInlineTypes,
+    Duration? responseTimeout,
+  }) {
     // TODO: implement fetchMessageContents
     throw UnimplementedError();
   }
@@ -253,19 +291,24 @@ class FakeMimeSource extends PagedCachedMimeSource {
   bool get isInbox => throw UnimplementedError();
 
   @override
-  Future<MimePart> fetchMessagePart(MimeMessage message,
-      {required String fetchId, Duration? responseTimeout}) {
+  Future<MimePart> fetchMessagePart(
+    MimeMessage message, {
+    required String fetchId,
+    Duration? responseTimeout,
+  }) {
     // TODO: implement fetchMessagePart
     throw UnimplementedError();
   }
 
   @override
-  Future<void> sendMessage(MimeMessage message,
-      {MailAddress? from,
-      bool appendToSent = true,
-      Mailbox? sentMailbox,
-      bool use8BitEncoding = false,
-      List<MailAddress>? recipients}) {
+  Future<void> sendMessage(
+    MimeMessage message, {
+    MailAddress? from,
+    bool appendToSent = true,
+    Mailbox? sentMailbox,
+    bool use8BitEncoding = false,
+    List<MailAddress>? recipients,
+  }) {
     // TODO: implement sendMessage
     throw UnimplementedError();
   }

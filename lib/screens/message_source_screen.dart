@@ -851,7 +851,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         final notification =
             localizations.multipleMovedToTrash(_selectedMessages.length);
         await source.deleteMessages(
-            localizations, _selectedMessages, notification);
+          localizations,
+          _selectedMessages,
+          notification,
+        );
         break;
       case _MultipleChoice.inbox:
         final notification =

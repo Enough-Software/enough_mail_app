@@ -49,7 +49,10 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
   late List<StorageMessageId> _allMessageIds;
 
   static String _getBoxName(
-          MailAccount mailAccount, Mailbox mailbox, String name) =>
+    MailAccount mailAccount,
+    Mailbox mailbox,
+    String name,
+  ) =>
       '${mailAccount.email}_${mailbox.encodedPath.replaceAll('/', '_')}_$name';
 
   static Future<void> initGlobal() async {
@@ -400,6 +403,7 @@ class StorageMessageEnvelope {
       if (input == null) {
         return null;
       }
+
       return MailAddress.parse(input);
     }
 

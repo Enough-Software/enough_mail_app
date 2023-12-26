@@ -524,16 +524,28 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
             : localizations.composeTitleNew;
     final htmlEditorApi = _htmlEditorApi;
 
-    return PopScope(
-      onPopInvoked: (didPop) async {
-        // let it pop but show snackbar to return:
+    return WillPopScope(
+      onWillPop: () async {
         await _populateMessageBuilder(storeComposeDataForResume: true);
         ScaffoldMessengerService.instance.showTextSnackBar(
           localizations,
           localizations.composeLeftByMistake,
           undo: _returnToCompose,
         );
+
+        return Future.value(true);
       },
+      // wait for https://github.com/flutter/flutter/issues/138525 before
+      // switching to PopScope
+      // onPopInvoked: (didPop) async {
+      //   // let it pop but show snackbar to return:
+      //   await _populateMessageBuilder(storeComposeDataForResume: true);
+      //   ScaffoldMessengerService.instance.showTextSnackBar(
+      //     localizations,
+      //     localizations.composeLeftByMistake,
+      //     undo: _returnToCompose,
+      //   );
+      // },
       child: PlatformScaffold(
         material: (context, platform) =>
             MaterialScaffoldData(drawer: const AppDrawer()),

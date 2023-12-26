@@ -65,14 +65,13 @@ class MailHosterService {
       if (kDebugMode) {
         print('Unable to discover settings for [$email]: $e $s');
       }
+
       return null;
     }
   }
 
   void addAll(Iterable<MailHoster> providers) {
-    for (final p in providers) {
-      add(p);
-    }
+    providers.forEach(add);
   }
 
   void add(MailHoster provider) {
@@ -188,7 +187,7 @@ class GmailMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.oauth2,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
                 outgoingServers: [
                   const ServerConfig(
@@ -198,9 +197,9 @@ class GmailMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.oauth2,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           appSpecificPasswordSetupUrl:
               'https://support.google.com/accounts/answer/185833',
@@ -287,7 +286,7 @@ class OutlookMailHoster extends MailHoster {
                     usernameType: UsernameType.emailAddress,
                   ),
                 ],
-              )
+              ),
             ],
           oauthClient: OutlookOAuthClient(),
           appSpecificPasswordSetupUrl:
@@ -394,7 +393,7 @@ class OutlookMailHoster extends MailHoster {
             'live.com.pt',
             'live.com.sg',
             'livemail.tw',
-            'olc.protection.outlook.com'
+            'olc.protection.outlook.com',
           ],
         );
 }
@@ -417,7 +416,7 @@ class YahooMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
                 outgoingServers: [
                   const ServerConfig(
@@ -427,9 +426,9 @@ class YahooMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           appSpecificPasswordSetupUrl:
               'https://help.yahoo.com/kb/SLN15241.html',
@@ -450,7 +449,7 @@ class YahooMailHoster extends MailHoster {
             'rocketmail.com',
             'mail.am0.yahoodns.net',
             'am0.yahoodns.net',
-            'yahoodns.net'
+            'yahoodns.net',
           ],
         );
 }
@@ -473,7 +472,7 @@ class AolMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
                 outgoingServers: [
                   const ServerConfig(
@@ -483,9 +482,9 @@ class AolMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           appSpecificPasswordSetupUrl:
               'https://help.aol.com/articles/Create-and-manage-app-password',
@@ -508,7 +507,7 @@ class AolMailHoster extends MailHoster {
             'aol.com.ar',
             'aol.com.br',
             'aol.com.mx',
-            'mail.gm0.yahoodns.net'
+            'mail.gm0.yahoodns.net',
           ],
         );
 }
@@ -531,7 +530,7 @@ class AppleMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
                 outgoingServers: [
                   const ServerConfig(
@@ -541,9 +540,9 @@ class AppleMailHoster extends MailHoster {
                     socketType: SocketType.starttls,
                     authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           appSpecificPasswordSetupUrl:
               'https://support.apple.com/en-us/HT204397',
@@ -569,7 +568,7 @@ class GmxMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
                 outgoingServers: [
                   const ServerConfig(
@@ -579,9 +578,9 @@ class GmxMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           manualImapAccessSetupUrl:
               'https://hilfe.gmx.net/pop-imap/einschalten.html',
@@ -593,7 +592,7 @@ class GmxMailHoster extends MailHoster {
             'gmx.eu',
             'gmx.biz',
             'gmx.org',
-            'gmx.info'
+            'gmx.info',
           ],
         );
 }
@@ -616,7 +615,7 @@ class MailboxOrMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
                 outgoingServers: [
                   const ServerConfig(
@@ -626,9 +625,9 @@ class MailboxOrMailHoster extends MailHoster {
                     socketType: SocketType.ssl,
                     authentication: Authentication.passwordClearText,
                     usernameType: UsernameType.emailAddress,
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           domains: ['mailbox.org'],
         );

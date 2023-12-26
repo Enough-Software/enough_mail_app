@@ -520,8 +520,8 @@ class RenderExpansionWrap extends RenderBox {
       for (var i = 0; i <= lastChildIndex; i++) {
         final child = children[i];
         final childSize = _layoutBox(child, looseConstraints);
-        final parentData = child.parentData! as _WrapParentData;
-        parentData._isVisible = currentRun <= maxRuns;
+        final parentData = child.parentData! as _WrapParentData
+          .._isVisible = currentRun <= maxRuns;
         if (currentRunNumberOfChildren > 0 &&
             ((currentRunWidth + childSize.width > availableWidth) ||
                 (currentRun == maxRuns &&
@@ -548,14 +548,15 @@ class RenderExpansionWrap extends RenderBox {
             if (indicator != null) {
               // this is the last visible run, add indicator:
               final indicatorParentData =
-                  indicator.parentData! as _WrapParentData;
-              indicatorParentData._isVisible = true;
+                  indicator.parentData! as _WrapParentData.._isVisible = true;
               final dx =
                   _indicatorPosition == ExpansionWrapIndicatorPosition.border
                       ? availableWidth - indicatorWith
                       : currentRunWidth + spacing;
-              indicatorParentData.offset = Offset(dx,
-                  currentRunY + (currentRunHeight - indicatorSize.height) / 2);
+              indicatorParentData.offset = Offset(
+                dx,
+                currentRunY + (currentRunHeight - indicatorSize.height) / 2,
+              );
             }
             crossAxisMaxInCompressedState =
                 currentRunY + currentRunHeight + runSpacing;
@@ -579,25 +580,25 @@ class RenderExpansionWrap extends RenderBox {
     }
     if (expanded && currentRun >= originalMaxRuns && indicator != null) {
       // add compress indicator at the end:
-      final indicatorParentData = indicator.parentData! as _WrapParentData;
-      indicatorParentData._isVisible = true;
+      final indicatorParentData = indicator.parentData! as _WrapParentData
+        .._isVisible = true;
       final dx = _indicatorPosition == ExpansionWrapIndicatorPosition.border
           ? availableWidth - indicatorWith
           : currentRunWidth + spacing;
       indicatorParentData.offset = Offset(
-          dx, currentRunY + (currentRunHeight - indicatorSize.height) / 2);
+        dx,
+        currentRunY + (currentRunHeight - indicatorSize.height) / 2,
+      );
     }
     if (!expanded && currentRun <= originalMaxRuns && indicator != null) {
-      final indicatorParentData = indicator.parentData! as _WrapParentData;
-      indicatorParentData._isVisible = false;
+      final indicatorParentData = indicator.parentData! as _WrapParentData
+        .._isVisible = false;
     }
-    if (crossAxisMaxInCompressedState != null) {
-      size = constraints
-          .constrain(Size(maxRunWidth, crossAxisMaxInCompressedState));
-    } else {
-      size = constraints
-          .constrain(Size(maxRunWidth, currentRunY + currentRunHeight));
-    }
+    size = crossAxisMaxInCompressedState != null
+        ? constraints
+            .constrain(Size(maxRunWidth, crossAxisMaxInCompressedState))
+        : constraints
+            .constrain(Size(maxRunWidth, currentRunY + currentRunHeight));
   }
 
   @override

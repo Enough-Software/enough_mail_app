@@ -426,7 +426,7 @@ class AccountEditScreen extends HookConsumerWidget {
       // oauth case: restart oauth authentication,
       // save new token
       final hoster = MailHosterService
-          .instance[account.mailAccount.incoming.serverConfig.hostname ?? ''];
+          .instance[account.mailAccount.incoming.serverConfig.hostname];
       final oauthClient = hoster?.oauthClient;
       if (hoster != null && oauthClient != null) {
         final token = await oauthClient.authenticate(account.mailAccount.email);
