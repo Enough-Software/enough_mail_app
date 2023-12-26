@@ -436,9 +436,11 @@ packages:
   enough_ascii_art:
     dependency: "direct main"
     description:
-      path: "../enough_ascii_art"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: f1ba3913c6f37b86121f3b453fde5ba545142a9c
+      url: "https://github.com/Enough-Software/enough_ascii_art.git"
+    source: git
     version: "1.1.0"
   enough_convert:
     dependency: transitive
@@ -449,88 +451,111 @@ packages:
     source: hosted
     version: "1.6.0"
   enough_giphy:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../enough_giphy"
-      relative: true
-    source: path
+      name: enough_giphy
+      sha256: "71939f18e6bbe195d8d70f2fef828dea9634258dda429f294bc9d5322fff3ae7"
+      url: "https://pub.dev"
+    source: hosted
     version: "0.2.1"
   enough_giphy_flutter:
     dependency: "direct main"
     description:
-      path: "../enough_giphy_flutter"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: e20aa96b1d368db670f1657837888df63f482bb1
+      url: "https://github.com/Enough-Software/enough_giphy_flutter.git"
+    source: git
     version: "0.4.1"
   enough_html_editor:
     dependency: "direct main"
     description:
-      path: "../enough_html_editor"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: f8bd4f835d8d7934a612cb9493fac4abc5915904
+      url: "https://github.com/Enough-Software/enough_html_editor.git"
+    source: git
     version: "0.0.5"
   enough_icalendar:
     dependency: "direct main"
     description:
-      path: "../enough_icalendar"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "2682fd5e45090452c13e89fc47c30c5180eeb911"
+      url: "https://github.com/Enough-Software/enough_icalendar.git"
+    source: git
     version: "0.15.0"
   enough_icalendar_export:
     dependency: "direct main"
     description:
-      path: "../enough_icalendar_export"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "3d4811292267f70a20d843b204f263132d476592"
+      url: "https://github.com/Enough-Software/enough_icalendar_export.git"
+    source: git
     version: "0.3.0"
   enough_mail:
     dependency: "direct main"
     description:
-      path: "../enough_mail"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "7587d07dc1ade92cb6d2a5f5ff0b0af74079d318"
+      url: "https://github.com/Enough-Software/enough_mail.git"
+    source: git
     version: "2.1.6"
   enough_mail_flutter:
     dependency: "direct main"
     description:
-      path: "../enough_mail_flutter"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "38eb65ca7a34c2a7695618ed1301d7159c4d9deb"
+      url: "https://github.com/Enough-Software/enough_mail_flutter.git"
+    source: git
     version: "2.1.0"
   enough_mail_html:
     dependency: "direct main"
     description:
-      path: "../enough_mail_html"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "378b93dd2daa5201098ee34677f16a0ffb96a1d5"
+      url: "https://github.com/Enough-Software/enough_mail_html.git"
+    source: git
     version: "2.0.1"
   enough_mail_icalendar:
     dependency: "direct main"
     description:
-      path: "../enough_mail_icalendar"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "55a7b249c59cc62b242cbe299fbad6968ffd9a76"
+      url: "https://github.com/Enough-Software/enough_mail_icalendar.git"
+    source: git
     version: "0.2.1"
   enough_media:
     dependency: "direct main"
     description:
-      path: "../enough_media"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: a27f06f6bfe7c714d1d15c0e3a22834682c39a29
+      url: "https://github.com/Enough-Software/enough_media.git"
+    source: git
     version: "2.2.2"
   enough_platform_widgets:
     dependency: "direct main"
     description:
-      path: "../enough_platform_widgets"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "2eb6f9f8d1ab0347161a861b9d232370988d3006"
+      url: "https://github.com/Enough-Software/enough_platform_widgets.git"
+    source: git
     version: "1.0.0"
   enough_text_editor:
     dependency: "direct main"
     description:
-      path: "../enough_text_editor"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "6b02e5ba7ce1ce59226149b9bd66d52c7a8546a4"
+      url: "https://github.com/Enough-Software/enough_text_editor.git"
+    source: git
     version: "0.1.0"
   event_bus:
     dependency: "direct main"
