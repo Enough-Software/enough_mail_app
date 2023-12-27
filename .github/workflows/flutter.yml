@@ -17,7 +17,7 @@ jobs:
       run: |
           TMP_KEYSTORE_FILE_PATH="${{ github.workspace }}/android/keystore
           mkdir "${TMP_KEYSTORE_FILE_PATH}"
-          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/google_play_upload.jks
+          echo $ENCODED_STRING | base64 --decode > "${TMP_KEYSTORE_FILE_PATH}/google_play_upload.jks"
           echo keyPassword=\${{ secrets.PLAY_UPLOAD_KEY_PASSWORD }} > ${{env.PROPERTIES_PATH}}
           echo storePassword=\${{ secrets.PLAY_UPLOAD_STORE_PASSWORD }} >> ${{env.PROPERTIES_PATH}}
           echo keyAlias=\${{ secrets.PLAY_KEY_ALIAS }} >> ${{env.PROPERTIES_PATH}}
