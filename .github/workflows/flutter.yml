@@ -12,16 +12,15 @@ jobs:
     steps:
     - name: Decode Keystore and Create key.properties
       env:
-          ENCODED_STRING: ${{ secrets.PLAY_UPLOAD_KEYSTORE }}
+          BASE64_STORE: ${{ secrets.PLAY_UPLOAD_KEYSTORE }}
           PROPERTIES_PATH: ${{ github.workspace }}/android/key.properties
+          STORE_PATH: ${{ github.workspace }}/android/keystore.jks
       run: |
-          TMP_KEYSTORE_FILE_PATH="${{ github.workspace }}/android/keystore"
-          mkdir "${TMP_KEYSTORE_FILE_PATH}"
-          echo $ENCODED_STRING | base64 --decode > "${TMP_KEYSTORE_FILE_PATH}/google_play_upload.jks"
-          echo keyPassword=\${{ secrets.PLAY_UPLOAD_KEY_PASSWORD }} > ${{env.PROPERTIES_PATH}}
-          echo storePassword=\${{ secrets.PLAY_UPLOAD_STORE_PASSWORD }} >> ${{env.PROPERTIES_PATH}}
-          echo keyAlias=\${{ secrets.PLAY_KEY_ALIAS }} >> ${{env.PROPERTIES_PATH}}
-          echo storeFile=\${TMP_KEYSTORE_FILE_PATH}/google_play_upload.jks >> ${{env.PROPERTIES_PATH}}
+          echo "${{env.BASE64_STORE}}" | base64 --decode > ${{env.STORE_PATH}}
+          echo keyPassword=\${{secrets.PLAY_UPLOAD_KEY_PASSWORD}} > ${{env.PROPERTIES_PATH}}
+          echo storePassword=\${{secrets.PLAY_UPLOAD_STORE_PASSWORD}} >> ${{env.PROPERTIES_PATH}}
+          echo keyAlias=\${{secrets.PLAY_KEY_ALIAS}} >> ${{env.PROPERTIES_PATH}}
+          echo storeFile=\${{env.STORE_PATH}} >> ${{env.PROPERTIES_PATH}}
     - uses: actions/checkout@v3
     - uses: actions/setup-java@v2
       with:
