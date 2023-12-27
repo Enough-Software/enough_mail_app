@@ -7,7 +7,15 @@
         {
             "name": "Maily",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--dart-define",
+                "GIPHY_API_KEY=${env:GIPHY_API_KEY}",
+                "--dart-define",
+                "OAUTH_GMAIL=${env:OAUTH_GMAIL}",
+                "--dart-define",
+                "OAUTH_OUTLOOK=${env:OAUTH_OUTLOOK}",
+            ],
         },
         {
             "name": "Maily (profile mode)",
