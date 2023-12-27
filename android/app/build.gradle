@@ -53,9 +53,6 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
 
     defaultConfig {
         applicationId "de.enough.enough_mail_app"
@@ -83,6 +80,10 @@ android {
                 signingConfig signingConfigs.debug  
             }
         }
+    }
+    namespace 'de.enough.enough_mail_app'
+    lint {
+        disable 'InvalidPackage'
     }
 }
 
