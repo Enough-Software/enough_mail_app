@@ -26,97 +26,66 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystorePropertiesFile = rootProject.file('key.properties')
+def keystoreProperties = new Properties()
+
 if (keystorePropertiesFile.exists()) {
-    def keystoreProperties = new Properties()
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
- 
-     android {
-        defaultConfig {
-            multiDexEnabled true
-        }
+    keystorePropertiesFile.withReader('UTF-8') { reader ->
+        keystoreProperties.load(reader)
+    }
+}
 
-        compileOptions {
-            // Flag to enable support for the new language APIs
-            coreLibraryDesugaringEnabled true
-            // Sets Java compatibility to Java 8
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
-        }
+android {
+    defaultConfig {
+        multiDexEnabled true
+    }
 
-        compileSdkVersion rootProject.ext.compileSdkVersion
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+        // Sets Java compatibility to Java 8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
-        sourceSets {
-            main.java.srcDirs += 'src/main/kotlin'
-        }
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
-        lintOptions {
-            disable 'InvalidPackage'
-        }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 
-        defaultConfig {
-            applicationId "de.enough.enough_mail_app"
-            minSdkVersion rootProject.ext.minSdkVersion
-            targetSdkVersion rootProject.ext.targetSdkVersion
-            versionCode flutterVersionCode.toInteger()
-            versionName flutterVersionName
-        }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
 
-        signingConfigs {
-            release {
-                keyAlias keystoreProperties['keyAlias']
-                keyPassword keystoreProperties['keyPassword']
-                storeFile file(keystoreProperties['storeFile'])
-                storePassword keystoreProperties['storePassword']
-            }
-        }
+    defaultConfig {
+        applicationId "de.enough.enough_mail_app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
 
-        buildTypes {
-            release {
-                signingConfig signingConfigs.release
-            }
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
-} else {
-    System.out.println("warning: android/key.properties not found, now using debug key.")
 
-    android {
-        defaultConfig {
-            multiDexEnabled true
-        }
-
-        compileOptions {
-            // Flag to enable support for the new language APIs
-            coreLibraryDesugaringEnabled true
-            // Sets Java compatibility to Java 8
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
-        }
-
-        compileSdkVersion rootProject.ext.compileSdkVersion
-
-        sourceSets {
-            main.java.srcDirs += 'src/main/kotlin'
-        }
-
-        lintOptions {
-            disable 'InvalidPackage'
-        }
-
-        defaultConfig {
-            applicationId "de.enough.enough_mail_app"
-            minSdkVersion rootProject.ext.minSdkVersion
-            targetSdkVersion rootProject.ext.targetSdkVersion
-            versionCode flutterVersionCode.toInteger()
-            versionName flutterVersionName
-        }
-
-        buildTypes {
-            release {
-                signingConfig signingConfigs.debug
+    buildTypes {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            } else {
+                System.err.println("WARNING: android/key.properties not found, now using debug key.")
+                signingConfig signingConfigs.debug  
             }
         }
     }
 }
+
 
 
 flutter {
