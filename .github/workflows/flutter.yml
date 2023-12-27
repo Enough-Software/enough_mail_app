@@ -15,7 +15,7 @@ jobs:
           ENCODED_STRING: ${{ secrets.PLAY_UPLOAD_KEYSTORE }}
           PROPERTIES_PATH: ${{ github.workspace }}/android/key.properties
       run: |
-          TMP_KEYSTORE_FILE_PATH="${{ github.workspace }}/android/keystore
+          TMP_KEYSTORE_FILE_PATH="${{ github.workspace }}/android/keystore"
           mkdir "${TMP_KEYSTORE_FILE_PATH}"
           echo $ENCODED_STRING | base64 --decode > "${TMP_KEYSTORE_FILE_PATH}/google_play_upload.jks"
           echo keyPassword=\${{ secrets.PLAY_UPLOAD_KEY_PASSWORD }} > ${{env.PROPERTIES_PATH}}
@@ -33,7 +33,7 @@ jobs:
     - run: flutter --version
     - run: flutter pub get
     #- run: flutter test
-    - run: flutter build apk --release
+    - run: flutter build apk --release --dart-define GIPHY_API_KEY=${{ secrets.GIPHY_API_KEY }} --dart-define OAUTH_GMAIL=${{ secrets.OAUTH_GMAIL }} --dart-define OAUTH_OUTLOOK=${{ secrets.OAUTH_OUTLOOK }}
 
   apple:
     name: Build iOS
