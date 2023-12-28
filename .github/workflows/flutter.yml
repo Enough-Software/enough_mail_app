@@ -13,21 +13,16 @@ jobs:
     - uses: actions/checkout@v3
     - name: Decode Keystore and Create key.properties
       env:
-          BASE64_STORE: ${{ secrets.PLAY_UPLOAD_KEYSTORE }}
           PROPERTIES_PATH: ${{ github.workspace }}/android/key.properties
           STORE_PATH: ${{ github.workspace }}/android/keystore.jks
-          KEY_PASSWORD: ${{secrets.PLAY_UPLOAD_KEY_PASSWORD}}
       run: |
-        echo keyPassword=\${{env.KEY_PASSWORD}} > ${{env.PROPERTIES_PATH}}
+        echo keyPassword=\${{secrets.PLAY_UPLOAD_KEY_PASSWORD}} > ${{env.PROPERTIES_PATH}}
         echo storePassword=\${{secrets.PLAY_UPLOAD_STORE_PASSWORD}} >> ${{env.PROPERTIES_PATH}}
         echo keyAlias=\${{secrets.PLAY_KEY_ALIAS}} >> ${{env.PROPERTIES_PATH}}
         echo storeFile=\${{env.STORE_PATH}} >> ${{env.PROPERTIES_PATH}}
-        echo "${{env.BASE64_STORE}}" | base64 --decode > ${{env.STORE_PATH}}
+        echo "${{ secrets.PLAY_UPLOAD_KEYSTORE }}" | base64 --decode > ${{env.STORE_PATH}}
         echo "storePath: $STORE_PATH"
         ls -la ${{env.STORE_PATH}}
-        echo "propertiesPath: $PROPERTIES_PATH / ${{env.PROPERTIES_PATH}}}"
-        cat ${{env.PROPERTIES_PATH}}
-        echo "Size of PW: ${#KEY_PASSWORD} ${#${{secrets.PLAY_UPLOAD_KEY_PASSWORD}}}"
     - uses: actions/setup-java@v2
       with:
         distribution: 'zulu'
