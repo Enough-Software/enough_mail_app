@@ -17,12 +17,12 @@ jobs:
           PROPERTIES_PATH: ${{ github.workspace }}/android/key.properties
           STORE_PATH: ${{ github.workspace }}/android/keystore.jks
       run: |
-        ls -la ${{github.workspace}}
         echo keyPassword=\${{secrets.PLAY_UPLOAD_KEY_PASSWORD}} > ${{env.PROPERTIES_PATH}}
         echo storePassword=\${{secrets.PLAY_UPLOAD_STORE_PASSWORD}} >> ${{env.PROPERTIES_PATH}}
         echo keyAlias=\${{secrets.PLAY_KEY_ALIAS}} >> ${{env.PROPERTIES_PATH}}
         echo storeFile=\${{env.STORE_PATH}} >> ${{env.PROPERTIES_PATH}}
         echo "${{env.BASE64_STORE}}" | base64 --decode > ${{env.STORE_PATH}}
+        cat ${{env.PROPERTIES_PATH}}
     - uses: actions/setup-java@v2
       with:
         distribution: 'zulu'
