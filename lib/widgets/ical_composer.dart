@@ -328,7 +328,7 @@ class _DateTimePicker extends StatelessWidget {
       children: [
         // set date button:
         PlatformTextButton(
-          child: PlatformText(
+          child: Text(
             dt == null
                 ? localizations.composeAppointmentLabelDay
                 : context.formatDate(dt.toLocal(), useLongFormat: true),
@@ -355,7 +355,7 @@ class _DateTimePicker extends StatelessWidget {
         if (!onlyDate)
           // set time button:
           PlatformTextButton(
-            child: PlatformText(
+            child: Text(
               dt == null
                   ? localizations.composeAppointmentLabelTime
                   : context.formatTimeOfDay(

@@ -59,7 +59,7 @@ class _LockScreenState extends State<LockScreen> {
                 child: Text(localizations.lockScreenIntro),
               ),
               PlatformTextButton(
-                child: PlatformText(localizations.lockScreenUnlockAction),
+                child: Text(localizations.lockScreenUnlockAction),
                 onPressed: () => _authenticate(context),
               ),
             ],

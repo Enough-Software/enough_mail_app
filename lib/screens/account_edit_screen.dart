@@ -93,7 +93,7 @@ class AccountEditScreen extends HookConsumerWidget {
                                   isRetryingToConnectState,
                                 ),
                                 icon: Icon(iconService.retry),
-                                label: PlatformText(
+                                label: Text(
                                   localizations
                                       .editAccountFailureToConnectRetryAction,
                                 ),
@@ -107,7 +107,7 @@ class AccountEditScreen extends HookConsumerWidget {
                                   account,
                                   isRetryingToConnectState,
                                 ),
-                                child: PlatformText(
+                                child: Text(
                                   localizations
                                       .editAccountFailureToConnectChangePasswordAction,
                                 ),

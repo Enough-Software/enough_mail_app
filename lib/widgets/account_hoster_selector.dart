@@ -22,7 +22,7 @@ class MailHosterSelector extends StatelessWidget {
         if (index == 0) {
           return Center(
             child: PlatformTextButton(
-              child: PlatformText(localizations.accountProviderCustom),
+              child: Text(localizations.accountProviderCustom),
               onPressed: () => onSelected(null),
             ),
           );

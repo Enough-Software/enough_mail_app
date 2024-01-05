@@ -107,7 +107,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
               Row(
                 children: [
                   PlatformTextButton(
-                    child: PlatformText(localizations.actionAccept),
+                    child: Text(localizations.actionAccept),
                     onPressed: () => _changeParticipantStatus(
                       ParticipantStatus.accepted,
                       localizations,
@@ -122,7 +122,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                     ),
                   ),
                   PlatformTextButton(
-                    child: PlatformText(localizations.actionDecline),
+                    child: Text(localizations.actionDecline),
                     onPressed: () => _changeParticipantStatus(
                       ParticipantStatus.declined,
                       localizations,
@@ -140,7 +140,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                     ),
                   ),
                   PlatformTextButton(
-                    child: PlatformText(
+                    child: Text(
                       localizations.icalendarActionChangeParticipantStatus,
                     ),
                     onPressed: () => _queryParticipantStatus(localizations),
@@ -354,7 +354,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
             ),
             if (!isReply)
               PlatformElevatedButton(
-                child: PlatformText(localizations.icalendarExportAction),
+                child: Text(localizations.icalendarExportAction),
                 onPressed: () => _exportToNativeCalendar(_calendar),
               ),
           ],
@@ -436,19 +436,19 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
       localizations.icalendarParticipantStatusChangeText,
       actions: [
         PlatformTextButton(
-          child: PlatformText(localizations.actionAccept),
+          child: Text(localizations.actionAccept),
           onPressed: () => context.pop(ParticipantStatus.accepted),
         ),
         PlatformTextButton(
-          child: PlatformText(localizations.icalendarAcceptTentatively),
+          child: Text(localizations.icalendarAcceptTentatively),
           onPressed: () => context.pop(ParticipantStatus.tentative),
         ),
         PlatformTextButton(
-          child: PlatformText(localizations.actionDecline),
+          child: Text(localizations.actionDecline),
           onPressed: () => context.pop(ParticipantStatus.declined),
         ),
         PlatformTextButton(
-          child: PlatformText(localizations.actionCancel),
+          child: Text(localizations.actionCancel),
           onPressed: () => context.pop(),
         ),
       ],

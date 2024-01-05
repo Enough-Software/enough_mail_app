@@ -21,8 +21,6 @@ jobs:
         echo keyAlias=\${{secrets.PLAY_KEY_ALIAS}} >> ${{env.PROPERTIES_PATH}}
         echo storeFile=\${{env.STORE_PATH}} >> ${{env.PROPERTIES_PATH}}
         echo "${{ secrets.PLAY_UPLOAD_KEYSTORE }}" | base64 --decode > ${{env.STORE_PATH}}
-        echo "storePath: $STORE_PATH"
-        ls -la ${{env.STORE_PATH}}
     - uses: actions/setup-java@v2
       with:
         distribution: 'zulu'

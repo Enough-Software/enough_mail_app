@@ -103,7 +103,7 @@ class WelcomeScreen extends StatelessWidget {
               child: PlatformFilledButtonIcon(
                 icon: Icon(IconService.instance.email),
                 label: Center(
-                  child: PlatformText(localizations.welcomeActionSignIn),
+                  child: Text(localizations.welcomeActionSignIn),
                 ),
                 onPressed: () {
                   context.goNamed(Routes.accountAdd);

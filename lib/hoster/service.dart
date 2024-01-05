@@ -158,7 +158,7 @@ class MailHoster {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: PlatformText(buttonText),
+                  child: Text(buttonText),
                 ),
               ],
             ),
@@ -240,7 +240,7 @@ class GmailMailHoster extends MailHoster {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8, right: 16),
-                child: PlatformText(
+                child: Text(
                   localizations.addAccountOauthSignInGoogle,
                   style: GoogleFonts.roboto(
                     color: googleText,
