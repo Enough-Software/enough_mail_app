@@ -41,7 +41,8 @@ class LocalizedDialogHelper {
             child: Text(localizations.feedbackActionHelpDeveloping),
             onPressed: () async {
               await launcher.launchUrl(Uri.parse(
-                  'https://github.com/Enough-Software/enough_mail_app'));
+                'https://github.com/Enough-Software/enough_mail_app',
+              ));
             },
           ),
           const Legalese(),
@@ -53,7 +54,8 @@ class LocalizedDialogHelper {
   /// Asks the user for confirmation with the given [title] and [query].
   ///
   /// Specify the [action] in case it's different from the title.
-  /// Set [isDangerousAction] to `true` for marking the action as dangerous on Cupertino
+  /// Set [isDangerousAction] to `true` for marking the action as
+  /// dangerous on Cupertino
   static Future<bool?> askForConfirmation(
     BuildContext context, {
     required String title,

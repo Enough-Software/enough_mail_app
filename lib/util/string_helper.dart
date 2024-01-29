@@ -28,7 +28,8 @@ class StringHelper {
     // print('lcs of "$first" and "$second"');
     // problem: the longest sequence between first and second is not
     //necessarily the longest sequence between all
-    String shorter, longer;
+    String shorter;
+    String longer;
     if (first.length <= second.length) {
       shorter = first;
       longer = second;

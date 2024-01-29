@@ -90,7 +90,8 @@ abstract class MessageSource extends ChangeNotifier
   /// Only available when [supportsDeleteAll] is `true`
   Future<List<DeleteResult>> deleteAllMessages({bool expunge = false});
 
-  /// Marks all messages as seen (read) `true` or unseen (unread) when `false` is given
+  /// Marks all messages as seen (read) `true` or unseen (unread)
+  /// when `false` is given
   ///
   /// Only available when [supportsDeleteAll] is `true`
   Future<void> markAllMessagesSeen(bool seen);
@@ -546,19 +547,6 @@ abstract class MessageSource extends ChangeNotifier
     return mimesBySource;
   }
 
-  // Map<MailClient, MessageSequence> orderByClient(List<Message?> messages) {
-  //   final sequenceByClient = <MailClient, MessageSequence>{};
-  //   for (final msg in messages) {
-  //     final client = msg!.mailClient;
-  //     if (sequenceByClient.containsKey(client)) {
-  //       sequenceByClient[client]!.addMessage(msg.mimeMessage);
-  //     } else {
-  //       sequenceByClient[client] = MessageSequence.fromMessage(msg.mimeMessage);
-  //     }
-  //   }
-  //   return sequenceByClient;
-  // }
-
   Future<void> storeMessageFlags(
     List<Message> messages,
     List<String> flags, {
@@ -936,8 +924,6 @@ class MultipleMessageSource extends MessageSource {
 
       return _UnifiedMessage(mime, this, index, id.source);
     }
-    // print(
-    //     'get uncached $index with lastUncachedIndex=$_lastUncachedIndex and size $size');
     int diff = index - _indicesCache.length;
     while (diff > 0) {
       final sourceIndex = index - diff;
@@ -1115,22 +1101,6 @@ class MultipleMessageSource extends MessageSource {
       multipleSource.clear();
     }
   }
-
-  // @override
-  // Future<Message> loadSingleMessage(MailNotificationPayload payload) async {
-  //   final mimeSource = mimeSources.firstWhereOrNull(
-  //     (source) => source.mailClient.account.email == payload.accountEmail,
-  //   );
-  //   if (mimeSource == null) {
-  //     throw Exception('Unable to find mime source for ${payload.accountEmail}');
-  //   }
-  //   final payloadMime = MimeMessage()
-  //     ..sequenceId = payload.sequenceId
-  //     ..uid = payload.uid;
-  //   final mime = await mimeSource.fetchMessageContents(payloadMime);
-
-  //   return createMessage(mime, mimeSource, 0);
-  // }
 }
 
 class _UnifiedMessage extends Message {
@@ -1157,11 +1127,8 @@ class _MultipleMimeSource {
   int _currentIndex = 0;
   _MultipleMimeSourceMessage? _currentMessage;
 
-  Future<_MultipleMimeSourceMessage?> peek() async {
-    _currentMessage ??= await _next();
-
-    return _currentMessage;
-  }
+  Future<_MultipleMimeSourceMessage?> peek() async =>
+      _currentMessage ??= await _next();
 
   void pop() {
     _currentMessage = null;

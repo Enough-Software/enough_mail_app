@@ -183,7 +183,6 @@ class _LocationScreenState extends State<LocationScreen> {
 
   void _onScaleUpdate(ScaleUpdateDetails details, MapTransformer transformer) {
     final scaleDiff = details.scale - _scaleStart;
-    //print('on scale update: scaleDiff=$scaleDiff focal=${details.focalPoint}');
     _scaleStart = details.scale;
 
     if (scaleDiff > 0) {

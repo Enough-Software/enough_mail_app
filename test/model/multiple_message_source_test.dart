@@ -71,12 +71,12 @@ void main() async {
         reason: 'no date for message at index $i $subject',
       );
       expect(
-        messageDate!.isBefore(lastDate),
+        messageDate?.isBefore(lastDate),
         isTrue,
         reason:
             'wrong date for message at $i: $messageDate of "$subject" should be before $lastDate of "$lastSubject"',
       );
-      lastDate = messageDate;
+      lastDate = messageDate ?? DateTime.now();
       lastSubject = subject;
     }
   }
@@ -499,7 +499,7 @@ void main() async {
       });
 
       final updatedMime = (secondMimeSource as FakeMimeSource)
-          .createMessage(firstMime.sequenceId!)
+          .createMessage(firstMime.sequenceId ?? 0)
         ..setFlag(MessageFlags.seen, true);
       await secondMimeSource.onMessageFlagsUpdated(updatedMime);
       expect(notifyCounter, 1);
@@ -520,7 +520,7 @@ void main() async {
       });
 
       final updatedMime = (secondMimeSource as FakeMimeSource)
-          .createMessage(firstMime.sequenceId!)
+          .createMessage(firstMime.sequenceId ?? 0)
         ..setFlag(MessageFlags.seen, false);
       await secondMimeSource.onMessageFlagsUpdated(updatedMime);
       expect(notifyCounter, 1);
@@ -680,7 +680,7 @@ void main() async {
         messages.add(message);
       }
       final copy = (firstMimeSource as FakeMimeSource)
-          .createMessage(messages[1].sequenceId!)
+          .createMessage(messages[1].sequenceId ?? 0)
         ..isSeen = true;
       messages[1] = copy;
 
@@ -717,7 +717,7 @@ void main() async {
       }
       messages[1].isSeen = true;
       final copy = (firstMimeSource as FakeMimeSource)
-          .createMessage(messages[1].sequenceId!);
+          .createMessage(messages[1].sequenceId ?? 0);
       messages[1] = copy;
 
       var message = await source.getMessageAt(2);
@@ -1316,13 +1316,6 @@ class TestNotificationService implements NotificationService {
   }) {
     // TODO(RV): implement init
     throw UnimplementedError();
-  }
-
-  @override
-  Future _sendLocalNotification(int id, String title, String? text) {
-    _sendNotifications++;
-
-    return Future.value();
   }
 
   @override

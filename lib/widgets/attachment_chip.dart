@@ -276,7 +276,9 @@ class _AttachmentChipState extends State<AttachmentChip> {
   }
 
   Widget? _buildInteractiveMedia(
-      BuildContext context, MediaProvider mediaProvider) {
+    BuildContext context,
+    MediaProvider mediaProvider,
+  ) {
     if (mediaProvider.mediaType == 'text/calendar' ||
         mediaProvider.mediaType == 'application/ics') {
       return IcalInteractiveMedia(
@@ -284,6 +286,7 @@ class _AttachmentChipState extends State<AttachmentChip> {
         message: widget.message,
       );
     }
+
     return null;
   }
 }

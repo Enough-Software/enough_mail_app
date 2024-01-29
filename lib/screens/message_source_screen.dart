@@ -265,7 +265,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
               ? CupertinoStatusBar(
                   info: CupertinoStatusBar.createInfo(source.description),
                   rightAction: PlatformIconButton(
-                    // TODO(RV): use CupertinoIcons.create once it's not buggy anymore
+                    // TODO(RV): use CupertinoIcons.create once available
                     icon: const Icon(CupertinoIcons.pen),
                     onPressed: () => context.pushNamed(
                       Routes.mailCompose,
@@ -383,19 +383,6 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                         SliverToBoxAdapter(
                           child: zeroPosWidget,
                         ),
-
-                      // TODO(RV): Plan: use individual slivers for each section
-                      // and use SliverVariedExtentList() for the messages,
-                      // SliverVariedExtentList(
-                      //   itemExtentBuilder: (index, dimension) {
-                      //     final element =
-                      //         _sectionedMessageSource.getCachedElementAt(index);
-                      //     if (element == null || element.section == null) {
-                      //       return 48;
-                      //     }
-
-                      //     return 52;
-                      //   },
                       SliverFixedExtentList.builder(
                         itemExtent: 52,
                         itemBuilder: (context, index) =>
@@ -495,8 +482,6 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                             if (message == null) {
                               return const SizedBox.shrink();
                             }
-                            // print(
-                            //     '$index subject=${message.mimeMessage?.decodeSubject()}');
 
                             return Dismissible(
                               key: ValueKey(message),
@@ -729,7 +714,8 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                     child: IconText(
                       icon: Icon(iconService.messageIsNotFlagged),
                       label: Text(
-                          localizations.messageActionMultipleMarkUnflagged),
+                        localizations.messageActionMultipleMarkUnflagged,
+                      ),
                     ),
                   ),
                 if (source.supportsMessageFolders) ...[
@@ -1296,9 +1282,13 @@ enum _MultipleChoice {
 
 class MessageOverview extends StatefulWidget {
   MessageOverview(
-      this.message, this.isInSelectionMode, this.onTap, this.onLongPress,
-      {this.animationController, required this.isSentMessage})
-      : super(key: ValueKey(message.sourceIndex));
+    this.message,
+    this.isInSelectionMode,
+    this.onTap,
+    this.onLongPress, {
+    this.animationController,
+    required this.isSentMessage,
+  }) : super(key: ValueKey(message.sourceIndex));
   final Message message;
   final bool isInSelectionMode;
   final void Function(Message message) onTap;

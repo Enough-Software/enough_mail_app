@@ -14,7 +14,8 @@ part 'hive_mime_storage.g.dart';
 /// 1) list of SequenceId-UID-GUID elements - to be loaded when mailbox is
 ///    opened, possibly along with envelope data of first page to speed up
 ///     loading
-/// 2) possibly envelope data by GUID (contains flags, subject, senders, recipients, date, has-attachment, possibly message preview)
+/// 2) possibly envelope data by GUID (contains flags, subject, senders,
+///    recipients, date, has-attachment, possibly message preview)
 /// 3) downloaded message data by GUID - this may not (yet) contain attachments
 ///
 /// new message:
@@ -144,8 +145,8 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
       if (guid != null) {
         final existingMessageId =
             allMessageIds.firstWhereOrNull((id) => id.guid == guid);
-        final sequenceId = message.sequenceId!;
-        final uid = message.uid!;
+        final sequenceId = message.sequenceId ?? 0;
+        final uid = message.uid ?? 0;
         if (existingMessageId == null) {
           addedMessageIds++;
           final messageId =
@@ -338,6 +339,7 @@ class StorageMessageEnvelope {
         flags: message.flags,
       );
     }
+
     return StorageMessageEnvelope(
       uid: uid,
       guid: guid,

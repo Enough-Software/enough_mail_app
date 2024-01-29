@@ -61,7 +61,9 @@ class NotificationService {
           // print(
           //     'got notification launched details: $launchDetails
           // with payload ${response.payload}');
-          _selectNotification(response, context: context);
+          if (context != null && context.mounted) {
+            _selectNotification(response, context: context);
+          }
 
           return NotificationServiceInitResult.appLaunchedByNotification;
         }

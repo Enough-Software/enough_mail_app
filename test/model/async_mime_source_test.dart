@@ -29,8 +29,8 @@ void main() async {
     await source.getMessage(0);
     final message = source.cache[0];
     expect(message, isNotNull);
-    expect(message!.sequenceId, 101);
-    expect(message.decodeSubject(), 'Subject 101');
+    expect(message?.sequenceId, 101);
+    expect(message?.decodeSubject(), 'Subject 101');
   });
 
   test('load second message size 101', () async {
@@ -54,7 +54,7 @@ void main() async {
     for (int i = 0; i < 101; i += 15) {
       final message = cache[i];
       expect(message, isNotNull);
-      expect(message!.sequenceId, 101 - i);
+      expect(message?.sequenceId, 101 - i);
     }
   });
 
@@ -131,7 +131,8 @@ void main() async {
     final firstMessage = await source.getMessage(0);
     final newMessage = source.createMessage(101);
     final oldDate =
-        firstMessage.decodeDate()!.subtract(const Duration(seconds: 30));
+        firstMessage.decodeDate()?.subtract(const Duration(seconds: 30)) ??
+            DateTime.now();
     newMessage.setHeader(
       MailConventions.headerDate,
       DateCodec.encodeDate(oldDate),
@@ -161,7 +162,7 @@ void main() async {
     final length = numberToTest ?? source.size;
     for (int i = 0; i < length; i++) {
       final message = await source.getMessage(i);
-      final messageDate = message.decodeDate();
+      final messageDate = message.decodeDate() ?? DateTime.now();
       final subject = message.decodeSubject() ?? '<no subject for $i>';
       expect(
         messageDate,
@@ -169,7 +170,7 @@ void main() async {
         reason: 'no date for message at index $i $subject',
       );
       expect(
-        messageDate!.isBefore(lastDate),
+        messageDate.isBefore(lastDate),
         isTrue,
         reason:
             'wrong date for message at $i: $messageDate of "$subject" should be before $lastDate of "$lastSubject"',
@@ -184,10 +185,14 @@ void main() async {
     expect(source.size, 100);
     final firstMessage = source.messages[0];
     final oldDate = firstMessage
-        .decodeDate()!
-        .subtract(const Duration(days: 120, seconds: 30));
-    source.messages[97]
-        .setHeader(MailConventions.headerDate, DateCodec.encodeDate(oldDate));
+        .decodeDate()
+        ?.subtract(const Duration(days: 120, seconds: 30));
+    source.messages[97].setHeader(
+      MailConventions.headerDate,
+      DateCodec.encodeDate(
+        oldDate ?? DateTime.now(),
+      ),
+    );
     // first page should be sorted:
     await expectMessagesOrderedByDate(source, numberToTest: 20);
   });
@@ -473,7 +478,8 @@ void main() async {
         final message = await source.getMessage(i);
         messages.add(message);
       }
-      final copy = source.createMessage(messages[1].sequenceId!)..isSeen = true;
+      final copy = source.createMessage(messages[1].sequenceId ?? -1)
+        ..isSeen = true;
       messages[1] = copy;
       await source.resyncMessagesManually(messages);
       expect(source.size, 100);
@@ -498,7 +504,7 @@ void main() async {
         }
         messages.add(message);
       }
-      final copy = source.createMessage(messages[1].sequenceId!);
+      final copy = source.createMessage(messages[1].sequenceId ?? -1);
       messages[1] = copy;
       await source.resyncMessagesManually(messages);
       expect(source.size, 100);
@@ -521,7 +527,8 @@ void main() async {
         messages.add(message);
       }
 
-      final copy = source.createMessage(messages[1].sequenceId!)..isSeen = true;
+      final copy = source.createMessage(messages[1].sequenceId ?? -1)
+        ..isSeen = true;
       messages[1] = copy;
       messages.removeAt(2);
       final newMessage = source.createMessage(101);

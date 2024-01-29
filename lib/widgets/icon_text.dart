@@ -27,17 +27,13 @@ class IconText extends StatelessWidget {
               padding: horizontalPadding,
               child: label,
             ),
-          )
+          ),
         ],
       ),
     );
-    if (brightness != null) {
-      return Theme(
-        data: ThemeData(brightness: brightness),
-        child: content,
-      );
-    } else {
-      return content;
-    }
+
+    return brightness != null
+        ? Theme(data: ThemeData(brightness: brightness), child: content)
+        : content;
   }
 }

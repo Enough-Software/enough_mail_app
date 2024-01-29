@@ -306,8 +306,8 @@ class AddAttachmentPopupButton extends ConsumerWidget {
     final appointment =
         await IcalComposer.createOrEditAppointment(context, ref);
     if (appointment != null) {
-      // idea: add some sort of finalizer that updates the appointment at the end
-      // to set the organizer and the attendees
+      // idea: add some sort of finalizer that updates the appointment
+      // at the end to set the organizer and the attendees
       final text = appointment.toString();
       final attachmentBuilder = composeData.messageBuilder.addText(
         text,

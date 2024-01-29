@@ -341,6 +341,7 @@ class _MessageDragTargetState extends State<_MessageDragTarget> {
         ),
         onWillAccept: (data) {
           startAccepting();
+
           return true;
         },
         onAccept: (data) async {
@@ -552,7 +553,7 @@ class _MessageCardState extends State<MessageCard> {
     //   },
     //   onPageFinished: (url) {
     //     print('finished loading page');
-    //     // TODO(RV): inject JS to query size?
+    // TODO(RV): inject JS to query size?
     //   },
     // );
     // }

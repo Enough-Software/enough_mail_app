@@ -148,12 +148,14 @@ abstract class AsyncMimeSource {
     Duration? responseTimeout,
   });
 
-  /// Informs this source about a new incoming [message] at the optional [index].
+  /// Informs this source about a new incoming [message]
+  /// at the optional [index].
   ///
   /// Note this message does not necessarily match to this sources.
   Future<void> onMessageArrived(MimeMessage message, {int? index});
 
-  /// Informs this source about the [sequence] having been removed on the server.
+  /// Informs this source about the [sequence] having been removed
+  /// on the server.
   Future<void> onMessagesVanished(MessageSequence sequence);
 
   /// Is called when message flags have been updated on the server.
@@ -381,11 +383,14 @@ abstract class CachedMimeSource extends AsyncMimeSource {
     // fetch and compare the 20 latest messages:
 
     // For each message check for the following cases:
-    // - message can be new (it will have a higher UID that the known first message)
+    // - message can be new (it will have a higher UID that the known
+    // first message)
     // - message can have updated flags (GUID will still be the same)
-    // - a previously cached message can now be deleted (sequence ID will match, but not the UID/GUID)
+    // - a previously cached message can now be deleted (sequence ID will match,
+    //   but not the UID/GUID)
     //
-    // Additional complications occur when not the same number of first messages are cached,
+    // Additional complications occur when not the same number of first messages
+    //  are cached,
     // in that case the GUID/UID cannot be compared.
     //
     // Also, previously there might have been less messages in this
@@ -395,7 +400,8 @@ abstract class CachedMimeSource extends AsyncMimeSource {
     final firstCachedUid = firstCached?.uid;
     if (firstCachedUid == null) {
       // When the latest message is not known, better reload all.
-      // TODO(RV): Should a reload also be triggered when other messages are not cached?
+      // TODO(RV): Should a reload also be triggered when other messages are
+      // not cached?
       cache.clear();
       notifySubscribersOnCacheInvalidated();
 
@@ -930,11 +936,11 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
   @override
   Future<void> onMessagesVanished(MessageSequence sequence) {
     if (sequence.isUidSequence == searchResult.pagedSequence.isUidSequence) {
-      final removedMessages = searchResult.removeMessageSequence(sequence);
-      for (final removed in removedMessages) {
-        notifySubscribersOnMessageVanished(removed);
-      }
+      searchResult
+          .removeMessageSequence(sequence)
+          .forEach(notifySubscribersOnMessageVanished);
     }
+
     return Future.value();
   }
 
@@ -976,14 +982,18 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
 
   @override
   Future<MoveResult> moveMessages(
-      List<MimeMessage> messages, Mailbox targetMailbox) {
+    List<MimeMessage> messages,
+    Mailbox targetMailbox,
+  ) {
     // TODO(RV): implement moveMessages
     throw UnimplementedError();
   }
 
   @override
   Future<MoveResult> moveMessagesToFlag(
-      List<MimeMessage> messages, MailboxFlag targetMailboxFlag) {
+    List<MimeMessage> messages,
+    MailboxFlag targetMailboxFlag,
+  ) {
     // TODO(RV): implement moveMessagesToFlag
     throw UnimplementedError();
   }

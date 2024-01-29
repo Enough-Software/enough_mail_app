@@ -177,9 +177,10 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     final currentAccount = ref.read(currentRealAccountProvider)!;
     _realAccount = currentAccount;
     final defaultSender = ref.read(settingsProvider).defaultSender;
-    mb.from ??= [defaultSender ?? currentAccount.fromAddress];
+    final mbFrom = mb.from ?? [defaultSender ?? currentAccount.fromAddress];
+    mb.from ??= mbFrom;
     Sender? from;
-    if (mb.from?.first == defaultSender) {
+    if (mbFrom.first == defaultSender) {
       from = _senders
           .firstWhereOrNull((sender) => sender.address == defaultSender);
     } else {
@@ -189,7 +190,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       );
     }
     if (from == null) {
-      from = Sender(mb.from!.first, currentAccount);
+      from = Sender(mbFrom.first, currentAccount);
       _senders = [from, ..._senders];
     }
     _from = from;

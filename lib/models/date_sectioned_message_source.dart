@@ -130,6 +130,7 @@ class DateSectionedMessageSource extends ChangeNotifier {
     if (message != null) {
       return SectionElement(null, message);
     }
+
     return null;
   }
 
@@ -148,11 +149,13 @@ class DateSectionedMessageSource extends ChangeNotifier {
       }
     }
     final message = await messageSource.getMessageAt(messageIndex);
+
     return SectionElement(null, message);
   }
 
   Future<List<Message>> getMessagesForSection(
-      MessageDateSection section) async {
+    MessageDateSection section,
+  ) async {
     final index = _sections.indexOf(section);
     if (index == -1) {
       return [];

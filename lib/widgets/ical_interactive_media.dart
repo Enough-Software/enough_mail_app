@@ -494,7 +494,8 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
 }
 
 extension ExtensionParticipantStatusTextStyle on ParticipantStatus {
-  // static const TextStyle _styleAccepted = const TextStyle(color: Colors.green);
+  // static const TextStyle _styleAccepted =
+  //    const TextStyle(color: Colors.green);
   static const TextStyle _styleDeclined =
       TextStyle(color: Colors.red, decorationStyle: TextDecorationStyle.dashed);
   static const TextStyle _styleTentative =

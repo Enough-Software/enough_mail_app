@@ -244,6 +244,22 @@ class _WrapParentData extends BoxParentData {
   bool _isVisible = true;
 }
 
+extension _WrapParentDataExtension on ParentData? {
+  set isVisible(bool value) {
+    final data = this;
+    if (data is _WrapParentData) {
+      data._isVisible = value;
+    }
+  }
+
+  _WrapParentData toWrapParentData() {
+    final data = this;
+    if (data is _WrapParentData) return data;
+
+    throw Exception('ParentData $data is not a _WrapParentData');
+  }
+}
+
 /// Renders the children in a wrap layout and adds an indicator at the end if
 /// the children do not fit in the available space.
 class RenderExpansionWrap extends RenderBox {
@@ -478,11 +494,8 @@ class RenderExpansionWrap extends RenderBox {
   // https://material.io/design/components/lists.html#specs
   @override
   void performLayout() {
-    // print('performLayout');
     final BoxConstraints constraints = this.constraints;
-
     final BoxConstraints looseConstraints = constraints.loosen();
-
     final double availableWidth = looseConstraints.maxWidth;
     final children = _wrapChildren;
     final expanded = _isExpanded;
@@ -490,10 +503,10 @@ class RenderExpansionWrap extends RenderBox {
     final compressIndicator = _compressIndicator;
     if (expanded) {
       if (expandIndicator != null) {
-        (expandIndicator.parentData! as _WrapParentData)._isVisible = false;
+        expandIndicator.parentData.isVisible = false;
       }
     } else if (compressIndicator != null) {
-      (compressIndicator.parentData! as _WrapParentData)._isVisible = false;
+      compressIndicator.parentData.isVisible = false;
     }
     final spacing = _spacing;
     final runSpacing = _runSpacing;
@@ -503,7 +516,6 @@ class RenderExpansionWrap extends RenderBox {
     final indicator = expanded ? compressIndicator : expandIndicator;
     final indicatorSize =
         expanded ? compressIndicatorSize : expandIndicatorSize;
-
     final indicatorWith = indicatorSize.width;
     final originalMaxRuns = _maxRuns ?? double.maxFinite.floor();
     final maxRuns = expanded ? double.maxFinite.floor() : originalMaxRuns;
@@ -520,7 +532,7 @@ class RenderExpansionWrap extends RenderBox {
       for (var i = 0; i <= lastChildIndex; i++) {
         final child = children[i];
         final childSize = _layoutBox(child, looseConstraints);
-        final parentData = child.parentData! as _WrapParentData
+        final parentData = child.parentData.toWrapParentData()
           .._isVisible = currentRun <= maxRuns;
         if (currentRunNumberOfChildren > 0 &&
             ((currentRunWidth + childSize.width > availableWidth) ||
@@ -548,7 +560,7 @@ class RenderExpansionWrap extends RenderBox {
             if (indicator != null) {
               // this is the last visible run, add indicator:
               final indicatorParentData =
-                  indicator.parentData! as _WrapParentData.._isVisible = true;
+                  indicator.parentData.toWrapParentData().._isVisible = true;
               final dx =
                   _indicatorPosition == ExpansionWrapIndicatorPosition.border
                       ? availableWidth - indicatorWith
@@ -580,7 +592,7 @@ class RenderExpansionWrap extends RenderBox {
     }
     if (expanded && currentRun >= originalMaxRuns && indicator != null) {
       // add compress indicator at the end:
-      final indicatorParentData = indicator.parentData! as _WrapParentData
+      final indicatorParentData = indicator.parentData.toWrapParentData()
         .._isVisible = true;
       final dx = _indicatorPosition == ExpansionWrapIndicatorPosition.border
           ? availableWidth - indicatorWith
@@ -591,8 +603,7 @@ class RenderExpansionWrap extends RenderBox {
       );
     }
     if (!expanded && currentRun <= originalMaxRuns && indicator != null) {
-      final indicatorParentData = indicator.parentData! as _WrapParentData
-        .._isVisible = false;
+      indicator.parentData.isVisible = false;
     }
     size = crossAxisMaxInCompressedState != null
         ? constraints

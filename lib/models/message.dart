@@ -128,7 +128,9 @@ class Message extends ChangeNotifier {
   bool get hasAttachment {
     final mime = mimeMessage;
     final size = mime.size;
-    // when only the envelope is downloaded, the content-type header ergo mediaType is not yet available
+    // when only the envelope is downloaded, the content-type header ergo
+    // mediaType is not yet available
+
     return mime.hasAttachments() ||
         (mime.mimeData == null &&
             mime.body == null &&
@@ -172,7 +174,8 @@ extension NewsLetter on MimeMessage {
   String? decodeListName() {
     final listPost = decodeHeaderValue('list-post');
     if (listPost != null) {
-      // typically only mailing lists that allow posting have a human understandable List-ID header:
+      // typically only mailing lists that allow posting have a
+      // human understandable List-ID header:
       final id = decodeHeaderValue('list-id');
       if (id != null && id.isNotEmpty) {
         return id;
@@ -189,6 +192,7 @@ extension NewsLetter on MimeMessage {
     if (sender.isNotEmpty) {
       return sender.first.toString();
     }
+
     return null;
   }
 

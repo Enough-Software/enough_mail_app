@@ -25,6 +25,7 @@ class Legalese extends StatelessWidget {
       TextLink(termsAndConditions, urlTermsAndConditions),
       TextLink(legaleseUsage.substring(tcIndex + '[TC]'.length)),
     ];
+
     return TextWithNamedLinks(
       parts: legaleseParts,
     );

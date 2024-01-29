@@ -85,14 +85,15 @@ class _QueuedMailOperation {
         operation = StoreFlagsOperation.fromJson(data);
         break;
       // case MailOperationType.moveToFlag:
-      //   // TODO: Handle this case.
+      // TODO(RV): Handle this case.
       //   break;
       // case MailOperationType.moveToFolder:
-      //   // TODO: Handle this case.
+      // TODO(RV): Handle this case.
       //   break;
       default:
         throw FormatException('Unsupported type $type');
     }
+
     return _QueuedMailOperation(operation, email);
   }
 

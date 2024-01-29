@@ -102,9 +102,9 @@ class FakeMimeSource extends PagedCachedMimeSource {
 
   @override
   Future<DeleteResult> deleteMessages(List<MimeMessage> messages) {
-    messages.sort((a, b) => b.sequenceId!.compareTo(a.sequenceId!));
+    messages.sort((a, b) => (b.sequenceId ?? 0).compareTo(a.sequenceId ?? 0));
     for (final message in messages) {
-      final sequenceId = message.sequenceId!;
+      final sequenceId = message.sequenceId ?? -1;
       this.messages.removeAt(sequenceId - 1);
       for (var i = sequenceId - 1; i < this.messages.length; i++) {
         this.messages[i].sequenceId = i + 1;
