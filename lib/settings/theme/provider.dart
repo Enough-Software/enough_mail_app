@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -5,30 +6,21 @@ import '../../app_lifecycle/provider.dart';
 import '../provider.dart';
 import 'model.dart';
 
-/// Provides the settings
-final themeProvider =
-    NotifierProvider<ThemeNotifier, ThemeSettingsData>(ThemeNotifier.new);
+part 'provider.g.dart';
 
 /// Provides the settings
-class ThemeNotifier extends Notifier<ThemeSettingsData> {
-  /// Creates a [ThemeNotifier]
-  ThemeNotifier();
-
+@Riverpod(keepAlive: true)
+class ThemeFinder extends _$ThemeFinder {
   @override
-  ThemeSettingsData build() {
+  ThemeSettingsData build({required BuildContext context}) {
     final themeSettings = ref.watch(
       settingsProvider.select((value) => value.themeSettings),
     );
-    final isResumed = ref.watch(
-      appLifecycleStateProvider
-          .select((value) => value == AppLifecycleState.resumed),
-    );
-    if (!isResumed) {
-      return state;
-    }
+    ref.watch(appIsResumedProvider);
 
     return _fromThemeSettings(
       themeSettings,
+      context: context,
     );
   }
 
@@ -38,31 +30,29 @@ class ThemeNotifier extends Notifier<ThemeSettingsData> {
   }) {
     final mode = settings.getCurrentThemeMode();
     final brightness = _resolveBrightness(mode, context);
-    final dark = _generateTheme(Brightness.dark, settings.colorSchemeSeed);
-    final light = _generateTheme(Brightness.light, settings.colorSchemeSeed);
+    final dark =
+        _generateMaterialTheme(Brightness.dark, settings.colorSchemeSeed);
+    final light =
+        _generateMaterialTheme(Brightness.light, settings.colorSchemeSeed);
+    final cupertino =
+        _generateCupertinoTheme(brightness, settings.colorSchemeSeed);
 
     return ThemeSettingsData(
       brightness: brightness,
       lightTheme: light,
       darkTheme: dark,
       themeMode: mode,
+      cupertinoTheme: cupertino,
     );
   }
 
   /// The default light theme
   static final ThemeData defaultLightTheme =
-      _generateTheme(Brightness.light, Colors.green);
+      _generateMaterialTheme(Brightness.light, Colors.green);
 
   /// The default dark theme
   static final ThemeData defaultDarkTheme =
-      _generateTheme(Brightness.dark, Colors.green);
-  ThemeData _lightTheme = defaultLightTheme;
-  ThemeData get lightTheme => _lightTheme;
-  ThemeData _darkTheme = defaultDarkTheme;
-  ThemeData get darkTheme => _darkTheme;
-  ThemeMode _themeMode = ThemeMode.system;
-  ThemeMode get themeMode => _themeMode;
-  Color _colorSchemeSeed = Colors.green;
+      _generateMaterialTheme(Brightness.dark, Colors.green);
 
   static Brightness _resolveBrightness(
     ThemeMode mode,
@@ -80,13 +70,7 @@ class ThemeNotifier extends Notifier<ThemeSettingsData> {
     }
   }
 
-  /// Initializes this theme notifier
-  void init(BuildContext context) {
-    final themeSettings = ref.read(settingsProvider).themeSettings;
-    state = _fromThemeSettings(themeSettings, context: context);
-  }
-
-  static ThemeData _generateTheme(Brightness brightness, Color color) =>
+  static ThemeData _generateMaterialTheme(Brightness brightness, Color color) =>
       color is MaterialColor
           ? ThemeData(
               brightness: brightness,
@@ -99,20 +83,37 @@ class ThemeNotifier extends Notifier<ThemeSettingsData> {
               useMaterial3: true,
             );
 
-  void checkForChangedTheme(ThemeSettings settings) {
-    var isChanged = false;
-    final mode = settings.getCurrentThemeMode();
-    if (mode != _themeMode) {
-      _themeMode = mode;
-      isChanged = true;
-    }
-    final colorSchemeSeed = settings.colorSchemeSeed;
-    if (colorSchemeSeed != _colorSchemeSeed) {
-      _colorSchemeSeed = colorSchemeSeed;
-      _lightTheme = _generateTheme(Brightness.light, colorSchemeSeed);
-      _darkTheme = _generateTheme(Brightness.dark, colorSchemeSeed);
-      isChanged = true;
-    }
-    if (isChanged) {}
-  }
+  static CupertinoThemeData _generateCupertinoTheme(
+    Brightness brightness,
+    Color color,
+  ) =>
+      CupertinoThemeData(
+        brightness: brightness,
+        primaryColor: color,
+      );
+  // CupertinoThemeData(
+  //   brightness: brightness,
+  //   primaryColor: color,
+  //   primaryContrastingColor: brightness == Brightness.dark
+  //       ? CupertinoColors.white
+  //       : CupertinoColors.black,
+  //   barBackgroundColor: CupertinoColors.systemBackground,
+  //   scaffoldBackgroundColor: CupertinoColors.systemFill,
+  //   textTheme: CupertinoTextThemeData(
+  //     primaryColor: brightness == Brightness.dark
+  //         ? CupertinoColors.white
+  //         : CupertinoColors.black,
+  //   ),
+  //   applyThemeToAll: true,
+  // );
+  // MaterialBasedCupertinoThemeData(
+  //   materialTheme: _generateMaterialTheme(brightness, color),
+  // .copyWith(
+  //   cupertinoOverrideTheme: CupertinoThemeData(
+  //     brightness: brightness,
+  //     primaryColor: color,
+  //     applyThemeToAll: true,
+  //   ),
+  // ),
+  // );
 }

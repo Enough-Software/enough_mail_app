@@ -1,50 +1,51 @@
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:enough_ascii_art/enough_ascii_art.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/button_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../locator.dart';
+import '../localization/extension.dart';
+import '../util/localized_dialog_helper.dart';
 
+/// A button to open the art extension dialog.
 class EditorArtExtensionButton extends StatelessWidget {
-  const EditorArtExtensionButton({Key? key, required this.editorApi})
-      : super(key: key);
+  /// Creates a new [EditorArtExtensionButton].
+  const EditorArtExtensionButton({super.key, required this.editorApi});
+
+  /// The editor API.
   final HtmlEditorApi editorApi;
 
   @override
-  Widget build(BuildContext context) {
-    return PlatformIconButton(
-      icon: const Icon(CommunityMaterialIcons.format_font),
-      onPressed: () => showArtExtensionDialog(context, editorApi),
-    );
-  }
+  Widget build(BuildContext context) => PlatformIconButton(
+        icon: const Icon(CommunityMaterialIcons.format_font),
+        onPressed: () => showArtExtensionDialog(context, editorApi),
+      );
 
+  /// Shows the art extension dialog.
   static void showArtExtensionDialog(
-      BuildContext context, HtmlEditorApi editorApi) {
+    BuildContext context,
+    HtmlEditorApi editorApi,
+  ) {
     //final localizations = context.text;
     LocalizedDialogHelper.showWidgetDialog(
       context,
-      EditorArtExtensionWidget(editorApi: editorApi),
+      _EditorArtExtensionWidget(editorApi: editorApi),
       defaultActions: DialogActions.cancel,
     );
   }
 }
 
-class EditorArtExtensionWidget extends StatefulWidget {
+class _EditorArtExtensionWidget extends StatefulWidget {
+  const _EditorArtExtensionWidget({required this.editorApi});
   final HtmlEditorApi editorApi;
-  const EditorArtExtensionWidget({Key? key, required this.editorApi})
-      : super(key: key);
 
   @override
-  State<EditorArtExtensionWidget> createState() =>
+  State<_EditorArtExtensionWidget> createState() =>
       _EditorArtExtensionWidgetState();
 }
 
-class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
+class _EditorArtExtensionWidgetState extends State<_EditorArtExtensionWidget> {
   final _inputController = TextEditingController();
   final _textsByUnicodeFont = <UnicodeFont, String>{};
 
@@ -53,7 +54,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
     super.initState();
     widget.editorApi.getSelectedText().then((value) {
       _updateTexts(value);
-      _inputController.text = value!;
+      _inputController.text = value ?? '';
     });
   }
 
@@ -73,25 +74,30 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
       UnicodeFont.fraktur: localizations.fontFraktur,
       UnicodeFont.frakturBold: localizations.fontFrakturBold,
       UnicodeFont.monospace: localizations.fontMonospace,
+      // cSpell: disable
       UnicodeFont.fullwidth: localizations.fontFullwidth,
       UnicodeFont.doublestruck: localizations.fontDoublestruck,
+      // cSpell: enable
       UnicodeFont.capitalized: localizations.fontCapitalized,
       UnicodeFont.circled: localizations.fontCircled,
       UnicodeFont.parenthesized: localizations.fontParenthesized,
       UnicodeFont.underlinedSingle: localizations.fontUnderlinedSingle,
       UnicodeFont.underlinedDouble: localizations.fontUnderlinedDouble,
+      // cSpell: disable
       UnicodeFont.strikethroughSingle: localizations.fontStrikethroughSingle,
+      // cSpell: enable
     };
     final captionStyle = Theme.of(context).textTheme.bodySmall;
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
+            padding: const EdgeInsets.only(bottom: 8),
             child: DecoratedPlatformTextField(
               controller: _inputController,
-              onChanged: (value) => _updateTexts(value),
+              onChanged: _updateTexts,
               decoration: InputDecoration(
                 labelText: localizations.editorArtInputLabel,
                 hintText: localizations.editorArtInputHint,
@@ -105,15 +111,16 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
                 style: captionStyle,
               ),
               PlatformTextButton(
-                child: ButtonText(_textsByUnicodeFont[unicodeFont] ??
-                    localizations.editorArtWaitingForInputHint),
+                child: Text(
+                  _textsByUnicodeFont[unicodeFont] ??
+                      localizations.editorArtWaitingForInputHint,
+                ),
                 onPressed: () {
                   final text = _textsByUnicodeFont[unicodeFont];
                   if (text != null && text.isNotEmpty) {
                     widget.editorApi.insertText(text);
                   }
-                  final navService = locator<NavigationService>();
-                  navService.pop();
+                  context.pop();
                 },
               ),
               const Divider(),
@@ -127,7 +134,7 @@ class _EditorArtExtensionWidgetState extends State<EditorArtExtensionWidget> {
     for (final unicodeFont in UnicodeFont.values) {
       if (unicodeFont != UnicodeFont.normal) {
         _textsByUnicodeFont[unicodeFont] =
-            UnicodeFontConverter.encode(input!, unicodeFont);
+            UnicodeFontConverter.encode(input ?? 'hello world', unicodeFont);
       }
     }
     setState(() {});

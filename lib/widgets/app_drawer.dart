@@ -1,39 +1,35 @@
-import 'dart:io';
-
 import 'package:badges/badges.dart' as badges;
+import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/extensions/extension_action_tile.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/services/icon_service.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/inherited_widgets.dart';
-import 'package:enough_mail_app/widgets/mailbox_tree.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../l10n/app_localizations.g.dart';
-import '../routes.dart';
+import '../account/model.dart';
+import '../account/provider.dart';
+import '../extensions/extension_action_tile.dart';
+import '../localization/app_localizations.g.dart';
+import '../localization/extension.dart';
+import '../routes/routes.dart';
+import '../settings/theme/icon_service.dart';
+import '../util/localized_dialog_helper.dart';
+import 'mailbox_tree.dart';
 
-class AppDrawer extends StatelessWidget {
-  const AppDrawer({Key? key}) : super(key: key);
+/// Displays the base navigation drawer with all accounts
+class AppDrawer extends ConsumerWidget {
+  /// Creates a new [AppDrawer]
+  const AppDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final mailService = locator<MailService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final accounts = ref.watch(allAccountsProvider);
     final theme = Theme.of(context);
     final localizations = context.text;
-    final iconService = locator<IconService>();
-    final mailState = MailServiceWidget.of(context)!;
-    final currentAccount = mailState.account ?? mailService.currentAccount;
-    var accounts = mailState.accounts ?? mailService.accounts;
-    if (mailService.hasUnifiedAccount) {
-      accounts = accounts.toList();
-      accounts.insert(0, mailService.unifiedAccount!);
-    }
+    final iconService = IconService.instance;
+    final currentAccount = ref.watch(currentAccountProvider);
+    final hasAccountsWithErrors = ref.watch(hasAccountWithErrorProvider);
+
     return PlatformDrawer(
       child: SafeArea(
         child: Column(
@@ -41,9 +37,13 @@ class AppDrawer extends StatelessWidget {
             Material(
               elevation: 18,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 child: _buildAccountHeader(
-                    currentAccount, mailService.accounts, theme),
+                  context,
+                  currentAccount,
+                  accounts,
+                  theme,
+                ),
               ),
             ),
             Expanded(
@@ -54,12 +54,12 @@ class AppDrawer extends StatelessWidget {
                     children: [
                       _buildAccountSelection(
                         context,
-                        mailService,
                         accounts,
                         currentAccount,
                         localizations,
+                        hasAccountsWithErrors: hasAccountsWithErrors,
                       ),
-                      _buildFolderTree(currentAccount),
+                      _buildFolderTree(context, currentAccount),
                       if (currentAccount is RealAccount)
                         ExtensionActionTile.buildSideMenuForAccount(
                           context,
@@ -84,11 +84,10 @@ class AppDrawer extends StatelessWidget {
                 leading: Icon(iconService.settings),
                 title: Text(localizations.drawerEntrySettings),
                 onTap: () {
-                  final navService = locator<NavigationService>();
-                  navService.push(Routes.settings);
+                  context.pushNamed(Routes.settings);
                 },
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -96,36 +95,43 @@ class AppDrawer extends StatelessWidget {
   }
 
   Widget _buildAccountHeader(
+    BuildContext context,
     Account? currentAccount,
     List<Account> accounts,
     ThemeData theme,
   ) {
     if (currentAccount == null) {
-      return Container();
+      return const SizedBox.shrink();
     }
     final avatarAccount = currentAccount is RealAccount
         ? currentAccount
-        : accounts.isNotEmpty
-            ? accounts.first as RealAccount
-            : null;
+        : (currentAccount is UnifiedAccount
+            ? currentAccount.accounts.first
+            : accounts.firstWhereOrNull((a) => a is RealAccount)
+                as RealAccount?);
+    final avatarImageUrl = avatarAccount?.imageUrlGravatar;
+    final hasError = currentAccount is RealAccount && currentAccount.hasError;
+
     final userName =
         currentAccount is RealAccount ? currentAccount.userName : null;
     final accountName = Text(
       currentAccount.name,
       style: const TextStyle(fontWeight: FontWeight.bold),
     );
-    final accountNameWithBadge = locator<MailService>().hasError(currentAccount)
-        ? badges.Badge(child: accountName)
-        : accountName;
+    final accountNameWithBadge =
+        hasError ? badges.Badge(child: accountName) : accountName;
 
     return PlatformListTile(
       onTap: () {
-        final NavigationService navService = locator<NavigationService>();
         if (currentAccount is UnifiedAccount) {
-          navService.push(Routes.settingsAccounts, fade: true);
+          context.pushNamed(Routes.settingsAccounts);
         } else {
-          navService.push(Routes.accountEdit,
-              arguments: currentAccount, fade: true);
+          context.pushNamed(
+            Routes.accountEdit,
+            pathParameters: {
+              Routes.pathParameterEmail: currentAccount.email,
+            },
+          );
         }
       },
       title: avatarAccount == null
@@ -134,9 +140,9 @@ class AppDrawer extends StatelessWidget {
               children: [
                 CircleAvatar(
                   backgroundColor: theme.secondaryHeaderColor,
-                  backgroundImage: NetworkImage(
-                    avatarAccount.imageUrlGravatar!,
-                  ),
+                  backgroundImage: avatarImageUrl == null
+                      ? null
+                      : NetworkImage(avatarImageUrl),
                   radius: 30,
                 ),
                 const Padding(
@@ -152,16 +158,20 @@ class AppDrawer extends StatelessWidget {
                         Text(
                           userName,
                           style: const TextStyle(
-                              fontStyle: FontStyle.italic, fontSize: 14),
+                            fontStyle: FontStyle.italic,
+                            fontSize: 14,
+                          ),
                         ),
                       Text(
                         currentAccount is UnifiedAccount
                             ? currentAccount.accounts
                                 .map((a) => a.name)
                                 .join(', ')
-                            : (currentAccount as RealAccount).email,
+                            : currentAccount.email,
                         style: const TextStyle(
-                            fontStyle: FontStyle.italic, fontSize: 14),
+                          fontStyle: FontStyle.italic,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -172,95 +182,149 @@ class AppDrawer extends StatelessWidget {
   }
 
   Widget _buildAccountSelection(
-      BuildContext context,
-      MailService mailService,
-      List<Account> accounts,
-      Account? currentAccount,
-      AppLocalizations localizations) {
-    if (accounts.length > 1) {
-      return ExpansionTile(
-        leading: mailService.hasAccountsWithErrors() ? const Badge() : null,
-        title: Text(localizations
-            .drawerAccountsSectionTitle(mailService.accounts.length)),
-        children: [
-          for (final account in accounts)
-            SelectablePlatformListTile(
-              leading: mailService.hasError(account)
-                  ? const Icon(Icons.error_outline)
-                  : null,
-              tileColor: mailService.hasError(account) ? Colors.red : null,
-              title: Text(account.name),
-              selected: account == currentAccount,
-              onTap: () async {
-                final navService = locator<NavigationService>();
-                if (!Platform.isIOS) {
-                  // close drawer
-                  navService.pop();
-                }
-                if (mailService.hasError(account)) {
-                  navService.push(Routes.accountEdit, arguments: account);
-                } else {
-                  final accountWidgetState = MailServiceWidget.of(context);
-                  if (accountWidgetState != null) {
-                    accountWidgetState.account = account;
-                  }
-                  final messageSource = locator<MailService>()
-                      .getMessageSourceFor(account, switchToAccount: true);
-                  navService.push(Routes.messageSourceFuture,
-                      arguments: messageSource,
-                      replace: !Platform.isIOS,
-                      fade: true);
-                }
-              },
-              onLongPress: () {
-                final navService = locator<NavigationService>();
-                if (account is UnifiedAccount) {
-                  navService.push(Routes.settingsAccounts, fade: true);
-                } else {
-                  navService.push(Routes.accountEdit,
-                      arguments: account, fade: true);
-                }
-              },
-            ),
-          _buildAddAccountTile(localizations),
-        ],
-      );
-    } else {
-      return _buildAddAccountTile(localizations);
-    }
-  }
+    BuildContext context,
+    List<Account> accounts,
+    Account? currentAccount,
+    AppLocalizations localizations, {
+    required bool hasAccountsWithErrors,
+  }) =>
+      accounts.length > 1
+          ? ExpansionTile(
+              leading: hasAccountsWithErrors ? const Badge() : null,
+              title: Text(
+                localizations.drawerAccountsSectionTitle(accounts.length),
+              ),
+              children: [
+                for (final account in accounts)
+                  _SelectableAccountTile(
+                    account: account,
+                    currentAccount: currentAccount,
+                  ),
+                _buildAddAccountTile(context, localizations),
+              ],
+            )
+          : _buildAddAccountTile(context, localizations);
 
-  Widget _buildAddAccountTile(AppLocalizations localizations) {
-    return PlatformListTile(
-      leading: const Icon(Icons.add),
-      title: Text(localizations.drawerEntryAddAccount),
-      onTap: () {
-        final navService = locator<NavigationService>();
-        if (!Platform.isIOS) {
-          navService.pop();
-        }
-        navService.push(Routes.accountAdd);
-      },
+  Widget _buildAddAccountTile(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) =>
+      PlatformListTile(
+        leading: const Icon(Icons.add),
+        title: Text(localizations.drawerEntryAddAccount),
+        onTap: () {
+          if (!useAppDrawerAsRoot) {
+            context.pop();
+          }
+          context.pushNamed(Routes.accountAdd);
+        },
+      );
+
+  Widget _buildFolderTree(
+    BuildContext context,
+    Account? account,
+  ) {
+    if (account == null) {
+      return const SizedBox.shrink();
+    }
+
+    return MailboxTree(
+      account: account,
+      onSelected: (mailbox) => _navigateToMailbox(context, account, mailbox),
+      isReselectPossible: true,
     );
   }
 
-  Widget _buildFolderTree(Account? account) {
-    if (account == null) {
-      return Container();
+  void _navigateToMailbox(
+    BuildContext context,
+    Account account,
+    Mailbox mailbox,
+  ) {
+    if (!useAppDrawerAsRoot) {
+      while (context.canPop()) {
+        context.pop();
+      }
     }
-    return MailboxTree(account: account, onSelected: _navigateToMailbox);
+    if (mailbox.isInbox) {
+      context.goNamed(
+        Routes.mailForAccount,
+        pathParameters: {
+          Routes.pathParameterEmail: account.email,
+        },
+      );
+    } else {
+      context.pushNamed(
+        Routes.mailForMailbox,
+        pathParameters: {
+          Routes.pathParameterEmail: account.email,
+          Routes.pathParameterEncodedMailboxPath: mailbox.encodedPath,
+        },
+      );
+    }
   }
+}
 
-  void _navigateToMailbox(Mailbox mailbox) async {
-    final mailService = locator<MailService>();
-    final account = mailService.currentAccount!;
-    final messageSourceFuture =
-        mailService.getMessageSourceFor(account, mailbox: mailbox);
-    locator<NavigationService>().push(
-      Routes.messageSourceFuture,
-      arguments: messageSourceFuture,
-      replace: !Platform.isIOS,
-      fade: true,
+class _SelectableAccountTile extends StatelessWidget {
+  const _SelectableAccountTile({
+    required this.account,
+    required this.currentAccount,
+  });
+
+  final Account account;
+  final Account? currentAccount;
+
+  @override
+  Widget build(BuildContext context) {
+    final account = this.account;
+    final hasError = account is RealAccount && account.hasError;
+    final localizations = context.text;
+
+    return SelectablePlatformListTile(
+      leading: hasError ? const Icon(Icons.error_outline) : null,
+      tileColor: hasError ? Colors.red : null,
+      title: Text(
+        account is UnifiedAccount
+            ? localizations.unifiedAccountName
+            : account.name,
+      ),
+      selected: account == currentAccount,
+      onTap: () {
+        if (!useAppDrawerAsRoot) {
+          context.pop();
+        }
+        if (hasError) {
+          context.pushNamed(
+            Routes.accountEdit,
+            pathParameters: {
+              Routes.pathParameterEmail: account.email,
+            },
+          );
+        } else {
+          context.goNamed(
+            Routes.mailForAccount,
+            pathParameters: {
+              Routes.pathParameterEmail: account.email,
+            },
+          );
+        }
+      },
+      onLongPress: () {
+        if (account is UnifiedAccount) {
+          context.pushNamed(
+            Routes.settingsAccounts,
+            pathParameters: {
+              Routes.pathParameterEmail: account.email,
+            },
+          );
+        } else {
+          context.pushNamed(
+            Routes.accountEdit,
+            pathParameters: {
+              Routes.pathParameterEmail: account.email,
+            },
+          );
+        }
+      },
     );
   }
 }

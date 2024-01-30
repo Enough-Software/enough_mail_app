@@ -5,6 +5,7 @@ class Validator {
     }
     final atIndex = value.lastIndexOf('@');
     final dotIndex = value.lastIndexOf('.');
-    return (atIndex > 0 && dotIndex > atIndex && dotIndex < value.length - 2);
+
+    return atIndex > 0 && dotIndex > atIndex && dotIndex < value.length - 2;
   }
 }

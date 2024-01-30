@@ -1,63 +1,82 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/models/account.dart';
-import 'package:enough_mail_app/screens/base.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
-import 'package:enough_mail_app/util/localized_dialog_helper.dart';
-import 'package:enough_mail_app/widgets/password_field.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class AccountServerDetailsScreen extends StatelessWidget {
-  final RealAccount account;
-  final String? title;
-  final bool includeDrawer;
+import '../account/model.dart';
+import '../account/provider.dart';
+import '../localization/extension.dart';
+import '../mail/provider.dart';
+import '../util/localized_dialog_helper.dart';
+import '../widgets/password_field.dart';
+import 'base.dart';
+import 'mail_screen_for_default_account.dart';
+
+/// Allows to edit server details for an account.
+class AccountServerDetailsScreen extends ConsumerWidget {
+  /// Creates a [AccountServerDetailsScreen].
   const AccountServerDetailsScreen({
-    Key? key,
-    required this.account,
+    super.key,
+    this.accountEmail,
+    this.account,
     this.title,
-    this.includeDrawer = true,
-  }) : super(key: key);
+  });
+
+  /// The email address of the account to edit.
+  final String? accountEmail;
+
+  /// The account to edit.
+  final RealAccount? account;
+
+  /// The title of the screen, if it should differ from the account's name.
+  final String? title;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final accountEmail = this.accountEmail;
+    final account = this.account ??
+        (accountEmail != null
+            ? ref.watch(
+                findRealAccountByEmailProvider(email: accountEmail),
+              )
+            : null);
+    if (account == null) {
+      return const MailScreenForDefaultAccount();
+    }
     final editor = AccountServerDetailsEditor(account: account);
-    return Base.buildAppChrome(
-      context,
+
+    return BasePage(
       title: title ?? account.name,
       content: editor,
-      includeDrawer: includeDrawer,
-      appBarActions: [
-        const _SaveButton(),
+      appBarActions: const [
+        _SaveButton(),
       ],
     );
   }
 }
 
-class AccountServerDetailsEditor extends StatefulWidget {
+class AccountServerDetailsEditor extends StatefulHookConsumerWidget {
+  const AccountServerDetailsEditor({
+    super.key,
+    required this.account,
+  });
   final RealAccount account;
 
-  const AccountServerDetailsEditor({
-    Key? key,
-    required this.account,
-  }) : super(key: key);
-
   @override
-  State<AccountServerDetailsEditor> createState() =>
+  ConsumerState<AccountServerDetailsEditor> createState() =>
       _AccountServerDetailsEditorState();
 
-  void testConnection(BuildContext context) async {
+  Future<void> testConnection(BuildContext context) async {
     await _AccountServerDetailsEditorState._currentState
         ?.testConnection(context);
   }
 }
 
 class _SaveButton extends StatefulWidget {
-  const _SaveButton({Key? key}) : super(key: key);
+  const _SaveButton();
 
   @override
   _SaveButtonState createState() => _SaveButtonState();
@@ -70,6 +89,7 @@ class _SaveButtonState extends State<_SaveButton> {
     if (_isSaving) {
       return const PlatformProgressIndicator();
     }
+
     return PlatformIconButton(
       icon: Icon(PlatformInfo.isCupertino
           ? CupertinoIcons.check_mark_circled
@@ -91,7 +111,7 @@ class _SaveButtonState extends State<_SaveButton> {
 }
 
 class _AccountServerDetailsEditorState
-    extends State<AccountServerDetailsEditor> {
+    extends ConsumerState<AccountServerDetailsEditor> {
   static _AccountServerDetailsEditorState? _currentState;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _userNameController = TextEditingController();
@@ -128,29 +148,34 @@ class _AccountServerDetailsEditorState
     final outgoingAuth =
         outgoing.authentication as UserNameBasedAuthentication?;
     _emailController.text = mailAccount.email;
-    _setupFields(incoming.serverConfig, outgoing.serverConfig, incomingAuth,
-        outgoingAuth);
+    _setupFields(
+      incoming.serverConfig,
+      outgoing.serverConfig,
+      incomingAuth,
+      outgoingAuth,
+    );
     super.initState();
   }
 
   void _setupFields(
-      ServerConfig? incoming,
-      ServerConfig? outgoing,
-      UserNameBasedAuthentication? incomingAuth,
-      UserNameBasedAuthentication? outgoingAuth) {
+    ServerConfig? incoming,
+    ServerConfig? outgoing,
+    UserNameBasedAuthentication? incomingAuth,
+    UserNameBasedAuthentication? outgoingAuth,
+  ) {
     final incomingPassword =
         incomingAuth is PlainAuthentication ? incomingAuth.password : null;
     if (incomingAuth?.userName != null) {
-      _userNameController.text = incomingAuth!.userName;
+      _userNameController.text = incomingAuth?.userName ?? '';
     }
     if (incomingPassword != null) {
       _passwordController.text = incomingPassword;
     }
     final incomingHostName = incoming?.hostname;
     _incomingHostDomainController.text = incomingHostName ?? '';
-    _incomingHostPortController.text = incoming?.port?.toString() ?? '';
+    _incomingHostPortController.text = incoming?.port.toString() ?? '';
     if (incomingAuth?.userName != null) {
-      _incomingUserNameController.text = incomingAuth!.userName;
+      _incomingUserNameController.text = incomingAuth?.userName ?? '';
     }
     if (incomingPassword != null) {
       _incomingPasswordController.text = incomingPassword;
@@ -158,9 +183,9 @@ class _AccountServerDetailsEditorState
     _incomingSecurity = incoming?.socketType ?? SocketType.ssl;
     _incomingServerType = incoming?.type ?? ServerType.imap;
     _outgoingHostDomainController.text = outgoing?.hostname ?? '';
-    _outgoingHostPortController.text = outgoing?.port?.toString() ?? '';
+    _outgoingHostPortController.text = outgoing?.port.toString() ?? '';
     if (outgoingAuth?.userName != null) {
-      _outgoingUserNameController.text = outgoingAuth!.userName;
+      _outgoingUserNameController.text = outgoingAuth?.userName ?? '';
     }
     if (outgoingAuth is PlainAuthentication) {
       _outgoingPasswordController.text = outgoingAuth.password;
@@ -195,8 +220,10 @@ class _AccountServerDetailsEditorState
     final incomingServerConfig = ServerConfig(
       type: _incomingServerType,
       hostname: _incomingHostDomainController.text,
-      port: int.tryParse(_incomingHostPortController.text),
+      port: int.tryParse(_incomingHostPortController.text) ?? 0,
       socketType: _incomingSecurity,
+      authentication: Authentication.plain,
+      usernameType: UsernameType.unknown,
     );
     final incomingUserName = (_incomingUserNameController.text.isEmpty)
         ? userName
@@ -207,8 +234,10 @@ class _AccountServerDetailsEditorState
     final outgoingServerConfig = ServerConfig(
       type: _outgoingServerType,
       hostname: _outgoingHostDomainController.text,
-      port: int.tryParse(_outgoingHostPortController.text),
+      port: int.tryParse(_outgoingHostPortController.text) ?? 0,
       socketType: _outgoingSecurity,
+      authentication: Authentication.plain,
+      usernameType: UsernameType.unknown,
     );
     final outgoingUserName = (_outgoingUserNameController.text.isEmpty)
         ? userName
@@ -243,6 +272,7 @@ class _AccountServerDetailsEditorState
           ),
         );
       }
+
       return;
     } else {
       final incoming = mailAccount.incoming;
@@ -250,24 +280,28 @@ class _AccountServerDetailsEditorState
       if (mounted) {
         setState(() {
           _incomingHostPortController.text =
-              incoming.serverConfig.port?.toString() ?? '';
-          _incomingServerType = incoming.serverConfig.type ?? ServerType.imap;
-          _incomingSecurity =
-              incoming.serverConfig.socketType ?? SocketType.ssl;
+              incoming.serverConfig.port.toString();
+          _incomingServerType = incoming.serverConfig.type;
+          _incomingSecurity = incoming.serverConfig.socketType;
           _outgoingHostPortController.text =
-              outgoing.serverConfig.port?.toString() ?? '';
-          _outgoingServerType = outgoing.serverConfig.type ?? ServerType.smtp;
-          _outgoingSecurity =
-              outgoing.serverConfig.socketType ?? SocketType.ssl;
+              outgoing.serverConfig.port.toString();
+          _outgoingServerType = outgoing.serverConfig.type;
+          _outgoingSecurity = outgoing.serverConfig.socketType;
         });
       }
     }
     // now try to sign in:
-    final connectedAccount =
-        await locator<MailService>().connectFirstTime(mailAccount);
+    final connectedAccount = await ref.read(
+      firstTimeMailClientSourceProvider(
+        account: RealAccount(mailAccount),
+      ).future,
+    );
+
     final mailClient = connectedAccount?.mailClient;
     if (mailClient != null && mailClient.isConnected) {
-      locator<NavigationService>().pop(connectedAccount);
+      if (context.mounted) {
+        context.pop(connectedAccount);
+      }
     } else if (mounted) {
       await LocalizedDialogHelper.showTextDialog(
         context,
@@ -283,11 +317,12 @@ class _AccountServerDetailsEditorState
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
+
     return SingleChildScrollView(
       child: Material(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Column(
               children: [
                 DecoratedPlatformTextField(
@@ -335,65 +370,79 @@ class _AccountServerDetailsEditorState
                 ),
                 ExpansionTile(
                   title: Text(
-                      localizations.accountDetailsAdvancedIncomingSectionTitle),
+                    localizations.accountDetailsAdvancedIncomingSectionTitle,
+                  ),
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
+                          padding: const EdgeInsets.only(right: 8),
                           child: Text(localizations
                               .accountDetailsIncomingServerTypeLabel),
                         ),
                         PlatformDropdownButton<ServerType>(
-                            items: [
-                              DropdownMenuItem(
-                                  child: Text(localizations
-                                      .accountDetailsOptionAutomatic)),
-                              const DropdownMenuItem(
-                                value: ServerType.imap,
-                                child: Text('IMAP'),
+                          items: [
+                            DropdownMenuItem(
+                              child: Text(
+                                localizations.accountDetailsOptionAutomatic,
                               ),
-                              const DropdownMenuItem(
-                                value: ServerType.pop,
-                                child: Text('POP'),
-                              ),
-                            ],
-                            value: _incomingServerType,
-                            onChanged: (value) =>
-                                setState(() => _incomingServerType = value!)),
+                            ),
+                            const DropdownMenuItem(
+                              value: ServerType.imap,
+                              child: Text('IMAP'),
+                            ),
+                            const DropdownMenuItem(
+                              value: ServerType.pop,
+                              child: Text('POP'),
+                            ),
+                          ],
+                          value: _incomingServerType,
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(
+                                () => _incomingServerType = value,
+                              );
+                            }
+                          },
+                        ),
                       ],
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
+                          padding: const EdgeInsets.only(right: 8),
                           child: Text(localizations
                               .accountDetailsIncomingSecurityLabel),
                         ),
                         PlatformDropdownButton<SocketType>(
-                            items: [
-                              DropdownMenuItem(
-                                  child: Text(localizations
-                                      .accountDetailsOptionAutomatic)),
-                              const DropdownMenuItem(
-                                value: SocketType.ssl,
-                                child: Text('SSL'),
+                          items: [
+                            DropdownMenuItem(
+                              child: Text(
+                                localizations.accountDetailsOptionAutomatic,
                               ),
-                              const DropdownMenuItem(
-                                value: SocketType.starttls,
-                                child: Text('Start TLS'),
-                              ),
-                              DropdownMenuItem(
-                                value: SocketType.plain,
-                                child: Text(localizations
-                                    .accountDetailsSecurityOptionNone),
-                              ),
-                            ],
-                            value: _incomingSecurity,
-                            onChanged: (value) =>
-                                setState(() => _incomingSecurity = value!)),
+                            ),
+                            const DropdownMenuItem(
+                              value: SocketType.ssl,
+                              child: Text('SSL'),
+                            ),
+                            const DropdownMenuItem(
+                              // cSpell: ignore starttls
+                              value: SocketType.starttls,
+                              child: Text('Start TLS'),
+                            ),
+                            DropdownMenuItem(
+                              value: SocketType.plain,
+                              child: Text(localizations
+                                  .accountDetailsSecurityOptionNone),
+                            ),
+                          ],
+                          value: _incomingSecurity,
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _incomingSecurity = value);
+                            }
+                          },
+                        ),
                       ],
                     ),
                     DecoratedPlatformTextField(
@@ -418,70 +467,84 @@ class _AccountServerDetailsEditorState
                       ),
                     ),
                     PasswordField(
-                        controller: _incomingPasswordController,
-                        labelText:
-                            localizations.accountDetailsIncomingPasswordLabel,
-                        hintText: localizations
-                            .accountDetailsAlternativePasswordHint),
+                      controller: _incomingPasswordController,
+                      labelText:
+                          localizations.accountDetailsIncomingPasswordLabel,
+                      hintText:
+                          localizations.accountDetailsAlternativePasswordHint,
+                    ),
                   ],
                 ),
                 ExpansionTile(
                   title: Text(
-                      localizations.accountDetailsAdvancedOutgoingSectionTitle),
+                    localizations.accountDetailsAdvancedOutgoingSectionTitle,
+                  ),
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Text(localizations
-                              .accountDetailsOutgoingServerTypeLabel),
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Text(
+                            localizations.accountDetailsOutgoingServerTypeLabel,
+                          ),
                         ),
                         PlatformDropdownButton<ServerType>(
-                            items: [
-                              DropdownMenuItem(
-                                  child: Text(localizations
-                                      .accountDetailsOptionAutomatic)),
-                              const DropdownMenuItem(
-                                value: ServerType.smtp,
-                                child: Text('SMTP'),
+                          items: [
+                            DropdownMenuItem(
+                              child: Text(
+                                localizations.accountDetailsOptionAutomatic,
                               ),
-                            ],
-                            value: _outgoingServerType,
-                            onChanged: (value) =>
-                                setState(() => _outgoingServerType = value!)),
+                            ),
+                            const DropdownMenuItem(
+                              value: ServerType.smtp,
+                              child: Text('SMTP'),
+                            ),
+                          ],
+                          value: _outgoingServerType,
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _outgoingServerType = value);
+                            }
+                          },
+                        ),
                       ],
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
+                          padding: const EdgeInsets.only(right: 8),
                           child: Text(localizations
                               .accountDetailsOutgoingSecurityLabel),
                         ),
                         PlatformDropdownButton<SocketType>(
-                            items: [
-                              DropdownMenuItem(
-                                  child: Text(localizations
-                                      .accountDetailsOptionAutomatic)),
-                              const DropdownMenuItem(
-                                value: SocketType.ssl,
-                                child: Text('SSL'),
+                          items: [
+                            DropdownMenuItem(
+                              child: Text(
+                                localizations.accountDetailsOptionAutomatic,
                               ),
-                              const DropdownMenuItem(
-                                value: SocketType.starttls,
-                                child: Text('Start TLS'),
+                            ),
+                            const DropdownMenuItem(
+                              value: SocketType.ssl,
+                              child: Text('SSL'),
+                            ),
+                            const DropdownMenuItem(
+                              value: SocketType.starttls,
+                              child: Text('Start TLS'),
+                            ),
+                            DropdownMenuItem(
+                              value: SocketType.plain,
+                              child: Text(
+                                localizations.accountDetailsSecurityOptionNone,
                               ),
-                              DropdownMenuItem(
-                                value: SocketType.plain,
-                                child: Text(localizations
-                                    .accountDetailsSecurityOptionNone),
-                              ),
-                            ],
-                            value: _outgoingSecurity,
-                            onChanged: (value) =>
-                                setState(() => _outgoingSecurity = value!)),
+                            ),
+                          ],
+                          value: _outgoingSecurity,
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _outgoingSecurity = value);
+                            }
+                          },
+                        ),
                       ],
                     ),
                     DecoratedPlatformTextField(

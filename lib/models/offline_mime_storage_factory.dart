@@ -1,6 +1,6 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/hive/hive.dart';
-import 'package:enough_mail_app/models/offline_mime_storage.dart';
+import 'hive/hive.dart';
+import 'offline_mime_storage.dart';
 
 /// Provides access to storage facilities
 class OfflineMimeStorageFactory {
@@ -11,7 +11,6 @@ class OfflineMimeStorageFactory {
   OfflineMimeStorage getMailboxStorage({
     required MailAccount mailAccount,
     required Mailbox mailbox,
-  }) {
-    return HiveMailboxMimeStorage(mailAccount: mailAccount, mailbox: mailbox);
-  }
+  }) =>
+      HiveMailboxMimeStorage(mailAccount: mailAccount, mailbox: mailbox);
 }

@@ -1,27 +1,27 @@
-import 'dart:io';
-
-import 'package:enough_mail_app/extensions/extensions.dart';
-import 'package:enough_mail_app/models/models.dart';
-import 'package:enough_mail_app/services/i18n_service.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart' hide WebViewConfiguration;
 
-import '../locator.dart';
-import '../routes.dart';
+import '../account/model.dart';
+import '../localization/extension.dart';
+import '../models/models.dart';
+import '../routes/routes.dart';
+import 'extensions.dart';
 
 class ExtensionActionTile extends StatelessWidget {
+  const ExtensionActionTile({super.key, required this.actionDescription});
   final AppExtensionActionDescription actionDescription;
-  const ExtensionActionTile({Key? key, required this.actionDescription})
-      : super(key: key);
 
   static Widget buildSideMenuForAccount(
-      BuildContext context, RealAccount? currentAccount) {
+    BuildContext context,
+    RealAccount? currentAccount,
+  ) {
     if (currentAccount == null || currentAccount.isVirtual) {
       return Container();
     }
     final actions = currentAccount.appExtensionsAccountSideMenu;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: buildActionWidgets(context, actions),
@@ -29,8 +29,10 @@ class ExtensionActionTile extends StatelessWidget {
   }
 
   static List<Widget> buildActionWidgets(
-      BuildContext context, List<AppExtensionActionDescription> actions,
-      {bool withDivider = true}) {
+    BuildContext context,
+    List<AppExtensionActionDescription> actions, {
+    bool withDivider = true,
+  }) {
     if (actions.isEmpty) {
       return [];
     }
@@ -41,38 +43,48 @@ class ExtensionActionTile extends StatelessWidget {
     for (final action in actions) {
       widgets.add(ExtensionActionTile(actionDescription: action));
     }
+
     return widgets;
   }
 
   @override
   Widget build(BuildContext context) {
-    final languageCode = locator<I18nService>().locale!.languageCode;
+    final languageCode = context.text.localeName;
+    final icon = actionDescription.icon;
 
     return PlatformListTile(
-      leading: actionDescription.icon == null
+      leading: icon == null
           ? null
           : Image.network(
-              actionDescription.icon!,
+              icon,
               height: 24,
               width: 24,
             ),
-      title: Text(actionDescription.getLabel(languageCode)!),
+      title: Text(actionDescription.getLabel(languageCode) ?? ''),
       onTap: () {
-        final url = actionDescription.action!.url;
-        switch (actionDescription.action!.mechanism) {
+        final action = actionDescription.action;
+        if (action == null) {
+          return;
+        }
+
+        final url = action.url;
+        switch (action.mechanism) {
           case AppExtensionActionMechanism.inApp:
-            final navService = locator<NavigationService>();
-            if (!(Platform.isIOS || Platform.isMacOS)) {
-              // close app drawer:
-              navService.pop();
+            final context = Routes.navigatorKey.currentContext;
+            if (context != null) {
+              if (!useAppDrawerAsRoot) {
+                // close app drawer:
+                context.pop();
+              }
+              context.pushNamed(
+                Routes.webview,
+                extra: WebViewConfiguration(
+                  actionDescription.getLabel(languageCode),
+                  Uri.parse(url),
+                ),
+              );
             }
-            navService.push(
-              Routes.webview,
-              arguments: WebViewConfiguration(
-                actionDescription.getLabel(languageCode),
-                Uri.parse(url),
-              ),
-            );
+
             break;
           case AppExtensionActionMechanism.external:
             launchUrl(Uri.parse(url));

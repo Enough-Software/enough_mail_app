@@ -4,15 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../l10n/extension.dart';
+import '../../localization/extension.dart';
 import '../../screens/base.dart';
 import '../../util/localized_dialog_helper.dart';
-import '../../widgets/button_text.dart';
 import '../provider.dart';
 import '../theme/model.dart';
 
-class SettingsThemeScreen extends HookConsumerWidget {
-  const SettingsThemeScreen({super.key});
+class SettingsDesignScreen extends HookConsumerWidget {
+  const SettingsDesignScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,8 +41,7 @@ class SettingsThemeScreen extends HookConsumerWidget {
           themeSettings.copyWith(themeModeSetting: value),
         );
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.designTitle,
       content: SingleChildScrollView(
         child: Material(
@@ -53,8 +51,10 @@ class SettingsThemeScreen extends HookConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(localizations.designSectionThemeTitle,
-                      style: theme.textTheme.titleMedium),
+                  Text(
+                    localizations.designSectionThemeTitle,
+                    style: theme.textTheme.titleMedium,
+                  ),
                   PlatformRadioListTile<ThemeModeSetting>(
                     title: Text(localizations.designThemeOptionLight),
                     value: ThemeModeSetting.light,
@@ -88,7 +88,7 @@ class SettingsThemeScreen extends HookConsumerWidget {
                     Row(
                       children: [
                         PlatformTextButton(
-                          child: ButtonText(
+                          child: Text(
                             localizations.designThemeCustomStart(
                               darkThemeStartTime.format(context),
                             ),
@@ -109,8 +109,11 @@ class SettingsThemeScreen extends HookConsumerWidget {
                           },
                         ),
                         PlatformTextButton(
-                          child: ButtonText(localizations.designThemeCustomEnd(
-                              darkThemeEndTime.format(context))),
+                          child: Text(
+                            localizations.designThemeCustomEnd(
+                              darkThemeEndTime.format(context),
+                            ),
+                          ),
                           onPressed: () async {
                             final pickedTime = await showPlatformTimePicker(
                               context: context,

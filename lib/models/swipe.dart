@@ -1,8 +1,7 @@
-import 'package:enough_mail_app/services/icon_service.dart';
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.g.dart';
 
-import '../locator.dart';
+import '../localization/app_localizations.g.dart';
+import '../settings/theme/icon_service.dart';
 
 enum SwipeAction {
   markRead,
@@ -17,15 +16,15 @@ extension SwipeExtension on SwipeAction {
   Color get colorBackground {
     switch (this) {
       case SwipeAction.markRead:
-        return Colors.blue[200]!;
+        return Colors.blue[200] ?? Colors.lightBlue;
       case SwipeAction.archive:
-        return Colors.amber[200]!;
+        return Colors.amber[200] ?? Colors.amber;
       case SwipeAction.markJunk:
-        return Colors.red[200]!;
+        return Colors.red[200] ?? Colors.orangeAccent;
       case SwipeAction.delete:
-        return Colors.red[600]!;
+        return Colors.red[600] ?? Colors.red;
       case SwipeAction.flag:
-        return Colors.lime[600]!;
+        return Colors.lime[600] ?? Colors.lime;
     }
   }
 
@@ -47,15 +46,15 @@ extension SwipeExtension on SwipeAction {
   Color get colorIcon {
     switch (this) {
       case SwipeAction.markRead:
-        return Colors.blue[900]!;
+        return Colors.blue[900] ?? Colors.blue;
       case SwipeAction.archive:
-        return Colors.amber[900]!;
+        return Colors.amber[900] ?? Colors.amber;
       case SwipeAction.markJunk:
-        return Colors.red[900]!;
+        return Colors.red[900] ?? Colors.red;
       case SwipeAction.delete:
         return Colors.white;
       case SwipeAction.flag:
-        return Colors.lime[900]!;
+        return Colors.lime[900] ?? Colors.lime;
     }
   }
 
@@ -76,7 +75,7 @@ extension SwipeExtension on SwipeAction {
 
   /// Icon of the action
   IconData get icon {
-    final iconService = locator<IconService>();
+    final iconService = IconService.instance;
     switch (this) {
       case SwipeAction.markRead:
         return iconService.messageIsNotSeen;

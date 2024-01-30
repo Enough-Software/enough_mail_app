@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../logger.dart';
 import '../offline_mime_storage.dart';
 
 part 'hive_mime_storage.g.dart';
@@ -13,7 +14,8 @@ part 'hive_mime_storage.g.dart';
 /// 1) list of SequenceId-UID-GUID elements - to be loaded when mailbox is
 ///    opened, possibly along with envelope data of first page to speed up
 ///     loading
-/// 2) possibly envelope data by GUID (contains flags, subject, senders, recipients, date, has-attachment, possibly message preview)
+/// 2) possibly envelope data by GUID (contains flags, subject, senders,
+///    recipients, date, has-attachment, possibly message preview)
 /// 3) downloaded message data by GUID - this may not (yet) contain attachments
 ///
 /// new message:
@@ -48,12 +50,16 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
   late List<StorageMessageId> _allMessageIds;
 
   static String _getBoxName(
-          MailAccount mailAccount, Mailbox mailbox, String name) =>
+    MailAccount mailAccount,
+    Mailbox mailbox,
+    String name,
+  ) =>
       '${mailAccount.email}_${mailbox.encodedPath.replaceAll('/', '_')}_$name';
 
   static Future<void> initGlobal() async {
-    Hive.registerAdapter(StorageMessageIdAdapter());
-    Hive.registerAdapter(StorageMessageEnvelopeAdapter());
+    Hive
+      ..registerAdapter(StorageMessageIdAdapter())
+      ..registerAdapter(StorageMessageEnvelopeAdapter());
     await Hive.initFlutter();
   }
 
@@ -81,11 +87,12 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
   Future<List<MimeMessage>?> loadMessageEnvelopes(
     MessageSequence sequence,
   ) async {
-    print('load offline message for ${_mailAccount.name}');
+    logger.d('load offline message for ${_mailAccount.name}');
     final ids = sequence.toList(_mailbox.messagesExists);
     final allIds = _allMessageIds;
     if (allIds.length < ids.length) {
-      print('${_mailAccount.name}: not enough ids (${allIds.length})');
+      logger.d('${_mailAccount.name}: not enough ids (${allIds.length})');
+
       return null;
     }
     final envelopes = <MimeMessage>[];
@@ -94,20 +101,28 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
       final messageId = allIds.firstWhereOrNull((messageId) =>
           isUid ? messageId.uid == id : messageId.sequenceId == id);
       if (messageId == null) {
-        print(
-            '${_mailAccount.name}: ${isUid ? 'uid' : 'sequence-id'} $id not found in allIds');
+        logger.d(
+          '${_mailAccount.name}: ${isUid ? 'uid' : 'sequence-id'}'
+          ' $id not found in allIds',
+        );
+
         return null;
       }
       final messageEnvelope = await _boxEnvelopes.get(messageId.guid);
       if (messageEnvelope == null) {
-        print(
-            '${_mailAccount.name}: message data not found for guid ${messageId.guid} belonging to ${isUid ? 'uid' : 'sequence-id'} $id ');
+        logger.d(
+          '${_mailAccount.name}: message data not found for '
+          'guid ${messageId.guid} belonging to '
+          '${isUid ? 'uid' : 'sequence-id'} $id ',
+        );
+
         return null;
       }
       final mimeMessage = messageEnvelope.toMimeMessage();
       envelopes.add(mimeMessage);
     }
-    print('${_mailAccount.name}: all messages loaded offline :-)');
+    logger.d('${_mailAccount.name}: all messages loaded offline :-)');
+
     return envelopes;
   }
 
@@ -130,8 +145,8 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
       if (guid != null) {
         final existingMessageId =
             allMessageIds.firstWhereOrNull((id) => id.guid == guid);
-        final sequenceId = message.sequenceId!;
-        final uid = message.uid!;
+        final sequenceId = message.sequenceId ?? 0;
+        final uid = message.uid ?? 0;
         if (existingMessageId == null) {
           addedMessageIds++;
           final messageId =
@@ -148,10 +163,13 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
     }
     final futures = [
       _boxEnvelopes.putAll(map),
-      _boxIds.put(_keyMessageIds, allMessageIds)
+      _boxIds.put(_keyMessageIds, allMessageIds),
     ];
-    print(
-        '${_mailAccount.name}: saved message envelopes :-)  (ids: $addedMessageIds (total: ${allMessageIds.length}) / envelopes: ${map.length})');
+    logger.d(
+      '${_mailAccount.name}: saved message envelopes :-)  '
+      '(ids: $addedMessageIds (total: ${allMessageIds.length}) / '
+      'envelopes: ${map.length})',
+    );
     await Future.wait(futures);
   }
 
@@ -169,6 +187,7 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
     if (existingContent == null) {
       return null;
     }
+
     return MimeMessage.parseFromText(existingContent);
   }
 
@@ -179,6 +198,7 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
       Hive.deleteBoxFromDisk(_boxNameEnvelopes),
       Hive.deleteBoxFromDisk(_boxNameFullMessages),
     ];
+
     return Future.wait(futures);
   }
 
@@ -188,8 +208,9 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
     if (guid == null) {
       return Future.value();
     }
-    print('delete message with guid $guid from storage');
+    logger.d('delete message with guid $guid from storage');
     _allMessageIds.removeWhere((id) => id.guid == guid);
+
     return Future.wait([
       _boxIds.put(_keyMessageIds, _allMessageIds),
       _boxEnvelopes.delete(guid),
@@ -199,7 +220,7 @@ class HiveMailboxMimeStorage extends OfflineMimeStorage {
 
   @override
   Future<void> moveMessages(List<MimeMessage> messages, Mailbox targetMailbox) {
-    // TODO: implement moveMessages
+    // TODO(RV): implement moveMessages
     throw UnimplementedError();
   }
 }
@@ -230,6 +251,7 @@ class TextHiveStorage {
   Future<String?> load(String key) async {
     final box = _textBox ?? await Hive.openBox<String>(_keyTextBox);
     _textBox ??= box;
+
     return box.get(key);
   }
 }
@@ -317,6 +339,7 @@ class StorageMessageEnvelope {
         flags: message.flags,
       );
     }
+
     return StorageMessageEnvelope(
       uid: uid,
       guid: guid,
@@ -377,11 +400,12 @@ class StorageMessageEnvelope {
 
   Envelope toEnvelope() {
     List<MailAddress>? parseAddresses(List<String>? input) =>
-        input?.map((s) => MailAddress.parse(s)).toList();
+        input?.map(MailAddress.parse).toList();
     MailAddress? parse(String? input) {
       if (input == null) {
         return null;
       }
+
       return MailAddress.parse(input);
     }
 

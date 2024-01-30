@@ -1,13 +1,37 @@
 {
+    "dart.flutterSdkPath": ".fvm/flutter_sdk",
+    // Remove .fvm files from search
+    "search.exclude": {
+      "**/.fvm": true
+    },
+    // Remove from file watching
+    "files.watcherExclude": {
+      "**/.fvm": true
+    },
     "cSpell.words": [
-        "autofocus",
-        "Cupertino",
-        "Ical",
-        "icalendar",
-        "Imap",
-        "LTRB",
-        "Maily",
-        "riverpod",
-        "unawaited"
+      "autocorrect",
+      "autofocus",
+      "Cupertino",
+      "datetime",
+      "finalizer",
+      "finalizers",
+      "fluttercontactpicker",
+      "giphy",
+      "hoster",
+      "hosters",
+      "Ical",
+      "icalendar",
+      "Imap",
+      "lerp",
+      "LTRB",
+      "Maily",
+      "mocktail",
+      "QRESYNC",
+      "redepth",
+      "riverpod",
+      "Toptype",
+      "uids",
+      "unawaited",
+      "unfocus"
     ]
 }

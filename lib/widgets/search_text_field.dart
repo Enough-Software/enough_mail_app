@@ -1,35 +1,43 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/models/message_source.dart';
-import 'package:enough_mail_app/routes.dart';
-import 'package:enough_mail_app/services/navigation_service.dart';
 import 'package:enough_platform_widgets/cupertino.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../locator.dart';
+import '../localization/extension.dart';
+import '../models/message_source.dart';
+import '../routes/routes.dart';
 
 /// A dedicated search field optimized for Cupertino
 class CupertinoSearch extends StatelessWidget {
-  const CupertinoSearch({Key? key, required this.messageSource})
-      : super(key: key);
+  /// Creates a new [CupertinoSearch]
+  const CupertinoSearch({super.key, required this.messageSource});
 
+  /// The source in which should be searched
   final MessageSource messageSource;
 
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
+
     return CupertinoSearchFlowTextField(
-        onSubmitted: _onSearchSubmitted,
-        cancelText: localizations.actionCancel);
+      onSubmitted: (text) => _onSearchSubmitted(context, text.trim()),
+      cancelText: localizations.actionCancel,
+    );
   }
 
-  void _onSearchSubmitted(String text) {
+  void _onSearchSubmitted(BuildContext context, String text) {
+    if (text.isEmpty) {
+      return;
+    }
     final search = MailSearch(text, SearchQueryType.allTextHeaders);
-    final next = messageSource.search(search);
-    locator<NavigationService>().push(
+    final next = messageSource.search(context.text, search);
+    context.pushNamed(
       Routes.messageSource,
-      arguments: next,
+      pathParameters: {
+        Routes.pathParameterEmail: messageSource.account.email,
+      },
+      extra: next,
     );
   }
 }

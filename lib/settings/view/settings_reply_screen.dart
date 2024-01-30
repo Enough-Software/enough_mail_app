@@ -2,7 +2,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../l10n/extension.dart';
+import '../../localization/extension.dart';
 import '../../screens/base.dart';
 import '../model.dart';
 import '../provider.dart';
@@ -28,8 +28,7 @@ class SettingsReplyScreen extends ConsumerWidget {
       settingsProvider.select((value) => value.replyFormatPreference),
     );
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.replySettingsTitle,
       content: SingleChildScrollView(
         child: SafeArea(

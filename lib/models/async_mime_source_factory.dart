@@ -1,7 +1,8 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/async_mime_source.dart';
-import 'package:enough_mail_app/models/offline_mime_source.dart';
-import 'package:enough_mail_app/models/offline_mime_storage_factory.dart';
+
+import 'async_mime_source.dart';
+import 'offline_mime_source.dart';
+import 'offline_mime_storage_factory.dart';
 
 /// Creates [AsyncMimeSource] instances
 class AsyncMimeSourceFactory {
@@ -21,13 +22,16 @@ class AsyncMimeSourceFactory {
 
   /// Creates a new mailbox-based mime source
   AsyncMimeSource createMailboxMimeSource(
-      MailClient mailClient, Mailbox mailbox) {
+    MailClient mailClient,
+    Mailbox mailbox,
+  ) {
     final onlineSource = AsyncMailboxMimeSource(mailbox, mailClient);
     if (_isOfflineModeSupported) {
       final storage = _storageFactory.getMailboxStorage(
         mailAccount: mailClient.account,
         mailbox: mailbox,
       );
+
       return OfflineMailboxMimeSource(
         mailAccount: mailClient.account,
         mailbox: mailbox,
@@ -35,6 +39,7 @@ class AsyncMimeSourceFactory {
         storage: storage,
       );
     }
+
     return onlineSource;
   }
 

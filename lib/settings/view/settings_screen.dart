@@ -1,22 +1,22 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../l10n/extension.dart';
-import '../../locator.dart';
-import '../../routes.dart';
+import '../../localization/extension.dart';
+import '../../routes/routes.dart';
 import '../../screens/base.dart';
-import '../../services/navigation_service.dart';
 import '../../util/localized_dialog_helper.dart';
 
+/// Allows to personalize the app settings
 class SettingsScreen extends StatelessWidget {
+  /// Creates a new [SettingsScreen]
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final localizations = context.text;
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.settingsTitle,
       content: SingleChildScrollView(
         child: SafeArea(
@@ -28,73 +28,68 @@ class SettingsScreen extends StatelessWidget {
                 PlatformListTile(
                   title: Text(localizations.securitySettingsTitle),
                   onTap: () {
-                    locator<NavigationService>().push(Routes.settingsSecurity);
+                    context.pushNamed(Routes.settingsSecurity);
                   },
                 ),
                 PlatformListTile(
                   title: Text(localizations.settingsActionAccounts),
                   onTap: () {
-                    locator<NavigationService>().push(Routes.settingsAccounts);
+                    context.pushNamed(Routes.settingsAccounts);
                   },
                 ),
                 PlatformListTile(
                   title: Text(localizations.swipeSettingTitle),
                   onTap: () {
-                    locator<NavigationService>().push(Routes.settingsSwipe);
+                    context.pushNamed(Routes.settingsSwipe);
                   },
                 ),
                 PlatformListTile(
                   title: Text(localizations.signatureSettingsTitle),
                   onTap: () {
-                    locator<NavigationService>()
-                        .push(Routes.settingsSignature, containsModals: true);
+                    context.pushNamed(Routes.settingsSignature);
                   },
                 ),
                 PlatformListTile(
                   title: Text(localizations.defaultSenderSettingsTitle),
                   onTap: () {
-                    locator<NavigationService>()
-                        .push(Routes.settingsDefaultSender);
+                    context.pushNamed(Routes.settingsDefaultSender);
                   },
                 ),
-                if (!PlatformInfo.isCupertino)
-                  PlatformListTile(
-                    title: Text(localizations.settingsActionDesign),
-                    onTap: () {
-                      locator<NavigationService>().push(Routes.settingsDesign);
-                    },
-                  ),
+                PlatformListTile(
+                  title: Text(localizations.settingsActionDesign),
+                  onTap: () {
+                    context.pushNamed(Routes.settingsDesign);
+                  },
+                ),
                 PlatformListTile(
                   title: Text(localizations.languageSettingTitle),
                   onTap: () {
-                    locator<NavigationService>().push(Routes.settingsLanguage);
+                    context.pushNamed(Routes.settingsLanguage);
                   },
                 ),
                 PlatformListTile(
                   title: Text(localizations.settingsFolders),
                   onTap: () {
-                    locator<NavigationService>().push(Routes.settingsFolders);
+                    context.pushNamed(Routes.settingsFolders);
                   },
                 ),
                 PlatformListTile(
                   title: Text(localizations.settingsReadReceipts),
                   onTap: () {
-                    locator<NavigationService>()
-                        .push(Routes.settingsReadReceipts);
+                    context.pushNamed(Routes.settingsReadReceipts);
                   },
                 ),
                 PlatformListTile(
                   title: Text(localizations.replySettingsTitle),
                   onTap: () {
-                    locator<NavigationService>()
-                        .push(Routes.settingsReplyFormat);
+                    context.pushNamed(Routes.settingsReplyFormat);
                   },
                 ),
                 const Divider(),
                 PlatformListTile(
                   title: Text(localizations.settingsActionFeedback),
                   onTap: () {
-                    locator<NavigationService>().push(Routes.settingsFeedback);
+                    context.pushNamed(Routes.settingsFeedback);
                   },
                 ),
                 PlatformListTile(
@@ -105,7 +100,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 PlatformListTile(
                   onTap: () {
-                    locator<NavigationService>().push(Routes.welcome);
+                    context.pushNamed(Routes.welcome);
                   },
                   title: Text(localizations.settingsActionWelcome),
                 ),
@@ -113,8 +108,7 @@ class SettingsScreen extends StatelessWidget {
                 PlatformListTile(
                   title: Text(localizations.settingsDevelopment),
                   onTap: () {
-                    locator<NavigationService>()
-                        .push(Routes.settingsDevelopment);
+                    context.pushNamed(Routes.settingsDevelopment);
                   },
                 ),
               ],

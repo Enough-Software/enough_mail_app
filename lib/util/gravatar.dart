@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:crypto/crypto.dart';
 
 enum GravatarImage {
@@ -37,13 +38,16 @@ class Gravatar {
     if (rating != null) query['r'] = _ratingString(rating);
     if (fileExtension) hashDigest += '.png';
 
-    return Uri.https('www.gravatar.com', '/avatar/$hashDigest',
-            query.isEmpty ? null : query)
-        .toString();
+    return Uri.https(
+      'www.gravatar.com',
+      '/avatar/$hashDigest',
+      query.isEmpty ? null : query,
+    ).toString();
   }
 
   static String _generateHash(String email) {
     final preparedEmail = email.trim().toLowerCase();
+
     return md5.convert(utf8.encode(preparedEmail)).toString();
   }
 
@@ -67,6 +71,7 @@ class Gravatar {
         return 'mp';
       case GravatarImage.identicon:
         return 'identicon';
+      // cSpell: ignore monsterid, wavatar, robohash
       case GravatarImage.monsterid:
         return 'monsterid';
       case GravatarImage.wavatar:

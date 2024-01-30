@@ -1,13 +1,14 @@
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/widgets/text_with_links.dart';
 import 'package:flutter/material.dart';
 
+import '../localization/extension.dart';
+import 'text_with_links.dart';
+
 class Legalese extends StatelessWidget {
+  const Legalese({super.key});
   static const String urlPrivacyPolicy =
       'https://www.enough.de/privacypolicy/maily-pp.html';
   static const String urlTermsAndConditions =
       'https://github.com/Enough-Software/enough_mail_app/blob/main/LICENSE';
-  const Legalese({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,7 @@ class Legalese extends StatelessWidget {
       TextLink(termsAndConditions, urlTermsAndConditions),
       TextLink(legaleseUsage.substring(tcIndex + '[TC]'.length)),
     ];
+
     return TextWithNamedLinks(
       parts: legaleseParts,
     );

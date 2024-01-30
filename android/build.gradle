@@ -4,7 +4,7 @@ buildscript {
        minSdkVersion       = 21                // or higher
        compileSdkVersion   = 34                // or higher
        targetSdkVersion    = 34                // or higher
-       appCompatVersion    = "1.2.0"           // or higher
+       appCompatVersion    = "1.4.2"           // or higher
    }
     repositories {
         google()
@@ -12,7 +12,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath 'com.android.tools.build:gradle:7.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }

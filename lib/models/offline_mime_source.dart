@@ -10,16 +10,16 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
   /// Creates a new [OfflineMailboxMimeSource]
   OfflineMailboxMimeSource({
     required MailAccount mailAccount,
-    required Mailbox mailbox,
+    required this.mailbox,
     required PagedCachedMimeSource onlineMimeSource,
     required OfflineMimeStorage storage,
   })  : _mailAccount = mailAccount,
-        _mailbox = mailbox,
         _onlineMimeSource = onlineMimeSource,
         _storage = storage;
 
   final MailAccount _mailAccount;
-  final Mailbox _mailbox;
+  @override
+  final Mailbox mailbox;
   final PagedCachedMimeSource _onlineMimeSource;
   final OfflineMimeStorage _storage;
 
@@ -65,8 +65,39 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
       responseTimeout: responseTimeout,
     );
     await _storage.saveMessageContents(onlineContents);
+
     return onlineContents;
   }
+
+  @override
+  Future<MimePart> fetchMessagePart(
+    MimeMessage message, {
+    required String fetchId,
+    Duration? responseTimeout,
+  }) =>
+      _onlineMimeSource.fetchMessagePart(
+        message,
+        fetchId: fetchId,
+        responseTimeout: responseTimeout,
+      );
+
+  @override
+  Future<void> sendMessage(
+    MimeMessage message, {
+    MailAddress? from,
+    bool appendToSent = true,
+    Mailbox? sentMailbox,
+    bool use8BitEncoding = false,
+    List<MailAddress>? recipients,
+  }) =>
+      _onlineMimeSource.sendMessage(
+        message,
+        from: from,
+        appendToSent: appendToSent,
+        sentMailbox: sentMailbox,
+        use8BitEncoding: use8BitEncoding,
+        recipients: recipients,
+      );
 
   @override
   Future<void> handleOnMessageArrived(int index, MimeMessage message) =>
@@ -82,19 +113,19 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
       );
 
   @override
-  bool get isArchive => _mailbox.isArchive;
+  bool get isArchive => mailbox.isArchive;
 
   @override
-  bool get isInbox => _mailbox.isInbox;
+  bool get isInbox => mailbox.isInbox;
 
   @override
-  bool get isJunk => _mailbox.isJunk;
+  bool get isJunk => mailbox.isJunk;
 
   @override
-  bool get isSent => _mailbox.isSent;
+  bool get isSent => mailbox.isSent;
 
   @override
-  bool get isTrash => _mailbox.isTrash;
+  bool get isTrash => mailbox.isTrash;
 
   @override
   Future<List<MimeMessage>> loadMessages(MessageSequence sequence) async {
@@ -104,6 +135,7 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
     }
     final onlineMessages = await _onlineMimeSource.loadMessages(sequence);
     await _storage.saveMessageEnvelopes(onlineMessages);
+
     return onlineMessages;
   }
 
@@ -112,7 +144,9 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
 
   @override
   Future<MoveResult> moveMessages(
-      List<MimeMessage> messages, Mailbox targetMailbox) async {
+    List<MimeMessage> messages,
+    Mailbox targetMailbox,
+  ) async {
     // TODO(RV): this and most other offline ops should be done with a queue
     // Some ops can be done offline and an later online, e.g. store flags
     // Some ops must update their offline part after having finished it online,
@@ -123,37 +157,40 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
     final result =
         await _onlineMimeSource.moveMessages(messages, targetMailbox);
     await _storage.moveMessages(messages, targetMailbox);
+
     return result;
   }
 
   @override
   Future<MoveResult> moveMessagesToFlag(
-      List<MimeMessage> messages, MailboxFlag targetMailboxFlag) {
-    // TODO: implement moveMessagesToFlag
+    List<MimeMessage> messages,
+    MailboxFlag targetMailboxFlag,
+  ) {
+    // TODO(RV): implement moveMessagesToFlag
     throw UnimplementedError();
   }
 
   @override
   Future<MoveResult> undoMoveMessages(MoveResult moveResult) {
-    // TODO: implement undoMoveMessages
+    // TODO(RV): implement undoMoveMessages
     throw UnimplementedError();
   }
 
   @override
   Future<List<DeleteResult>> deleteAllMessages({bool expunge = false}) {
-    // TODO: implement deleteAllMessages
+    // TODO(RV): implement deleteAllMessages
     throw UnimplementedError();
   }
 
   @override
   Future<DeleteResult> deleteMessages(List<MimeMessage> messages) {
-    // TODO: implement deleteMessages
+    // TODO(RV): implement deleteMessages
     throw UnimplementedError();
   }
 
   @override
   Future<DeleteResult> undoDeleteMessages(DeleteResult deleteResult) {
-    // TODO: implement undoDeleteMessages
+    // TODO(RV): implement undoDeleteMessages
     throw UnimplementedError();
   }
 
@@ -162,12 +199,12 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
 
   @override
   AsyncMimeSource search(MailSearch search) {
-    // TODO: implement search
+    // TODO(RV): implement search
     throw UnimplementedError();
   }
 
   @override
-  int get size => _mailbox.messagesExists;
+  int get size => mailbox.messagesExists;
 
   @override
   Future<void> store(
@@ -191,7 +228,7 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
     List<String> flags, {
     StoreAction action = StoreAction.add,
   }) {
-    // TODO: implement storeAll
+    // TODO(RV): implement storeAll
     throw UnimplementedError();
   }
 

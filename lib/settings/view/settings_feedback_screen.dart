@@ -8,11 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
-import '../../l10n/extension.dart';
-import '../../locator.dart';
+import '../../localization/extension.dart';
+import '../../scaffold_messenger/service.dart';
 import '../../screens/base.dart';
-import '../../services/scaffold_messenger_service.dart';
-import '../../widgets/button_text.dart';
 
 class SettingsFeedbackScreen extends StatefulWidget {
   const SettingsFeedbackScreen({super.key});
@@ -34,18 +32,27 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
     final packageInfo = await PackageInfo.fromPlatform();
     var textualInfo =
         'Maily v${packageInfo.version}+${packageInfo.buildNumber}\n'
-        'Platform ${Platform.operatingSystem} ${Platform.operatingSystemVersion}\n';
-    if (Platform.isAndroid || Platform.isIOS) {
-      final deviceInfoPlugin = DeviceInfoPlugin();
-      if (Platform.isAndroid) {
-        final androidInfo = await deviceInfoPlugin.androidInfo;
-        textualInfo +=
-            '${androidInfo.manufacturer}/${androidInfo.model} (${androidInfo.device})\nAndroid ${androidInfo.version.release} with API level ${androidInfo.version.sdkInt}';
-      } else {
-        final iosInfo = await deviceInfoPlugin.iosInfo;
-        textualInfo +=
-            '${iosInfo.localizedModel}\n${iosInfo.systemName}/${iosInfo.systemVersion}\n';
-      }
+        'Platform '
+        '${Platform.operatingSystem} ${Platform.operatingSystemVersion}\n';
+    final deviceInfoPlugin = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfoPlugin.androidInfo;
+      textualInfo += '${androidInfo.manufacturer}/${androidInfo.model} '
+          '(${androidInfo.device})\nAndroid ${androidInfo.version.release} '
+          'with API level ${androidInfo.version.sdkInt}';
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfoPlugin.iosInfo;
+      textualInfo += '${iosInfo.localizedModel}\n'
+          '${iosInfo.systemName}/${iosInfo.systemVersion}\n';
+    } else if (Platform.isWindows) {
+      final windowsInfo = await deviceInfoPlugin.windowsInfo;
+      textualInfo += '${windowsInfo.productName}\n${windowsInfo.majorVersion}.'
+          '${windowsInfo.minorVersion} ${windowsInfo.displayVersion}\n';
+    } else if (Platform.isMacOS) {
+      final macOsInfo = await deviceInfoPlugin.macOsInfo;
+      textualInfo += '${macOsInfo.model}\n'
+          'MacOS ${macOsInfo.majorVersion}.${macOsInfo.minorVersion} '
+          '${macOsInfo.osRelease}\n';
     }
     setState(() {
       info = textualInfo;
@@ -57,8 +64,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
     final theme = Theme.of(context);
     final localizations = context.text;
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.feedbackTitle,
       content: SingleChildScrollView(
         child: SafeArea(
@@ -69,8 +75,10 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8),
-                  child: Text(localizations.feedbackIntro,
-                      style: theme.textTheme.titleMedium),
+                  child: Text(
+                    localizations.feedbackIntro,
+                    style: theme.textTheme.titleMedium,
+                  ),
                 ),
                 if (info == null)
                   const Padding(
@@ -87,7 +95,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Text(info!),
+                    child: Text(info ?? ''),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8),
@@ -95,8 +103,10 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                       icon: Icon(CommonPlatformIcons.copy),
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: info ?? ''));
-                        locator<ScaffoldMessengerService>().showTextSnackBar(
-                            localizations.feedbackResultInfoCopied);
+                        ScaffoldMessengerService.instance.showTextSnackBar(
+                          localizations,
+                          localizations.feedbackResultInfoCopied,
+                        );
                       },
                     ),
                   ),
@@ -104,8 +114,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: PlatformTextButton(
-                    child:
-                        ButtonText(localizations.feedbackActionSuggestFeature),
+                    child: Text(localizations.feedbackActionSuggestFeature),
                     onPressed: () async {
                       await launcher
                           .launchUrl(Uri.parse('https://maily.userecho.com/'));
@@ -115,8 +124,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: PlatformTextButton(
-                    child:
-                        ButtonText(localizations.feedbackActionReportProblem),
+                    child: Text(localizations.feedbackActionReportProblem),
                     onPressed: () async {
                       await launcher
                           .launchUrl(Uri.parse('https://maily.userecho.com/'));
@@ -126,11 +134,13 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: PlatformTextButton(
-                    child:
-                        ButtonText(localizations.feedbackActionHelpDeveloping),
+                    child: Text(localizations.feedbackActionHelpDeveloping),
                     onPressed: () async {
-                      await launcher.launchUrl(Uri.parse(
-                          'https://github.com/Enough-Software/enough_mail_app'));
+                      await launcher.launchUrl(
+                        Uri.parse(
+                          'https://github.com/Enough-Software/enough_mail_app',
+                        ),
+                      );
                     },
                   ),
                 ),

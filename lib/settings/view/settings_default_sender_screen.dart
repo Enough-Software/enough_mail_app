@@ -1,14 +1,13 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../l10n/extension.dart';
-import '../../locator.dart';
-import '../../routes.dart';
+import '../../account/provider.dart';
+import '../../localization/extension.dart';
+import '../../routes/routes.dart';
 import '../../screens/base.dart';
-import '../../services/mail_service.dart';
-import '../../services/navigation_service.dart';
 import '../../widgets/text_with_links.dart';
 import '../provider.dart';
 
@@ -40,10 +39,8 @@ class SettingsDefaultSenderScreen extends ConsumerWidget {
       ),
     );
 
-    final availableSenders = locator<MailService>()
-        .getSenders()
-        .map((sender) => sender.address)
-        .toList();
+    final availableSenders =
+        ref.watch(sendersProvider).map((sender) => sender.address).toList();
     final firstAccount = localizations
         .defaultSenderSettingsFirstAccount(availableSenders.first.email);
     final senders = [null, ...availableSenders];
@@ -56,13 +53,12 @@ class SettingsDefaultSenderScreen extends ConsumerWidget {
       TextLink(aliasInfo.substring(0, asIndex)),
       TextLink.callback(
         accountSettings,
-        () => locator<NavigationService>().push(Routes.settingsAccounts),
+        () => context.pushNamed(Routes.settingsAccounts),
       ),
       TextLink(aliasInfo.substring(asIndex + '[AS]'.length)),
     ];
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.defaultSenderSettingsTitle,
       content: SingleChildScrollView(
         child: SafeArea(
@@ -71,8 +67,10 @@ class SettingsDefaultSenderScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(localizations.defaultSenderSettingsLabel,
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  localizations.defaultSenderSettingsLabel,
+                  style: theme.textTheme.bodySmall,
+                ),
                 FittedBox(
                   child: PlatformDropdownButton<MailAddress>(
                     value: defaultSender,

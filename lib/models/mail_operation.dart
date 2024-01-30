@@ -3,9 +3,8 @@ import 'dart:convert';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:enough_mail_app/models/offline_mime_storage.dart';
-
 import 'hive/hive_mime_storage.dart';
+import 'offline_mime_storage.dart';
 
 part 'mail_operation.g.dart';
 
@@ -52,7 +51,7 @@ class MailOperationQueue {
   Future<void> _storeQueue() async {
     final list = _queue.map((e) => e.toJson()).toList();
     final value = json.encode(list);
-    TextHiveStorage.instance.save(_keyQueue, value);
+    await TextHiveStorage.instance.save(_keyQueue, value);
   }
 
   /// Loads the [MailOperationQueue]
@@ -62,7 +61,13 @@ class MailOperationQueue {
       return MailOperationQueue._(<_QueuedMailOperation>[]);
     }
     final data = json.decode(savedData) as List;
-    final entries = data.map((e) => _QueuedMailOperation.fromJson(e)).toList();
+    final entries = data
+        .map(
+          // ignore: unnecessary_lambdas
+          (json) => _QueuedMailOperation.fromJson(json),
+        )
+        .toList();
+
     return MailOperationQueue._(entries);
   }
 }
@@ -80,14 +85,15 @@ class _QueuedMailOperation {
         operation = StoreFlagsOperation.fromJson(data);
         break;
       // case MailOperationType.moveToFlag:
-      //   // TODO: Handle this case.
+      // TODO(RV): Handle this case.
       //   break;
       // case MailOperationType.moveToFolder:
-      //   // TODO: Handle this case.
+      // TODO(RV): Handle this case.
       //   break;
       default:
         throw FormatException('Unsupported type $type');
     }
+
     return _QueuedMailOperation(operation, email);
   }
 
@@ -110,22 +116,22 @@ class StoreFlagsOperation extends MailOperation {
     required this.sequence,
   }) : super(MailOperationType.storeFlags);
 
+  // De-serialized the JSON to a store flags operation
+  factory StoreFlagsOperation.fromJson(Map<String, dynamic> json) =>
+      _$StoreFlagsOperationFromJson(json);
+
   /// The flags to store
   final List<String> flags;
 
   /// The sequence of messages
   final MessageSequence sequence;
 
-  // De-serialized the JSON to a store flags operation
-  factory StoreFlagsOperation.fromJson(Map<String, dynamic> json) =>
-      _$StoreFlagsOperationFromJson(json);
-
   /// Serializes the data to JSON
   Map<String, dynamic> toJson() => _$StoreFlagsOperationToJson(this);
 
   @override
   Future<void> execute(MailClient mailClient, OfflineMimeStorage storage) {
-    // TODO: implement execute
+    // TODO(RV): implement execute
     throw UnimplementedError();
   }
 }

@@ -1,17 +1,22 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/l10n/extension.dart';
-import 'package:enough_mail_app/models/contact.dart';
-import 'package:enough_mail_app/util/validator.dart';
-import 'package:enough_mail_app/widgets/icon_text.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class RecipientInputField extends StatefulWidget {
+import '../app_lifecycle/provider.dart';
+import '../contact/model.dart';
+import '../localization/extension.dart';
+import '../logger.dart';
+import '../util/validator.dart';
+import 'icon_text.dart';
+
+/// Allows to enter recipients for a message
+class RecipientInputField extends StatefulHookConsumerWidget {
+  /// Creates a new [RecipientInputField]
   const RecipientInputField({
-    Key? key,
+    super.key,
     this.labelText,
     this.hintText,
     this.controller,
@@ -19,25 +24,41 @@ class RecipientInputField extends StatefulWidget {
     this.autofocus = false,
     required this.addresses,
     required this.contactManager,
-  }) : super(key: key);
+  });
 
+  /// Optional label text
   final String? labelText;
+
+  /// Optional hint text
   final String? hintText;
+
+  /// Optional controller
   final TextEditingController? controller;
+
+  /// Optional additional suffix icon
   final Widget? additionalSuffixIcon;
+
+  /// Should the field be focused on first build?
+  ///
+  /// Defaults to `false`
   final bool autofocus;
+
+  /// The list of addresses
   final List<MailAddress> addresses;
+
+  /// The optional contact manager
   final ContactManager? contactManager;
 
   @override
-  State<RecipientInputField> createState() => _RecipientInputFieldState();
+  ConsumerState<RecipientInputField> createState() =>
+      _RecipientInputFieldState();
 }
 
 enum _AddressAction {
   copy,
 }
 
-class _RecipientInputFieldState extends State<RecipientInputField> {
+class _RecipientInputFieldState extends ConsumerState<RecipientInputField> {
   final _focusNode = FocusNode();
   late TextEditingController _controller;
 
@@ -56,7 +77,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
   }
 
   @override
-  dispose() {
+  void dispose() {
     super.dispose();
     _focusNode.dispose();
     _controller.dispose();
@@ -66,16 +87,18 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final localizations = context.text;
+
     return DragTarget<MailAddress>(
       builder: (context, candidateData, rejectedData) {
         final labelText = widget.labelText;
+
         return Container(
           color: candidateData.isEmpty ? null : theme.hoverColor,
           child: Wrap(
             children: [
               if (widget.addresses.isNotEmpty && labelText != null)
                 Padding(
-                  padding: const EdgeInsets.only(top: 8.0, right: 8.0),
+                  padding: const EdgeInsets.only(top: 8, right: 8),
                   child: Text(
                     labelText,
                     style: TextStyle(
@@ -96,7 +119,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                       ),
                     ),
                   ),
-                  feedbackOffset: const Offset(10.0, 10.0),
+                  feedbackOffset: const Offset(10, 10),
                   childWhenDragging: Opacity(
                     opacity: 0.6,
                     child: _AddressChip(
@@ -133,7 +156,9 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
         );
       },
       onAccept: (mailAddress) {
-        widget.addresses.add(mailAddress);
+        if (!widget.addresses.contains(mailAddress)) {
+          widget.addresses.add(mailAddress);
+        }
       },
       onLeave: (mailAddress) {
         widget.addresses.remove(mailAddress);
@@ -141,37 +166,36 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
     );
   }
 
-  Widget buildInput(ThemeData theme, BuildContext context) {
-    return RawAutocomplete<MailAddress>(
-      focusNode: _focusNode,
-      textEditingController: _controller,
-      optionsBuilder: (textEditingValue) {
-        final search = textEditingValue.text.toLowerCase();
-        if (search.length < 2) {
-          return [];
-        }
-        if (search.endsWith(' ') ||
-            search.endsWith(';') ||
-            search.endsWith(';')) {
-          // check if this is a complete email address
-          final email = textEditingValue.text.substring(0, search.length - 1);
-          checkEmail(email);
-        }
-        final contactManager = widget.contactManager;
-        if (contactManager == null) {
-          return [];
-        }
-        final matches = contactManager.find(search).toList();
-        // do not suggest recipients that are already added:
-        for (final existing in widget.addresses) {
-          matches.remove(existing);
-        }
-        return matches;
-      },
-      displayStringForOption: (option) => option.toString(),
-      fieldViewBuilder:
-          (context, textEditingController, focusNode, onFieldSubmitted) {
-        return DecoratedPlatformTextField(
+  Widget buildInput(ThemeData theme, BuildContext context) =>
+      RawAutocomplete<MailAddress>(
+        focusNode: _focusNode,
+        textEditingController: _controller,
+        optionsBuilder: (textEditingValue) {
+          final search = textEditingValue.text.toLowerCase();
+          if (search.length < 2) {
+            return [];
+          }
+          if (search.endsWith(' ') ||
+              search.endsWith(';') ||
+              search.endsWith(';')) {
+            // check if this is a complete email address
+            final email = textEditingValue.text.substring(0, search.length - 1);
+            checkEmail(email);
+          }
+          final contactManager = widget.contactManager;
+          if (contactManager == null) {
+            return [];
+          }
+          final matches = contactManager.find(search).toList();
+          // do not suggest recipients that are already added:
+          widget.addresses.forEach(matches.remove);
+
+          return matches;
+        },
+        displayStringForOption: (option) => option.toString(),
+        fieldViewBuilder:
+            (context, textEditingController, focusNode, onFieldSubmitted) =>
+                DecoratedPlatformTextField(
           controller: textEditingController,
           focusNode: focusNode,
           autofocus: widget.autofocus,
@@ -191,7 +215,7 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      widget.additionalSuffixIcon!,
+                      widget.additionalSuffixIcon ?? const SizedBox.shrink(),
                       PlatformIconButton(
                         icon: const Icon(Icons.contacts),
                         onPressed: () => _pickContact(textEditingController),
@@ -199,24 +223,26 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                     ],
                   ),
           ),
-        );
-      },
-      optionsViewBuilder: (context, onSelected, options) {
-        return Material(
+        ),
+        optionsViewBuilder: (context, onSelected, options) => Material(
           child: Align(
             alignment: Alignment.topLeft,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 200),
               child: ListView.builder(
                 shrinkWrap: true,
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 itemCount: options.length,
                 itemBuilder: (BuildContext context, int index) {
                   final MailAddress option = options.elementAt(index);
+
                   return PlatformActionChip(
                     label: Column(
                       children: [
-                        if (option.hasPersonalName) Text(option.personalName!),
+                        if (option.hasPersonalName)
+                          Text(
+                            option.personalName ?? '',
+                          ),
                         Text(option.email, style: theme.textTheme.bodySmall),
                       ],
                     ),
@@ -230,7 +256,8 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
                       } else {
                         _controller.value = TextEditingValue(
                           selection: TextSelection.collapsed(
-                              offset: currentTextInput.length),
+                            offset: currentTextInput.length,
+                          ),
                           text: currentTextInput,
                         );
                       }
@@ -240,10 +267,8 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
               ),
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
 
   void checkEmail(String input) {
     if (Validator.validateEmail(input)) {
@@ -254,46 +279,37 @@ class _RecipientInputFieldState extends State<RecipientInputField> {
     }
   }
 
-  void _pickContact(TextEditingController controller) async {
+  Future<void> _pickContact(TextEditingController controller) async {
     try {
-      final contact =
-          await FlutterContactPicker.pickEmailContact(askForPermission: true);
-      widget.addresses.add(
-        MailAddress(
-          contact.fullName,
-          contact.email!.email!,
-        ),
-      );
-      setState(() {});
+      ref
+          .read(appLifecycleProvider.notifier)
+          .ignoreNextInactivationCycle(timeout: const Duration(seconds: 120));
 
-      // final contact =
-      //     await FlutterContactPicker.pickEmailContact(askForPermission: true);
-      // widget.addresses
-      //     .add(MailAddress(contact.fullName, contact.email!.email!));
-      // setState(() {});
-      // if (controller.text.isNotEmpty) {
-      //   controller.text += '; ' + contact.email.email;
-      // } else {
-      //   controller.text = contact.email.email;
-      // }
-      // controller.selection =
-      //     TextSelection.collapsed(offset: controller.text.length);
-    } catch (e, s) {
-      if (kDebugMode) {
-        print('Unable to pick contact $e $s');
+      final contact = await FlutterContactPicker.pickEmailContact();
+      final email = contact.email?.email;
+      if (email != null) {
+        widget.addresses.add(
+          MailAddress(
+            contact.fullName,
+            email,
+          ),
+        );
       }
+      setState(() {});
+    } catch (e, s) {
+      logger.e('Unable to pick contact $e', error: e, stackTrace: s);
     }
   }
 }
 
 class _AddressChip<T> extends StatelessWidget {
   const _AddressChip({
-    Key? key,
+    super.key,
     required this.address,
     this.onDeleted,
     this.menuItems,
     this.onMenuItemSelected,
-  }) : super(key: key);
+  });
   final MailAddress address;
   final VoidCallback? onDeleted;
 
@@ -306,22 +322,24 @@ class _AddressChip<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final content = PlatformChip(
-        label: Column(
-          children: [
-            Text(address.personalName ?? ''),
-            Text(address.email, style: Theme.of(context).textTheme.bodySmall),
-          ],
-        ),
-        deleteIcon: const Icon(Icons.close),
-        onDeleted: onDeleted);
+      label: Column(
+        children: [
+          Text(address.personalName ?? ''),
+          Text(address.email, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+      deleteIcon: const Icon(Icons.close),
+      onDeleted: onDeleted,
+    );
     final menuItems = this.menuItems;
     if (menuItems == null) {
       return content;
     }
     final theme = Theme.of(context);
+
     return PlatformPopupMenuButton<T>(
       cupertinoButtonPadding: EdgeInsets.zero,
-      title: address.hasPersonalName ? Text(address.personalName!) : null,
+      title: address.hasPersonalName ? Text(address.personalName ?? '') : null,
       message: Text(address.email, style: theme.textTheme.bodySmall),
       itemBuilder: (context) => menuItems,
       onSelected: onMenuItemSelected,

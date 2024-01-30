@@ -1,10 +1,10 @@
+import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../locator.dart';
+import '../account/model.dart';
+import '../localization/extension.dart';
 import '../logger.dart';
-import '../models/account.dart';
 import '../models/compose_data.dart';
-import '../services/i18n_service.dart';
 import 'model.dart';
 import 'storage.dart';
 
@@ -47,32 +47,40 @@ class SettingsNotifier extends Notifier<Settings> {
     }
   }
 
-  /// Retrieves the HTML signature for the specified [account] and [composeAction]
-  String getSignatureHtml(RealAccount account, ComposeAction composeAction) {
+  /// Retrieves the HTML signature for the specified [account]
+  /// and [composeAction]
+  String getSignatureHtml(
+    BuildContext context,
+    RealAccount account,
+    ComposeAction composeAction,
+    String? languageCode,
+  ) {
     if (!state.signatureActions.contains(composeAction)) {
       return '';
     }
 
-    return account.signatureHtml ?? getSignatureHtmlGlobal();
+    return account.getSignatureHtml(languageCode) ??
+        getSignatureHtmlGlobal(context);
   }
 
   /// Retrieves the global signature
-  String getSignatureHtmlGlobal() =>
-      state.signatureHtml ?? '<p>---<br/>$_fallbackSignature</p>';
+  String getSignatureHtmlGlobal(BuildContext context) =>
+      state.signatureHtml ?? '<p>---<br/>${context.text.signature}</p>';
 
   /// Retrieves the plain text signature for the specified account
-  String getSignaturePlain(RealAccount account, ComposeAction composeAction) {
+  String getSignaturePlain(
+    BuildContext context,
+    RealAccount account,
+    ComposeAction composeAction,
+  ) {
     if (!state.signatureActions.contains(composeAction)) {
       return '';
     }
 
-    return account.signaturePlain ?? getSignaturePlainGlobal();
+    return account.signaturePlain ?? getSignaturePlainGlobal(context);
   }
 
   /// Retrieves the global plain text signature
-  String getSignaturePlainGlobal() =>
-      state.signaturePlain ?? '\n---\n$_fallbackSignature';
-
-  String get _fallbackSignature =>
-      locator<I18nService>().localizations.signature;
+  String getSignaturePlainGlobal(BuildContext context) =>
+      state.signaturePlain ?? '\n---\n${context.text.signature}';
 }

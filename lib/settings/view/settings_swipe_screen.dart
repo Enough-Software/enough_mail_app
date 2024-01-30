@@ -1,15 +1,13 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../l10n/extension.dart';
-import '../../locator.dart';
+import '../../localization/extension.dart';
 import '../../models/swipe.dart';
 import '../../screens/base.dart';
-import '../../services/navigation_service.dart';
 import '../../util/localized_dialog_helper.dart';
-import '../../widgets/button_text.dart';
 import '../provider.dart';
 
 class SettingsSwipeScreen extends ConsumerWidget {
@@ -24,8 +22,7 @@ class SettingsSwipeScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final localizations = context.text;
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.swipeSettingTitle,
       content: SingleChildScrollView(
         child: SafeArea(
@@ -34,15 +31,19 @@ class SettingsSwipeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(localizations.swipeSettingLeftToRightLabel,
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  localizations.swipeSettingLeftToRightLabel,
+                  style: theme.textTheme.bodySmall,
+                ),
                 _SwipeSetting(
                   swipeAction: leftToRightAction,
                   isLeftToRight: true,
                 ),
                 const Divider(),
-                Text(localizations.swipeSettingRightToLeftLabel,
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  localizations.swipeSettingRightToLeftLabel,
+                  style: theme.textTheme.bodySmall,
+                ),
                 _SwipeSetting(
                   swipeAction: rightToLeftAction,
                   isLeftToRight: false,
@@ -105,7 +106,7 @@ class _SwipeSetting extends HookConsumerWidget {
                       ],
                     ),
                     onPressed: () {
-                      locator<NavigationService>().pop(action);
+                      context.pop(action);
                     },
                   ),
                 )
@@ -120,6 +121,7 @@ class _SwipeSetting extends HookConsumerWidget {
       if (action == false) {
         return null;
       }
+
       return action;
     }
 
@@ -148,7 +150,7 @@ class _SwipeSetting extends HookConsumerWidget {
         PlatformTextButtonIcon(
           onPressed: onPressed,
           icon: const Icon(Icons.edit),
-          label: ButtonText(localizations.swipeSettingChangeAction),
+          label: Text(localizations.swipeSettingChangeAction),
         ),
       ],
     );

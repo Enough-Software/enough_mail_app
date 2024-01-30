@@ -4,19 +4,21 @@ import 'package:flutter/material.dart';
 
 class PasswordField extends StatefulWidget {
   const PasswordField({
-    Key? key,
+    super.key,
     required this.controller,
     this.labelText,
     this.hintText,
     this.onChanged,
     this.autofocus = false,
     this.cupertinoShowLabel = true,
-  }) : super(key: key);
+    this.onSubmitted,
+  });
 
   final TextEditingController? controller;
   final String? labelText;
   final String? hintText;
-  final void Function(String text)? onChanged;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
   final bool autofocus;
   final bool cupertinoShowLabel;
 
@@ -28,33 +30,32 @@ class _PasswordFieldState extends State<PasswordField> {
   bool _obscureText = true;
 
   @override
-  Widget build(BuildContext context) {
-    return DecoratedPlatformTextField(
-      controller: widget.controller,
-      obscureText: _obscureText,
-      onChanged: widget.onChanged,
-      autofocus: widget.autofocus,
-      cupertinoShowLabel: widget.cupertinoShowLabel,
-      decoration: InputDecoration(
-        hintText: widget.hintText,
-        labelText: widget.labelText,
-        suffixIcon: PlatformIconButton(
-          icon: Icon(_obscureText ? Icons.lock_open : Icons.lock),
-          onPressed: () {
-            setState(
-              () => _obscureText = !_obscureText,
-            );
-          },
-          cupertino: (context, platform) => CupertinoIconButtonData(
-            padding: const EdgeInsets.fromLTRB(0, 0, 5, 2),
-            icon: Icon(
-              _obscureText ? Icons.lock_open : Icons.lock,
-              color: CupertinoColors.secondaryLabel,
-              size: 20.0,
+  Widget build(BuildContext context) => DecoratedPlatformTextField(
+        controller: widget.controller,
+        obscureText: _obscureText,
+        onChanged: widget.onChanged,
+        onSubmitted: widget.onSubmitted,
+        autofocus: widget.autofocus,
+        cupertinoShowLabel: widget.cupertinoShowLabel,
+        decoration: InputDecoration(
+          hintText: widget.hintText,
+          labelText: widget.labelText,
+          suffixIcon: PlatformIconButton(
+            icon: Icon(_obscureText ? Icons.lock_open : Icons.lock),
+            onPressed: () {
+              setState(
+                () => _obscureText = !_obscureText,
+              );
+            },
+            cupertino: (context, platform) => CupertinoIconButtonData(
+              padding: const EdgeInsets.fromLTRB(0, 0, 5, 2),
+              icon: Icon(
+                _obscureText ? Icons.lock_open : Icons.lock,
+                color: CupertinoColors.secondaryLabel,
+                size: 20,
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

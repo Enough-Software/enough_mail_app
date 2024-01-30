@@ -4,10 +4,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
-import '../../l10n/extension.dart';
-import '../../locator.dart';
+import '../../app_lifecycle/provider.dart';
+import '../../localization/extension.dart';
+import '../../lock/provider.dart';
+import '../../lock/service.dart';
 import '../../screens/base.dart';
-import '../../services/biometrics_service.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../model.dart';
 import '../provider.dart';
@@ -17,12 +18,11 @@ class SettingsSecurityScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    //final theme = Theme.of(context);
     final localizations = context.text;
     final settings = ref.watch(settingsProvider);
     final isBiometricsSupported = useState<bool?>(null);
     useMemoized(() async {
-      final supported = await locator<BiometricsService>().isDeviceSupported();
+      final supported = await BiometricsService.instance.isDeviceSupported();
       isBiometricsSupported.value = supported;
     });
 
@@ -37,8 +37,7 @@ class SettingsSecurityScreen extends HookConsumerWidget {
       }
     }
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.securitySettingsTitle,
       content: SingleChildScrollView(
         child: SafeArea(
@@ -52,7 +51,9 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                     vertical: 8,
                     horizontal: 4,
                   ),
-                  child: Text(localizations.securitySettingsIntro),
+                  child: Text(
+                    localizations.securitySettingsIntro,
+                  ),
                 ),
                 const Divider(),
                 Row(
@@ -113,12 +114,12 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                   ),
                 ),
                 const Divider(),
-                if (isBiometricsSupported.value == false)
+                if (!(isBiometricsSupported.value ?? false))
                   Padding(
                     padding: const EdgeInsets.all(8),
                     child: Text(localizations.securityUnlockNotAvailable),
                   )
-                else if (isBiometricsSupported.value ?? false == true) ...[
+                else if (isBiometricsSupported.value ?? false) ...[
                   Row(
                     children: [
                       Expanded(
@@ -129,10 +130,18 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                             final String? reason = enableBiometricLock
                                 ? null
                                 : localizations.securityUnlockDisableReason;
+                            ref
+                                .read(appLifecycleProvider.notifier)
+                                .ignoreNextInactivationCycle();
                             final didAuthenticate =
-                                await locator<BiometricsService>()
-                                    .authenticate(reason: reason);
+                                await BiometricsService.instance.authenticate(
+                              localizations,
+                              reason: reason,
+                            );
                             if (didAuthenticate) {
+                              if (enableBiometricLock && context.mounted) {
+                                AppLock.ignoreNextSettingsChange = true;
+                              }
                               await ref.read(settingsProvider.notifier).update(
                                     settings.copyWith(
                                       enableBiometricLock: enableBiometricLock,

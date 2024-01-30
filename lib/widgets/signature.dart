@@ -1,17 +1,19 @@
+import 'dart:async';
+
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
-import '../l10n/extension.dart';
-import '../locator.dart';
-import '../models/account.dart';
-import '../services/icon_service.dart';
-import '../services/mail_service.dart';
+import '../account/model.dart';
+import '../account/provider.dart';
+import '../localization/extension.dart';
 import '../settings/provider.dart';
+import '../settings/theme/icon_service.dart';
 import '../util/modal_bottom_sheet_helper.dart';
 
 class SignatureWidget extends HookConsumerWidget {
@@ -22,22 +24,24 @@ class SignatureWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final account = this.account;
     final signatureState = useState<String?>(
-      account?.signatureHtml ??
-          ref.read(settingsProvider.notifier).getSignatureHtmlGlobal(),
+      account?.getSignatureHtml(context.text.localeName) ??
+          ref.read(settingsProvider.notifier).getSignatureHtmlGlobal(context),
     );
     final signature = signatureState.value;
 
     Future<void> showEditor() async {
       final localizations = context.text;
-      final iconService = locator<IconService>();
+      final iconService = IconService.instance;
       HtmlEditorApi? editorApi;
 
-      final result = await ModelBottomSheetHelper.showModalBottomSheet(
+      final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
         context,
         account?.name ?? localizations.signatureSettingsTitle,
         PackagedHtmlEditor(
           initialContent: signature ??
-              ref.read(settingsProvider.notifier).getSignatureHtmlGlobal(),
+              ref
+                  .read(settingsProvider.notifier)
+                  .getSignatureHtmlGlobal(context),
           excludeDocumentLevelControls: true,
           onCreated: (api) => editorApi = api,
         ),
@@ -48,29 +52,30 @@ class SignatureWidget extends HookConsumerWidget {
               onPressed: () async {
                 signatureState.value = null;
 
-                Navigator.of(context).pop(false);
+                context.pop(false);
                 if (account != null) {
                   account.signatureHtml = null;
-                  await locator<MailService>().saveAccounts();
+                  unawaited(ref.read(realAccountsProvider.notifier).save());
                 } else {
                   final settings = ref.read(settingsProvider);
                   final notifier = ref.read(settingsProvider.notifier);
+                  signatureState.value =
+                      notifier.getSignatureHtmlGlobal(context);
                   await notifier.update(
                     settings.withoutSignatures(),
                   );
-                  signatureState.value = notifier.getSignatureHtmlGlobal();
                 }
               },
             ),
           DensePlatformIconButton(
             icon: Icon(CommonPlatformIcons.ok),
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => context.pop(true),
           ),
         ],
       );
-
-      if (result && editorApi != null) {
-        final newSignature = await editorApi!.getText();
+      final usedEditorApi = editorApi;
+      if ((result ?? false) && usedEditorApi != null) {
+        final newSignature = await usedEditorApi.getText();
         signatureState.value = newSignature;
         if (account == null) {
           final settings = ref.read(settingsProvider);
@@ -79,7 +84,7 @@ class SignatureWidget extends HookConsumerWidget {
               );
         } else {
           account.signatureHtml = newSignature;
-          await locator<MailService>().saveAccounts();
+          unawaited(ref.read(realAccountsProvider.notifier).save());
         }
       }
     }

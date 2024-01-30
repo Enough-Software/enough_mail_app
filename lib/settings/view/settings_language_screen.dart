@@ -2,15 +2,13 @@ import 'package:collection/collection.dart' show IterableExtension;
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../l10n/app_localizations.g.dart';
-import '../../l10n/extension.dart';
-import '../../locator.dart';
+import '../../localization/app_localizations.g.dart';
+import '../../localization/extension.dart';
 import '../../screens/base.dart';
-import '../../services/i18n_service.dart';
 import '../../util/localized_dialog_helper.dart';
-import '../../widgets/button_text.dart';
 import '../provider.dart';
 
 class SettingsLanguageScreen extends HookConsumerWidget {
@@ -21,6 +19,7 @@ class SettingsLanguageScreen extends HookConsumerWidget {
     final displayNames = {
       'de': 'deutsch',
       'en': 'English',
+      'es': 'español',
     };
     final available = AppLocalizations.supportedLocales
         .map(
@@ -28,18 +27,19 @@ class SettingsLanguageScreen extends HookConsumerWidget {
         )
         .toList();
     final systemLanguage = _Language(
-        null, locator<I18nService>().localizations.designThemeOptionSystem);
+      null,
+      context.text.designThemeOptionSystem,
+    );
+
     final languages = [systemLanguage, ...available];
     final languageTag = ref.watch(
       settingsProvider.select((value) => value.languageTag),
     );
     final _Language? selectedLanguage;
-    if (languageTag != null) {
-      selectedLanguage = available
-          .firstWhereOrNull((l) => l.locale?.toLanguageTag() == languageTag);
-    } else {
-      selectedLanguage = systemLanguage;
-    }
+    selectedLanguage = languageTag != null
+        ? available
+            .firstWhereOrNull((l) => l.locale?.toLanguageTag() == languageTag)
+        : systemLanguage;
 
     final theme = Theme.of(context);
     final localizations = context.text;
@@ -47,8 +47,7 @@ class SettingsLanguageScreen extends HookConsumerWidget {
     final selectedLanguageState = useState(selectedLanguage);
     final selectedLocalizationsState = useState<AppLocalizations?>(null);
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.languageSettingTitle,
       content: SingleChildScrollView(
         child: SafeArea(
@@ -57,8 +56,10 @@ class SettingsLanguageScreen extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(localizations.languageSettingLabel,
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  localizations.languageSettingLabel,
+                  style: theme.textTheme.bodySmall,
+                ),
                 PlatformDropdownButton<_Language>(
                   value: selectedLanguage,
                   onChanged: (value) async {
@@ -70,6 +71,7 @@ class SettingsLanguageScreen extends HookConsumerWidget {
                       await ref
                           .read(settingsProvider.notifier)
                           .update(settings.removeLanguageTag());
+
                       return;
                     }
 
@@ -79,23 +81,22 @@ class SettingsLanguageScreen extends HookConsumerWidget {
                     if (context.mounted) {
                       final confirmed =
                           await LocalizedDialogHelper.showTextDialog(
-                              context,
-                              selectedLocalizations
-                                  .languageSettingConfirmationTitle,
-                              selectedLocalizations
-                                  .languageSettingConfirmationQuery,
-                              actions: [
-                            PlatformTextButton(
-                              child: ButtonText(
-                                selectedLocalizations.actionCancel,
-                              ),
-                              onPressed: () => Navigator.of(context).pop(false),
+                        context,
+                        selectedLocalizations.languageSettingConfirmationTitle,
+                        selectedLocalizations.languageSettingConfirmationQuery,
+                        actions: [
+                          PlatformTextButton(
+                            child: Text(
+                              selectedLocalizations.actionCancel,
                             ),
-                            PlatformTextButton(
-                              child: ButtonText(selectedLocalizations.actionOk),
-                              onPressed: () => Navigator.of(context).pop(true),
-                            ),
-                          ]);
+                            onPressed: () => context.pop(false),
+                          ),
+                          PlatformTextButton(
+                            child: Text(selectedLocalizations.actionOk),
+                            onPressed: () => context.pop(true),
+                          ),
+                        ],
+                      );
                       if (confirmed) {
                         selectedLanguageState.value = value;
 
@@ -108,11 +109,13 @@ class SettingsLanguageScreen extends HookConsumerWidget {
                     }
                   },
                   selectedItemBuilder: (context) => languages
-                      .map((language) => Text(language.displayName!))
+                      .map((language) => Text(language.displayName ?? ''))
                       .toList(),
                   items: languages
                       .map((language) => DropdownMenuItem(
-                          value: language, child: Text(language.displayName!)))
+                            value: language,
+                            child: Text(language.displayName ?? ''),
+                          ))
                       .toList(),
                 ),
                 if (selectedLocalizationsState.value != null)

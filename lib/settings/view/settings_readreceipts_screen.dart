@@ -2,7 +2,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../l10n/extension.dart';
+import '../../localization/extension.dart';
 import '../../screens/base.dart';
 import '../model.dart';
 import '../provider.dart';
@@ -23,8 +23,7 @@ class SettingsReadReceiptsScreen extends HookConsumerWidget {
     void onReadReceiptDisplaySettingChanged(ReadReceiptDisplaySetting? value) =>
         _onReadReceiptDisplaySettingChanged(value, ref);
 
-    return Base.buildAppChrome(
-      context,
+    return BasePage(
       title: localizations.settingsReadReceipts,
       content: SingleChildScrollView(
         child: Padding(
@@ -33,8 +32,10 @@ class SettingsReadReceiptsScreen extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(localizations.readReceiptsSettingsIntroduction,
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  localizations.readReceiptsSettingsIntroduction,
+                  style: theme.textTheme.bodySmall,
+                ),
                 PlatformRadioListTile<ReadReceiptDisplaySetting>(
                   value: ReadReceiptDisplaySetting.always,
                   groupValue: readReceiptDisplaySetting,

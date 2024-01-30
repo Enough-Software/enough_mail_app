@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -145,6 +146,7 @@ Color _colorFromJson(Map<String, dynamic> json) {
 }
 
 //// The actually applied theme data
+@immutable
 class ThemeSettingsData {
   /// Creates the theme data
   const ThemeSettingsData({
@@ -152,6 +154,7 @@ class ThemeSettingsData {
     required this.darkTheme,
     required this.lightTheme,
     required this.themeMode,
+    required this.cupertinoTheme,
   });
 
   /// The current brightness
@@ -165,4 +168,18 @@ class ThemeSettingsData {
 
   /// The (material) theme mode
   final ThemeMode themeMode;
+
+  /// The cupertino theme data
+  final CupertinoThemeData cupertinoTheme;
+
+  @override
+  int get hashCode =>
+      darkTheme.hashCode ^ lightTheme.hashCode ^ themeMode.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ThemeSettingsData &&
+      other.darkTheme == darkTheme &&
+      other.lightTheme == lightTheme &&
+      other.themeMode == themeMode;
 }

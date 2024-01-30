@@ -1,22 +1,21 @@
+import 'package:collection/collection.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
 
-import 'package:enough_mail_app/locator.dart';
-import 'package:enough_mail_app/services/mail_service.dart';
-import 'package:enough_mail_app/widgets/inherited_widgets.dart';
-
-import 'account.dart';
+import '../account/model.dart';
+import '../logger.dart';
 import 'message_source.dart';
 
 class Message extends ChangeNotifier {
-  Message(this.mimeMessage, this.mailClient, this.source, this.sourceIndex);
+  Message(this.mimeMessage, this.source, this.sourceIndex);
 
   Message.embedded(this.mimeMessage, Message parent)
-      : mailClient = parent.mailClient,
-        source = SingleMessageSource(parent.source),
+      : source = SingleMessageSource(
+          parent.source,
+          account: parent.source.account,
+        ),
         sourceIndex = 0 {
     (source as SingleMessageSource).singleMessage = this;
     isEmbedded = true;
@@ -25,7 +24,6 @@ class Message extends ChangeNotifier {
   static const String keywordFlagUnsubscribed = r'$Unsubscribed';
 
   MimeMessage mimeMessage;
-  final MailClient mailClient;
   int sourceIndex;
   final MessageSource source;
 
@@ -48,11 +46,11 @@ class Message extends ChangeNotifier {
       infos.addAll(inlineAttachments);
       _attachments = infos;
     }
+
     return infos;
   }
 
-  RealAccount get account =>
-      locator<MailService>().getAccountFor(mailClient.account)!;
+  Account get account => source.account;
 
   set isSelected(bool value) {
     if (value != _isSelected) {
@@ -65,7 +63,7 @@ class Message extends ChangeNotifier {
 
   bool get hasNext => sourceIndex < source.size;
   Future<Message?> get next => source.next(this);
-  bool get hasPrevious => (sourceIndex > 0);
+  bool get hasPrevious => sourceIndex > 0;
   Future<Message?> get previous => source.previous(this);
 
   bool get isSeen => mimeMessage.isSeen;
@@ -130,7 +128,9 @@ class Message extends ChangeNotifier {
   bool get hasAttachment {
     final mime = mimeMessage;
     final size = mime.size;
-    // when only the envelope is downloaded, the content-type header ergo mediaType is not yet available
+    // when only the envelope is downloaded, the content-type header ergo
+    // mediaType is not yet available
+
     return mime.hasAttachments() ||
         (mime.mimeData == null &&
             mime.body == null &&
@@ -153,17 +153,12 @@ class Message extends ChangeNotifier {
     isSelected = !_isSelected;
   }
 
-  static Message? of(BuildContext context) =>
-      MessageWidget.of(context)?.message;
-
   @override
-  String toString() {
-    return '${mailClient.account.name}[$sourceIndex]=$mimeMessage';
-  }
+  String toString() => '${account.name}[$sourceIndex]=$mimeMessage';
 }
 
 extension NewsLetter on MimeMessage {
-  bool get isEmpty => (mimeData == null && envelope == null && body == null);
+  bool get isEmpty => mimeData == null && envelope == null && body == null;
 
   /// Checks if this is a newsletter with a `list-unsubscribe` header.
   bool get isNewsletter => hasHeader('list-unsubscribe');
@@ -172,18 +167,15 @@ extension NewsLetter on MimeMessage {
   bool get isNewsLetterSubscribable => hasHeader('list-subscribe');
 
   /// Retrieves the List-Unsubscribe URIs, if present
-  List<Uri?>? decodeListUnsubscribeUris() {
-    return _decodeUris('list-unsubscribe');
-  }
+  List<Uri>? decodeListUnsubscribeUris() => _decodeUris('list-unsubscribe');
 
-  List<Uri?>? decodeListSubscribeUris() {
-    return _decodeUris('list-subscribe');
-  }
+  List<Uri>? decodeListSubscribeUris() => _decodeUris('list-subscribe');
 
   String? decodeListName() {
     final listPost = decodeHeaderValue('list-post');
     if (listPost != null) {
-      // typically only mailing lists that allow posting have a human understandable List-ID header:
+      // typically only mailing lists that allow posting have a
+      // human understandable List-ID header:
       final id = decodeHeaderValue('list-id');
       if (id != null && id.isNotEmpty) {
         return id;
@@ -200,16 +192,17 @@ extension NewsLetter on MimeMessage {
     if (sender.isNotEmpty) {
       return sender.first.toString();
     }
+
     return null;
   }
 
-  List<Uri?>? _decodeUris(final String name) {
+  List<Uri>? _decodeUris(final String name) {
     final value = getHeaderValue(name);
     if (value == null) {
       return null;
     }
-    //TODO allow comments in / before URIs, e.g. "(send a mail to unsubscribe) <mailto:unsubscribe@list.org>"
-    final uris = <Uri?>[];
+    // TODO(RV): allow comments in / before URIs, e.g. "(send a mail to unsubscribe) <mailto:unsubscribe@list.org>"
+    final uris = <Uri>[];
     final parts = value.split('>');
     for (var part in parts) {
       part = part.trimLeft();
@@ -222,50 +215,52 @@ extension NewsLetter on MimeMessage {
       if (part.isNotEmpty) {
         final uri = Uri.tryParse(part);
         if (uri == null) {
-          if (kDebugMode) {
-            print('Invalid $name $value: unable to pars URI $part');
-          }
+          logger.e('Invalid $name $value: unable to pars URI $part');
         } else {
           uris.add(uri);
         }
       }
     }
+
     return uris;
   }
 
-  bool hasListUnsubscribePostHeader() {
-    return hasHeader('list-unsubscribe-post');
-  }
+  bool hasListUnsubscribePostHeader() => hasHeader('list-unsubscribe-post');
 
   Future<bool> unsubscribe(MailClient client) async {
     final uris = decodeListUnsubscribeUris();
     if (uris == null) {
       return false;
     }
-    final httpUri = uris.firstWhere(
-        (uri) => uri!.scheme.toLowerCase() == 'https',
-        orElse: () => uris.firstWhere(
-            (uri) => uri!.scheme.toLowerCase() == 'http',
-            orElse: () => null));
+    final httpUri = uris.firstWhereOrNull(
+          (uri) => uri.scheme.toLowerCase() == 'https',
+        ) ??
+        uris.firstWhereOrNull(
+          (uri) => uri.scheme.toLowerCase() == 'http',
+        );
+
     // unsubscribe via one click POST request: https://tools.ietf.org/html/rfc8058
     if (hasListUnsubscribePostHeader() && httpUri != null) {
-      var response = await unsubscribeWithOneClick(httpUri);
+      final response = await unsubscribeWithOneClick(httpUri);
       if (response.statusCode == 200) {
         return true;
       }
     }
     // unsubscribe via generated mail:
-    final mailtoUri = uris.firstWhere(
-        (uri) => uri!.scheme.toLowerCase() == 'mailto',
-        orElse: () => null);
+    final mailtoUri = uris.firstWhereOrNull(
+      (uri) => uri.scheme.toLowerCase() == 'mailto',
+    );
     if (mailtoUri != null) {
       await sendMailto(mailtoUri, client, 'unsubscribe');
+
       return true;
     }
+
     // manually open unsubscribe web page:
     if (httpUri != null) {
       return url_launcher.launchUrl(httpUri);
     }
+
     return false;
   }
 
@@ -275,49 +270,52 @@ extension NewsLetter on MimeMessage {
       return false;
     }
     // subscribe via generated mail:
-    final mailtoUri = uris.firstWhere(
-        (uri) => uri!.scheme.toLowerCase() == 'mailto',
-        orElse: () => null);
+    final mailtoUri = uris.firstWhereOrNull(
+      (uri) => uri.scheme.toLowerCase() == 'mailto',
+    );
     if (mailtoUri != null) {
       await sendMailto(mailtoUri, client, 'subscribe');
+
       return true;
     }
     // manually open subscribe web page:
-    final httpUri = uris.firstWhere(
-        (uri) => uri!.scheme.toLowerCase() == 'https',
-        orElse: () => uris.firstWhere(
-            (uri) => uri!.scheme.toLowerCase() == 'http',
-            orElse: () => null));
+    final httpUri = uris.firstWhereOrNull(
+          (uri) => uri.scheme.toLowerCase() == 'https',
+        ) ??
+        uris.firstWhereOrNull(
+          (uri) => uri.scheme.toLowerCase() == 'http',
+        );
     if (httpUri != null) {
       return url_launcher.launchUrl(httpUri);
     }
+
     return false;
   }
 
   Future<http.StreamedResponse> unsubscribeWithOneClick(Uri uri) {
-    var request = http.MultipartRequest('POST', uri)
+    final request = http.MultipartRequest('POST', uri)
       ..fields['List-Unsubscribe'] = 'One-Click';
+
     return request.send();
   }
 
   Future<void> sendMailto(
-      Uri mailtoUri, MailClient client, String defaultSubject) {
+    Uri mailtoUri,
+    MailClient client,
+    String defaultSubject,
+  ) {
     final account = client.account;
-    var me = findRecipient(account.fromAddress,
-        aliases: account.aliases,
-        allowPlusAliases: account.supportsPlusAliases);
+    var me = findRecipient(
+      account.fromAddress,
+      aliases: account.aliases,
+      allowPlusAliases: account.supportsPlusAliases,
+    );
     me ??= account.fromAddress;
-    final builder = MessageBuilder.prepareMailtoBasedMessage(mailtoUri, me);
-    builder.subject ??= defaultSubject;
-    builder.text ??= defaultSubject;
+    final builder = MessageBuilder.prepareMailtoBasedMessage(mailtoUri, me)
+      ..subject ??= defaultSubject
+      ..text ??= defaultSubject;
     final message = builder.buildMimeMessage();
+
     return client.sendMessage(message, appendToSent: false);
   }
-}
-
-class DisplayMessageArguments {
-  final Message message;
-  final bool blockExternalContent;
-
-  const DisplayMessageArguments(this.message, this.blockExternalContent);
 }
