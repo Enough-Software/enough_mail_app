@@ -1,3 +1,10 @@
 export 'account/account.dart';
 export 'contact/contact.dart';
+export 'localization/app_localizations.g.dart';
+export 'localization/extension.dart';
+export 'logger.dart';
 export 'main.dart';
+export 'routes/provider.dart';
+export 'routes/routes.dart';
+export 'settings/settings.dart';
+export 'util/localized_dialog_helper.dart';

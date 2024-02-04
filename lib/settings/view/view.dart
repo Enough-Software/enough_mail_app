@@ -1,3 +1,4 @@
+export '../home/screen.dart';
 export 'settings_accounts_screen.dart';
 export 'settings_default_sender_screen.dart';
 export 'settings_developer_mode_screen.dart';
@@ -6,7 +7,6 @@ export 'settings_folders_screen.dart';
 export 'settings_language_screen.dart';
 export 'settings_readreceipts_screen.dart';
 export 'settings_reply_screen.dart';
-export 'settings_screen.dart';
 export 'settings_security_screen.dart';
 export 'settings_signature_screen.dart';
 export 'settings_swipe_screen.dart';

@@ -1,5 +1,5 @@
 name: enough_mail_app
-description: Maily aims to become a fully featured email app once it has grown up.
+description: Base components for mail apps
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -84,6 +84,8 @@ dependencies:
   webview_flutter: ^4.0.2
 
 dependency_overrides:
+  # analyzer: ^6.4.1 # for dart_code_metrics
+  # meta: ^1.11.0 # for analyzer / dart_code_metrics
   collection: ^1.18.0
   intl: ^0.18.1
   http: ^1.1.1 # for dart_code_metrics
@@ -164,6 +166,7 @@ dependency_overrides:
   #   path: ../enough_platform_widgets
 
 dev_dependencies:
+  # analyzer: ^6.4.1
   build_runner: ^2.4.6
   custom_lint: ^0.5.3
   dart_code_metrics: 5.7.6

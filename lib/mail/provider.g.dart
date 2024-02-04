@@ -6,7 +6,7 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$mailboxTreeHash() => r'b1ccb0f9abb23fa230f80618370e187d21b10fac';
+String _$mailboxTreeHash() => r'2feafc0f0d00b8c4547b6408363a522539e85853';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -1121,7 +1121,7 @@ class _SourceProviderElement
   Mailbox? get mailbox => (origin as SourceProvider).mailbox;
 }
 
-String _$unifiedSourceHash() => r'd065ee7acddd895e44ce502094eeb0bec70ab818';
+String _$unifiedSourceHash() => r'9b128c1a2afaa51fa11e0810a9e6ecddfc6c53fd';
 
 abstract class _$UnifiedSource
     extends BuildlessAsyncNotifier<MultipleMessageSource> {
@@ -1300,7 +1300,7 @@ class _UnifiedSourceProviderElement
   Mailbox? get mailbox => (origin as UnifiedSourceProvider).mailbox;
 }
 
-String _$realSourceHash() => r'd9f16bf2faa477e3d2e25f1dc9e1f89a3f3e7094';
+String _$realSourceHash() => r'b47b7d957d62f73be40a5e8666d7f5c76209e502';
 
 abstract class _$RealSource
     extends BuildlessAsyncNotifier<MailboxMessageSource> {
@@ -1479,7 +1479,7 @@ class _RealSourceProviderElement
   Mailbox? get mailbox => (origin as RealSourceProvider).mailbox;
 }
 
-String _$realMimeSourceHash() => r'2bebfe53595c7cc57a87b55302d680d46113a79c';
+String _$realMimeSourceHash() => r'4c50962bb20d8eacf3a69062ae2a656627393dcb';
 
 abstract class _$RealMimeSource
     extends BuildlessAsyncNotifier<AsyncMimeSource> {
@@ -1658,7 +1658,7 @@ class _RealMimeSourceProviderElement
   Mailbox? get mailbox => (origin as RealMimeSourceProvider).mailbox;
 }
 
-String _$mailClientSourceHash() => r'b38b5b583765b7078c959777bb9d2f346914fbb5';
+String _$mailClientSourceHash() => r'6245fdaddaceb72c43b94b988b7e6dfd5966c8ab';
 
 abstract class _$MailClientSource extends BuildlessNotifier<MailClient> {
   late final RealAccount account;

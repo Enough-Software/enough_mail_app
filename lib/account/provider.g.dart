@@ -393,7 +393,7 @@ final realAccountsProvider =
 );
 
 typedef _$RealAccounts = Notifier<List<RealAccount>>;
-String _$allAccountsHash() => r'e97a4caa8ae7cdc52f6a1d9e7a4f7fcaf4f21da4';
+String _$allAccountsHash() => r'72f9626b7f40dfa85b19cbc7a694494a13b9638f';
 
 /// Provides all accounts
 ///

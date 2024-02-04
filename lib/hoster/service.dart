@@ -155,6 +155,7 @@ class MailHoster {
                   height: 50,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stacktrace) => Container(),
+                  package: 'enough_mail_app',
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -237,6 +238,7 @@ class GmailMailHoster extends MailHoster {
                 height: 50,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stacktrace) => Container(),
+                package: 'enough_mail_app',
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8, right: 16),
