@@ -95,7 +95,7 @@ dependency_overrides:
   ffi: ^2.1.0
   uuid: ^4.0.0 # for dart_code_metrics
   web: ^0.4.0 # for flutter test from SDK / http
-  pdfx: # fix util compatible version is released
+  pdfx: # 2.5.0 --> use git util compatible version is released:
     git:
       url: 'https://github.com/ScerIO/packages.flutter'
       path: packages/pdfx
