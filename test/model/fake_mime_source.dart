@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/async_mime_source.dart';
+import 'package:enough_mail_app/src/models/async_mime_source.dart';
 
 class FakeMimeSource extends PagedCachedMimeSource {
   FakeMimeSource({

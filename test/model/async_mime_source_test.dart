@@ -1,7 +1,7 @@
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/models/async_mime_source.dart';
+import 'package:enough_mail_app/src/models/async_mime_source.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fake_mime_source.dart';

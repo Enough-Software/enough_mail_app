@@ -1,16 +1,16 @@
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:enough_mail/enough_mail.dart';
-import 'package:enough_mail_app/account/model.dart';
-import 'package:enough_mail_app/localization/app_localizations.g.dart';
-import 'package:enough_mail_app/localization/app_localizations_en.g.dart';
-import 'package:enough_mail_app/models/async_mime_source.dart';
-import 'package:enough_mail_app/models/message.dart';
-import 'package:enough_mail_app/models/message_source.dart';
-import 'package:enough_mail_app/notification/model.dart';
-import 'package:enough_mail_app/notification/service.dart';
-import 'package:enough_mail_app/scaffold_messenger/service.dart';
-import 'package:enough_mail_app/widgets/cupertino_status_bar.dart';
+import 'package:enough_mail_app/src/account/model.dart';
+import 'package:enough_mail_app/src/localization/app_localizations.g.dart';
+import 'package:enough_mail_app/src/localization/app_localizations_en.g.dart';
+import 'package:enough_mail_app/src/models/async_mime_source.dart';
+import 'package:enough_mail_app/src/models/message.dart';
+import 'package:enough_mail_app/src/models/message_source.dart';
+import 'package:enough_mail_app/src/notification/model.dart';
+import 'package:enough_mail_app/src/notification/service.dart';
+import 'package:enough_mail_app/src/scaffold_messenger/service.dart';
+import 'package:enough_mail_app/src/widgets/cupertino_status_bar.dart';
 import 'package:flutter/src/material/scaffold.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -1,4 +1,4 @@
-import 'package:enough_mail_app/util/indexed_cache.dart';
+import 'package:enough_mail_app/src/util/indexed_cache.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
