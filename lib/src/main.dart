@@ -23,18 +23,10 @@ import 'settings/theme/provider.dart';
 import 'share/provider.dart';
 // AppStyles appStyles = AppStyles.instance;
 
-void main() {
-  runApp(
-    const ProviderScope(
-      child: MailyApp(),
-    ),
-  );
-}
-
 /// Runs the app
-class MailyApp extends HookConsumerWidget {
+class EnoughMailApp extends HookConsumerWidget {
   /// Creates a new app
-  const MailyApp({super.key});
+  const EnoughMailApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
