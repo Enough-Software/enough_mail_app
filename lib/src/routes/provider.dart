@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../account/model.dart';
-import '../main.dart';
+import '../app.dart';
 import '../models/compose_data.dart';
 import '../models/message.dart';
 import '../models/message_source.dart';

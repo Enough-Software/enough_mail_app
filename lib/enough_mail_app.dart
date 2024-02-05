@@ -1,9 +1,9 @@
 export 'src/account/account.dart';
+export 'src/app.dart';
 export 'src/contact/contact.dart';
 export 'src/localization/app_localizations.g.dart';
 export 'src/localization/extension.dart';
 export 'src/logger.dart';
-export 'src/main.dart';
 export 'src/models/compose_data.dart';
 export 'src/routes/provider.dart';
 export 'src/routes/routes.dart';
