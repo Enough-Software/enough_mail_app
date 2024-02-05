@@ -18,7 +18,7 @@ class SettingsSecurityScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final settings = ref.watch(settingsProvider);
     final isBiometricsSupported = useState<bool?>(null);
     useMemoized(() async {
@@ -76,7 +76,7 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                     PlatformIconButton(
                       icon: Icon(CommonPlatformIcons.info),
                       onPressed: () => LocalizedDialogHelper.showTextDialog(
-                        context,
+                        ref,
                         localizations
                             .settingsSecurityBlockExternalImagesDescriptionTitle,
                         localizations
@@ -157,7 +157,7 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                       PlatformIconButton(
                         icon: Icon(CommonPlatformIcons.info),
                         onPressed: () => LocalizedDialogHelper.showTextDialog(
-                          context,
+                          ref,
                           localizations.securityUnlockDescriptionTitle,
                           localizations.securityUnlockDescriptionText,
                         ),

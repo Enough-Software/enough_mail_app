@@ -1,5 +1,6 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/extension.dart';
 import '../scaffold_messenger/service.dart';
@@ -7,7 +8,7 @@ import '../scaffold_messenger/service.dart';
 /// Status bar for cupertino.
 ///
 /// Contains compose action and can display snackbar notifications on ios.
-class CupertinoStatusBar extends StatefulWidget {
+class CupertinoStatusBar extends StatefulHookConsumerWidget {
   const CupertinoStatusBar({
     super.key,
     this.leftAction,
@@ -21,7 +22,7 @@ class CupertinoStatusBar extends StatefulWidget {
   final Widget? info;
 
   @override
-  CupertinoStatusBarState createState() => CupertinoStatusBarState();
+  ConsumerState<CupertinoStatusBar> createState() => CupertinoStatusBarState();
 
   static Widget? createInfo(String? text) => (text == null)
       ? null
@@ -31,7 +32,7 @@ class CupertinoStatusBar extends StatefulWidget {
         );
 }
 
-class CupertinoStatusBarState extends State<CupertinoStatusBar> {
+class CupertinoStatusBarState extends ConsumerState<CupertinoStatusBar> {
   Widget? _status;
   Widget? _statusAction;
   late double _statusOpacity;
@@ -123,7 +124,7 @@ class CupertinoStatusBarState extends State<CupertinoStatusBar> {
           padding: const EdgeInsets.all(8),
           minSize: 20,
           child: Text(
-            context.text.actionUndo,
+            ref.text.actionUndo,
             style: CupertinoStatusBar._statusTextStyle,
           ),
           onPressed: () {

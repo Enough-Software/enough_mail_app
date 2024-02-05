@@ -50,7 +50,7 @@ class MessageActions extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final attachments = message.attachments;
     final iconService = IconService.instance;
 
@@ -72,10 +72,10 @@ class MessageActions extends HookConsumerWidget {
           _forwardAttachments(context, ref);
           break;
         case _OverflowMenuChoice.delete:
-          _delete(context);
+          _delete(context, ref);
           break;
         case _OverflowMenuChoice.inbox:
-          _moveToInbox(context);
+          _moveToInbox(context, ref);
           break;
         case _OverflowMenuChoice.seen:
           _toggleSeen();
@@ -84,13 +84,13 @@ class MessageActions extends HookConsumerWidget {
           _toggleFlagged();
           break;
         case _OverflowMenuChoice.move:
-          _move(context);
+          _move(context, ref);
           break;
         case _OverflowMenuChoice.junk:
-          _moveJunk(context);
+          _moveJunk(context, ref);
           break;
         case _OverflowMenuChoice.archive:
-          _moveArchive(context);
+          _moveArchive(context, ref);
           break;
         case _OverflowMenuChoice.redirect:
           _redirectMessage(context, ref);
@@ -136,12 +136,12 @@ class MessageActions extends HookConsumerWidget {
               if (message.source.isTrash)
                 DensePlatformIconButton(
                   icon: Icon(iconService.messageActionMoveToInbox),
-                  onPressed: () => _moveToInbox(context),
+                  onPressed: () => _moveToInbox(context, ref),
                 )
               else if (!message.isEmbedded)
                 DensePlatformIconButton(
                   icon: Icon(iconService.messageActionDelete),
-                  onPressed: () => _delete(context),
+                  onPressed: () => _delete(context, ref),
                 ),
               PlatformPopupMenuButton<_OverflowMenuChoice>(
                 onSelected: onOverflowChoiceSelected,
@@ -358,11 +358,11 @@ class MessageActions extends HookConsumerWidget {
       return;
     }
     final List<MailAddress> recipients = [];
-    final localizations = context.text;
+    final localizations = ref.text;
     final size = MediaQuery.sizeOf(context);
     final textEditingController = TextEditingController();
     final redirect = await LocalizedDialogHelper.showWidgetDialog(
-      context,
+      ref,
       SingleChildScrollView(
         child: SizedBox(
           width: size.width - 32,
@@ -408,7 +408,7 @@ class MessageActions extends HookConsumerWidget {
     if (redirect == true) {
       if (recipients.isEmpty) {
         await LocalizedDialogHelper.showTextDialog(
-          context,
+          ref,
           localizations.errorTitle,
           localizations.redirectEmailInputRequired,
         );
@@ -436,7 +436,7 @@ class MessageActions extends HookConsumerWidget {
             return;
           }
           await LocalizedDialogHelper.showTextDialog(
-            context,
+            ref,
             localizations.errorTitle,
             localizations.resultRedirectedFailure(e.message ?? '<unknown>'),
           );
@@ -445,8 +445,8 @@ class MessageActions extends HookConsumerWidget {
     }
   }
 
-  Future<void> _delete(BuildContext context) async {
-    final localizations = context.text;
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    final localizations = ref.text;
     context.pop();
     await message.source.deleteMessages(
       localizations,
@@ -455,14 +455,14 @@ class MessageActions extends HookConsumerWidget {
     );
   }
 
-  void _move(BuildContext context) {
-    final localizations = context.text;
+  void _move(BuildContext context, WidgetRef ref) {
+    final localizations = ref.text;
     LocalizedDialogHelper.showWidgetDialog(
-      context,
+      ref,
       SingleChildScrollView(
         child: MailboxTree(
           account: message.account,
-          onSelected: (mailbox) => _moveTo(context, mailbox),
+          onSelected: (mailbox) => _moveTo(context, ref, mailbox),
           // TODO(RV): retrieve the current selected mailbox in a different way
           // current:  message.mailClient.selectedMailbox,
         ),
@@ -472,11 +472,12 @@ class MessageActions extends HookConsumerWidget {
     );
   }
 
-  Future<void> _moveTo(BuildContext context, Mailbox mailbox) async {
+  Future<void> _moveTo(
+      BuildContext context, WidgetRef ref, Mailbox mailbox) async {
     context
       ..pop() // alert
       ..pop(); // detail view
-    final localizations = context.text;
+    final localizations = ref.text;
     final source = message.source;
     await source.moveMessage(
       localizations,
@@ -486,22 +487,22 @@ class MessageActions extends HookConsumerWidget {
     );
   }
 
-  Future<void> _moveJunk(BuildContext context) async {
+  Future<void> _moveJunk(BuildContext context, WidgetRef ref) async {
     final source = message.source;
     if (source.isJunk) {
-      await source.markAsNotJunk(context.text, message);
+      await source.markAsNotJunk(ref.text, message);
     } else {
       NotificationService.instance.cancelNotificationForMessage(message);
-      await source.markAsJunk(context.text, message);
+      await source.markAsJunk(ref.text, message);
     }
     if (context.mounted) {
       context.pop();
     }
   }
 
-  Future<void> _moveToInbox(BuildContext context) async {
+  Future<void> _moveToInbox(BuildContext context, WidgetRef ref) async {
     final source = message.source;
-    final localizations = context.text;
+    final localizations = ref.text;
     await source.moveMessageToFlag(
       localizations,
       message,
@@ -513,13 +514,13 @@ class MessageActions extends HookConsumerWidget {
     }
   }
 
-  Future<void> _moveArchive(BuildContext context) async {
+  Future<void> _moveArchive(BuildContext context, WidgetRef ref) async {
     final source = message.source;
     if (source.isArchive) {
-      await source.moveToInbox(context.text, message);
+      await source.moveToInbox(ref.text, message);
     } else {
       NotificationService.instance.cancelNotificationForMessage(message);
-      await source.archive(context.text, message);
+      await source.archive(ref.text, message);
     }
     if (context.mounted) {
       context.pop();

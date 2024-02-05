@@ -1,11 +1,8 @@
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../localization/extension.dart';
-import '../../routes/routes.dart';
-import '../../util/localized_dialog_helper.dart';
-import 'model.dart';
+import '../../../enough_mail_app.dart';
 
 part 'provider.g.dart';
 
@@ -16,12 +13,15 @@ class SettingsUiElements extends _$SettingsUiElements {
 
   /// Generates the shown setting entries
   List<UiSettingsElement> generate(
-    BuildContext context,
+    WidgetRef ref,
   ) =>
-      buildStandardElements(context);
+      buildStandardElements(ref);
 
-  static List<UiSettingsElement> buildStandardElements(BuildContext context) {
-    final text = context.text;
+  static List<UiSettingsElement> buildStandardElements(
+    WidgetRef ref,
+  ) {
+    final text = ref.text;
+    final context = ref.context;
 
     return [
       UiSettingsElement(
@@ -83,7 +83,7 @@ class SettingsUiElements extends _$SettingsUiElements {
       UiSettingsElement(
         type: UiSettingsType.about,
         title: text.drawerEntryAbout,
-        onTap: () => LocalizedDialogHelper.showAbout(context),
+        onTap: () => LocalizedDialogHelper.showAbout(ref),
       ),
       UiSettingsElement(
         type: UiSettingsType.welcome,

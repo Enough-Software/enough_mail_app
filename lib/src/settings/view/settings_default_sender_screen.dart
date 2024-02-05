@@ -31,7 +31,7 @@ class SettingsDefaultSenderScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
 
     final defaultSender = ref.watch(
       settingsProvider.select(

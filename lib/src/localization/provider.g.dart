@@ -7,12 +7,13 @@ part of 'provider.dart';
 // **************************************************************************
 
 String _$currentAppLocalizationHash() =>
-    r'd52e1e28754897f16fc63cc12e648d28a80092a2';
+    r'b96452a9fe1ceea30bbc77af301de04867b96099';
 
-/// See also [currentAppLocalization].
-@ProviderFor(currentAppLocalization)
-final currentAppLocalizationProvider = Provider<AppLocalizations>.internal(
-  currentAppLocalization,
+/// See also [CurrentAppLocalization].
+@ProviderFor(CurrentAppLocalization)
+final currentAppLocalizationProvider =
+    NotifierProvider<CurrentAppLocalization, AppLocalizations>.internal(
+  CurrentAppLocalization.new,
   name: r'currentAppLocalizationProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
@@ -21,6 +22,6 @@ final currentAppLocalizationProvider = Provider<AppLocalizations>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef CurrentAppLocalizationRef = ProviderRef<AppLocalizations>;
+typedef _$CurrentAppLocalization = Notifier<AppLocalizations>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

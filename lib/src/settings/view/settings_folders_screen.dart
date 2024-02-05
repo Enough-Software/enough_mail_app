@@ -24,7 +24,7 @@ class SettingsFoldersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
     final settings = ref.watch(settingsProvider);
     final folderNameSetting = settings.folderNameSetting;
 
@@ -87,10 +87,10 @@ class SettingsFoldersScreen extends ConsumerWidget {
     Settings settings,
     WidgetRef ref,
   ) async {
-    final localizations = context.text;
+    final localizations = ref.text;
     var customNames = settings.customFolderNames;
     if (customNames == null) {
-      final l = context.text;
+      final l = ref.text;
       customNames = [
         l.folderInbox,
         l.folderDrafts,
@@ -101,7 +101,7 @@ class SettingsFoldersScreen extends ConsumerWidget {
       ];
     }
     final result = await LocalizedDialogHelper.showWidgetDialog(
-      context,
+      ref,
       CustomFolderNamesEditor(customNames: customNames),
       title: localizations.folderNamesCustomTitle,
       defaultActions: DialogActions.okAndCancel,
@@ -133,7 +133,7 @@ class CustomFolderNamesEditor extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final iconService = IconService.instance;
 
     final inboxController = useTextEditingController(text: customNames[0]);
@@ -239,7 +239,7 @@ class _FolderManagementState extends ConsumerState<FolderManagement> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return SingleChildScrollView(
       child: SafeArea(
@@ -303,7 +303,7 @@ class MailboxWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -334,10 +334,10 @@ class MailboxWidget extends ConsumerWidget {
   }
 
   Future<void> _createFolder(BuildContext context, WidgetRef ref) async {
-    final localizations = context.text;
+    final localizations = ref.text;
     final folderNameController = TextEditingController();
     final result = await LocalizedDialogHelper.showWidgetDialog(
-      context,
+      ref,
       DecoratedPlatformTextField(
         controller: folderNameController,
         decoration: InputDecoration(
@@ -365,7 +365,7 @@ class MailboxWidget extends ConsumerWidget {
       } on MailException catch (e) {
         if (context.mounted) {
           await LocalizedDialogHelper.showTextDialog(
-            context,
+            ref,
             localizations.errorTitle,
             localizations.folderAddResultFailure(e.message ?? e.toString()),
           );
@@ -375,14 +375,14 @@ class MailboxWidget extends ConsumerWidget {
   }
 
   Future<void> _deleteFolder(BuildContext context, WidgetRef ref) async {
-    final localizations = context.text;
+    final localizations = ref.text;
     final mailbox = this.mailbox;
     if (mailbox == null) {
       return;
     }
 
     final confirmed = await LocalizedDialogHelper.askForConfirmation(
-      context,
+      ref,
       title: localizations.folderDeleteConfirmTitle,
       query: localizations.folderDeleteConfirmText(mailbox.path),
     );
@@ -399,7 +399,7 @@ class MailboxWidget extends ConsumerWidget {
       } on MailException catch (e) {
         if (context.mounted) {
           await LocalizedDialogHelper.showTextDialog(
-            context,
+            ref,
             localizations.errorTitle,
             localizations.folderDeleteResultFailure(e.message ?? e.toString()),
           );

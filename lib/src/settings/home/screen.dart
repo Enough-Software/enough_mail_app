@@ -17,8 +17,8 @@ class SettingsScreen extends ConsumerWidget {
     final uiSettingElementsNotifier = ref.watch(
       settingsUiElementsProvider.notifier,
     );
-    final settingEntries = uiSettingElementsNotifier.generate(context);
-    final localizations = context.text;
+    final settingEntries = uiSettingElementsNotifier.generate(ref);
+    final localizations = ref.text;
 
     Widget buildEntry(UiSettingsElement entry) {
       if (entry.isDivider) return const Divider();

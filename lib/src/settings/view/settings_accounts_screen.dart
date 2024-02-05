@@ -22,7 +22,7 @@ class SettingsAccountsScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final reorderAccountsState = useState(false);
     final accounts = ref.watch(realAccountsProvider);
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return BasePage(
       title: localizations.accountsTitle,

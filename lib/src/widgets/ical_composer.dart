@@ -26,7 +26,7 @@ class IcalComposer extends StatefulHookConsumerWidget {
     WidgetRef ref, {
     VCalendar? appointment,
   }) async {
-    final localizations = context.text;
+    final localizations = ref.text;
     // final iconService = IconService.instance;
     final account = ref.read(currentRealAccountProvider);
     if (account == null) {
@@ -106,7 +106,7 @@ class _IcalComposerState extends ConsumerState<IcalComposer> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final end = _event.end;
     final start = _event.start ?? DateTime.now();
     final isAllDay = _event.isAllDayEvent ?? false;
@@ -224,6 +224,7 @@ class _IcalComposerState extends ConsumerState<IcalComposer> {
                     ),
               onTap: () async {
                 final result = await _RecurrenceComposer.createOrEditRecurrence(
+                  ref,
                   context,
                   recurrenceRule,
                   start,
@@ -309,7 +310,7 @@ extension _ExtensionRecurrenceFrequency on RecurrenceFrequency {
   }
 }
 
-class _DateTimePicker extends StatelessWidget {
+class _DateTimePicker extends ConsumerWidget {
   const _DateTimePicker({
     required this.dateTime,
     required this.onChanged,
@@ -320,8 +321,8 @@ class _DateTimePicker extends StatelessWidget {
   final bool onlyDate;
 
   @override
-  Widget build(BuildContext context) {
-    final localizations = context.text;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localizations = ref.text;
     final dt = dateTime;
 
     return Row(
@@ -331,7 +332,7 @@ class _DateTimePicker extends StatelessWidget {
           child: Text(
             dt == null
                 ? localizations.composeAppointmentLabelDay
-                : context.formatDate(dt.toLocal(), useLongFormat: true),
+                : ref.formatDate(dt.toLocal(), useLongFormat: true),
           ),
           onPressed: () async {
             FocusScope.of(context).unfocus();
@@ -383,7 +384,7 @@ class _DateTimePicker extends StatelessWidget {
   }
 }
 
-class _RecurrenceComposer extends StatefulWidget {
+class _RecurrenceComposer extends StatefulHookConsumerWidget {
   const _RecurrenceComposer({
     this.recurrenceRule,
     required this.startDate,
@@ -392,14 +393,16 @@ class _RecurrenceComposer extends StatefulWidget {
   final DateTime startDate;
 
   @override
-  State<_RecurrenceComposer> createState() => _RecurrenceComposerState();
+  ConsumerState<_RecurrenceComposer> createState() =>
+      _RecurrenceComposerState();
 
   static Future<Recurrence?> createOrEditRecurrence(
+    WidgetRef ref,
     BuildContext context,
     Recurrence? recurrenceRule,
     DateTime startDate,
   ) async {
-    final localizations = context.text;
+    final localizations = ref.text;
     // final iconService = IconService.instance;
 
     final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
@@ -417,7 +420,7 @@ class _RecurrenceComposer extends StatefulWidget {
   }
 }
 
-class _RecurrenceComposerState extends State<_RecurrenceComposer> {
+class _RecurrenceComposerState extends ConsumerState<_RecurrenceComposer> {
   static late _RecurrenceComposerState _currentState;
   Recurrence? _recurrenceRule;
   _RepeatFrequency _repeatFrequency = _RepeatFrequency.never;
@@ -436,7 +439,7 @@ class _RecurrenceComposerState extends State<_RecurrenceComposer> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     final rule = _recurrenceRule;
 
@@ -576,11 +579,11 @@ class _RecurrenceComposerState extends State<_RecurrenceComposer> {
                     : rule.until == _recommendationDate
                         ? localizations
                             .composeAppointmentRecurrenceUntilOptionRecommended(
-                            context.formatIsoDuration(
+                            ref.formatIsoDuration(
                               rule.frequency.recommendedUntil ?? IsoDuration(),
                             ),
                           )
-                        : context.formatDate(
+                        : ref.formatDate(
                             rule.until,
                             useLongFormat: true,
                           ),
@@ -588,6 +591,7 @@ class _RecurrenceComposerState extends State<_RecurrenceComposer> {
               onTap: () async {
                 final until = await _UntilComposer.createOrEditUntil(
                   context,
+                  ref,
                   widget.startDate,
                   rule.until,
                   rule.frequency.recommendedUntil,
@@ -615,7 +619,7 @@ class _RecurrenceComposerState extends State<_RecurrenceComposer> {
   }
 }
 
-class _WeekDaySelector extends StatefulWidget {
+class _WeekDaySelector extends StatefulHookConsumerWidget {
   const _WeekDaySelector({
     required this.recurrence,
     required this.onChanged,
@@ -626,19 +630,19 @@ class _WeekDaySelector extends StatefulWidget {
   final void Function(List<ByDayRule>? rules) onChanged;
 
   @override
-  State<_WeekDaySelector> createState() => _WeekDaySelectorState();
+  ConsumerState<_WeekDaySelector> createState() => _WeekDaySelectorState();
 }
 
-class _WeekDaySelectorState extends State<_WeekDaySelector> {
+class _WeekDaySelectorState extends ConsumerState<_WeekDaySelector> {
   late List<WeekDay> _weekdays;
   final _selectedDays = <bool>[false, false, false, false, false, false, false];
   @override
   void initState() {
     super.initState();
-    _weekdays = context.formatWeekDays(abbreviate: true);
+    _weekdays = ref.formatWeekDays(abbreviate: true);
     final byWeekDays = widget.recurrence.byWeekDay;
     if (byWeekDays != null) {
-      final int firstDayOfWeek = context.firstDayOfWeek;
+      final int firstDayOfWeek = ref.firstDayOfWeek;
       for (int i = 0; i < 7; i++) {
         final day = ((firstDayOfWeek + i) <= 7)
             ? (firstDayOfWeek + i)
@@ -702,7 +706,7 @@ class _WeekDaySelectorState extends State<_WeekDaySelector> {
 
 enum _DayOfMonthOption { dayOfMonth, dayInNumberedWeek }
 
-class _DayOfMonthSelector extends StatefulWidget {
+class _DayOfMonthSelector extends StatefulHookConsumerWidget {
   const _DayOfMonthSelector({
     required this.recurrence,
     required this.startDate,
@@ -713,7 +717,8 @@ class _DayOfMonthSelector extends StatefulWidget {
   final void Function(Recurrence recurrence) onChanged;
 
   @override
-  State<_DayOfMonthSelector> createState() => _DayOfMonthSelectorState();
+  ConsumerState<_DayOfMonthSelector> createState() =>
+      _DayOfMonthSelectorState();
 
   static Recurrence? updateMonthlyRecurrence(
     Recurrence recurrence,
@@ -736,7 +741,7 @@ class _DayOfMonthSelector extends StatefulWidget {
   }
 }
 
-class _DayOfMonthSelectorState extends State<_DayOfMonthSelector> {
+class _DayOfMonthSelectorState extends ConsumerState<_DayOfMonthSelector> {
   late _DayOfMonthOption _option;
   ByDayRule? _byDayRule;
   WeekDay? _currentWeekday;
@@ -745,7 +750,7 @@ class _DayOfMonthSelectorState extends State<_DayOfMonthSelector> {
   @override
   void initState() {
     super.initState();
-    _weekdays = context.formatWeekDays();
+    _weekdays = ref.formatWeekDays();
     if (widget.recurrence.hasByMonthDay) {
       _option = _DayOfMonthOption.dayOfMonth;
     } else {
@@ -766,7 +771,7 @@ class _DayOfMonthSelectorState extends State<_DayOfMonthSelector> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final rule = _byDayRule;
 
     return Column(
@@ -900,7 +905,7 @@ class _DayOfMonthSelectorState extends State<_DayOfMonthSelector> {
   }
 }
 
-class _UntilComposer extends StatefulWidget {
+class _UntilComposer extends StatefulHookConsumerWidget {
   const _UntilComposer({
     required this.start,
     this.until,
@@ -912,15 +917,16 @@ class _UntilComposer extends StatefulWidget {
   final IsoDuration? recommendation;
 
   @override
-  State<_UntilComposer> createState() => _UntilComposerState();
+  ConsumerState<_UntilComposer> createState() => _UntilComposerState();
 
   static Future<DateTime?> createOrEditUntil(
     BuildContext context,
+    WidgetRef ref,
     DateTime start,
     DateTime? until,
     IsoDuration? recommendation,
   ) async {
-    final localizations = context.text;
+    final localizations = ref.text;
     // final iconService = IconService.instance;
     final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
       context,
@@ -936,7 +942,7 @@ class _UntilComposer extends StatefulWidget {
   }
 }
 
-class _UntilComposerState extends State<_UntilComposer> {
+class _UntilComposerState extends ConsumerState<_UntilComposer> {
   static late _UntilComposerState _currentState;
   late _UntilOption _option;
   DateTime? _recommendationDate;
@@ -963,7 +969,7 @@ class _UntilComposerState extends State<_UntilComposer> {
   @override
   Widget build(BuildContext context) {
     // final i18nService = locator<I18nService>();
-    final localizations = context.text;
+    final localizations = ref.text;
     final theme = Theme.of(context);
 
     return Padding(
@@ -980,7 +986,7 @@ class _UntilComposerState extends State<_UntilComposer> {
                 onChanged: _onChanged,
                 title: Text(
                   value.localization(
-                    context,
+                    ref,
                     localizations,
                     widget.recommendation,
                   ),
@@ -1035,7 +1041,7 @@ enum _UntilOption { unlimited, recommendation, date }
 
 extension _ExtensionUntilOption on _UntilOption {
   String localization(
-    BuildContext context,
+    WidgetRef ref,
     AppLocalizations localizations,
     IsoDuration? recommendation,
   ) {
@@ -1043,9 +1049,8 @@ extension _ExtensionUntilOption on _UntilOption {
       case _UntilOption.unlimited:
         return localizations.composeAppointmentRecurrenceUntilOptionUnlimited;
       case _UntilOption.recommendation:
-        final duration = recommendation == null
-            ? ''
-            : context.formatIsoDuration(recommendation);
+        final duration =
+            recommendation == null ? '' : ref.formatIsoDuration(recommendation);
         return localizations
             .composeAppointmentRecurrenceUntilOptionRecommended(duration);
       case _UntilOption.date:

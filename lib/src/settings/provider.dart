@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../account/model.dart';
@@ -50,7 +49,6 @@ class SettingsNotifier extends Notifier<Settings> {
   /// Retrieves the HTML signature for the specified [account]
   /// and [composeAction]
   String getSignatureHtml(
-    BuildContext context,
     RealAccount account,
     ComposeAction composeAction,
     String? languageCode,
@@ -59,17 +57,15 @@ class SettingsNotifier extends Notifier<Settings> {
       return '';
     }
 
-    return account.getSignatureHtml(languageCode) ??
-        getSignatureHtmlGlobal(context);
+    return account.getSignatureHtml(languageCode) ?? getSignatureHtmlGlobal();
   }
 
   /// Retrieves the global signature
-  String getSignatureHtmlGlobal(BuildContext context) =>
-      state.signatureHtml ?? '<p>---<br/>${context.text.signature}</p>';
+  String getSignatureHtmlGlobal() =>
+      state.signatureHtml ?? '<p>---<br/>${ref.text.signature}</p>';
 
   /// Retrieves the plain text signature for the specified account
   String getSignaturePlain(
-    BuildContext context,
     RealAccount account,
     ComposeAction composeAction,
   ) {
@@ -77,10 +73,10 @@ class SettingsNotifier extends Notifier<Settings> {
       return '';
     }
 
-    return account.signaturePlain ?? getSignaturePlainGlobal(context);
+    return account.signaturePlain ?? getSignaturePlainGlobal();
   }
 
   /// Retrieves the global plain text signature
-  String getSignaturePlainGlobal(BuildContext context) =>
-      state.signaturePlain ?? '\n---\n${context.text.signature}';
+  String getSignaturePlainGlobal() =>
+      state.signaturePlain ?? '\n---\n${ref.text.signature}';
 }

@@ -1,5 +1,6 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
@@ -11,10 +12,11 @@ class LocalizedDialogHelper {
   LocalizedDialogHelper._();
 
   /// Shows the about dialog
-  static Future<void> showAbout(BuildContext context) async {
-    final localizations = context.text;
+  static Future<void> showAbout(WidgetRef ref) async {
+    final localizations = ref.text;
     final packageInfo = await PackageInfo.fromPlatform();
     final version = 'v${packageInfo.version}+${packageInfo.buildNumber}';
+    final context = ref.context;
     if (context.mounted) {
       showAboutDialog(
         context: context,
@@ -57,16 +59,16 @@ class LocalizedDialogHelper {
   /// Set [isDangerousAction] to `true` for marking the action as
   /// dangerous on Cupertino
   static Future<bool?> askForConfirmation(
-    BuildContext context, {
+    WidgetRef ref, {
     required String title,
     required String query,
     String? action,
     bool isDangerousAction = false,
   }) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return DialogHelper.askForConfirmation(
-      context,
+      ref.context,
       title: title,
       query: query,
       action: action,
@@ -79,15 +81,15 @@ class LocalizedDialogHelper {
   ///
   /// Compare [showWidgetDialog] for parameter details.
   static Future<T?> showTextDialog<T>(
-    BuildContext context,
+    WidgetRef ref,
     String title,
     String text, {
     List<Widget>? actions,
   }) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return DialogHelper.showTextDialog<T>(
-      context,
+      ref.context,
       title,
       text,
       actions: actions,
@@ -108,16 +110,16 @@ class LocalizedDialogHelper {
   /// When default actions are used, this method will return `true` when the
   /// user pressed `ok` and `false` after selecting `cancel`.
   static Future<T?> showWidgetDialog<T>(
-    BuildContext context,
+    WidgetRef ref,
     Widget content, {
     String? title,
     List<Widget>? actions,
     DialogActions defaultActions = DialogActions.ok,
   }) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return DialogHelper.showWidgetDialog<T>(
-      context,
+      ref.context,
       content,
       title: title,
       actions: actions,

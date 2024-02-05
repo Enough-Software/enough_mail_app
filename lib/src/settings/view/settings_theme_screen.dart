@@ -15,7 +15,7 @@ class SettingsDesignScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final theme = Theme.of(context);
 
     final themeSettings = ref.watch(
@@ -153,7 +153,7 @@ class SettingsDesignScreen extends HookConsumerWidget {
                           Color selectedColor = themeSettings.colorSchemeSeed;
                           final result =
                               await LocalizedDialogHelper.showWidgetDialog(
-                            context,
+                            ref,
                             ColorPicker(
                               pickerColor: themeSettings.colorSchemeSeed,
                               onColorChanged: (value) => selectedColor = value,

@@ -34,7 +34,7 @@ class MailScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final text = context.text;
+    final text = ref.text;
     final sourceFuture = ref.watch(
       sourceProvider(
         account: account,

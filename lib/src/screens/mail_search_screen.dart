@@ -21,7 +21,7 @@ class MailSearchScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final text = context.text;
+    final text = ref.text;
     final searchSource = ref.watch(
       mailSearchProvider(
         localizations: text,

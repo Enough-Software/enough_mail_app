@@ -2,11 +2,12 @@ import 'dart:math';
 
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/extension.dart';
 
 /// Displays a splash screen
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatefulHookConsumerWidget {
   /// Creates a new [SplashScreen]
   const SplashScreen({super.key});
 
@@ -16,10 +17,10 @@ class SplashScreen extends StatefulWidget {
   static bool get isShown => _isShown;
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -34,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final texts = [
       localizations.splashLoading1,
       localizations.splashLoading2,

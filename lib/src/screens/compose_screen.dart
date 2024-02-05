@@ -121,7 +121,7 @@ class SenderDropdown extends HookConsumerWidget {
         }
       },
       value: senderState.value,
-      hint: Text(context.text.composeSenderHint),
+      hint: Text(ref.text.composeSenderHint),
     );
   }
 }
@@ -222,10 +222,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       Future.value(widget.data.resumeText);
 
   String get _signature => ref.read(settingsProvider.notifier).getSignatureHtml(
-        context,
         _from.account,
         widget.data.action,
-        context.text.localeName,
+        ref.text.localeName,
       );
 
   Future<String> _loadMailTextFromMessage() async {
@@ -243,7 +242,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       }
     } else {
       const blockExternalImages = false;
-      final emptyMessageText = context.text.composeEmptyMessage;
+      final emptyMessageText = ref.text.composeEmptyMessage;
       const maxImageWidth = 300;
       if (widget.data.action == ComposeAction.newMessage) {
         // continue with draft:
@@ -412,7 +411,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     final subject = _subjectController.text.trim();
     if (subject.isEmpty) {
       final result = await LocalizedDialogHelper.askForConfirmation(
-        context,
+        ref,
         title: localizations.composeSubjectHint,
         query: localizations.composeWarningNoSubject,
         action: localizations.composeActionSentWithoutSubject,
@@ -448,7 +447,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         final message =
             (e is MailException) ? e.message ?? e.toString() : e.toString();
         await LocalizedDialogHelper.showTextDialog(
-          currentContext,
+          ref,
           localizations.errorTitle,
           localizations.composeSendErrorInfo(message),
           actions: [
@@ -517,7 +516,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final titleText = widget.data.action == ComposeAction.answer
         ? localizations.composeTitleReply
         : widget.data.action == ComposeAction.forward
@@ -815,7 +814,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
 
   Future<void> _saveAsDraft() async {
     context.pop();
-    final localizations = context.text;
+    final localizations = ref.text;
     final mailClient = _getMailClient();
     final mime = await _buildMimeMessage(mailClient);
     try {
@@ -847,7 +846,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       final currentContext = Routes.navigatorKey.currentContext;
       if (currentContext != null && currentContext.mounted) {
         await LocalizedDialogHelper.showTextDialog(
-          currentContext,
+          ref,
           localizations.errorTitle,
           localizations.composeMessageSavedAsDraftErrorInfo(e.toString()),
           actions: [

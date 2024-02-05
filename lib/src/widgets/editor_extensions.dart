@@ -4,12 +4,13 @@ import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/extension.dart';
 import '../util/localized_dialog_helper.dart';
 
 /// A button to open the art extension dialog.
-class EditorArtExtensionButton extends StatelessWidget {
+class EditorArtExtensionButton extends ConsumerWidget {
   /// Creates a new [EditorArtExtensionButton].
   const EditorArtExtensionButton({super.key, required this.editorApi});
 
@@ -17,35 +18,36 @@ class EditorArtExtensionButton extends StatelessWidget {
   final HtmlEditorApi editorApi;
 
   @override
-  Widget build(BuildContext context) => PlatformIconButton(
+  Widget build(BuildContext context, WidgetRef ref) => PlatformIconButton(
         icon: const Icon(CommunityMaterialIcons.format_font),
-        onPressed: () => showArtExtensionDialog(context, editorApi),
+        onPressed: () => showArtExtensionDialog(ref, editorApi),
       );
 
   /// Shows the art extension dialog.
   static void showArtExtensionDialog(
-    BuildContext context,
+    WidgetRef ref,
     HtmlEditorApi editorApi,
   ) {
-    //final localizations = context.text;
+    //final localizations = ref.text;
     LocalizedDialogHelper.showWidgetDialog(
-      context,
+      ref,
       _EditorArtExtensionWidget(editorApi: editorApi),
       defaultActions: DialogActions.cancel,
     );
   }
 }
 
-class _EditorArtExtensionWidget extends StatefulWidget {
+class _EditorArtExtensionWidget extends StatefulHookConsumerWidget {
   const _EditorArtExtensionWidget({required this.editorApi});
   final HtmlEditorApi editorApi;
 
   @override
-  State<_EditorArtExtensionWidget> createState() =>
+  ConsumerState<_EditorArtExtensionWidget> createState() =>
       _EditorArtExtensionWidgetState();
 }
 
-class _EditorArtExtensionWidgetState extends State<_EditorArtExtensionWidget> {
+class _EditorArtExtensionWidgetState
+    extends ConsumerState<_EditorArtExtensionWidget> {
   final _inputController = TextEditingController();
   final _textsByUnicodeFont = <UnicodeFont, String>{};
 
@@ -60,7 +62,7 @@ class _EditorArtExtensionWidgetState extends State<_EditorArtExtensionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final captions = {
       UnicodeFont.serifBold: localizations.fontSerifBold,
       UnicodeFont.serifItalic: localizations.fontSerifItalic,

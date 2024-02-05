@@ -3,6 +3,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/extension.dart';
 import '../oauth/oauth.dart';
@@ -127,11 +128,11 @@ class MailHoster {
   ///
   /// As this is UI, consider moving to a widget extension class?
   Widget buildSignInButton(
-    BuildContext context, {
+    WidgetRef ref, {
     required Function() onPressed,
     bool isSignInButton = false,
   }) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final providerName = displayName ?? '<unknown>';
     final buttonText = isSignInButton
         ? localizations.addAccountOauthSignIn(providerName)
@@ -210,11 +211,11 @@ class GmailMailHoster extends MailHoster {
 
   @override
   Widget buildSignInButton(
-    BuildContext context, {
+    WidgetRef ref, {
     required Function() onPressed,
     bool isSignInButton = false,
   }) {
-    final localizations = context.text;
+    final localizations = ref.text;
     const googleBlue = Color(0xff4285F4);
     const googleText = Color(0x89000000);
 

@@ -1,5 +1,6 @@
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
@@ -7,7 +8,7 @@ import '../models/message.dart';
 import '../settings/theme/icon_service.dart';
 
 /// Displays the content of a message in the message overview.
-class MessageOverviewContent extends StatelessWidget {
+class MessageOverviewContent extends ConsumerWidget {
   /// Creates a new [MessageOverviewContent] widget.
   const MessageOverviewContent({
     super.key,
@@ -22,17 +23,17 @@ class MessageOverviewContent extends StatelessWidget {
   final bool isSentMessage;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final msg = message;
     final mime = msg.mimeMessage;
-    final localizations = context.text;
+    final localizations = ref.text;
     final threadSequence = mime.threadSequence;
     final threadLength =
         threadSequence != null ? threadSequence.toList().length : 0;
     final subject = mime.decodeSubject() ?? localizations.subjectUndefined;
     final senderOrRecipients = _getSenderOrRecipients(mime, localizations);
     final hasAttachments = msg.hasAttachment;
-    final date = context.formatDateTime(mime.decodeDate());
+    final date = ref.formatDateTime(mime.decodeDate());
     final theme = Theme.of(context);
 
     return Container(

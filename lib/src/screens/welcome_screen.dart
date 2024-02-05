@@ -1,6 +1,7 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
@@ -11,13 +12,13 @@ import '../settings/theme/icon_service.dart';
 import '../widgets/legalese.dart';
 
 /// Displays a welcome screen
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends ConsumerWidget {
   /// Creates a [WelcomeScreen]
   const WelcomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final localizations = context.text;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localizations = ref.text;
     final pages = _buildPages(context, localizations);
 
     return Theme(

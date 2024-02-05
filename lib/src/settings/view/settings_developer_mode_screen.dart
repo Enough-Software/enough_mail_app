@@ -21,7 +21,7 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
     final isDeveloperModeEnabled = ref.watch(
       settingsProvider.select(
         (value) => value.enableDeveloperMode,
@@ -101,10 +101,10 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) async {
-    final localizations = context.text;
+    final localizations = ref.text;
     final controller = TextEditingController();
     final url = await LocalizedDialogHelper.showWidgetDialog<String>(
-      context,
+      ref,
       DecoratedPlatformTextField(
         controller: controller,
         decoration: InputDecoration(
@@ -145,19 +145,19 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
                   : ref.read(realAccountsProvider).first)
               .appExtensions = [appExtension];
           if (context.mounted) {
-            _showExtensionDetails(context, url, appExtension);
+            _showExtensionDetails(context, ref, url, appExtension);
           }
           await ref.read(realAccountsProvider.notifier).save();
         } else if (context.mounted) {
           await LocalizedDialogHelper.showTextDialog(
-            context,
+            ref,
             localizations.errorTitle,
             localizations.extensionsManualLoadingError(url),
           );
         }
       } else if (context.mounted) {
         await LocalizedDialogHelper.showTextDialog(
-          context,
+          ref,
           localizations.errorTitle,
           'Invalid URL "$url"',
         );
@@ -174,7 +174,7 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
   }
 
   Future<void> _reloadExtensions(BuildContext context, WidgetRef ref) async {
-    final localizations = context.text;
+    final localizations = ref.text;
     final accounts = ref.read(realAccountsProvider);
     final domains = <_AccountDomain>[];
     for (final account in accounts) {
@@ -192,7 +192,7 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
       );
     }
     await LocalizedDialogHelper.showWidgetDialog(
-      context,
+      ref,
       SingleChildScrollView(
         child: Column(
           children: [
@@ -211,6 +211,7 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
                         icon: const Icon(Icons.check),
                         onPressed: () => _showExtensionDetails(
                           context,
+                          ref,
                           domain.domain,
                           data,
                         ),
@@ -263,6 +264,7 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
 
   void _showExtensionDetails(
     BuildContext context,
+    WidgetRef ref,
     String? domainOrUrl,
     AppExtension data,
   ) {
@@ -270,7 +272,7 @@ class SettingsDeveloperModeScreen extends HookConsumerWidget {
     final forgotPasswordAction = data.forgotPasswordAction;
 
     LocalizedDialogHelper.showWidgetDialog(
-      context,
+      ref,
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -1,6 +1,7 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' hide WebViewConfiguration;
 
 import '../account/model.dart';
@@ -9,7 +10,7 @@ import '../models/models.dart';
 import '../routes/routes.dart';
 import 'extensions.dart';
 
-class ExtensionActionTile extends StatelessWidget {
+class ExtensionActionTile extends ConsumerWidget {
   const ExtensionActionTile({super.key, required this.actionDescription});
   final AppExtensionActionDescription actionDescription;
 
@@ -48,8 +49,8 @@ class ExtensionActionTile extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final languageCode = context.text.localeName;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final languageCode = ref.text.localeName;
     final icon = actionDescription.icon;
 
     return PlatformListTile(

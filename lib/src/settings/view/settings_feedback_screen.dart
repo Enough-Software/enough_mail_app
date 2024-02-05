@@ -5,6 +5,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
@@ -12,14 +13,16 @@ import '../../localization/extension.dart';
 import '../../scaffold_messenger/service.dart';
 import '../../screens/base.dart';
 
-class SettingsFeedbackScreen extends StatefulWidget {
+class SettingsFeedbackScreen extends StatefulHookConsumerWidget {
   const SettingsFeedbackScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() => _SettingsFeedbackScreenState();
+  ConsumerState<SettingsFeedbackScreen> createState() =>
+      _SettingsFeedbackScreenState();
 }
 
-class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
+class _SettingsFeedbackScreenState
+    extends ConsumerState<SettingsFeedbackScreen> {
   String? info;
 
   @override
@@ -62,7 +65,7 @@ class _SettingsFeedbackScreenState extends State<SettingsFeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return BasePage(
       title: localizations.feedbackTitle,

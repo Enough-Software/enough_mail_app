@@ -33,7 +33,7 @@ class InteractiveMediaScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final iconService = IconService.instance;
 
     return BasePage(
@@ -87,7 +87,7 @@ class InteractiveMediaScreen extends ConsumerWidget {
                   if (showErrorMessage) {
                     if (context.mounted) {
                       await LocalizedDialogHelper.showTextDialog(
-                        context,
+                        ref,
                         localizations.errorTitle,
                         localizations.developerShowAsEmailFailed,
                       );

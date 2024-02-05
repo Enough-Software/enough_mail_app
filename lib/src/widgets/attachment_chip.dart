@@ -3,6 +3,7 @@ import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/extension.dart';
 import '../logger.dart';
@@ -13,16 +14,16 @@ import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import 'ical_interactive_media.dart';
 
-class AttachmentChip extends StatefulWidget {
+class AttachmentChip extends StatefulHookConsumerWidget {
   const AttachmentChip({super.key, required this.info, required this.message});
   final ContentInfo info;
   final Message message;
 
   @override
-  State<AttachmentChip> createState() => _AttachmentChipState();
+  ConsumerState<AttachmentChip> createState() => _AttachmentChipState();
 }
 
-class _AttachmentChipState extends State<AttachmentChip> {
+class _AttachmentChipState extends ConsumerState<AttachmentChip> {
   MimePart? _mimePart;
   bool _isDownloading = false;
   MediaProvider? _mediaProvider;
@@ -41,8 +42,8 @@ class _AttachmentChipState extends State<AttachmentChip> {
             MimeMediaProviderFactory.fromMime(mimeMessage, mimePart);
       } catch (e, s) {
         _mediaProvider = MimeMediaProviderFactory.fromError(
-          title: context.text.errorTitle,
-          text: context.text.attachmentDecodeError(e.toString()),
+          title: ref.text.errorTitle,
+          text: ref.text.attachmentDecodeError(e.toString()),
         );
         logger.e(
           'Unable to decode mime-part with headers ${mimePart.headers}: $e',
@@ -202,9 +203,9 @@ class _AttachmentChipState extends State<AttachmentChip> {
       );
       if (context.mounted) {
         await LocalizedDialogHelper.showTextDialog(
-          context,
-          context.text.errorTitle,
-          context.text.attachmentDownloadError(e.message ?? e.toString()),
+          ref,
+          ref.text.errorTitle,
+          ref.text.attachmentDownloadError(e.message ?? e.toString()),
         );
       }
     } finally {
@@ -239,8 +240,8 @@ class _AttachmentChipState extends State<AttachmentChip> {
     BuildContext context,
     MediaProvider mediaProvider,
   ) {
-    final sizeText = context.formatMemory(mediaProvider.size);
-    final localizations = context.text;
+    final sizeText = ref.formatMemory(mediaProvider.size);
+    final localizations = ref.text;
     final iconData = IconService.instance
         .getForMediaType(MediaType.fromText(mediaProvider.mediaType));
 

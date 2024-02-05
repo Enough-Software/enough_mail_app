@@ -2,6 +2,7 @@ import 'package:enough_platform_widgets/platform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/app_localizations.g.dart';
 import '../localization/extension.dart';
@@ -9,7 +10,7 @@ import '../screens/base.dart';
 import 'service.dart';
 
 /// Displays a lock screen
-class LockScreen extends StatefulWidget {
+class LockScreen extends StatefulHookConsumerWidget {
   /// Creates a new [LockScreen]
   const LockScreen({super.key});
 
@@ -19,10 +20,10 @@ class LockScreen extends StatefulWidget {
   static bool get isShown => _isShown;
 
   @override
-  State<LockScreen> createState() => _LockScreenState();
+  ConsumerState<LockScreen> createState() => _LockScreenState();
 }
 
-class _LockScreenState extends State<LockScreen> {
+class _LockScreenState extends ConsumerState<LockScreen> {
   @override
   void initState() {
     super.initState();
@@ -37,7 +38,7 @@ class _LockScreenState extends State<LockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return BasePage(
       includeDrawer: false,
@@ -69,7 +70,7 @@ class _LockScreenState extends State<LockScreen> {
 
   Future<void> _authenticate(BuildContext context) async {
     final didAuthenticate =
-        await BiometricsService.instance.authenticate(context.text);
+        await BiometricsService.instance.authenticate(ref.text);
     if (didAuthenticate && context.mounted) {
       context.pop();
     }

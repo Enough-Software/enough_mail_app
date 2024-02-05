@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../app_lifecycle/provider.dart';
@@ -66,7 +67,7 @@ class AppLock extends _$AppLock {
             logger.d('pushing lock screen (immediately + isResumed)');
             unawaited(context.pushNamed(Routes.lockScreen));
           }
-          _unlock(context);
+          _unlock(context, ref);
           break;
         case LockTimePreference.after5minutes:
           if (difference.inMinutes >= 5) {
@@ -74,7 +75,7 @@ class AppLock extends _$AppLock {
               logger.d('pushing lock screen 5min');
               unawaited(context.pushNamed(Routes.lockScreen));
             }
-            _unlock(context);
+            _unlock(context, ref);
           }
           break;
         case LockTimePreference.after30minutes:
@@ -83,15 +84,15 @@ class AppLock extends _$AppLock {
               logger.d('pushing lock screen 30min');
               unawaited(context.pushNamed(Routes.lockScreen));
             }
-            _unlock(context);
+            _unlock(context, ref);
           }
           break;
       }
     }
   }
 
-  Future<void> _unlock(BuildContext context) async {
-    final localizations = context.text;
+  Future<void> _unlock(BuildContext context, Ref ref) async {
+    final localizations = ref.text;
     var isUnlocked = false;
     while (!isUnlocked) {
       ref.read(appLifecycleProvider.notifier).ignoreNextInactivationCycle();

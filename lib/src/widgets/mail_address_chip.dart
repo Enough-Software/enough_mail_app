@@ -5,6 +5,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/extension.dart';
 import '../models/compose_data.dart';
@@ -12,7 +13,7 @@ import '../routes/routes.dart';
 import '../scaffold_messenger/service.dart';
 import 'icon_text.dart';
 
-class MailAddressChip extends StatelessWidget {
+class MailAddressChip extends ConsumerWidget {
   const MailAddressChip({super.key, required this.mailAddress, this.icon});
   final MailAddress mailAddress;
   final Widget? icon;
@@ -22,8 +23,8 @@ class MailAddressChip extends StatelessWidget {
       : mailAddress.email;
 
   @override
-  Widget build(BuildContext context) {
-    final localizations = context.text;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localizations = ref.text;
     final theme = Theme.of(context);
 
     return PlatformPopupMenuButton<_AddressAction>(

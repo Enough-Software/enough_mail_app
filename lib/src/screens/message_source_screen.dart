@@ -63,7 +63,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     _searchEditingController = TextEditingController();
     _sectionedMessageSource = DateSectionedMessageSource(
       widget.messageSource,
-      firstDayOfWeek: context.firstDayOfWeek,
+      firstDayOfWeek: ref.firstDayOfWeek,
     );
     _sectionedMessageSource.addListener(_update);
     _messageLoader = _initMessageSource();
@@ -95,7 +95,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     }
     final search = MailSearch(trimmedQuery, SearchQueryType.allTextHeaders);
     final searchSource =
-        _sectionedMessageSource.messageSource.search(context.text, search);
+        _sectionedMessageSource.messageSource.search(ref.text, search);
     context.pushNamed(
       Routes.messageSource,
       pathParameters: {
@@ -113,7 +113,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     // print('parent name: ${widget.messageSource.parentName}');
     final settings = ref.watch(settingsProvider);
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
     final source = _sectionedMessageSource.messageSource;
     final searchColor = theme.brightness == Brightness.light
         ? theme.colorScheme.onSecondary
@@ -414,7 +414,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                             final section = element.section;
 
                             if (section != null) {
-                              final text = context.getDateRangeName(
+                              final text = ref.getDateRangeName(
                                 section.range,
                               );
 
@@ -788,7 +788,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
 
   Future<void> _handleMultipleChoice(_MultipleChoice choice) async {
     final source = _sectionedMessageSource.messageSource;
-    final localizations = context.text;
+    final localizations = ref.text;
     if (_selectedMessages.isEmpty) {
       ScaffoldMessengerService.instance.showTextSnackBar(
         localizations,
@@ -1021,7 +1021,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   }
 
   void move() {
-    final localizations = context.text;
+    final localizations = ref.text;
     var account = widget.messageSource.account;
     if (account.isVirtual) {
       // check how many mail-clients are involved in the current selection
@@ -1048,7 +1048,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     }
 
     LocalizedDialogHelper.showWidgetDialog(
-      context,
+      ref,
       SingleChildScrollView(
         child: MailboxTree(
           account: account,
@@ -1066,7 +1066,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     });
     context.pop(); // alert
     final source = _sectionedMessageSource.messageSource;
-    final localizations = context.text;
+    final localizations = ref.text;
     final account = widget.messageSource.account;
     if (account.isVirtual) {
       await source.moveMessagesToFlag(
@@ -1169,12 +1169,12 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
   }
 
   Future<void> _deleteAllMessages() async {
-    final localizations = context.text;
+    final localizations = ref.text;
     final firstMessage = widget.messageSource.cache.first;
     var expunge =
         firstMessage?.mimeMessage.hasFlag(MessageFlags.deleted) ?? false;
     final confirmed = await LocalizedDialogHelper.showWidgetDialog(
-      context,
+      ref,
       Column(
         mainAxisSize: MainAxisSize.min,
         children: [

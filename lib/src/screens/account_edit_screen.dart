@@ -42,7 +42,7 @@ class AccountEditScreen extends HookConsumerWidget {
       return Center(child: PlatformCircularProgressIndicator());
     }
     final unifiedAccount = ref.watch(unifiedAccountProvider);
-    final localizations = context.text;
+    final localizations = ref.text;
     final accountNameController = useTextEditingController(text: account.name);
     final userNameController = useTextEditingController(text: account.userName);
     final theme = Theme.of(context);
@@ -268,7 +268,7 @@ class AccountEditScreen extends HookConsumerWidget {
                         PlatformIconButton(
                           icon: Icon(CommonPlatformIcons.info),
                           onPressed: () => LocalizedDialogHelper.showTextDialog(
-                            context,
+                            ref,
                             localizations.editAccountBccMyselfDescriptionTitle,
                             localizations.editAccountBccMyselfDescriptionText,
                           ),
@@ -309,7 +309,7 @@ class AccountEditScreen extends HookConsumerWidget {
                         onPressed: () async {
                           final result =
                               await LocalizedDialogHelper.askForConfirmation(
-                            context,
+                            ref,
                             title: localizations
                                 .editAccountDeleteAccountConfirmationTitle,
                             query: localizations
@@ -387,7 +387,7 @@ class AccountEditScreen extends HookConsumerWidget {
         userName: authentication.userName,
       );
       final result = await LocalizedDialogHelper.showWidgetDialog(
-        context,
+        ref,
         _PasswordUpdateDialog(
           authentication: mutableAuth,
         ),
@@ -491,9 +491,9 @@ class AccountEditScreen extends HookConsumerWidget {
           .replaceAccount(oldAccount: account, newAccount: connectedAccount);
       isRetryingToConnectState.value = false;
       if (context.mounted) {
-        final localizations = context.text;
+        final localizations = ref.text;
         await LocalizedDialogHelper.showTextDialog(
-          context,
+          ref,
           localizations.editAccountFailureToConnectFixedTitle,
           localizations.editAccountFailureToConnectFixedInfo,
         );
@@ -507,9 +507,9 @@ class AccountEditScreen extends HookConsumerWidget {
       logger.e('Unable to reconnect account: $e');
       isRetryingToConnectState.value = false;
       if (context.mounted) {
-        final localizations = context.text;
+        final localizations = ref.text;
         await LocalizedDialogHelper.showTextDialog(
-          context,
+          ref,
           localizations.errorTitle,
           localizations.editAccountFailureToConnectInfo(account.name),
         );
@@ -529,7 +529,7 @@ class _MutablePlainAuthentication {
   String password;
 }
 
-class _PasswordUpdateDialog extends StatefulWidget {
+class _PasswordUpdateDialog extends StatefulHookConsumerWidget {
   const _PasswordUpdateDialog({
     required this.authentication,
   });
@@ -537,10 +537,10 @@ class _PasswordUpdateDialog extends StatefulWidget {
   final _MutablePlainAuthentication authentication;
 
   @override
-  _PasswordUpdateDialogState createState() => _PasswordUpdateDialogState();
+  ConsumerState createState() => _PasswordUpdateDialogState();
 }
 
-class _PasswordUpdateDialogState extends State<_PasswordUpdateDialog> {
+class _PasswordUpdateDialogState extends ConsumerState<_PasswordUpdateDialog> {
   late TextEditingController _controller;
   @override
   void initState() {
@@ -551,7 +551,7 @@ class _PasswordUpdateDialogState extends State<_PasswordUpdateDialog> {
   @override
   Widget build(BuildContext context) => PasswordField(
         controller: _controller,
-        labelText: context.text.accountDetailsPasswordLabel,
+        labelText: ref.text.accountDetailsPasswordLabel,
         onChanged: (text) => widget.authentication.password = text,
       );
 }
@@ -627,7 +627,7 @@ class _PlusAliasTestingDialogState
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return PlatformAlertDialog(
       title: Text(
@@ -761,7 +761,7 @@ class _AliasEditDialogState extends ConsumerState<_AliasEditDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return PlatformAlertDialog(
       title: Text(widget.isNewAlias

@@ -211,7 +211,7 @@ class _AccountServerDetailsEditorState
   }
 
   Future<void> testConnection(BuildContext context) async {
-    final localizations = context.text;
+    final localizations = ref.text;
     final mailAccount = widget.account.mailAccount;
     final userName = (_userNameController.text.isEmpty)
         ? mailAccount.email
@@ -264,7 +264,7 @@ class _AccountServerDetailsEditorState
     if (completedAccount == null) {
       if (mounted) {
         await LocalizedDialogHelper.showTextDialog(
-          context,
+          ref,
           localizations.errorTitle,
           localizations.accountDetailsErrorHostProblem(
             _incomingHostDomainController.text,
@@ -304,7 +304,7 @@ class _AccountServerDetailsEditorState
       }
     } else if (mounted) {
       await LocalizedDialogHelper.showTextDialog(
-        context,
+        ref,
         localizations.errorTitle,
         localizations.accountDetailsErrorLoginProblem(
           incomingUserName,
@@ -316,7 +316,7 @@ class _AccountServerDetailsEditorState
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return SingleChildScrollView(
       child: Material(

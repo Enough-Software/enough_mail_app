@@ -99,7 +99,7 @@ class AddAttachmentPopupButton extends ConsumerWidget {
         .read(appLifecycleProvider.notifier)
         .ignoreNextInactivationCycle(timeout: const Duration(seconds: 120));
 
-    final localizations = context.text;
+    final localizations = ref.text;
     final iconService = IconService.instance;
     const brightness = Brightness.light;
     // TODO(RV): implement brightness access
@@ -207,7 +207,7 @@ class AddAttachmentPopupButton extends ConsumerWidget {
             break;
           case 5: // gif / sticker / emoji file
             if (context.mounted) {
-              changed = await addAttachmentGif(context, localizations);
+              changed = await addAttachmentGif(ref, localizations);
             }
             break;
           case 6: // appointment
@@ -254,13 +254,13 @@ class AddAttachmentPopupButton extends ConsumerWidget {
   }
 
   Future<bool> addAttachmentGif(
-    BuildContext context,
+    WidgetRef ref,
     AppLocalizations localizations,
   ) async {
     final giphy = KeyService.instance.giphy;
     if (giphy == null) {
       await LocalizedDialogHelper.showTextDialog(
-        context,
+        ref,
         localizations.errorTitle,
         'No GIPHY API key found. Please check set up instructions.',
       );
@@ -269,7 +269,7 @@ class AddAttachmentPopupButton extends ConsumerWidget {
     }
 
     final gif = await Giphy.getGif(
-      context: context,
+      context: ref.context,
       apiKey: giphy,
       // searchLabelText: searchSticker
       //     ? localizations.attachTypeStickerSearch
@@ -396,7 +396,7 @@ class _ComposeAttachment extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final parentMessage = this.parentMessage;
 
     return Padding(

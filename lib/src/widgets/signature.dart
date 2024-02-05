@@ -24,13 +24,13 @@ class SignatureWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final account = this.account;
     final signatureState = useState<String?>(
-      account?.getSignatureHtml(context.text.localeName) ??
-          ref.read(settingsProvider.notifier).getSignatureHtmlGlobal(context),
+      account?.getSignatureHtml(ref.text.localeName) ??
+          ref.read(settingsProvider.notifier).getSignatureHtmlGlobal(),
     );
     final signature = signatureState.value;
 
     Future<void> showEditor() async {
-      final localizations = context.text;
+      final localizations = ref.text;
       final iconService = IconService.instance;
       HtmlEditorApi? editorApi;
 
@@ -39,9 +39,7 @@ class SignatureWidget extends HookConsumerWidget {
         account?.name ?? localizations.signatureSettingsTitle,
         PackagedHtmlEditor(
           initialContent: signature ??
-              ref
-                  .read(settingsProvider.notifier)
-                  .getSignatureHtmlGlobal(context),
+              ref.read(settingsProvider.notifier).getSignatureHtmlGlobal(),
           excludeDocumentLevelControls: true,
           onCreated: (api) => editorApi = api,
         ),
@@ -59,8 +57,7 @@ class SignatureWidget extends HookConsumerWidget {
                 } else {
                   final settings = ref.read(settingsProvider);
                   final notifier = ref.read(settingsProvider.notifier);
-                  signatureState.value =
-                      notifier.getSignatureHtmlGlobal(context);
+                  signatureState.value = notifier.getSignatureHtmlGlobal();
                   await notifier.update(
                     settings.withoutSignatures(),
                   );
@@ -93,7 +90,7 @@ class SignatureWidget extends HookConsumerWidget {
       return PlatformListTile(
         leading: const Icon(Icons.add),
         title: Text(
-          context.text.signatureSettingsAddForAccount(account?.name ?? ''),
+          ref.text.signatureSettingsAddForAccount(account?.name ?? ''),
         ),
         onTap: showEditor,
       );

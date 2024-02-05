@@ -4,6 +4,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/extension.dart';
 import '../models/message.dart';
@@ -14,7 +15,7 @@ import 'mail_address_chip.dart';
 enum _DragAction { noted, later, delete, reply }
 
 /// A stack of messages that can be processed.
-class MessageStack extends StatefulWidget {
+class MessageStack extends StatefulHookConsumerWidget {
   /// Creates a new [MessageStack] widget.
   const MessageStack({super.key, required this.messageSource});
 
@@ -22,10 +23,10 @@ class MessageStack extends StatefulWidget {
   final MessageSource messageSource;
 
   @override
-  State<MessageStack> createState() => _MessageStackState();
+  ConsumerState<MessageStack> createState() => _MessageStackState();
 }
 
-class _MessageStackState extends State<MessageStack> {
+class _MessageStackState extends ConsumerState<MessageStack> {
   static final _random = Random();
   int _currentMessageIndex = 0;
   Message? _currentMessage;
@@ -82,7 +83,7 @@ class _MessageStackState extends State<MessageStack> {
   Widget build(BuildContext context) {
     final quickReplies = ['OK', 'Thank you!', '👍', '😊'];
     final dateTime = _currentMessage?.mimeMessage.decodeDate();
-    final dayName = dateTime == null ? '' : context.formatDay(dateTime);
+    final dayName = dateTime == null ? '' : ref.formatDay(dateTime);
     final currentMessage = _currentMessage;
 
     return Stack(
@@ -229,7 +230,7 @@ class _MessageStackState extends State<MessageStack> {
       if (context.mounted) {
         // TODO(RV): allow undo when marking as deleted
         ScaffoldMessengerService.instance.showTextSnackBar(
-          context.text,
+          ref.text,
           snack,
           undo: () async {
             // bring back message:

@@ -33,7 +33,7 @@ class SettingsSignatureScreen extends HookConsumerWidget {
     });
 
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
     final accounts = ref.read(realAccountsProvider);
     final accountsWithSignature = List<RealAccount>.from(
       accounts.where(

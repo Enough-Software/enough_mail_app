@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:enough_icalendar/enough_icalendar.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart' as date_intl;
 import 'package:intl/date_symbols.dart';
 import 'package:intl/intl.dart';
 
 import '../util/date_helper.dart';
 import 'app_localizations.g.dart';
-import 'app_localizations_en.g.dart';
+import 'provider.dart';
 
 // lateDateFormat _dateTimeFormatToday;
 // late intl.DateFormat _dateTimeFormatLastWeek;
@@ -23,10 +24,15 @@ import 'app_localizations_en.g.dart';
 // // late intl.DateFormat _dateFormatNoTime;
 
 /// Allows to look up the localized strings for the current locale
-extension AppLocalizationBuildContext on BuildContext {
+extension AppLocalizationRef on Ref {
   /// Retrieves the current localizations
-  AppLocalizations get text =>
-      AppLocalizations.of(this) ?? AppLocalizationsEn();
+  AppLocalizations get text => read(currentAppLocalizationProvider);
+}
+
+/// Allows to look up the localized strings for the current locale
+extension AppLocalizationWidgetRef on WidgetRef {
+  /// Retrieves the current localizations
+  AppLocalizations get text => read(currentAppLocalizationProvider);
 
   /// Retrieves the data range Name
   String getDateRangeName(
@@ -56,6 +62,7 @@ extension AppLocalizationBuildContext on BuildContext {
   }
 
   DateFormat get _dateTimeFormatLong =>
+      // cSpell: ignore yMMMMEEEEd
       DateFormat.yMMMMEEEEd(text.localeName).add_jm();
   DateFormat get _dateTimeFormatLastWeek =>
       DateFormat.E(text.localeName).add_jm();
@@ -147,6 +154,7 @@ extension AppLocalizationBuildContext on BuildContext {
     final dateSymbols = date_intl.dateTimeSymbolMap()[text.localeName];
     final weekdays = (dateSymbols is DateSymbols)
         ? (abbreviate
+            // cSpell: ignore STANDALONESHORTWEEKDAYS, STANDALONEWEEKDAYS
             ? dateSymbols.STANDALONESHORTWEEKDAYS
             : dateSymbols.STANDALONEWEEKDAYS)
         : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -187,8 +195,6 @@ extension AppLocalizationBuildContext on BuildContext {
 
     return firstDay;
   }
-
-  String formatTimeOfDay(TimeOfDay timeOfDay) => timeOfDay.format(this);
 
   String? formatMemory(int? size) {
     if (size == null) {
@@ -243,6 +249,10 @@ extension AppLocalizationBuildContext on BuildContext {
   }
 }
 
+extension AppLocalizationExtension on BuildContext {
+  String formatTimeOfDay(TimeOfDay timeOfDay) => timeOfDay.format(this);
+}
+
 class WeekDay {
   const WeekDay(this.day, this.name);
   final int day;
@@ -265,6 +275,7 @@ const _firstDayOfWeekPerCountryCode = <String, int>{
   'cl': DateTime.sunday, // Chile
   'cn': DateTime.sunday, // China
   'co': DateTime.sunday, // Colombia
+  // cSpell: ignore Rica
   'cr': DateTime.sunday, // Costa Rica
   'do': DateTime.sunday, // Dominican Republic
   'dz': DateTime.saturday, // Algeria

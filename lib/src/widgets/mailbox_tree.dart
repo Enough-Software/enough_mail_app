@@ -36,7 +36,7 @@ class MailboxTree extends ConsumerWidget {
     final mailboxTreeValue = ref.watch(mailboxTreeProvider(account: account));
     final currentMailbox = ref.watch(currentMailboxProvider);
     final settings = ref.watch(settingsProvider);
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return mailboxTreeValue.when(
       loading: () => Center(

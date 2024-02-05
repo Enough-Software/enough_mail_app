@@ -18,7 +18,7 @@ class SettingsReadReceiptsScreen extends HookConsumerWidget {
       ),
     );
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
 
     void onReadReceiptDisplaySettingChanged(ReadReceiptDisplaySetting? value) =>
         _onReadReceiptDisplaySettingChanged(value, ref);

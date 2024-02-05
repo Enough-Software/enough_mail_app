@@ -25,7 +25,7 @@ class AppDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final accounts = ref.watch(allAccountsProvider);
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
     final iconService = IconService.instance;
     final currentAccount = ref.watch(currentAccountProvider);
     final hasAccountsWithErrors = ref.watch(hasAccountWithErrorProvider);
@@ -70,7 +70,9 @@ class AppDrawer extends ConsumerWidget {
                         leading: Icon(iconService.about),
                         title: Text(localizations.drawerEntryAbout),
                         onTap: () {
-                          LocalizedDialogHelper.showAbout(context);
+                          LocalizedDialogHelper.showAbout(
+                            ref,
+                          );
                         },
                       ),
                     ],
@@ -264,7 +266,7 @@ class AppDrawer extends ConsumerWidget {
   }
 }
 
-class _SelectableAccountTile extends StatelessWidget {
+class _SelectableAccountTile extends ConsumerWidget {
   const _SelectableAccountTile({
     required this.account,
     required this.currentAccount,
@@ -274,10 +276,10 @@ class _SelectableAccountTile extends StatelessWidget {
   final Account? currentAccount;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final account = this.account;
     final hasError = account is RealAccount && account.hasError;
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return SelectablePlatformListTile(
       leading: hasError ? const Icon(Icons.error_outline) : null,

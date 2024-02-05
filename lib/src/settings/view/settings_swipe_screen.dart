@@ -20,7 +20,7 @@ class SettingsSwipeScreen extends ConsumerWidget {
     final rightToLeftAction = settings.swipeRightToLeftAction;
 
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return BasePage(
       title: localizations.swipeSettingTitle,
@@ -68,12 +68,12 @@ class _SwipeSetting extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final swipeActionState = useState(swipeAction);
 
     Future<SwipeAction?> selectSwipe(SwipeAction current) async {
       final action = await LocalizedDialogHelper.showWidgetDialog(
-        context,
+        ref,
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.7,
           width: MediaQuery.of(context).size.width * 0.7,
@@ -157,14 +157,14 @@ class _SwipeSetting extends HookConsumerWidget {
   }
 }
 
-class _SwipeWidget extends StatelessWidget {
+class _SwipeWidget extends ConsumerWidget {
   const _SwipeWidget({required this.swipeAction, this.isSmall = false});
   final SwipeAction swipeAction;
   final bool isSmall;
 
   @override
-  Widget build(BuildContext context) {
-    final localizations = context.text;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localizations = ref.text;
 
     return Padding(
       padding: const EdgeInsets.all(4),

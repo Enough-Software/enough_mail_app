@@ -12,7 +12,7 @@ class SettingsReplyScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final localizations = context.text;
+    final localizations = ref.text;
     String getFormatPreferenceName(ReplyFormatPreference preference) {
       switch (preference) {
         case ReplyFormatPreference.alwaysHtml:

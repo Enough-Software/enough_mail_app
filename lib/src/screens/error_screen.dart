@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/extension.dart';
 import '../logger.dart';
 import 'base.dart';
 
 /// Displays details about an error
-class ErrorScreen extends StatelessWidget {
+class ErrorScreen extends ConsumerWidget {
   /// Creates an [ErrorScreen]
   ErrorScreen({
     super.key,
@@ -30,8 +31,8 @@ class ErrorScreen extends StatelessWidget {
   final StackTrace? stackTrace;
 
   @override
-  Widget build(BuildContext context) => BasePage(
-        title: context.text.errorTitle,
+  Widget build(BuildContext context, WidgetRef ref) => BasePage(
+        title: ref.text.errorTitle,
         content: Center(
           child: Padding(
             padding: const EdgeInsets.all(8),

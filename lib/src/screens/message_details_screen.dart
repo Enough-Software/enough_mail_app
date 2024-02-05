@@ -79,7 +79,7 @@ class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return ListenableBuilder(
       listenable: _current,
@@ -190,7 +190,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return SingleChildScrollView(
       child: SafeArea(
@@ -211,7 +211,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
   Widget _buildHeader(BuildContext context, AppLocalizations localizations) {
     final mime = widget.message.mimeMessage;
     final attachments = widget.message.attachments;
-    final date = context.formatDateTime(mime.decodeDate());
+    final date = ref.formatDateTime(mime.decodeDate());
     final subject = mime.decodeSubject();
 
     TableRow rowWithLabel({required String label, required Widget child}) =>
@@ -522,8 +522,7 @@ class MessageContentsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => BasePage(
-        title: message.mimeMessage.decodeSubject() ??
-            context.text.subjectUndefined,
+        title: message.mimeMessage.decodeSubject() ?? ref.text.subjectUndefined,
         content: SafeArea(
           child: MimeMessageViewer(
             mimeMessage: message.mimeMessage,
@@ -717,26 +716,26 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
   }
 }
 
-class ReadReceiptButton extends StatefulWidget {
+class ReadReceiptButton extends StatefulHookConsumerWidget {
   const ReadReceiptButton({super.key, required this.message});
   final Message message;
 
   @override
-  State<ReadReceiptButton> createState() => _ReadReceiptButtonState();
+  ConsumerState<ReadReceiptButton> createState() => _ReadReceiptButtonState();
 
   static bool shouldBeShown(MimeMessage mime, Settings settings) =>
       (mime.isReadReceiptSent || mime.isReadReceiptRequested) &&
       (settings.readReceiptDisplaySetting != ReadReceiptDisplaySetting.never);
 }
 
-class _ReadReceiptButtonState extends State<ReadReceiptButton> {
+class _ReadReceiptButtonState extends ConsumerState<ReadReceiptButton> {
   bool _isSendingReadReceipt = false;
 
   @override
   Widget build(BuildContext context) {
     final message = widget.message;
     final mime = message.mimeMessage;
-    final localizations = context.text;
+    final localizations = ref.text;
     if (mime.isReadReceiptSent) {
       return Text(
         localizations.detailsReadReceiptSentStatus,
@@ -773,15 +772,15 @@ class _ReadReceiptButtonState extends State<ReadReceiptButton> {
   }
 }
 
-class UnsubscribeButton extends StatefulWidget {
+class UnsubscribeButton extends StatefulHookConsumerWidget {
   const UnsubscribeButton({super.key, required this.message});
   final Message message;
 
   @override
-  State<UnsubscribeButton> createState() => _UnsubscribeButtonState();
+  ConsumerState<UnsubscribeButton> createState() => _UnsubscribeButtonState();
 }
 
-class _UnsubscribeButtonState extends State<UnsubscribeButton> {
+class _UnsubscribeButtonState extends ConsumerState<UnsubscribeButton> {
   bool _isActive = false;
 
   @override
@@ -789,7 +788,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
     if (_isActive) {
       return const PlatformProgressIndicator();
     }
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return widget.message.isNewsletterUnsubscribed
         ? widget.message.isNewsLetterSubscribable
@@ -808,11 +807,11 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
   }
 
   Future<void> _resubscribe() async {
-    final localizations = context.text;
+    final localizations = ref.text;
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName() ?? '<>';
     final confirmation = await LocalizedDialogHelper.askForConfirmation(
-      context,
+      ref,
       title: localizations.detailsNewsletterResubscribeDialogTitle,
       action: localizations.detailsNewsletterResubscribeDialogAction,
       query: localizations.detailsNewsletterResubscribeDialogQuestion(listName),
@@ -840,7 +839,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
       }
       if (context.mounted) {
         await LocalizedDialogHelper.showTextDialog(
-          context,
+          ref,
           subscribed
               ? localizations.detailsNewsletterResubscribeSuccessTitle
               : localizations.detailsNewsletterResubscribeFailureTitle,
@@ -855,11 +854,11 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
   }
 
   Future<void> _unsubscribe() async {
-    final localizations = context.text;
+    final localizations = ref.text;
     final mime = widget.message.mimeMessage;
     final listName = mime.decodeListName() ?? '<>';
     final confirmation = await LocalizedDialogHelper.askForConfirmation(
-      context,
+      ref,
       title: localizations.detailsNewsletterUnsubscribeDialogTitle,
       action: localizations.detailsNewsletterUnsubscribeDialogAction,
       query: localizations.detailsNewsletterUnsubscribeDialogQuestion(listName),
@@ -899,7 +898,7 @@ class _UnsubscribeButtonState extends State<UnsubscribeButton> {
       }
       if (context.mounted) {
         await LocalizedDialogHelper.showTextDialog(
-          context,
+          ref,
           unsubscribed
               ? localizations.detailsNewsletterUnsubscribeSuccessTitle
               : localizations.detailsNewsletterUnsubscribeFailureTitle,

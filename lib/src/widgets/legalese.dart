@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/extension.dart';
 import 'text_with_links.dart';
 
-class Legalese extends StatelessWidget {
+class Legalese extends ConsumerWidget {
   const Legalese({super.key});
   static const String urlPrivacyPolicy =
       'https://www.enough.de/privacypolicy/maily-pp.html';
@@ -11,8 +12,8 @@ class Legalese extends StatelessWidget {
       'https://github.com/Enough-Software/enough_mail_app/blob/main/LICENSE';
 
   @override
-  Widget build(BuildContext context) {
-    final localizations = context.text;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localizations = ref.text;
     final legaleseUsage = localizations.legaleseUsage;
     final privacyPolicy = localizations.legalesePrivacyPolicy;
     final termsAndConditions = localizations.legaleseTermsAndConditions;

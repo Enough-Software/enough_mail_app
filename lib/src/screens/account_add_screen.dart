@@ -137,7 +137,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
   @override
   Widget build(BuildContext context) {
     // print('build: current step=$_currentStep');
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return BasePage(
       title: localizations.addAccountTitle,
@@ -151,7 +151,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
                       await _onStepProgressed(step);
                     }
                   : null,
-              onStepCancel: () => Navigator.pop(context),
+              onStepCancel: () => context.pop(),
               currentStep: _currentStep,
               onStepTapped: (index) {
                 if (index != _currentStep && index <= _progressedSteps) {
@@ -587,7 +587,7 @@ class _AccountAddScreenState extends ConsumerState<AccountAddScreen> {
         ),
         FittedBox(
           child: mailHoster.buildSignInButton(
-            context,
+            ref,
             onPressed: () => _loginWithOAuth(
               mailHoster,
               oauthClient,

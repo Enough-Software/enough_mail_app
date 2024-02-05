@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../account/model.dart';
 import '../localization/app_localizations.g.dart';
@@ -20,7 +21,7 @@ import '../util/localized_dialog_helper.dart';
 import 'mail_address_chip.dart';
 import 'text_with_links.dart';
 
-class IcalInteractiveMedia extends StatefulWidget {
+class IcalInteractiveMedia extends StatefulHookConsumerWidget {
   const IcalInteractiveMedia({
     super.key,
     required this.mediaProvider,
@@ -30,10 +31,11 @@ class IcalInteractiveMedia extends StatefulWidget {
   final Message message;
 
   @override
-  State<IcalInteractiveMedia> createState() => _IcalInteractiveMediaState();
+  ConsumerState<IcalInteractiveMedia> createState() =>
+      _IcalInteractiveMediaState();
 }
 
-class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
+class _IcalInteractiveMediaState extends ConsumerState<IcalInteractiveMedia> {
   VCalendar? _calendar;
   VEvent? _event;
   bool _isPermanentError = false;
@@ -70,7 +72,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
     final event = _calendar?.event;
     if (event == null) {
       if (_isPermanentError) {
@@ -176,7 +178,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                       Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
-                          context.formatDateTime(
+                          ref.formatDateTime(
                             start.toLocal(),
                             alwaysUseAbsoluteFormat: true,
                             useLongFormat: true,
@@ -195,7 +197,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                       Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
-                          context.formatDateTime(
+                          ref.formatDateTime(
                             end.toLocal(),
                             alwaysUseAbsoluteFormat: true,
                             useLongFormat: true,
@@ -214,7 +216,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
                       Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
-                          context.formatIsoDuration(duration),
+                          ref.formatIsoDuration(duration),
                         ),
                       ),
                     ],
@@ -393,7 +395,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
           widget.message.source.getMimeSource(widget.message)?.mailClient;
       if (mailClient == null) {
         await LocalizedDialogHelper.showTextDialog(
-          context,
+          ref,
           localizations.errorTitle,
           localizations.icalendarParticipantStatusSentFailure(
             'No mail client found.',
@@ -419,7 +421,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
       }
       if (context.mounted) {
         await LocalizedDialogHelper.showTextDialog(
-          context,
+          ref,
           localizations.errorTitle,
           localizations.icalendarParticipantStatusSentFailure(
             e.toString(),
@@ -431,7 +433,7 @@ class _IcalInteractiveMediaState extends State<IcalInteractiveMedia> {
 
   Future<void> _queryParticipantStatus(AppLocalizations localizations) async {
     final status = await LocalizedDialogHelper.showTextDialog(
-      context,
+      ref,
       localizations.icalendarParticipantStatusChangeTitle,
       localizations.icalendarParticipantStatusChangeText,
       actions: [

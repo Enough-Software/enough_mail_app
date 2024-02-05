@@ -5,6 +5,7 @@ import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlng/latlng.dart';
 import 'package:location/location.dart';
 import 'package:map/map.dart';
@@ -15,14 +16,14 @@ import '../routes/routes.dart';
 import '../screens/base.dart';
 import 'service.dart';
 
-class LocationScreen extends StatefulWidget {
+class LocationScreen extends StatefulHookConsumerWidget {
   const LocationScreen({super.key});
 
   @override
-  State<LocationScreen> createState() => _LocationScreenState();
+  ConsumerState<LocationScreen> createState() => _LocationScreenState();
 }
 
-class _LocationScreenState extends State<LocationScreen> {
+class _LocationScreenState extends ConsumerState<LocationScreen> {
   final _repaintBoundaryKey = GlobalKey();
 
   final _defaultLocation = const LatLng(53.07516, 8.80777);
@@ -52,7 +53,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return BasePage(
       title: localizations.attachTypeLocation,

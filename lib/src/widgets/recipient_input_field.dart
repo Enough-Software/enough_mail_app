@@ -86,7 +86,7 @@ class _RecipientInputFieldState extends ConsumerState<RecipientInputField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
 
     return DragTarget<MailAddress>(
       builder: (context, candidateData, rejectedData) {

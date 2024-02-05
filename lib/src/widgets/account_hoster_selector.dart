@@ -1,11 +1,12 @@
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../hoster/service.dart';
 import '../localization/extension.dart';
 
 /// Allows to select a mail hoster
-class MailHosterSelector extends StatelessWidget {
+class MailHosterSelector extends ConsumerWidget {
   /// Creates a [MailHosterSelector]
   const MailHosterSelector({super.key, required this.onSelected});
 
@@ -13,8 +14,8 @@ class MailHosterSelector extends StatelessWidget {
   final void Function(MailHoster? hoster) onSelected;
 
   @override
-  Widget build(BuildContext context) {
-    final localizations = context.text;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localizations = ref.text;
     final hosters = MailHosterService.instance.hosters;
 
     return ListView.separated(
@@ -31,7 +32,7 @@ class MailHosterSelector extends StatelessWidget {
 
         return Center(
           child: provider.buildSignInButton(
-            context,
+            ref,
             onPressed: () => onSelected(provider),
           ),
         );

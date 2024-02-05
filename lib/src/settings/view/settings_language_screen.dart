@@ -28,7 +28,7 @@ class SettingsLanguageScreen extends HookConsumerWidget {
         .toList();
     final systemLanguage = _Language(
       null,
-      context.text.designThemeOptionSystem,
+      ref.text.designThemeOptionSystem,
     );
 
     final languages = [systemLanguage, ...available];
@@ -42,7 +42,7 @@ class SettingsLanguageScreen extends HookConsumerWidget {
         : systemLanguage;
 
     final theme = Theme.of(context);
-    final localizations = context.text;
+    final localizations = ref.text;
     final systemSettingApplied = useState(false);
     final selectedLanguageState = useState(selectedLanguage);
     final selectedLocalizationsState = useState<AppLocalizations?>(null);
@@ -81,7 +81,7 @@ class SettingsLanguageScreen extends HookConsumerWidget {
                     if (context.mounted) {
                       final confirmed =
                           await LocalizedDialogHelper.showTextDialog(
-                        context,
+                        ref,
                         selectedLocalizations.languageSettingConfirmationTitle,
                         selectedLocalizations.languageSettingConfirmationQuery,
                         actions: [
