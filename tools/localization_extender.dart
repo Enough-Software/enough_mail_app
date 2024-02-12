@@ -140,6 +140,7 @@ class LocalizationExtender {
         print('No referenced arb file found for ${currentArbFile.name}');
         continue;
       }
+      print('Extending ${currentArbFile.name}.');
       extendArb(referencedArbMap, currentArbFile.read());
     }
 
@@ -168,34 +169,35 @@ class LocalizationExtender {
   }
 
   /// Extends the arb file with the referenced arb file
-  Map<String, dynamic> extendArb(
-    Map<String, dynamic> arb,
+  void extendArb(
     Map<String, dynamic> referencedArb,
+    Map<String, dynamic> extendingArb,
   ) {
-    final extendedArb = <String, dynamic>{};
-    for (final entry in arb.entries) {
-      final key = entry.key;
-      final value = entry.value;
-      if (value is String) {
-        final referencedValue = referencedArb[key];
-        if (referencedValue is String) {
-          extendedArb[key] = '$value\n$referencedValue';
-        } else {
-          extendedArb[key] = value;
-        }
-      } else if (value is Map<String, dynamic>) {
-        final referencedValue = referencedArb[key];
-        if (referencedValue is Map<String, dynamic>) {
-          extendedArb[key] = extendArb(value, referencedValue);
-        } else {
-          extendedArb[key] = value;
-        }
-      } else {
-        extendedArb[key] = value;
-      }
-    }
+    referencedArb.addAll(extendingArb);
+    // for (final entry in extendingArb.entries) {
+    //   final key = entry.key;
+    //   final value = entry.value;
+    //   referencedArb[key] = value;
+    //   if (value is String) {
+    //     final referencedValue = referencedArb[key];
+    //     if (referencedValue is String) {
+    //       extendedArb[key] = '$value\n$referencedValue';
+    //     } else {
+    //       extendedArb[key] = value;
+    //     }
+    //   } else if (value is Map<String, dynamic>) {
+    //     final referencedValue = referencedArb[key];
+    //     if (referencedValue is Map<String, dynamic>) {
+    //       extendedArb[key] = extendArb(value, referencedValue);
+    //     } else {
+    //       extendedArb[key] = value;
+    //     }
+    //   } else {
+    //     extendedArb[key] = value;
+    //   }
+    // }
 
-    return extendedArb;
+    // return extendedArb;
   }
 
   /// Replaces the value in the arb file
