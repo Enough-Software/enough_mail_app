@@ -46,14 +46,6 @@ class ThemeFinder extends _$ThemeFinder {
     );
   }
 
-  /// The default light theme
-  static final ThemeData defaultLightTheme =
-      _generateMaterialTheme(Brightness.light, Colors.green);
-
-  /// The default dark theme
-  static final ThemeData defaultDarkTheme =
-      _generateMaterialTheme(Brightness.dark, Colors.green);
-
   static Brightness _resolveBrightness(
     ThemeMode mode,
     BuildContext? context,

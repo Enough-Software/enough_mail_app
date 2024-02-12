@@ -26,7 +26,12 @@ import 'share/provider.dart';
 /// Runs the app
 class EnoughMailApp extends HookConsumerWidget {
   /// Creates a new app
-  const EnoughMailApp({super.key});
+  const EnoughMailApp({
+    super.key,
+    required this.appName,
+  });
+
+  final String appName;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,7 +58,7 @@ class EnoughMailApp extends HookConsumerWidget {
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         debugShowCheckedModeBanner: false,
-        title: 'Maily',
+        title: appName,
         routerConfig: routerConfig,
         scaffoldMessengerKey:
             ScaffoldMessengerService.instance.scaffoldMessengerKey,

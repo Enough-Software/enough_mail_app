@@ -9,4 +9,5 @@ export 'src/models/compose_data.dart';
 export 'src/routes/provider.dart';
 export 'src/routes/routes.dart';
 export 'src/settings/settings.dart';
+export 'src/settings/theme/model.dart';
 export 'src/util/localized_dialog_helper.dart';
