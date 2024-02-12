@@ -20,7 +20,10 @@ part 'provider.g.dart';
 
 /// Provides the [GoRouter] configuration
 @Riverpod(keepAlive: true)
-RouterConfig<Object> routerConfig(RouterConfigRef ref) => GoRouter(
+GoRouter routerConfig(RouterConfigRef ref) => standardRouterConfig;
+
+/// The standard [GoRouter] configuration
+GoRouter get standardRouterConfig => GoRouter(
       navigatorKey: Routes.navigatorKey,
       // redirect: (context, state) {
       //   logger.d('redirect for ${state.uri}');

@@ -6,7 +6,7 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appLockHash() => r'c79bf94cce825a31b67a46a4060d0913dc5ab9ff';
+String _$appLockHash() => r'f41ef0732f43fae14f10611015d2415d32463a70';
 
 /// Checks the app life cycle and displays the lock screen if needed
 ///
