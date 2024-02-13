@@ -19,9 +19,8 @@ ThemeSettings _$ThemeSettingsFromJson(Map<String, dynamic> json) =>
           ? const TimeOfDay(hour: 7, minute: 0)
           : _timeOfDayFromJson(
               json['themeDarkEndTime'] as Map<String, dynamic>),
-      colorSchemeSeed: json['colorSchemeSeed'] == null
-          ? Colors.green
-          : _colorFromJson(json['colorSchemeSeed'] as Map<String, dynamic>),
+      colorSchemeSeed:
+          _colorFromJson(json['colorSchemeSeed'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ThemeSettingsToJson(ThemeSettings instance) =>

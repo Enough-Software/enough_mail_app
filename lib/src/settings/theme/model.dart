@@ -28,7 +28,7 @@ class ThemeSettings {
     this.themeModeSetting = ThemeModeSetting.system,
     this.themeDarkStartTime = const TimeOfDay(hour: 22, minute: 0),
     this.themeDarkEndTime = const TimeOfDay(hour: 7, minute: 0),
-    this.colorSchemeSeed = Colors.green,
+    this.colorSchemeSeed,
   });
 
   /// Creates settings from the given [json]
@@ -51,7 +51,7 @@ class ThemeSettings {
 
   /// The color scheme seed
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  final Color colorSchemeSeed;
+  final Color? colorSchemeSeed;
 
   /// Standard colors
   static List<Color> get availableColors => const [
@@ -121,7 +121,10 @@ TimeOfDay _timeOfDayFromJson(Map<String, dynamic> json) => TimeOfDay(
 
 int _convertTimeOfDayToInt(TimeOfDay input) => input.hour * 100 + input.minute;
 
-Map<String, dynamic> _colorToJson(Color value) {
+Map<String, dynamic> _colorToJson(Color? value) {
+  if (value == null) {
+    return {};
+  }
   final index = ThemeSettings.availableColors.indexOf(value);
 
   return {
@@ -130,7 +133,7 @@ Map<String, dynamic> _colorToJson(Color value) {
   };
 }
 
-Color _colorFromJson(Map<String, dynamic> json) {
+Color? _colorFromJson(Map<String, dynamic> json) {
   final index = json['index'] as int?;
   if (index != null &&
       index > 0 &&
@@ -142,7 +145,7 @@ Color _colorFromJson(Map<String, dynamic> json) {
     return Color(color);
   }
 
-  return Colors.green;
+  return null;
 }
 
 //// The actually applied theme data

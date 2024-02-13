@@ -5,9 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
-import '../localization/app_localizations.g.dart';
-import '../localization/extension.dart';
-import '../routes/routes.dart';
+import '../../enough_mail_app.dart';
 import '../settings/theme/icon_service.dart';
 import '../widgets/legalese.dart';
 
@@ -20,11 +18,13 @@ class WelcomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final localizations = ref.text;
     final pages = _buildPages(context, localizations);
+    final defaultColor = ref.watch(defaultColorSeedProvider);
 
     return Theme(
       data: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.green,
+        primarySwatch:
+            defaultColor is MaterialColor ? defaultColor : Colors.green,
       ),
       child: SafeArea(
         child: PlatformScaffold(

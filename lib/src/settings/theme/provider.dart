@@ -8,6 +8,10 @@ import 'model.dart';
 
 part 'provider.g.dart';
 
+/// The default color provider
+@Riverpod(keepAlive: true)
+Color defaultColorSeed(DefaultColorSeedRef ref) => Colors.green;
+
 /// Provides the settings
 @Riverpod(keepAlive: true)
 class ThemeFinder extends _$ThemeFinder {
@@ -17,25 +21,34 @@ class ThemeFinder extends _$ThemeFinder {
       settingsProvider.select((value) => value.themeSettings),
     );
     ref.watch(appIsResumedProvider);
+    final defaultColor = ref.watch(defaultColorSeedProvider);
 
     return _fromThemeSettings(
       themeSettings,
+      defaultColor,
       context: context,
     );
   }
 
   static ThemeSettingsData _fromThemeSettings(
-    ThemeSettings settings, {
+    ThemeSettings settings,
+    Color defaultColor, {
     BuildContext? context,
   }) {
     final mode = settings.getCurrentThemeMode();
     final brightness = _resolveBrightness(mode, context);
-    final dark =
-        _generateMaterialTheme(Brightness.dark, settings.colorSchemeSeed);
-    final light =
-        _generateMaterialTheme(Brightness.light, settings.colorSchemeSeed);
-    final cupertino =
-        _generateCupertinoTheme(brightness, settings.colorSchemeSeed);
+    final dark = _generateMaterialTheme(
+      Brightness.dark,
+      settings.colorSchemeSeed ?? defaultColor,
+    );
+    final light = _generateMaterialTheme(
+      Brightness.light,
+      settings.colorSchemeSeed ?? defaultColor,
+    );
+    final cupertino = _generateCupertinoTheme(
+      brightness,
+      settings.colorSchemeSeed ?? defaultColor,
+    );
 
     return ThemeSettingsData(
       brightness: brightness,
@@ -83,29 +96,4 @@ class ThemeFinder extends _$ThemeFinder {
         brightness: brightness,
         primaryColor: color,
       );
-  // CupertinoThemeData(
-  //   brightness: brightness,
-  //   primaryColor: color,
-  //   primaryContrastingColor: brightness == Brightness.dark
-  //       ? CupertinoColors.white
-  //       : CupertinoColors.black,
-  //   barBackgroundColor: CupertinoColors.systemBackground,
-  //   scaffoldBackgroundColor: CupertinoColors.systemFill,
-  //   textTheme: CupertinoTextThemeData(
-  //     primaryColor: brightness == Brightness.dark
-  //         ? CupertinoColors.white
-  //         : CupertinoColors.black,
-  //   ),
-  //   applyThemeToAll: true,
-  // );
-  // MaterialBasedCupertinoThemeData(
-  //   materialTheme: _generateMaterialTheme(brightness, color),
-  // .copyWith(
-  //   cupertinoOverrideTheme: CupertinoThemeData(
-  //     brightness: brightness,
-  //     primaryColor: color,
-  //     applyThemeToAll: true,
-  //   ),
-  // ),
-  // );
 }

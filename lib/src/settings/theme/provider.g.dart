@@ -6,7 +6,24 @@ part of 'provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$themeFinderHash() => r'0c2b7f1f626596ee6d1c08aa86e37ea4bdda6fef';
+String _$defaultColorSeedHash() => r'c2bdee6a44fad5bfcada3d31af099906bb24c988';
+
+/// The default color provider
+///
+/// Copied from [defaultColorSeed].
+@ProviderFor(defaultColorSeed)
+final defaultColorSeedProvider = Provider<Color>.internal(
+  defaultColorSeed,
+  name: r'defaultColorSeedProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$defaultColorSeedHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef DefaultColorSeedRef = ProviderRef<Color>;
+String _$themeFinderHash() => r'484171788a33fa10e91e0f085a1c87cb4a29d8f0';
 
 /// Copied from Dart SDK
 class _SystemHash {

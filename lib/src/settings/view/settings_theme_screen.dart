@@ -9,6 +9,7 @@ import '../../screens/base.dart';
 import '../../util/localized_dialog_helper.dart';
 import '../provider.dart';
 import '../theme/model.dart';
+import '../theme/provider.dart';
 
 class SettingsDesignScreen extends HookConsumerWidget {
   const SettingsDesignScreen({super.key});
@@ -26,6 +27,7 @@ class SettingsDesignScreen extends HookConsumerWidget {
     final darkThemeStartTime = themeSettings.themeDarkStartTime;
     final darkThemeEndTime = themeSettings.themeDarkEndTime;
     final availableColors = ThemeSettings.availableColors;
+    final defaultColor = ref.watch(defaultColorSeedProvider);
 
     void updateThemeSettings(ThemeSettings value) {
       final settings = ref.read(settingsProvider);
@@ -150,12 +152,14 @@ class SettingsDesignScreen extends HookConsumerWidget {
                               : Icons.colorize),
                         ),
                         onTap: () async {
-                          Color selectedColor = themeSettings.colorSchemeSeed;
+                          Color selectedColor =
+                              themeSettings.colorSchemeSeed ?? defaultColor;
                           final result =
                               await LocalizedDialogHelper.showWidgetDialog(
                             ref,
                             ColorPicker(
-                              pickerColor: themeSettings.colorSchemeSeed,
+                              pickerColor:
+                                  themeSettings.colorSchemeSeed ?? defaultColor,
                               onColorChanged: (value) => selectedColor = value,
                             ),
                             defaultActions: DialogActions.okAndCancel,
