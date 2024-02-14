@@ -5,36 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../localization/extension.dart';
+import '../settings/theme/provider.dart';
 
 /// Displays a splash screen
-class SplashScreen extends StatefulHookConsumerWidget {
+class SplashScreen extends ConsumerWidget {
   /// Creates a new [SplashScreen]
   const SplashScreen({super.key});
 
-  static var _isShown = false;
-
-  /// Is the splash screen shown?
-  static bool get isShown => _isShown;
-
   @override
-  ConsumerState<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends ConsumerState<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    SplashScreen._isShown = true;
-  }
-
-  @override
-  void dispose() {
-    SplashScreen._isShown = false;
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final localizations = ref.text;
     final texts = [
       localizations.splashLoading1,
@@ -46,8 +25,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final text = texts[index];
     final timeOfDay = TimeOfDay.now();
     final isNight = timeOfDay.hour >= 22 || timeOfDay.hour <= 6;
-    final splashColor = isNight ? Colors.black87 : const Color(0xff99cc00);
-    final textColor = isNight ? Colors.white : Colors.black87;
+    final splashColor =
+        isNight ? Colors.black87 : ref.watch(defaultColorSeedProvider);
+    final textColor = isNight
+        ? Colors.white
+        : ThemeData.estimateBrightnessForColor(splashColor) == Brightness.dark
+            ? Colors.white
+            : Colors.black87;
 
     return PlatformScaffold(
       body: Container(
