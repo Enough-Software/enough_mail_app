@@ -42,11 +42,6 @@ dart_code_metrics:
 linter:
   rules:
     - always_declare_return_types
-    # - always_put_control_body_on_new_line # No real benefit. Readability is better without
-    # - always_put_required_named_parameters_first # We mostly put optional "Key" first.
-    - always_require_non_null_named_parameters
-    # - always_specify_types # No - Then we need to add types everywhere
-    # - always_use_package_imports # We are using relative Imports inside of the LIB
     - annotate_overrides
       # - avoid_annotating_with_dynamic # We want to be explicit if we do use dynamic
     - avoid_bool_literals_in_conditional_expressions
@@ -72,8 +67,6 @@ linter:
     - avoid_relative_lib_imports
     - avoid_renaming_method_parameters
     - avoid_return_types_on_setters
-    - avoid_returning_null
-    - avoid_returning_null_for_future
     - avoid_returning_null_for_void
     - avoid_returning_this
     - avoid_setters_without_getters

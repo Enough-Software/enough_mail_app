@@ -551,7 +551,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
             MaterialScaffoldData(drawer: const AppDrawer()),
         body: CustomScrollView(
           slivers: [
-            PlatformSliverAppBar(
+            EnoughPlatformSliverAppBar(
               title: Text(titleText),
               pinned: true,
               stretch: true,

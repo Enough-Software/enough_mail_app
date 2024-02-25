@@ -351,7 +351,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                   child: CustomScrollView(
                     physics: const BouncingScrollPhysics(),
                     slivers: [
-                      PlatformSliverAppBar(
+                      EnoughPlatformSliverAppBar(
                         stretch: true,
                         title: appBarTitle,
                         leading: hasAccountWithError
