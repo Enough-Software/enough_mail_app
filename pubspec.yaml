@@ -67,11 +67,11 @@ dependencies:
   intl: ^0.17.0
   introduction_screen: ^3.0.2
   json_annotation: ^4.8.1
-  latlng: ^1.0.0
+  latlng: ^2.0.7
   local_auth: ^2.1.0
   location: ^5.0.1
   logger: ^2.0.2+1
-  map: ^1.0.0
+  map: ^2.0.2
   modal_bottom_sheet: ^3.0.0-pre
   open_settings: ^2.0.2
   package_info_plus: ^1.3.0
