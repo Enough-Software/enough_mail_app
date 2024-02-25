@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlng/latlng.dart';
 import 'package:location/location.dart';
-import 'package:map/map.dart';
+import 'package:map/map.dart' as map;
 
 import '../localization/extension.dart';
 import '../logger.dart';
@@ -26,15 +26,15 @@ class LocationScreen extends StatefulHookConsumerWidget {
 class _LocationScreenState extends ConsumerState<LocationScreen> {
   final _repaintBoundaryKey = GlobalKey();
 
-  final _defaultLocation = const LatLng(53.07516, 8.80777);
-  late MapController _controller;
+  final _defaultLocation = LatLng.degree(53.07516, 8.80777);
+  late map.MapController _controller;
   Future<LocationData?>? _findLocationFuture;
   late Offset _dragStart;
   var _scaleStart = 1.0;
 
   @override
   void initState() {
-    _controller = MapController(
+    _controller = map.MapController(
       location: _defaultLocation,
     );
     _findLocationFuture = LocationService.instance.getCurrentLocation().then(
@@ -42,7 +42,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
         final latitude = value?.latitude;
         final longitude = value?.longitude;
         if (latitude != null && longitude != null) {
-          _controller.center = LatLng(latitude, longitude);
+          _controller.center = LatLng.degree(latitude, longitude);
         }
 
         return value;
@@ -112,7 +112,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
   Widget _buildMap(BuildContext context, double latitude, double longitude) {
     final size = MediaQuery.of(context).size;
 
-    return MapLayout(
+    return map.MapLayout(
       controller: _controller,
       builder: (context, transformer) => GestureDetector(
         onDoubleTap: _onDoubleTap,
@@ -131,8 +131,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
             key: _repaintBoundaryKey,
             child: Stack(
               children: [
-                Map(
-                  controller: _controller,
+                map.TileLayer(
                   builder: (context, x, y, z) {
                     final url =
                         'https://www.google.com/maps/vt/pb=!1m4!1m3!1i$z!2i$x!3i$y!2m3!1e0!2sm!3i420120488!3m7!2sen!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0!5m1!1e0!23i4111425';
@@ -182,7 +181,10 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     _scaleStart = 1.0;
   }
 
-  void _onScaleUpdate(ScaleUpdateDetails details, MapTransformer transformer) {
+  void _onScaleUpdate(
+    ScaleUpdateDetails details,
+    map.MapTransformer transformer,
+  ) {
     final scaleDiff = details.scale - _scaleStart;
     _scaleStart = details.scale;
 
