@@ -29,7 +29,7 @@ dependencies:
   community_material_icon: ^5.9.55
   crypto: ^3.0.2
   cupertino_icons: ^1.0.4
-  device_info_plus: ^3.2.1
+  device_info_plus: ^9.1.0
   enough_ascii_art: ^1.0.0
   enough_giphy_flutter: ^0.3.0
   enough_html_editor: ^0.0.3
@@ -95,11 +95,7 @@ dependency_overrides:
   ffi: ^2.1.0
   uuid: ^4.0.0 # for dart_code_metrics
   web: ^0.4.0 # for flutter test from SDK / http
-  pdfx: # 2.5.0 --> use git util compatible version is released:
-    git:
-      url: 'https://github.com/ScerIO/packages.flutter'
-      path: packages/pdfx
-
+  pdfx: ^2.6.0 
   # out-comment the following to enable git-based development:
   enough_mail:
     git:
