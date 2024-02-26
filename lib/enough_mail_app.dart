@@ -1,3 +1,5 @@
+export 'package:enough_mail/enough_mail.dart';
+
 export 'src/account/account.dart';
 export 'src/app.dart';
 export 'src/contact/contact.dart';
