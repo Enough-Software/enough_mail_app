@@ -10,7 +10,7 @@ For a full email app based on this project, see [maily](https://github.com/Enoug
 * Mail management: delete, mark as read/unread
 * Unsubscribe from newsletters easily
 * View attachments in app - photos, PDFs, video and audio files 
-* Compose messages: compose new messages and reply to/forward mails with WYSIWG editor  
+* Compose messages: compose new messages and reply to/forward mails with WYSIWYG editor  
 * Save and continue draft messages
 * Attach photo-, audio-, video- or generic files. Attach your current location.
 * Swipe right to left to delete and swipe left to right to mark as read/unread
