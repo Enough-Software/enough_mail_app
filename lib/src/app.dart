@@ -13,6 +13,8 @@ import 'keys/service.dart';
 import 'localization/app_localizations.g.dart';
 import 'lock/provider.dart';
 import 'logger.dart';
+import 'mail/service.dart';
+import 'models/async_mime_source_factory.dart';
 import 'notification/service.dart';
 import 'routes/provider.dart';
 import 'routes/routes.dart';
@@ -29,12 +31,19 @@ class EnoughMailApp extends HookConsumerWidget {
   const EnoughMailApp({
     super.key,
     required this.appName,
+    this.mimeSourceFactory =
+        const AsyncMimeSourceFactory(isOfflineModeSupported: false),
   });
 
+  /// The name of the app
   final String appName;
+
+  final AsyncMimeSourceFactory mimeSourceFactory;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    EmailService.mimeSourceFactory = mimeSourceFactory;
+
     useOnAppLifecycleStateChange((previous, current) {
       logger.d('raw AppLifecycleState changed from $previous to $current');
       ref.read(rawAppLifecycleStateProvider.notifier).state = current;

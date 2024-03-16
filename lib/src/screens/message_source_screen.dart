@@ -1108,12 +1108,12 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         //message.updateMime(mime);
         final builder = MessageBuilder.prepareFromDraft(mime);
         final data = ComposeData([message], builder, ComposeAction.newMessage);
-        if (context.mounted) {
+        if (mounted) {
           unawaited(context.pushNamed(Routes.mailCompose, extra: data));
         }
       } else {
         // move to mail details:
-        if (context.mounted) {
+        if (mounted) {
           unawaited(context.pushNamed(Routes.mailDetails, extra: message));
         }
       }

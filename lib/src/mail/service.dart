@@ -18,9 +18,11 @@ class EmailService {
   /// Retrieves the singleton instance
   static EmailService get instance => _instance;
 
-  static const _clientId = Id(name: 'Maily', version: '1.0');
-  final _mimeSourceFactory =
+  /// The used mime source factory
+  static AsyncMimeSourceFactory mimeSourceFactory =
       const AsyncMimeSourceFactory(isOfflineModeSupported: false);
+
+  static const _clientId = Id(name: 'Maily', version: '1.0');
 
   /// Creates a mime source for the given account
   Future<AsyncMimeSource> createMimeSource({
@@ -33,7 +35,7 @@ class EmailService {
     } else {
       await mailClient.selectMailbox(mailbox);
     }
-    final source = _mimeSourceFactory.createMailboxMimeSource(
+    final source = mimeSourceFactory.createMailboxMimeSource(
       mailClient,
       mailbox,
     );
