@@ -420,7 +420,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
         return;
       }
     }
-    if (context.mounted) {
+    if (mounted) {
       context.pop();
     }
     final mailClient = _getMailClient();
@@ -807,7 +807,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   Future<void> _showSourceCode() async {
     final mailClient = _getMailClient();
     final mime = await _buildMimeMessage(mailClient);
-    if (context.mounted) {
+    if (mounted) {
       unawaited(context.pushNamed(Routes.sourceCode, extra: mime));
     }
   }
