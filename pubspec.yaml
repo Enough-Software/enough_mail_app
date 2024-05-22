@@ -18,8 +18,8 @@ publish_to: "none"
 version: 1.0.0+96
 
 environment:
-  flutter: ">=3.16.0"
-  sdk: '>=3.2.0 <4.0.0'
+  flutter: ">=3.22.0"
+  sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
   background_fetch: ^1.2.1
@@ -45,57 +45,52 @@ dependencies:
     git:
       url: https://github.com/Enough-Software/enough_text_editor.git
   event_bus: ^2.0.0
-  file_picker: ^6.0.0
+  file_picker: ^8.0.3
   flutter:
     sdk: flutter
   flutter_colorpicker: ^1.0.3
   flutter_hooks: ^0.20.3
-  flutter_local_notifications: ^16.1.0
+  flutter_local_notifications: ^17.1.2
   flutter_localizations:
     sdk: flutter
   flutter_secure_storage: ^9.0.0
-  flutter_web_auth: ^0.5.0
+  flutter_web_auth_2: ^3.1.2
   flutter_widget_from_html_core: ^0.14.4
-  fluttercontactpicker: ^4.7.0
+  fluttercontactpicker: ^5.0.0
   get_it: ^7.2.0
-  go_router: ^13.0.0
+  go_router: ^14.1.2
   google_fonts: ^6.1.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   hooks_riverpod: ^2.4.4
   http: ^1.1.1
-  intl: ^0.17.0
+  intl: any
   introduction_screen: ^3.0.2
   json_annotation: ^4.8.1
   latlng: ^2.0.7
   local_auth: ^2.1.0
-  location: ^5.0.1
+  location: ^6.0.2
   logger: ^2.0.2+1
   map: ^2.0.2
   modal_bottom_sheet: ^3.0.0-pre
-  open_settings: ^2.0.2
   package_info_plus: ^1.3.0
   path_provider: ^2.0.8
   riverpod_annotation: ^2.1.5
-  share_plus: ^7.1.0
+  share_plus: ^9.0.0
   shared_preferences: ^2.0.11
   shimmer_animation: ^2.1.0+1
   url_launcher: ^6.0.17
   webview_flutter: ^4.0.2
 
 dependency_overrides:
-  # analyzer: ^6.4.1 # for dart_code_metrics
-  # meta: ^1.11.0 # for analyzer / dart_code_metrics
   collection: ^1.18.0
-  intl: ^0.18.1
   http: ^1.1.1 # for dart_code_metrics
   xml: ^6.4.2
   device_info_plus: ^9.1.0
   package_info_plus: ^4.2.0
   ffi: ^2.1.0
-  uuid: ^4.0.0 # for dart_code_metrics
-  web: ^0.4.0 # for flutter test from SDK / http
   pdfx: ^2.6.0 
+  js: ^0.7.1 # for pdfx & fluttercontactpicker
   # out-comment the following to enable git-based development:
   enough_mail:
     git:
@@ -162,11 +157,9 @@ dependency_overrides:
   #   path: ../enough_platform_widgets
 
 dev_dependencies:
-  # analyzer: ^6.4.1
   build_runner: ^2.4.6
-  custom_lint: ^0.5.3
-  dart_code_metrics: 5.7.6
-  flutter_lints: ^3.0.0
+  custom_lint: ^0.6.4
+  flutter_lints: ^4.0.0
   flutter_native_splash: ^2.3.2
   flutter_test:
     sdk: flutter

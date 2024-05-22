@@ -1,5 +1,5 @@
 import 'package:enough_mail/enough_mail.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
 
 import '../keys/service.dart';
@@ -123,7 +123,7 @@ class GmailOAuthClient extends OauthClient {
     }).toString();
 
     // Present the dialog to the user
-    final result = await FlutterWebAuth.authenticate(
+    final result = await FlutterWebAuth2.authenticate(
       url: uri,
       callbackUrlScheme: callbackUrlScheme,
     );
@@ -227,7 +227,7 @@ class OutlookOAuthClient extends OauthClient {
     // print('authenticate URL: $uri');
 
     // Present the dialog to the user
-    final result = await FlutterWebAuth.authenticate(
+    final result = await FlutterWebAuth2.authenticate(
       url: uri,
       callbackUrlScheme: 'maily', //callbackUrlScheme,
     );
