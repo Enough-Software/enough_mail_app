@@ -18,8 +18,8 @@ publish_to: "none"
 version: 1.0.0+96
 
 environment:
-  flutter: ">=3.16.0"
-  sdk: '>=3.2.0 <4.0.0'
+  flutter: ">=3.22.0"
+  sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
   background_fetch: ^1.2.1
@@ -54,9 +54,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_secure_storage: ^9.0.0
-  flutter_web_auth: ^0.5.0
-  flutter_widget_from_html_core: ^0.15.1
-  fluttercontactpicker: ^4.7.0
+  flutter_web_auth_2: ^3.1.2
+  flutter_widget_from_html_core: ^0.14.4
+  fluttercontactpicker: ^5.0.0
   get_it: ^7.2.0
   go_router: ^14.2.0
   google_fonts: ^6.1.0
@@ -64,7 +64,7 @@ dependencies:
   hive_flutter: ^1.1.0
   hooks_riverpod: ^2.4.4
   http: ^1.1.1
-  intl: ^0.17.0
+  intl: any
   introduction_screen: ^3.0.2
   json_annotation: ^4.8.1
   latlng: ^2.0.7
@@ -73,7 +73,6 @@ dependencies:
   logger: ^2.0.2+1
   map: ^2.0.2
   modal_bottom_sheet: ^3.0.0-pre
-  open_settings: ^2.0.2
   package_info_plus: ^1.3.0
   path_provider: ^2.0.8
   riverpod_annotation: ^2.1.5
@@ -84,18 +83,14 @@ dependencies:
   webview_flutter: ^4.0.2
 
 dependency_overrides:
-  # analyzer: ^6.4.1 # for dart_code_metrics
-  # meta: ^1.11.0 # for analyzer / dart_code_metrics
   collection: ^1.18.0
-  intl: ^0.18.1
   http: ^1.1.1 # for dart_code_metrics
   xml: ^6.4.2
   device_info_plus: ^9.1.0
   package_info_plus: ^4.2.0
   ffi: ^2.1.0
-  uuid: ^4.0.0 # for dart_code_metrics
-  web: ^0.4.0 # for flutter test from SDK / http
   pdfx: ^2.6.0 
+  js: ^0.7.1 # for pdfx & fluttercontactpicker
   # out-comment the following to enable git-based development:
   enough_mail:
     git:
@@ -162,10 +157,8 @@ dependency_overrides:
   #   path: ../enough_platform_widgets
 
 dev_dependencies:
-  # analyzer: ^6.4.1
   build_runner: ^2.4.6
-  custom_lint: ^0.5.3
-  dart_code_metrics: 5.7.6
+  custom_lint: ^0.6.4
   flutter_lints: ^4.0.0
   flutter_native_splash: ^2.3.2
   flutter_test:
