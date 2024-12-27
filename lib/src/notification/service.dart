@@ -40,8 +40,9 @@ class NotificationService {
       onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
     );
     const macos = DarwinInitializationSettings();
+    const linux = LinuxInitializationSettings(defaultActionName: 'Maily');
     final initSettings =
-        InitializationSettings(android: android, iOS: ios, macOS: macos);
+        InitializationSettings(android: android, iOS: ios, macOS: macos, linux: linux);
     await _flutterLocalNotificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _selectNotification,
