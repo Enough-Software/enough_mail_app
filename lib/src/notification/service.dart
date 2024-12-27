@@ -25,7 +25,7 @@ class NotificationService {
 
   Future<NotificationServiceInitResult> init({
     BuildContext? context,
-    bool checkForLaunchDetails = true,
+    bool checkForLaunchDetails = false,
   }) async {
     // print('init notification service...');
     // set up local notifications:
