@@ -37,11 +37,14 @@ class NotificationService {
     }
     const android = AndroidInitializationSettings('ic_stat_notification');
     final ios = DarwinInitializationSettings(
-      onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
+      // onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
     );
     const macos = DarwinInitializationSettings();
-    final initSettings =
-        InitializationSettings(android: android, iOS: ios, macOS: macos);
+    final initSettings = InitializationSettings(
+      android: android,
+      iOS: ios,
+      macOS: macos,
+    );
     await _flutterLocalNotificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _selectNotification,
@@ -49,12 +52,14 @@ class NotificationService {
     if (Platform.isAndroid) {
       await _flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.requestNotificationsPermission();
     }
     if (checkForLaunchDetails) {
-      final launchDetails = await _flutterLocalNotificationsPlugin
-          .getNotificationAppLaunchDetails();
+      final launchDetails =
+          await _flutterLocalNotificationsPlugin
+              .getNotificationAppLaunchDetails();
       if (launchDetails != null && launchDetails.didNotificationLaunchApp) {
         final response = launchDetails.notificationResponse;
         if (response != null) {
@@ -132,10 +137,7 @@ class NotificationService {
 
     if (payloadText != null && payloadText.startsWith(_messagePayloadStart)) {
       final payload = _deserialize(payloadText);
-      usedContext.pushNamed(
-        Routes.mailDetailsForNotification,
-        extra: payload,
-      );
+      usedContext.pushNamed(Routes.mailDetailsForNotification, extra: payload);
     }
   }
 
@@ -152,15 +154,17 @@ class NotificationService {
   ) {
     String retrieveFromName() {
       final mimeFrom = mimeMessage.from;
-      final personalName = mimeFrom != null && mimeFrom.isNotEmpty
-          ? mimeFrom.first.personalName
-          : mimeMessage.sender?.personalName;
+      final personalName =
+          mimeFrom != null && mimeFrom.isNotEmpty
+              ? mimeFrom.first.personalName
+              : mimeMessage.sender?.personalName;
       if (personalName != null && personalName.isNotEmpty) {
         return personalName;
       }
-      final email = mimeFrom != null && mimeFrom.isNotEmpty
-          ? mimeFrom.first.email
-          : mimeMessage.sender?.email;
+      final email =
+          mimeFrom != null && mimeFrom.isNotEmpty
+              ? mimeFrom.first.email
+              : mimeMessage.sender?.email;
       if (email != null && email.isNotEmpty) {
         return email;
       }
@@ -225,8 +229,13 @@ class NotificationService {
       android: androidPlatformChannelSpecifics,
       iOS: iosPlatformChannelSpecifics,
     );
-    await _flutterLocalNotificationsPlugin
-        .show(id, title, text, platformChannelSpecifics, payload: payloadText);
+    await _flutterLocalNotificationsPlugin.show(
+      id,
+      title,
+      text,
+      platformChannelSpecifics,
+      payload: payloadText,
+    );
   }
 
   void cancelNotificationForMessage(maily.Message message) =>
