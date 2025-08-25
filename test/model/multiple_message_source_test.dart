@@ -22,6 +22,7 @@ import 'fake_mime_source.dart';
 class MockUnifiedAccount extends Mock implements UnifiedAccount {}
 
 void main() async {
+  TestWidgetsFlutterBinding.ensureInitialized();
   final notificationService = TestNotificationService();
   GetIt.instance.registerSingleton<NotificationService>(notificationService);
   GetIt.instance.registerLazySingleton<ScaffoldMessengerService>(

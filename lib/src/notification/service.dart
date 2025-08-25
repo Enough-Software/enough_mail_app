@@ -13,6 +13,12 @@ import '../models/message.dart' as maily;
 import '../routes/routes.dart';
 import 'model.dart';
 
+/// Handles background notification taps
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  NotificationService.instance._selectNotification(notificationResponse);
+}
+
 class NotificationService {
   NotificationService._();
   static final NotificationService _instance = NotificationService._();
@@ -36,15 +42,14 @@ class NotificationService {
       return NotificationServiceInitResult.normal;
     }
     const android = AndroidInitializationSettings('ic_stat_notification');
-    final ios = DarwinInitializationSettings(
-      onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
-    );
+    final ios = DarwinInitializationSettings();
     const macos = DarwinInitializationSettings();
     final initSettings =
         InitializationSettings(android: android, iOS: ios, macOS: macos);
     await _flutterLocalNotificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _selectNotification,
+      onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
     if (Platform.isAndroid) {
       await _flutterLocalNotificationsPlugin
@@ -71,17 +76,6 @@ class NotificationService {
     }
 
     return NotificationServiceInitResult.normal;
-  }
-
-  Future _onDidReceiveLocalNotification(
-    int id,
-    String? title,
-    String? body,
-    String? payload,
-  ) async {
-    if (kDebugMode) {
-      print('iOS onDidReceiveLocalNotification $id $title $body $payload');
-    }
   }
 
   Future<List<MailNotificationPayload>> getActiveMailNotifications() {
