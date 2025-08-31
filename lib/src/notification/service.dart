@@ -31,7 +31,7 @@ class NotificationService {
 
   Future<NotificationServiceInitResult> init({
     BuildContext? context,
-    bool checkForLaunchDetails = true,
+    bool checkForLaunchDetails = false,
   }) async {
     // print('init notification service...');
     // set up local notifications:
@@ -44,8 +44,9 @@ class NotificationService {
     const android = AndroidInitializationSettings('ic_stat_notification');
     final ios = DarwinInitializationSettings();
     const macos = DarwinInitializationSettings();
+    const linux = LinuxInitializationSettings(defaultActionName: 'Maily');
     final initSettings =
-        InitializationSettings(android: android, iOS: ios, macOS: macos);
+        InitializationSettings(android: android, iOS: ios, macOS: macos, linux: linux);
     await _flutterLocalNotificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _selectNotification,
