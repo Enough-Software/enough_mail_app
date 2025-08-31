@@ -65,7 +65,7 @@ dependencies:
   hooks_riverpod: ^2.4.4
   http: ^1.1.1
   intl: any
-  introduction_screen: ^3.0.2
+  introduction_screen: ^4.0.0
   json_annotation: ^4.8.1
   latlng: ^2.0.7
   local_auth: ^2.1.0
