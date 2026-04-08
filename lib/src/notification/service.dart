@@ -44,8 +44,16 @@ class NotificationService {
     const android = AndroidInitializationSettings('ic_stat_notification');
     final ios = DarwinInitializationSettings();
     const macos = DarwinInitializationSettings();
-    final initSettings =
-        InitializationSettings(android: android, iOS: ios, macOS: macos);
+    LinuxInitializationSettings? linux;
+    if (Platform.isLinux) {
+      linux = const LinuxInitializationSettings(defaultActionName: 'Open');
+    }
+    final initSettings = InitializationSettings(
+      android: android,
+      iOS: ios,
+      macOS: macos,
+      linux: linux,
+    );
     await _flutterLocalNotificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _selectNotification,
@@ -57,7 +65,7 @@ class NotificationService {
               AndroidFlutterLocalNotificationsPlugin>()
           ?.requestNotificationsPermission();
     }
-    if (checkForLaunchDetails) {
+    if (checkForLaunchDetails && !Platform.isLinux) {
       final launchDetails = await _flutterLocalNotificationsPlugin
           .getNotificationAppLaunchDetails();
       if (launchDetails != null && launchDetails.didNotificationLaunchApp) {
