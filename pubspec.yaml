@@ -83,8 +83,6 @@ dependencies:
   webview_flutter: ^4.0.2
 
 dependency_overrides:
-  enough_mail:
-    path: ../enough_mail
 # collection: ^1.18.0
 # http: ^1.1.1 # for dart_code_metrics
 # xml: ^6.4.2
@@ -94,42 +92,42 @@ dependency_overrides:
 # pdfx: ^2.6.0
 # js: ^0.7.1 # for pdfx & fluttercontactpicker
 # out-comment the following to enable git-based development:
-# enough_mail:
-#   git:
-#     url: https://github.com/Enough-Software/enough_mail.git
-# enough_mail_html:
-#   git:
-#     url: https://github.com/Enough-Software/enough_mail_html.git
-# enough_mail_flutter:
-#   git:
-#     url: https://github.com/Enough-Software/enough_mail_flutter.git
-# enough_media:
-#   git:
-#     url: https://github.com/Enough-Software/enough_media.git
-# enough_icalendar:
-#   git:
-#     url: https://github.com/Enough-Software/enough_icalendar.git
-# enough_mail_icalendar:
-#   git:
-#     url: https://github.com/Enough-Software/enough_mail_icalendar.git
-# enough_icalendar_export:
-#   git:
-#     url: https://github.com/Enough-Software/enough_icalendar_export.git
-# enough_html_editor:
-#   git:
-#     url: https://github.com/Enough-Software/enough_html_editor.git
-# enough_text_editor:
-#   git:
-#     url: https://github.com/Enough-Software/enough_text_editor.git
-# enough_ascii_art:
-#   git:
-#     url: https://github.com/Enough-Software/enough_ascii_art.git
-# enough_giphy_flutter:
-#   git:
-#     url: https://github.com/Enough-Software/enough_giphy_flutter.git
-# enough_platform_widgets:
-#   git:
-#     url: https://github.com/Enough-Software/enough_platform_widgets.git
+enough_mail:
+  git:
+    url: https://github.com/Enough-Software/enough_mail.git
+enough_mail_html:
+  git:
+    url: https://github.com/Enough-Software/enough_mail_html.git
+enough_mail_flutter:
+  git:
+    url: https://github.com/Enough-Software/enough_mail_flutter.git
+enough_media:
+  git:
+    url: https://github.com/Enough-Software/enough_media.git
+enough_icalendar:
+  git:
+    url: https://github.com/Enough-Software/enough_icalendar.git
+enough_mail_icalendar:
+  git:
+    url: https://github.com/Enough-Software/enough_mail_icalendar.git
+enough_icalendar_export:
+  git:
+    url: https://github.com/Enough-Software/enough_icalendar_export.git
+enough_html_editor:
+  git:
+    url: https://github.com/Enough-Software/enough_html_editor.git
+enough_text_editor:
+  git:
+    url: https://github.com/Enough-Software/enough_text_editor.git
+enough_ascii_art:
+  git:
+    url: https://github.com/Enough-Software/enough_ascii_art.git
+enough_giphy_flutter:
+  git:
+    url: https://github.com/Enough-Software/enough_giphy_flutter.git
+enough_platform_widgets:
+  git:
+    url: https://github.com/Enough-Software/enough_platform_widgets.git
 # out-comment the following to enable local development:
 # enough_mail:
 #   path: ../enough_mail
