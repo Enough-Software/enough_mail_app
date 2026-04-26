@@ -549,30 +549,36 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   }
 
   void _registerEvents() {
-    _mailLoadEventSubscription = mailClient.eventBus.on<MailLoadEvent>().listen(
+    _mailLoadEventSubscription = mailClient.eventStream
+        .where((e) => e is MailLoadEvent)
+        .cast<MailLoadEvent>()
+        .listen(
       (event) {
         if (event.mailClient == mailClient) {
           onMessageArrived(event.message);
         }
       },
     );
-    _mailVanishedEventSubscription = mailClient.eventBus
-        .on<MailVanishedEvent>()
+    _mailVanishedEventSubscription = mailClient.eventStream
+        .where((e) => e is MailVanishedEvent)
+        .cast<MailVanishedEvent>()
         .listen((event) {
           final sequence = event.sequence;
           if (sequence != null && event.mailClient == mailClient) {
             onMessagesVanished(sequence);
           }
         });
-    _mailUpdatedEventSubscription = mailClient.eventBus
-        .on<MailUpdateEvent>()
+    _mailUpdatedEventSubscription = mailClient.eventStream
+        .where((e) => e is MailUpdateEvent)
+        .cast<MailUpdateEvent>()
         .listen((event) {
           if (event.mailClient == mailClient) {
             onMessageFlagsUpdated(event.message);
           }
         });
-    _mailReconnectedEventSubscription = mailClient.eventBus
-        .on<MailConnectionReEstablishedEvent>()
+    _mailReconnectedEventSubscription = mailClient.eventStream
+        .where((e) => e is MailConnectionReEstablishedEvent)
+        .cast<MailConnectionReEstablishedEvent>()
         .listen(_onMailReconnected);
   }
 
