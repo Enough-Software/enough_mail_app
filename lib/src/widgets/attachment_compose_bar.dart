@@ -61,20 +61,20 @@ class _AttachmentComposeBarState extends State<AttachmentComposeBar> {
 
   @override
   Widget build(BuildContext context) => Wrap(
-        children: [
-          for (final attachment in _attachments)
-            _ComposeAttachment(
-              parentMessage: widget.composeData.originalMessage,
-              attachment: attachment,
-              onRemove: removeAttachment,
-            ),
-          if (widget.isDownloading) const PlatformProgressIndicator(),
-          AddAttachmentPopupButton(
-            composeData: widget.composeData,
-            update: () => setState(() {}),
-          ),
-        ],
-      );
+    children: [
+      for (final attachment in _attachments)
+        _ComposeAttachment(
+          parentMessage: widget.composeData.originalMessage,
+          attachment: attachment,
+          onRemove: removeAttachment,
+        ),
+      if (widget.isDownloading) const PlatformProgressIndicator(),
+      AddAttachmentPopupButton(
+        composeData: widget.composeData,
+        update: () => setState(() {}),
+      ),
+    ],
+  );
 
   void removeAttachment(AttachmentInfo attachment) {
     widget.composeData.messageBuilder.removeAttachment(attachment);
@@ -175,26 +175,21 @@ class AddAttachmentPopupButton extends ConsumerWidget {
             break;
           case 1: // photo file
             ignoreNextResume();
-            changed = await _addAttachmentFile(
-              fileType: FileType.image,
-            );
+            changed = await _addAttachmentFile(fileType: FileType.image);
             break;
           case 2: // video file
             ignoreNextResume();
-            changed = await _addAttachmentFile(
-              fileType: FileType.video,
-            );
+            changed = await _addAttachmentFile(fileType: FileType.video);
             break;
           case 3: // audio file
             ignoreNextResume();
-            changed = await _addAttachmentFile(
-              fileType: FileType.audio,
-            );
+            changed = await _addAttachmentFile(fileType: FileType.audio);
             break;
           case 4: // location
             if (context.mounted) {
-              final result =
-                  await context.pushNamed<Uint8List>(Routes.locationPicker);
+              final result = await context.pushNamed<Uint8List>(
+                Routes.locationPicker,
+              );
               if (result != null) {
                 composeData.messageBuilder.addBinary(
                   result,
@@ -212,8 +207,11 @@ class AddAttachmentPopupButton extends ConsumerWidget {
             break;
           case 6: // appointment
             if (context.mounted) {
-              changed =
-                  await addAttachmentAppointment(context, ref, localizations);
+              changed = await addAttachmentAppointment(
+                context,
+                ref,
+                localizations,
+              );
             }
             break;
         }
@@ -224,11 +222,12 @@ class AddAttachmentPopupButton extends ConsumerWidget {
     );
   }
 
-  Future<bool> _addAttachmentFile({
-    FileType fileType = FileType.any,
-  }) async {
-    final result = await FilePicker.platform
-        .pickFiles(type: fileType, allowMultiple: true, withData: true);
+  Future<bool> _addAttachmentFile({FileType fileType = FileType.any}) async {
+    final result = await FilePicker.pickFiles(
+      type: fileType,
+      allowMultiple: true,
+      withData: true,
+    );
     if (result == null) {
       return false;
     }
@@ -246,8 +245,11 @@ class AddAttachmentPopupButton extends ConsumerWidget {
         final ext = path.substring(lastDotIndex + 1);
         mediaType = MediaType.guessFromFileExtension(ext);
       }
-      composeData.messageBuilder
-          .addBinary(bytes, mediaType, filename: file.name);
+      composeData.messageBuilder.addBinary(
+        bytes,
+        mediaType,
+        filename: file.name,
+      );
     }
 
     return true;
@@ -303,8 +305,10 @@ class AddAttachmentPopupButton extends ConsumerWidget {
     WidgetRef ref,
     AppLocalizations localizations,
   ) async {
-    final appointment =
-        await IcalComposer.createOrEditAppointment(context, ref);
+    final appointment = await IcalComposer.createOrEditAppointment(
+      context,
+      ref,
+    );
     if (appointment != null) {
       // idea: add some sort of finalizer that updates the appointment
       // at the end to set the organizer and the attendees
@@ -404,8 +408,9 @@ class _ComposeAttachment extends ConsumerWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: PreviewMediaWidget(
-          mediaProvider:
-              _AttachmentMediaProviderFactory.fromAttachmentInfo(attachment),
+          mediaProvider: _AttachmentMediaProviderFactory.fromAttachmentInfo(
+            attachment,
+          ),
           width: 60,
           height: 60,
           showInteractiveDelegate: (interactiveMedia) async {
@@ -416,10 +421,7 @@ class _ComposeAttachment extends ConsumerWidget {
               final mime = MimeMessage.parseFromData(attachmentData);
               final message = Message.embedded(mime, parentMessage);
 
-              return context.pushNamed(
-                Routes.mailDetails,
-                extra: message,
-              );
+              return context.pushNamed(Routes.mailDetails, extra: message);
             }
             final attachmentText = attachment.part.text;
             if (attachmentText != null &&

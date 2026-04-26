@@ -33,9 +33,11 @@ abstract class Account extends ChangeNotifier {
   String? _key;
 
   @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
   int get hashCode => key.hashCode;
 
   @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) => other is Account && other.key == key;
 }
 
@@ -239,12 +241,11 @@ class RealAccount extends Account {
     MailAccount? mailAccount,
     List<AppExtension>? appExtensions,
     ContactManager? contactManager,
-  }) =>
-      RealAccount(
-        mailAccount ?? _account,
-        appExtensions: appExtensions ?? this.appExtensions,
-        contactManager: contactManager ?? this.contactManager,
-      );
+  }) => RealAccount(
+    mailAccount ?? _account,
+    appExtensions: appExtensions ?? this.appExtensions,
+    contactManager: contactManager ?? this.contactManager,
+  );
 }
 
 /// A unified account bundles folders of several accounts

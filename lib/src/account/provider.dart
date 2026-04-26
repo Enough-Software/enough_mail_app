@@ -132,10 +132,7 @@ class AllAccounts extends _$AllAccounts {
     final unifiedAccount = ref.watch(unifiedAccountProvider);
     logger.d('Creating all accounts');
 
-    return [
-      if (unifiedAccount != null) unifiedAccount,
-      ...realAccounts,
-    ];
+    return [?unifiedAccount, ...realAccounts];
   }
 }
 
@@ -167,9 +164,7 @@ RealAccount? findRealAccountByEmail(
 
 //// Checks if there is at least one real account with a login error
 @Riverpod(keepAlive: true)
-bool hasAccountWithError(
-  HasAccountWithErrorRef ref,
-) {
+bool hasAccountWithError(HasAccountWithErrorRef ref) {
   final realAccounts = ref.watch(realAccountsProvider);
 
   return realAccounts.any((a) => a.hasError);
@@ -187,6 +182,6 @@ RealAccount? currentRealAccount(CurrentRealAccountRef ref) {
   return providedCurrentAccount is RealAccount
       ? providedCurrentAccount
       : (providedCurrentAccount is UnifiedAccount
-          ? providedCurrentAccount.accounts.first
-          : (realAccounts.isNotEmpty ? realAccounts.first : null));
+            ? providedCurrentAccount.accounts.first
+            : (realAccounts.isNotEmpty ? realAccounts.first : null));
 }

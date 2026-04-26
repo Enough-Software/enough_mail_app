@@ -24,12 +24,8 @@ class CupertinoStatusBar extends StatefulHookConsumerWidget {
   @override
   ConsumerState<CupertinoStatusBar> createState() => CupertinoStatusBarState();
 
-  static Widget? createInfo(String? text) => (text == null)
-      ? null
-      : Text(
-          text,
-          style: _statusTextStyle,
-        );
+  static Widget? createInfo(String? text) =>
+      (text == null) ? null : Text(text, style: _statusTextStyle);
 }
 
 class CupertinoStatusBarState extends ConsumerState<CupertinoStatusBar> {
@@ -91,20 +87,11 @@ class CupertinoStatusBarState extends ConsumerState<CupertinoStatusBar> {
                 ),
               ),
               if (lAction != null)
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: lAction,
-                ),
+                Align(alignment: Alignment.centerLeft, child: lAction),
               if (rAction != null)
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: rAction,
-                ),
+                Align(alignment: Alignment.centerRight, child: rAction),
               if (sAction != null)
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: sAction,
-                ),
+                Align(alignment: Alignment.centerRight, child: sAction),
             ],
           ),
         ),
@@ -113,16 +100,13 @@ class CupertinoStatusBarState extends ConsumerState<CupertinoStatusBar> {
   }
 
   Future<void> showTextStatus(String text, {Function()? undo}) async {
-    final notification = Text(
-      text,
-      style: CupertinoStatusBar._statusTextStyle,
-    );
+    final notification = Text(text, style: CupertinoStatusBar._statusTextStyle);
     if (undo != null) {
       _statusAction = Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: CupertinoButton.filled(
           padding: const EdgeInsets.all(8),
-          minSize: 20,
+          minimumSize: const Size(20, 20),
           child: Text(
             ref.text.actionUndo,
             style: CupertinoStatusBar._statusTextStyle,

@@ -84,7 +84,8 @@ class _DetailsScreenState extends ConsumerState<MessageDetailsScreen> {
     return ListenableBuilder(
       listenable: _current,
       builder: (context, child) => BasePage(
-        title: _current.mimeMessage.decodeSubject() ??
+        title:
+            _current.mimeMessage.decodeSubject() ??
             localizations.subjectUndefined,
         appBarActions: [
           //PlatformIconButton(icon: Icon(Icons.reply), onPressed: reply),
@@ -169,16 +170,17 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
   void initState() {
     final message = widget.message;
     final mime = message.mimeMessage;
-    _settingsBlockExternalImages =
-        ref.read(settingsProvider).blockExternalImages;
+    _settingsBlockExternalImages = ref
+        .read(settingsProvider)
+        .blockExternalImages;
     if (widget.blockExternalContents) {
       _blockExternalImages = true;
     } else if (mime.isDownloaded) {
       _blockExternalImages = _shouldImagesBeBlocked(mime);
       if (!mime.isSeen) {
-        Future.delayed(const Duration(milliseconds: 50)).then(
-          (_) => message.source.markAsSeen(message, true),
-        );
+        Future.delayed(
+          const Duration(milliseconds: 50),
+        ).then((_) => message.source.markAsSeen(message, true));
       }
     } else {
       _messageRequiresRefresh = mime.envelope == null;
@@ -257,10 +259,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         _buildAttachments(attachments),
-        const Padding(
-          padding: EdgeInsets.all(8),
-          child: Divider(height: 2),
-        ),
+        const Padding(padding: EdgeInsets.all(8), child: Divider(height: 2)),
         if (_blockExternalImages ||
             mime.isNewsletter ||
             mime.threadSequence != null ||
@@ -285,26 +284,20 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
               if (_blockExternalImages)
                 PlatformElevatedButton(
                   child: Text(localizations.detailsActionShowImages),
-                  onPressed: () => setState(
-                    () {
-                      _blockExternalImages = false;
-                    },
-                  ),
+                  onPressed: () => setState(() {
+                    _blockExternalImages = false;
+                  }),
                 )
               else
                 const SizedBox.shrink(),
               if (mime.isNewsletter)
-                UnsubscribeButton(
-                  message: widget.message,
-                )
+                UnsubscribeButton(message: widget.message)
               else
                 const SizedBox.shrink(),
             ],
           ),
         if (ReadReceiptButton.shouldBeShown(mime, ref.read(settingsProvider)))
-          ReadReceiptButton(
-            message: widget.message,
-          ),
+          ReadReceiptButton(message: widget.message),
       ],
     );
   }
@@ -318,11 +311,11 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
   }
 
   Widget _buildAttachments(List<ContentInfo> attachments) => Wrap(
-        children: [
-          for (final attachment in attachments)
-            AttachmentChip(info: attachment, message: widget.message),
-        ],
-      );
+    children: [
+      for (final attachment in attachments)
+        AttachmentChip(info: attachment, message: widget.message),
+    ],
+  );
 
   Widget _buildMessageDownloadErrorContent(AppLocalizations localizations) =>
       Column(
@@ -369,20 +362,20 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
 
     return MimeMessageDownloader(
       mimeMessage: message.mimeMessage,
-      fetchMessageContents: (
-        mimeMessage, {
-        int? maxSize,
-        bool markAsSeen = false,
-        List<MediaToptype>? includedInlineTypes,
-        Duration? responseTimeout,
-      }) =>
-          message.source.fetchMessageContents(
-        message,
-        maxSize: maxSize,
-        markAsSeen: markAsSeen,
-        includedInlineTypes: includedInlineTypes,
-        responseTimeout: responseTimeout,
-      ),
+      fetchMessageContents:
+          (
+            mimeMessage, {
+            int? maxSize,
+            bool markAsSeen = false,
+            List<MediaToptype>? includedInlineTypes,
+            Duration? responseTimeout,
+          }) => message.source.fetchMessageContents(
+            message,
+            maxSize: maxSize,
+            markAsSeen: markAsSeen,
+            includedInlineTypes: includedInlineTypes,
+            responseTimeout: responseTimeout,
+          ),
       markAsSeen: true,
       onDownloaded: _onMimeMessageDownloaded,
       onError: _onMimeMessageError,
@@ -402,10 +395,7 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
               : url,
         );
 
-        launcher.launchUrl(
-          uri,
-          mode: ref.read(settingsProvider).urlLaunchMode,
-        );
+        launcher.launchUrl(uri, mode: ref.read(settingsProvider).urlLaunchMode);
 
         return Future.value(true);
       },
@@ -418,14 +408,18 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
       },
       logger: logger,
       builder: (context, mimeMessage) {
-        final textCalendarPart =
-            mimeMessage.getAlternativePart(MediaSubtype.textCalendar);
+        final textCalendarPart = mimeMessage.getAlternativePart(
+          MediaSubtype.textCalendar,
+        );
         if (textCalendarPart != null) {
           // || mediaType.sub == MediaSubtype.applicationIcs)
           final calendarText = textCalendarPart.decodeContentText();
           if (calendarText != null) {
-            final mediaProvider =
-                TextMediaProvider('invite.ics', 'text/calendar', calendarText);
+            final mediaProvider = TextMediaProvider(
+              'invite.ics',
+              'text/calendar',
+              calendarText,
+            );
 
             return IcalInteractiveMedia(
               mediaProvider: mediaProvider,
@@ -440,7 +434,8 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
   }
 
   bool _shouldImagesBeBlocked(MimeMessage mimeMessage) {
-    var blockExternalImages = widget.blockExternalContents ||
+    var blockExternalImages =
+        widget.blockExternalContents ||
         _settingsBlockExternalImages ||
         widget.message.source.shouldBlockImages;
     if (blockExternalImages) {
@@ -486,13 +481,13 @@ class _MessageContentState extends ConsumerState<_MessageContent> {
 
   Future _handleMailto(Uri mailto, MimeMessage mimeMessage) {
     final messageBuilder = ref.read(
-      mailtoProvider(
-        mailtoUri: mailto,
-        originatingMessage: mimeMessage,
-      ),
+      mailtoProvider(mailtoUri: mailto, originatingMessage: mimeMessage),
     );
-    final composeData =
-        ComposeData([widget.message], messageBuilder, ComposeAction.newMessage);
+    final composeData = ComposeData(
+      [widget.message],
+      messageBuilder,
+      ComposeAction.newMessage,
+    );
 
     return context.pushNamed(Routes.mailCompose, extra: composeData);
   }
@@ -522,20 +517,19 @@ class MessageContentsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => BasePage(
-        title: message.mimeMessage.decodeSubject() ?? ref.text.subjectUndefined,
-        content: SafeArea(
-          child: MimeMessageViewer(
-            mimeMessage: message.mimeMessage,
-            adjustHeight: false,
-            mailtoDelegate: (uri, mime) =>
-                _handleMailto(context, ref, uri, mime),
-            showMediaDelegate: (mediaViewer) =>
-                _navigateToMedia(context, mediaViewer),
-            enableDarkMode: Theme.of(context).brightness == Brightness.dark,
-            logger: logger,
-          ),
-        ),
-      );
+    title: message.mimeMessage.decodeSubject() ?? ref.text.subjectUndefined,
+    content: SafeArea(
+      child: MimeMessageViewer(
+        mimeMessage: message.mimeMessage,
+        adjustHeight: false,
+        mailtoDelegate: (uri, mime) => _handleMailto(context, ref, uri, mime),
+        showMediaDelegate: (mediaViewer) =>
+            _navigateToMedia(context, mediaViewer),
+        enableDarkMode: Theme.of(context).brightness == Brightness.dark,
+        logger: logger,
+      ),
+    ),
+  );
 
   Future _handleMailto(
     BuildContext context,
@@ -544,13 +538,13 @@ class MessageContentsScreen extends ConsumerWidget {
     MimeMessage mimeMessage,
   ) {
     final messageBuilder = ref.read(
-      mailtoProvider(
-        mailtoUri: mailto,
-        originatingMessage: mimeMessage,
-      ),
+      mailtoProvider(mailtoUri: mailto, originatingMessage: mimeMessage),
     );
-    final composeData =
-        ComposeData([message], messageBuilder, ComposeAction.newMessage);
+    final composeData = ComposeData(
+      [message],
+      messageBuilder,
+      ComposeAction.newMessage,
+    );
 
     return context.pushNamed(Routes.mailCompose, extra: composeData);
   }
@@ -558,8 +552,7 @@ class MessageContentsScreen extends ConsumerWidget {
   Future _navigateToMedia(
     BuildContext context,
     InteractiveMediaWidget mediaWidget,
-  ) =>
-      context.pushNamed(Routes.interactiveMedia, extra: mediaWidget);
+  ) => context.pushNamed(Routes.interactiveMedia, extra: mediaWidget);
 }
 
 class ThreadSequenceButton extends StatefulWidget {
@@ -597,8 +590,9 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
     if (threadSequence == null || threadSequence.isEmpty) {
       return [];
     }
-    final mailClient =
-        widget.message.source.getMimeSource(widget.message)?.mailClient;
+    final mailClient = widget.message.source
+        .getMimeSource(widget.message)
+        ?.mailClient;
     if (mailClient == null) {
       return [];
     }
@@ -617,14 +611,16 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
   Widget build(BuildContext context) {
     final length = widget.message.mimeMessage.threadSequence?.length ?? 0;
 
-    return WillPopScope(
-      onWillPop: () {
-        if (_overlayEntry == null) {
-          return Future.value(true);
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          if (_overlayEntry == null) {
+            Navigator.of(context).pop();
+          } else {
+            _removeOverlay();
+          }
         }
-        _removeOverlay();
-
-        return Future.value(false);
       },
       child: PlatformIconButton(
         icon: IconService.buildNumericIcon(context, length),
@@ -680,9 +676,7 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                   builder: (context, snapshot) {
                     final data = snapshot.data;
                     if (data == null) {
-                      return const Center(
-                        child: PlatformProgressIndicator(),
-                      );
+                      return const Center(child: PlatformProgressIndicator());
                     }
                     final messages = data;
                     final isSentFolder = widget.message.source.isSent;
@@ -693,15 +687,16 @@ class _ThreadSequenceButtonState extends State<ThreadSequenceButton> {
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         children: messages
-                            .map((message) => SelectablePlatformListTile(
-                                  title: MessageOverviewContent(
-                                    message: message,
-                                    isSentMessage: isSentFolder,
-                                  ),
-                                  onTap: () => _select(message),
-                                  selected:
-                                      message.mimeMessage.uid == currentUid,
-                                ))
+                            .map(
+                              (message) => SelectablePlatformListTile(
+                                title: MessageOverviewContent(
+                                  message: message,
+                                  isSentMessage: isSentFolder,
+                                ),
+                                onTap: () => _select(message),
+                                selected: message.mimeMessage.uid == currentUid,
+                              ),
+                            )
                             .toList(),
                       ),
                     );
@@ -792,14 +787,14 @@ class _UnsubscribeButtonState extends ConsumerState<UnsubscribeButton> {
 
     return widget.message.isNewsletterUnsubscribed
         ? widget.message.isNewsLetterSubscribable
-            ? PlatformElevatedButton(
-                onPressed: _resubscribe,
-                child: Text(localizations.detailsNewsletterActionResubscribe),
-              )
-            : Text(
-                localizations.detailsNewsletterStatusUnsubscribed,
-                style: const TextStyle(fontStyle: FontStyle.italic),
-              )
+              ? PlatformElevatedButton(
+                  onPressed: _resubscribe,
+                  child: Text(localizations.detailsNewsletterActionResubscribe),
+                )
+              : Text(
+                  localizations.detailsNewsletterStatusUnsubscribed,
+                  style: const TextStyle(fontStyle: FontStyle.italic),
+                )
         : PlatformElevatedButton(
             onPressed: _unsubscribe,
             child: Text(localizations.detailsNewsletterActionUnsubscribe),
@@ -820,8 +815,9 @@ class _UnsubscribeButtonState extends ConsumerState<UnsubscribeButton> {
       setState(() {
         _isActive = true;
       });
-      final mailClient =
-          widget.message.source.getMimeSource(widget.message)?.mailClient;
+      final mailClient = widget.message.source
+          .getMimeSource(widget.message)
+          ?.mailClient;
       final subscribed = mailClient != null && await mime.subscribe(mailClient);
       setState(() {
         _isActive = false;
@@ -831,11 +827,9 @@ class _UnsubscribeButtonState extends ConsumerState<UnsubscribeButton> {
           widget.message.isNewsletterUnsubscribed = false;
         });
         // TODO(RV): store flag only when server/mailbox supports arbitrary flags?
-        await mailClient.store(
-          MessageSequence.fromMessage(mime),
-          [Message.keywordFlagUnsubscribed],
-          action: StoreAction.remove,
-        );
+        await mailClient.store(MessageSequence.fromMessage(mime), [
+          Message.keywordFlagUnsubscribed,
+        ], action: StoreAction.remove);
       }
       if (context.mounted) {
         await LocalizedDialogHelper.showTextDialog(
@@ -844,10 +838,12 @@ class _UnsubscribeButtonState extends ConsumerState<UnsubscribeButton> {
               ? localizations.detailsNewsletterResubscribeSuccessTitle
               : localizations.detailsNewsletterResubscribeFailureTitle,
           subscribed
-              ? localizations
-                  .detailsNewsletterResubscribeSuccessMessage(listName)
-              : localizations
-                  .detailsNewsletterResubscribeFailureMessage(listName),
+              ? localizations.detailsNewsletterResubscribeSuccessMessage(
+                  listName,
+                )
+              : localizations.detailsNewsletterResubscribeFailureMessage(
+                  listName,
+                ),
         );
       }
     }
@@ -867,8 +863,9 @@ class _UnsubscribeButtonState extends ConsumerState<UnsubscribeButton> {
       setState(() {
         _isActive = true;
       });
-      final mailClient =
-          widget.message.source.getMimeSource(widget.message)?.mailClient;
+      final mailClient = widget.message.source
+          .getMimeSource(widget.message)
+          ?.mailClient;
       var unsubscribed = false;
       try {
         unsubscribed = mailClient != null && await mime.unsubscribe(mailClient);
@@ -886,10 +883,9 @@ class _UnsubscribeButtonState extends ConsumerState<UnsubscribeButton> {
         });
         // TODO(RV): store flag only when server/mailbox supports arbitrary flags?
         try {
-          await mailClient?.store(
-            MessageSequence.fromMessage(mime),
-            [Message.keywordFlagUnsubscribed],
-          );
+          await mailClient?.store(MessageSequence.fromMessage(mime), [
+            Message.keywordFlagUnsubscribed,
+          ]);
         } catch (e, s) {
           if (kDebugMode) {
             print('error during unsubscribe flag store operation: $e $s');
@@ -903,10 +899,12 @@ class _UnsubscribeButtonState extends ConsumerState<UnsubscribeButton> {
               ? localizations.detailsNewsletterUnsubscribeSuccessTitle
               : localizations.detailsNewsletterUnsubscribeFailureTitle,
           unsubscribed
-              ? localizations
-                  .detailsNewsletterUnsubscribeSuccessMessage(listName)
-              : localizations
-                  .detailsNewsletterUnsubscribeFailureMessage(listName),
+              ? localizations.detailsNewsletterUnsubscribeSuccessMessage(
+                  listName,
+                )
+              : localizations.detailsNewsletterUnsubscribeFailureMessage(
+                  listName,
+                ),
         );
       }
     }
@@ -926,28 +924,28 @@ class _MailAddressListState extends State<MailAddressList> {
 
   @override
   Widget build(BuildContext context) => ExpansionWrap(
-        spacing: 4,
-        expandIndicator: DensePlatformIconButton(
-          icon: const Icon(Icons.keyboard_arrow_down),
-          onPressed: () {
-            setState(() {
-              _isExpanded = true;
-            });
-          },
-        ),
-        compressIndicator: DensePlatformIconButton(
-          icon: const Icon(Icons.keyboard_arrow_up),
-          onPressed: () {
-            setState(() {
-              _isExpanded = false;
-            });
-          },
-        ),
-        isExpanded: _isExpanded,
-        maxRuns: 2,
-        children: [
-          for (final address in widget.mailAddresses)
-            MailAddressChip(mailAddress: address),
-        ],
-      );
+    spacing: 4,
+    expandIndicator: DensePlatformIconButton(
+      icon: const Icon(Icons.keyboard_arrow_down),
+      onPressed: () {
+        setState(() {
+          _isExpanded = true;
+        });
+      },
+    ),
+    compressIndicator: DensePlatformIconButton(
+      icon: const Icon(Icons.keyboard_arrow_up),
+      onPressed: () {
+        setState(() {
+          _isExpanded = false;
+        });
+      },
+    ),
+    isExpanded: _isExpanded,
+    maxRuns: 2,
+    children: [
+      for (final address in widget.mailAddresses)
+        MailAddressChip(mailAddress: address),
+    ],
+  );
 }

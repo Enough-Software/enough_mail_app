@@ -30,14 +30,13 @@ class EmailService {
     Mailbox? mailbox,
   }) async {
     await mailClient.connect();
-    if (mailbox == null) {
-      mailbox = await mailClient.selectInbox();
-    } else {
-      await mailClient.selectMailbox(mailbox);
+    final selectedMailbox = mailbox ?? await mailClient.selectInbox();
+    if (mailbox != null) {
+      await mailClient.selectMailbox(selectedMailbox);
     }
     final source = mimeSourceFactory.createMailboxMimeSource(
       mailClient,
-      mailbox,
+      selectedMailbox,
     );
 
     return source;
@@ -49,7 +48,8 @@ class EmailService {
     String logName,
     OnMailClientConfigChanged? onMailClientConfigChanged,
   ) {
-    final bool isLogEnabled = kDebugMode ||
+    final bool isLogEnabled =
+        kDebugMode ||
         (mailAccount.attributes[RealAccount.attributeEnableLogging] ?? false);
 
     return MailClient(
@@ -111,13 +111,15 @@ class EmailService {
     } on MailException {
       await mailClient.disconnect();
       final email = usedMailAccount.email;
-      var preferredUserName =
-          usedMailAccount.incoming.serverConfig.getUserName(email);
+      var preferredUserName = usedMailAccount.incoming.serverConfig.getUserName(
+        email,
+      );
       if (preferredUserName == null || preferredUserName == email) {
         final atIndex = mailAccount.email.lastIndexOf('@');
         preferredUserName = usedMailAccount.email.substring(0, atIndex);
-        usedMailAccount =
-            usedMailAccount.copyWithAuthenticationUserName(preferredUserName);
+        usedMailAccount = usedMailAccount.copyWithAuthenticationUserName(
+          preferredUserName,
+        );
         await mailClient.disconnect();
         mailClient = createMailClient(
           usedMailAccount,

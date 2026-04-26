@@ -340,14 +340,14 @@ class _MessageDragTargetState extends State<_MessageDragTarget> {
             child: Center(child: Text(text)),
           ),
         ),
-        onWillAccept: (data) {
+        onWillAcceptWithDetails: (data) {
           startAccepting();
 
           return true;
         },
-        onAccept: (data) async {
+        onAcceptWithDetails: (data) async {
           endAccepting();
-          widget.onComplete(data, widget.action, data: widget.data);
+          widget.onComplete(data.data, widget.action, data: widget.data);
         },
         onLeave: (data) => endAccepting(),
       );

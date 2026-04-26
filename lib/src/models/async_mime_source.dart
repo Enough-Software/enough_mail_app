@@ -172,9 +172,7 @@ abstract class AsyncMimeSource {
   ///
   /// This call will receive the latest 20 (or less) messages
   /// retrieved from the service.
-  Future<void> resyncMessagesManually(
-    List<MimeMessage> messages,
-  );
+  Future<void> resyncMessagesManually(List<MimeMessage> messages);
 
   final _subscribers = <MimeSourceSubscriber>[];
 
@@ -253,7 +251,7 @@ abstract class AsyncMimeSource {
 abstract class CachedMimeSource extends AsyncMimeSource {
   /// Creates a new cached mime source
   CachedMimeSource({int maxCacheSize = IndexedCache.defaultMaxCacheSize})
-      : cache = IndexedCache<MimeMessage>(maxCacheSize: maxCacheSize);
+    : cache = IndexedCache<MimeMessage>(maxCacheSize: maxCacheSize);
 
   /// The cache for the received mime messages
   final IndexedCache<MimeMessage> cache;
@@ -316,10 +314,12 @@ abstract class CachedMimeSource extends AsyncMimeSource {
     bool sequenceIdLargerMatcher(MimeMessage message, int sequenceId) =>
         (message.sequenceId ?? 0) > sequenceId;
     final messages = <MimeMessage>[];
-    final equalsMatcher =
-        sequence.isUidSequence ? uidMatcher : sequenceIdMatcher;
-    final largerMatcher =
-        sequence.isUidSequence ? uidLargerMatcher : sequenceIdLargerMatcher;
+    final equalsMatcher = sequence.isUidSequence
+        ? uidMatcher
+        : sequenceIdMatcher;
+    final largerMatcher = sequence.isUidSequence
+        ? uidLargerMatcher
+        : sequenceIdLargerMatcher;
 
     final ids = sequence.toList()..sort((a, b) => b.compareTo(a));
     for (final id in ids) {
@@ -360,12 +360,8 @@ abstract class CachedMimeSource extends AsyncMimeSource {
     final guid = message.guid;
     final sequenceId = message.sequenceId;
     final existing = guid != null
-        ? cache.firstWhereOrNull(
-            (element) => element.guid == guid,
-          )
-        : cache.firstWhereOrNull(
-            (element) => element.sequenceId == sequenceId,
-          );
+        ? cache.firstWhereOrNull((element) => element.guid == guid)
+        : cache.firstWhereOrNull((element) => element.sequenceId == sequenceId);
     if (existing != null) {
       existing.flags = message.flags;
     }
@@ -375,9 +371,7 @@ abstract class CachedMimeSource extends AsyncMimeSource {
   }
 
   @override
-  Future<void> resyncMessagesManually(
-    List<MimeMessage> messages,
-  ) async {
+  Future<void> resyncMessagesManually(List<MimeMessage> messages) async {
     // when mail server does not support QRESYNC, compare the latest messages
     // and check for changed flags (seen, flagged, ...) or vanished messages
     // fetch and compare the 20 latest messages:
@@ -432,9 +426,11 @@ abstract class CachedMimeSource extends AsyncMimeSource {
 
     // detect removed messages:
     final removedMessages = List<MimeMessage>.from(
-      cachedMessages.where((cached) =>
-          cached != null &&
-          messagesCopy.firstWhereOrNull((m) => m.guid == cached.guid) == null),
+      cachedMessages.where(
+        (cached) =>
+            cached != null &&
+            messagesCopy.firstWhereOrNull((m) => m.guid == cached.guid) == null,
+      ),
     );
     if (removedMessages.isNotEmpty) {
       final sequence = MessageSequence(isUidSequence: true);
@@ -454,8 +450,9 @@ abstract class CachedMimeSource extends AsyncMimeSource {
     final areListsEqual = const ListEquality().equals;
     for (final cached in cachedMessages) {
       if (cached != null) {
-        final newMessage =
-            messagesCopy.firstWhereOrNull((m) => m.guid == cached.guid);
+        final newMessage = messagesCopy.firstWhereOrNull(
+          (m) => m.guid == cached.guid,
+        );
         if (newMessage != null &&
             !areListsEqual(newMessage.flags, cached.flags)) {
           await onMessageFlagsUpdated(newMessage);
@@ -468,10 +465,7 @@ abstract class CachedMimeSource extends AsyncMimeSource {
 /// Keeps messages in a temporary cache and accesses them page-wise
 abstract class PagedCachedMimeSource extends CachedMimeSource {
   /// Creates a new paged cached mime source
-  PagedCachedMimeSource({
-    this.pageSize = 30,
-    super.maxCacheSize,
-  });
+  PagedCachedMimeSource({this.pageSize = 30, super.maxCacheSize});
 
   /// The size of a single page
   final int pageSize;
@@ -496,8 +490,11 @@ abstract class PagedCachedMimeSource extends CachedMimeSource {
       if (cache[pageEndIndex] == null) {
         // messages have not been added by another thread yet:
         final receivingDate = DateTime.now();
-        messages.sort((m1, m2) => (m1.decodeDate() ?? receivingDate)
-            .compareTo(m2.decodeDate() ?? receivingDate));
+        messages.sort(
+          (m1, m2) => (m1.decodeDate() ?? receivingDate).compareTo(
+            m2.decodeDate() ?? receivingDate,
+          ),
+        );
         await _pageLoadersByPageIndex.remove(pageIndex);
         for (int i = 0; i < messages.length; i++) {
           final cacheIndex = pageEndIndex - i;
@@ -533,7 +530,7 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   StreamSubscription<MailVanishedEvent>? _mailVanishedEventSubscription;
   StreamSubscription<MailUpdateEvent>? _mailUpdatedEventSubscription;
   StreamSubscription<MailConnectionReEstablishedEvent>?
-      _mailReconnectedEventSubscription;
+  _mailReconnectedEventSubscription;
 
   @override
   Future<void> init() {
@@ -552,25 +549,28 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   }
 
   void _registerEvents() {
-    _mailLoadEventSubscription =
-        mailClient.eventBus.on<MailLoadEvent>().listen((event) {
-      if (event.mailClient == mailClient) {
-        onMessageArrived(event.message);
-      }
-    });
-    _mailVanishedEventSubscription =
-        mailClient.eventBus.on<MailVanishedEvent>().listen((event) {
-      final sequence = event.sequence;
-      if (sequence != null && event.mailClient == mailClient) {
-        onMessagesVanished(sequence);
-      }
-    });
-    _mailUpdatedEventSubscription =
-        mailClient.eventBus.on<MailUpdateEvent>().listen((event) {
-      if (event.mailClient == mailClient) {
-        onMessageFlagsUpdated(event.message);
-      }
-    });
+    _mailLoadEventSubscription = mailClient.eventBus.on<MailLoadEvent>().listen(
+      (event) {
+        if (event.mailClient == mailClient) {
+          onMessageArrived(event.message);
+        }
+      },
+    );
+    _mailVanishedEventSubscription = mailClient.eventBus
+        .on<MailVanishedEvent>()
+        .listen((event) {
+          final sequence = event.sequence;
+          if (sequence != null && event.mailClient == mailClient) {
+            onMessagesVanished(sequence);
+          }
+        });
+    _mailUpdatedEventSubscription = mailClient.eventBus
+        .on<MailUpdateEvent>()
+        .listen((event) {
+          if (event.mailClient == mailClient) {
+            onMessageFlagsUpdated(event.message);
+          }
+        });
     _mailReconnectedEventSubscription = mailClient.eventBus
         .on<MailConnectionReEstablishedEvent>()
         .listen(_onMailReconnected);
@@ -592,8 +592,9 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
   ) async {
     if (event.mailClient == mailClient &&
         event.isManualSynchronizationRequired) {
-      final messages = await event.mailClient
-          .fetchMessages(fetchPreference: FetchPreference.envelope);
+      final messages = await event.mailClient.fetchMessages(
+        fetchPreference: FetchPreference.envelope,
+      );
       if (messages.isEmpty) {
         logger.w(
           'MESSAGES ARE EMPTY FOR '
@@ -629,8 +630,10 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
     clear();
     mailbox.messagesExists = 0;
 
-    final result =
-        await mailClient.deleteAllMessages(mailbox, expunge: expunge);
+    final result = await mailClient.deleteAllMessages(
+      mailbox,
+      expunge: expunge,
+    );
 
     return [result];
   }
@@ -755,26 +758,24 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
     bool markAsSeen = false,
     List<MediaToptype>? includedInlineTypes,
     Duration? responseTimeout,
-  }) =>
-      mailClient.fetchMessageContents(
-        message,
-        maxSize: maxSize,
-        markAsSeen: markAsSeen,
-        includedInlineTypes: includedInlineTypes,
-        responseTimeout: responseTimeout,
-      );
+  }) => mailClient.fetchMessageContents(
+    message,
+    maxSize: maxSize,
+    markAsSeen: markAsSeen,
+    includedInlineTypes: includedInlineTypes,
+    responseTimeout: responseTimeout,
+  );
 
   @override
   Future<MimePart> fetchMessagePart(
     MimeMessage message, {
     required String fetchId,
     Duration? responseTimeout,
-  }) =>
-      mailClient.fetchMessagePart(
-        message,
-        fetchId,
-        responseTimeout: responseTimeout,
-      );
+  }) => mailClient.fetchMessagePart(
+    message,
+    fetchId,
+    responseTimeout: responseTimeout,
+  );
 
   @override
   Future<void> sendMessage(
@@ -784,18 +785,18 @@ class AsyncMailboxMimeSource extends PagedCachedMimeSource {
     Mailbox? sentMailbox,
     bool use8BitEncoding = false,
     List<MailAddress>? recipients,
-  }) =>
-      mailClient.sendMessage(
-        message,
-        from: from,
-        appendToSent: appendToSent,
-        sentMailbox: sentMailbox,
-        use8BitEncoding: use8BitEncoding,
-        recipients: recipients,
-      );
+  }) => mailClient.sendMessage(
+    message,
+    from: from,
+    appendToSent: appendToSent,
+    sentMailbox: sentMailbox,
+    use8BitEncoding: use8BitEncoding,
+    recipients: recipients,
+  );
 
   @override
-  String toString() => 'AsyncMailboxMimeSource(${mailClient.account.email}: '
+  String toString() =>
+      'AsyncMailboxMimeSource(${mailClient.account.email}: '
       '${mailbox.name})';
 }
 
@@ -893,13 +894,9 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
   }
 
   @override
-  Future<DeleteResult> undoDeleteMessages(DeleteResult deleteResult) {
-    // TODO(RV): add sequence back to search result - or rather
-    // the sequence after undoing it
-    //searchResult.addMessageSequence(deleteResult.originalSequence);
-
-    return parent.undoDeleteMessages(deleteResult);
-  }
+  Future<DeleteResult> undoDeleteMessages(DeleteResult deleteResult) =>
+      // TODO(RV): add sequence back to search result
+      parent.undoDeleteMessages(deleteResult);
 
   @override
   void dispose() {
@@ -923,8 +920,9 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
   @override
   Future<void> onMessageFlagsUpdated(MimeMessage message) {
     final uid = message.uid;
-    final existing =
-        searchResult.messages.firstWhereOrNull((m) => m.uid == uid);
+    final existing = searchResult.messages.firstWhereOrNull(
+      (m) => m.uid == uid,
+    );
     if (existing != null) {
       existing.flags = message.flags;
       notifySubscribersOnMessageFlagsUpdated(existing);
@@ -949,8 +947,7 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
     List<MimeMessage> messages,
     List<String> flags, {
     StoreAction action = StoreAction.add,
-  }) =>
-      parent.store(messages, flags, action: action);
+  }) => parent.store(messages, flags, action: action);
 
   @override
   Future<void> storeAll(
@@ -1011,26 +1008,24 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
     bool markAsSeen = false,
     List<MediaToptype>? includedInlineTypes,
     Duration? responseTimeout,
-  }) =>
-      mailClient.fetchMessageContents(
-        message,
-        maxSize: maxSize,
-        markAsSeen: markAsSeen,
-        includedInlineTypes: includedInlineTypes,
-        responseTimeout: responseTimeout,
-      );
+  }) => mailClient.fetchMessageContents(
+    message,
+    maxSize: maxSize,
+    markAsSeen: markAsSeen,
+    includedInlineTypes: includedInlineTypes,
+    responseTimeout: responseTimeout,
+  );
 
   @override
   Future<MimePart> fetchMessagePart(
     MimeMessage message, {
     required String fetchId,
     Duration? responseTimeout,
-  }) =>
-      mailClient.fetchMessagePart(
-        message,
-        fetchId,
-        responseTimeout: responseTimeout,
-      );
+  }) => mailClient.fetchMessagePart(
+    message,
+    fetchId,
+    responseTimeout: responseTimeout,
+  );
 
   @override
   Future<void> sendMessage(
@@ -1040,13 +1035,12 @@ class AsyncSearchMimeSource extends AsyncMimeSource {
     Mailbox? sentMailbox,
     bool use8BitEncoding = false,
     List<MailAddress>? recipients,
-  }) =>
-      mailClient.sendMessage(
-        message,
-        from: from,
-        appendToSent: appendToSent,
-        sentMailbox: sentMailbox,
-        use8BitEncoding: use8BitEncoding,
-        recipients: recipients,
-      );
+  }) => mailClient.sendMessage(
+    message,
+    from: from,
+    appendToSent: appendToSent,
+    sentMailbox: sentMailbox,
+    use8BitEncoding: use8BitEncoding,
+    recipients: recipients,
+  );
 }

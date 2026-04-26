@@ -44,17 +44,21 @@ class NotificationService {
     const android = AndroidInitializationSettings('ic_stat_notification');
     final ios = DarwinInitializationSettings();
     const macos = DarwinInitializationSettings();
-    final initSettings =
-        InitializationSettings(android: android, iOS: ios, macOS: macos);
+    final initSettings = InitializationSettings(
+      android: android,
+      iOS: ios,
+      macOS: macos,
+    );
     await _flutterLocalNotificationsPlugin.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: _selectNotification,
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
     if (Platform.isAndroid) {
       await _flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.requestNotificationsPermission();
     }
     if (checkForLaunchDetails) {
@@ -78,30 +82,9 @@ class NotificationService {
     return NotificationServiceInitResult.normal;
   }
 
-  Future<List<MailNotificationPayload>> getActiveMailNotifications() {
-    /// wait until active notification also return the payload
-    return Future.value([]);
-    // if (!Platform.isAndroid) {
-    //   return [];
-    // }
-    // final activeNotifications = await _flutterLocalNotificationsPlugin
-    //     .resolvePlatformSpecificImplementation<
-    //         AndroidFlutterLocalNotificationsPlugin>()
-    //     .getActiveNotifications();
-    // if (activeNotifications == null || activeNotifications.isEmpty) {
-    //   return [];
-    // }
-    // print('active Notifications:');
-    // for (final n in activeNotifications) {
-    //   print(
-    //       'body=${n.body}, title=${n.title}, id=${n.id}, channel=${n.channelId}');
-    // }
-    // return activeNotifications
-    //     .where((notification) =>
-    //         notification.body.startsWith(_messagePayloadStart))
-    //     .map((notification) => _deserialize(notification.body))
-    //     .toList();
-  }
+  Future<List<MailNotificationPayload>> getActiveMailNotifications() =>
+      // TODO(RV): wait until active notification also return the payload
+      Future.value([]);
 
   MailNotificationPayload _deserialize(String payloadText) {
     final json = jsonDecode(payloadText.substring(_messagePayloadStart.length));
@@ -126,10 +109,7 @@ class NotificationService {
 
     if (payloadText != null && payloadText.startsWith(_messagePayloadStart)) {
       final payload = _deserialize(payloadText);
-      usedContext.pushNamed(
-        Routes.mailDetailsForNotification,
-        extra: payload,
-      );
+      usedContext.pushNamed(Routes.mailDetailsForNotification, extra: payload);
     }
   }
 
@@ -178,14 +158,6 @@ class NotificationService {
     );
   }
 
-  // int getNotificationIdForMail(MimeMessage mimeMessage, MailClient mailClient) {
-  //   return getNotificationIdForUid(mimeMessage.uid!, mailClient.account.email);
-  // }
-
-  // int getNotificationIdForUid(int uid, String? email) {
-  //   return (email?.hashCode ?? 0) + uid;
-  // }
-
   Future<void> _sendLocalNotification(
     int id,
     String title,
@@ -219,8 +191,13 @@ class NotificationService {
       android: androidPlatformChannelSpecifics,
       iOS: iosPlatformChannelSpecifics,
     );
-    await _flutterLocalNotificationsPlugin
-        .show(id, title, text, platformChannelSpecifics, payload: payloadText);
+    await _flutterLocalNotificationsPlugin.show(
+      id: id,
+      title: title,
+      body: text,
+      notificationDetails: platformChannelSpecifics,
+      payload: payloadText,
+    );
   }
 
   void cancelNotificationForMessage(maily.Message message) =>
@@ -233,13 +210,9 @@ class NotificationService {
     }
   }
 
-  // void cancelNotificationForUid(int uid, MailClient mailClient) {
-  //   cancelNotification(getNotificationIdForUid(uid, mailClient.account.email));
-  // }
-
   void cancelNotification(int id) {
     if (defaultTargetPlatform != TargetPlatform.windows) {
-      _flutterLocalNotificationsPlugin.cancel(id);
+      _flutterLocalNotificationsPlugin.cancel(id: id);
     }
   }
 }

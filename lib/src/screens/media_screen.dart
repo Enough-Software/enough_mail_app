@@ -23,9 +23,7 @@ import '../settings/theme/icon_service.dart';
 import '../util/localized_dialog_helper.dart';
 import 'base.dart';
 
-enum _OverflowMenuChoice {
-  showAsEmail,
-}
+enum _OverflowMenuChoice { showAsEmail }
 
 class InteractiveMediaScreen extends ConsumerWidget {
   const InteractiveMediaScreen({super.key, required this.mediaWidget});
@@ -125,8 +123,11 @@ class InteractiveMediaScreen extends ConsumerWidget {
         filename: provider.name,
       );
     }
-    final composeData =
-        ComposeData(null, messageBuilder, ComposeAction.newMessage);
+    final composeData = ComposeData(
+      null,
+      messageBuilder,
+      ComposeAction.newMessage,
+    );
     context.pushNamed(Routes.mailCompose, extra: composeData);
   }
 
@@ -149,9 +150,12 @@ class InteractiveMediaScreen extends ConsumerWidget {
     }
   }
 
-  static Future _shareText(TextMediaProvider provider) => Share.share(
-        provider.text,
-        subject: provider.description ?? provider.name,
+  static Future _shareText(TextMediaProvider provider) =>
+      SharePlus.instance.share(
+        ShareParams(
+          text: provider.text,
+          subject: provider.description ?? provider.name,
+        ),
       );
 
   static Future _shareFile(MemoryMediaProvider provider) async {
@@ -161,10 +165,12 @@ class InteractiveMediaScreen extends ConsumerWidget {
       name: provider.name,
     );
 
-    await Share.shareXFiles(
-      [file],
-      subject: provider.name,
-      text: provider.description,
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [file],
+        subject: provider.name,
+        text: provider.description,
+      ),
     );
   }
 }

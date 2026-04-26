@@ -51,9 +51,7 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                     vertical: 8,
                     horizontal: 4,
                   ),
-                  child: Text(
-                    localizations.securitySettingsIntro,
-                  ),
+                  child: Text(localizations.securitySettingsIntro),
                 ),
                 const Divider(),
                 Row(
@@ -62,7 +60,9 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                       child: PlatformCheckboxListTile(
                         value: settings.blockExternalImages,
                         onChanged: (value) {
-                          ref.read(settingsProvider.notifier).update(
+                          ref
+                              .read(settingsProvider.notifier)
+                              .update(
                                 settings.copyWith(
                                   blockExternalImages: value ?? false,
                                 ),
@@ -78,6 +78,7 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                       onPressed: () => LocalizedDialogHelper.showTextDialog(
                         ref,
                         localizations
+                            // ignore: lines_longer_than_80_chars
                             .settingsSecurityBlockExternalImagesDescriptionTitle,
                         localizations
                             .settingsSecurityBlockExternalImagesDescriptionText,
@@ -90,7 +91,9 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                   child: PlatformDropdownButton<bool>(
                     value: settings.preferPlainTextMessages,
                     onChanged: (value) {
-                      ref.read(settingsProvider.notifier).update(
+                      ref
+                          .read(settingsProvider.notifier)
+                          .update(
                             settings.copyWith(
                               preferPlainTextMessages: value ?? false,
                             ),
@@ -133,25 +136,23 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                             ref
                                 .read(appLifecycleProvider.notifier)
                                 .ignoreNextInactivationCycle();
-                            final didAuthenticate =
-                                await BiometricsService.instance.authenticate(
-                              localizations,
-                              reason: reason,
-                            );
+                            final didAuthenticate = await BiometricsService
+                                .instance
+                                .authenticate(localizations, reason: reason);
                             if (didAuthenticate) {
                               if (enableBiometricLock && context.mounted) {
                                 AppLock.ignoreNextSettingsChange = true;
                               }
-                              await ref.read(settingsProvider.notifier).update(
+                              await ref
+                                  .read(settingsProvider.notifier)
+                                  .update(
                                     settings.copyWith(
                                       enableBiometricLock: enableBiometricLock,
                                     ),
                                   );
                             }
                           },
-                          title: Text(
-                            localizations.securityUnlockLabel,
-                          ),
+                          title: Text(localizations.securityUnlockLabel),
                         ),
                       ),
                       PlatformIconButton(
@@ -170,19 +171,21 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                       child: PlatformDropdownButton<LockTimePreference>(
                         value: settings.lockTimePreference,
                         onChanged: (value) {
-                          ref.read(settingsProvider.notifier).update(
-                                settings.copyWith(
-                                  lockTimePreference: value,
-                                ),
+                          ref
+                              .read(settingsProvider.notifier)
+                              .update(
+                                settings.copyWith(lockTimePreference: value),
                               );
                         },
                         items: LockTimePreference.values
-                            .map((preference) => DropdownMenuItem(
-                                  value: preference,
-                                  child: Text(
-                                    getLockTimePreferenceName(preference),
-                                  ),
-                                ))
+                            .map(
+                              (preference) => DropdownMenuItem(
+                                value: preference,
+                                child: Text(
+                                  getLockTimePreferenceName(preference),
+                                ),
+                              ),
+                            )
                             .toList(),
                       ),
                     ),
@@ -204,11 +207,9 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                     value: settings.urlLaunchMode,
                     onChanged: (value) {
                       if (value != null) {
-                        ref.read(settingsProvider.notifier).update(
-                              settings.copyWith(
-                                urlLaunchMode: value,
-                              ),
-                            );
+                        ref
+                            .read(settingsProvider.notifier)
+                            .update(settings.copyWith(urlLaunchMode: value));
                       }
                     },
                     items: [
@@ -220,8 +221,9 @@ class SettingsSecurityScreen extends HookConsumerWidget {
                       ),
                       DropdownMenuItem(
                         value: launcher.LaunchMode.inAppWebView,
-                        child:
-                            Text(localizations.settingsSecurityLaunchModeInApp),
+                        child: Text(
+                          localizations.settingsSecurityLaunchModeInApp,
+                        ),
                       ),
                     ],
                   ),

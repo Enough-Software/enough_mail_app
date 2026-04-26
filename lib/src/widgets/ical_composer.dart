@@ -37,7 +37,8 @@ class IcalComposer extends StatefulHookConsumerWidget {
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, now.day, (now.hour + 1) % 24);
     final end = DateTime(start.year, start.month, start.day, start.hour, 30);
-    final editAppointment = appointment ??
+    final editAppointment =
+        appointment ??
         VCalendar.createEvent(
           start: start,
           end: end,
@@ -51,7 +52,8 @@ class IcalComposer extends StatefulHookConsumerWidget {
 
     if (result ?? false) {
       _IcalComposerState._current.apply();
-      appointment = editAppointment;
+
+      return editAppointment;
     }
 
     return appointment;
@@ -100,8 +102,9 @@ class _IcalComposerState extends ConsumerState<IcalComposer> {
       ..description = _descriptionController.text.isNotEmpty
           ? _descriptionController.text
           : null
-      ..location =
-          _locationController.text.isNotEmpty ? _locationController.text : null;
+      ..location = _locationController.text.isNotEmpty
+          ? _locationController.text
+          : null;
   }
 
   @override
@@ -338,8 +341,11 @@ class _DateTimePicker extends ConsumerWidget {
             FocusScope.of(context).unfocus();
             final initialDate = dt ?? DateTime.now();
             final firstDate = DateTime.now();
-            final lastDate =
-                DateTime(firstDate.year + 10, firstDate.month, firstDate.day);
+            final lastDate = DateTime(
+              firstDate.year + 10,
+              firstDate.month,
+              firstDate.day,
+            );
             final newStartDate = await showPlatformDatePicker(
               context: context,
               initialDate: initialDate,
@@ -347,8 +353,9 @@ class _DateTimePicker extends ConsumerWidget {
               lastDate: lastDate,
             );
             if (newStartDate != null) {
-              final withTimeOfDay =
-                  newStartDate.withTimeOfDay(initialDate.toTimeOfDay());
+              final withTimeOfDay = newStartDate.withTimeOfDay(
+                initialDate.toTimeOfDay(),
+              );
               onChanged(withTimeOfDay);
             }
           },
@@ -373,8 +380,9 @@ class _DateTimePicker extends ConsumerWidget {
               );
 
               if (newStartTime != null) {
-                final withTimeOfDay =
-                    initialDateTime.withTimeOfDay(newStartTime);
+                final withTimeOfDay = initialDateTime.withTimeOfDay(
+                  newStartTime,
+                );
                 onChanged(withTimeOfDay);
               }
             },
@@ -385,10 +393,7 @@ class _DateTimePicker extends ConsumerWidget {
 }
 
 class _RecurrenceComposer extends StatefulHookConsumerWidget {
-  const _RecurrenceComposer({
-    this.recurrenceRule,
-    required this.startDate,
-  });
+  const _RecurrenceComposer({this.recurrenceRule, required this.startDate});
   final Recurrence? recurrenceRule;
   final DateTime startDate;
 
@@ -408,10 +413,7 @@ class _RecurrenceComposer extends StatefulHookConsumerWidget {
     final result = await ModelBottomSheetHelper.showModalBottomSheet<bool>(
       context,
       localizations.composeAppointmentLabelRepeat,
-      _RecurrenceComposer(
-        recurrenceRule: recurrenceRule,
-        startDate: startDate,
-      ),
+      _RecurrenceComposer(recurrenceRule: recurrenceRule, startDate: startDate),
     );
 
     return result ?? false
@@ -458,10 +460,12 @@ class _RecurrenceComposerState extends ConsumerState<_RecurrenceComposer> {
               ),
               PlatformDropdownButton<_RepeatFrequency>(
                 items: _RepeatFrequency.values
-                    .map((rf) => DropdownMenuItem<_RepeatFrequency>(
-                          value: rf,
-                          child: Text(rf.localization(localizations)),
-                        ))
+                    .map(
+                      (rf) => DropdownMenuItem<_RepeatFrequency>(
+                        value: rf,
+                        child: Text(rf.localization(localizations)),
+                      ),
+                    )
                     .toList(),
                 onChanged: (freq) {
                   if (freq == null || freq == _RepeatFrequency.never) {
@@ -538,8 +542,9 @@ class _RecurrenceComposerState extends ConsumerState<_RecurrenceComposer> {
             if (rule.frequency == RecurrenceFrequency.weekly) ...[
               Padding(
                 padding: const EdgeInsets.all(8),
-                child:
-                    Text(localizations.composeAppointmentRecurrenceDaysLabel),
+                child: Text(
+                  localizations.composeAppointmentRecurrenceDaysLabel,
+                ),
               ),
               _WeekDaySelector(
                 recurrence: rule,
@@ -557,8 +562,9 @@ class _RecurrenceComposerState extends ConsumerState<_RecurrenceComposer> {
             ] else if (rule.frequency == RecurrenceFrequency.monthly) ...[
               Padding(
                 padding: const EdgeInsets.all(8),
-                child:
-                    Text(localizations.composeAppointmentRecurrenceDaysLabel),
+                child: Text(
+                  localizations.composeAppointmentRecurrenceDaysLabel,
+                ),
               ),
               _DayOfMonthSelector(
                 recurrence: rule,
@@ -575,18 +581,15 @@ class _RecurrenceComposerState extends ConsumerState<_RecurrenceComposer> {
               trailing: Text(
                 rule.until == null
                     ? localizations
-                        .composeAppointmentRecurrenceUntilOptionUnlimited
+                          .composeAppointmentRecurrenceUntilOptionUnlimited
                     : rule.until == _recommendationDate
-                        ? localizations
-                            .composeAppointmentRecurrenceUntilOptionRecommended(
+                    ? localizations
+                          .composeAppointmentRecurrenceUntilOptionRecommended(
                             ref.formatIsoDuration(
                               rule.frequency.recommendedUntil ?? IsoDuration(),
                             ),
                           )
-                        : ref.formatDate(
-                            rule.until,
-                            useLongFormat: true,
-                          ),
+                    : ref.formatDate(rule.until, useLongFormat: true),
               ),
               onTap: () async {
                 final until = await _UntilComposer.createOrEditUntil(
@@ -607,10 +610,12 @@ class _RecurrenceComposerState extends ConsumerState<_RecurrenceComposer> {
             const Divider(),
             Padding(
               padding: const EdgeInsets.all(8),
-              child: Text(rule.toHumanReadableText(
-                languageCode: localizations.localeName,
-                startDate: widget.startDate,
-              )),
+              child: Text(
+                rule.toHumanReadableText(
+                  languageCode: localizations.localeName,
+                  startDate: widget.startDate,
+                ),
+              ),
             ),
           ],
         ],
@@ -647,8 +652,9 @@ class _WeekDaySelectorState extends ConsumerState<_WeekDaySelector> {
         final day = ((firstDayOfWeek + i) <= 7)
             ? (firstDayOfWeek + i)
             : ((firstDayOfWeek + i) - 7);
-        final bool isSelected =
-            byWeekDays.any((dayRule) => dayRule.weekday == day);
+        final bool isSelected = byWeekDays.any(
+          (dayRule) => dayRule.weekday == day,
+        );
         _selectedDays[i] = isSelected;
       }
     }
@@ -657,8 +663,9 @@ class _WeekDaySelectorState extends ConsumerState<_WeekDaySelector> {
 
   void _selectStartDateWeekDay() {
     final startDateWeekDay = widget.startDate.weekday;
-    final index =
-        _weekdays.indexWhere((weekDay) => weekDay.day == startDateWeekDay);
+    final index = _weekdays.indexWhere(
+      (weekDay) => weekDay.day == startDateWeekDay,
+    );
     _selectedDays[index] = true;
   }
 
@@ -691,17 +698,19 @@ class _WeekDaySelectorState extends ConsumerState<_WeekDaySelector> {
 
   @override
   Widget build(BuildContext context) => FittedBox(
-        child: PlatformToggleButtons(
-          isSelected: _selectedDays,
-          onPressed: _toggle,
-          children: _weekdays
-              .map((day) => Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Text(day.name),
-                  ))
-              .toList(),
-        ),
-      );
+    child: PlatformToggleButtons(
+      isSelected: _selectedDays,
+      onPressed: _toggle,
+      children: _weekdays
+          .map(
+            (day) => Padding(
+              padding: const EdgeInsets.all(8),
+              child: Text(day.name),
+            ),
+          )
+          .toList(),
+    ),
+  );
 }
 
 enum _DayOfMonthOption { dayOfMonth, dayInNumberedWeek }
@@ -756,7 +765,8 @@ class _DayOfMonthSelectorState extends ConsumerState<_DayOfMonthSelector> {
     } else {
       var recurrence = widget.recurrence;
       if (!widget.recurrence.hasByWeekDay) {
-        recurrence = _DayOfMonthSelector.updateMonthlyRecurrence(
+        recurrence =
+            _DayOfMonthSelector.updateMonthlyRecurrence(
               recurrence,
               widget.startDate,
             ) ??
@@ -804,14 +814,16 @@ class _DayOfMonthSelectorState extends ConsumerState<_DayOfMonthSelector> {
         PlatformRadioListTile<_DayOfMonthOption>(
           groupValue: _option,
           value: _DayOfMonthOption.dayInNumberedWeek,
-          title:
-              Text(localizations.composeAppointmentRecurrenceMonthlyOnWeekDay),
+          title: Text(
+            localizations.composeAppointmentRecurrenceMonthlyOnWeekDay,
+          ),
           onChanged: (value) {
             if (value == null) {
               return;
             }
             if (_byDayRule == null) {
-              final recurrence = _DayOfMonthSelector.updateMonthlyRecurrence(
+              final recurrence =
+                  _DayOfMonthSelector.updateMonthlyRecurrence(
                     widget.recurrence.copyWith(copyByRules: false),
                     widget.startDate,
                   ) ??
@@ -820,8 +832,9 @@ class _DayOfMonthSelectorState extends ConsumerState<_DayOfMonthSelector> {
                   );
               final rule = recurrence.byWeekDay?.first;
               _byDayRule = rule;
-              _currentWeekday =
-                  _weekdays.firstWhere((wd) => wd.day == rule?.weekday);
+              _currentWeekday = _weekdays.firstWhere(
+                (wd) => wd.day == rule?.weekday,
+              );
               widget.onChanged(recurrence);
             }
             setState(() {
@@ -838,8 +851,9 @@ class _DayOfMonthSelectorState extends ConsumerState<_DayOfMonthSelector> {
                   items: [
                     DropdownMenuItem<int>(
                       value: 1,
-                      child:
-                          Text(localizations.composeAppointmentRecurrenceFirst),
+                      child: Text(
+                        localizations.composeAppointmentRecurrenceFirst,
+                      ),
                     ),
                     DropdownMenuItem<int>(
                       value: 2,
@@ -855,8 +869,9 @@ class _DayOfMonthSelectorState extends ConsumerState<_DayOfMonthSelector> {
                     ),
                     DropdownMenuItem<int>(
                       value: -1,
-                      child:
-                          Text(localizations.composeAppointmentRecurrenceLast),
+                      child: Text(
+                        localizations.composeAppointmentRecurrenceLast,
+                      ),
                     ),
                     DropdownMenuItem<int>(
                       value: -2,
@@ -869,20 +884,21 @@ class _DayOfMonthSelectorState extends ConsumerState<_DayOfMonthSelector> {
                   onChanged: (value) {
                     final newRule = ByDayRule(rule.weekday, week: value);
                     _byDayRule = newRule;
-                    final recurrence =
-                        widget.recurrence.copyWith(byWeekDay: [newRule]);
+                    final recurrence = widget.recurrence.copyWith(
+                      byWeekDay: [newRule],
+                    );
                     widget.onChanged(recurrence);
                   },
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(8),
-                ),
+                const Padding(padding: EdgeInsets.all(8)),
                 PlatformDropdownButton<WeekDay>(
                   items: _weekdays
-                      .map((wd) => DropdownMenuItem<WeekDay>(
-                            value: wd,
-                            child: Text(wd.name),
-                          ))
+                      .map(
+                        (wd) => DropdownMenuItem<WeekDay>(
+                          value: wd,
+                          child: Text(wd.name),
+                        ),
+                      )
                       .toList(),
                   value: _currentWeekday,
                   onChanged: (value) {
@@ -891,8 +907,9 @@ class _DayOfMonthSelectorState extends ConsumerState<_DayOfMonthSelector> {
                     }
                     final newRule = ByDayRule(value.day, week: rule.week);
                     _byDayRule = newRule;
-                    final recurrence =
-                        widget.recurrence.copyWith(byWeekDay: [newRule]);
+                    final recurrence = widget.recurrence.copyWith(
+                      byWeekDay: [newRule],
+                    );
                     widget.onChanged(recurrence);
                   },
                 ),
@@ -906,11 +923,7 @@ class _DayOfMonthSelectorState extends ConsumerState<_DayOfMonthSelector> {
 }
 
 class _UntilComposer extends StatefulHookConsumerWidget {
-  const _UntilComposer({
-    required this.start,
-    this.until,
-    this.recommendation,
-  });
+  const _UntilComposer({required this.start, this.until, this.recommendation});
 
   final DateTime start;
   final DateTime? until;
@@ -985,11 +998,7 @@ class _UntilComposerState extends ConsumerState<_UntilComposer> {
                 value: value,
                 onChanged: _onChanged,
                 title: Text(
-                  value.localization(
-                    ref,
-                    localizations,
-                    widget.recommendation,
-                  ),
+                  value.localization(ref, localizations, widget.recommendation),
                 ),
               ),
           if (_option == _UntilOption.date) ...[
@@ -1049,10 +1058,12 @@ extension _ExtensionUntilOption on _UntilOption {
       case _UntilOption.unlimited:
         return localizations.composeAppointmentRecurrenceUntilOptionUnlimited;
       case _UntilOption.recommendation:
-        final duration =
-            recommendation == null ? '' : ref.formatIsoDuration(recommendation);
-        return localizations
-            .composeAppointmentRecurrenceUntilOptionRecommended(duration);
+        final duration = recommendation == null
+            ? ''
+            : ref.formatIsoDuration(recommendation);
+        return localizations.composeAppointmentRecurrenceUntilOptionRecommended(
+          duration,
+        );
       case _UntilOption.date:
         return localizations
             .composeAppointmentRecurrenceUntilOptionSpecificDate;

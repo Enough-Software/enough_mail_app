@@ -58,310 +58,298 @@ class AccountEditScreen extends HookConsumerWidget {
         ref.read(realAccountsProvider.notifier).save();
 
     Widget buildEditContent() => SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: SafeArea(
-              child: ListenableBuilder(
-                listenable: account,
-                builder: (context, child) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (account.hasError) ...[
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          localizations
-                              .editAccountFailureToConnectInfo(account.name),
-                        ),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: SafeArea(
+          child: ListenableBuilder(
+            listenable: account,
+            builder: (context, child) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (account.hasError) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      localizations.editAccountFailureToConnectInfo(
+                        account.name,
                       ),
-                      if (isRetryingToConnectState.value)
-                        const Padding(
-                          padding: EdgeInsets.all(8),
-                          child: PlatformProgressIndicator(),
-                        )
-                      else
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: PlatformTextButtonIcon(
-                                onPressed: () => _reconnect(
-                                  context,
-                                  ref,
-                                  account,
-                                  account.mailAccount,
-                                  isRetryingToConnectState,
-                                ),
-                                icon: Icon(iconService.retry),
-                                label: Text(
-                                  localizations
-                                      .editAccountFailureToConnectRetryAction,
-                                ),
-                              ),
+                    ),
+                  ),
+                  if (isRetryingToConnectState.value)
+                    const Padding(
+                      padding: EdgeInsets.all(8),
+                      child: PlatformProgressIndicator(),
+                    )
+                  else
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: PlatformTextButtonIcon(
+                            onPressed: () => _reconnect(
+                              context,
+                              ref,
+                              account,
+                              account.mailAccount,
+                              isRetryingToConnectState,
                             ),
-                            Expanded(
-                              child: PlatformTextButton(
-                                onPressed: () => _updateAuthentication(
-                                  context,
-                                  ref,
-                                  account,
-                                  isRetryingToConnectState,
-                                ),
-                                child: Text(
-                                  localizations
-                                      .editAccountFailureToConnectChangePasswordAction,
-                                ),
-                              ),
+                            icon: Icon(iconService.retry),
+                            label: Text(
+                              localizations
+                                  .editAccountFailureToConnectRetryAction,
                             ),
-                          ],
+                          ),
                         ),
-                      const Divider(),
-                    ],
-                    DecoratedPlatformTextField(
-                      controller: accountNameController,
-                      decoration: InputDecoration(
-                        labelText: localizations.addAccountNameOfAccountLabel,
-                        hintText: localizations.addAccountNameOfAccountHint,
-                      ),
-                      onChanged: (value) async {
-                        account.name = value;
-                        await saveAccounts();
-                      },
-                    ),
-                    DecoratedPlatformTextField(
-                      controller: userNameController,
-                      decoration: InputDecoration(
-                        labelText: localizations.addAccountNameOfUserLabel,
-                        hintText: localizations.addAccountNameOfUserHint,
-                      ),
-                      onChanged: (value) async {
-                        account.userName = value;
-                        await saveAccounts();
-                      },
-                    ),
-                    if (unifiedAccount != null)
-                      PlatformCheckboxListTile(
-                        value: !account.excludeFromUnified,
-                        onChanged: (value) async {
-                          final exclude = (value == false);
-                          account.excludeFromUnified = exclude;
-                          ref.invalidate(unifiedAccountProvider);
-                          await saveAccounts();
-                        },
-                        title: Text(
-                          localizations.editAccountIncludeInUnifiedLabel,
+                        Expanded(
+                          child: PlatformTextButton(
+                            onPressed: () => _updateAuthentication(
+                              context,
+                              ref,
+                              account,
+                              isRetryingToConnectState,
+                            ),
+                            child: Text(
+                              localizations
+                                  // ignore: lines_longer_than_80_chars
+                                  .editAccountFailureToConnectChangePasswordAction,
+                            ),
+                          ),
                         ),
-                      ),
-                    const Divider(),
-                    Text(
-                      localizations.signatureSettingsTitle,
-                      style: theme.textTheme.titleMedium,
+                      ],
                     ),
-                    SignatureWidget(
-                      account: account,
+                  const Divider(),
+                ],
+                DecoratedPlatformTextField(
+                  controller: accountNameController,
+                  decoration: InputDecoration(
+                    labelText: localizations.addAccountNameOfAccountLabel,
+                    hintText: localizations.addAccountNameOfAccountHint,
+                  ),
+                  onChanged: (value) async {
+                    account.name = value;
+                    await saveAccounts();
+                  },
+                ),
+                DecoratedPlatformTextField(
+                  controller: userNameController,
+                  decoration: InputDecoration(
+                    labelText: localizations.addAccountNameOfUserLabel,
+                    hintText: localizations.addAccountNameOfUserHint,
+                  ),
+                  onChanged: (value) async {
+                    account.userName = value;
+                    await saveAccounts();
+                  },
+                ),
+                if (unifiedAccount != null)
+                  PlatformCheckboxListTile(
+                    value: !account.excludeFromUnified,
+                    onChanged: (value) async {
+                      final exclude = (value == false);
+                      account.excludeFromUnified = exclude;
+                      ref.invalidate(unifiedAccountProvider);
+                      await saveAccounts();
+                    },
+                    title: Text(localizations.editAccountIncludeInUnifiedLabel),
+                  ),
+                const Divider(),
+                Text(
+                  localizations.signatureSettingsTitle,
+                  style: theme.textTheme.titleMedium,
+                ),
+                SignatureWidget(account: account),
+                const Divider(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                  child: Text(
+                    localizations.editAccountAliasLabel(account.email),
+                  ),
+                ),
+                if (account.hasNoAlias)
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(
+                      localizations.editAccountNoAliasesInfo,
+                      style: const TextStyle(fontStyle: FontStyle.italic),
                     ),
-                    const Divider(),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-                      child: Text(
-                        localizations.editAccountAliasLabel(account.email),
-                      ),
-                    ),
-                    if (account.hasNoAlias)
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(
-                          localizations.editAccountNoAliasesInfo,
-                          style: const TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      ),
+                  ),
 
-                    for (final alias in account.aliases)
-                      Dismissible(
-                        key: ValueKey(alias),
-                        background: Container(
-                          color: Colors.red,
-                          child: Icon(iconService.messageActionDelete),
-                        ),
-                        onDismissed: (direction) {
-                          account.removeAlias(alias);
-                          ScaffoldMessengerService.instance.showTextSnackBar(
-                            localizations,
-                            localizations.editAccountAliasRemoved(
-                              alias.email,
-                            ),
-                          );
-                          ref.read(realAccountsProvider.notifier).save();
-                        },
-                        child: PlatformListTile(
-                          title: Text(alias.toString()),
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => _AliasEditDialog(
-                                isNewAlias: false,
-                                alias: alias,
-                                account: account,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    PlatformTextButtonIcon(
-                      icon: Icon(iconService.add),
-                      label: Text(localizations.editAccountAddAliasAction),
-                      onPressed: () {
-                        var email = account.email;
-                        email = email.substring(email.lastIndexOf('@'));
-                        final alias = MailAddress(account.userName, email);
+                for (final alias in account.aliases)
+                  Dismissible(
+                    key: ValueKey(alias),
+                    background: Container(
+                      color: Colors.red,
+                      child: Icon(iconService.messageActionDelete),
+                    ),
+                    onDismissed: (direction) {
+                      account.removeAlias(alias);
+                      ScaffoldMessengerService.instance.showTextSnackBar(
+                        localizations,
+                        localizations.editAccountAliasRemoved(alias.email),
+                      );
+                      ref.read(realAccountsProvider.notifier).save();
+                    },
+                    child: PlatformListTile(
+                      title: Text(alias.toString()),
+                      onTap: () {
                         showDialog(
                           context: context,
                           builder: (context) => _AliasEditDialog(
-                            isNewAlias: true,
+                            isNewAlias: false,
                             alias: alias,
                             account: account,
                           ),
                         );
                       },
                     ),
-                    // section to test plus alias support
-                    PlatformCheckboxListTile(
-                      value: account.supportsPlusAliases,
-                      onChanged: null,
-                      title:
-                          Text(localizations.editAccountPlusAliasesSupported),
-                    ),
-                    PlatformTextButton(
-                      child:
-                          Text(localizations.editAccountCheckPlusAliasAction),
-                      onPressed: () async {
-                        final result = await showPlatformDialog<bool>(
-                          context: context,
-                          builder: (context) =>
-                              _PlusAliasTestingDialog(account: account),
-                        );
-                        if (result != null) {
-                          account
-                            ..supportsPlusAliases = result
-                            ..setAttribute(
-                              RealAccount.attributePlusAliasTested,
-                              true,
-                            );
-                          await saveAccounts();
-                        }
-                      },
-                    ),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: PlatformCheckboxListTile(
-                            value: account.bccMyself,
-                            onChanged: (value) async {
-                              final bccMyself = value ?? false;
-                              account.bccMyself = bccMyself;
-                              await saveAccounts();
-                            },
-                            title: Text(localizations.editAccountBccMyself),
-                          ),
-                        ),
-                        PlatformIconButton(
-                          icon: Icon(CommonPlatformIcons.info),
-                          onPressed: () => LocalizedDialogHelper.showTextDialog(
-                            ref,
-                            localizations.editAccountBccMyselfDescriptionTitle,
-                            localizations.editAccountBccMyselfDescriptionText,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const Divider(),
-                    PlatformTextButtonIcon(
-                      onPressed: () => context.pushNamed(
-                        Routes.accountServerDetails,
-                        pathParameters: {
-                          Routes.pathParameterEmail: account.email,
-                        },
+                  ),
+                PlatformTextButtonIcon(
+                  icon: Icon(iconService.add),
+                  label: Text(localizations.editAccountAddAliasAction),
+                  onPressed: () {
+                    var email = account.email;
+                    email = email.substring(email.lastIndexOf('@'));
+                    final alias = MailAddress(account.userName, email);
+                    showDialog(
+                      context: context,
+                      builder: (context) => _AliasEditDialog(
+                        isNewAlias: true,
+                        alias: alias,
+                        account: account,
                       ),
-                      icon: const Icon(Icons.edit),
-                      label:
-                          Text(localizations.editAccountServerSettingsAction),
+                    );
+                  },
+                ),
+                // section to test plus alias support
+                PlatformCheckboxListTile(
+                  value: account.supportsPlusAliases,
+                  onChanged: null,
+                  title: Text(localizations.editAccountPlusAliasesSupported),
+                ),
+                PlatformTextButton(
+                  child: Text(localizations.editAccountCheckPlusAliasAction),
+                  onPressed: () async {
+                    final result = await showPlatformDialog<bool>(
+                      context: context,
+                      builder: (context) =>
+                          _PlusAliasTestingDialog(account: account),
+                    );
+                    if (result != null) {
+                      account
+                        ..supportsPlusAliases = result
+                        ..setAttribute(
+                          RealAccount.attributePlusAliasTested,
+                          true,
+                        );
+                      await saveAccounts();
+                    }
+                  },
+                ),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: PlatformCheckboxListTile(
+                        value: account.bccMyself,
+                        onChanged: (value) async {
+                          final bccMyself = value ?? false;
+                          account.bccMyself = bccMyself;
+                          await saveAccounts();
+                        },
+                        title: Text(localizations.editAccountBccMyself),
+                      ),
                     ),
-                    const Divider(),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: PlatformTextButtonIcon(
-                        backgroundColor: Colors.red,
-                        style:
-                            TextButton.styleFrom(backgroundColor: Colors.red),
-                        icon: const Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          localizations.editAccountDeleteAccountAction,
-                          style:
-                              Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    color: Colors.white,
-                                  ),
-                        ),
-                        onPressed: () async {
-                          final result =
-                              await LocalizedDialogHelper.askForConfirmation(
+                    PlatformIconButton(
+                      icon: Icon(CommonPlatformIcons.info),
+                      onPressed: () => LocalizedDialogHelper.showTextDialog(
+                        ref,
+                        localizations.editAccountBccMyselfDescriptionTitle,
+                        localizations.editAccountBccMyselfDescriptionText,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const Divider(),
+                PlatformTextButtonIcon(
+                  onPressed: () => context.pushNamed(
+                    Routes.accountServerDetails,
+                    pathParameters: {Routes.pathParameterEmail: account.email},
+                  ),
+                  icon: const Icon(Icons.edit),
+                  label: Text(localizations.editAccountServerSettingsAction),
+                ),
+                const Divider(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: PlatformTextButtonIcon(
+                    backgroundColor: Colors.red,
+                    style: TextButton.styleFrom(backgroundColor: Colors.red),
+                    icon: const Icon(Icons.delete, color: Colors.white),
+                    label: Text(
+                      localizations.editAccountDeleteAccountAction,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelLarge?.copyWith(color: Colors.white),
+                    ),
+                    onPressed: () async {
+                      final result =
+                          await LocalizedDialogHelper.askForConfirmation(
                             ref,
                             title: localizations
                                 .editAccountDeleteAccountConfirmationTitle,
                             query: localizations
                                 .editAccountDeleteAccountConfirmationQuery(
-                              accountNameController.text,
-                            ),
+                                  accountNameController.text,
+                                ),
                             action: localizations.actionDelete,
                             isDangerousAction: true,
                           );
-                          if (result ?? false) {
-                            if (!context.mounted) {
-                              return;
-                            }
-                            ref
-                                .read(realAccountsProvider.notifier)
-                                .removeAccount(account);
-                            if (ref.read(realAccountsProvider).isEmpty) {
-                              context.goNamed(Routes.welcome);
-                            } else {
-                              context.goNamed(Routes.mail);
-                            }
-                          }
-                        },
-                      ),
-                    ),
-                    if (enableDeveloperMode) ...[
-                      const Divider(),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: PlatformCheckboxListTile(
-                          value: account.enableLogging,
-                          title: Text(localizations.editAccountEnableLogging),
-                          onChanged: (value) {
-                            if (value != null) {
-                              account.enableLogging = value;
-                              ref.read(realAccountsProvider.notifier).save();
-                              final message = value
-                                  ? localizations.editAccountLoggingEnabled
-                                  : localizations.editAccountLoggingDisabled;
-                              ScaffoldMessengerService.instance
-                                  .showTextSnackBar(localizations, message);
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ],
+                      if (result ?? false) {
+                        if (!context.mounted) {
+                          return;
+                        }
+                        ref
+                            .read(realAccountsProvider.notifier)
+                            .removeAccount(account);
+                        if (ref.read(realAccountsProvider).isEmpty) {
+                          context.goNamed(Routes.welcome);
+                        } else {
+                          context.goNamed(Routes.mail);
+                        }
+                      }
+                    },
+                  ),
                 ),
-              ),
+                if (enableDeveloperMode) ...[
+                  const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: PlatformCheckboxListTile(
+                      value: account.enableLogging,
+                      title: Text(localizations.editAccountEnableLogging),
+                      onChanged: (value) {
+                        if (value != null) {
+                          account.enableLogging = value;
+                          ref.read(realAccountsProvider.notifier).save();
+                          final message = value
+                              ? localizations.editAccountLoggingEnabled
+                              : localizations.editAccountLoggingDisabled;
+                          ScaffoldMessengerService.instance.showTextSnackBar(
+                            localizations,
+                            message,
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-        );
+        ),
+      ),
+    );
 
     return BasePage(
       title: localizations.editAccountTitle(account.name),
@@ -388,9 +376,7 @@ class AccountEditScreen extends HookConsumerWidget {
       );
       final result = await LocalizedDialogHelper.showWidgetDialog(
         ref,
-        _PasswordUpdateDialog(
-          authentication: mutableAuth,
-        ),
+        _PasswordUpdateDialog(authentication: mutableAuth),
         defaultActions: DialogActions.okAndCancel,
       );
       if (result == true) {
@@ -445,10 +431,12 @@ class AccountEditScreen extends HookConsumerWidget {
           }
           final mailAccount = account.mailAccount;
           final updatedMailAccount = mailAccount.copyWith(
-            incoming: mailAccount.incoming
-                .copyWith(authentication: adaptedIncomingAuth),
-            outgoing: mailAccount.outgoing
-                .copyWith(authentication: adaptedOutgoingAuth),
+            incoming: mailAccount.incoming.copyWith(
+              authentication: adaptedIncomingAuth,
+            ),
+            outgoing: mailAccount.outgoing.copyWith(
+              authentication: adaptedOutgoingAuth,
+            ),
           );
           if (context.mounted) {
             await _reconnect(
@@ -476,15 +464,11 @@ class AccountEditScreen extends HookConsumerWidget {
     try {
       final accountCopy = account.copyWith(mailAccount: mailAccount);
       final connectedAccount = await ref.read(
-        firstTimeMailClientSourceProvider(
-          account: accountCopy,
-        ).future,
+        firstTimeMailClientSourceProvider(account: accountCopy).future,
       );
       if (connectedAccount == null ||
           !connectedAccount.mailClient.isConnected) {
-        throw Exception(
-          'Unable to connect',
-        );
+        throw Exception('Unable to connect');
       }
       ref
           .read(realAccountsProvider.notifier)
@@ -521,18 +505,13 @@ class AccountEditScreen extends HookConsumerWidget {
 }
 
 class _MutablePlainAuthentication {
-  _MutablePlainAuthentication({
-    required this.userName,
-    required this.password,
-  });
+  _MutablePlainAuthentication({required this.userName, required this.password});
   String userName;
   String password;
 }
 
 class _PasswordUpdateDialog extends StatefulHookConsumerWidget {
-  const _PasswordUpdateDialog({
-    required this.authentication,
-  });
+  const _PasswordUpdateDialog({required this.authentication});
 
   final _MutablePlainAuthentication authentication;
 
@@ -550,10 +529,10 @@ class _PasswordUpdateDialogState extends ConsumerState<_PasswordUpdateDialog> {
 
   @override
   Widget build(BuildContext context) => PasswordField(
-        controller: _controller,
-        labelText: ref.text.accountDetailsPasswordLabel,
-        onChanged: (text) => widget.authentication.password = text,
-      );
+    controller: _controller,
+    labelText: ref.text.accountDetailsPasswordLabel,
+    onChanged: (text) => widget.authentication.password = text,
+  );
 }
 
 class _PlusAliasTestingDialog extends StatefulHookConsumerWidget {
@@ -643,9 +622,7 @@ class _PlusAliasTestingDialogState
                   if (_step < _maxStep) {
                     _step++;
                   } else {
-                    context.pop(
-                      widget.account.supportsPlusAliases,
-                    );
+                    context.pop(widget.account.supportsPlusAliases);
                   }
                   switch (_step) {
                     case 1:
@@ -685,14 +662,16 @@ class _PlusAliasTestingDialogState
               isActive: _step == 0,
             ),
             Step(
-              title:
-                  Text(localizations.editAccountTestPlusAliasStepTestingTitle),
+              title: Text(
+                localizations.editAccountTestPlusAliasStepTestingTitle,
+              ),
               content: const Center(child: PlatformProgressIndicator()),
               isActive: _step == 1,
             ),
             Step(
-              title:
-                  Text(localizations.editAccountTestPlusAliasStepResultTitle),
+              title: Text(
+                localizations.editAccountTestPlusAliasStepResultTitle,
+              ),
               content: widget.account.supportsPlusAliases
                   ? Text(
                       localizations.editAccountTestPlusAliasStepResultSuccess(
@@ -764,9 +743,11 @@ class _AliasEditDialogState extends ConsumerState<_AliasEditDialog> {
     final localizations = ref.text;
 
     return PlatformAlertDialog(
-      title: Text(widget.isNewAlias
-          ? localizations.editAccountAddAliasTitle
-          : localizations.editAccountEditAliasTitle),
+      title: Text(
+        widget.isNewAlias
+            ? localizations.editAccountAddAliasTitle
+            : localizations.editAccountEditAliasTitle,
+      ),
       content: _isSaving
           ? const PlatformProgressIndicator()
           : _buildContent(localizations),
@@ -801,58 +782,58 @@ class _AliasEditDialogState extends ConsumerState<_AliasEditDialog> {
   }
 
   Widget _buildContent(AppLocalizations localizations) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DecoratedPlatformTextField(
-            controller: _nameController,
-            decoration: InputDecoration(
-              labelText: localizations.editAccountEditAliasNameLabel,
-              hintText: localizations.addAccountNameOfUserHint,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      DecoratedPlatformTextField(
+        controller: _nameController,
+        decoration: InputDecoration(
+          labelText: localizations.editAccountEditAliasNameLabel,
+          hintText: localizations.addAccountNameOfUserHint,
+        ),
+      ),
+      DecoratedPlatformTextField(
+        controller: _emailController,
+        decoration: InputDecoration(
+          labelText: localizations.editAccountEditAliasEmailLabel,
+          hintText: localizations.editAccountEditAliasEmailHint,
+        ),
+        onChanged: (value) {
+          final bool isValid = Validator.validateEmail(value);
+          final emailValue = value.toLowerCase();
+          if (isValid) {
+            final existingAlias = widget.account.aliases.firstWhereOrNull(
+              (e) => e.email.toLowerCase() == emailValue,
+            );
+            if (existingAlias != null && existingAlias != widget.alias) {
+              setState(() {
+                _errorMessage = localizations
+                    .editAccountEditAliasDuplicateError(value);
+              });
+            } else if (_errorMessage != null) {
+              setState(() {
+                _errorMessage = null;
+              });
+            }
+          }
+          if (isValid != _isEmailValid) {
+            setState(() {
+              _isEmailValid = isValid;
+            });
+          }
+        },
+      ),
+      if (_errorMessage != null)
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: Text(
+            _errorMessage ?? '',
+            style: const TextStyle(
+              color: Colors.red,
+              fontStyle: FontStyle.italic,
             ),
           ),
-          DecoratedPlatformTextField(
-            controller: _emailController,
-            decoration: InputDecoration(
-              labelText: localizations.editAccountEditAliasEmailLabel,
-              hintText: localizations.editAccountEditAliasEmailHint,
-            ),
-            onChanged: (value) {
-              final bool isValid = Validator.validateEmail(value);
-              final emailValue = value.toLowerCase();
-              if (isValid) {
-                final existingAlias = widget.account.aliases.firstWhereOrNull(
-                  (e) => e.email.toLowerCase() == emailValue,
-                );
-                if (existingAlias != null && existingAlias != widget.alias) {
-                  setState(() {
-                    _errorMessage =
-                        localizations.editAccountEditAliasDuplicateError(value);
-                  });
-                } else if (_errorMessage != null) {
-                  setState(() {
-                    _errorMessage = null;
-                  });
-                }
-              }
-              if (isValid != _isEmailValid) {
-                setState(() {
-                  _isEmailValid = isValid;
-                });
-              }
-            },
-          ),
-          if (_errorMessage != null)
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Text(
-                _errorMessage ?? '',
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
-        ],
-      );
+        ),
+    ],
+  );
 }

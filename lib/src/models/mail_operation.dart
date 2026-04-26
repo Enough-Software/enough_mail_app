@@ -84,13 +84,8 @@ class _QueuedMailOperation {
       case MailOperationType.storeFlags:
         operation = StoreFlagsOperation.fromJson(data);
         break;
-      // case MailOperationType.moveToFlag:
-      // TODO(RV): Handle this case.
-      //   break;
-      // case MailOperationType.moveToFolder:
-      // TODO(RV): Handle this case.
-      //   break;
-      default:
+      case MailOperationType.moveToFlag:
+      case MailOperationType.moveToFolder:
         throw FormatException('Unsupported type $type');
     }
 
@@ -101,20 +96,18 @@ class _QueuedMailOperation {
   final String email;
 
   Map<String, dynamic> toJson() => {
-        'email': email,
-        'typeIndex': operation.type.index,
-        //'operation': operation.toJson(),
-      };
+    'email': email,
+    'typeIndex': operation.type.index,
+    //'operation': operation.toJson(),
+  };
 }
 
 /// An operation to store flags
 @JsonSerializable()
 class StoreFlagsOperation extends MailOperation {
   /// Creates a new [StoreFlagsOperation]
-  StoreFlagsOperation({
-    required this.flags,
-    required this.sequence,
-  }) : super(MailOperationType.storeFlags);
+  StoreFlagsOperation({required this.flags, required this.sequence})
+    : super(MailOperationType.storeFlags);
 
   // De-serialized the JSON to a store flags operation
   factory StoreFlagsOperation.fromJson(Map<String, dynamic> json) =>

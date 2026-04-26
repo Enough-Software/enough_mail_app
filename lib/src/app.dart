@@ -31,8 +31,9 @@ class EnoughMailApp extends HookConsumerWidget {
   const EnoughMailApp({
     super.key,
     required this.appName,
-    this.mimeSourceFactory =
-        const AsyncMimeSourceFactory(isOfflineModeSupported: false),
+    this.mimeSourceFactory = const AsyncMimeSourceFactory(
+      isOfflineModeSupported: false,
+    ),
   });
 
   /// The name of the app
@@ -50,8 +51,9 @@ class EnoughMailApp extends HookConsumerWidget {
     });
 
     final themeSettingsData = ref.watch(themeFinderProvider(context: context));
-    final languageTag =
-        ref.watch(settingsProvider.select((settings) => settings.languageTag));
+    final languageTag = ref.watch(
+      settingsProvider.select((settings) => settings.languageTag),
+    );
     final routerConfig = ref.watch(routerConfigProvider);
 
     ref
@@ -111,18 +113,16 @@ class _InitializationScreenState extends ConsumerState<InitializationScreen> {
     await ref.read(realAccountsProvider.notifier).init();
     await ref.read(backgroundProvider.notifier).init();
 
-    if (context.mounted) {
-      // TODO(RV): check if the context is really needed for NotificationService
-      await NotificationService.instance.init(context: context);
-    }
+    if (!mounted) return;
+    // TODO(RV): check if the context is really needed for NotificationService
+    await NotificationService.instance.init(context: context);
     await KeyService.instance.init();
     logger.d('App initialized');
-    if (context.mounted) {
-      if (ref.read(allAccountsProvider).isEmpty) {
-        context.goNamed(Routes.welcome);
-      } else {
-        context.goNamed(Routes.mail);
-      }
+    if (!mounted) return;
+    if (ref.read(allAccountsProvider).isEmpty) {
+      context.goNamed(Routes.welcome);
+    } else {
+      context.goNamed(Routes.mail);
     }
   }
 

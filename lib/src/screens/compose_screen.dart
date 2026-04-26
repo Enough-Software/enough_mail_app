@@ -37,7 +37,7 @@ enum _OverflowMenuChoice {
   saveAsDraft,
   requestReadReceipt,
   convertToPlainTextEditor,
-  convertToHtmlEditor
+  convertToHtmlEditor,
 }
 
 enum _Autofocus { to, subject, text }
@@ -45,11 +45,7 @@ enum _Autofocus { to, subject, text }
 /// A dropdown to select the sender
 class SenderDropdown extends HookConsumerWidget {
   /// Creates a new [SenderDropdown] with the given [onChanged]
-  const SenderDropdown({
-    super.key,
-    required this.onChanged,
-    this.from,
-  });
+  const SenderDropdown({super.key, required this.onChanged, this.from});
 
   /// Callback when the selected sender changes
   final ValueChanged<Sender> onChanged;
@@ -100,17 +96,13 @@ class SenderDropdown extends HookConsumerWidget {
     final senderState = useState(getInitialSender());
 
     return PlatformDropdownButton<Sender>(
-      material: (context, platform) => MaterialDropdownButtonData(
-        isExpanded: true,
-      ),
+      material: (context, platform) =>
+          MaterialDropdownButtonData(isExpanded: true),
       items: senders
           .map(
             (s) => DropdownMenuItem<Sender>(
               value: s,
-              child: Text(
-                s.toString(),
-                overflow: TextOverflow.fade,
-              ),
+              child: Text(s.toString(), overflow: TextOverflow.fade),
             ),
           )
           .toList(),
@@ -171,8 +163,8 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     _focus = (_toRecipients.isEmpty && _ccRecipients.isEmpty)
         ? _Autofocus.to
         : (_subjectController.text.isEmpty)
-            ? _Autofocus.subject
-            : _Autofocus.text;
+        ? _Autofocus.subject
+        : _Autofocus.text;
     _senders = ref.read(sendersProvider);
     final currentAccount = ref.read(currentRealAccountProvider)!;
     _realAccount = currentAccount;
@@ -181,8 +173,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     mb.from ??= mbFrom;
     Sender? from;
     if (mbFrom.first == defaultSender) {
-      from = _senders
-          .firstWhereOrNull((sender) => sender.address == defaultSender);
+      from = _senders.firstWhereOrNull(
+        (sender) => sender.address == defaultSender,
+      );
     } else {
       final senderEmail = mb.from?.first.email.toLowerCase();
       from = _senders.firstWhereOrNull(
@@ -221,11 +214,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   Future<String> _loadMailTextFromComposeData() =>
       Future.value(widget.data.resumeText);
 
-  String get _signature => ref.read(settingsProvider.notifier).getSignatureHtml(
-        _from.account,
-        widget.data.action,
-        ref.text.localeName,
-      );
+  String get _signature => ref
+      .read(settingsProvider.notifier)
+      .getSignatureHtml(_from.account, widget.data.action, ref.text.localeName);
 
   Future<String> _loadMailTextFromMessage() async {
     final signature = _signature;
@@ -270,8 +261,8 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       final quoteTemplate = widget.data.action == ComposeAction.answer
           ? MailConventions.defaultReplyHeaderTemplate
           : widget.data.action == ComposeAction.forward
-              ? MailConventions.defaultForwardHeaderTemplate
-              : MailConventions.defaultReplyHeaderTemplate;
+          ? MailConventions.defaultForwardHeaderTemplate
+          : MailConventions.defaultReplyHeaderTemplate;
       if (_composeMode == ComposeMode.html) {
         final args = _HtmlGenerationArguments(
           quoteTemplate,
@@ -355,10 +346,10 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
 
         final multipartAlternativeBuilder = mb.hasAttachments
             ? mb.getPart(MediaSubtype.multipartAlternative, recursive: false) ??
-                mb.addPart(
-                  mediaSubtype: MediaSubtype.multipartAlternative,
-                  insert: true,
-                )
+                  mb.addPart(
+                    mediaSubtype: MediaSubtype.multipartAlternative,
+                    insert: true,
+                  )
             : mb;
         if (!mb.hasAttachments) {
           mb.setContentType(
@@ -444,8 +435,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
       // mounted anymore
       final currentContext = Routes.navigatorKey.currentContext;
       if (currentContext != null && currentContext.mounted) {
-        final message =
-            (e is MailException) ? e.message ?? e.toString() : e.toString();
+        final message = (e is MailException)
+            ? e.message ?? e.toString()
+            : e.toString();
         await LocalizedDialogHelper.showTextDialog(
           ref,
           localizations.errorTitle,
@@ -493,8 +485,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
           }
         }
       }
-    } else if (widget.data.originalMessage?.mimeMessage
-            .hasFlag(MessageFlags.draft) ??
+    } else if (widget.data.originalMessage?.mimeMessage.hasFlag(
+          MessageFlags.draft,
+        ) ??
         false) {
       // delete draft message:
       try {
@@ -520,32 +513,21 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
     final titleText = widget.data.action == ComposeAction.answer
         ? localizations.composeTitleReply
         : widget.data.action == ComposeAction.forward
-            ? localizations.composeTitleForward
-            : localizations.composeTitleNew;
+        ? localizations.composeTitleForward
+        : localizations.composeTitleNew;
     final htmlEditorApi = _htmlEditorApi;
 
-    return WillPopScope(
-      onWillPop: () async {
-        await _populateMessageBuilder(storeComposeDataForResume: true);
-        ScaffoldMessengerService.instance.showTextSnackBar(
-          localizations,
-          localizations.composeLeftByMistake,
-          undo: _returnToCompose,
-        );
-
-        return Future.value(true);
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          await _populateMessageBuilder(storeComposeDataForResume: true);
+          ScaffoldMessengerService.instance.showTextSnackBar(
+            localizations,
+            localizations.composeLeftByMistake,
+            undo: _returnToCompose,
+          );
+        }
       },
-      // wait for https://github.com/flutter/flutter/issues/138525 before
-      // switching to PopScope
-      // onPopInvoked: (didPop) async {
-      //   // let it pop but show snackbar to return:
-      //   await _populateMessageBuilder(storeComposeDataForResume: true);
-      //   ScaffoldMessengerService.instance.showTextSnackBar(
-      //     localizations,
-      //     localizations.composeLeftByMistake,
-      //     undo: _returnToCompose,
-      //   );
-      // },
       child: PlatformScaffold(
         material: (context, platform) =>
             MaterialScaffoldData(drawer: const AppDrawer()),
@@ -558,9 +540,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
               actions: [
                 AddAttachmentPopupButton(
                   composeData: widget.data,
-                  update: () => setState(
-                    () {},
-                  ),
+                  update: () => setState(() {}),
                 ),
                 PlatformIconButton(
                   icon: const Icon(Icons.send),
@@ -593,8 +573,9 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                     ),
                     PlatformPopupMenuItem<_OverflowMenuChoice>(
                       value: _OverflowMenuChoice.requestReadReceipt,
-                      child:
-                          Text(localizations.composeRequestReadReceiptAction),
+                      child: Text(
+                        localizations.composeRequestReadReceiptAction,
+                      ),
                     ),
                     if (_composeMode == ComposeMode.html)
                       PlatformPopupMenuItem<_OverflowMenuChoice>(
@@ -634,9 +615,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                     //   onChanged:
                     PlatformDropdownButton<Sender>(
                       material: (context, platform) =>
-                          MaterialDropdownButtonData(
-                        isExpanded: true,
-                      ),
+                          MaterialDropdownButtonData(isExpanded: true),
                       items: _senders
                           .map(
                             (s) => DropdownMenuItem<Sender>(
@@ -687,9 +666,8 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                       hintText: localizations.composeRecipientHint,
                       additionalSuffixIcon: PlatformTextButton(
                         child: Text(localizations.detailsHeaderCc),
-                        onPressed: () => setState(
-                          () => _isCcBccVisible = !_isCcBccVisible,
-                        ),
+                        onPressed: () =>
+                            setState(() => _isCcBccVisible = !_isCcBccVisible),
                       ),
                     ),
                     if (_isCcBccVisible) ...[
@@ -724,9 +702,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                           isDownloading: _downloadAttachmentsFuture != null,
                         ),
                       ),
-                      const Divider(
-                        color: Colors.grey,
-                      ),
+                      const Divider(color: Colors.grey),
                     ],
                   ],
                 ),
@@ -749,9 +725,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
               )
             else if (_composeMode == ComposeMode.plainText &&
                 _plainTextEditorApi != null)
-              SliverHeaderTextEditorControls(
-                editorApi: _plainTextEditorApi,
-              ),
+              SliverHeaderTextEditorControls(editorApi: _plainTextEditorApi),
             SliverToBoxAdapter(
               child: FutureBuilder<String>(
                 future: _loadMailTextFuture,
@@ -900,18 +874,16 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
   void _returnToCompose() {
     final currentContext = Routes.navigatorKey.currentContext;
     if (currentContext != null && currentContext.mounted) {
-      currentContext.pushNamed(
-        Routes.mailCompose,
-        extra: _resumeComposeData,
-      );
+      currentContext.pushNamed(Routes.mailCompose, extra: _resumeComposeData);
     }
   }
 
   Future<void> _checkAccountContactManager(RealAccount account) async {
     final contactManager = account.contactManager;
     if (contactManager == null) {
-      account.contactManager =
-          await ref.read(contactsLoaderProvider(account: account).future);
+      account.contactManager = await ref.read(
+        contactsLoaderProvider(account: account).future,
+      );
       setState(() {});
     }
   }

@@ -22,13 +22,10 @@ part 'provider.g.dart';
 @Riverpod(keepAlive: true)
 class Source extends _$Source {
   @override
-  Future<MessageSource> build({
-    required Account account,
-    Mailbox? mailbox,
-  }) {
-    Future.delayed(const Duration(milliseconds: 10)).then(
-      (_) => ref.read(currentMailboxProvider.notifier).state = mailbox,
-    );
+  Future<MessageSource> build({required Account account, Mailbox? mailbox}) {
+    Future.delayed(
+      const Duration(milliseconds: 10),
+    ).then((_) => ref.read(currentMailboxProvider.notifier).state = mailbox);
     final usedMailbox = mailbox?.isInbox ?? true ? null : mailbox;
     if (account is RealAccount) {
       return ref.watch(
@@ -93,11 +90,9 @@ class UnifiedSource extends _$UnifiedSource {
     }
 
     final accounts = account.accounts;
-    final futureSources = accounts.map(
-      (a) => resolve(a, mailbox),
-    );
+    final futureSources = accounts.map((a) => resolve(a, mailbox));
     final mimeSourcesWithNullValues = await Future.wait(futureSources);
-    final mimeSources = mimeSourcesWithNullValues.whereNotNull().toList();
+    final mimeSources = mimeSourcesWithNullValues.nonNulls.toList();
     if (mimeSources.isEmpty) {
       throw Exception('No mime sources could be connected');
     }
@@ -147,8 +142,9 @@ Future<Tree<Mailbox?>> mailboxTree(
   if (account is RealAccount) {
     final source = await ref.watch(realSourceProvider(account: account).future);
 
-    return source.mimeSource.mailClient
-        .listMailboxesAsTree(createIntermediate: false);
+    return source.mimeSource.mailClient.listMailboxesAsTree(
+      createIntermediate: false,
+    );
   } else if (account is UnifiedAccount) {
     final mailboxes = [
       MailboxFlag.inbox,
@@ -175,8 +171,9 @@ Future<Mailbox?> findMailbox(
 }) async {
   final tree = await ref.watch(mailboxTreeProvider(account: account).future);
 
-  final mailbox =
-      tree.firstWhereOrNull((m) => m?.encodedPath == encodedMailboxPath);
+  final mailbox = tree.firstWhereOrNull(
+    (m) => m?.encodedPath == encodedMailboxPath,
+  );
 
   return mailbox;
 }
@@ -189,8 +186,9 @@ class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
     required RealAccount account,
     Mailbox? mailbox,
   }) async {
-    final usedMailboxForMailClient =
-        (mailbox?.isInbox ?? true) ? null : mailbox;
+    final usedMailboxForMailClient = (mailbox?.isInbox ?? true)
+        ? null
+        : mailbox;
     logger.d(
       'Creating real mime source for ${account.key}: '
       '${mailbox?.name ?? '<inbox>'}',
@@ -231,8 +229,9 @@ class RealMimeSource extends _$RealMimeSource implements MimeSourceSubscriber {
     int index = 0,
   }) {
     if (source == state.value) {
-      source.mailClient.lowLevelIncomingMailClient
-          .logApp('new message: ${mime.decodeSubject()}');
+      source.mailClient.lowLevelIncomingMailClient.logApp(
+        'new message: ${mime.decodeSubject()}',
+      );
       if (!mime.isSeen && source.isInbox) {
         NotificationService.instance.sendLocalNotificationForMail(
           mime,
@@ -268,13 +267,11 @@ class MailClientSource extends _$MailClientSource {
   MailClient? _existingClient;
 
   @override
-  MailClient build({
-    required RealAccount account,
-    Mailbox? mailbox,
-  }) {
+  MailClient build({required RealAccount account, Mailbox? mailbox}) {
     MailClient create() {
-      final logName =
-          mailbox != null ? '${account.name}-${mailbox.name}' : account.name;
+      final logName = mailbox != null
+          ? '${account.name}-${mailbox.name}'
+          : account.name;
       logger.d('Creating MailClient $logName');
 
       return EmailService.instance.createMailClient(
@@ -302,10 +299,7 @@ class MailClientSource extends _$MailClientSource {
   }
 
   /// Creates a new mailbox with the given [mailboxName]
-  Future<void> createMailbox(
-    String mailboxName,
-    Mailbox? parentMailbox,
-  ) async {
+  Future<void> createMailbox(String mailboxName, Mailbox? parentMailbox) async {
     final mailClient = state;
     await mailClient.createMailbox(mailboxName, parentMailbox: parentMailbox);
 
@@ -358,13 +352,12 @@ Future<ConnectedAccount?> firstTimeMailClientSource(
   FirstTimeMailClientSourceRef ref, {
   required RealAccount account,
   Mailbox? mailbox,
-}) =>
-    EmailService.instance.connectFirstTime(
-      account.mailAccount,
-      (mailAccount) => ref
-          .watch(realAccountsProvider.notifier)
-          .updateMailAccount(account, mailAccount),
-    );
+}) => EmailService.instance.connectFirstTime(
+  account.mailAccount,
+  (mailAccount) => ref
+      .watch(realAccountsProvider.notifier)
+      .updateMailAccount(account, mailAccount),
+);
 
 /// Creates a new [MessageBuilder] based on the given [mailtoUri] uri
 @riverpod

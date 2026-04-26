@@ -9,15 +9,12 @@ import 'offline_mime_storage.dart';
 class OfflineMailboxMimeSource extends PagedCachedMimeSource {
   /// Creates a new [OfflineMailboxMimeSource]
   OfflineMailboxMimeSource({
-    required MailAccount mailAccount,
     required this.mailbox,
     required PagedCachedMimeSource onlineMimeSource,
     required OfflineMimeStorage storage,
-  })  : _mailAccount = mailAccount,
-        _onlineMimeSource = onlineMimeSource,
-        _storage = storage;
+  }) : _onlineMimeSource = onlineMimeSource,
+       _storage = storage;
 
-  final MailAccount _mailAccount;
   @override
   final Mailbox mailbox;
   final PagedCachedMimeSource _onlineMimeSource;
@@ -27,7 +24,7 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
   late StreamSubscription<MailVanishedEvent> _mailVanishedEventSubscription;
   late StreamSubscription<MailUpdateEvent> _mailUpdatedEventSubscription;
   late StreamSubscription<MailConnectionReEstablishedEvent>
-      _mailReconnectedEventSubscription;
+  _mailReconnectedEventSubscription;
 
   @override
   Future<void> init() async {
@@ -74,12 +71,11 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
     MimeMessage message, {
     required String fetchId,
     Duration? responseTimeout,
-  }) =>
-      _onlineMimeSource.fetchMessagePart(
-        message,
-        fetchId: fetchId,
-        responseTimeout: responseTimeout,
-      );
+  }) => _onlineMimeSource.fetchMessagePart(
+    message,
+    fetchId: fetchId,
+    responseTimeout: responseTimeout,
+  );
 
   @override
   Future<void> sendMessage(
@@ -89,15 +85,14 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
     Mailbox? sentMailbox,
     bool use8BitEncoding = false,
     List<MailAddress>? recipients,
-  }) =>
-      _onlineMimeSource.sendMessage(
-        message,
-        from: from,
-        appendToSent: appendToSent,
-        sentMailbox: sentMailbox,
-        use8BitEncoding: use8BitEncoding,
-        recipients: recipients,
-      );
+  }) => _onlineMimeSource.sendMessage(
+    message,
+    from: from,
+    appendToSent: appendToSent,
+    sentMailbox: sentMailbox,
+    use8BitEncoding: use8BitEncoding,
+    recipients: recipients,
+  );
 
   @override
   Future<void> handleOnMessageArrived(int index, MimeMessage message) =>
@@ -108,9 +103,7 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
 
   @override
   Future<void> handleOnMessagesVanished(List<MimeMessage> messages) =>
-      Future.wait(
-        messages.map(_storage.deleteMessage),
-      );
+      Future.wait(messages.map(_storage.deleteMessage));
 
   @override
   bool get isArchive => mailbox.isArchive;
@@ -154,8 +147,10 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
     // after storing it online
     // What happens with ops that go back and forth, e.g. delete, then un-delete
     // or archive message and then delete message while being offline?
-    final result =
-        await _onlineMimeSource.moveMessages(messages, targetMailbox);
+    final result = await _onlineMimeSource.moveMessages(
+      messages,
+      targetMailbox,
+    );
     await _storage.moveMessages(messages, targetMailbox);
 
     return result;
@@ -211,17 +206,10 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
     List<MimeMessage> messages,
     List<String> flags, {
     StoreAction action = StoreAction.add,
-  }) =>
-      Future.wait(
-        [
-          _storage.saveMessageEnvelopes(messages),
-          _onlineMimeSource.store(
-            messages,
-            flags,
-            action: action,
-          ),
-        ],
-      );
+  }) => Future.wait([
+    _storage.saveMessageEnvelopes(messages),
+    _onlineMimeSource.store(messages, flags, action: action),
+  ]);
 
   @override
   Future<void> storeAll(
@@ -242,25 +230,28 @@ class OfflineMailboxMimeSource extends PagedCachedMimeSource {
   bool get supportsSearching => _onlineMimeSource.supportsSearching;
 
   void _subscribeEvents() {
-    _mailLoadEventSubscription =
-        mailClient.eventBus.on<MailLoadEvent>().listen((event) {
-      if (event.mailClient == mailClient) {
-        onMessageArrived(event.message);
-      }
-    });
-    _mailVanishedEventSubscription =
-        mailClient.eventBus.on<MailVanishedEvent>().listen((event) {
-      final sequence = event.sequence;
-      if (sequence != null && event.mailClient == mailClient) {
-        onMessagesVanished(sequence);
-      }
-    });
-    _mailUpdatedEventSubscription =
-        mailClient.eventBus.on<MailUpdateEvent>().listen((event) {
-      if (event.mailClient == mailClient) {
-        onMessageFlagsUpdated(event.message);
-      }
-    });
+    _mailLoadEventSubscription = mailClient.eventBus.on<MailLoadEvent>().listen(
+      (event) {
+        if (event.mailClient == mailClient) {
+          onMessageArrived(event.message);
+        }
+      },
+    );
+    _mailVanishedEventSubscription = mailClient.eventBus
+        .on<MailVanishedEvent>()
+        .listen((event) {
+          final sequence = event.sequence;
+          if (sequence != null && event.mailClient == mailClient) {
+            onMessagesVanished(sequence);
+          }
+        });
+    _mailUpdatedEventSubscription = mailClient.eventBus
+        .on<MailUpdateEvent>()
+        .listen((event) {
+          if (event.mailClient == mailClient) {
+            onMessageFlagsUpdated(event.message);
+          }
+        });
     // _mailReconnectedEventSubscription = mailClient.eventBus
     //     .on<MailConnectionReEstablishedEvent>()
     //     .listen(_onMailReconnected);

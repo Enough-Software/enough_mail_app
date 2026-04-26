@@ -33,10 +33,7 @@ enum _Visualization { stack, list }
 /// Displays a list of mails
 class MessageSourceScreen extends ConsumerStatefulWidget {
   /// Creates a new [MessageSourceScreen]
-  const MessageSourceScreen({
-    super.key,
-    required this.messageSource,
-  });
+  const MessageSourceScreen({super.key, required this.messageSource});
 
   /// The source for the shown messages
   final MessageSource messageSource;
@@ -94,8 +91,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       return;
     }
     final search = MailSearch(trimmedQuery, SearchQueryType.allTextHeaders);
-    final searchSource =
-        _sectionedMessageSource.messageSource.search(ref.text, search);
+    final searchSource = _sectionedMessageSource.messageSource.search(
+      ref.text,
+      search,
+    );
     context.pushNamed(
       Routes.messageSource,
       pathParameters: {
@@ -125,15 +124,11 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
             textInputAction: TextInputAction.search,
             decoration: InputDecoration(
               hintText: localizations.homeSearchHint,
-              hintStyle: TextStyle(
-                color: searchColor.withAlpha(0xa0),
-              ),
+              hintStyle: TextStyle(color: searchColor.withAlpha(0xa0)),
             ),
             autofocus: true,
             autocorrect: false,
-            style: TextStyle(
-              color: searchColor,
-            ),
+            style: TextStyle(color: searchColor),
             onSubmitted: _search,
             onChanged: (text) {
               if (text.isNotEmpty != _hasSearchInput) {
@@ -144,11 +139,11 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
             },
           )
         : (PlatformInfo.isCupertino)
-            ? Text(source.localizedName(localizations, settings))
-            : BaseTitle(
-                title: source.localizedName(localizations, settings),
-                subtitle: source.description,
-              );
+        ? Text(source.localizedName(localizations, settings))
+        : BaseTitle(
+            title: source.localizedName(localizations, settings),
+            subtitle: source.description,
+          );
 
     final appBarActions = [
       if (_isInSearchMode && _hasSearchInput)
@@ -234,8 +229,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
             PlatformTextButtonIcon(
               style: style,
               icon: Icon(iconService.messageIsSeen),
-              label:
-                  Text(localizations.homeMarkAllSeenAction, style: textStyle),
+              label: Text(
+                localizations.homeMarkAllSeenAction,
+                style: textStyle,
+              ),
               onPressed: () async {
                 await source.markAllMessagesSeen(true);
               },
@@ -243,8 +240,10 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
             PlatformTextButtonIcon(
               style: style,
               icon: Icon(iconService.messageIsNotSeen),
-              label:
-                  Text(localizations.homeMarkAllUnseenAction, style: textStyle),
+              label: Text(
+                localizations.homeMarkAllUnseenAction,
+                style: textStyle,
+              ),
               onPressed: () async {
                 await source.markAllMessagesSeen(false);
               },
@@ -262,22 +261,22 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       bottomBar: _isInSelectionMode
           ? buildSelectionModeBottomBar(localizations)
           : PlatformInfo.isCupertino
-              ? CupertinoStatusBar(
-                  info: CupertinoStatusBar.createInfo(source.description),
-                  rightAction: PlatformIconButton(
-                    // TODO(RV): use CupertinoIcons.create once available
-                    icon: const Icon(CupertinoIcons.pen),
-                    onPressed: () => context.pushNamed(
-                      Routes.mailCompose,
-                      extra: ComposeData(
-                        null,
-                        MessageBuilder(),
-                        ComposeAction.newMessage,
-                      ),
-                    ),
+          ? CupertinoStatusBar(
+              info: CupertinoStatusBar.createInfo(source.description),
+              rightAction: PlatformIconButton(
+                // TODO(RV): use CupertinoIcons.create once available
+                icon: const Icon(CupertinoIcons.pen),
+                onPressed: () => context.pushNamed(
+                  Routes.mailCompose,
+                  extra: ComposeData(
+                    null,
+                    MessageBuilder(),
+                    ComposeAction.newMessage,
                   ),
-                )
-              : null,
+                ),
+              ),
+            )
+          : null,
       material: (context, platform) => MaterialScaffoldData(
         drawer: const AppDrawer(),
         floatingActionButton: _visualization == _Visualization.stack
@@ -321,11 +320,12 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
               );
             case ConnectionState.done:
               if (_visualization == _Visualization.stack) {
-                return WillPopScope(
-                  onWillPop: () {
-                    switchVisualization(_Visualization.list);
-
-                    return Future.value(false);
+                return PopScope(
+                  canPop: false,
+                  onPopInvokedWithResult: (didPop, result) {
+                    if (!didPop) {
+                      switchVisualization(_Visualization.list);
+                    }
                   },
                   child: MessageStack(messageSource: source),
                 );
@@ -334,15 +334,12 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
               final swipeLeftToRightAction = settings.swipeLeftToRightAction;
               final swipeRightToLeftAction = settings.swipeRightToLeftAction;
 
-              return WillPopScope(
-                onWillPop: () {
-                  if (_isInSelectionMode) {
+              return PopScope(
+                canPop: !_isInSelectionMode,
+                onPopInvokedWithResult: (didPop, result) {
+                  if (!didPop && _isInSelectionMode) {
                     leaveSelectionMode();
-
-                    return Future.value(false);
                   }
-
-                  return Future.value(true);
                 },
                 child: RefreshIndicator(
                   onRefresh: () async {
@@ -374,205 +371,212 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                               horizontal: 8,
                               vertical: 4,
                             ),
-                            child: CupertinoSearch(
-                              messageSource: source,
-                            ),
+                            child: CupertinoSearch(messageSource: source),
                           ),
                         ),
                       if (zeroPosWidget != null)
-                        SliverToBoxAdapter(
-                          child: zeroPosWidget,
-                        ),
+                        SliverToBoxAdapter(child: zeroPosWidget),
                       SliverFixedExtentList.builder(
                         itemExtent: 52,
                         itemBuilder: (context, index) =>
                             FutureBuilder<SectionElement>(
-                          future: _sectionedMessageSource.getElementAt(index),
-                          initialData:
-                              _sectionedMessageSource.getCachedElementAt(index),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) {
-                              return PlatformListTile(
-                                title: const Row(
-                                  children: [
-                                    Icon(Icons.replay),
-                                    // TODO(RV): localize reload
-                                    Text(' reload'),
-                                  ],
-                                ),
-                                onTap: () {
-                                  // TODO(RV): implement reload
-                                  setState(() {});
-                                },
-                              );
-                            }
-                            final element = snapshot.data;
+                              future: _sectionedMessageSource.getElementAt(
+                                index,
+                              ),
+                              initialData: _sectionedMessageSource
+                                  .getCachedElementAt(index),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return PlatformListTile(
+                                    title: const Row(
+                                      children: [
+                                        Icon(Icons.replay),
+                                        // TODO(RV): localize reload
+                                        Text(' reload'),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      // TODO(RV): implement reload
+                                      setState(() {});
+                                    },
+                                  );
+                                }
+                                final element = snapshot.data;
 
-                            if (element == null) {
-                              return const EmptyMessage();
-                            }
-                            final section = element.section;
+                                if (element == null) {
+                                  return const EmptyMessage();
+                                }
+                                final section = element.section;
 
-                            if (section != null) {
-                              final text = ref.getDateRangeName(
-                                section.range,
-                              );
+                                if (section != null) {
+                                  final text = ref.getDateRangeName(
+                                    section.range,
+                                  );
 
-                              return GestureDetector(
-                                onLongPress: () async {
-                                  _selectedMessages =
-                                      await _sectionedMessageSource
-                                          .getMessagesForSection(section);
-                                  for (final m in _selectedMessages) {
-                                    m.isSelected = true;
-                                  }
-                                  setState(() {
-                                    _isInSelectionMode = true;
-                                  });
-                                },
-                                onTap: !_isInSelectionMode
-                                    ? null
-                                    : () async {
-                                        final sectionMessages =
-                                            await _sectionedMessageSource
-                                                .getMessagesForSection(
-                                          section,
-                                        );
-                                        final doSelect =
-                                            !sectionMessages.first.isSelected;
-                                        for (final msg in sectionMessages) {
-                                          if (doSelect) {
-                                            if (!msg.isSelected) {
-                                              msg.isSelected = true;
-                                              _selectedMessages.add(msg);
+                                  return GestureDetector(
+                                    onLongPress: () async {
+                                      _selectedMessages =
+                                          await _sectionedMessageSource
+                                              .getMessagesForSection(section);
+                                      for (final m in _selectedMessages) {
+                                        m.isSelected = true;
+                                      }
+                                      setState(() {
+                                        _isInSelectionMode = true;
+                                      });
+                                    },
+                                    onTap: !_isInSelectionMode
+                                        ? null
+                                        : () async {
+                                            final sectionMessages =
+                                                await _sectionedMessageSource
+                                                    .getMessagesForSection(
+                                                      section,
+                                                    );
+                                            final doSelect = !sectionMessages
+                                                .first
+                                                .isSelected;
+                                            for (final msg in sectionMessages) {
+                                              if (doSelect) {
+                                                if (!msg.isSelected) {
+                                                  msg.isSelected = true;
+                                                  _selectedMessages.add(msg);
+                                                }
+                                              } else {
+                                                if (msg.isSelected) {
+                                                  msg.isSelected = false;
+                                                  _selectedMessages.remove(msg);
+                                                }
+                                              }
                                             }
-                                          } else {
-                                            if (msg.isSelected) {
-                                              msg.isSelected = false;
-                                              _selectedMessages.remove(msg);
-                                            }
-                                          }
-                                        }
-                                        setState(() {});
-                                      },
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 16,
-                                        right: 8,
-                                        bottom: 4,
-                                        top: 16,
-                                      ),
-                                      child: Text(
-                                        text,
-                                        style: TextStyle(
-                                          color: theme.colorScheme.secondary,
+                                            setState(() {});
+                                          },
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 16,
+                                            right: 8,
+                                            bottom: 4,
+                                            top: 16,
+                                          ),
+                                          child: Text(
+                                            text,
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                            ),
+                                          ),
                                         ),
-                                      ),
+                                        const Divider(),
+                                      ],
                                     ),
-                                    const Divider(),
-                                  ],
-                                ),
-                              );
-                            }
-                            final message = element.message;
+                                  );
+                                }
+                                final message = element.message;
 
-                            if (message == null) {
-                              return const SizedBox.shrink();
-                            }
+                                if (message == null) {
+                                  return const SizedBox.shrink();
+                                }
 
-                            return Dismissible(
-                              key: ValueKey(message),
-                              dismissThresholds: {
-                                DismissDirection.startToEnd:
-                                    swipeLeftToRightAction.dismissThreshold,
-                                DismissDirection.endToStart:
-                                    swipeRightToLeftAction.dismissThreshold,
-                              },
-                              background: Container(
-                                color: swipeLeftToRightAction.colorBackground,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                ),
-                                alignment: AlignmentDirectional.centerStart,
-                                child: Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                      ),
-                                      child: Text(
-                                        swipeLeftToRightAction
-                                            .name(localizations),
-                                        style: TextStyle(
-                                          color: swipeLeftToRightAction
-                                              .colorForeground,
+                                return Dismissible(
+                                  key: ValueKey(message),
+                                  dismissThresholds: {
+                                    DismissDirection.startToEnd:
+                                        swipeLeftToRightAction.dismissThreshold,
+                                    DismissDirection.endToStart:
+                                        swipeRightToLeftAction.dismissThreshold,
+                                  },
+                                  background: Container(
+                                    color:
+                                        swipeLeftToRightAction.colorBackground,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
+                                    alignment: AlignmentDirectional.centerStart,
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                          ),
+                                          child: Text(
+                                            swipeLeftToRightAction.name(
+                                              localizations,
+                                            ),
+                                            style: TextStyle(
+                                              color: swipeLeftToRightAction
+                                                  .colorForeground,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                    Icon(
-                                      swipeLeftToRightAction.icon,
-                                      color: swipeLeftToRightAction.colorIcon,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              secondaryBackground: Container(
-                                color: swipeRightToLeftAction.colorBackground,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                ),
-                                alignment: AlignmentDirectional.centerEnd,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Icon(
-                                      swipeRightToLeftAction.icon,
-                                      color: swipeRightToLeftAction.colorIcon,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                      ),
-                                      child: Text(
-                                        swipeRightToLeftAction
-                                            .name(localizations),
-                                        style: TextStyle(
-                                          color: swipeRightToLeftAction
-                                              .colorForeground,
+                                        Icon(
+                                          swipeLeftToRightAction.icon,
+                                          color:
+                                              swipeLeftToRightAction.colorIcon,
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                              child: MessageOverview(
-                                message,
-                                _isInSelectionMode,
-                                onMessageTap,
-                                onMessageLongPress,
-                                isSentMessage: isSentFolder,
-                              ),
-                              confirmDismiss: (direction) {
-                                final swipeAction =
-                                    direction == DismissDirection.startToEnd
+                                  ),
+                                  secondaryBackground: Container(
+                                    color:
+                                        swipeRightToLeftAction.colorBackground,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
+                                    alignment: AlignmentDirectional.centerEnd,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Icon(
+                                          swipeRightToLeftAction.icon,
+                                          color:
+                                              swipeRightToLeftAction.colorIcon,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                          ),
+                                          child: Text(
+                                            swipeRightToLeftAction.name(
+                                              localizations,
+                                            ),
+                                            style: TextStyle(
+                                              color: swipeRightToLeftAction
+                                                  .colorForeground,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  child: MessageOverview(
+                                    message,
+                                    _isInSelectionMode,
+                                    onMessageTap,
+                                    onMessageLongPress,
+                                    isSentMessage: isSentFolder,
+                                  ),
+                                  confirmDismiss: (direction) {
+                                    final swipeAction =
+                                        direction == DismissDirection.startToEnd
                                         ? swipeLeftToRightAction
                                         : swipeRightToLeftAction;
-                                fireSwipeAction(
-                                  localizations,
-                                  swipeAction,
-                                  message,
-                                );
+                                    fireSwipeAction(
+                                      localizations,
+                                      swipeAction,
+                                      message,
+                                    );
 
-                                return Future.value(
-                                  swipeAction.isMessageMoving,
+                                    return Future.value(
+                                      swipeAction.isMessageMoving,
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                        ),
+                            ),
                         itemCount: _sectionedMessageSource.size,
                       ),
                     ],
@@ -695,8 +699,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                     value: _MultipleChoice.unseen,
                     child: IconText(
                       icon: Icon(iconService.messageIsNotSeen),
-                      label:
-                          Text(localizations.messageActionMultipleMarkUnseen),
+                      label: Text(
+                        localizations.messageActionMultipleMarkUnseen,
+                      ),
                     ),
                   ),
                 if (isAnyUnflagged)
@@ -704,8 +709,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                     value: _MultipleChoice.flag,
                     child: IconText(
                       icon: Icon(iconService.messageIsFlagged),
-                      label:
-                          Text(localizations.messageActionMultipleMarkFlagged),
+                      label: Text(
+                        localizations.messageActionMultipleMarkFlagged,
+                      ),
                     ),
                   )
                 else
@@ -731,8 +737,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                     PlatformPopupMenuItem(
                       value: _MultipleChoice.inbox,
                       child: IconText(
-                        icon:
-                            Icon(iconService.messageActionMoveFromJunkToInbox),
+                        icon: Icon(
+                          iconService.messageActionMoveFromJunkToInbox,
+                        ),
                         label: Text(localizations.messageActionMarkAsNotJunk),
                       ),
                     )
@@ -773,9 +780,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
                   value: _MultipleChoice.addNotification,
                   child: IconText(
                     icon: Icon(iconService.messageActionAddNotification),
-                    label: Text(
-                      localizations.messageActionAddNotification,
-                    ),
+                    label: Text(localizations.messageActionAddNotification),
                   ),
                 ),
               ],
@@ -799,8 +804,11 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     }
 
     try {
-      final endSelectionMode =
-          await _handleChoice(choice, source, localizations);
+      final endSelectionMode = await _handleChoice(
+        choice,
+        source,
+        localizations,
+      );
       if (endSelectionMode) {
         setState(() {
           _isInSelectionMode = false;
@@ -834,8 +842,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         forwardAttachments();
         break;
       case _MultipleChoice.delete:
-        final notification =
-            localizations.multipleMovedToTrash(_selectedMessages.length);
+        final notification = localizations.multipleMovedToTrash(
+          _selectedMessages.length,
+        );
         await source.deleteMessages(
           localizations,
           _selectedMessages,
@@ -843,8 +852,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         );
         break;
       case _MultipleChoice.inbox:
-        final notification =
-            localizations.multipleMovedToInbox(_selectedMessages.length);
+        final notification = localizations.multipleMovedToInbox(
+          _selectedMessages.length,
+        );
         await source.moveMessagesToFlag(
           localizations,
           _selectedMessages,
@@ -877,8 +887,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         move();
         break;
       case _MultipleChoice.junk:
-        final notification =
-            localizations.multipleMovedToJunk(_selectedMessages.length);
+        final notification = localizations.multipleMovedToJunk(
+          _selectedMessages.length,
+        );
         await source.moveMessagesToFlag(
           localizations,
           _selectedMessages,
@@ -887,8 +898,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         );
         break;
       case _MultipleChoice.archive:
-        final notification =
-            localizations.multipleMovedToArchive(_selectedMessages.length);
+        final notification = localizations.multipleMovedToArchive(
+          _selectedMessages.length,
+        );
         await source.moveMessagesToFlag(
           localizations,
           _selectedMessages,
@@ -898,13 +910,15 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         break;
       case _MultipleChoice.viewInSafeMode:
         if (_selectedMessages.isNotEmpty && context.mounted) {
-          unawaited(context.pushNamed(
-            Routes.mailDetails,
-            extra: _selectedMessages.first,
-            queryParameters: {
-              Routes.queryParameterBlockExternalContent: 'true',
-            },
-          ));
+          unawaited(
+            context.pushNamed(
+              Routes.mailDetails,
+              extra: _selectedMessages.first,
+              queryParameters: {
+                Routes.queryParameterBlockExternalContent: 'true',
+              },
+            ),
+          );
         }
         endSelectionMode = false;
         leaveSelectionMode();
@@ -913,8 +927,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         endSelectionMode = false;
         final notificationService = NotificationService.instance;
         for (final message in _selectedMessages) {
-          await notificationService
-              .sendLocalNotificationForMailMessage(message);
+          await notificationService.sendLocalNotificationForMailMessage(
+            message,
+          );
         }
         leaveSelectionMode();
         break;
@@ -993,8 +1008,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     final mime = message.mimeMessage;
     Future? composeFuture;
     if (mime.mimeData == null) {
-      composeFuture =
-          message.source.fetchMessageContents(message).then((value) {
+      composeFuture = message.source.fetchMessageContents(message).then((
+        value,
+      ) {
         for (final attachment in message.attachments) {
           final part = value.getPart(attachment.fetchId);
           builder.addPart(mimePart: part);
@@ -1007,11 +1023,13 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
         if (part != null) {
           builder.addPart(mimePart: part);
         } else {
-          futures.add(message.source
-              .fetchMessagePart(message, fetchId: attachment.fetchId)
-              .then((value) {
-            builder.addPart(mimePart: value);
-          }));
+          futures.add(
+            message.source
+                .fetchMessagePart(message, fetchId: attachment.fetchId)
+                .then((value) {
+                  builder.addPart(mimePart: value);
+                }),
+          );
         }
         composeFuture = futures.isEmpty ? null : Future.wait(futures);
       }
@@ -1050,10 +1068,7 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
     LocalizedDialogHelper.showWidgetDialog(
       ref,
       SingleChildScrollView(
-        child: MailboxTree(
-          account: account,
-          onSelected: moveTo,
-        ),
+        child: MailboxTree(account: account, onSelected: moveTo),
       ),
       title: localizations.multipleMoveTitle(_selectedMessages.length),
       defaultActions: DialogActions.cancel,
@@ -1147,14 +1162,20 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       case SwipeAction.markRead:
         final isSeen = !message.isSeen;
         message.isSeen = isSeen;
-        return _sectionedMessageSource.messageSource
-            .markAsSeen(message, isSeen);
+        return _sectionedMessageSource.messageSource.markAsSeen(
+          message,
+          isSeen,
+        );
       case SwipeAction.archive:
-        return _sectionedMessageSource.messageSource
-            .archive(localizations, message);
+        return _sectionedMessageSource.messageSource.archive(
+          localizations,
+          message,
+        );
       case SwipeAction.markJunk:
-        return _sectionedMessageSource.messageSource
-            .markAsJunk(localizations, message);
+        return _sectionedMessageSource.messageSource.markAsJunk(
+          localizations,
+          message,
+        );
       case SwipeAction.delete:
         return _sectionedMessageSource.deleteMessage(localizations, message);
       case SwipeAction.flag:
@@ -1200,8 +1221,9 @@ class _MessageSourceScreenState extends ConsumerState<MessageSourceScreen>
       ],
     );
     if (confirmed == true) {
-      final results =
-          await widget.messageSource.deleteAllMessages(expunge: expunge);
+      final results = await widget.messageSource.deleteAllMessages(
+        expunge: expunge,
+      );
       Function()? undo;
       if (!expunge && results.any((result) => result.canUndo)) {
         undo = () async {
@@ -1253,15 +1275,15 @@ class _CheckboxTextState extends State<CheckboxText> {
 
   @override
   Widget build(BuildContext context) => PlatformCheckboxListTile(
-        title: Text(widget.text),
-        value: _value,
-        onChanged: (value) {
-          widget.onChanged(value ?? false);
-          setState(() {
-            _value = value ?? false;
-          });
-        },
-      );
+    title: Text(widget.text),
+    value: _value,
+    onChanged: (value) {
+      widget.onChanged(value ?? false);
+      setState(() {
+        _value = value ?? false;
+      });
+    },
+  );
 }
 
 enum _MultipleChoice {

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -50,40 +48,39 @@ class SettingsAccountsScreen extends HookConsumerWidget {
     WidgetRef ref,
     ValueNotifier<bool> reorderAccountsState,
     List<RealAccount> accounts,
-  ) =>
-      SingleChildScrollView(
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final account in accounts)
-                PlatformListTile(
-                  leading: account.hasError
-                      ? Badge(child: Icon(CommonPlatformIcons.account))
-                      : Icon(CommonPlatformIcons.account),
-                  title: Text(account.name),
-                  onTap: () => context.pushNamed(
-                    Routes.accountEdit,
-                    pathParameters: {Routes.pathParameterEmail: account.email},
-                  ),
-                ),
-              PlatformListTile(
-                leading: Icon(CommonPlatformIcons.add),
-                title: Text(localizations.drawerEntryAddAccount),
-                onTap: () => context.pushNamed(Routes.accountAdd),
+  ) => SingleChildScrollView(
+    child: SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final account in accounts)
+            PlatformListTile(
+              leading: account.hasError
+                  ? Badge(child: Icon(CommonPlatformIcons.account))
+                  : Icon(CommonPlatformIcons.account),
+              title: Text(account.name),
+              onTap: () => context.pushNamed(
+                Routes.accountEdit,
+                pathParameters: {Routes.pathParameterEmail: account.email},
               ),
-              if (accounts.length > 1)
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: PlatformElevatedButton(
-                    onPressed: () => reorderAccountsState.value = true,
-                    child: Text(localizations.accountsActionReorder),
-                  ),
-                ),
-            ],
+            ),
+          PlatformListTile(
+            leading: Icon(CommonPlatformIcons.add),
+            title: Text(localizations.drawerEntryAddAccount),
+            onTap: () => context.pushNamed(Routes.accountAdd),
           ),
-        ),
-      );
+          if (accounts.length > 1)
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: PlatformElevatedButton(
+                onPressed: () => reorderAccountsState.value = true,
+                child: Text(localizations.accountsActionReorder),
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
 
   Widget _buildReorderableListView(
     BuildContext context,
@@ -91,38 +88,36 @@ class SettingsAccountsScreen extends HookConsumerWidget {
     WidgetRef ref,
     ValueNotifier<bool> reorderAccountsState,
     List<RealAccount> accounts,
-  ) =>
-      WillPopScope(
-        onWillPop: () {
-          reorderAccountsState.value = false;
-
-          return Future.value(false);
-        },
-        child: SafeArea(
-          child: Material(
-            child: ReorderableListView(
-              onReorder: (oldIndex, newIndex) async {
-                // print('moved $oldIndex to $newIndex');
-                final account = accounts.removeAt(oldIndex);
-                if (newIndex > accounts.length) {
-                  accounts.add(account);
-                } else {
-                  accounts.insert(newIndex, account);
-                }
-                ref
-                    .read(realAccountsProvider.notifier)
-                    .reorderAccounts(accounts);
-              },
-              children: [
-                for (final account in accounts)
-                  ListTile(
-                    key: ValueKey(account),
-                    leading: const Icon(Icons.account_circle),
-                    title: Text(account.name),
-                  ),
-              ],
-            ),
-          ),
+  ) => PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, result) {
+      if (!didPop) {
+        reorderAccountsState.value = false;
+      }
+    },
+    child: SafeArea(
+      child: Material(
+        child: ReorderableListView(
+          onReorder: (oldIndex, newIndex) async {
+            // print('moved $oldIndex to $newIndex');
+            final account = accounts.removeAt(oldIndex);
+            if (newIndex > accounts.length) {
+              accounts.add(account);
+            } else {
+              accounts.insert(newIndex, account);
+            }
+            ref.read(realAccountsProvider.notifier).reorderAccounts(accounts);
+          },
+          children: [
+            for (final account in accounts)
+              ListTile(
+                key: ValueKey(account),
+                leading: const Icon(Icons.account_circle),
+                title: Text(account.name),
+              ),
+          ],
         ),
-      );
+      ),
+    ),
+  );
 }

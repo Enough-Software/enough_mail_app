@@ -18,8 +18,8 @@ publish_to: "none"
 version: 1.0.0+96
 
 environment:
-  flutter: ">=3.32.0"
-  sdk: '>=3.4.0 <4.0.0'
+  flutter: ">=3.41.7"
+  sdk: '>=3.11.5 <4.0.0'
 
 dependencies:
   background_fetch: ^1.2.1
@@ -29,7 +29,7 @@ dependencies:
   community_material_icon: ^5.9.55
   crypto: ^3.0.2
   cupertino_icons: ^1.0.4
-  device_info_plus: ^11.5.0
+  device_info_plus: ^12.4.0
   enough_ascii_art: ^1.0.0
   enough_giphy_flutter: ^0.4.2
   enough_html_editor: ^0.0.3
@@ -45,39 +45,39 @@ dependencies:
     git:
       url: https://github.com/Enough-Software/enough_text_editor.git
   event_bus: ^2.0.0
-  file_picker: ^10.3.1
+  file_picker: ^11.0.2
   flutter:
     sdk: flutter
   flutter_colorpicker: ^1.0.3
   flutter_hooks: ^0.21.3+1
-  flutter_local_notifications: ^19.4.0
+  flutter_local_notifications: ^21.0.0
   flutter_localizations:
     sdk: flutter
   flutter_native_contact_picker_plus: ^1.1.1
   flutter_secure_storage: ^10.0.0-beta.4
-  flutter_web_auth_2: ^4.1.0
+  flutter_web_auth_2: ^5.0.2
   flutter_widget_from_html_core: ^0.17.0
-  get_it: ^8.2.0
-  go_router: ^16.2.0
-  google_fonts: ^6.1.0
+  get_it: ^9.2.1
+  go_router: ^17.2.2
+  google_fonts: ^8.0.2
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  hooks_riverpod: ^2.4.4
+  hooks_riverpod: ^2.6.1
   http: ^1.1.1
   intl: any
   introduction_screen: ^4.0.0
   json_annotation: ^4.8.1
   latlng: ^2.0.7
-  local_auth: ^2.1.0
+  local_auth: ^3.0.1
   location: ^8.0.1
   logger: ^2.0.2+1
   map: ^2.0.2
   modal_bottom_sheet: ^3.0.0-pre
-  package_info_plus: ^8.3.1
+  package_info_plus: ^9.0.1
   path_provider: ^2.0.8
   permission_handler: ^12.0.1
-  riverpod_annotation: ^2.1.5
-  share_plus: ^11.1.0
+  riverpod_annotation: ^2.6.1
+  share_plus: ^12.0.2
   shared_preferences: ^2.0.11
   shimmer_animation: ^2.1.0+1
   url_launcher: ^6.0.17
@@ -164,10 +164,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   hive_generator: ^2.0.0
-  json_serializable: ^6.3.1
+  json_serializable: ^6.8.0
   mocktail: ^1.0.0
-  riverpod_generator: ^2.3.2
-  riverpod_lint: ^2.1.0
+  riverpod_generator: ^2.4.0
+  riverpod_lint: ^2.3.10
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

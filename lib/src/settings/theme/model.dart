@@ -55,26 +55,26 @@ class ThemeSettings {
 
   /// Standard colors
   static List<Color> get availableColors => const [
-        Colors.red,
-        Colors.green,
-        Colors.yellow,
-        Colors.blue,
-        Colors.grey,
-        Colors.blueGrey,
-        Colors.lightBlue,
-        Colors.cyan,
-        Colors.teal,
-        Colors.indigo,
-        Colors.lightGreen,
-        Colors.orange,
-        Colors.deepOrange,
-        Colors.purple,
-        Colors.deepPurple,
-        Colors.brown,
-        Colors.amber,
-        Colors.lime,
-        Colors.pink,
-      ];
+    Colors.red,
+    Colors.green,
+    Colors.yellow,
+    Colors.blue,
+    Colors.grey,
+    Colors.blueGrey,
+    Colors.lightBlue,
+    Colors.cyan,
+    Colors.teal,
+    Colors.indigo,
+    Colors.lightGreen,
+    Colors.orange,
+    Colors.deepOrange,
+    Colors.purple,
+    Colors.deepPurple,
+    Colors.brown,
+    Colors.amber,
+    Colors.lime,
+    Colors.pink,
+  ];
 
   /// Returns the current theme mode
   ThemeMode getCurrentThemeMode() {
@@ -100,24 +100,21 @@ class ThemeSettings {
     TimeOfDay? themeDarkStartTime,
     TimeOfDay? themeDarkEndTime,
     ThemeModeSetting? themeModeSetting,
-  }) =>
-      ThemeSettings(
-        colorSchemeSeed: colorSchemeSeed ?? this.colorSchemeSeed,
-        themeDarkStartTime: themeDarkStartTime ?? this.themeDarkStartTime,
-        themeDarkEndTime: themeDarkEndTime ?? this.themeDarkEndTime,
-        themeModeSetting: themeModeSetting ?? this.themeModeSetting,
-      );
+  }) => ThemeSettings(
+    colorSchemeSeed: colorSchemeSeed ?? this.colorSchemeSeed,
+    themeDarkStartTime: themeDarkStartTime ?? this.themeDarkStartTime,
+    themeDarkEndTime: themeDarkEndTime ?? this.themeDarkEndTime,
+    themeModeSetting: themeModeSetting ?? this.themeModeSetting,
+  );
 }
 
 Map<String, dynamic> _timeOfDayToJson(TimeOfDay value) => {
-      'hour': value.hour,
-      'minute': value.minute,
-    };
+  'hour': value.hour,
+  'minute': value.minute,
+};
 
-TimeOfDay _timeOfDayFromJson(Map<String, dynamic> json) => TimeOfDay(
-      hour: json['hour'],
-      minute: json['minute'],
-    );
+TimeOfDay _timeOfDayFromJson(Map<String, dynamic> json) =>
+    TimeOfDay(hour: json['hour'], minute: json['minute']);
 
 int _convertTimeOfDayToInt(TimeOfDay input) => input.hour * 100 + input.minute;
 
@@ -127,10 +124,7 @@ Map<String, dynamic> _colorToJson(Color? value) {
   }
   final index = ThemeSettings.availableColors.indexOf(value);
 
-  return {
-    'index': index,
-    'color': value.value,
-  };
+  return {'index': index, 'color': value.toARGB32()};
 }
 
 Color? _colorFromJson(Map<String, dynamic> json) {

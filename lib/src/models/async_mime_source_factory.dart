@@ -13,8 +13,8 @@ class AsyncMimeSourceFactory {
     required bool isOfflineModeSupported,
     OfflineMimeStorageFactory storageFactory =
         const OfflineMimeStorageFactory(),
-  })  : _isOfflineModeSupported = isOfflineModeSupported,
-        _storageFactory = storageFactory;
+  }) : _isOfflineModeSupported = isOfflineModeSupported,
+       _storageFactory = storageFactory;
 
   /// Should the generated mime source support being used in offline mode?
   final bool _isOfflineModeSupported;
@@ -33,7 +33,6 @@ class AsyncMimeSourceFactory {
       );
 
       return OfflineMailboxMimeSource(
-        mailAccount: mailClient.account,
         mailbox: mailbox,
         onlineMimeSource: onlineSource,
         storage: storage,

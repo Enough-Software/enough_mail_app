@@ -20,6 +20,10 @@ class ScaffoldMessengerService {
 
   final _statusBarStates = <CupertinoStatusBarState>[];
   CupertinoStatusBarState? _statusBarState;
+
+  /// The current status bar state
+  CupertinoStatusBarState? get statusBarState => _statusBarState;
+
   set statusBarState(CupertinoStatusBarState state) {
     final current = _statusBarState;
     if (current != null) {
@@ -29,24 +33,21 @@ class ScaffoldMessengerService {
   }
 
   void popStatusBarState() {
-    _statusBarState =
-        _statusBarStates.isNotEmpty ? _statusBarStates.removeLast() : null;
+    _statusBarState = _statusBarStates.isNotEmpty
+        ? _statusBarStates.removeLast()
+        : null;
   }
 
   SnackBar _buildTextSnackBar(
     AppLocalizations localizations,
     String text, {
     Function()? undo,
-  }) =>
-      SnackBar(
-        content: Text(text),
-        action: undo == null
-            ? null
-            : SnackBarAction(
-                label: localizations.actionUndo,
-                onPressed: undo,
-              ),
-      );
+  }) => SnackBar(
+    content: Text(text),
+    action: undo == null
+        ? null
+        : SnackBarAction(label: localizations.actionUndo, onPressed: undo),
+  );
 
   void _showSnackBar(SnackBar snackBar) {
     scaffoldMessengerKey.currentState?.showSnackBar(snackBar);

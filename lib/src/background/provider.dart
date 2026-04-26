@@ -74,7 +74,7 @@ class Background extends _$Background {
             stackTrace: s,
           );
         }
-        BackgroundFetch.finish(taskId);
+        await BackgroundFetch.finish(taskId);
       },
     );
     await BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
@@ -89,9 +89,7 @@ class Background extends _$Background {
 
     final accounts = ref.read(realAccountsProvider);
     final mailClients = accounts
-        .map(
-          (account) => ref.read(mailClientSourceProvider(account: account)),
-        )
+        .map((account) => ref.read(mailClientSourceProvider(account: account)))
         .toList();
     final futures = <Future>[];
     final preferences = await SharedPreferences.getInstance();
@@ -137,6 +135,7 @@ class Background extends _$Background {
 const String _keyInboxUids = 'nextUidsInfo';
 
 /// Fetches data in the background when the app is not running
+// ignore: deprecated_member_use
 Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {
   final taskId = task.taskId;
   logger.d(
@@ -144,7 +143,7 @@ Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {
     'taskId $taskId, timeout=${task.timeout}',
   );
   if (task.timeout) {
-    BackgroundFetch.finish(taskId);
+    await BackgroundFetch.finish(taskId);
 
     return;
   }
@@ -155,7 +154,7 @@ Future<void> backgroundFetchHeadlessTask(HeadlessTask task) async {
       print('Error during backgroundFetchHeadlessTask $e $s');
     }
   } finally {
-    BackgroundFetch.finish(taskId);
+    await BackgroundFetch.finish(taskId);
   }
 }
 
@@ -174,8 +173,11 @@ Future<void> _checkForNewMail() async {
   const storage = AccountStorage();
   final accounts = await storage.loadAccounts();
   final mailClients = accounts.map(
-    (account) => EmailService.instance
-        .createMailClient(account.mailAccount, account.name, null),
+    (account) => EmailService.instance.createMailClient(
+      account.mailAccount,
+      account.name,
+      null,
+    ),
   );
   final notificationService = NotificationService.instance;
   await notificationService.init(checkForLaunchDetails: false);
@@ -220,10 +222,6 @@ Future<void> _loadNewMessage(
     final inbox = await mailClient.selectInbox();
     final uidNext = inbox.uidNext;
     if (uidNext == previousUidNext || uidNext == null) {
-      // print(
-      //     'no change for ${account.name}, activeNotifications=$activeNotifications');
-      // check outdated notifications that should be removed because the message is deleted or read elsewhere:
-      // if (activeNotifications.isNotEmpty) {
       //   final uids = activeNotifications.map((n) => n.uid).toList();
       //   final sequence =
       //       MessageSequence.fromIds(uids as List<int>, isUid: true);

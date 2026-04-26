@@ -48,8 +48,8 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   }
 
   Widget _buildContent(BuildContext context, AppLocalizations localizations) =>
-      WillPopScope(
-        onWillPop: () => Future.value(false),
+      PopScope(
+        canPop: false,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -69,8 +69,9 @@ class _LockScreenState extends ConsumerState<LockScreen> {
       );
 
   Future<void> _authenticate(BuildContext context) async {
-    final didAuthenticate =
-        await BiometricsService.instance.authenticate(ref.text);
+    final didAuthenticate = await BiometricsService.instance.authenticate(
+      ref.text,
+    );
     if (didAuthenticate && context.mounted) {
       context.pop();
     }

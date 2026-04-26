@@ -56,9 +56,7 @@ class BiometricsService {
       final result = await _localAuth.authenticate(
         localizedReason:
             reason ?? await _getLocalizedUnlockReason(localizations),
-        options: const AuthenticationOptions(
-          sensitiveTransaction: false,
-        ),
+        sensitiveTransaction: false,
       );
       // unawaited(Future.delayed(const Duration(seconds: 2)).then(
       //   (_) => AppService.instance.ignoreBiometricsCheckAtNextResume = false,
