@@ -5,7 +5,6 @@ template-arb-file: app_en.arb
 output-localization-file: app_localizations.g.dart
 output-dir: lib/src/localization
 output-class: AppLocalizations
-synthetic-package: false
 untranslated-messages-file: missing-translations.txt
 preferred-supported-locales: en
 nullable-getter: true

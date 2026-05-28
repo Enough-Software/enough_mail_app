@@ -1,0 +1,2447 @@
+{
+  "@@locale": "zh",
+  "signature": "由 Maily 发送",
+  "@signature": {
+    "description": "Default signature text"
+  },
+  "actionCancel": "取消",
+  "@actionCancel": {
+    "description": "Generic cancel action"
+  },
+  "actionOk": "确定",
+  "@actionOk": {
+    "description": "Generic OK action"
+  },
+  "actionDone": "完成",
+  "@actionDone": {
+    "description": "Generic done action"
+  },
+  "actionNext": "下一步",
+  "@actionNext": {
+    "description": "Generic next action"
+  },
+  "actionSkip": "跳过",
+  "@actionSkip": {
+    "description": "Generic skip action"
+  },
+  "actionUndo": "撤销",
+  "@actionUndo": {
+    "description": "Generic undo action"
+  },
+  "actionDelete": "删除",
+  "@actionDelete": {
+    "description": "Generic delete action"
+  },
+  "actionAccept": "接受",
+  "@actionAccept": {
+    "description": "Generic accept action"
+  },
+  "actionDecline": "拒绝",
+  "@actionDecline": {
+    "description": "Generic decline action"
+  },
+  "actionEdit": "编辑",
+  "@actionEdit": {
+    "description": "Generic edit action"
+  },
+  "actionAddressCopy": "复制",
+  "@actionAddressCopy": {
+    "description": "Copy action for email addresses"
+  },
+  "actionAddressCompose": "新建邮件",
+  "@actionAddressCompose": {
+    "description": "Compose action for email addresses"
+  },
+  "actionAddressSearch": "搜索",
+  "@actionAddressSearch": {
+    "description": "Search action for email addresses"
+  },
+  "splashLoading1": "Maily 启动中...",
+  "@splashLoading1": {
+    "description": "Message shown on splash screen while loading"
+  },
+  "splashLoading2": "准备您的 Maily 引擎...",
+  "@splashLoading2": {
+    "description": "Message shown on splash screen while loading"
+  },
+  "splashLoading3": "10、9、8… 启动 Maily",
+  "@splashLoading3": {
+    "description": "Message shown on splash screen while loading"
+  },
+  "welcomePanel1Title": "Maily",
+  "@welcomePanel1Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel1Text": "欢迎使用 Maily，您友好且快速的邮件助手！",
+  "@welcomePanel1Text": {
+    "description": "Welcome message shown on first panel"
+  },
+  "welcomePanel2Title": "账户",
+  "@welcomePanel2Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel2Text": "管理无限数量的邮件账户。同时在所有账户中阅读和搜索邮件。",
+  "@welcomePanel2Text": {
+    "description": "Welcome message shown on second panel"
+  },
+  "welcomePanel3Title": "Swipe & Long-Press",
+  "@welcomePanel3Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel3Text": "滑动邮件进行删除或标记为已读。长按邮件可以选择和管理多封邮件。",
+  "@welcomePanel3Text": {
+    "description": "Welcome message shown on third panel"
+  },
+  "welcomePanel4Title": "保持收件箱整洁",
+  "@welcomePanel4Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel4Text": "只需点击一下即可取消订阅新闻通讯。",
+  "@welcomePanel4Text": {
+    "description": "Welcome message shown on fourth panel"
+  },
+  "welcomeActionSignIn": "登录您的邮件账户",
+  "@welcomeActionSignIn": {
+    "description": "Button showing login option"
+  },
+  "homeSearchHint": "您的搜索",
+  "@homeSearchHint": {
+    "description": "Hint shown in empty search field"
+  },
+  "homeActionsShowAsStack": "堆叠显示",
+  "@homeActionsShowAsStack": {
+    "description": "Action to show mails as stack"
+  },
+  "homeActionsShowAsList": "列表显示",
+  "@homeActionsShowAsList": {
+    "description": "Action to show mails as list"
+  },
+  "homeEmptyFolderMessage": "全部完成！\n\n此文件夹中没有邮件。",
+  "@homeEmptyFolderMessage": {
+    "description": "Message shown when there are no messages in the folder"
+  },
+  "homeEmptySearchMessage": "未找到邮件。",
+  "@homeEmptySearchMessage": {
+    "description": "Message shown when there are no messages found in a search query"
+  },
+  "homeDeleteAllTitle": "确认",
+  "@homeDeleteAllTitle": {
+    "description": "Title of confirmation dialog when deleting all messages"
+  },
+  "homeDeleteAllQuestion": "确定要删除所有邮件吗？",
+  "@homeDeleteAllQuestion": {
+    "description": "Question in confirmation dialog when deleting all messages"
+  },
+  "homeDeleteAllAction": "全部删除",
+  "@homeDeleteAllAction": {
+    "description": "Action to tap to delete all messages (must be short)."
+  },
+  "homeDeleteAllScrubOption": "清理邮件",
+  "@homeDeleteAllScrubOption": {
+    "description": "Option to remove deleted messages from disk."
+  },
+  "homeDeleteAllSuccess": "所有邮件已删除。",
+  "@homeDeleteAllSuccess": {
+    "description": "Message shown after all messages have been deleted."
+  },
+  "homeMarkAllSeenAction": "全部已读",
+  "@homeMarkAllSeenAction": {
+    "description": "Action to tap to mark all messages as seen / read (must be short)."
+  },
+  "homeMarkAllUnseenAction": "全部未读",
+  "@homeMarkAllUnseenAction": {
+    "description": "Action to tap to mark all messages as unseen / unread (must be short)."
+  },
+  "homeFabTooltip": "新建邮件",
+  "@homeFabTooltip": {
+    "description": "Tooltip for 'compose new message' floating action button."
+  },
+  "homeLoadingMessageSourceTitle": "加载中...",
+  "@homeLoadingMessageSourceTitle": {
+    "description": "Title shown while message source itself is being loaded."
+  },
+  "homeLoading": "正在加载 {name}...",
+  "@homeLoading": {
+    "description": "Message shown while loading message.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Inbox"
+      }
+    }
+  },
+  "swipeActionToggleRead": "标记为已读/未读",
+  "@swipeActionToggleRead": {
+    "description": "Swipe action for marking a message as read / unread."
+  },
+  "swipeActionDelete": "删除",
+  "@swipeActionDelete": {
+    "description": "Swipe action for deleting a message."
+  },
+  "swipeActionMarkJunk": "标记为垃圾邮件",
+  "@swipeActionMarkJunk": {
+    "description": "Swipe action for moving a message to junk."
+  },
+  "swipeActionArchive": "归档",
+  "@swipeActionArchive": {
+    "description": "Swipe action for moving a message to archive."
+  },
+  "swipeActionFlag": "切换星标",
+  "@swipeActionFlag": {
+    "description": "Swipe action for marking a message as flagged / unflagged."
+  },
+  "multipleMovedToJunk": "{number,plural, =1{一封邮件已标记为垃圾邮件} other{{number} 封邮件已标记为垃圾邮件}}",
+  "@multipleMovedToJunk": {
+    "description": "Message shown after moving messages to junk. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "multipleMovedToInbox": "{number,plural, =1{一封邮件已移至收件箱} other{{number} 封邮件已移至收件箱}}",
+  "@multipleMovedToInbox": {
+    "description": "Message shown after moving messages from junk, trash or archive back to the Inbox. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "multipleMovedToArchive": "{number,plural, =1{一封邮件已归档} other{{number} 封邮件已归档}}",
+  "@multipleMovedToArchive": {
+    "description": "Message shown after moving messages to archive. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "multipleMovedToTrash": "{number,plural, =1{一封邮件已删除} other{{number} 封邮件已删除}}",
+  "@multipleMovedToTrash": {
+    "description": "Message shown after moving messages to trash. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "multipleSelectionNeededInfo": "请先选择邮件。",
+  "@multipleSelectionNeededInfo": {
+    "description": "Short info shown when a multiple message action is triggered without selecting at least one message first."
+  },
+  "multipleSelectionActionFailed": "无法执行操作\n详细信息：{details}",
+  "@multipleSelectionActionFailed": {
+    "description": "Error message when the selection action failed.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Mailbox not found"
+      }
+    }
+  },
+  "multipleMoveTitle": "{number,plural, =1{移动邮件} other{移动 {number} 封邮件}}",
+  "@multipleMoveTitle": {
+    "description": "Title of move dialog for multiple messages. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "messageActionMultipleMarkSeen": "Mark as read",
+  "@messageActionMultipleMarkSeen": {
+    "description": "Action for several messages."
+  },
+  "messageActionMultipleMarkUnseen": "Mark as unread",
+  "@messageActionMultipleMarkUnseen": {
+    "description": "Action for several messages."
+  },
+  "messageActionMultipleMarkFlagged": "标记星标",
+  "@messageActionMultipleMarkFlagged": {
+    "description": "Action for several messages."
+  },
+  "messageActionMultipleMarkUnflagged": "取消星标",
+  "@messageActionMultipleMarkUnflagged": {
+    "description": "Action for several messages."
+  },
+  "messageActionViewInSafeMode": "不加载外部内容查看",
+  "@messageActionMultipleViewInSafeMode": {
+    "description": "Action for message."
+  },
+  "emailSenderUnknown": "<no sender>",
+  "@emailSenderUnknown": {
+    "description": "Shown as replacement when there is no known sender of a message."
+  },
+  "dateRangeFuture": "未来",
+  "@dateRangeFuture": {
+    "description": "Date range title."
+  },
+  "dateRangeTomorrow": "明天",
+  "@dateRangeTomorrow": {
+    "description": "Date range title."
+  },
+  "dateRangeToday": "今天",
+  "@dateRangeToday": {
+    "description": "Date range title."
+  },
+  "dateRangeYesterday": "昨天",
+  "@dateRangeYesterday": {
+    "description": "Date range title."
+  },
+  "dateRangeCurrentWeek": "本周",
+  "@dateRangeCurrentWeek": {
+    "description": "Date range title."
+  },
+  "dateRangeLastWeek": "上周",
+  "@dateRangeLastWeek": {
+    "description": "Date range title."
+  },
+  "dateRangeCurrentMonth": "本月",
+  "@dateRangeCurrentMonth": {
+    "description": "Date range title."
+  },
+  "dateRangeLastMonth": "上月",
+  "@dateRangeLastMonth": {
+    "description": "Date range title."
+  },
+  "dateRangeCurrentYear": "今年",
+  "@dateRangeCurrentYear": {
+    "description": "Date range title."
+  },
+  "dateRangeLongAgo": "更早",
+  "@dateRangeLongAgo": {
+    "description": "Date range title."
+  },
+  "dateUndefined": "未定义",
+  "@dateUndefined": {
+    "description": "Unknown date."
+  },
+  "dateDayToday": "今天",
+  "@dateDayToday": {
+    "description": "Message data is today."
+  },
+  "dateDayYesterday": "昨天",
+  "@dateDayYesterday": {
+    "description": "Message data is yesterday."
+  },
+  "dateDayLastWeekday": "上{day}",
+  "@dateDayLastWeekday": {
+    "description": "Message data is a recent weekday.",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "Tuesday"
+      }
+    }
+  },
+  "drawerEntryAbout": "关于 Maily",
+  "@drawerEntryAbout": {
+    "description": "Menu entry for about."
+  },
+  "drawerEntrySettings": "设置",
+  "@drawerEntrySettings": {
+    "description": "Menu entry for settings."
+  },
+  "drawerAccountsSectionTitle": "{number,plural, =1{一个账户} other{{number} 个账户}}",
+  "@drawerAccountsSectionTitle": {
+    "description": "Title shown for accounts drop down. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "drawerEntryAddAccount": "添加账户",
+  "@drawerEntryAddAccount": {
+    "description": "Menu entry for adding a new account."
+  },
+  "unifiedAccountName": "统一账户",
+  "@unifiedAccountName": {
+    "description": "Name of unified account."
+  },
+  "unifiedFolderInbox": "统一收件箱",
+  "@unifiedFolderInbox": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderSent": "统一已发送",
+  "@unifiedFolderSent": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderDrafts": "统一草稿",
+  "@unifiedFolderDrafts": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderTrash": "统一垃圾箱",
+  "@unifiedFolderTrash": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderArchive": "统一归档",
+  "@unifiedFolderArchive": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderJunk": "统一垃圾邮件",
+  "@unifiedFolderJunk": {
+    "description": "Folder name of unified account."
+  },
+  "folderInbox": "收件箱",
+  "@folderInbox": {
+    "description": "Folder name."
+  },
+  "folderSent": "已发送",
+  "@folderSent": {
+    "description": "Folder name."
+  },
+  "folderDrafts": "草稿",
+  "@folderDrafts": {
+    "description": "Folder name."
+  },
+  "folderTrash": "垃圾箱",
+  "@folderTrash": {
+    "description": "Folder name."
+  },
+  "folderArchive": "归档",
+  "@folderArchive": {
+    "description": "Folder name."
+  },
+  "folderJunk": "垃圾邮件",
+  "@folderJunk": {
+    "description": "Folder name."
+  },
+  "folderUnknown": "未知",
+  "@folderUnknown": {
+    "description": "Folder name for a message source without a name."
+  },
+  "viewContentsAction": "查看内容",
+  "@viewContentsAction": {
+    "description": "Show contents of a message on a separate screen."
+  },
+  "viewSourceAction": "查看源代码",
+  "@viewSourceAction": {
+    "description": "Show source code of a message."
+  },
+  "detailsErrorDownloadInfo": "无法下载邮件。",
+  "@detailsErrorDownloadInfo": {
+    "description": "Info shown when an email could not be downloaded."
+  },
+  "detailsErrorDownloadRetry": "重试",
+  "@detailsErrorDownloadRetry": {
+    "description": "Retry action shown when an email could not be downloaded."
+  },
+  "detailsHeaderFrom": "发件人",
+  "@detailsHeaderFrom": {
+    "description": "Label for sender(s) of email."
+  },
+  "detailsHeaderTo": "收件人",
+  "@detailsHeaderTo": {
+    "description": "Label for [to] recipient(s) of email."
+  },
+  "detailsHeaderCc": "CC",
+  "@detailsHeaderCc": {
+    "description": "Label for [CC] - carbon copy - recipient(s) of email."
+  },
+  "detailsHeaderBcc": "BCC",
+  "@detailsHeaderBcc": {
+    "description": "Label for [BCC] - blind carbon copy - recipient(s) of email."
+  },
+  "detailsHeaderDate": "日期",
+  "@detailsHeaderDate": {
+    "description": "Label for date of email."
+  },
+  "subjectUndefined": "<without subject>",
+  "@subjectUndefined": {
+    "description": "Shown instead of the subject when it is undefined."
+  },
+  "detailsActionShowImages": "显示图片",
+  "@detailsActionShowImages": {
+    "description": "Action for showing images. Only visible when external images are blocked."
+  },
+  "detailsNewsletterActionUnsubscribe": "取消订阅",
+  "@detailsNewsletterActionUnsubscribe": {
+    "description": "Action shown for unsubscribable newsletter."
+  },
+  "detailsNewsletterActionResubscribe": "重新订阅",
+  "@detailsNewsletterActionResubscribe": {
+    "description": "Action shown after re-subscribable newsletter has been unsubscribed."
+  },
+  "detailsNewsletterStatusUnsubscribed": "已取消订阅",
+  "@detailsNewsletterStatusUnsubscribed": {
+    "description": "Status shown for unsubscribed newsletter."
+  },
+  "detailsNewsletterUnsubscribeDialogTitle": "取消订阅",
+  "@detailsNewsletterUnsubscribeDialogTitle": {
+    "description": "Title for unsubscribe newsletter dialog."
+  },
+  "detailsNewsletterUnsubscribeDialogQuestion": "您确定要取消订阅 {listName} 吗？",
+  "@detailsNewsletterUnsubscribeDialogQuestion": {
+    "description": "Question for unsubscribe newsletter dialog.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsNewsletterUnsubscribeDialogAction": "取消订阅",
+  "@detailsNewsletterUnsubscribeDialogAction": {
+    "description": "Action for unsubscribe newsletter dialog."
+  },
+  "detailsNewsletterUnsubscribeSuccessTitle": "已取消订阅",
+  "@detailsNewsletterUnsubscribeSuccessTitle": {
+    "description": "Title for dialog after unsubscribing newsletter successfully."
+  },
+  "detailsNewsletterUnsubscribeSuccessMessage": "您已成功取消订阅 {listName}。",
+  "@detailsNewsletterUnsubscribeSuccessMessage": {
+    "description": "Text confirmation after successfully unsubscribing a newsletter.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsNewsletterUnsubscribeFailureTitle": "取消订阅失败",
+  "@detailsNewsletterUnsubscribeFailureTitle": {
+    "description": "Title for dialog after unsubscribing newsletter failed."
+  },
+  "detailsNewsletterUnsubscribeFailureMessage": "抱歉，我无法自动取消订阅 {listName}。",
+  "@detailsNewsletterUnsubscribeFailureMessage": {
+    "description": "Text confirmation after unsubscribing a newsletter failed.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsNewsletterResubscribeDialogTitle": "重新订阅",
+  "@detailsNewsletterResubscribeDialogTitle": {
+    "description": "Title for re-subscribe newsletter dialog."
+  },
+  "detailsNewsletterResubscribeDialogQuestion": "您确定要重新订阅 {listName} 吗？",
+  "@detailsNewsletterResubscribeDialogQuestion": {
+    "description": "Question for re-subscribe newsletter dialog.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsNewsletterResubscribeDialogAction": "订阅",
+  "@detailsNewsletterResubscribeDialogAction": {
+    "description": "Action for re-subscribe newsletter dialog."
+  },
+  "detailsNewsletterResubscribeSuccessTitle": "已订阅",
+  "@detailsNewsletterResubscribeSuccessTitle": {
+    "description": "Title for dialog after re-subscribed newsletter successfully."
+  },
+  "detailsNewsletterResubscribeSuccessMessage": "您已重新订阅 {listName}。",
+  "@detailsNewsletterResubscribeSuccessMessage": {
+    "description": "Text confirmation after successfully re-subscribing a newsletter.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsNewsletterResubscribeFailureTitle": "Not subscribed",
+  "@detailsNewsletterResubscribeFailureTitle": {
+    "description": "Title for dialog after re-subscribing newsletter failed."
+  },
+  "detailsNewsletterResubscribeFailureMessage": "抱歉，{listName} 的订阅请求失败了。",
+  "@detailsNewsletterResubscribeFailureMessage": {
+    "description": "Text confirmation after re-subscribing a newsletter failed.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "List-Name"
+      }
+    }
+  },
+  "detailsSendReadReceiptAction": "发送已读回执",
+  "@detailsSendReadReceiptAction": {
+    "description": "Action to send the read receipt for the shown message."
+  },
+  "detailsReadReceiptSentStatus": "已读回执已发送 ✔",
+  "@detailsReadReceiptSentStatus": {
+    "description": "Status after sending the read receipt for the shown message."
+  },
+  "detailsReadReceiptSubject": "已读回执",
+  "@detailsReadReceiptSubject": {
+    "description": "Message subject for read receipts."
+  },
+  "attachmentActionOpen": "打开",
+  "@attachmentActionOpen": {
+    "description": "Open action for attachments without interactive viewer."
+  },
+  "attachmentDecodeError": "This attachment has an unsupported format or encoding.\nDetails: ${details}",
+  "@attachmentDecodeError": {
+    "description": "Text shown when downloaded attachment could not be decoded.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "FormatException"
+      }
+    }
+  },
+  "attachmentDownloadError": "Unable to download this attachment.\nDetails: ${details}",
+  "@attachmentDownloadError": {
+    "description": "Text shown when attachment could not be downloaded.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "NotFound"
+      }
+    }
+  },
+  "messageActionReply": "回复",
+  "@messageActionReply": {
+    "description": "Action for single message."
+  },
+  "messageActionReplyAll": "全部回复",
+  "@messageActionReplyAll": {
+    "description": "Action for single message."
+  },
+  "messageActionForward": "转发",
+  "@messageActionForward": {
+    "description": "Action for single message."
+  },
+  "messageActionForwardAsAttachment": "作为附件转发",
+  "@messageActionForwardAsAttachment": {
+    "description": "Action for single message."
+  },
+  "messageActionForwardAttachments": "{number,plural, =1{转发附件} other{转发 {number} 个附件}}",
+  "@messageActionForwardAttachments": {
+    "description": "Action for single message to forward the given number of attachments.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "messagesActionForwardAttachments": "转发附件",
+  "@messagesActionForwardAttachments": {
+    "description": "Action for multiple selected messages to forward all attachments of the messages."
+  },
+  "messageActionDelete": "删除",
+  "@messageActionDelete": {
+    "description": "Action for single message."
+  },
+  "messageActionMoveToInbox": "移至收件箱",
+  "@messageActionMoveToInbox": {
+    "description": "Action for single message."
+  },
+  "messageActionMove": "移动",
+  "@messageActionMove": {
+    "description": "Action for single message."
+  },
+  "messageStatusSeen": "已读",
+  "@messageStatusSeen": {
+    "description": "Status of single message."
+  },
+  "messageStatusUnseen": "未读",
+  "@messageStatusUnseen": {
+    "description": "Status of single message."
+  },
+  "messageStatusFlagged": "已星标",
+  "@messageStatusFlagged": {
+    "description": "Status of single message."
+  },
+  "messageStatusUnflagged": "未星标",
+  "@messageStatusUnflagged": {
+    "description": "Status of single message."
+  },
+  "messageActionMarkAsJunk": "标记为垃圾邮件",
+  "@messageActionMarkAsJunk": {
+    "description": "Action for single message."
+  },
+  "messageActionMarkAsNotJunk": "标记为非垃圾邮件",
+  "@messageActionMarkAsNotJunk": {
+    "description": "Action for single message."
+  },
+  "messageActionArchive": "归档",
+  "@messageActionArchive": {
+    "description": "Action for single message."
+  },
+  "messageActionUnarchive": "移至收件箱",
+  "@messageActionUnarchive": {
+    "description": "Action for single message."
+  },
+  "messageActionRedirect": "重定向",
+  "@messageActionRedirect": {
+    "description": "Action for single message."
+  },
+  "messageActionAddNotification": "添加通知",
+  "@messageActionAddNotification": {
+    "description": "Action for single message."
+  },
+  "resultDeleted": "已删除",
+  "@resultDeleted": {
+    "description": "Successful short snackbar message after deleting message(s)."
+  },
+  "resultMovedToJunk": "已标记为垃圾邮件",
+  "@resultMovedToJunk": {
+    "description": "Successful short snackbar message after moving message(s) to junk."
+  },
+  "resultMovedToInbox": "已移至收件箱",
+  "@resultMovedToInbox": {
+    "description": "Successful short snackbar message after moving message(s) to inbox."
+  },
+  "resultArchived": "已归档",
+  "@resultArchived": {
+    "description": "Successful short snackbar message after moving message(s) to archive."
+  },
+  "resultRedirectedSuccess": "邮件已重定向 👍",
+  "@resultRedirectedSuccess": {
+    "description": "Successful snackbar message after redirecting message to new recipient(s)."
+  },
+  "resultRedirectedFailure": "Unable to redirect message.\n\nThe server responded with the following details: \"{details}\"",
+  "@resultRedirectedFailure": {
+    "description": "Failure snackbar message after failed to redirect message to new recipient(s).",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Invalid recipient"
+      }
+    }
+  },
+  "redirectTitle": "重定向",
+  "@redirectTitle": {
+    "description": "Title of redirect dialog."
+  },
+  "redirectInfo": "将此邮件重定向到以下收件人。重定向不会更改邮件内容。",
+  "@redirectInfo": {
+    "description": "Short explanation of redirect action in redirect dialog."
+  },
+  "redirectEmailInputRequired": "您需要添加至少一个有效的电子邮件地址。",
+  "@redirectEmailInputRequired": {
+    "description": "Information when redirect is wanted but no address has been entered."
+  },
+  "searchQueryDescription": "在 {folder} 中搜索...",
+  "@searchQueryDescription": {
+    "description": "Description of search within the given folder.",
+    "placeholders": {
+      "folder": {
+        "type": "String",
+        "example": "Inbox"
+      }
+    }
+  },
+  "searchQueryTitle": "搜索 \"{query}\"",
+  "@searchQueryTitle": {
+    "description": "Title for a search with the given query.",
+    "placeholders": {
+      "query": {
+        "type": "String",
+        "example": "a sender name"
+      }
+    }
+  },
+  "legaleseUsage": "使用 Maily 即表示您同意我们的 [PP] 和 [TC]。",
+  "@legaleseUsage": {
+    "description": "Legal info shown on initial welcome screen and later in about. [PP] is replaced with the legalesePrivacyPolicy text and [TC] with legaleseTermsAndConditions."
+  },
+  "legalesePrivacyPolicy": "隐私政策",
+  "@legalesePrivacyPolicy": {
+    "description": "Translation of privacy policy"
+  },
+  "legaleseTermsAndConditions": "Terms & Conditions",
+  "@legaleseTermsAndConditions": {
+    "description": "Translation of Terms & Conditions "
+  },
+  "aboutApplicationLegalese": "Maily 是根据 GNU 通用公共许可证发布的自由软件。",
+  "@aboutApplicationLegalese": {
+    "description": "Legal info shown in about dialog."
+  },
+  "feedbackActionSuggestFeature": "建议功能",
+  "@feedbackActionSuggestFeature": {
+    "description": "Action to suggest a feature."
+  },
+  "feedbackActionReportProblem": "报告问题",
+  "@feedbackActionReportProblem": {
+    "description": "Action to report a problem."
+  },
+  "feedbackActionHelpDeveloping": "帮助开发 Maily",
+  "@feedbackActionHelpDeveloping": {
+    "description": "Action to help developing."
+  },
+  "feedbackTitle": "反馈",
+  "@feedbackTitle": {
+    "description": "Title of feedback settings screen."
+  },
+  "feedbackIntro": "感谢您测试 Maily！",
+  "@feedbackIntro": {
+    "description": "Intro for feedback settings screen."
+  },
+  "feedbackProvideInfoRequest": "报告问题时请提供以下信息：",
+  "@feedbackProvideInfoRequest": {
+    "description": "Request to provide device and app information when reporting a problem."
+  },
+  "feedbackResultInfoCopied": "已复制到剪贴板",
+  "@feedbackResultInfoCopied": {
+    "description": "Info shown after copying device and app info to clipboard."
+  },
+  "accountsTitle": "账户",
+  "@accountsTitle": {
+    "description": "Title of accounts settings screen."
+  },
+  "accountsActionReorder": "重新排序账户",
+  "@accountActionReorder": {
+    "description": "Action to start reordering accounts."
+  },
+  "settingsTitle": "设置",
+  "@settingsTitle": {
+    "description": "Title of base settings screen."
+  },
+  "settingsSecurityBlockExternalImages": "阻止外部图片",
+  "@settingsSecurityBlockExternalImages": {
+    "description": "Settings option to block external options."
+  },
+  "settingsSecurityBlockExternalImagesDescriptionTitle": "外部图片",
+  "@settingsSecurityBlockExternalImagesDescriptionTitle": {
+    "description": "Title of dialog that shows additional information about the 'block external images' option."
+  },
+  "settingsSecurityBlockExternalImagesDescriptionText": "电子邮件可能包含集成或托管在外部服务器上的图片。外部图片可能会向邮件发件人暴露信息，例如让发件人知道您已打开邮件。此选项允许您阻止此类外部图片，从而降低暴露敏感信息的风险。您仍然可以在阅读邮件时选择逐封加载这些图片。",
+  "@settingsSecurityBlockExternalImagesDescriptionText": {
+    "description": "Text of dialog that shows additional information about the 'block external images' option."
+  },
+  "settingsSecurityMessageRenderingHtml": "显示完整邮件内容",
+  "@settingsSecurityMessageRenderingHtml": {
+    "description": "Option for how to render messages."
+  },
+  "settingsSecurityMessageRenderingPlainText": "仅显示邮件文本",
+  "@settingsSecurityMessageRenderingPlainText": {
+    "description": "Option for how to render messages."
+  },
+  "settingsSecurityLaunchModeLabel": "Maily 应如何打开链接？",
+  "@settingsSecurityLaunchModeLabel": {
+    "description": "Option for how to launch URLs."
+  },
+  "settingsSecurityLaunchModeExternal": "在外部打开链接",
+  "@settingsSecurityLaunchModeExternal": {
+    "description": "Option for how to launch URLs."
+  },
+  "settingsSecurityLaunchModeInApp": "在 Maily 中打开链接",
+  "@settingsSecurityLaunchModeInApp": {
+    "description": "Option for how to launch URLs."
+  },
+  "settingsActionAccounts": "管理账户",
+  "@settingsActionAccounts": {
+    "description": "Settings action to manage accounts."
+  },
+  "settingsActionDesign": "外观",
+  "@settingsActionDesign": {
+    "description": "Settings action to manage the visualization of the app."
+  },
+  "settingsActionFeedback": "提供反馈",
+  "@settingsActionFeedback": {
+    "description": "Settings action to provide feedback about the app."
+  },
+  "settingsActionWelcome": "显示欢迎页面",
+  "@settingsActionWelcome": {
+    "description": "Settings action to show welcome screen of the app again."
+  },
+  "settingsReadReceipts": "已读回执",
+  "@settingsReadReceipts": {
+    "description": "Settings action to customize read receipts."
+  },
+  "readReceiptsSettingsIntroduction": "您是否要显示已读回执请求？",
+  "@readReceiptsSettingsIntroduction": {
+    "description": "Introduction text for managing read receipt requests."
+  },
+  "readReceiptOptionAlways": "始终",
+  "@readReceiptOptionAlways": {
+    "description": "Display option for read receipt requests."
+  },
+  "readReceiptOptionNever": "从不",
+  "@readReceiptOptionNever": {
+    "description": "Display option for read receipt requests."
+  },
+  "settingsFolders": "文件夹",
+  "@settingsFolders": {
+    "description": "Settings action to customize folders."
+  },
+  "folderNamesIntroduction": "您希望文件夹使用什么名称？",
+  "@folderNamesIntroduction": {
+    "description": "Introduction for folder names setting."
+  },
+  "folderNamesSettingLocalized": "Maily 提供的名称",
+  "@folderNamesSettingLocalized": {
+    "description": "Folder name setting option."
+  },
+  "folderNamesSettingServer": "服务提供的名称",
+  "@folderNamesSettingServer": {
+    "description": "Folder name setting option."
+  },
+  "folderNamesSettingCustom": "我自定义的名称",
+  "@folderNamesSettingCustom": {
+    "description": "Folder name setting option."
+  },
+  "folderNamesEditAction": "编辑自定义名称",
+  "@folderNamesEditAction": {
+    "description": "Action to specify custom folder names."
+  },
+  "folderNamesCustomTitle": "自定义名称",
+  "@folderNamesCustomTitle": {
+    "description": "Title of dialog to specify custom folder names."
+  },
+  "folderAddAction": "创建文件夹",
+  "@folderAddAction": {
+    "description": "Action to create a new folder."
+  },
+  "folderAddTitle": "创建文件夹",
+  "@folderAddTitle": {
+    "description": "Dialog title when creating a new folder."
+  },
+  "folderAddNameLabel": "名称",
+  "@folderAddNameLabel": {
+    "description": "Label for input field for the folder name."
+  },
+  "folderAddNameHint": "新文件夹的名称",
+  "@folderAddNameHint": {
+    "description": "Hint for input field for the folder name."
+  },
+  "folderAccountLabel": "账户",
+  "@folderAddAccountLabel": {
+    "description": "Label to select the current account."
+  },
+  "folderMailboxLabel": "文件夹",
+  "@folderAddParentFolderLabel": {
+    "description": "Label to select the current folder."
+  },
+  "folderAddResultSuccess": "文件夹已创建 😊",
+  "@folderAddResultSuccess": {
+    "description": "Info for showing the creation success."
+  },
+  "folderAddResultFailure": "无法创建文件夹。\n\n服务器返回 {details}",
+  "@folderAddResultFailure": {
+    "description": "Info for showing a folder creation error.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Invalid name"
+      }
+    }
+  },
+  "folderDeleteAction": "删除",
+  "@folderDeleteAction": {
+    "description": "Action to delete an existing folder."
+  },
+  "folderDeleteConfirmTitle": "确认",
+  "@folderDeleteConfirmTitle": {
+    "description": "Dialog title to confirm deleting a folder."
+  },
+  "folderDeleteConfirmText": "您确定要删除文件夹 {name} 吗？",
+  "@folderDeleteConfirmText": {
+    "description": "Dialog text to confirm deleting a folder.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "My Custom Folder"
+      }
+    }
+  },
+  "folderDeleteResultSuccess": "文件夹已删除。",
+  "@folderDeleteResultSuccess": {
+    "description": "Info for showing the creation success."
+  },
+  "folderDeleteResultFailure": "无法删除文件夹。\n\n服务器返回 {details}",
+  "@folderDeleteResultFailure": {
+    "description": "Info for showing a folder deletion error.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Invalid name"
+      }
+    }
+  },
+  "settingsDevelopment": "开发设置",
+  "@settingsDevelopment": {
+    "description": "Settings action to specify the development options."
+  },
+  "developerModeTitle": "开发模式",
+  "@developerModeTitle": {
+    "description": "Title of the development mode section."
+  },
+  "developerModeIntroduction": "如果启用开发模式，您将能够查看邮件的源代码并将文本附件转换为邮件。",
+  "@developerModeIntroduction": {
+    "description": "Text explaining the development mode."
+  },
+  "developerModeEnable": "启用开发模式",
+  "@developerModeEnable": {
+    "description": "Text in checkbox to enable the development mode."
+  },
+  "developerShowAsEmail": "转换为电子邮件",
+  "@developerShowAsEmail": {
+    "description": "Action to convert text into an email."
+  },
+  "developerShowAsEmailFailed": "此文本无法转换为 MIME 邮件。",
+  "@developerShowAsEmailFailed": {
+    "description": "Text shown when text cannot be converted into an email."
+  },
+  "designTitle": "外观设置",
+  "@designTitle": {
+    "description": "Title of design settings screen."
+  },
+  "designSectionThemeTitle": "主题",
+  "@designSectionThemeTitle": {
+    "description": "Title of theme section on design settings screen."
+  },
+  "designThemeOptionLight": "浅色",
+  "@designThemeOptionLight": {
+    "description": "Theme option."
+  },
+  "designThemeOptionDark": "深色",
+  "@designThemeOptionDark": {
+    "description": "Theme option."
+  },
+  "designThemeOptionSystem": "跟随系统",
+  "@designThemeOptionSystem": {
+    "description": "Theme option."
+  },
+  "designThemeOptionCustom": "自定义",
+  "@designThemeOptionCustom": {
+    "description": "Theme option."
+  },
+  "designSectionCustomTitle": "启用深色主题",
+  "@designSectionCustomTitle": {
+    "description": "Title of custom theme option section on design settings screen."
+  },
+  "designThemeCustomStart": "从 {time} 开始",
+  "@designThemeCustomStart": {
+    "description": "Start time of custom theme setting.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "10 PM"
+      }
+    }
+  },
+  "designThemeCustomEnd": "到 {time} 结束",
+  "@designThemeCustomEnd": {
+    "description": "End time of custom theme setting.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "7 AM"
+      }
+    }
+  },
+  "designSectionColorTitle": "配色方案",
+  "@designSectionColorTitle": {
+    "description": "Title of color section on design settings screen."
+  },
+  "securitySettingsTitle": "安全性",
+  "@securitySettingsTitle": {
+    "description": "Title of security settings screen."
+  },
+  "securitySettingsIntro": "根据您的个人需求调整安全设置。",
+  "@securitySettingsIntro": {
+    "description": "Introduction of security settings screen."
+  },
+  "securityUnlockWithFaceId": "使用 Face ID 解锁 Maily。",
+  "@securityUnlockWithFaceId": {
+    "description": "iOS-specific unlock reason."
+  },
+  "securityUnlockWithTouchId": "使用 Touch ID 解锁 Maily。",
+  "@securityUnlockWithTouchId": {
+    "description": "iOS-specific unlock reason."
+  },
+  "securityUnlockReason": "解锁 Maily。",
+  "@securityUnlockReason": {
+    "description": "Generic unlock reason."
+  },
+  "securityUnlockDisableReason": "解锁 Maily 以关闭锁定。",
+  "@securityUnlockDisableReason": {
+    "description": "Generic unlock disable reason."
+  },
+  "securityUnlockNotAvailable": "您的设备不支持生物识别，您可能需要先设置解锁选项。",
+  "@securityUnlockNotAvailable": {
+    "description": "Message when biometric authentication is not available."
+  },
+  "securityUnlockLabel": "锁定 Maily",
+  "@securityUnlockLabel": {
+    "description": "Label of biometric authentication lock feature."
+  },
+  "securityUnlockDescriptionTitle": "锁定 Maily",
+  "@securityUnlockDescriptionTitle": {
+    "description": "Title to explain lock feature via biometric authentication."
+  },
+  "securityUnlockDescriptionText": "您可以选择锁定对 Maily 的访问，这样即使他人有权访问您的设备，也无法阅读您的邮件。",
+  "@securityUnlockDescriptionText": {
+    "description": "Text explaining lock feature via biometric authentication."
+  },
+  "securityLockImmediately": "立即锁定",
+  "@securityLockImmediately": {
+    "description": "Lock timing option."
+  },
+  "securityLockAfter5Minutes": "5 分钟后锁定",
+  "@securityLockAfter5Minutes": {
+    "description": "Lock timing option."
+  },
+  "securityLockAfter30Minutes": "30 分钟后锁定",
+  "@securityLockAfter30Minutes": {
+    "description": "Lock timing option."
+  },
+  "lockScreenTitle": "Maily 已锁定",
+  "@lockScreenTitle": {
+    "description": "Title of lock screen."
+  },
+  "lockScreenIntro": "Maily 已锁定，请进行身份验证以继续。",
+  "@lockScreenIntro": {
+    "description": "Text on lock screen."
+  },
+  "lockScreenUnlockAction": "解锁",
+  "@lockScreenUnlockAction": {
+    "description": "Action to unlock on lock screen."
+  },
+  "addAccountTitle": "添加账户",
+  "@addAccountTitle": {
+    "description": "Title of add account screen."
+  },
+  "addAccountEmailLabel": "电子邮件",
+  "@addAccountEmailLabel": {
+    "description": "Label and section header of email address input field."
+  },
+  "addAccountEmailHint": "请输入您的电子邮件地址",
+  "@addAccountEmailHint": {
+    "description": "Hint text of email address input field."
+  },
+  "addAccountResolvingSettingsLabel": "正在解析 {email}...",
+  "@addAccountResolvingSettingsLabel": {
+    "description": "Label shown while resolving the settings for the specified email address.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "addAccountResolvedSettingsWrongAction": "不是 {provider}？",
+  "@addAccountResolvedSettingsWrongAction": {
+    "description": "Button text shown for the user to edit server settings manually when the resolving was successful but turned out a different than expected provider name.",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "gmail"
+      }
+    }
+  },
+  "addAccountResolvingSettingsFailedInfo": "无法解析 {email}。请返回修改或手动设置账户。",
+  "@addAccountResolvingSettingsFailedInfo": {
+    "description": "Info shown after resolving the settings for the specified email address failed.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "addAccountEditManuallyAction": "手动编辑",
+  "@addAccountEditManuallyAction": {
+    "description": "Action shown after account settings could not be automatically be discovered."
+  },
+  "addAccountPasswordLabel": "密码",
+  "@addAccountPasswordLabel": {
+    "description": "Label and section header of password input field."
+  },
+  "addAccountPasswordHint": "请输入您的密码",
+  "@addAccountPasswordHint": {
+    "description": "Hint text of password input field."
+  },
+  "addAccountApplicationPasswordRequiredInfo": "此提供商要求您设置应用专用密码。",
+  "@addAccountApplicationPasswordRequiredInfo": {
+    "description": "Text shown when the provider of the email account requires app specific passwords to be set up."
+  },
+  "addAccountApplicationPasswordRequiredButton": "创建应用专用密码",
+  "@addAccountApplicationPasswordRequiredButton": {
+    "description": "Button text for setting up app specific password."
+  },
+  "addAccountApplicationPasswordRequiredAcknowledged": "我已有应用密码",
+  "@addAccountApplicationPasswordRequiredAcknowledged": {
+    "description": "Acknowledgement to be confirmed by user to acknowledge the fact that an app specific password is required."
+  },
+  "addAccountVerificationStep": "验证",
+  "@addAccountVerificationStep": {
+    "description": "Section header of verification/log in step."
+  },
+  "addAccountSetupAccountStep": "账户设置",
+  "@addAccountSetupAccountStep": {
+    "description": "Section header of account setup step."
+  },
+  "addAccountVerifyingSettingsLabel": "正在验证 {email}...",
+  "@addAccountVerifyingSettingsLabel": {
+    "description": "Info shown while the account settings for the given email are verified.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "addAccountVerifyingSuccessInfo": "成功登录 {email}。",
+  "@addAccountVerifyingSuccessInfo": {
+    "description": "Info shown after the account settings for the given email have been verified.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "addAccountVerifyingFailedInfo": "抱歉，出现了问题。请检查您的电子邮件 {email} 和密码。",
+  "@addAccountVerifyingFailedInfo": {
+    "description": "Info shown after the account settings for the given email could not be verified.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "addAccountOauthOptionsText": "使用 {provider} 登录或创建应用专用密码。",
+  "@addAccountOauthOptionsText": {
+    "description": "Info shown oauth process fails and the user can try again or use an app-specific password.",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "Mailbox.org"
+      }
+    }
+  },
+  "addAccountOauthSignIn": "使用 {provider} 登录",
+  "@addAccountOauthSignIn": {
+    "description": "Label of button to sign in via oauth with the given provider.",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "Mailbox.org"
+      }
+    }
+  },
+  "addAccountOauthSignInGoogle": "使用 Google 登录",
+  "@addAccountOauthSignInGoogle": {
+    "description": "Label of button to sign in via oauth with the Google."
+  },
+  "addAccountOauthSignInWithAppPassword": "或者，创建应用密码进行登录。",
+  "@addAccountOauthSignInWithAppPassword": {
+    "description": "Info to set up app specific password."
+  },
+  "accountAddImapAccessSetupMightBeRequired": "您的提供商可能要求您手动设置电子邮件应用的访问权限。",
+  "@accountAddImapAccessSetupMightBeRequired": {
+    "description": "Info shown when login fails for a provider that is know to require manual activation of IMAP access."
+  },
+  "addAccountSetupImapAccessButtonLabel": "设置电子邮件访问",
+  "@addAccountSetupImapAccessButtonLabel": {
+    "description": "Label of button to launch website with instructions."
+  },
+  "addAccountNameOfUserLabel": "您的姓名",
+  "@addAccountNameOfUserLabel": {
+    "description": "Label for user name input field."
+  },
+  "addAccountNameOfUserHint": "收件人看到的姓名",
+  "@addAccountNameOfUserHint": {
+    "description": "Hint for user name input field."
+  },
+  "addAccountNameOfAccountLabel": "账户名称",
+  "@addAccountNameOfAccountLabel": {
+    "description": "Label for account name input field."
+  },
+  "addAccountNameOfAccountHint": "请输入您的账户名称",
+  "@addAccountNameOfAccountHint": {
+    "description": "Hint for account name input field."
+  },
+  "editAccountTitle": "编辑 {name}",
+  "@editAccountTitle": {
+    "description": "Title for screen when editing the account with the given name.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountFailureToConnectInfo": "Maily 无法连接 {name}。",
+  "@editAccountFailureToConnectInfo": {
+    "description": "Info about not being able to connect to the named service. Most common causes are temporary network problems or a changed password.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountFailureToConnectRetryAction": "重试",
+  "@editAccountFailureToConnectRetryAction": {
+    "description": "Action to retry connecting to service again."
+  },
+  "editAccountFailureToConnectChangePasswordAction": "更改密码",
+  "@editAccountFailureToConnectChangePasswordAction": {
+    "description": "Action to change password for the service."
+  },
+  "editAccountFailureToConnectFixedTitle": "已连接",
+  "@editAccountFailureToConnectFixedTitle": {
+    "description": "Title of dialog shown after successfully connecting a failed account again."
+  },
+  "editAccountFailureToConnectFixedInfo": "账户已重新连接。",
+  "@editAccountFailureToConnectFixedInfo": {
+    "description": "Message of dialog shown after successfully connecting a failed account again."
+  },
+  "editAccountIncludeInUnifiedLabel": "包含在统一账户中",
+  "@editAccountIncludeInUnifiedLabel": {
+    "description": "Label for opting this account in/out of the unified account."
+  },
+  "editAccountAliasLabel": "{email} 的别名电子邮件地址：",
+  "@editAccountAliasLabel": {
+    "description": "Label for any alias addresses that have been specified for the given email address.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "editAccountNoAliasesInfo": "您此账户尚无已知别名。",
+  "@editAccountNoAliasesInfo": {
+    "description": "Info when there have been no aliases specified for this account."
+  },
+  "editAccountAliasRemoved": "{email} 别名已移除",
+  "@editAccountAliasRemoved": {
+    "description": "Info given after an alias was removed.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "editAccountAddAliasAction": "添加别名",
+  "@editAccountAddAliasAction": {
+    "description": "Button text for adding an alias to this account."
+  },
+  "editAccountPlusAliasesSupported": "支持 + 别名",
+  "@editAccountPlusAliasesSupported": {
+    "description": "Info shown when + aliases are supported by this account."
+  },
+  "editAccountCheckPlusAliasAction": "测试 + 别名支持",
+  "@editAccountCheckPlusAliasAction": {
+    "description": "Button text for testing of + aliases are supported by this account."
+  },
+  "editAccountBccMyself": "密送给自己",
+  "@editAccountBccMyself": {
+    "description": "Label of checkbox to enable the BCC-MYSELF-Feature."
+  },
+  "editAccountBccMyselfDescriptionTitle": "密送给自己",
+  "@editAccountBccMyselfDescriptionTitle": {
+    "description": "Title of alert explaining the BCC-MYSELF-Feature."
+  },
+  "editAccountBccMyselfDescriptionText": "您可以使用“密送给自己”功能，自动将从此账户发送的每封邮件同时发送给自己。通常不需要这样做，因为所有已发送邮件都会保存在“已发送”文件夹中。",
+  "@editAccountBccMyselfDescriptionText": {
+    "description": "Explanation of the the BCC-MYSELF-Feature."
+  },
+  "editAccountServerSettingsAction": "编辑服务器设置",
+  "@editAccountServerSettingsAction": {
+    "description": "Button text for editing the server settings of  this account."
+  },
+  "editAccountDeleteAccountAction": "删除账户",
+  "@editAccountDeleteAccountAction": {
+    "description": "Button text for deleting this account."
+  },
+  "editAccountDeleteAccountConfirmationTitle": "确认",
+  "@editAccountDeleteAccountConfirmationTitle": {
+    "description": "Title for confirmation dialog when deleting this account."
+  },
+  "editAccountDeleteAccountConfirmationQuery": "您确定要删除账户 {name} 吗？",
+  "@editAccountDeleteAccountConfirmationQuery": {
+    "description": "Request to confirm when deleting this account.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountTestPlusAliasTitle": "{name} 的 + 别名",
+  "@editAccountTestPlusAliasTitle": {
+    "description": "Title for dialog shown while testing + alias support",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountTestPlusAliasStepIntroductionTitle": "介绍",
+  "@editAccountTestPlusAliasStepIntroductionTitle": {
+    "description": "Title for introducing concept of + aliases."
+  },
+  "editAccountTestPlusAliasStepIntroductionText": "您的账户 {accountName} 可能支持 {example} 这样的 + 别名。\n+ 别名可以帮助您保护身份并防止垃圾邮件。\n为了测试这一点，将向此生成的地址发送一封测试邮件。如果到达，则您的提供商支持 + 别名，您可以在撰写新邮件时轻松生成它们。",
+  "@editAccountTestPlusAliasStepIntroductionText": {
+    "description": "Text for introducing concept of + aliases.",
+    "placeholders": {
+      "accountName": {
+        "type": "String",
+        "example": "domain.com"
+      },
+      "example": {
+        "type": "String",
+        "example": "someone+example@domain.com"
+      }
+    }
+  },
+  "editAccountTestPlusAliasStepTestingTitle": "Testing",
+  "@editAccountTestPlusAliasStepTestingTitle": {
+    "description": "Title while testing concept of + aliases."
+  },
+  "editAccountTestPlusAliasStepResultTitle": "Result",
+  "@editAccountTestPlusAliasStepResultTitle": {
+    "description": "Title after testing concept of + aliases."
+  },
+  "editAccountTestPlusAliasStepResultSuccess": "Your account {name} supports + aliases.",
+  "@editAccountTestPlusAliasStepResultSuccess": {
+    "description": "Result when account supports + aliases",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountTestPlusAliasStepResultNoSuccess": "Your account {name} does not support + aliases.",
+  "@editAccountTestPlusAliasStepResultNoSuccess": {
+    "description": "Result when account does not supports + aliases",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountAddAliasTitle": "添加别名",
+  "@editAccountAddAliasTitle": {
+    "description": "Title when adding new alias."
+  },
+  "editAccountEditAliasTitle": "Edit alias",
+  "@editAccountEditAliasTitle": {
+    "description": "Title when editing alias."
+  },
+  "editAccountAliasAddAction": "Add",
+  "@editAccountAliasAddAction": {
+    "description": "Action when adding new alias."
+  },
+  "editAccountAliasUpdateAction": "Update",
+  "@editAccountAliasUpdateAction": {
+    "description": "Action when editing alias."
+  },
+  "editAccountEditAliasNameLabel": "Alias name",
+  "@editAccountEditAliasNameLabel": {
+    "description": "Label for alias name input field."
+  },
+  "editAccountEditAliasEmailLabel": "Alias email",
+  "@editAccountEditAliasEmailLabel": {
+    "description": "Label for alias email input field."
+  },
+  "editAccountEditAliasEmailHint": "Your alias email address",
+  "@editAccountEditAliasEmailHint": {
+    "description": "Hint for alias email input field."
+  },
+  "editAccountEditAliasDuplicateError": "There is already an alias with {email}.",
+  "@editAccountEditAliasDuplicateError": {
+    "description": "Error when the alias email is already known",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "you@domain.com"
+      }
+    }
+  },
+  "editAccountEnableLogging": "Enable logging",
+  "@editAccountEnableLogging": {
+    "description": "Label developer mode option to enable logging."
+  },
+  "editAccountLoggingEnabled": "Log enabled, please restart",
+  "@editAccountLoggingEnabled": {
+    "description": "Short message shown after the log has been enabled."
+  },
+  "editAccountLoggingDisabled": "Log disabled, please restart",
+  "@editAccountLoggingDisabled": {
+    "description": "Short message shown after the log has been disabled."
+  },
+  "accountDetailsFallbackTitle": "Server Settings",
+  "@accountDetailsFallbackTitle": {
+    "description": "Title shown when account name is not set."
+  },
+  "errorTitle": "Error",
+  "@errorTitle": {
+    "description": "Title for error dialogs."
+  },
+  "accountProviderStepTitle": "Email Service Provider",
+  "@accountProviderStepTitle": {
+    "description": "Step to select a provider."
+  },
+  "accountProviderCustom": "Other email service",
+  "@accountProviderCustom": {
+    "description": "When no standard provider is chosen."
+  },
+  "accountDetailsErrorHostProblem": "Maily cannot reach the specified mail server. Please check your incoming server setting \"{incomingHost}\" and your outgoing server setting \"{outgoingHost}\".",
+  "@accountDetailsErrorHostProblem": {
+    "description": "Error details when no connection to server could be established at all",
+    "placeholders": {
+      "incomingHost": {
+        "type": "String",
+        "example": "imap@domain.com"
+      },
+      "outgoingHost": {
+        "type": "String",
+        "example": "smtp@domain.com"
+      }
+    }
+  },
+  "accountDetailsErrorLoginProblem": "Unable to log your in. Please check your user name \"{userName}\" and your password \"{password}\".",
+  "@accountDetailsErrorLoginProblem": {
+    "description": "Error details when login fails",
+    "placeholders": {
+      "userName": {
+        "type": "String",
+        "example": "email@domain.com"
+      },
+      "password": {
+        "type": "String",
+        "example": "secret"
+      }
+    }
+  },
+  "accountDetailsUserNameLabel": "Login name",
+  "@accountDetailsUserNameLabel": {
+    "description": "Label for user name input field."
+  },
+  "accountDetailsUserNameHint": "Your user name, if different from email",
+  "@accountDetailsUserNameHint": {
+    "description": "Hint for user name input field."
+  },
+  "accountDetailsPasswordLabel": "Login password",
+  "@accountDetailsPasswordLabel": {
+    "description": "Label for password input field."
+  },
+  "accountDetailsPasswordHint": "Your password",
+  "@accountDetailsPasswordHint": {
+    "description": "Hint for user password input field."
+  },
+  "accountDetailsBaseSectionTitle": "Base settings",
+  "@accountDetailsBaseSectionTitle": {
+    "description": "Title of base settings section."
+  },
+  "accountDetailsIncomingLabel": "Incoming server",
+  "@accountDetailsIncomingLabel": {
+    "description": "Label for incoming server domain field."
+  },
+  "accountDetailsIncomingHint": "Domain like imap.domain.com",
+  "@accountDetailsIncomingHint": {
+    "description": "Hint for incoming server domain field."
+  },
+  "accountDetailsOutgoingLabel": "Outgoing server",
+  "@accountDetailsOutgoingLabel": {
+    "description": "Label for outgoing server domain field."
+  },
+  "accountDetailsOutgoingHint": "Domain like smtp.domain.com",
+  "@accountDetailsOutgoingHint": {
+    "description": "Hint for outgoing server domain field."
+  },
+  "accountDetailsAdvancedIncomingSectionTitle": "Advanced incoming settings",
+  "@accountDetailsAdvancedIncomingSectionTitle": {
+    "description": "Title of incoming settings section."
+  },
+  "accountDetailsIncomingServerTypeLabel": "Incoming type:",
+  "@accountDetailsIncomingServerTypeLabel": {
+    "description": "Label for server type dropdown."
+  },
+  "accountDetailsOptionAutomatic": "automatic",
+  "@accountDetailsOptionAutomatic": {
+    "description": "Option when the server type/security should be discovered automatically."
+  },
+  "accountDetailsIncomingSecurityLabel": "Incoming security:",
+  "@accountDetailsIncomingSecurityLabel": {
+    "description": "Label for server security dropdown."
+  },
+  "accountDetailsSecurityOptionNone": "Plain (no encryption)",
+  "@accountDetailsSecurityOptionNone": {
+    "description": "Label for security dropdown option without encryption."
+  },
+  "accountDetailsIncomingPortLabel": "Incoming port",
+  "@accountDetailsIncomingPortLabel": {
+    "description": "Label for incoming port input field."
+  },
+  "accountDetailsPortHint": "Leave empty to determine automatically",
+  "@accountDetailsPortHint": {
+    "description": "Hint for port input fields."
+  },
+  "accountDetailsIncomingUserNameLabel": "Incoming user name",
+  "@accountDetailsIncomingUserNameLabel": {
+    "description": "Label for incoming user name input field."
+  },
+  "accountDetailsAlternativeUserNameHint": "Your user name, if different from above",
+  "@accountDetailsAlternativeUserNameHint": {
+    "description": "Label for alternative user name input fields."
+  },
+  "accountDetailsIncomingPasswordLabel": "Incoming password",
+  "@accountDetailsIncomingPasswordLabel": {
+    "description": "Label for incoming password input field."
+  },
+  "accountDetailsAlternativePasswordHint": "Your password, if different from above",
+  "@accountDetailsAlternativePasswordHint": {
+    "description": "Label for alternative user name input fields."
+  },
+  "accountDetailsAdvancedOutgoingSectionTitle": "Advanced outgoing settings",
+  "@accountDetailsAdvancedOutgoingSectionTitle": {
+    "description": "Title of incoming settings section."
+  },
+  "accountDetailsOutgoingServerTypeLabel": "Outgoing type:",
+  "@accountDetailsOutgoingServerTypeLabel": {
+    "description": "Label for server type dropdown."
+  },
+  "accountDetailsOutgoingSecurityLabel": "Outgoing security:",
+  "@accountDetailsOutgoingSecurityLabel": {
+    "description": "Label for server security dropdown."
+  },
+  "accountDetailsOutgoingPortLabel": "Outgoing port",
+  "@accountDetailsOutgoingPortLabel": {
+    "description": "Label for outgoing port input field."
+  },
+  "accountDetailsOutgoingUserNameLabel": "Outgoing user name",
+  "@accountDetailsOutgoingUserNameLabel": {
+    "description": "Label for outgoing user name input field."
+  },
+  "accountDetailsOutgoingPasswordLabel": "Outgoing password",
+  "@accountDetailsOutgoingPasswordLabel": {
+    "description": "Label for outgoing password input field."
+  },
+  "composeTitleNew": "新建邮件",
+  "@composeTitleNew": {
+    "description": "Title for compose screen when a new message is created."
+  },
+  "composeTitleForward": "转发",
+  "@composeTitleForward": {
+    "description": "Title for compose screen when a message is forwarded."
+  },
+  "composeTitleReply": "回复",
+  "@composeTitleReply": {
+    "description": "Title for compose screen when a message is replied."
+  },
+  "composeEmptyMessage": "empty message",
+  "@composeEmptyMessage": {
+    "description": "Message text for message without text."
+  },
+  "composeWarningNoSubject": "You have not specified a subject. Do you want to sent the message without a subject?",
+  "@composeWarningNoSubject": {
+    "description": "Warning shown when trying to send a message without subject."
+  },
+  "composeActionSentWithoutSubject": "Send",
+  "@composeActionSentWithoutSubject": {
+    "description": "Action to send message without subject."
+  },
+  "composeMailSendSuccess": "Mail sent 😊",
+  "@composeMailSendSuccess": {
+    "description": "Notification shown after a mail was sent successfully."
+  },
+  "composeSendErrorInfo": "Sorry, your mail could not be send. We received the following error:\n{details}.",
+  "@composeSendErrorInfo": {
+    "description": "Error shown when email could not be send",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "554-Reject due to policy restrictions."
+      }
+    }
+  },
+  "composeRequestReadReceiptAction": "Request read receipt",
+  "@composeRequestReadReceiptAction": {
+    "description": "Action to request a read receipt for this message"
+  },
+  "composeSaveDraftAction": "Save as draft",
+  "@composeSaveDraftAction": {
+    "description": "Action to save a message as draft"
+  },
+  "composeMessageSavedAsDraft": "Draft saved",
+  "@composeMessageSavedAsDraft": {
+    "description": "Info shown when message was saved as draft successfully"
+  },
+  "composeMessageSavedAsDraftErrorInfo": "Your draft could not be saved with the following error:\n{details}",
+  "@composeMessageSavedAsDraftErrorInfo": {
+    "description": "Info shown when message could not be saved as a draft",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Invalid header: XX"
+      }
+    }
+  },
+  "composeConvertToPlainTextEditorAction": "Convert to plain text",
+  "@composeConvertToPlainTextEditorAction": {
+    "description": "Action to write a plain text message instead of an html message"
+  },
+  "composeConvertToHtmlEditorAction": "Convert to rich message (HTML)",
+  "@composeConvertToHtmlEditorAction": {
+    "description": "Action to write a HTML message instead of a text message"
+  },
+  "composeContinueEditingAction": "Continue editing",
+  "@composeContinueEditingAction": {
+    "description": "Action to return to compose screen when draft cannot be saved"
+  },
+  "composeCreatePlusAliasAction": "Create new + alias...",
+  "@composeCreatePlusAliasAction": {
+    "description": "Action to create a new + alias as a sender"
+  },
+  "composeSenderHint": "Sender",
+  "@composeSenderHint": {
+    "description": "Hint for From input field"
+  },
+  "composeRecipientHint": "Recipient email",
+  "@composeRecipientHint": {
+    "description": "Hint for To input field"
+  },
+  "composeSubjectLabel": "Subject",
+  "@composeSubjectLabel": {
+    "description": "Label for Subject input field"
+  },
+  "composeSubjectHint": "Message subject",
+  "@composeSubjectHint": {
+    "description": "Hint for Subject input field"
+  },
+  "composeAddAttachmentAction": "Add",
+  "@composeAddAttachmentAction": {
+    "description": "Action to add an attachment - should be short!"
+  },
+  "composeRemoveAttachmentAction": "Remove {name}",
+  "@composeRemoveAttachmentAction": {
+    "description": "Action to remove an attachment",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "funny.png"
+      }
+    }
+  },
+  "composeLeftByMistake": "Left by mistake?",
+  "@composeLeftByMistake": {
+    "description": "Info shown after leaving compose screen to allow an easy return"
+  },
+  "attachTypeFile": "File",
+  "@attachTypeFile": {
+    "description": "Attachment type to add"
+  },
+  "attachTypePhoto": "Photo",
+  "@attachTypePhoto": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeVideo": "Video",
+  "@attachTypeVideo": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeAudio": "Audio",
+  "@attachTypeAudio": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeLocation": "Location",
+  "@attachTypeLocation": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeGif": "Animated Gif",
+  "@attachTypeGif": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeGifSearch": "search GIPHY",
+  "@attachTypeGifSearch": {
+    "description": "Text for searching in GIPHY service for GIF"
+  },
+  "attachTypeSticker": "Sticker",
+  "@attachTypeSticker": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeStickerSearch": "search GIPHY",
+  "@attachTypeStickerSearch": {
+    "description": "Text for searching in GIPHY service for sticker"
+  },
+  "attachTypeAppointment": "Appointment",
+  "@attachTypeAppointment": {
+    "description": "Attachment type to add"
+  },
+  "languageSettingTitle": "Language",
+  "@languageSettingTitle": {
+    "description": "Title of language setting screen"
+  },
+  "languageSettingLabel": "Choose the language for Maily:",
+  "@languageSettingLabel": {
+    "description": "Label for language setting dropdown screen"
+  },
+  "languageSettingSystemOption": "System language",
+  "@languageSettingSystemOption": {
+    "description": "Option to use the system's settings"
+  },
+  "languageSettingConfirmationTitle": "Use English for Maily?",
+  "@languageSettingConfirmationTitle": {
+    "description": "Title of dialog to confirm when switching the language"
+  },
+  "languageSettingConfirmationQuery": "Please confirm to use English as your chosen language.",
+  "@languageSettingConfirmationQuery": {
+    "description": "Query to be confirmed by user when switching the language"
+  },
+  "languageSetInfo": "Maily is now shown in English.",
+  "@languageSetInfo": {
+    "description": "Info text after having specified the language."
+  },
+  "languageSystemSetInfo": "Maily will now use the system's language or English if the system's language is not supported.",
+  "@languageSystemSetInfo": {
+    "description": "Info text after choosing the system's language for Maily."
+  },
+  "swipeSettingTitle": "Swipe gestures",
+  "@swipeSettingTitle": {
+    "description": "Title of swipe setting screen"
+  },
+  "swipeSettingLeftToRightLabel": "Left to right swipe",
+  "@swipeSettingLeftToRightLabel": {
+    "description": "Label for swipe gesture"
+  },
+  "swipeSettingRightToLeftLabel": "Right to left swipe",
+  "@swipeSettingRightToLeftLabel": {
+    "description": "Label for swipe gesture"
+  },
+  "swipeSettingChangeAction": "Change",
+  "@swipeSettingChangeAction": {
+    "description": "Action for changing a swipe gesture"
+  },
+  "signatureSettingsTitle": "Signature",
+  "@signatureSettingsTitle": {
+    "description": "Title of signature setting screen"
+  },
+  "signatureSettingsComposeActionsInfo": "Enable the signature for the following messages:",
+  "@signatureSettingsComposeActionsInfo": {
+    "description": "Text before selecting message types for a signature (new, forward, reply)."
+  },
+  "signatureSettingsAccountInfo": "You can specify account specific signatures in the account settings.",
+  "@signatureSettingsAccountInfo": {
+    "description": "Informational text before showing link to account settings."
+  },
+  "signatureSettingsAddForAccount": "Add signature for {account}",
+  "@signatureSettingsAddForAccount": {
+    "description": "Action to add account specific signature.",
+    "placeholders": {
+      "account": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "defaultSenderSettingsTitle": "Default sender",
+  "@defaultSenderSettingsTitle": {
+    "description": "Title of default sender setting screen"
+  },
+  "defaultSenderSettingsLabel": "Select the sender for new messages.",
+  "@defaultSenderSettingsLabel": {
+    "description": "Description of default sender setting screen"
+  },
+  "defaultSenderSettingsFirstAccount": "First account ({email})",
+  "@defaultSenderSettingsFirstAccount": {
+    "description": "The default sender is the one from the first account",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "email@domain.com"
+      }
+    }
+  },
+  "defaultSenderSettingsAliasInfo": "You can set up email alias addresses in the [AS].",
+  "@defaultSenderSettingsAliasInfo": {
+    "description": "Info about that email aliases can be set up in the account settings. [AS] is the place, where defaultSenderSettingsAliasAccountSettings is included as a link."
+  },
+  "defaultSenderSettingsAliasAccountSettings": "account settings",
+  "@defaultSenderSettingsAliasAccountSettings": {
+    "description": "Text of the account settings link."
+  },
+  "replySettingsTitle": "Message format",
+  "@replySettingsTitle": {
+    "description": "Reply settings title."
+  },
+  "replySettingsIntro": "In what format do you want to answer or forward email by default?",
+  "@replySettingsIntro": {
+    "description": "Reply settings introduction text."
+  },
+  "replySettingsFormatHtml": "Always rich format (HTML)",
+  "@replySettingsFormatHtml": {
+    "description": "Reply settings option."
+  },
+  "replySettingsFormatSameAsOriginal": "Use same format as originating email",
+  "@replySettingsFormatSameAsOriginal": {
+    "description": "Reply settings option."
+  },
+  "replySettingsFormatPlainText": "Always text-only",
+  "@replySettingsFormatPlainText": {
+    "description": "Reply settings option."
+  },
+  "moveTitle": "Move message",
+  "@moveTitle": {
+    "description": "Title of move to mailbox dialog."
+  },
+  "moveSuccess": "Messaged moved to {mailbox}.",
+  "@moveSuccess": {
+    "description": "Message after moving message successfully.",
+    "placeholders": {
+      "mailbox": {
+        "type": "String",
+        "example": "Inbox"
+      }
+    }
+  },
+  "editorArtInputLabel": "Your input",
+  "@editorArtInputLabel": {
+    "description": "Label of input field when inserting a formatted text"
+  },
+  "editorArtInputHint": "Enter text here",
+  "@editorArtInputHint": {
+    "description": "Hint of input field when inserting a formatted text"
+  },
+  "editorArtWaitingForInputHint": "waiting for input...",
+  "@editorArtWaitingForInputHint": {
+    "description": "Text shown while waiting for input"
+  },
+  "fontSerifBold": "Serif bold",
+  "@fontSerifBold": {
+    "description": "Font name"
+  },
+  "fontSerifItalic": "Serif italic",
+  "@fontSerifItalic": {
+    "description": "Font name"
+  },
+  "fontSerifBoldItalic": "Serif bold italic",
+  "@fontSerifBoldItalic": {
+    "description": "Font name"
+  },
+  "fontSans": "Sans",
+  "@fontSans": {
+    "description": "Font name"
+  },
+  "fontSansBold": "Sans bold",
+  "@fontSansBold": {
+    "description": "Font name"
+  },
+  "fontSansItalic": "Sans italic",
+  "@fontSansItalic": {
+    "description": "Font name"
+  },
+  "fontSansBoldItalic": "Sans bold italic",
+  "@fontSansBoldItalic": {
+    "description": "Font name"
+  },
+  "fontScript": "Script",
+  "@fontScript": {
+    "description": "Font name"
+  },
+  "fontScriptBold": "Script bold",
+  "@fontScriptBold": {
+    "description": "Font name"
+  },
+  "fontFraktur": "Fraktur",
+  "@fontFraktur": {
+    "description": "Font name"
+  },
+  "fontFrakturBold": "Fraktur bold",
+  "@fontFrakturBold": {
+    "description": "Font name"
+  },
+  "fontMonospace": "Monospace",
+  "@fontMonospace": {
+    "description": "Font name"
+  },
+  "fontFullwidth": "Fullwidth",
+  "@fontFullwidth": {
+    "description": "Font name"
+  },
+  "fontDoublestruck": "Double struck",
+  "@fontDoublestruck": {
+    "description": "Font name"
+  },
+  "fontCapitalized": "Capitalized",
+  "@fontCapitalized": {
+    "description": "Font name"
+  },
+  "fontCircled": "Circled",
+  "@fontCircled": {
+    "description": "Font name"
+  },
+  "fontParenthesized": "Parenthesized",
+  "@fontParenthesized": {
+    "description": "Font name"
+  },
+  "fontUnderlinedSingle": "Underlined",
+  "@fontUnderlinedSingle": {
+    "description": "Font name"
+  },
+  "fontUnderlinedDouble": "Underlined double",
+  "@fontUnderlinedDouble": {
+    "description": "Font name"
+  },
+  "fontStrikethroughSingle": "Strike through",
+  "@fontStrikethroughSingle": {
+    "description": "Font name"
+  },
+  "fontCrosshatch": "Crosshatch",
+  "@fontCrosshatch": {
+    "description": "Font name"
+  },
+  "accountLoadError": "Unable to connect to your account {name}. Has the password been changed?",
+  "@accountLoadError": {
+    "description": "Message shown when single account could not be loaded.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "accountLoadErrorEditAction": "Edit account",
+  "@accountLoadErrorEditAction": {
+    "description": "Action to edit account"
+  },
+  "extensionsTitle": "Extensions",
+  "@extensionsTitle": {
+    "description": "Title of extension section within the development settings"
+  },
+  "extensionsIntro": "With extensions e-mail service providers, companies and developers can adapt Maily with useful functionalities.",
+  "@extensionsIntro": {
+    "description": "Explanation of extensions"
+  },
+  "extensionsLearnMoreAction": "Learn more about extensions",
+  "@extensionsLearnMoreAction": {
+    "description": "Label for launching a website with more information"
+  },
+  "extensionsReloadAction": "Reload extensions",
+  "@extensionsReloadAction": {
+    "description": "Action to refresh extensions"
+  },
+  "extensionDeactivateAllAction": "Deactivate all extensions",
+  "@extensionDeactivateAllAction": {
+    "description": "Action to deactivate / unload any extension"
+  },
+  "extensionsManualAction": "Load manually",
+  "@extensionsManualAction": {
+    "description": "Action to load extension manually"
+  },
+  "extensionsManualUrlLabel": "Url of extension",
+  "@extensionsManualUrlLabel": {
+    "description": "Label for URL input field"
+  },
+  "extensionsManualLoadingError": "Unable to download extension from \"{url}\".",
+  "@extensionsManualLoadingError": {
+    "description": "Message shown when extensions could not be loaded.",
+    "placeholders": {
+      "url": {
+        "type": "String",
+        "example": "https://domain.com/.maily.json"
+      }
+    }
+  },
+  "icalendarAcceptTentatively": "Tentatively",
+  "@icalendarAcceptTentatively": {
+    "description": "Action to accept an icalendar invitation tentatively"
+  },
+  "icalendarActionChangeParticipantStatus": "Change",
+  "@icalendarActionChangeParticipantStatus": {
+    "description": "Action to change an icalendar invitation participant status"
+  },
+  "icalendarLabelSummary": "Title",
+  "@icalendarLabelSummary": {
+    "description": "Label of the summary info of an icalendar object"
+  },
+  "icalendarNoSummaryInfo": "(no title)",
+  "@icalendarNoSummaryInfo": {
+    "description": "Info shown when the icalendar object has no summary (no title)"
+  },
+  "icalendarLabelDescription": "Description",
+  "@icalendarLabelDescription": {
+    "description": "Label of the description info of an icalendar object"
+  },
+  "icalendarLabelStart": "Start",
+  "@icalendarLabelStart": {
+    "description": "Label of the start datetime info of an icalendar object"
+  },
+  "icalendarLabelEnd": "End",
+  "@icalendarLabelEnd": {
+    "description": "Label of the end datetime info of an icalendar object"
+  },
+  "icalendarLabelDuration": "Duration",
+  "@icalendarLabelDuration": {
+    "description": "Label of the duration info of an icalendar object"
+  },
+  "icalendarLabelLocation": "Location",
+  "@icalendarLabelLocation": {
+    "description": "Label of the location info of an icalendar object"
+  },
+  "icalendarLabelTeamsUrl": "Link",
+  "@icalendarLabelTeamsUrl": {
+    "description": "Label of the ms teams url info of an icalendar object"
+  },
+  "icalendarLabelRecurrenceRule": "Repeats",
+  "@icalendarLabelRecurrenceRule": {
+    "description": "Label of the recurrence info of an icalendar object"
+  },
+  "icalendarLabelParticipants": "Participants",
+  "@icalendarLabelParticipants": {
+    "description": "Label of the participants info of an icalendar object"
+  },
+  "icalendarParticipantStatusNeedsAction": "You are asked to answer this invitation.",
+  "@icalendarParticipantStatusNeedsAction": {
+    "description": "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusAccepted": "You have accepted this invitation.",
+  "@icalendarParticipantStatusAccepted": {
+    "description": "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusDeclined": "You have declined this invitation.",
+  "@icalendarParticipantStatusDeclined": {
+    "description": "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusAcceptedTentatively": "You have tentatively accepted this invitation.",
+  "@icalendarParticipantStatusAcceptedTentatively": {
+    "description": "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusDelegated": "You have delegated this invitation.",
+  "@icalendarParticipantStatusDelegated": {
+    "description": "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusInProcess": "The task is in progress.",
+  "@icalendarParticipantStatusInProcess": {
+    "description": "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusPartial": "The task is partially done.",
+  "@icalendarParticipantStatusPartial": {
+    "description": "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusCompleted": "The task is done.",
+  "@icalendarParticipantStatusCompleted": {
+    "description": "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusOther": "Your status is unknown.",
+  "@icalendarParticipantStatusOther": {
+    "description": "Participant status of the current user for a icalendar object"
+  },
+  "icalendarParticipantStatusChangeTitle": "Your Status",
+  "@icalendarParticipantStatusChangeTitle": {
+    "description": "Title for dialog to change participant status"
+  },
+  "icalendarParticipantStatusChangeText": "Do you want to accept this invitation?",
+  "@icalendarParticipantStatusChangeText": {
+    "description": "Text of dialog to change participant status"
+  },
+  "icalendarParticipantStatusSentFailure": "Unable to send reply.\nThe server responded with the following details:\n{details}",
+  "@icalendarParticipantStatusSentFailure": {
+    "description": "Failure message for a status change reply",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "No internet connection"
+      }
+    }
+  },
+  "icalendarExportAction": "Export",
+  "@icalendarExportAction": {
+    "description": "Action to export the invite to the native calendar"
+  },
+  "icalendarReplyStatusNeedsAction": "{attendee} has not answered this invitation.",
+  "@icalendarReplyStatusNeedsAction": {
+    "description": "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusAccepted": "{attendee} has accepted the appointment.",
+  "@icalendarReplyStatusAccepted": {
+    "description": "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusDeclined": "{attendee} has declined this invitation.",
+  "@icalendarReplyStatusDeclined": {
+    "description": "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusAcceptedTentatively": "{attendee} has tentatively accepted this invitation.",
+  "@icalendarReplyStatusAcceptedTentatively": {
+    "description": "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusDelegated": "{attendee} has delegated this invitation.",
+  "@icalendarReplyStatusDelegated": {
+    "description": "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusInProcess": "{attendee} has started this task.",
+  "@icalendarReplyStatusInProcess": {
+    "description": "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusPartial": "{attendee} has partially done this task.",
+  "@icalendarReplyStatusPartial": {
+    "description": "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusCompleted": "{attendee} has finished this task.",
+  "@icalendarReplyStatusCompleted": {
+    "description": "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyStatusOther": "{attendee} has answered with an unknown status.",
+  "@icalendarReplyStatusOther": {
+    "description": "Valid Calendar reply",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "icalendarReplyWithoutParticipants": "This calendar reply contains no participants.",
+  "@icalendarReplyWithoutParticipants": {
+    "description": "Calendar reply without any participant"
+  },
+  "icalendarReplyWithoutStatus": "{attendee} replied without an participation status.",
+  "@icalendarReplyWithoutStatus": {
+    "description": "Calendar reply without any participant status",
+    "placeholders": {
+      "attendee": {
+        "type": "String",
+        "example": "User Name <user.name@domain.com>"
+      }
+    }
+  },
+  "composeAppointmentTitle": "Create Appointment",
+  "@composeAppointmentTitle": {
+    "description": "Title for adding a new appointment screen"
+  },
+  "composeAppointmentLabelDay": "day",
+  "@composeAppointmentLabelDay": {
+    "description": "Label for select day button"
+  },
+  "composeAppointmentLabelTime": "time",
+  "@composeAppointmentLabelTime": {
+    "description": "Label for select time button"
+  },
+  "composeAppointmentLabelAllDayEvent": "All day",
+  "@composeAppointmentLabelAllDayEvent": {
+    "description": "Label for is all day toggle"
+  },
+  "composeAppointmentLabelRepeat": "Repeat",
+  "@composeAppointmentLabelRepeat": {
+    "description": "Label for repeat drop-down"
+  },
+  "composeAppointmentLabelRepeatOptionNever": "从不",
+  "@composeAppointmentLabelRepeatOptionNever": {
+    "description": "Option for repeat drop-down"
+  },
+  "composeAppointmentLabelRepeatOptionDaily": "Daily",
+  "@composeAppointmentLabelRepeatOptionDaily": {
+    "description": "Option for repeat drop-down"
+  },
+  "composeAppointmentLabelRepeatOptionWeekly": "Weekly",
+  "@composeAppointmentLabelRepeatOptionWeekly": {
+    "description": "Option for repeat drop-down"
+  },
+  "composeAppointmentLabelRepeatOptionMonthly": "Monthly",
+  "@composeAppointmentLabelRepeatOptionMonthly": {
+    "description": "Option for repeat drop-down"
+  },
+  "composeAppointmentLabelRepeatOptionYearly": "Annually",
+  "@composeAppointmentLabelRepeatOptionYearly": {
+    "description": "Option for repeat drop-down"
+  },
+  "composeAppointmentRecurrenceFrequencyLabel": "Frequency",
+  "@composeAppointmentRecurrenceFrequencyLabel": {
+    "description": "Label for frequency drop-down"
+  },
+  "composeAppointmentRecurrenceIntervalLabel": "Interval",
+  "@composeAppointmentRecurrenceIntervalLabel": {
+    "description": "Label for interval drop-down"
+  },
+  "composeAppointmentRecurrenceDaysLabel": "On days",
+  "@composeAppointmentRecurrenceDaysLabel": {
+    "description": "Label for days selection area in a weekly or monthly recurrence"
+  },
+  "composeAppointmentRecurrenceUntilLabel": "Until",
+  "@composeAppointmentRecurrenceUntilLabel": {
+    "description": "Label for choosing end date of recurrence"
+  },
+  "composeAppointmentRecurrenceUntilOptionUnlimited": "Unlimited",
+  "@composeAppointmentRecurrenceUntilOptionUnlimited": {
+    "description": "Option for no end date of recurrence"
+  },
+  "composeAppointmentRecurrenceUntilOptionRecommended": "Recommended ({duration})",
+  "@composeAppointmentRecurrenceUntilOptionRecommended": {
+    "description": "Option for standard end date of recurrence with the given duration",
+    "placeholders": {
+      "duration": {
+        "type": "String",
+        "example": "3 months"
+      }
+    }
+  },
+  "composeAppointmentRecurrenceUntilOptionSpecificDate": "Until chosen date",
+  "@composeAppointmentRecurrenceUntilOptionSpecificDate": {
+    "description": "Option for specific end date of recurrence"
+  },
+  "composeAppointmentRecurrenceMonthlyOnDayOfMonth": "On the {day}. day of the month",
+  "@composeAppointmentRecurrenceMonthlyOnDayOfMonth": {
+    "description": "Option for repeating an event always on that day of the month",
+    "placeholders": {
+      "day": {
+        "type": "int",
+        "example": "3",
+        "format": "compactLong"
+      }
+    }
+  },
+  "composeAppointmentRecurrenceMonthlyOnWeekDay": "Weekday in month",
+  "@composeAppointmentRecurrenceMonthlyOnWeekDay": {
+    "description": "Monthly repeat on weekday of a chosen week"
+  },
+  "composeAppointmentRecurrenceFirst": "First",
+  "@composeAppointmentRecurrenceFirst": {
+    "description": "Monthly day option"
+  },
+  "composeAppointmentRecurrenceSecond": "Second",
+  "@composeAppointmentRecurrenceSecond": {
+    "description": "Monthly day option"
+  },
+  "composeAppointmentRecurrenceThird": "Third",
+  "@composeAppointmentRecurrenceThird": {
+    "description": "Monthly day option"
+  },
+  "composeAppointmentRecurrenceLast": "Last",
+  "@composeAppointmentRecurrenceLast": {
+    "description": "Monthly day option"
+  },
+  "composeAppointmentRecurrenceSecondLast": "Second-last",
+  "@composeAppointmentRecurrenceSecondLast": {
+    "description": "Monthly day option"
+  },
+  "durationYears": "{number,plural, =1{1 year} other{{number} years}}",
+  "@durationYears": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "durationMonths": "{number,plural, =1{1 month} other{{number} months}}",
+  "@durationMonths": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "durationWeeks": "{number,plural, =1{1 week} other{{number} weeks}}",
+  "@durationWeeks": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "durationDays": "{number,plural, =1{1 day} other{{number} days}}",
+  "@durationDays": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "durationHours": "{number,plural, =1{1 hour} other{{number} hours}}",
+  "@durationHours": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "durationMinutes": "{number,plural, =1{1 minute} other{{number} minutes}}",
+  "@durationMinutes": {
+    "description": "Duration. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "durationEmpty": "No duration",
+  "@durationEmpty": {
+    "description": "Text shown when the duration is 0"
+  }
+}
