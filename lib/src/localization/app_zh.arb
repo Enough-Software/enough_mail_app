@@ -1,0 +1,2238 @@
+{
+  "@@locale": "zh",
+  "signature": "使用 Maily 发送",
+  "@signature": {
+    "description": "Default signature text"
+  },
+  "actionCancel": "取消",
+  "@actionCancel": {
+    "description": "Generic cancel action"
+  },
+  "actionOk": "确定",
+  "@actionOk": {
+    "description": "Generic OK action"
+  },
+  "actionDone": "完成",
+  "@actionDone": {
+    "description": "Generic done action"
+  },
+  "actionNext": "下一步",
+  "@actionNext": {
+    "description": "Generic next action"
+  },
+  "actionSkip": "跳过",
+  "@actionSkip": {
+    "description": "Generic skip action"
+  },
+  "actionUndo": "撤销",
+  "@actionUndo": {
+    "description": "Generic undo action"
+  },
+  "actionDelete": "删除",
+  "@actionDelete": {
+    "description": "Generic delete action"
+  },
+  "actionAccept": "接受",
+  "@actionAccept": {
+    "description": "Generic accept action"
+  },
+  "actionDecline": "拒绝",
+  "@actionDecline": {
+    "description": "Generic decline action"
+  },
+  "actionEdit": "编辑",
+  "@actionEdit": {
+    "description": "Generic edit action"
+  },
+  "actionAddressCopy": "复制",
+  "@actionAddressCopy": {
+    "description": "Copy action for email addresses"
+  },
+  "actionAddressCompose": "新建邮件",
+  "@actionAddressCompose": {
+    "description": "Compose action for email addresses"
+  },
+  "actionAddressSearch": "搜索",
+  "@actionAddressSearch": {
+    "description": "Search action for email addresses"
+  },
+  "splashLoading1": "Maily 正在启动...",
+  "@splashLoading1": {
+    "description": "Message shown on splash screen while loading"
+  },
+  "splashLoading2": "正在准备您的 Maily 引擎...",
+  "@splashLoading2": {
+    "description": "Message shown on splash screen while loading"
+  },
+  "splashLoading3": "Maily 即将启动，倒数 10、9、8...",
+  "@splashLoading3": {
+    "description": "Message shown on splash screen while loading"
+  },
+  "welcomePanel1Title": "Maily",
+  "@welcomePanel1Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel1Text": "欢迎使用 Maily，您友好快捷的邮件助手！",
+  "@welcomePanel1Text": {
+    "description": "Welcome message shown on first panel"
+  },
+  "welcomePanel2Title": "账户",
+  "@welcomePanel2Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel2Text": "管理无限数量的电子邮件账户。一次性阅读和搜索所有账户中的邮件。",
+  "@welcomePanel2Text": {
+    "description": "Welcome message shown on second panel"
+  },
+  "welcomePanel3Title": "滑动与长按",
+  "@welcomePanel3Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel3Text": "滑动邮件以删除或标记为已读。长按邮件以选择并管理多个邮件。",
+  "@welcomePanel3Text": {
+    "description": "Welcome message shown on third panel"
+  },
+  "welcomePanel4Title": "保持收件箱整洁",
+  "@welcomePanel4Title": {
+    "description": "Welcome panel title"
+  },
+  "welcomePanel4Text": "只需一键即可取消订阅新闻通讯。",
+  "@welcomePanel4Text": {
+    "description": "Welcome message shown on fourth panel"
+  },
+  "welcomeActionSignIn": "登录您的邮件账户",
+  "@welcomeActionSignIn": {
+    "description": "Button showing login option"
+  },
+  "homeSearchHint": "搜索",
+  "@homeSearchHint": {
+    "description": "Hint shown in empty search field"
+  },
+  "homeActionsShowAsStack": "以堆叠方式显示",
+  "@homeActionsShowAsStack": {
+    "description": "Action to show mails as stack"
+  },
+  "homeActionsShowAsList": "以列表方式显示",
+  "@homeActionsShowAsList": {
+    "description": "Action to show mails as list"
+  },
+  "homeEmptyFolderMessage": "已全部完成！\n\n此文件夹中没有邮件。",
+  "@homeEmptyFolderMessage": {
+    "description": "Message shown when there are no messages in the folder"
+  },
+  "homeEmptySearchMessage": "未找到邮件。",
+  "@homeEmptySearchMessage": {
+    "description": "Message shown when there are no messages found in a search query"
+  },
+  "homeDeleteAllTitle": "确认",
+  "@homeDeleteAllTitle": {
+    "description": "Title of confirmation dialog when deleting all messages"
+  },
+  "homeDeleteAllQuestion": "确定要删除所有邮件吗？",
+  "@homeDeleteAllQuestion": {
+    "description": "Question in confirmation dialog when deleting all messages"
+  },
+  "homeDeleteAllAction": "全部删除",
+  "@homeDeleteAllAction": {
+    "description": "Action to tap to delete all messages (must be short)."
+  },
+  "homeDeleteAllScrubOption": "清除邮件",
+  "@homeDeleteAllScrubOption": {
+    "description": "Option to remove deleted messages from disk."
+  },
+  "homeDeleteAllSuccess": "所有邮件已删除。",
+  "@homeDeleteAllSuccess": {
+    "description": "Message shown after all messages have been deleted."
+  },
+  "homeMarkAllSeenAction": "全部已读",
+  "@homeMarkAllSeenAction": {
+    "description": "Action to tap to mark all messages as seen / read (must be short)."
+  },
+  "homeMarkAllUnseenAction": "全部未读",
+  "@homeMarkAllUnseenAction": {
+    "description": "Action to tap to mark all messages as unseen / unread (must be short)."
+  },
+  "homeFabTooltip": "新建邮件",
+  "@homeFabTooltip": {
+    "description": "Tooltip for 'compose new message' floating action button."
+  },
+  "homeLoadingMessageSourceTitle": "加载中...",
+  "@homeLoadingMessageSourceTitle": {
+    "description": "Title shown while message source itself is being loaded."
+  },
+  "homeLoading": "正在加载 {name}...",
+  "@homeLoading": {
+    "description": "Message shown while loading message.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "收件箱"
+      }
+    }
+  },
+  "swipeActionToggleRead": "标记为已读/未读",
+  "@swipeActionToggleRead": {
+    "description": "Swipe action for marking a message as read / unread."
+  },
+  "swipeActionDelete": "删除",
+  "@swipeActionDelete": {
+    "description": "Swipe action for deleting a message."
+  },
+  "swipeActionMarkJunk": "标记为垃圾邮件",
+  "@swipeActionMarkJunk": {
+    "description": "Swipe action for moving a message to junk."
+  },
+  "swipeActionArchive": "存档",
+  "@swipeActionArchive": {
+    "description": "Swipe action for moving a message to archive."
+  },
+  "swipeActionFlag": "标记/取消标记",
+  "@swipeActionFlag": {
+    "description": "Swipe action for marking a message as flagged / unflagged."
+  },
+  "multipleMovedToJunk": "{number,plural, =1{一封邮件已标记为垃圾邮件} other{{number} 封邮件已标记为垃圾邮件}}",
+  "@multipleMovedToJunk": {
+    "description": "Message shown after moving messages to junk. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "multipleMovedToInbox": "{number,plural, =1{一封邮件已移至收件箱} other{{number} 封邮件已移至收件箱}}",
+  "@multipleMovedToInbox": {
+    "description": "Message shown after moving messages from junk, trash or archive back to the Inbox. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "multipleMovedToArchive": "{number,plural, =1{一封邮件已存档} other{{number} 封邮件已存档}}",
+  "@multipleMovedToArchive": {
+    "description": "Message shown after moving messages to archive. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "multipleMovedToTrash": "{number,plural, =1{一封邮件已删除} other{{number} 封邮件已删除}}",
+  "@multipleMovedToTrash": {
+    "description": "Message shown after moving messages to trash. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "multipleSelectionNeededInfo": "请先选择邮件。",
+  "@multipleSelectionNeededInfo": {
+    "description": "Short info shown when a multiple message action is triggered without selecting at least one message first."
+  },
+  "multipleSelectionActionFailed": "无法执行操作\n详情：{details}",
+  "@multipleSelectionActionFailed": {
+    "description": "Error message when the selection action failed.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "邮箱文件夹未找到"
+      }
+    }
+  },
+  "multipleMoveTitle": "{number,plural, =1{移动邮件} other{移动 {number} 封邮件}}",
+  "@multipleMoveTitle": {
+    "description": "Title of move dialog for multiple messages. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "messageActionMultipleMarkSeen": "标记为已读",
+  "@messageActionMultipleMarkSeen": {
+    "description": "Action for several messages."
+  },
+  "messageActionMultipleMarkUnseen": "标记为未读",
+  "@messageActionMultipleMarkUnseen": {
+    "description": "Action for several messages."
+  },
+  "messageActionMultipleMarkFlagged": "标记邮件",
+  "@messageActionMultipleMarkFlagged": {
+    "description": "Action for several messages."
+  },
+  "messageActionMultipleMarkUnflagged": "取消标记邮件",
+  "@messageActionMultipleMarkUnflagged": {
+    "description": "Action for several messages."
+  },
+  "messageActionViewInSafeMode": "查看不含外部内容",
+  "@messageActionMultipleViewInSafeMode": {
+    "description": "Action for message."
+  },
+  "emailSenderUnknown": "<无发件人>",
+  "@emailSenderUnknown": {
+    "description": "Shown as replacement when there is no known sender of a message."
+  },
+  "dateRangeFuture": "未来",
+  "@dateRangeFuture": {
+    "description": "Date range title."
+  },
+  "dateRangeTomorrow": "明天",
+  "@dateRangeTomorrow": {
+    "description": "Date range title."
+  },
+  "dateRangeToday": "今天",
+  "@dateRangeToday": {
+    "description": "Date range title."
+  },
+  "dateRangeYesterday": "昨天",
+  "@dateRangeYesterday": {
+    "description": "Date range title."
+  },
+  "dateRangeCurrentWeek": "本周",
+  "@dateRangeCurrentWeek": {
+    "description": "Date range title."
+  },
+  "dateRangeLastWeek": "上周",
+  "@dateRangeLastWeek": {
+    "description": "Date range title."
+  },
+  "dateRangeCurrentMonth": "本月",
+  "@dateRangeCurrentMonth": {
+    "description": "Date range title."
+  },
+  "dateRangeLastMonth": "上月",
+  "@dateRangeLastMonth": {
+    "description": "Date range title."
+  },
+  "dateRangeCurrentYear": "今年",
+  "@dateRangeCurrentYear": {
+    "description": "Date range title."
+  },
+  "dateRangeLongAgo": "很久以前",
+  "@dateRangeLongAgo": {
+    "description": "Date range title."
+  },
+  "dateUndefined": "未定义",
+  "@dateUndefined": {
+    "description": "Unknown date."
+  },
+  "dateDayToday": "今天",
+  "@dateDayToday": {
+    "description": "Message data is today."
+  },
+  "dateDayYesterday": "昨天",
+  "@dateDayYesterday": {
+    "description": "Message data is yesterday."
+  },
+  "dateDayLastWeekday": "上{day}",
+  "@dateDayLastWeekday": {
+    "description": "Message data is a recent weekday.",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "周二"
+      }
+    }
+  },
+  "drawerEntryAbout": "关于 Maily",
+  "@drawerEntryAbout": {
+    "description": "Menu entry for about."
+  },
+  "drawerEntrySettings": "设置",
+  "@drawerEntrySettings": {
+    "description": "Menu entry for settings."
+  },
+  "drawerAccountsSectionTitle": "{number,plural, =1{一个账户} other{{number} 个账户}}",
+  "@drawerAccountsSectionTitle": {
+    "description": "Title shown for accounts drop down. Message formatted using the plural JSON scheme.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "drawerEntryAddAccount": "添加账户",
+  "@drawerEntryAddAccount": {
+    "description": "Menu entry for adding a new account."
+  },
+  "unifiedAccountName": "统一账户",
+  "@unifiedAccountName": {
+    "description": "Name of unified account."
+  },
+  "unifiedFolderInbox": "统一收件箱",
+  "@unifiedFolderInbox": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderSent": "统一已发送",
+  "@unifiedFolderSent": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderDrafts": "统一草稿",
+  "@unifiedFolderDrafts": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderTrash": "统一垃圾箱",
+  "@unifiedFolderTrash": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderArchive": "统一存档",
+  "@unifiedFolderArchive": {
+    "description": "Folder name of unified account."
+  },
+  "unifiedFolderJunk": "统一垃圾邮件",
+  "@unifiedFolderJunk": {
+    "description": "Folder name of unified account."
+  },
+  "folderInbox": "收件箱",
+  "@folderInbox": {
+    "description": "Folder name."
+  },
+  "folderSent": "已发送",
+  "@folderSent": {
+    "description": "Folder name."
+  },
+  "folderDrafts": "草稿",
+  "@folderDrafts": {
+    "description": "Folder name."
+  },
+  "folderTrash": "垃圾箱",
+  "@folderTrash": {
+    "description": "Folder name."
+  },
+  "folderArchive": "存档",
+  "@folderArchive": {
+    "description": "Folder name."
+  },
+  "folderJunk": "垃圾邮件",
+  "@folderJunk": {
+    "description": "Folder name."
+  },
+  "folderUnknown": "未知",
+  "@folderUnknown": {
+    "description": "Folder name for a message source without a name."
+  },
+  "viewContentsAction": "查看内容",
+  "@viewContentsAction": {
+    "description": "Show contents of a message on a separate screen."
+  },
+  "viewSourceAction": "查看源代码",
+  "@viewSourceAction": {
+    "description": "Show source code of a message."
+  },
+  "detailsErrorDownloadInfo": "邮件无法下载。",
+  "@detailsErrorDownloadInfo": {
+    "description": "Info shown when an email could not be downloaded."
+  },
+  "detailsErrorDownloadRetry": "重试",
+  "@detailsErrorDownloadRetry": {
+    "description": "Retry action shown when an email could not be downloaded."
+  },
+  "detailsHeaderFrom": "发件人",
+  "@detailsHeaderFrom": {
+    "description": "Label for sender(s) of email."
+  },
+  "detailsHeaderTo": "收件人",
+  "@detailsHeaderTo": {
+    "description": "Label for [to] recipient(s) of email."
+  },
+  "detailsHeaderCc": "抄送",
+  "@detailsHeaderCc": {
+    "description": "Label for [CC] - carbon copy - recipient(s) of email."
+  },
+  "detailsHeaderBcc": "密送",
+  "@detailsHeaderBcc": {
+    "description": "Label for [BCC] - blind carbon copy - recipient(s) of email."
+  },
+  "detailsHeaderDate": "日期",
+  "@detailsHeaderDate": {
+    "description": "Label for date of email."
+  },
+  "subjectUndefined": "<无主题>",
+  "@subjectUndefined": {
+    "description": "Shown instead of the subject when it is undefined."
+  },
+  "detailsActionShowImages": "显示图片",
+  "@detailsActionShowImages": {
+    "description": "Action for showing images. Only visible when external images are blocked."
+  },
+  "detailsNewsletterActionUnsubscribe": "取消订阅",
+  "@detailsNewsletterActionUnsubscribe": {
+    "description": "Action shown for unsubscribable newsletter."
+  },
+  "detailsNewsletterActionResubscribe": "重新订阅",
+  "@detailsNewsletterActionResubscribe": {
+    "description": "Action shown after re-subscribable newsletter has been unsubscribed."
+  },
+  "detailsNewsletterStatusUnsubscribed": "已取消订阅",
+  "@detailsNewsletterStatusUnsubscribed": {
+    "description": "Status shown for unsubscribed newsletter."
+  },
+  "detailsNewsletterUnsubscribeDialogTitle": "取消订阅",
+  "@detailsNewsletterUnsubscribeDialogTitle": {
+    "description": "Title for unsubscribe newsletter dialog."
+  },
+  "detailsNewsletterUnsubscribeDialogQuestion": "您确定要取消订阅邮件列表 {listName} 吗？",
+  "@detailsNewsletterUnsubscribeDialogQuestion": {
+    "description": "Question for unsubscribe newsletter dialog.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "邮件列表名称"
+      }
+    }
+  },
+  "detailsNewsletterUnsubscribeDialogAction": "取消订阅",
+  "@detailsNewsletterUnsubscribeDialogAction": {
+    "description": "Action for unsubscribe newsletter dialog."
+  },
+  "detailsNewsletterUnsubscribeSuccessTitle": "已取消订阅",
+  "@detailsNewsletterUnsubscribeSuccessTitle": {
+    "description": "Title for dialog after unsubscribing newsletter successfully."
+  },
+  "detailsNewsletterUnsubscribeSuccessMessage": "您已成功取消订阅邮件列表 {listName}。",
+  "@detailsNewsletterUnsubscribeSuccessMessage": {
+    "description": "Text confirmation after successfully unsubscribing a newsletter.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "邮件列表名称"
+      }
+    }
+  },
+  "detailsNewsletterUnsubscribeFailureTitle": "取消订阅失败",
+  "@detailsNewsletterUnsubscribeFailureTitle": {
+    "description": "Title for dialog after unsubscribing newsletter failed."
+  },
+  "detailsNewsletterUnsubscribeFailureMessage": "抱歉，我无法自动为您取消订阅 {listName}。",
+  "@detailsNewsletterUnsubscribeFailureMessage": {
+    "description": "Text confirmation after unsubscribing a newsletter failed.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "邮件列表名称"
+      }
+    }
+  },
+  "detailsNewsletterResubscribeDialogTitle": "重新订阅",
+  "@detailsNewsletterResubscribeDialogTitle": {
+    "description": "Title for re-subscribe newsletter dialog."
+  },
+  "detailsNewsletterResubscribeDialogQuestion": "您确定要重新订阅邮件列表 {listName} 吗？",
+  "@detailsNewsletterResubscribeDialogQuestion": {
+    "description": "Question for re-subscribe newsletter dialog.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "邮件列表名称"
+      }
+    }
+  },
+  "detailsNewsletterResubscribeDialogAction": "订阅",
+  "@detailsNewsletterResubscribeDialogAction": {
+    "description": "Action for re-subscribe newsletter dialog."
+  },
+  "detailsNewsletterResubscribeSuccessTitle": "已订阅",
+  "@detailsNewsletterResubscribeSuccessTitle": {
+    "description": "Title for dialog after re-subscribed newsletter successfully."
+  },
+  "detailsNewsletterResubscribeSuccessMessage": "您已成功重新订阅邮件列表 {listName}。",
+  "@detailsNewsletterResubscribeSuccessMessage": {
+    "description": "Text confirmation after successfully re-subscribing a newsletter.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "邮件列表名称"
+      }
+    }
+  },
+  "detailsNewsletterResubscribeFailureTitle": "订阅失败",
+  "@detailsNewsletterResubscribeFailureTitle": {
+    "description": "Title for dialog after re-subscribing newsletter failed."
+  },
+  "detailsNewsletterResubscribeFailureMessage": "抱歉，邮件列表 {listName} 的订阅请求失败。",
+  "@detailsNewsletterResubscribeFailureMessage": {
+    "description": "Text confirmation after re-subscribing a newsletter failed.",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "邮件列表名称"
+      }
+    }
+  },
+  "detailsSendReadReceiptAction": "发送已读回执",
+  "@detailsSendReadReceiptAction": {
+    "description": "Action to send the read receipt for the shown message."
+  },
+  "detailsReadReceiptSentStatus": "已发送已读回执 ✔",
+  "@detailsReadReceiptSentStatus": {
+    "description": "Status after sending the read receipt for the shown message."
+  },
+  "detailsReadReceiptSubject": "已读回执",
+  "@detailsReadReceiptSubject": {
+    "description": "Message subject for read receipts."
+  },
+  "attachmentActionOpen": "打开",
+  "@attachmentActionOpen": {
+    "description": "Open action for attachments without interactive viewer."
+  },
+  "attachmentDecodeError": "此附件格式或编码不受支持。\n详情：${details}",
+  "@attachmentDecodeError": {
+    "description": "Text shown when downloaded attachment could not be decoded.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "FormatException"
+      }
+    }
+  },
+  "attachmentDownloadError": "无法下载此附件。\n详情：${details}",
+  "@attachmentDownloadError": {
+    "description": "Text shown when attachment could not be downloaded.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "NotFound"
+      }
+    }
+  },
+  "messageActionReply": "回复",
+  "@messageActionReply": {
+    "description": "Action for single message."
+  },
+  "messageActionReplyAll": "回复全部",
+  "@messageActionReplyAll": {
+    "description": "Action for single message."
+  },
+  "messageActionForward": "转发",
+  "@messageActionForward": {
+    "description": "Action for single message."
+  },
+  "messageActionForwardAsAttachment": "作为附件转发",
+  "@messageActionForwardAsAttachment": {
+    "description": "Action for single message."
+  },
+  "messageActionForwardAttachments": "{number,plural, =1{转发附件} other{转发 {number} 个附件}}",
+  "@messageActionForwardAttachments": {
+    "description": "Action for single message to forward the given number of attachments.",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "2",
+        "format": "compactLong"
+      }
+    }
+  },
+  "messagesActionForwardAttachments": "转发附件",
+  "@messagesActionForwardAttachments": {
+    "description": "Action for multiple selected messages to forward all attachments of the messages."
+  },
+  "messageActionDelete": "删除",
+  "@messageActionDelete": {
+    "description": "Action for single message."
+  },
+  "messageActionMoveToInbox": "移至收件箱",
+  "@messageActionMoveToInbox": {
+    "description": "Action for single message."
+  },
+  "messageActionMove": "移动",
+  "@messageActionMove": {
+    "description": "Action for single message."
+  },
+  "messageStatusSeen": "已读",
+  "@messageStatusSeen": {
+    "description": "Status of single message."
+  },
+  "messageStatusUnseen": "未读",
+  "@messageStatusUnseen": {
+    "description": "Status of single message."
+  },
+  "messageStatusFlagged": "已标记",
+  "@messageStatusFlagged": {
+    "description": "Status of single message."
+  },
+  "messageStatusUnflagged": "未标记",
+  "@messageStatusUnflagged": {
+    "description": "Status of single message."
+  },
+  "messageActionMarkAsJunk": "标记为垃圾邮件",
+  "@messageActionMarkAsJunk": {
+    "description": "Action for single message."
+  },
+  "messageActionMarkAsNotJunk": "标记为非垃圾邮件",
+  "@messageActionMarkAsNotJunk": {
+    "description": "Action for single message."
+  },
+  "messageActionArchive": "存档",
+  "@messageActionArchive": {
+    "description": "Action for single message."
+  },
+  "messageActionUnarchive": "移至收件箱",
+  "@messageActionUnarchive": {
+    "description": "Action for single message."
+  },
+  "messageActionRedirect": "重定向",
+  "@messageActionRedirect": {
+    "description": "Action for single message."
+  },
+  "messageActionAddNotification": "添加通知",
+  "@messageActionAddNotification": {
+    "description": "Action for single message."
+  },
+  "resultDeleted": "已删除",
+  "@resultDeleted": {
+    "description": "Successful short snackbar message after deleting message(s)."
+  },
+  "resultMovedToJunk": "已标记为垃圾邮件",
+  "@resultMovedToJunk": {
+    "description": "Successful short snackbar message after moving message(s) to junk."
+  },
+  "resultMovedToInbox": "已移至收件箱",
+  "@resultMovedToInbox": {
+    "description": "Successful short snackbar message after moving message(s) to inbox."
+  },
+  "resultArchived": "已存档",
+  "@resultArchived": {
+    "description": "Successful short snackbar message after moving message(s) to archive."
+  },
+  "resultRedirectedSuccess": "邮件已重定向 👍",
+  "@resultRedirectedSuccess": {
+    "description": "Successful snackbar message after redirecting message to new recipient(s)."
+  },
+  "resultRedirectedFailure": "无法重定向邮件。\n\n服务器返回以下详情：\"{details}\"",
+  "@resultRedirectedFailure": {
+    "description": "Failure snackbar message after failed to redirect message to new recipient(s).",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Invalid recipient"
+      }
+    }
+  },
+  "redirectTitle": "重定向",
+  "@redirectTitle": {
+    "description": "Title of redirect dialog."
+  },
+  "redirectInfo": "将此邮件重定向到以下收件人。重定向不会更改邮件内容。",
+  "@redirectInfo": {
+    "description": "Short explanation of redirect action in redirect dialog."
+  },
+  "redirectEmailInputRequired": "您需要添加至少一个有效的电子邮件地址。",
+  "@redirectEmailInputRequired": {
+    "description": "Information when redirect is wanted but no address has been entered."
+  },
+  "searchQueryDescription": "在 {folder} 中搜索...",
+  "@searchQueryDescription": {
+    "description": "Description of search within the given folder.",
+    "placeholders": {
+      "folder": {
+        "type": "String",
+        "example": "收件箱"
+      }
+    }
+  },
+  "searchQueryTitle": "搜索 \"{query}\"",
+  "@searchQueryTitle": {
+    "description": "Title for a search with the given query.",
+    "placeholders": {
+      "query": {
+        "type": "String",
+        "example": "发件人姓名"
+      }
+    }
+  },
+  "legaleseUsage": "使用 Maily 即表示您同意我们的 [PP] 和 [TC]。",
+  "@legaleseUsage": {
+    "description": "Legal info shown on initial welcome screen and later in about. [PP] is replaced with the legalesePrivacyPolicy text and [TC] with legaleseTermsAndConditions."
+  },
+  "legalesePrivacyPolicy": "隐私政策",
+  "@legalesePrivacyPolicy": {
+    "description": "Translation of privacy policy"
+  },
+  "legaleseTermsAndConditions": "服务条款",
+  "@legaleseTermsAndConditions": {
+    "description": "Translation of Terms & Conditions "
+  },
+  "aboutApplicationLegalese": "Maily 是根据 GNU 通用公共许可证发布的免费软件。",
+  "@aboutApplicationLegalese": {
+    "description": "Legal info shown in about dialog."
+  },
+  "feedbackActionSuggestFeature": "建议功能",
+  "@feedbackActionSuggestFeature": {
+    "description": "Action to suggest a feature."
+  },
+  "feedbackActionReportProblem": "报告问题",
+  "@feedbackActionReportProblem": {
+    "description": "Action to report a problem."
+  },
+  "feedbackActionHelpDeveloping": "帮助开发 Maily",
+  "@feedbackActionHelpDeveloping": {
+    "description": "Action to help developing."
+  },
+  "feedbackTitle": "反馈",
+  "@feedbackTitle": {
+    "description": "Title of feedback settings screen."
+  },
+  "feedbackIntro": "感谢您测试 Maily！",
+  "@feedbackIntro": {
+    "description": "Intro for feedback settings screen."
+  },
+  "feedbackProvideInfoRequest": "报告问题时，请提供以下信息：",
+  "@feedbackProvideInfoRequest": {
+    "description": "Request to provide device and app information when reporting a problem."
+  },
+  "feedbackResultInfoCopied": "已复制到剪贴板",
+  "@feedbackResultInfoCopied": {
+    "description": "Info shown after copying device and app info to clipboard."
+  },
+  "accountsTitle": "账户",
+  "@accountsTitle": {
+    "description": "Title of accounts settings screen."
+  },
+  "accountsActionReorder": "重新排序账户",
+  "@accountActionReorder": {
+    "description": "Action to start reordering accounts."
+  },
+  "settingsTitle": "设置",
+  "@settingsTitle": {
+    "description": "Title of base settings screen."
+  },
+  "settingsSecurityBlockExternalImages": "阻止外部图片",
+  "@settingsSecurityBlockExternalImages": {
+    "description": "Settings option to block external options."
+  },
+  "settingsSecurityBlockExternalImagesDescriptionTitle": "外部图片",
+  "@settingsSecurityBlockExternalImagesDescriptionTitle": {
+    "description": "Title of dialog that shows additional information about the 'block external images' option."
+  },
+  "settingsSecurityBlockExternalImagesDescriptionText": "电子邮件可能包含内联图片或托管在外部服务器上的图片。后者（外部图片）可能会向发件人泄露信息，例如让发件人知道您已打开邮件。此选项允许您阻止此类外部图片，从而降低泄露敏感信息的风险。您仍然可以在阅读邮件时选择按邮件加载此类图片。",
+  "@settingsSecurityBlockExternalImagesDescriptionText": {
+    "description": "Text of dialog that shows additional information about the 'block external images' option."
+  },
+  "settingsSecurityMessageRenderingHtml": "显示完整邮件内容",
+  "@settingsSecurityMessageRenderingHtml": {
+    "description": "Option for how to render messages."
+  },
+  "settingsSecurityMessageRenderingPlainText": "仅显示邮件文本",
+  "@settingsSecurityMessageRenderingPlainText": {
+    "description": "Option for how to render messages."
+  },
+  "settingsSecurityLaunchModeLabel": "Maily 应如何打开链接？",
+  "@settingsSecurityLaunchModeLabel": {
+    "description": "Option for how to launch URLs."
+  },
+  "settingsSecurityLaunchModeExternal": "在外部打开链接",
+  "@settingsSecurityLaunchModeExternal": {
+    "description": "Option for how to launch URLs."
+  },
+  "settingsSecurityLaunchModeInApp": "在 Maily 中打开链接",
+  "@settingsSecurityLaunchModeInApp": {
+    "description": "Option for how to launch URLs."
+  },
+  "settingsActionAccounts": "管理账户",
+  "@settingsActionAccounts": {
+    "description": "Settings action to manage accounts."
+  },
+  "settingsActionDesign": "外观",
+  "@settingsActionDesign": {
+    "description": "Settings action to manage the visualization of the app."
+  },
+  "settingsActionFeedback": "提供反馈",
+  "@settingsActionFeedback": {
+    "description": "Settings action to provide feedback about the app."
+  },
+  "settingsActionWelcome": "显示欢迎界面",
+  "@settingsActionWelcome": {
+    "description": "Settings action to show welcome screen of the app again."
+  },
+  "settingsReadReceipts": "已读回执",
+  "@settingsReadReceipts": {
+    "description": "Settings action to customize read receipts."
+  },
+  "readReceiptsSettingsIntroduction": "您是否希望显示已读回执请求？",
+  "@readReceiptsSettingsIntroduction": {
+    "description": "Introduction text for managing read receipt requests."
+  },
+  "readReceiptOptionAlways": "始终显示",
+  "@readReceiptOptionAlways": {
+    "description": "Display option for read receipt requests."
+  },
+  "readReceiptOptionNever": "从不显示",
+  "@readReceiptOptionNever": {
+    "description": "Display option for read receipt requests."
+  },
+  "settingsFolders": "文件夹",
+  "@settingsFolders": {
+    "description": "Settings action to customize folders."
+  },
+  "folderNamesIntroduction": "您喜欢使用什么名称来命名文件夹？",
+  "@folderNamesIntroduction": {
+    "description": "Introduction for folder names setting."
+  },
+  "folderNamesSettingLocalized": "Maily 提供的名称",
+  "@folderNamesSettingLocalized": {
+    "description": "Folder name setting option."
+  },
+  "folderNamesSettingServer": "服务提供的名称",
+  "@folderNamesSettingServer": {
+    "description": "Folder name setting option."
+  },
+  "folderNamesSettingCustom": "自定义名称",
+  "@folderNamesSettingCustom": {
+    "description": "Folder name setting option."
+  },
+  "folderNamesEditAction": "编辑自定义名称",
+  "@folderNamesEditAction": {
+    "description": "Action to specify custom folder names."
+  },
+  "folderNamesCustomTitle": "自定义名称",
+  "@folderNamesCustomTitle": {
+    "description": "Title of dialog to specify custom folder names."
+  },
+  "folderAddAction": "创建文件夹",
+  "@folderAddAction": {
+    "description": "Action to create a new folder."
+  },
+  "folderAddTitle": "创建文件夹",
+  "@folderAddTitle": {
+    "description": "Dialog title when creating a new folder."
+  },
+  "folderAddNameLabel": "名称",
+  "@folderAddNameLabel": {
+    "description": "Label for input field for the folder name."
+  },
+  "folderAddNameHint": "新文件夹名称",
+  "@folderAddNameHint": {
+    "description": "Hint for input field for the folder name."
+  },
+  "folderAccountLabel": "账户",
+  "@folderAddAccountLabel": {
+    "description": "Label to select the current account."
+  },
+  "folderMailboxLabel": "文件夹",
+  "@folderAddParentFolderLabel": {
+    "description": "Label to select the current folder."
+  },
+  "folderAddResultSuccess": "文件夹已创建 😊",
+  "@folderAddResultSuccess": {
+    "description": "Info for showing the creation success."
+  },
+  "folderAddResultFailure": "无法创建文件夹。\n\n服务器返回：{details}",
+  "@folderAddResultFailure": {
+    "description": "Info for showing a folder creation error.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "无效名称"
+      }
+    }
+  },
+  "folderDeleteAction": "删除",
+  "@folderDeleteAction": {
+    "description": "Action to delete an existing folder."
+  },
+  "folderDeleteConfirmTitle": "确认",
+  "@folderDeleteConfirmTitle": {
+    "description": "Dialog title to confirm deleting a folder."
+  },
+  "folderDeleteConfirmText": "您确定要删除文件夹 {name} 吗？",
+  "@folderDeleteConfirmText": {
+    "description": "Dialog text to confirm deleting a folder.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "我的自定义文件夹"
+      }
+    }
+  },
+  "folderDeleteResultSuccess": "文件夹已删除。",
+  "@folderDeleteResultSuccess": {
+    "description": "Info for showing the creation success."
+  },
+  "folderDeleteResultFailure": "无法删除文件夹。\n\n服务器返回：{details}",
+  "@folderDeleteResultFailure": {
+    "description": "Info for showing a folder deletion error.",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "无效名称"
+      }
+    }
+  },
+  "settingsDevelopment": "开发设置",
+  "@settingsDevelopment": {
+    "description": "Settings action to specify the development options."
+  },
+  "developerModeTitle": "开发模式",
+  "@developerModeTitle": {
+    "description": "Title of the development mode section."
+  },
+  "developerModeIntroduction": "如果启用开发模式，您将能够查看邮件的源代码并将文本附件转换为邮件。",
+  "@developerModeIntroduction": {
+    "description": "Text explaining the development mode."
+  },
+  "developerModeEnable": "启用开发模式",
+  "@developerModeEnable": {
+    "description": "Text in checkbox to enable the development mode."
+  },
+  "developerShowAsEmail": "转换为邮件格式",
+  "@developerShowAsEmail": {
+    "description": "Action to convert text into an email."
+  },
+  "developerShowAsEmailFailed": "此文本无法转换为 MIME 邮件。",
+  "@developerShowAsEmailFailed": {
+    "description": "Text shown when text cannot be converted into an email."
+  },
+  "designTitle": "外观设置",
+  "@designTitle": {
+    "description": "Title of design settings screen."
+  },
+  "designSectionThemeTitle": "主题",
+  "@designSectionThemeTitle": {
+    "description": "Title of theme section on design settings screen."
+  },
+  "designThemeOptionLight": "浅色",
+  "@designThemeOptionLight": {
+    "description": "Theme option."
+  },
+  "designThemeOptionDark": "深色",
+  "@designThemeOptionDark": {
+    "description": "Theme option."
+  },
+  "designThemeOptionSystem": "系统",
+  "@designThemeOptionSystem": {
+    "description": "Theme option."
+  },
+  "designThemeOptionCustom": "自定义",
+  "@designThemeOptionCustom": {
+    "description": "Theme option."
+  },
+  "designSectionCustomTitle": "启用深色主题",
+  "@designSectionCustomTitle": {
+    "description": "Title of custom theme option section on design settings screen."
+  },
+  "designThemeCustomStart": "从 {time} 开始",
+  "@designThemeCustomStart": {
+    "description": "Start time of custom theme setting.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "晚上10点"
+      }
+    }
+  },
+  "designThemeCustomEnd": "到 {time} 结束",
+  "@designThemeCustomEnd": {
+    "description": "End time of custom theme setting.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "早上7点"
+      }
+    }
+  },
+  "designSectionColorTitle": "配色方案",
+  "@designSectionColorTitle": {
+    "description": "Title of color section on design settings screen."
+  },
+  "securitySettingsTitle": "安全",
+  "@securitySettingsTitle": {
+    "description": "Title of security settings screen."
+  },
+  "securitySettingsIntro": "根据您的个人需求调整安全设置。",
+  "@securitySettingsIntro": {
+    "description": "Introduction of security settings screen."
+  },
+  "securityUnlockWithFaceId": "使用面容 ID 解锁 Maily。",
+  "@securityUnlockWithFaceId": {
+    "description": "iOS-specific unlock reason."
+  },
+  "securityUnlockWithTouchId": "使用触控 ID 解锁 Maily。",
+  "@securityUnlockWithTouchId": {
+    "description": "iOS-specific unlock reason."
+  },
+  "securityUnlockReason": "解锁 Maily。",
+  "@securityUnlockReason": {
+    "description": "Generic unlock reason."
+  },
+  "securityUnlockDisableReason": "解锁 Maily 以关闭锁定。",
+  "@securityUnlockDisableReason": {
+    "description": "Generic unlock disable reason."
+  },
+  "securityUnlockNotAvailable": "您的设备不支持生物识别功能，可能需要先设置解锁选项。",
+  "@securityUnlockNotAvailable": {
+    "description": "Message when biometric authentication is not available."
+  },
+  "securityUnlockLabel": "锁定 Maily",
+  "@securityUnlockLabel": {
+    "description": "Label of biometric authentication lock feature."
+  },
+  "securityUnlockDescriptionTitle": "锁定 Maily",
+  "@securityUnlockDescriptionTitle": {
+    "description": "Title to explain lock feature via biometric authentication."
+  },
+  "securityUnlockDescriptionText": "您可以选择锁定对 Maily 的访问，这样即使他人访问您的设备也无法阅读您的邮件。",
+  "@securityUnlockDescriptionText": {
+    "description": "Text explaining lock feature via biometric authentication."
+  },
+  "securityLockImmediately": "立即锁定",
+  "@securityLockImmediately": {
+    "description": "Lock timing option."
+  },
+  "securityLockAfter5Minutes": "5分钟后锁定",
+  "@securityLockAfter5Minutes": {
+    "description": "Lock timing option."
+  },
+  "securityLockAfter30Minutes": "30分钟后锁定",
+  "@securityLockAfter30Minutes": {
+    "description": "Lock timing option."
+  },
+  "lockScreenTitle": "Maily 已锁定",
+  "@lockScreenTitle": {
+    "description": "Title of lock screen."
+  },
+  "lockScreenIntro": "Maily 已锁定，请验证身份以继续。",
+  "@lockScreenIntro": {
+    "description": "Text on lock screen."
+  },
+  "lockScreenUnlockAction": "解锁",
+  "@lockScreenUnlockAction": {
+    "description": "Action to unlock on lock screen."
+  },
+  "addAccountTitle": "添加账户",
+  "@addAccountTitle": {
+    "description": "Title of add account screen."
+  },
+  "addAccountEmailLabel": "邮箱",
+  "@addAccountEmailLabel": {
+    "description": "Label and section header of email address input field."
+  },
+  "addAccountEmailHint": "请输入您的邮箱地址",
+  "@addAccountEmailHint": {
+    "description": "Hint text of email address input field."
+  },
+  "addAccountResolvingSettingsLabel": "正在解析 {email} 的设置...",
+  "@addAccountResolvingSettingsLabel": {
+    "description": "Label shown while resolving the settings for the specified email address.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "addAccountResolvedSettingsWrongAction": "不在 {provider} 上？",
+  "@addAccountResolvedSettingsWrongAction": {
+    "description": "Button text shown for the user to edit server settings manually when the resolving was successful but turned out a different than expected provider name.",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "gmail"
+      }
+    }
+  },
+  "addAccountResolvingSettingsFailedInfo": "无法解析 {email}。请返回修改或手动设置账户。",
+  "@addAccountResolvingSettingsFailedInfo": {
+    "description": "Info shown after resolving the settings for the specified email address failed.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "addAccountEditManuallyAction": "手动编辑",
+  "@addAccountEditManuallyAction": {
+    "description": "Action shown after account settings could not be automatically be discovered."
+  },
+  "addAccountPasswordLabel": "密码",
+  "@addAccountPasswordLabel": {
+    "description": "Label and section header of password input field."
+  },
+  "addAccountPasswordHint": "请输入您的密码",
+  "@addAccountPasswordHint": {
+    "description": "Hint text of password input field."
+  },
+  "addAccountApplicationPasswordRequiredInfo": "此提供商要求您设置应用专用密码。",
+  "@addAccountApplicationPasswordRequiredInfo": {
+    "description": "Text shown when the provider of the email account requires app specific passwords to be set up."
+  },
+  "addAccountApplicationPasswordRequiredButton": "创建应用专用密码",
+  "@addAccountApplicationPasswordRequiredButton": {
+    "description": "Button text for setting up app specific password."
+  },
+  "addAccountApplicationPasswordRequiredAcknowledged": "我已有应用密码",
+  "@addAccountApplicationPasswordRequiredAcknowledged": {
+    "description": "Acknowledgement to be confirmed by user to acknowledge the fact that an app specific password is required."
+  },
+  "addAccountVerificationStep": "验证",
+  "@addAccountVerificationStep": {
+    "description": "Section header of verification/log in step."
+  },
+  "addAccountSetupAccountStep": "账户设置",
+  "@addAccountSetupAccountStep": {
+    "description": "Section header of account setup step."
+  },
+  "addAccountVerifyingSettingsLabel": "正在验证 {email}...",
+  "@addAccountVerifyingSettingsLabel": {
+    "description": "Info shown while the account settings for the given email are verified.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "addAccountVerifyingSuccessInfo": "已成功登录 {email}。",
+  "@addAccountVerifyingSuccessInfo": {
+    "description": "Info shown after the account settings for the given email have been verified.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "addAccountVerifyingFailedInfo": "抱歉，出现问题。请检查您的邮箱 {email} 和密码。",
+  "@addAccountVerifyingFailedInfo": {
+    "description": "Info shown after the account settings for the given email could not be verified.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "addAccountOauthOptionsText": "使用 {provider} 登录或创建应用专用密码。",
+  "@addAccountOauthOptionsText": {
+    "description": "Info shown oauth process fails and the user can try again or use an app-specific password.",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "Mailbox.org"
+      }
+    }
+  },
+  "addAccountOauthSignIn": "使用 {provider} 登录",
+  "@addAccountOauthSignIn": {
+    "description": "Label of button to sign in via oauth with the given provider.",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "Mailbox.org"
+      }
+    }
+  },
+  "addAccountOauthSignInGoogle": "使用 Google 登录",
+  "@addAccountOauthSignInGoogle": {
+    "description": "Label of button to sign in via oauth with the Google."
+  },
+  "addAccountOauthSignInWithAppPassword": "或者，创建应用密码进行登录。",
+  "@addAccountOauthSignInWithAppPassword": {
+    "description": "Info to set up app specific password."
+  },
+  "accountAddImapAccessSetupMightBeRequired": "您的提供商可能要求您手动设置电子邮件应用的访问权限。",
+  "@accountAddImapAccessSetupMightBeRequired": {
+    "description": "Info shown when login fails for a provider that is know to require manual activation of IMAP access."
+  },
+  "addAccountSetupImapAccessButtonLabel": "设置邮箱访问权限",
+  "@addAccountSetupImapAccessButtonLabel": {
+    "description": "Label of button to launch website with instructions."
+  },
+  "addAccountNameOfUserLabel": "您的姓名",
+  "@addAccountNameOfUserLabel": {
+    "description": "Label for user name input field."
+  },
+  "addAccountNameOfUserHint": "收件人将看到的姓名",
+  "@addAccountNameOfUserHint": {
+    "description": "Hint for user name input field."
+  },
+  "addAccountNameOfAccountLabel": "账户名称",
+  "@addAccountNameOfAccountLabel": {
+    "description": "Label for account name input field."
+  },
+  "addAccountNameOfAccountHint": "请输入您的账户名称",
+  "@addAccountNameOfAccountHint": {
+    "description": "Hint for account name input field."
+  },
+  "editAccountTitle": "编辑 {name}",
+  "@editAccountTitle": {
+    "description": "Title for screen when editing the account with the given name.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountFailureToConnectInfo": "Maily 无法连接到 {name}。",
+  "@editAccountFailureToConnectInfo": {
+    "description": "Info about not being able to connect to the named service. Most common causes are temporary network problems or a changed password.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountFailureToConnectRetryAction": "重试",
+  "@editAccountFailureToConnectRetryAction": {
+    "description": "Action to retry connecting to service again."
+  },
+  "editAccountFailureToConnectChangePasswordAction": "修改密码",
+  "@editAccountFailureToConnectChangePasswordAction": {
+    "description": "Action to change password for the service."
+  },
+  "editAccountFailureToConnectFixedTitle": "已连接",
+  "@editAccountFailureToConnectFixedTitle": {
+    "description": "Title of dialog shown after successfully connecting a failed account again."
+  },
+  "editAccountFailureToConnectFixedInfo": "账户已重新连接。",
+  "@editAccountFailureToConnectFixedInfo": {
+    "description": "Message of dialog shown after successfully connecting a failed account again."
+  },
+  "editAccountIncludeInUnifiedLabel": "包含在统一账户中",
+  "@editAccountIncludeInUnifiedLabel": {
+    "description": "Label for opting this account in/out of the unified account."
+  },
+  "editAccountAliasLabel": "{email} 的别名邮箱地址：",
+  "@editAccountAliasLabel": {
+    "description": "Label for any alias addresses that have been specified for the given email address.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "editAccountNoAliasesInfo": "此账户暂无已知别名。",
+  "@editAccountNoAliasesInfo": {
+    "description": "Info when there have been no aliases specified for this account."
+  },
+  "editAccountAliasRemoved": "{email} 别名已移除",
+  "@editAccountAliasRemoved": {
+    "description": "Info given after an alias was removed.",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "someone@domain.com"
+      }
+    }
+  },
+  "editAccountAddAliasAction": "添加别名",
+  "@editAccountAddAliasAction": {
+    "description": "Button text for adding an alias to this account."
+  },
+  "editAccountPlusAliasesSupported": "支持 + 别名",
+  "@editAccountPlusAliasesSupported": {
+    "description": "Info shown when + aliases are supported by this account."
+  },
+  "editAccountCheckPlusAliasAction": "测试 + 别名支持",
+  "@editAccountCheckPlusAliasAction": {
+    "description": "Button text for testing of + aliases are supported by this account."
+  },
+  "editAccountBccMyself": "密送自己",
+  "@editAccountBccMyself": {
+    "description": "Label of checkbox to enable the BCC-MYSELF-Feature."
+  },
+  "editAccountBccMyselfDescriptionTitle": "密送自己",
+  "@editAccountBccMyselfDescriptionTitle": {
+    "description": "Title of alert explaining the BCC-MYSELF-Feature."
+  },
+  "editAccountBccMyselfDescriptionText": "您可以使用\"密送自己\"功能，自动在您从此账户发送的每封邮件中密送一份给自己。通常这不太必要，因为所有外发邮件都会存储在\"已发送\"文件夹中。",
+  "@editAccountBccMyselfDescriptionText": {
+    "description": "Explanation of the the BCC-MYSELF-Feature."
+  },
+  "editAccountServerSettingsAction": "编辑服务器设置",
+  "@editAccountServerSettingsAction": {
+    "description": "Button text for editing the server settings of this account."
+  },
+  "editAccountDeleteAccountAction": "删除账户",
+  "@editAccountDeleteAccountAction": {
+    "description": "Button text for deleting this account."
+  },
+  "editAccountDeleteAccountConfirmationTitle": "确认",
+  "@editAccountDeleteAccountConfirmationTitle": {
+    "description": "Title for confirmation dialog when deleting this account."
+  },
+  "editAccountDeleteAccountConfirmationQuery": "您确定要删除账户 {name} 吗？",
+  "@editAccountDeleteAccountConfirmationQuery": {
+    "description": "Request to confirm when deleting this account.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountTestPlusAliasTitle": "{name} 的 + 别名",
+  "@editAccountTestPlusAliasTitle": {
+    "description": "Title for dialog shown while testing + alias support",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountTestPlusAliasStepIntroductionTitle": "介绍",
+  "@editAccountTestPlusAliasStepIntroductionTitle": {
+    "description": "Title for introducing concept of + aliases."
+  },
+  "editAccountTestPlusAliasStepIntroductionText": "您的账户 {accountName} 可能支持所谓的 + 别名，如 {example}。\n+ 别名可帮助您保护身份并抵御垃圾邮件。\n要测试此项，将向生成的地址发送一封测试邮件。如果邮件到达，说明您的提供商支持 + 别名，您可以在撰写新邮件时按需生成它们。",
+  "@editAccountTestPlusAliasStepIntroductionText": {
+    "description": "Introduction text for explaining the concept of + aliases.",
+    "placeholders": {
+      "accountName": {
+        "type": "String",
+        "example": "domain.com"
+      },
+      "example": {
+        "type": "String",
+        "example": "someone+example@domain.com"
+      }
+    }
+  },
+  "editAccountTestPlusAliasStepTestingTitle": "测试中",
+  "@editAccountTestPlusAliasStepTestingTitle": {
+    "description": "Title while testing concept of + aliases."
+  },
+  "editAccountTestPlusAliasStepResultTitle": "结果",
+  "@editAccountTestPlusAliasStepResultTitle": {
+    "description": "Title after testing concept of + aliases."
+  },
+  "editAccountTestPlusAliasStepResultSuccess": "您的账户 {name} 支持 + 别名。",
+  "@editAccountTestPlusAliasStepResultSuccess": {
+    "description": "Result when account supports + aliases",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountTestPlusAliasStepResultNoSuccess": "您的账户 {name} 不支持 + 别名。",
+  "@editAccountTestPlusAliasStepResultNoSuccess": {
+    "description": "Result when account does not supports + aliases",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "editAccountAddAliasTitle": "添加别名",
+  "@editAccountAddAliasTitle": {
+    "description": "Title when adding new alias."
+  },
+  "editAccountEditAliasTitle": "编辑别名",
+  "@editAccountEditAliasTitle": {
+    "description": "Title when editing alias."
+  },
+  "editAccountAliasAddAction": "添加",
+  "@editAccountAliasAddAction": {
+    "description": "Action when adding new alias."
+  },
+  "editAccountAliasUpdateAction": "更新",
+  "@editAccountAliasUpdateAction": {
+    "description": "Action when editing alias."
+  },
+  "editAccountEditAliasNameLabel": "别名名称",
+  "@editAccountEditAliasNameLabel": {
+    "description": "Label for alias name input field."
+  },
+  "editAccountEditAliasEmailLabel": "别名邮箱",
+  "@editAccountEditAliasEmailLabel": {
+    "description": "Label for alias email input field."
+  },
+  "editAccountEditAliasEmailHint": "您的别名邮箱地址",
+  "@editAccountEditAliasEmailHint": {
+    "description": "Hint for alias email input field."
+  },
+  "editAccountEditAliasDuplicateError": "{email} 已存在别名。",
+  "@editAccountEditAliasDuplicateError": {
+    "description": "Error when the alias email is already known",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "you@domain.com"
+      }
+    }
+  },
+  "editAccountEnableLogging": "启用日志",
+  "@editAccountEnableLogging": {
+    "description": "Label developer mode option to enable logging."
+  },
+  "editAccountLoggingEnabled": "日志已启用，请重启",
+  "@editAccountLoggingEnabled": {
+    "description": "Short message shown after the log has been enabled."
+  },
+  "editAccountLoggingDisabled": "日志已禁用，请重启",
+  "@editAccountLoggingDisabled": {
+    "description": "Short message shown after the log has been disabled."
+  },
+  "accountDetailsFallbackTitle": "服务器设置",
+  "@accountDetailsFallbackTitle": {
+    "description": "Title shown when account name is not set."
+  },
+  "errorTitle": "错误",
+  "@errorTitle": {
+    "description": "Title for error dialogs."
+  },
+  "accountProviderStepTitle": "电子邮件服务提供商",
+  "@accountProviderStepTitle": {
+    "description": "Step to select a provider."
+  },
+  "accountProviderCustom": "其他电子邮件服务",
+  "@accountProviderCustom": {
+    "description": "When no standard provider is chosen."
+  },
+  "accountDetailsErrorHostProblem": "Maily 无法连接到指定的邮件服务器。请检查您的传入服务器设置 \"{incomingHost}\" 和传出服务器设置 \"{outgoingHost}\"。",
+  "@accountDetailsErrorHostProblem": {
+    "description": "Error details when no connection to server could be established at all",
+    "placeholders": {
+      "incomingHost": {
+        "type": "String",
+        "example": "imap@domain.com"
+      },
+      "outgoingHost": {
+        "type": "String",
+        "example": "smtp@domain.com"
+      }
+    }
+  },
+  "accountDetailsErrorLoginProblem": "无法登录。请检查您的用户名 \"{userName}\" 和密码 \"{password}\"。",
+  "@accountDetailsErrorLoginProblem": {
+    "description": "Error details when login fails",
+    "placeholders": {
+      "userName": {
+        "type": "String",
+        "example": "email@domain.com"
+      },
+      "password": {
+        "type": "String",
+        "example": "secret"
+      }
+    }
+  },
+  "accountDetailsUserNameLabel": "登录名",
+  "@accountDetailsUserNameLabel": {
+    "description": "Label for user name input field."
+  },
+  "accountDetailsUserNameHint": "您的用户名（如与邮箱不同）",
+  "@accountDetailsUserNameHint": {
+    "description": "Hint for user name input field."
+  },
+  "accountDetailsPasswordLabel": "登录密码",
+  "@accountDetailsPasswordLabel": {
+    "description": "Label for password input field."
+  },
+  "accountDetailsPasswordHint": "您的密码",
+  "@accountDetailsPasswordHint": {
+    "description": "Hint for user password input field."
+  },
+  "accountDetailsBaseSectionTitle": "基础设置",
+  "@accountDetailsBaseSectionTitle": {
+    "description": "Title of base settings section."
+  },
+  "accountDetailsIncomingLabel": "传入服务器",
+  "@accountDetailsIncomingLabel": {
+    "description": "Label for incoming server domain field."
+  },
+  "accountDetailsIncomingHint": "域名，如 imap.domain.com",
+  "@accountDetailsIncomingHint": {
+    "description": "Hint for incoming server domain field."
+  },
+  "accountDetailsOutgoingLabel": "传出服务器",
+  "@accountDetailsOutgoingLabel": {
+    "description": "Label for outgoing server domain field."
+  },
+  "accountDetailsOutgoingHint": "域名，如 smtp.domain.com",
+  "@accountDetailsOutgoingHint": {
+    "description": "Hint for outgoing server domain field."
+  },
+  "accountDetailsAdvancedIncomingSectionTitle": "高级传入设置",
+  "@accountDetailsAdvancedIncomingSectionTitle": {
+    "description": "Title of incoming settings section."
+  },
+  "accountDetailsIncomingServerTypeLabel": "传入类型：",
+  "@accountDetailsIncomingServerTypeLabel": {
+    "description": "Label for server type dropdown."
+  },
+  "accountDetailsOptionAutomatic": "自动",
+  "@accountDetailsOptionAutomatic": {
+    "description": "Option when the server type/security should be discovered automatically."
+  },
+  "accountDetailsIncomingSecurityLabel": "传入安全：",
+  "@accountDetailsIncomingSecurityLabel": {
+    "description": "Label for server security dropdown."
+  },
+  "accountDetailsSecurityOptionNone": "明文（无加密）",
+  "@accountDetailsSecurityOptionNone": {
+    "description": "Label for security dropdown option without encryption."
+  },
+  "accountDetailsIncomingPortLabel": "传入端口",
+  "@accountDetailsIncomingPortLabel": {
+    "description": "Label for incoming port input field."
+  },
+  "accountDetailsPortHint": "留空以自动确定",
+  "@accountDetailsPortHint": {
+    "description": "Hint for port input fields."
+  },
+  "accountDetailsIncomingUserNameLabel": "传入用户名",
+  "@accountDetailsIncomingUserNameLabel": {
+    "description": "Label for incoming user name input field."
+  },
+  "accountDetailsAlternativeUserNameHint": "您的用户名（如与上方不同）",
+  "@accountDetailsAlternativeUserNameHint": {
+    "description": "Label for alternative user name input fields."
+  },
+  "accountDetailsIncomingPasswordLabel": "传入密码",
+  "@accountDetailsIncomingPasswordLabel": {
+    "description": "Label for incoming password input field."
+  },
+  "accountDetailsAlternativePasswordHint": "您的密码（如与上方不同）",
+  "@accountDetailsAlternativePasswordHint": {
+    "description": "Label for alternative user name input fields."
+  },
+  "accountDetailsAdvancedOutgoingSectionTitle": "高级传出设置",
+  "@accountDetailsAdvancedOutgoingSectionTitle": {
+    "description": "Title of incoming settings section."
+  },
+  "accountDetailsOutgoingServerTypeLabel": "传出类型：",
+  "@accountDetailsOutgoingServerTypeLabel": {
+    "description": "Label for server type dropdown."
+  },
+  "accountDetailsOutgoingSecurityLabel": "传出安全：",
+  "@accountDetailsOutgoingSecurityLabel": {
+    "description": "Label for server security dropdown."
+  },
+  "accountDetailsOutgoingPortLabel": "传出端口",
+  "@accountDetailsOutgoingPortLabel": {
+    "description": "Label for outgoing port input field."
+  },
+  "accountDetailsOutgoingUserNameLabel": "传出用户名",
+  "@accountDetailsOutgoingUserNameLabel": {
+    "description": "Label for outgoing user name input field."
+  },
+  "accountDetailsOutgoingPasswordLabel": "传出密码",
+  "@accountDetailsOutgoingPasswordLabel": {
+    "description": "Label for outgoing password input field."
+  },
+  "composeTitleNew": "新建邮件",
+  "@composeTitleNew": {
+    "description": "Title for compose screen when a new message is created."
+  },
+  "composeTitleForward": "转发",
+  "@composeTitleForward": {
+    "description": "Title for compose screen when a message is forwarded."
+  },
+  "composeTitleReply": "回复",
+  "@composeTitleReply": {
+    "description": "Title for compose screen when a message is replied."
+  },
+  "composeEmptyMessage": "空邮件",
+  "@composeEmptyMessage": {
+    "description": "Message text for message without text."
+  },
+  "composeWarningNoSubject": "您尚未指定主题。确定要发送无主题的邮件吗？",
+  "@composeWarningNoSubject": {
+    "description": "Warning shown when trying to send a message without subject."
+  },
+  "composeActionSentWithoutSubject": "发送",
+  "@composeActionSentWithoutSubject": {
+    "description": "Action to send message without subject."
+  },
+  "composeMailSendSuccess": "邮件已发送 😊",
+  "@composeMailSendSuccess": {
+    "description": "Notification shown after a mail was sent successfully."
+  },
+  "composeSendErrorInfo": "抱歉，您的邮件无法发送。收到以下错误：\n{details}。",
+  "@composeSendErrorInfo": {
+    "description": "Error shown when email could not be send",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "554-Reject due to policy restrictions."
+      }
+    }
+  },
+  "composeRequestReadReceiptAction": "请求已读回执",
+  "@composeRequestReadReceiptAction": {
+    "description": "Action to request a read receipt for this message"
+  },
+  "composeSaveDraftAction": "保存为草稿",
+  "@composeSaveDraftAction": {
+    "description": "Action to save a message as draft"
+  },
+  "composeMessageSavedAsDraft": "草稿已保存",
+  "@composeMessageSavedAsDraft": {
+    "description": "Info shown when message was saved as draft successfully"
+  },
+  "composeMessageSavedAsDraftErrorInfo": "您的草稿无法保存，错误如下：\n{details}",
+  "@composeMessageSavedAsDraftErrorInfo": {
+    "description": "Info shown when message could not be saved as a draft",
+    "placeholders": {
+      "details": {
+        "type": "String",
+        "example": "Invalid header: XX"
+      }
+    }
+  },
+  "composeConvertToPlainTextEditorAction": "转换为纯文本",
+  "@composeConvertToPlainTextEditorAction": {
+    "description": "Action to write a plain text message instead of an html message"
+  },
+  "composeConvertToHtmlEditorAction": "转换为富文本（HTML）",
+  "@composeConvertToHtmlEditorAction": {
+    "description": "Action to write a HTML message instead of a text message"
+  },
+  "composeContinueEditingAction": "继续编辑",
+  "@composeContinueEditingAction": {
+    "description": "Action to return to compose screen when draft cannot be saved"
+  },
+  "composeCreatePlusAliasAction": "创建新的 + 别名...",
+  "@composeCreatePlusAliasAction": {
+    "description": "Action to create a new + alias as a sender"
+  },
+  "composeSenderHint": "发件人",
+  "@composeSenderHint": {
+    "description": "Hint for From input field"
+  },
+  "composeRecipientHint": "收件人邮箱",
+  "@composeRecipientHint": {
+    "description": "Hint for To input field"
+  },
+  "composeSubjectLabel": "主题",
+  "@composeSubjectLabel": {
+    "description": "Label for Subject input field"
+  },
+  "composeSubjectHint": "邮件主题",
+  "@composeSubjectHint": {
+    "description": "Hint for Subject input field"
+  },
+  "composeAddAttachmentAction": "添加",
+  "@composeAddAttachmentAction": {
+    "description": "Action to add an attachment - should be short!"
+  },
+  "composeRemoveAttachmentAction": "移除 {name}",
+  "@composeRemoveAttachmentAction": {
+    "description": "Action to remove an attachment",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "funny.png"
+      }
+    }
+  },
+  "composeLeftByMistake": "误离开？",
+  "@composeLeftByMistake": {
+    "description": "Info shown after leaving compose screen to allow an easy return"
+  },
+  "attachTypeFile": "文件",
+  "@attachTypeFile": {
+    "description": "Attachment type to add"
+  },
+  "attachTypePhoto": "照片",
+  "@attachTypePhoto": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeVideo": "视频",
+  "@attachTypeVideo": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeAudio": "音频",
+  "@attachTypeAudio": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeLocation": "位置",
+  "@attachTypeLocation": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeGif": "动图",
+  "@attachTypeGif": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeGifSearch": "搜索 GIPHY",
+  "@attachTypeGifSearch": {
+    "description": "Text for searching in GIPHY service for GIF"
+  },
+  "attachTypeSticker": "贴纸",
+  "@attachTypeSticker": {
+    "description": "Attachment type to add"
+  },
+  "attachTypeStickerSearch": "搜索 GIPHY",
+  "@attachTypeStickerSearch": {
+    "description": "Text for searching in GIPHY service for sticker"
+  },
+  "attachTypeAppointment": "日程",
+  "@attachTypeAppointment": {
+    "description": "Attachment type to add"
+  },
+  "languageSettingTitle": "语言",
+  "@languageSettingTitle": {
+    "description": "Title of language setting screen"
+  },
+  "languageSettingLabel": "选择 Maily 的语言：",
+  "@languageSettingLabel": {
+    "description": "Label for language setting dropdown screen"
+  },
+  "languageSettingSystemOption": "系统语言",
+  "@languageSettingSystemOption": {
+    "description": "Option to use the system's settings"
+  },
+  "languageSettingConfirmationTitle": "使用中文作为 Maily 语言？",
+  "@languageSettingConfirmationTitle": {
+    "description": "Title of dialog to confirm when switching the language"
+  },
+  "languageSettingConfirmationQuery": "请确认使用中文作为您选择的语言。",
+  "@languageSettingConfirmationQuery": {
+    "description": "Query to be confirmed by user when switching the language"
+  },
+  "languageSetInfo": "Maily 现在显示为中文。",
+  "@languageSetInfo": {
+    "description": "Info text after having specified the language."
+  },
+  "languageSystemSetInfo": "Maily 将使用系统语言，如果系统语言不支持则使用英语。",
+  "@languageSystemSetInfo": {
+    "description": "Info text after choosing the system's language for Maily."
+  },
+  "swipeSettingTitle": "滑动手势",
+  "@swipeSettingTitle": {
+    "description": "Title of swipe setting screen"
+  },
+  "swipeSettingLeftToRightLabel": "从左向右滑动",
+  "@swipeSettingLeftToRightLabel": {
+    "description": "Label for swipe gesture"
+  },
+  "swipeSettingRightToLeftLabel": "从右向左滑动",
+  "@swipeSettingRightToLeftLabel": {
+    "description": "Label for swipe gesture"
+  },
+  "swipeSettingChangeAction": "更改",
+  "@swipeSettingChangeAction": {
+    "description": "Action for changing a swipe gesture"
+  },
+  "signatureSettingsTitle": "签名",
+  "@signatureSettingsTitle": {
+    "description": "Title of signature setting screen"
+  },
+  "signatureSettingsComposeActionsInfo": "为以下邮件类型启用签名：",
+  "@signatureSettingsComposeActionsInfo": {
+    "description": "Text before selecting message types for a signature (new, forward, reply)."
+  },
+  "signatureSettingsAccountInfo": "您可以在账户设置中指定特定账户的签名。",
+  "@signatureSettingsAccountInfo": {
+    "description": "Informational text before showing link to account settings."
+  },
+  "signatureSettingsAddForAccount": "为 {account} 添加签名",
+  "@signatureSettingsAddForAccount": {
+    "description": "Action to add account specific signature.",
+    "placeholders": {
+      "account": {
+        "type": "String",
+        "example": "domain.com"
+      }
+    }
+  },
+  "defaultSenderSettingsTitle": "默认发件人",
+  "@defaultSenderSettingsTitle": {
+    "description": "Title of default sender setting screen"
+  },
+  "defaultSenderSettingsLabel": "选择新邮件的发件人。",
+  "@defaultSenderSettingsLabel": {
+    "description": "Description of default sender setting screen"
+  },
+  "defaultSenderSettingsFirstAccount": "第一个账户 ({email})",
+  "@defaultSenderSettingsFirstAccount": {
+    "description": "The default sender is the one from the first account",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "email@domain.com"
+      }
+    }
+  },
+  "defaultSenderSettingsAliasInfo": "您可以在 [AS] 中设置邮箱别名地址。",
+  "@defaultSenderSettingsAliasInfo": {
+    "description": "Info about that email aliases can be set up in the account settings. [AS] is the place, where defaultSenderSettingsAliasAccountSettings is included as a link."
+  },
+  "defaultSenderSettingsAliasAccountSettings": "账户设置",
+  "@defaultSenderSettingsAliasAccountSettings": {
+    "description": "Text of the account settings link."
+  },
+  "replySettingsTitle": "邮件格式",
+  "@replySettingsTitle": {
+    "description": "Reply settings title."
+  },
+  "replySettingsIntro": "默认情况下，您希望以什么格式回复或转发邮件？",
+  "@replySettingsIntro": {
+    "description": "Reply settings introduction text."
+  },
+  "replySettingsFormatHtml": "始终使用富格式（HTML）",
+  "@replySettingsFormatHtml": {
+    "description": "Reply settings option."
+  },
+  "replySettingsFormatSameAsOriginal": "使用与原始邮件相同的格式",
+  "@replySettingsFormatSameAsOriginal": {
+    "description": "Reply settings option."
+  },
+  "replySettingsFormatPlainText": "始终使用纯文本",
+  "@replySettingsFormatPlainText": {
+    "description": "Reply settings option."
+  },
+  "moveTitle": "移动邮件",
+  "@moveTitle": {
+    "description": "Title of move to mailbox dialog."
+  },
+  "moveSuccess": "邮件已移至 {mailbox}。",
+  "@moveSuccess": {
+    "description": "Message after moving message successfully.",
+    "placeholders": {
+      "mailbox": {
+        "type": "String",
+        "example": "收件箱"
+      }
+    }
+  },
+  "editorArtInputLabel": "您的输入",
+  "@editorArtInputLabel": {
+    "description": "Label of input field when inserting a formatted text"
+  },
+  "editorArtInputHint": "在此输入文本",
+  "@editorArtInputHint": {
+    "description": "Hint of input field when inserting a formatted text"
+  },
+  "editorArtWaitingForInputHint": "等待输入...",
+  "@editorArtWaitingForInputHint": {
+    "description": "Text shown while waiting for input"
+  },
+  "fontSerifBold": "衬线粗体",
+  "@fontSerifBold": {
+    "description": "Font name"
+  },
+  "fontSerifItalic": "衬线斜体",
+  "@fontSerifItalic": {
+    "description": "Font name"
+  },
+  "fontSerifBoldItalic": "衬线粗斜体",
+  "@fontSerifBoldItalic": {
+    "description": "Font name"
+  },
+  "fontSans": "无衬线",
+  "@fontSans": {
+    "description": "Font name"
+  },
+  "fontSansBold": "无衬线粗体",
+  "@fontSansBold": {
+    "description": "Font name"
+  },
+  "fontSansItalic": "无衬线斜体",
+  "@fontSansItalic": {
+    "description": "Font name"
+  },
+  "fontSansBoldItalic": "无衬线粗斜体",
+  "@fontSansBoldItalic": {
+    "description": "Font name"
+  },
+  "fontScript": "手写体",
+  "@fontScript": {
+    "description": "Font name"
+  },
+  "fontScriptBold": "手写体粗体",
+  "@fontScriptBold": {
+    "description": "Font name"
+  },
+  "fontFraktur": "德文花体",
+  "@fontFraktur": {
+    "description": "Font name"
+  },
+  "fontFrakturBold": "德文花体粗体",
+  "@fontFrakturBold": {
+    "description": "Font name"
+  },
+  "fontMonospace": "等宽",
+  "@fontMonospace": {
+    "description": "Font name"
+  },
+  "fontFullwidth": "全角",
+  "@fontFullwidth": {
+    "description": "Font name"
+  },
+  "fontDoublestruck": "双线体",
+  "@fontDoublestruck": {
+    "description": "Font name"
+  },
+  "fontCapitalized": "大写",
+  "@fontCapitalized": {
+    "description": "Font name"
+  },
+  "fontCircled": "圆圈",
+  "@fontCircled": {
+    "description": "Font name"
+  },
+  "fontParenthesized": "括号",
+  "@fontParenthesized": {
+    "description": "Font name"
+  },
+  "fontUnderlinedSingle": "下划线",
+  "@fontUnderlinedSingle": {
+    "description": "Font name"
+  },
+  "fontUnderlinedDouble": "双下划线",
+  "@fontUnderlinedDouble": {
+    "description": "Font name"
+  },
+  "fontStrikethroughSingle": "删除线",
+  "@fontStrikethroughSingle": {
+    "description": "Font name"
+  },
+  "fontStrikethroughDouble": "双删除线",
+  "@fontStrikethroughDouble": {
+    "description": "Font name"
+  },
+  "fontSubscript": "下标",
+  "@fontSubscript": {
+    "description": "Font name"
+  },
+  "fontSuperscript": "上标",
+  "@fontSuperscript": {
+    "description": "Font name"
+  },
+  "fontSmallcaps": "小型大写",
+  "@fontSmallcaps": {
+    "description": "Font name"
+  },
+  "fontSmallcapsBold": "小型大写粗体",
+  "@fontSmallcapsBold": {
+    "description": "Font name"
+  },
+  "fontItalic": "斜体",
+  "@fontItalic": {
+    "description": "Font name"
+  },
+  "fontBold": "粗体",
+  "@fontBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalic": "粗斜体",
+  "@fontBoldItalic": {
+    "description": "Font name"
+  },
+  "fontSerif": "衬线",
+  "@fontSerif": {
+    "description": "Font name"
+  },
+  "fontBoldFraktur": "粗体德文花体",
+  "@fontBoldFraktur": {
+    "description": "Font name"
+  },
+  "fontBoldScript": "粗体手写体",
+  "@fontBoldScript": {
+    "description": "Font name"
+  },
+  "fontBoldSans": "粗体无衬线",
+  "@fontBoldSans": {
+    "description": "Font name"
+  },
+  "fontBoldSerif": "粗体衬线",
+  "@fontBoldSerif": {
+    "description": "Font name"
+  },
+  "fontBoldMonospace": "粗体等宽",
+  "@fontBoldMonospace": {
+    "description": "Font name"
+  },
+  "fontBoldSmallcaps": "粗体小型大写",
+  "@fontBoldSmallcaps": {
+    "description": "Font name"
+  },
+  "fontBoldStrikethrough": "粗体删除线",
+  "@fontBoldStrikethrough": {
+    "description": "Font name"
+  },
+  "fontBoldUnderline": "粗体下划线",
+  "@fontBoldUnderline": {
+    "description": "Font name"
+  },
+  "fontBoldUnderlineDouble": "粗体双下划线",
+  "@fontBoldUnderlineDouble": {
+    "description": "Font name"
+  },
+  "fontBoldItalicUnderline": "粗斜体下划线",
+  "@fontBoldItalicUnderline": {
+    "description": "Font name"
+  },
+  "fontBoldItalicUnderlineDouble": "粗斜体双下划线",
+  "@fontBoldItalicUnderlineDouble": {
+    "description": "Font name"
+  },
+  "fontBoldStrikethroughDouble": "粗体双删除线",
+  "@fontBoldStrikethroughDouble": {
+    "description": "Font name"
+  },
+  "fontBoldItalicStrikethrough": "粗斜体删除线",
+  "@fontBoldItalicStrikethrough": {
+    "description": "Font name"
+  },
+  "fontBoldItalicStrikethroughDouble": "粗斜体双删除线",
+  "@fontBoldItalicStrikethroughDouble": {
+    "description": "Font name"
+  },
+  "fontBoldSmallcapsBold": "粗体小型大写粗体",
+  "@fontBoldSmallcapsBold": {
+    "description": "Font name"
+  },
+  "fontBoldScriptBold": "粗体手写体粗体",
+  "@fontBoldScriptBold": {
+    "description": "Font name"
+  },
+  "fontBoldFrakturBold": "粗体德文花体粗体",
+  "@fontBoldFrakturBold": {
+    "description": "Font name"
+  },
+  "fontBoldMonospaceBold": "粗体等宽粗体",
+  "@fontBoldMonospaceBold": {
+    "description": "Font name"
+  },
+  "fontBoldSerifBold": "粗体衬线粗体",
+  "@fontBoldSerifBold": {
+    "description": "Font name"
+  },
+  "fontBoldSansBold": "粗体无衬线粗体",
+  "@fontBoldSansBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalicBold": "粗斜体粗体",
+  "@fontBoldItalicBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalicBoldItalic": "粗斜体粗斜体",
+  "@fontBoldItalicBoldItalic": {
+    "description": "Font name"
+  },
+  "fontBoldSerifBoldItalic": "粗体衬线粗斜体",
+  "@fontBoldSerifBoldItalic": {
+    "description": "Font name"
+  },
+  "fontBoldSansBoldItalic": "粗体无衬线粗斜体",
+  "@fontBoldSansBoldItalic": {
+    "description": "Font name"
+  },
+  "fontBoldScriptBoldItalic": "粗体手写体粗斜体",
+  "@fontBoldScriptBoldItalic": {
+    "description": "Font name"
+  },
+  "fontBoldFrakturBoldItalic": "粗体德文花体粗斜体",
+  "@fontBoldFrakturBoldItalic": {
+    "description": "Font name"
+  },
+  "fontBoldMonospaceBoldItalic": "粗体等宽粗斜体",
+  "@fontBoldMonospaceBoldItalic": {
+    "description": "Font name"
+  },
+  "fontBoldSmallcapsBoldItalic": "粗体小型大写粗斜体",
+  "@fontBoldSmallcapsBoldItalic": {
+    "description": "Font name"
+  },
+  "fontBoldStrikethroughBold": "粗体删除线粗体",
+  "@fontBoldStrikethroughBold": {
+    "description": "Font name"
+  },
+  "fontBoldStrikethroughDoubleBold": "粗体双删除线粗体",
+  "@fontBoldStrikethroughDoubleBold": {
+    "description": "Font name"
+  },
+  "fontBoldUnderlineBold": "粗体下划线粗体",
+  "@fontBoldUnderlineBold": {
+    "description": "Font name"
+  },
+  "fontBoldUnderlineDoubleBold": "粗体双下划线粗体",
+  "@fontBoldUnderlineDoubleBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalicUnderlineBold": "粗斜体下划线粗体",
+  "@fontBoldItalicUnderlineBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalicUnderlineDoubleBold": "粗斜体双下划线粗体",
+  "@fontBoldItalicUnderlineDoubleBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalicStrikethroughBold": "粗斜体删除线粗体",
+  "@fontBoldItalicStrikethroughBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalicStrikethroughDoubleBold": "粗斜体双删除线粗体",
+  "@fontBoldItalicStrikethroughDoubleBold": {
+    "description": "Font name"
+  },
+  "fontBoldSerifBoldBold": "粗体衬线粗体粗体",
+  "@fontBoldSerifBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldSansBoldBold": "粗体无衬线粗体粗体",
+  "@fontBoldSansBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldScriptBoldBold": "粗体手写体粗体粗体",
+  "@fontBoldScriptBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldFrakturBoldBold": "粗体德文花体粗体粗体",
+  "@fontBoldFrakturBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldMonospaceBoldBold": "粗体等宽粗体粗体",
+  "@fontBoldMonospaceBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldSmallcapsBoldBold": "粗体小型大写粗体粗体",
+  "@fontBoldSmallcapsBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldStrikethroughBoldBold": "粗体删除线粗体粗体",
+  "@fontBoldStrikethroughBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldStrikethroughDoubleBoldBold": "粗体双删除线粗体粗体",
+  "@fontBoldStrikethroughDoubleBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldUnderlineBoldBold": "粗体下划线粗体粗体",
+  "@fontBoldUnderlineBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldUnderlineDoubleBoldBold": "粗体双下划线粗体粗体",
+  "@fontBoldUnderlineDoubleBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalicUnderlineBoldBold": "粗斜体下划线粗体粗体",
+  "@fontBoldItalicUnderlineBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalicUnderlineDoubleBoldBold": "粗斜体双下划线粗体粗体",
+  "@fontBoldItalicUnderlineDoubleBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalicStrikethroughBoldBold": "粗斜体删除线粗体粗体",
+  "@fontBoldItalicStrikethroughBoldBold": {
+    "description": "Font name"
+  },
+  "fontBoldItalicStrikethroughDoubleBoldBold": "粗斜体双删除线粗体粗体",
+  "@fontBoldItalicStrikethroughDoubleBoldBold": {
+    "description": "Font name"
+  }
+}

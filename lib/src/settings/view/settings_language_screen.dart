@@ -20,16 +20,14 @@ class SettingsLanguageScreen extends HookConsumerWidget {
       'de': 'deutsch',
       'en': 'English',
       'es': 'español',
+      'zh': '中文',
     };
     final available = AppLocalizations.supportedLocales
         .map(
           (locale) => _Language(locale, displayNames[locale.toLanguageTag()]),
         )
         .toList();
-    final systemLanguage = _Language(
-      null,
-      ref.text.designThemeOptionSystem,
-    );
+    final systemLanguage = _Language(null, ref.text.designThemeOptionSystem);
 
     final languages = [systemLanguage, ...available];
     final languageTag = ref.watch(
@@ -37,8 +35,9 @@ class SettingsLanguageScreen extends HookConsumerWidget {
     );
     final _Language? selectedLanguage;
     selectedLanguage = languageTag != null
-        ? available
-            .firstWhereOrNull((l) => l.locale?.toLanguageTag() == languageTag)
+        ? available.firstWhereOrNull(
+            (l) => l.locale?.toLanguageTag() == languageTag,
+          )
         : systemLanguage;
 
     final theme = Theme.of(context);
@@ -75,32 +74,35 @@ class SettingsLanguageScreen extends HookConsumerWidget {
                       return;
                     }
 
-                    final selectedLocalizations =
-                        await AppLocalizations.delegate.load(locale);
+                    final selectedLocalizations = await AppLocalizations
+                        .delegate
+                        .load(locale);
                     selectedLocalizationsState.value = selectedLocalizations;
                     if (context.mounted) {
                       final confirmed =
                           await LocalizedDialogHelper.showTextDialog(
-                        ref,
-                        selectedLocalizations.languageSettingConfirmationTitle,
-                        selectedLocalizations.languageSettingConfirmationQuery,
-                        actions: [
-                          PlatformTextButton(
-                            child: Text(
-                              selectedLocalizations.actionCancel,
-                            ),
-                            onPressed: () => context.pop(false),
-                          ),
-                          PlatformTextButton(
-                            child: Text(selectedLocalizations.actionOk),
-                            onPressed: () => context.pop(true),
-                          ),
-                        ],
-                      );
+                            ref,
+                            selectedLocalizations
+                                .languageSettingConfirmationTitle,
+                            selectedLocalizations
+                                .languageSettingConfirmationQuery,
+                            actions: [
+                              PlatformTextButton(
+                                child: Text(selectedLocalizations.actionCancel),
+                                onPressed: () => context.pop(false),
+                              ),
+                              PlatformTextButton(
+                                child: Text(selectedLocalizations.actionOk),
+                                onPressed: () => context.pop(true),
+                              ),
+                            ],
+                          );
                       if (confirmed) {
                         selectedLanguageState.value = value;
 
-                        await ref.read(settingsProvider.notifier).update(
+                        await ref
+                            .read(settingsProvider.notifier)
+                            .update(
                               settings.copyWith(
                                 languageTag: locale.toLanguageTag(),
                               ),
@@ -112,10 +114,12 @@ class SettingsLanguageScreen extends HookConsumerWidget {
                       .map((language) => Text(language.displayName ?? ''))
                       .toList(),
                   items: languages
-                      .map((language) => DropdownMenuItem(
-                            value: language,
-                            child: Text(language.displayName ?? ''),
-                          ))
+                      .map(
+                        (language) => DropdownMenuItem(
+                          value: language,
+                          child: Text(language.displayName ?? ''),
+                        ),
+                      )
                       .toList(),
                 ),
                 if (selectedLocalizationsState.value != null)
