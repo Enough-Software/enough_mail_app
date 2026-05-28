@@ -1,3 +1,12 @@
 {
-   "signedContributors": []
+  "signedContributors": [
+    {
+      "name": "ethanbourne789",
+      "id": 237191738,
+      "comment_id": 4560677309,
+      "created_at": "2026-05-28T03:46:19Z",
+      "repoId": 308576002,
+      "pullRequestNo": 101
+    }
+  ]
 }
